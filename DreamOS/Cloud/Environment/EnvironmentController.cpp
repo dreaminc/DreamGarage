@@ -1,6 +1,8 @@
 #include "EnvironmentController.h"
 #include "Cloud/CloudController.h"
 
+#include "CameraController.h"
+
 #include "DreamLogger/DreamLogger.h"
 
 #include "Cloud/User/User.h"
@@ -45,6 +47,15 @@ RESULT EnvironmentController::Initialize() {
 	CN(m_pPeerConnectionController);
 	CR(m_pPeerConnectionController->Initialize());
 	CR(m_pPeerConnectionController->RegisterPeerConnectionControllerObserver(this));
+
+	m_pCameraController = std::unique_ptr<CameraController>(new CameraController(this));
+	CN(m_pCameraController);
+	CR(m_pCameraController->Initialize());
+
+	CR(m_pCameraController->RegisterMethod("open", std::bind(&EnvironmentController::OnOpenCamera, this, std::placeholders::_1)));
+	CR(m_pCameraController->RegisterMethod("close", std::bind(&EnvironmentController::OnCloseCamera, this, std::placeholders::_1)));
+	CR(m_pCameraController->RegisterMethod("send_placement", std::bind(&EnvironmentController::OnSendCameraPlacement, this, std::placeholders::_1)));
+	CR(m_pCameraController->RegisterMethod("receive_placement", std::bind(&EnvironmentController::OnReceiveCameraPlacement, this, std::placeholders::_1)));
 
 	// Menu Controller
 	m_pMenuController = std::make_unique<MenuController>(this);
@@ -461,7 +472,6 @@ RESULT EnvironmentController::RequestOpenAsset(std::string strStorageProviderSco
 
 	//jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
 	jsonPayload["environment_asset"]["scope"] = strStorageProviderScope;
-
 	jsonPayload["environment_asset"]["title"] = strTitle;
 
 	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
@@ -482,19 +492,61 @@ RESULT EnvironmentController::RequestOpenCamera() {
 	guid guidMessage;
 	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
-	jsonPayload["environment_asset"] = nlohmann::json::object();
-	//jsonPayload["environment_asset"]["path"] = strPath;
+	jsonPayload["environment_camera"] = nlohmann::json::object();
+	//jsonPayload["environment_camera"]["path"] = "";
 
 	//jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
-	//jsonPayload["environment_asset"]["scope"] = strStorageProviderScope;
-
-	//jsonPayload["environment_asset"]["title"] = strTitle;
+	//jsonPayload["environment_camera"]["scope"] = "MenuProviderScope.CameraMenuProvider";
+	//jsonPayload["environment_camera"]["title"] = "Camera";
+	jsonPayload["environment_camera"]["user"] = GetCloudController()->GetUserID();
 
 	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
-	CR(pCloudRequest->SetControllerMethod("environment_asset.camera"));
+	CR(pCloudRequest->SetControllerMethod("environment_camera.open"));
 
-	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_ASSET_OPEN_CAMERA));
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_CAMERA_OPEN));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::RequestCloseCamera(long assetID) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+	std::string strData;
+	guid guidMessage;
+	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
+
+	jsonPayload["environment_camera"] = nlohmann::json::object();
+	jsonPayload["environment_camera"]["id"] = assetID;
+
+	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("environment_camera.close"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_CAMERA_CLOSE));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::RequestShareCamera(long assetID) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+	std::string strData;
+	guid guidMessage;
+	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
+
+	jsonPayload["environment_camera"] = nlohmann::json::object();
+	jsonPayload["environment_camera"]["id"] = assetID;
+
+	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("environment_camera.share_placement"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_CAMERA_SHARE_PLACEMENT));
 
 Error:
 	return r;
@@ -747,6 +799,59 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::OnOpenCamera(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentCamera = jsonPayload["/environment_camera"_json_pointer];
+
+	if (jsonEnvironmentCamera.size() != 0) {
+		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentCamera);
+		CN(pEnvironmentAsset);
+
+		pEnvironmentAsset->SetContentType("ContentControlType.Camera");
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+
+			// TODO: may need to be specific to camera
+			
+			CR(m_pEnvironmentControllerObserver->OnEnvironmentAsset(pEnvironmentAsset));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnCloseCamera(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_camera"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnCloseAsset());
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnSendCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {
+	// TODO: if the user sends a share camera placement request, they will receive a send camera 
+	// placement request directing the client to start sending update camera placement messages
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT EnvironmentController::OnReceiveCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {
+	// TODO: if the user sends a share camera placement request, the peers will receive a receive
+	// camera placement request 
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT EnvironmentController::OnCloseAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
@@ -957,6 +1062,10 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 		RESULT r = HandleOnMethodCallback(pCloudMessage);
 		// TODO: Handle error 
 	}
+	else if (pCloudMessage->GetController() == "environment_camera") {
+		m_pCameraController->HandleOnMethodCallback(pCloudMessage);
+	}
+
 	//TODO: split form into separate controller(?)
 	else if (pCloudMessage->GetController() == "user") {
 		auto pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));

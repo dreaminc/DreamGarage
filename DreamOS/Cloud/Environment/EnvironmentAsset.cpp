@@ -113,6 +113,11 @@ const std::string& EnvironmentAsset::GetContentType() {
 	return m_strContentType;
 }
 
+RESULT EnvironmentAsset::SetContentType(std::string strContentType) {
+	m_strContentType = strContentType;
+	return R_PASS;
+}
+
 std::multimap<std::string, std::string> EnvironmentAsset::GetHeaders() {
 	return m_headers;
 }

@@ -672,13 +672,13 @@ RESULT UserController::RequestGetSettings(std::string& strAccessToken) {
 	auto headers = HTTPController::ContentAcceptJson();
 	headers.emplace_back(HTTPController::AuthorizationHeader(strAccessToken));
 
-	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnGetApiSettings, this, std::placeholders::_1)));
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnGetSettings, this, std::placeholders::_1)));
 
 Error:
 	return r;
 }
 
-RESULT UserController::OnGetApiSettings(std::string&& strResponse) {
+RESULT UserController::OnGetSettings(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -750,13 +750,13 @@ RESULT UserController::RequestSetSettings(std::string& strAccessToken, point ptP
 	jsonSettings["user_settings"]["camera_orientation_z"] = qOrientation.z();
 
 	std::string strMessage = jsonSettings.dump(-1);
-	CB(pHTTPController->APOST(strURI, headers, strMessage, std::bind(&UserController::OnSetApiSettings, this, std::placeholders::_1)));
+	CB(pHTTPController->APOST(strURI, headers, strMessage, std::bind(&UserController::OnSetSettings, this, std::placeholders::_1)));
 
 Error:
 	return r;
 }
 
-RESULT UserController::OnSetApiSettings(std::string&& strResponse) {
+RESULT UserController::OnSetSettings(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -1044,7 +1044,7 @@ UserControllerProxy* UserController::GetUserControllerProxy() {
 }
 
 std::string UserController::GetUserToken() {
-	return m_strToken;
+	return m_user.GetToken();
 }
 
 std::string UserController::GetPeerScreenName(long peerUserID) {

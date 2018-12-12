@@ -110,6 +110,11 @@ public:
 
 	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override;
 
+	// Virtual Camera
+	virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override;
+
+	// Desktop Sharing
+	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) override;
 	virtual RESULT OnShareAsset() override;
 	virtual RESULT OnCloseAsset() override;
 

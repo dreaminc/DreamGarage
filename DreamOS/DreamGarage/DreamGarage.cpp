@@ -1738,6 +1738,29 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::OnGetSettings(point ptPosition, quaternion qOrientation) {
+	RESULT r = R_PASS;
+
+	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CN(pEnvironmentControllerProxy);
+
+	// needs asset id
+	//CR(pEnvironmentControllerProxy->RequestShareCamera());
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
+	RESULT r = R_PASS;
+	CN(m_pDreamUserControlArea);
+
+	m_pDreamUserControlArea->OnDesktopFrame(messageSize, pMessageData, pxHeight, pxWidth);
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::Exit(RESULT r) {
 
 	auto fnOnFadeOutCallback = [&](void *pContext) {

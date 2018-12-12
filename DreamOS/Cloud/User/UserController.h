@@ -143,10 +143,10 @@ public:
 	RESULT OnAccessToken(std::string&& strResponse);
 
 	virtual RESULT RequestGetSettings(std::string& strAccessToken) override;
-	RESULT OnGetApiSettings(std::string&& strResponse);
+	RESULT OnGetSettings(std::string&& strResponse);
 
 	virtual RESULT RequestSetSettings(std::string& strAccessToken, point ptPosition, quaternion qOrientation) override;
-	RESULT OnSetApiSettings(std::string&& strResponse);
+	RESULT OnSetSettings(std::string&& strResponse);
 
 	virtual RESULT RequestTeam(std::string& strAccessToken, std::string strTeamID = "") override;
 	RESULT OnGetTeam(std::string&& strResponse);

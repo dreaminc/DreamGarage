@@ -25,17 +25,21 @@
 class Websocket;
 class CloudMessage;
 class EnvironmentAsset;
+class CameraController;
 
 class EnvironmentControllerProxy : public ControllerProxy {
 public:
 	//virtual CLOUD_CONTROLLER_TYPE GetControllerType() = 0;
 	virtual RESULT RequestOpenAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") = 0;
-	virtual RESULT RequestOpenCamera() = 0;
 	virtual RESULT RequestCloseAsset(long assetID) = 0;
 	virtual RESULT RequestShareAsset(long assetID) = 0;
 	virtual RESULT RequestStopSharing(long assetID) = 0;
 
 	virtual RESULT RequestForm(std::string strKey) = 0;
+
+	virtual RESULT RequestOpenCamera() = 0;
+	virtual RESULT RequestCloseCamera(long assetID) = 0;
+	virtual RESULT RequestShareCamera(long assetID) = 0;
 };
 
 // TODO: This is actually a UserController - so change the name of object and file
@@ -71,8 +75,12 @@ public:
 		ENVIRONMENT_ASSET_SHARE,
 		ENVIRONMENT_STOP_SHARING,
 		ENVIRONMENT_ASSET_OPEN,
-		ENVIRONMENT_ASSET_OPEN_CAMERA,
 		ENVIRONMENT_ASSET_CLOSE,
+
+		// Camera
+		ENVIRONMENT_CAMERA_OPEN,
+		ENVIRONMENT_CAMERA_CLOSE,
+		ENVIRONMENT_CAMERA_SHARE_PLACEMENT,
 
 		// User
 		USER_GET_SETTINGS,
@@ -146,20 +154,28 @@ public:
 	// TODO: Note - Register Controller Observer pattern needs to be fixed here
 	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
 	virtual RESULT RequestOpenAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") override;
-	virtual RESULT RequestOpenCamera() override;
 	virtual RESULT RequestCloseAsset(long assetID) override;
 	virtual RESULT RequestShareAsset(long assetID) override;
 	virtual RESULT RequestStopSharing(long assetID) override;
 
 	virtual RESULT RequestForm(std::string strKey) override;
 
-	virtual RESULT OnOpenAsset(std::shared_ptr<CloudMessage> pCloudMessage);
+	virtual RESULT RequestOpenCamera() override;
+	virtual RESULT RequestCloseCamera(long assetID) override;
+	virtual RESULT RequestShareCamera(long assetID) override;
+
+	RESULT OnOpenAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnCloseAsset(std::shared_ptr<CloudMessage> pCloudMessage);
-	virtual RESULT OnSharedAsset(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnSharedAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnSendAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnReceiveAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnStopSending(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnStopReceiving(std::shared_ptr<CloudMessage> pCloudMessage);
+
+	RESULT OnOpenCamera(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnCloseCamera(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnSendCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnReceiveCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage);
 
 	RESULT OnGetForm(std::shared_ptr<CloudMessage> pCloudMessage);
 
@@ -258,6 +274,8 @@ private:
 
 	std::unique_ptr<PeerConnectionController> m_pPeerConnectionController;
 	std::unique_ptr<MenuController> m_pMenuController;
+
+	std::unique_ptr<CameraController> m_pCameraController;
 
 	EnvironmentControllerObserver *m_pEnvironmentControllerObserver;
 };
