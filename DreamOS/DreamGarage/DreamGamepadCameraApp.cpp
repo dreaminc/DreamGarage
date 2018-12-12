@@ -92,6 +92,8 @@ RESULT DreamGamepadCameraApp::UnregisterFromEvents() {
 		}
 	}
 
+	m_controlType = CameraControlType::INVALID;
+
 Error:
 	return r;
 }
