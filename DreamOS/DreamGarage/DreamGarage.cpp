@@ -21,6 +21,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 #include "DreamGarage/DreamSettingsApp.h"
 #include "DreamGarage/DreamLoginApp.h"
+#include "DreamVCam.h"
 #include "DreamUserApp.h"
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 #include "DreamGarage/DreamGamepadCameraApp.h"
@@ -647,7 +648,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			int testUserNumber = stoi(strTestUserNumber);
 
 			std::string strDebugRefreshToken = testRefreshTokens[testUserNumber];
-			return m_pUserController->GetAccessToken(strDebugRefreshToken);
+			return m_pUserController->RequestAccessToken(strDebugRefreshToken);
 		}
 	}
 #endif
@@ -717,7 +718,7 @@ RESULT DreamGarage::AuthenticateFromStoredCredentials() {
 	// if there has already been a successful login, try to authenticate
 	if (!m_fFirstLogin && m_fHasCredentials) {
 		DOSLOG(INFO, "Not first login and has creds");
-		m_pUserController->GetAccessToken(m_strRefreshToken);
+		m_pUserController->RequestAccessToken(m_strRefreshToken);
 	}
 	else {
 		// Otherwise, start by showing the login form
@@ -736,7 +737,7 @@ RESULT DreamGarage::AuthenticateFromStoredCredentials() {
 
 		CR(m_pDreamUserApp->ShowMessageQuad());
 
-		CR(m_pUserController->GetFormURL(strFormType));
+		CR(m_pUserController->RequestFormURL(strFormType));
 
 		if (m_pDreamEnvironmentApp != nullptr) {
 			// fade into lobby (with no environment showing)
@@ -1434,6 +1435,54 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+
+	auto pUserControllerProxy = (UserControllerProxy*)(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+	CN(pUserControllerProxy);
+	pUserControllerProxy->RequestGetSettings(m_strAccessToken);
+
+	CN(m_pDreamUserControlArea);
+
+	CR(m_pDreamUserControlArea->AddEnvironmentAsset(pEnvironmentAsset));
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnCloseCamera() { 
+	// TODO: fix shutdown problems with vcam
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamGarage::OnSendCameraPlacement() {
+	RESULT r = R_PASS;
+
+	// not great
+	//CR(m_pDreamUserControlArea->AddEnvironmentAsset(nullptr));
+
+	// TODO: start sending data messages
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnStopSendingCameraPlacement() {
+	// TODO:: update data sending flag
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamGarage::OnReceiveCameraPlacement(long userID) {
+	// TODO:: update data receiving flag
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamGarage::OnStopReceivingCameraPlacement() {
+	// TODO:: update data receiving flag
+	return R_NOT_IMPLEMENTED;
+}
+
+
 RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	RESULT r = R_PASS;
 
@@ -1460,7 +1509,7 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 			// could also be once the environment id is set
 
 			// TODO: populate user
-			CR(m_pUserController->GetTeam(m_strAccessToken));
+			CR(m_pUserController->RequestTeam(m_strAccessToken));
 			CR(m_pUserController->RequestUserProfile(m_strAccessToken));
 			CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
 		}
@@ -1484,9 +1533,6 @@ RESULT DreamGarage::OnLogin() {
 	//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
 	//CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
 
-	// TODO: uncomment when everything else works
-	//CR(pUserController->RequestGetSettings(GetHardwareID(), GetHMDTypeString()));
-
 //Error:
 	return r;
 }
@@ -1503,7 +1549,7 @@ RESULT DreamGarage::OnLogout() {
 
 	m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN);
 
-	CR(pUserController->GetFormURL(strFormType));
+	CR(pUserController->RequestFormURL(strFormType));
 
 	CR(m_pDreamShareView->Hide());
 	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));
@@ -1618,7 +1664,7 @@ RESULT DreamGarage::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
 		CR(m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::INVALID_REFRESH_TOKEN));
 		CR(m_pDreamUserApp->ShowMessageQuad());
 
-		CR(m_pUserController->GetFormURL(strFormType));
+		CR(m_pUserController->RequestFormURL(strFormType));
 
 		if (m_pDreamEnvironmentApp != nullptr) {
 			CR(m_pDreamEnvironmentApp->FadeIn());
@@ -1632,7 +1678,7 @@ RESULT DreamGarage::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
 		//CR(m_pUserController->GetSettings(m_strAccessToken));
 		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
 		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
-		CR(m_pUserController->GetTeam(m_strAccessToken));
+		CR(m_pUserController->RequestTeam(m_strAccessToken));
 	}
 
 Error:
@@ -1661,7 +1707,7 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 	if (!fSuccess) {
 		// need to create a team, since the user has no teams
 		std::string strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
-		CR(m_pUserController->GetFormURL(strFormType));
+		CR(m_pUserController->RequestFormURL(strFormType));
 	}
 	else {
 		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
@@ -1736,6 +1782,31 @@ RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::s
 		CR(m_pDreamGeneralForm->SetFormType(DreamFormApp::TypeFromString(strKey)));
 
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnGetSettings(point ptPosition, quaternion qOrientation) {
+	RESULT r = R_PASS;
+
+	long assetID = -1;
+	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CN(pEnvironmentControllerProxy);
+
+	CN(m_pDreamUserControlArea);
+	CN(m_pDreamUserControlArea->GetActiveSource());
+	CR(pEnvironmentControllerProxy->RequestShareCamera(m_pDreamUserControlArea->GetActiveSource()->GetCurrentAssetID()));
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
+	RESULT r = R_PASS;
+	CN(m_pDreamUserControlArea);
+
+	m_pDreamUserControlArea->OnDesktopFrame(messageSize, pMessageData, pxHeight, pxWidth);
 
 Error:
 	return r;

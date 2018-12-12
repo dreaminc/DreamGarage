@@ -89,6 +89,13 @@ public:
 		virtual RESULT OnCloseAsset() = 0;
 		virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 		virtual RESULT OnShareAsset() = 0;
+
+		virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
+		virtual RESULT OnCloseCamera() = 0;
+		virtual RESULT OnSendCameraPlacement() = 0;
+		virtual RESULT OnStopSendingCameraPlacement() = 0;
+		virtual RESULT OnReceiveCameraPlacement(long userID) = 0;
+		virtual RESULT OnStopReceivingCameraPlacement() = 0;
 	};
 
 	class UserObserver {
@@ -96,7 +103,7 @@ public:
 		virtual RESULT OnDreamVersion(version dreamVersion) = 0;
 		virtual RESULT OnAPIConnectionCheck(bool fIsConnected) = 0;
 
-		virtual RESULT OnGetSettings(float height, float depth, float scale) = 0;
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) = 0;
 		virtual RESULT OnSetSettings() = 0;
 
 		virtual RESULT OnLogin() = 0;
@@ -200,6 +207,13 @@ public:
 	virtual RESULT OnShareAsset() override;
 	virtual RESULT OnCloseAsset() override;
 
+	virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnCloseCamera() override;
+	virtual RESULT OnSendCameraPlacement() override;
+	virtual RESULT OnStopSendingCameraPlacement() override;
+	virtual RESULT OnReceiveCameraPlacement(long userID) override;
+	virtual RESULT OnStopReceivingCameraPlacement() override;
+
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
 
@@ -208,7 +222,7 @@ public:
 	// UserControllerObserver
 	virtual RESULT OnDreamVersion(version dreamVersion) override;
 	virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override;
-	virtual RESULT OnGetSettings(float height, float depth, float scale) override;
+	virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override;
 	virtual RESULT OnSetSettings() override;
 
 	virtual RESULT OnLogin() override;

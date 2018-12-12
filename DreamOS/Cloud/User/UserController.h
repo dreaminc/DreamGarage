@@ -19,6 +19,8 @@
 #include "json.hpp"
 
 class UserControllerObserver;
+class point;
+class quaternion;
 
 struct LoginState {
 	unsigned fFirstLaunch : 1;
@@ -35,8 +37,20 @@ public:
 	virtual std::string GetUserToken() = 0;
 	virtual std::string GetPeerScreenName(long peerUserID) = 0;
 
-	virtual RESULT RequestGetSettings(std::wstring wstrHardwareID, std::string strHMDType) = 0;
-	virtual RESULT RequestSetSettings(std::wstring wstrHardwareID, std::string strHMDType, float yOffset, float zOffset, float scale) = 0;
+	virtual RESULT RequestFormURL(std::string& strFormKey) = 0;
+
+	// settings for camera controls
+	virtual RESULT RequestGetSettings(std::string& strAccessToken) = 0;
+	virtual RESULT RequestSetSettings(std::string& strAccessToken, point ptPosition, quaternion qOrientation) = 0;
+
+	// login flow api requests
+	virtual RESULT RequestAccessToken(std::string& strRefreshToken) = 0;
+	virtual RESULT RequestTeam(std::string& strAccessToken, std::string strTeamID = "") = 0;
+	virtual RESULT RequestUserProfile(std::string& strAccessToken) = 0;
+	virtual RESULT RequestTwilioNTSInformation(std::string& strAccessToken) = 0;
+	virtual RESULT RequestDreamVersion() = 0;
+
+	virtual RESULT CheckAPIConnection() = 0;
 };
 
 // TODO: This is actually a UserController - so change the name of object and file
@@ -98,13 +112,6 @@ private:
 public:
 	RESULT HandleEnvironmentSocketMessage(std::shared_ptr<CloudMessage> pCloudMessage);
 
-	RESULT OnGetSettings(std::shared_ptr<CloudMessage> pCloudMessage);
-	RESULT OnSetSettings(std::shared_ptr<CloudMessage> pCloudMessage);
-
-	virtual RESULT RequestGetSettings(std::wstring wstrHardwareID, std::string strHMDType) override;
-	virtual RESULT RequestSetSettings(std::wstring wstrHardwareID, std::string strHMDType, float yOffset, float zOffset, float scale) override;
-
-
 // TODO: Move to private when CommandLineManager is brought in from WebRTC branch
 //private:
 public:
@@ -128,32 +135,32 @@ public:
 
 // new login flow api calls
 public:
-//	RESULT GetForm(std::string& strFormKey, std::string& strURL);
-	RESULT GetFormURL(std::string& strFormKey);
+
+	virtual RESULT RequestFormURL(std::string& strFormKey) override;
 	RESULT OnFormURL(std::string&& strResponse);
 
-	RESULT GetAccessToken(std::string& strRefreshToken);
+	virtual RESULT RequestAccessToken(std::string& strRefreshToken) override;
 	RESULT OnAccessToken(std::string&& strResponse);
 
-	RESULT GetSettings(std::string& strAccessToken);
-	RESULT OnGetApiSettings(std::string&& strResponse);
+	virtual RESULT RequestGetSettings(std::string& strAccessToken) override;
+	RESULT OnGetSettings(std::string&& strResponse);
 
-	RESULT SetSettings(std::string& strAccessToken, float height, float depth, float scale);
-	RESULT OnSetApiSettings(std::string&& strResponse);
+	virtual RESULT RequestSetSettings(std::string& strAccessToken, point ptPosition, quaternion qOrientation) override;
+	RESULT OnSetSettings(std::string&& strResponse);
 
-	RESULT GetTeam(std::string& strAccessToken, std::string strTeamID = "");
+	virtual RESULT RequestTeam(std::string& strAccessToken, std::string strTeamID = "") override;
 	RESULT OnGetTeam(std::string&& strResponse);
 
-	RESULT RequestUserProfile(std::string& strAccessToken);
+	virtual RESULT RequestUserProfile(std::string& strAccessToken) override;
 	RESULT OnUserProfile(std::string&& strResponse);
 
-	RESULT RequestTwilioNTSInformation(std::string& strAccessToken);
+	virtual RESULT RequestTwilioNTSInformation(std::string& strAccessToken) override;
 	RESULT OnTwilioNTSInformation(std::string&& strResponse);
 
-	RESULT RequestDreamVersion();
+	virtual RESULT RequestDreamVersion() override;
 	RESULT OnDreamVersion(std::string&& strResponse);
 
-	RESULT CheckAPIConnection();
+	virtual RESULT CheckAPIConnection() override;
 	RESULT OnAPIConnectionCheck(std::string&& strResponse);
 	RESULT OnAPIConnectionCheckTimeout();
 
@@ -173,14 +180,14 @@ public:
 	class UserControllerObserver {
 	public:
 		// socket methods
-		virtual RESULT OnGetSettings(float height, float depth, float scale) = 0;
-		virtual RESULT OnSetSettings() = 0;
 		virtual RESULT OnLogin() = 0;
 		virtual RESULT OnLogout() = 0;
 		virtual RESULT OnPendLogout() = 0;
 		virtual RESULT OnSwitchTeams() = 0;
 
 		// api methods
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) = 0;
+		virtual RESULT OnSetSettings() = 0;
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) = 0;
 		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) = 0;

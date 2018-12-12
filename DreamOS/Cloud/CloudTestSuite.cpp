@@ -133,7 +133,7 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 		int environmentIDs_n = 2;
 		int curEnvID = 0;
 
-		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
 			return R_NOT_IMPLEMENTED;
 		}
 
@@ -184,7 +184,7 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 
 			CRM(pUserController->RequestTwilioNTSInformation(strAccessToken), "Failed to request twilio info");
 
-			CRM(pUserController->GetTeam(strAccessToken), "Failed to request team");
+			CRM(pUserController->RequestTeam(strAccessToken), "Failed to request team");
 
 		Error:
 			return r;
@@ -315,7 +315,7 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 			// m_tokens stores the refresh token of users test0-9,
 			// so use -t 0 to login as test0@dreamos.com
 			std::string strTestUserRefreshToken = CloudTestSuite::GetTestUserRefreshToken(testUserNumber);
-			CRM(pTestContext->pUserController->GetAccessToken(strTestUserRefreshToken), "Failed to request access token");
+			CRM(pTestContext->pUserController->RequestAccessToken(strTestUserRefreshToken), "Failed to request access token");
 			
 		}
 
@@ -416,7 +416,7 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 	{
 		UserController *pUserController = nullptr;
 
-		virtual RESULT OnGetSettings(float height, float depth, float scale) override { 
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override { 
 			return R_NOT_IMPLEMENTED; 
 		}
 		
@@ -465,7 +465,7 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 			
 			CRM(pUserController->RequestUserProfile(strAccessToken), "Failed to request user profile"); 
 			CRM(pUserController->RequestTwilioNTSInformation(strAccessToken), "Failed to request twilio info");
-			CRM(pUserController->GetTeam(strAccessToken), "Failed to request team");
+			CRM(pUserController->RequestTeam(strAccessToken), "Failed to request team");
 			
 		Error:
 			return r;
@@ -532,7 +532,7 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 			// m_tokens stores the refresh token of users test0-9,
 			// so use -t 0 to login as test0@dreamos.com
 			std::string strTestUserRefreshToken = CloudTestSuite::GetTestUserRefreshToken(testUserNumber);
-			CRM(pTestContext->pUserController->GetAccessToken(strTestUserRefreshToken), "Failed to request access token");
+			CRM(pTestContext->pUserController->RequestAccessToken(strTestUserRefreshToken), "Failed to request access token");
 
 			m_pUserController = pTestContext->pUserController;
 

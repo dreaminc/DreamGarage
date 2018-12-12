@@ -31,6 +31,7 @@ public:
 	//const MenuNode::MimeType & GetMIMEType();
 	const std::string& GetTitle();
 	const std::string& GetContentType();
+	RESULT SetContentType(std::string strContentType);
 
 	std::string GetURI();
 	const std::string& GetURL();

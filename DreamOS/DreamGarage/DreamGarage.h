@@ -110,8 +110,21 @@ public:
 
 	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override;
 
+	// Virtual Camera
+	virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override;
+
+	// Desktop Sharing
+	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) override;
 	virtual RESULT OnShareAsset() override;
 	virtual RESULT OnCloseAsset() override;
+
+	// Virtual Camera
+	virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnCloseCamera() override;
+	virtual RESULT OnSendCameraPlacement() override;
+	virtual RESULT OnStopSendingCameraPlacement() override;
+	virtual RESULT OnReceiveCameraPlacement(long userID) override;
+	virtual RESULT OnStopReceivingCameraPlacement() override;
 
 	// User Observer
 	virtual RESULT OnDreamVersion(version dreamVersion) override;
@@ -212,6 +225,7 @@ private:
 	DreamBrowser* m_pDreamBrowser = nullptr;
 	UIControlView* m_pDreamControlView = nullptr;
 	DreamGamepadCameraApp* m_pDreamGamepadCameraApp = nullptr;
+
 };
 
 #endif	// DREAM_GARAGE_H_

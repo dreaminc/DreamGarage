@@ -63,6 +63,7 @@ public:
 	// all ui objects visible at once
 	RESULT AddTestAllUIObjects();
 
+	RESULT AddTestCameraSettings();
 	RESULT AddTestChangeUIWidth();
 	RESULT AddTestDreamSettingsApp();
 

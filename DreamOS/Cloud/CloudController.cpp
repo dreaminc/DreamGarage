@@ -425,6 +425,72 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnOpenCamera(pEnvironmentAsset));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnCloseCamera() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnCloseCamera());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnSendCameraPlacement() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnSendCameraPlacement());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnStopSendingCameraPlacement() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnStopSendingCameraPlacement());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnReceiveCameraPlacement(long userID) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnReceiveCameraPlacement(userID));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnStopReceivingCameraPlacement() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnStopReceivingCameraPlacement());
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnDataChannel(PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
 
@@ -480,11 +546,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnGetSettings(float height, float depth, float scale) {
+RESULT CloudController::OnGetSettings(point ptPosition, quaternion qOrientation) {
 	RESULT r = R_PASS;
 
 	if (m_pUserObserver != nullptr) {
-		CR(m_pUserObserver->OnGetSettings(height, depth, scale));
+		CR(m_pUserObserver->OnGetSettings(ptPosition, qOrientation));
 	}
 
 Error:

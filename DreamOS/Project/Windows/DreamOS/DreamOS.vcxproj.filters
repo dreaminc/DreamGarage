@@ -1028,6 +1028,9 @@
     <ClCompile Include="..\..\..\DreamShareViewPointerMessage.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Environment\CameraController.cpp">
+      <Filter>Cloud\Environment</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2234,6 +2237,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamShareViewPointerMessage.h">
       <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Environment\CameraController.h">
+      <Filter>Cloud\Environment</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

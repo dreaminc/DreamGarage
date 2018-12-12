@@ -683,11 +683,12 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 			m_pDreamVCam = GetDOS()->LaunchDreamModule<DreamVCam>(this);
 			m_pActiveSource = m_pDreamVCam;
 			m_pDreamVCam->InitializeWithParent(this);
+			m_pDreamVCam->InitializePipeline();
 			m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
 			// new desktop can't be the current content
-			m_pUserControls->SetSharingFlag(false);;
+			m_pUserControls->SetSharingFlag(false);
 			
-			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, "", strTitle), "Failed to share environment asset");
+			CRM(pEnvironmentControllerProxy->RequestOpenCamera(), "Failed to share environment asset");
 		}
 	}
 
@@ -792,7 +793,8 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 		//pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	}
 	else if(pEnvironmentAsset->GetStorageProviderScope() == m_strCameraScope) {
-		m_pDreamVCam->SetEnvironmentAsset(pEnvironmentAsset);
+	//	m_pDreamVCam->SetEnvironmentAsset(pEnvironmentAsset);
+		m_pUserControls->SetTitleText(pEnvironmentAsset->GetTitle());
 	}
 	else if(pEnvironmentAsset->GetStorageProviderScope() == m_strDesktopScope) {
 		// TODO: desktop setup
