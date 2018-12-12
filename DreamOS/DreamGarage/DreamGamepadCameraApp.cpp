@@ -58,42 +58,39 @@ RESULT DreamGamepadCameraApp::SetCamera(camera *pCamera, CameraControlType contr
 	CN(pCamera);
 	m_pCamera = pCamera;
 	
-	CBR(m_controlType != controlType, R_SKIPPED);	// if already that control type then skip
+	CBR(m_controlType != controlType, R_SKIPPED);	// if already that control type then skip 
+	CR(UnregisterFromEvents());
 
 	if (controlType == CameraControlType::GAMEPAD) {
-		if (m_controlType == CameraControlType::SENSECONTROLLER) {
-			for (int i = 0; i < SENSE_CONTROLLER_INVALID; i++) {
-				CR(GetDOS()->UnregisterSubscriber((SenseControllerEventType)(i), this));
-			}
-		}
 		for (int i = 0; i < SENSE_GAMEPAD_INVALID; i++) {
 			CR(GetDOS()->RegisterSubscriber((SenseGamepadEventType)(i), this));
 		}
 	}
 	else if (controlType == CameraControlType::SENSECONTROLLER) {
-		if (m_controlType == CameraControlType::GAMEPAD) {
-			for (int i = 0; i < SENSE_GAMEPAD_INVALID; i++) {
-				CR(GetDOS()->UnregisterSubscriber((SenseGamepadEventType)(i), this));
-			}
-		}
 		for (int i = 0; i < SENSE_CONTROLLER_INVALID; i++) {
 			CR(GetDOS()->RegisterSubscriber((SenseControllerEventType)(i), this));
 		}
 	}
-	else if (controlType == CameraControlType::INVALID) {
-		if (m_controlType == CameraControlType::GAMEPAD) {
-			for (int i = 0; i < SENSE_GAMEPAD_INVALID; i++) {
-				CR(GetDOS()->UnregisterSubscriber((SenseGamepadEventType)(i), this));
-			}
-		}
-		if (m_controlType == CameraControlType::SENSECONTROLLER) {
-			for (int i = 0; i < SENSE_CONTROLLER_INVALID; i++) {
-				CR(GetDOS()->UnregisterSubscriber((SenseControllerEventType)(i), this));
-			}
-		}
-	}
 
 	m_controlType = controlType;
+
+Error:
+	return r;
+}
+
+RESULT DreamGamepadCameraApp::UnregisterFromEvents() {
+	RESULT r = R_PASS;
+
+	if (m_controlType == CameraControlType::GAMEPAD) {
+		for (int i = 0; i < SENSE_GAMEPAD_INVALID; i++) {
+			CR(GetDOS()->UnregisterSubscriber((SenseGamepadEventType)(i), this));
+		}
+	}
+	else if (m_controlType == CameraControlType::SENSECONTROLLER) {
+		for (int i = 0; i < SENSE_CONTROLLER_INVALID; i++) {
+			CR(GetDOS()->UnregisterSubscriber((SenseControllerEventType)(i), this));
+		}
+	}
 
 Error:
 	return r;

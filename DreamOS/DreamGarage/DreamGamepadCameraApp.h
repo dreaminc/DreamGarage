@@ -41,6 +41,8 @@ public:
 
 	RESULT SetCamera(camera *pCamera, CameraControlType controlType);
 
+	RESULT UnregisterFromEvents();
+
 protected:
 	static DreamGamepadCameraApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 

@@ -182,7 +182,7 @@ RESULT DreamVCam::Update(void *pContext) {
 			CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
 		}
 		else {
-			CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::INVALID));
+			CR(m_pDreamGamepadCamera->UnregisterFromEvents());
 		}
 		
 		m_pCameraModel->SetPosition(m_pCamera->GetPosition(true));
