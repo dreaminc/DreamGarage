@@ -118,6 +118,14 @@ public:
 	virtual RESULT OnShareAsset() override;
 	virtual RESULT OnCloseAsset() override;
 
+	// Virtual Camera
+	virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnCloseCamera() override;
+	virtual RESULT OnSendCameraPlacement() override;
+	virtual RESULT OnStopSendingCameraPlacement() override;
+	virtual RESULT OnReceiveCameraPlacement(long userID) override;
+	virtual RESULT OnStopReceivingCameraPlacement() override;
+
 	// User Observer
 	virtual RESULT OnDreamVersion(version dreamVersion) override;
 	virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override;
@@ -217,6 +225,8 @@ private:
 	DreamBrowser* m_pDreamBrowser = nullptr;
 	UIControlView* m_pDreamControlView = nullptr;
 	DreamGamepadCameraApp* m_pDreamGamepadCameraApp = nullptr;
+
+	 std::shared_ptr<EnvironmentAsset> m_pPendingVCamAsset = nullptr;
 };
 
 #endif	// DREAM_GARAGE_H_

@@ -56,6 +56,8 @@ RESULT EnvironmentController::Initialize() {
 	CR(m_pCameraController->RegisterMethod("close", std::bind(&EnvironmentController::OnCloseCamera, this, std::placeholders::_1)));
 	CR(m_pCameraController->RegisterMethod("send_placement", std::bind(&EnvironmentController::OnSendCameraPlacement, this, std::placeholders::_1)));
 	CR(m_pCameraController->RegisterMethod("receive_placement", std::bind(&EnvironmentController::OnReceiveCameraPlacement, this, std::placeholders::_1)));
+	CR(m_pCameraController->RegisterMethod("stop_sending_placement", std::bind(&EnvironmentController::OnStopSendCameraPlacement, this, std::placeholders::_1)));
+	CR(m_pCameraController->RegisterMethod("stop_receiving_placement", std::bind(&EnvironmentController::OnStopReceiveCameraPlacement, this, std::placeholders::_1)));
 
 	// Menu Controller
 	m_pMenuController = std::make_unique<MenuController>(this);
@@ -815,7 +817,7 @@ RESULT EnvironmentController::OnOpenCamera(std::shared_ptr<CloudMessage> pCloudM
 
 			// TODO: may need to be specific to camera
 			
-			CR(m_pEnvironmentControllerObserver->OnEnvironmentAsset(pEnvironmentAsset));
+			CR(m_pEnvironmentControllerObserver->OnOpenCamera(pEnvironmentAsset));
 		}
 	}
 
@@ -832,7 +834,7 @@ RESULT EnvironmentController::OnCloseCamera(std::shared_ptr<CloudMessage> pCloud
 	if (jsonEnvironmentAsset.size() != 0) {
 
 		if (m_pEnvironmentControllerObserver != nullptr) {
-			CR(m_pEnvironmentControllerObserver->OnCloseAsset());
+			CR(m_pEnvironmentControllerObserver->OnCloseCamera());
 		}
 	}
 
@@ -849,6 +851,14 @@ RESULT EnvironmentController::OnSendCameraPlacement(std::shared_ptr<CloudMessage
 RESULT EnvironmentController::OnReceiveCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {
 	// TODO: if the user sends a share camera placement request, the peers will receive a receive
 	// camera placement request 
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT EnvironmentController::OnStopSendingCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT EnvironmentController::OnStopReceivingCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {
 	return R_NOT_IMPLEMENTED;
 }
 

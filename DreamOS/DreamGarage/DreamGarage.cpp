@@ -1434,6 +1434,51 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+
+	auto pUserControllerProxy = (UserControllerProxy*)(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+	CN(pUserControllerProxy);
+	pUserControllerProxy->RequestGetSettings(m_strAccessToken);
+
+	m_pPendingVCamAsset = pEnvironmentAsset;
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnCloseCamera() { 
+	// TODO: fix shutdown problems with vcam
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamGarage::OnSendCameraPlacement() {
+	RESULT r = R_PASS;
+
+	CR(m_pDreamUserControlArea->AddEnvironmentAsset(m_pPendingVCamAsset));
+
+	// TODO: start sending data messages
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnStopSendingCameraPlacement() {
+	// TODO:: update data sending flag
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamGarage::OnReceiveCameraPlacement(long userID) {
+	// TODO:: update data receiving flag
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamGarage::OnStopReceivingCameraPlacement() {
+	// TODO:: update data receiving flag
+	return R_NOT_IMPLEMENTED;
+}
+
+
 RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	RESULT r = R_PASS;
 
@@ -1745,7 +1790,7 @@ RESULT DreamGarage::OnGetSettings(point ptPosition, quaternion qOrientation) {
 	CN(pEnvironmentControllerProxy);
 
 	// needs asset id
-	//CR(pEnvironmentControllerProxy->RequestShareCamera());
+	CR(pEnvironmentControllerProxy->RequestShareCamera(m_pendingAssetReceiveUserID));
 
 Error:
 	return r;

@@ -189,6 +189,32 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
+	// Environment observer virtual camera
+	virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnCloseCamera() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnSendCameraPlacement() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnStopSendingCameraPlacement() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnReceiveCameraPlacement(long userID) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnStopReceivingCameraPlacement() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	// Environment observer forms
 	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override {
 		return R_NOT_IMPLEMENTED;
 	}

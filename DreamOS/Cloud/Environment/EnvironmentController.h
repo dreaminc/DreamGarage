@@ -114,6 +114,7 @@ public:
 		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) = 0;
 		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) = 0;
 		
+		// Opening and sharing
 		virtual long GetUserID() = 0;
 		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
 		virtual RESULT OnStopSending() = 0;
@@ -122,6 +123,15 @@ public:
 		virtual RESULT OnShareAsset() = 0;
 		virtual RESULT OnCloseAsset() = 0;
 
+		// Virtual Camera
+		virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
+		virtual RESULT OnCloseCamera() = 0;
+		virtual RESULT OnSendCameraPlacement() = 0;
+		virtual RESULT OnStopSendingCameraPlacement() = 0;
+		virtual RESULT OnReceiveCameraPlacement(long userID) = 0;
+		virtual RESULT OnStopReceivingCameraPlacement() = 0;
+
+		// Forms
 		virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 	};
 
@@ -176,6 +186,8 @@ public:
 	RESULT OnCloseCamera(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnSendCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnReceiveCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnStopSendingCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnStopReceivingCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage);
 
 	RESULT OnGetForm(std::shared_ptr<CloudMessage> pCloudMessage);
 
