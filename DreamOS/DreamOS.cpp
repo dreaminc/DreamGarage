@@ -1403,6 +1403,14 @@ RESULT DreamOS::RegisterSubscriber(SenseGamepadEventType gamePadEvent, Subscribe
 	return m_pSandbox->RegisterSubscriber(gamePadEvent, pGamepadSubscriber);
 }
 
+RESULT DreamOS::UnregisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
+	return m_pSandbox->UnregisterSubscriber(controllerEvent, pControllerSubscriber);
+}
+
+RESULT DreamOS::UnregisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber) {
+	return m_pSandbox->UnregisterSubscriber(gamePadEvent, pGamepadSubscriber);
+}
+
 RESULT DreamOS::GetCredential(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType) {
 	return m_pSandbox->GetKeyValue(wstrKey, strOut, credType);
 }

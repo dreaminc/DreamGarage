@@ -408,6 +408,9 @@ public:
 	RESULT RegisterSubscriber(SenseControllerEventType mouseEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
 	RESULT RegisterSubscriber(SenseGamepadEventType mouseEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber);
 
+	RESULT UnregisterSubscriber(SenseControllerEventType mouseEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
+	RESULT UnregisterSubscriber(SenseGamepadEventType mouseEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber);
+
 public:
 	PathManager *GetPathManager();
 	OpenGLRenderingContext *GetOpenGLRenderingContext();

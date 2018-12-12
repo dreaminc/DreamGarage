@@ -14,15 +14,23 @@
 #include "Primitives/point.h"
 #include "Primitives/point2D.h"
 #include "Sense/SenseGamepadController.h"
+#include "Sense/SenseController.h"
 
 class camera;
-
 class AirResistanceGenerator;
 
-class DreamGamepadCameraApp : public DreamApp<DreamGamepadCameraApp>, public Subscriber<SenseGamepadEvent> {
+class DreamGamepadCameraApp : public DreamApp<DreamGamepadCameraApp>, 
+							  public Subscriber<SenseGamepadEvent>,
+							  public Subscriber<SenseControllerEvent> {
 	friend class DreamAppManager;
 
 public:
+	enum class CameraControlType {
+		GAMEPAD,
+		SENSECONTROLLER,
+		INVALID
+	};
+
 	DreamGamepadCameraApp(DreamOS *pDreamOS, void *pContext = nullptr);
 	~DreamGamepadCameraApp();
 
@@ -31,13 +39,16 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
-	RESULT SetCamera(camera *pCamera);
+	RESULT SetCamera(camera *pCamera, CameraControlType controlType);
+
+	RESULT UnregisterFromEvents();
 
 protected:
 	static DreamGamepadCameraApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	RESULT Notify(SenseGamepadEvent *pEvent);
+	virtual RESULT Notify(SenseGamepadEvent *pEvent) override;
+	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 	camera *m_pCamera = nullptr;
 
@@ -70,7 +81,8 @@ private:
 	bool m_fUpdateRightTrigger = false;
 	
 	bool m_fLockY = false;
-
+	
+	CameraControlType m_controlType = CameraControlType::INVALID;
 	std::list<ForceGenerator*> m_pForceGenerators;
 };
 
