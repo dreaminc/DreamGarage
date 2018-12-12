@@ -56,8 +56,8 @@ RESULT EnvironmentController::Initialize() {
 	CR(m_pCameraController->RegisterMethod("close", std::bind(&EnvironmentController::OnCloseCamera, this, std::placeholders::_1)));
 	CR(m_pCameraController->RegisterMethod("send_placement", std::bind(&EnvironmentController::OnSendCameraPlacement, this, std::placeholders::_1)));
 	CR(m_pCameraController->RegisterMethod("receive_placement", std::bind(&EnvironmentController::OnReceiveCameraPlacement, this, std::placeholders::_1)));
-	CR(m_pCameraController->RegisterMethod("stop_sending_placement", std::bind(&EnvironmentController::OnStopSendCameraPlacement, this, std::placeholders::_1)));
-	CR(m_pCameraController->RegisterMethod("stop_receiving_placement", std::bind(&EnvironmentController::OnStopReceiveCameraPlacement, this, std::placeholders::_1)));
+	CR(m_pCameraController->RegisterMethod("stop_sending_placement", std::bind(&EnvironmentController::OnStopSendingCameraPlacement, this, std::placeholders::_1)));
+	CR(m_pCameraController->RegisterMethod("stop_receiving_placement", std::bind(&EnvironmentController::OnStopReceivingCameraPlacement, this, std::placeholders::_1)));
 
 	// Menu Controller
 	m_pMenuController = std::make_unique<MenuController>(this);
@@ -499,7 +499,7 @@ RESULT EnvironmentController::RequestOpenCamera() {
 
 	//jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
 	//jsonPayload["environment_camera"]["scope"] = "MenuProviderScope.CameraMenuProvider";
-	//jsonPayload["environment_camera"]["title"] = "Camera";
+	jsonPayload["environment_camera"]["title"] = "Dream Virtual Camera";
 	jsonPayload["environment_camera"]["user"] = GetCloudController()->GetUserID();
 
 	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
@@ -843,9 +843,20 @@ Error:
 }
 
 RESULT EnvironmentController::OnSendCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {
-	// TODO: if the user sends a share camera placement request, they will receive a send camera 
-	// placement request directing the client to start sending update camera placement messages
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_camera"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnSendCameraPlacement());
+		}
+	}
+
+Error:
+	return r;
 }
 
 RESULT EnvironmentController::OnReceiveCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {

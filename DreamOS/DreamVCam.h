@@ -43,6 +43,8 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+	RESULT InitializePipeline();
+
 	RESULT ModuleProcess(void *pContext) override;
 
 	RESULT SetSourceTexture(texture* pTexture);

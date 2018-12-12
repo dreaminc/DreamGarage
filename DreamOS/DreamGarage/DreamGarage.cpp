@@ -21,6 +21,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 #include "DreamGarage/DreamSettingsApp.h"
 #include "DreamGarage/DreamLoginApp.h"
+#include "DreamVCam.h"
 #include "DreamUserApp.h"
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 #include "DreamGarage/DreamGamepadCameraApp.h"
@@ -1441,7 +1442,9 @@ RESULT DreamGarage::OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentA
 	CN(pUserControllerProxy);
 	pUserControllerProxy->RequestGetSettings(m_strAccessToken);
 
-	m_pPendingVCamAsset = pEnvironmentAsset;
+	CN(m_pDreamUserControlArea);
+
+	CR(m_pDreamUserControlArea->AddEnvironmentAsset(pEnvironmentAsset));
 
 Error:
 	return r;
@@ -1455,7 +1458,8 @@ RESULT DreamGarage::OnCloseCamera() {
 RESULT DreamGarage::OnSendCameraPlacement() {
 	RESULT r = R_PASS;
 
-	CR(m_pDreamUserControlArea->AddEnvironmentAsset(m_pPendingVCamAsset));
+	// not great
+	//CR(m_pDreamUserControlArea->AddEnvironmentAsset(nullptr));
 
 	// TODO: start sending data messages
 
@@ -1786,11 +1790,13 @@ Error:
 RESULT DreamGarage::OnGetSettings(point ptPosition, quaternion qOrientation) {
 	RESULT r = R_PASS;
 
+	long assetID = -1;
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CN(pEnvironmentControllerProxy);
 
-	// needs asset id
-	CR(pEnvironmentControllerProxy->RequestShareCamera(m_pendingAssetReceiveUserID));
+	CN(m_pDreamUserControlArea);
+	CN(m_pDreamUserControlArea->GetActiveSource());
+	CR(pEnvironmentControllerProxy->RequestShareCamera(m_pDreamUserControlArea->GetActiveSource()->GetCurrentAssetID()));
 
 Error:
 	return r;

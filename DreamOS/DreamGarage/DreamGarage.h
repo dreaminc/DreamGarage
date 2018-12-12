@@ -226,7 +226,6 @@ private:
 	UIControlView* m_pDreamControlView = nullptr;
 	DreamGamepadCameraApp* m_pDreamGamepadCameraApp = nullptr;
 
-	 std::shared_ptr<EnvironmentAsset> m_pPendingVCamAsset = nullptr;
 };
 
 #endif	// DREAM_GARAGE_H_
