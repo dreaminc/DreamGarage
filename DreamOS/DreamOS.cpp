@@ -747,6 +747,10 @@ long DreamOS::GetUserID() {
 	return m_pSandbox->m_pCloudController->GetUserID();
 }
 
+long DreamOS::GetUserAvatarID() {
+	return m_pSandbox->m_pCloudController->GetUserAvatarID();
+}
+
 ControllerProxy* DreamOS::GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controllerType) {
 	return GetCloudController()->GetControllerProxy(controllerType);
 }
@@ -975,8 +979,12 @@ RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
 }
 
-RESULT DreamOS::AddObject(VirtualObj *pObject) {
-	return m_pSandbox->AddObject(pObject);
+RESULT DreamOS::AddObject(VirtualObj *pObject, bool fAddToAuxGraphs) {
+	return m_pSandbox->AddObject(pObject, fAddToAuxGraphs);
+}
+
+RESULT DreamOS::AddAuxObject(VirtualObj *pObject) {
+	return m_pSandbox->AddAuxObject(pObject);
 }
 
 // This is a pass-thru at the moment
@@ -1345,12 +1353,20 @@ RESULT DreamOS::AddObjectToUIClippingGraph(VirtualObj *pObject) {
 	return m_pSandbox->AddObjectToUIClippingGraph(pObject);
 }
 
+RESULT DreamOS::AddObjectToAuxUIGraph(VirtualObj *pObject) {
+	return m_pSandbox->AddObjectToAuxUIGraph(pObject);
+}
+
 RESULT DreamOS::RemoveObjectFromUIGraph(VirtualObj *pObject) {
 	return m_pSandbox->RemoveObjectFromUIGraph(pObject);
 }
 
 RESULT DreamOS::RemoveObjectFromUIClippingGraph(VirtualObj *pObject) {
 	return m_pSandbox->RemoveObjectFromUIClippingGraph(pObject);
+}
+
+RESULT DreamOS::RemoveObjectFromAuxUIGraph(VirtualObj *pObject) {
+	return m_pSandbox->RemoveObjectFromAuxUIGraph(pObject);
 }
 
 // Cloud Controller

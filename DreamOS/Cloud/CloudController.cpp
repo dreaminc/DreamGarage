@@ -820,6 +820,13 @@ long CloudController::GetUserID() {
 	return -1;
 }
 
+long CloudController::GetUserAvatarID() {
+	if (m_pUserController != nullptr) {
+		return m_pUserController->GetUserAvatarModelID();
+	}
+	return -1;
+}
+
 /*
 RESULT CloudController::InitializeConnection(bool fMaster, bool fAddDataChannel) {
 	RESULT r = R_PASS;

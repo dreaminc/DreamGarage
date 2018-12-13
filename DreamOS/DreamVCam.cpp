@@ -63,7 +63,7 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	CN(m_pCamera);
 	CB(m_pCamera->incRefCount());
 
-	r = GetDOS()->MakePipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode);
+	r = GetDOS()->MakePipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode, false);
 	if (r != R_NOT_IMPLEMENTED) {
 		CR(r);
 	}
@@ -230,7 +230,7 @@ RESULT DreamVCam::Update(void *pContext) {
 		}
 		
 		m_pCameraModel->SetPosition(m_pCamera->GetPosition(true));
-		m_pCameraModel->SetOrientation(quaternion(vector::kVector(-1.0f), m_pCamera->GetLookVector()));
+		m_pCameraModel->SetOrientation(m_pCamera->GetWorldOrientation());
 	}
 
 Error:

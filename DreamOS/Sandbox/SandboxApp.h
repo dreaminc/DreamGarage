@@ -214,14 +214,17 @@ public:
 
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
+	RESULT AddObjectToAuxUIGraph(VirtualObj *pObject);
 
 	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
 	RESULT RemoveObjectFromUIClippingGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromAuxUIGraph(VirtualObj *pObject);
 
 	RESULT RemoveAllObjects();
 	RESULT RemoveObject(VirtualObj *pObject);
 
-	RESULT AddObject(VirtualObj *pObject);	
+	RESULT AddObject(VirtualObj *pObject, bool fAddToAuxGraphs = true);
+	RESULT AddAuxObject(VirtualObj *pObject);
 	FlatContext* AddFlatContext(int width, int height, int channels);
 	RESULT RenderToTexture(FlatContext* pContext);
 
@@ -424,8 +427,10 @@ public:
 
 	CameraNode* GetCameraNode() { return m_pCamera; }
 	ObjectStoreNode* GetSceneGraphNode() { return m_pSceneGraph; }
+	ObjectStoreNode* GetAuxSceneGraphNode() { return m_pAuxSceneGraph; }
 	ObjectStoreNode* GetUISceneGraphNode() { return m_pUISceneGraph; }
 	ObjectStoreNode* GetUIClippingSceneGraphNode() { return m_pUIClippingSceneGraph; }
+	ObjectStoreNode* GetAuxUISceneGraphNode() { return m_pAuxUISceneGraph; }
 
 	hand *GetHand(HAND_TYPE handType);
 
@@ -450,8 +455,10 @@ protected:
 
 	//ObjectStore *m_pSceneGraph;
 	ObjectStoreNode *m_pSceneGraph = nullptr;
+	ObjectStoreNode *m_pAuxSceneGraph = nullptr;
 	ObjectStoreNode *m_pUISceneGraph = nullptr;
 	ObjectStoreNode *m_pUIClippingSceneGraph = nullptr;
+	ObjectStoreNode *m_pAuxUISceneGraph = nullptr;
 
 	CloudController *m_pCloudController = nullptr;
 	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine = nullptr;
