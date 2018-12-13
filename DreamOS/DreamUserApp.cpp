@@ -289,6 +289,9 @@ RESULT DreamUserApp::Update(void *pContext) {
 		m_pPhantomLeftHand->SetOrientation(m_pLeftHand->GetOrientation());
 		m_pPhantomRightHand->GetModel()->SetPosition(m_pRightHand->GetPosition());
 		m_pPhantomRightHand->SetOrientation(m_pRightHand->GetOrientation());
+		
+		m_pPhantomLeftHand->Update();
+		m_pPhantomRightHand->Update();
 	}
 
 	CR(UpdateHysteresisObject());
