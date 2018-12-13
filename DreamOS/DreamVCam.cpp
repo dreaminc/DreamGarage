@@ -67,9 +67,9 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	CN(m_pDreamGamepadCamera);
 	CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
 
-	m_pCameraModel = GetDOS()->AddModel(L"\\Bear\\bear-obj.obj");
+	m_pCameraModel = GetDOS()->AddModel(L"\\camera\\camera.fbx");
 	CN(m_pCameraModel);
-	m_pCameraModel->SetScale(0.01f);
+	m_pCameraModel->SetScale(0.003f);
 	
 Error:
 	return r;
@@ -372,4 +372,22 @@ std::string DreamVCam::GetTitle() {
 
 std::string DreamVCam::GetContentType() {
 	return m_strContentType;
+}
+	
+RESULT DreamVCam::SetIsSendingCameraPlacement(bool fSendingCameraPlacement) {
+	m_fSendingCameraPlacement = fSendingCameraPlacement;
+	return R_PASS;
+}
+
+RESULT DreamVCam::SetIsReceivingCameraPlacement(bool fReceivingCameraPlacement) {
+	m_fReceivingCameraPlacement = fReceivingCameraPlacement;
+	return R_PASS;
+}
+
+bool DreamVCam::IsSendingCameraPlacement() {
+	return m_fSendingCameraPlacement;
+}
+
+bool DreamVCam::IsReceivingCameraPlacement() {
+	return m_fReceivingCameraPlacement;
 }
