@@ -36,8 +36,7 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	DreamOS *pDreamOS = GetDOS();
 	std::shared_ptr<DreamUserApp> pDreamUserApp = pDreamOS->GetUserApp();
 
-	GetDOS()->AddObjectToUIGraph(GetComposite());
-	GetDOS()->AddObjectToAuxUIGraph(GetComposite());
+	GetDOS()->AddObjectToUIGraph(GetComposite(), PIPELINE_TYPE::ALL);
 
 	int channels = 4;
 	int pxSize = m_castpxWidth * m_castpxHeight * channels;

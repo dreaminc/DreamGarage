@@ -283,12 +283,12 @@ RESULT DreamUserApp::Update(void *pContext) {
 		m_pPhantomLeftHand = m_pLeftHand->GetPhantomModel();
 		m_pPhantomLeftHand->SetVisible(true, false);
 		
-		GetDOS()->AddAuxObject(m_pPhantomLeftHand.get());
+		GetDOS()->AddObject(m_pPhantomLeftHand.get(), PIPELINE_TYPE::AUX);
 
 		m_pPhantomRightHand = m_pRightHand->GetPhantomModel();
 		m_pPhantomRightHand->SetVisible(true, false);
 		
-		GetDOS()->AddAuxObject(m_pPhantomRightHand.get());
+		GetDOS()->AddObject(m_pPhantomRightHand.get(), PIPELINE_TYPE::AUX);
 	}
 	
 	if (m_pPhantomRightHand != nullptr && m_pPhantomLeftHand != nullptr) {
@@ -645,7 +645,7 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 
 	//pDreamOS->AddObject(pHand->GetModel().get());
 	//pDreamOS->AddObject(pHand->GetMalletHead());
-	pDreamOS->AddObject(pHand->m_pHMDComposite.get(), false);
+	pDreamOS->AddObject(pHand->m_pHMDComposite.get(), PIPELINE_TYPE::MAIN);
 
 	CR(pHand->InitializeWithContext(pDreamOS));
 

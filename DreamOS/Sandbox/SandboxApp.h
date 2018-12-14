@@ -66,6 +66,13 @@ class DreamModuleManager;
 class NamedPipeClient;
 class NamedPipeServer;
 
+enum class PIPELINE_TYPE : int {
+	ALL,
+	MAIN,
+	AUX,
+	INVALID
+};
+
 class SandboxApp : 
 	public Subscriber<SenseKeyboardEvent>, 
 	public Subscriber<SenseTypingEvent>,
@@ -212,9 +219,8 @@ public:
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
-	RESULT AddObjectToUIGraph(VirtualObj *pObject);
+	RESULT AddObjectToUIGraph(VirtualObj *pObject, PIPELINE_TYPE pipelineType = PIPELINE_TYPE::ALL);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
-	RESULT AddObjectToAuxUIGraph(VirtualObj *pObject);
 
 	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
 	RESULT RemoveObjectFromUIClippingGraph(VirtualObj *pObject);
@@ -223,8 +229,7 @@ public:
 	RESULT RemoveAllObjects();
 	RESULT RemoveObject(VirtualObj *pObject);
 
-	RESULT AddObject(VirtualObj *pObject, bool fAddToAuxGraphs = true);
-	RESULT AddAuxObject(VirtualObj *pObject);
+	RESULT AddObject(VirtualObj *pObject, PIPELINE_TYPE pipelineType = PIPELINE_TYPE::ALL);
 	FlatContext* AddFlatContext(int width, int height, int channels);
 	RESULT RenderToTexture(FlatContext* pContext);
 

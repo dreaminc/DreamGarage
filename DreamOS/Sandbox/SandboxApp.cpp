@@ -899,22 +899,24 @@ std::shared_ptr<NamedPipeServer> SandboxApp::MakeNamedPipeServer(std::wstring st
 	return nullptr;
 }
 
-RESULT SandboxApp::AddObject(VirtualObj *pObject, bool fAddToAuxGraphs) {
+RESULT SandboxApp::AddObject(VirtualObj *pObject, PIPELINE_TYPE pipelineType) {
 	RESULT r = R_PASS;
 
-	if (fAddToAuxGraphs) {
+	switch (pipelineType) {
+
+	case PIPELINE_TYPE::ALL: {
 		CR(m_pAuxSceneGraph->PushObject(pObject));
+		CR(m_pSceneGraph->PushObject(pObject));
+	} break;
+
+	case PIPELINE_TYPE::MAIN: {
+		CR(m_pSceneGraph->PushObject(pObject));
+	} break;
+
+	case PIPELINE_TYPE::AUX: {
+		CR(m_pAuxSceneGraph->PushObject(pObject));
+	} break;
 	}
-	CR(m_pSceneGraph->PushObject(pObject));
-
-Error:
-	return r;
-}
-
-RESULT SandboxApp::AddAuxObject(VirtualObj *pObject) {
-	RESULT r = R_PASS;
-
-	CR(m_pAuxSceneGraph->PushObject(pObject));
 
 Error:
 	return r;
@@ -953,10 +955,24 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject) {
+RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject, PIPELINE_TYPE pipelineType) {
 	RESULT r = R_PASS;
 
-	CR(m_pUISceneGraph->PushObject(pObject));
+	switch(pipelineType) {
+	
+	case PIPELINE_TYPE::ALL: {
+		CR(m_pAuxUISceneGraph->PushObject(pObject));
+		CR(m_pUISceneGraph->PushObject(pObject));
+	} break;
+
+	case PIPELINE_TYPE::MAIN: {
+		CR(m_pUISceneGraph->PushObject(pObject));
+	} break;
+
+	case PIPELINE_TYPE::AUX: {
+		CR(m_pAuxUISceneGraph->PushObject(pObject));
+	} break;
+	};
 
 Error:
 	return r;
@@ -966,15 +982,6 @@ RESULT SandboxApp::AddObjectToUIClippingGraph(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	CR(m_pUIClippingSceneGraph->PushObject(pObject));
-
-Error:
-	return r;
-}
-
-RESULT SandboxApp::AddObjectToAuxUIGraph(VirtualObj *pObject) {
-	RESULT r = R_PASS;
-
-	CR(m_pAuxUISceneGraph->PushObject(pObject));
 
 Error:
 	return r;

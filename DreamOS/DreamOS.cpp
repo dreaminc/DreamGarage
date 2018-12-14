@@ -979,12 +979,8 @@ RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
 }
 
-RESULT DreamOS::AddObject(VirtualObj *pObject, bool fAddToAuxGraphs) {
-	return m_pSandbox->AddObject(pObject, fAddToAuxGraphs);
-}
-
-RESULT DreamOS::AddAuxObject(VirtualObj *pObject) {
-	return m_pSandbox->AddAuxObject(pObject);
+RESULT DreamOS::AddObject(VirtualObj *pObject, PIPELINE_TYPE pipelineType) {
+	return m_pSandbox->AddObject(pObject, pipelineType);
 }
 
 // This is a pass-thru at the moment
@@ -1345,16 +1341,12 @@ Error:
 	return r;
 }
 
-RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject) {
-	return m_pSandbox->AddObjectToUIGraph(pObject);
+RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject, PIPELINE_TYPE pipelineType) {
+	return m_pSandbox->AddObjectToUIGraph(pObject, pipelineType);
 }
 
 RESULT DreamOS::AddObjectToUIClippingGraph(VirtualObj *pObject) {
 	return m_pSandbox->AddObjectToUIClippingGraph(pObject);
-}
-
-RESULT DreamOS::AddObjectToAuxUIGraph(VirtualObj *pObject) {
-	return m_pSandbox->AddObjectToAuxUIGraph(pObject);
 }
 
 RESULT DreamOS::RemoveObjectFromUIGraph(VirtualObj *pObject) {

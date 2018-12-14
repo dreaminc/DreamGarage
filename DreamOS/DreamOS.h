@@ -387,17 +387,15 @@ public:
 	std::shared_ptr<NamedPipeClient> MakeNamedPipeClient(std::wstring strPipename);
 	std::shared_ptr<NamedPipeServer> MakeNamedPipeServer(std::wstring strPipename);
 	
-	RESULT AddObject(VirtualObj *pObject, bool fAllStores = true);
-	RESULT AddAuxObject(VirtualObj *pObject);
+	RESULT AddObject(VirtualObj *pObject, PIPELINE_TYPE pipelineType = PIPELINE_TYPE::ALL);
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
 	RESULT RemoveObjectFromInteractionGraph(VirtualObj *pObject);
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
-	RESULT AddObjectToUIGraph(VirtualObj *pObject);
+	RESULT AddObjectToUIGraph(VirtualObj *pObject, PIPELINE_TYPE pipelineType = PIPELINE_TYPE::MAIN);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
-	RESULT AddObjectToAuxUIGraph(VirtualObj *pObject);
 
 	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
 	RESULT RemoveObjectFromUIClippingGraph(VirtualObj *pObject);
