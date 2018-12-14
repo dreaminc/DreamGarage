@@ -375,6 +375,11 @@ xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libss
 
   
 
+xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" /D
+
+
+xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" /D
+
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"</Command>
     </PostBuildEvent>
@@ -663,6 +668,11 @@ xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcr
 
 xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D		
 
+xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" /D
+
+
+xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" /D
+
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Debug\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeImaged.dll" "$(TargetDir)"</Command>
     </PostBuildEvent>
@@ -709,6 +719,11 @@ xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(Tar
 xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
 
 xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D		
+
+xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" /D
+
+
+xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" /D
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Debug\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeImaged.dll" "$(TargetDir)"</Command>
