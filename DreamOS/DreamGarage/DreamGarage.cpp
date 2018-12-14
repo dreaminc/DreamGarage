@@ -51,7 +51,7 @@ light *g_pLight = nullptr;
 
 #include "Sound/AudioPacket.h"
 
-//* Comment this out to enable 3rd party camera
+/* Comment this out to enable 3rd party camera
 #define _USE_3RD_PARTY_CAMERA
 //#define _USE_3RD_PARTY_CAMERA_HD
 //#define _USE_3RD_PARTY_CAMERA_UHD
