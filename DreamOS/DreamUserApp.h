@@ -214,8 +214,8 @@ private:
 	hand* m_pLeftHand = nullptr;
 	hand* m_pRightHand = nullptr;
 
-	std::shared_ptr<hand> m_pPhantomRightHand = nullptr;
-	std::shared_ptr<hand> m_pPhantomLeftHand = nullptr;
+	std::shared_ptr<composite> m_pPhantomRightHand = nullptr;
+	std::shared_ptr<composite> m_pPhantomLeftHand = nullptr;
 
 	// apps position themselves with this when they are presented
 	VirtualObj *m_pAppBasis = nullptr;

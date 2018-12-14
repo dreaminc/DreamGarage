@@ -269,29 +269,31 @@ RESULT DreamUserApp::Update(void *pContext) {
 			CR(m_pUserModel->GetMouth()->SetVisible(true));
 
 			if (m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT) != nullptr) {
-				m_pPhantomLeftHand = m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT);
-				m_pPhantomLeftHand->SetVisible(false);
-				m_pPhantomLeftHand->SetModelState(hand::ModelState::HAND);
-				GetDOS()->AddAuxObject(m_pPhantomLeftHand.get());
+				m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT)->SetVisible(false);
 			}
 			
 			if (m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT) != nullptr) {
-				m_pPhantomRightHand = m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT);
-				m_pPhantomRightHand->SetVisible(false);
-				m_pPhantomRightHand->SetModelState(hand::ModelState::HAND);
-				GetDOS()->AddAuxObject(m_pPhantomRightHand.get());
+				m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT)->SetVisible(false);
 			}			
 		}
 	}
 	
-	if (m_pPhantomLeftHand != nullptr) {
-		m_pPhantomLeftHand->GetModel()->SetPosition(m_pLeftHand->GetPosition());
-		m_pPhantomLeftHand->SetOrientation(m_pLeftHand->GetOrientation());
-		m_pPhantomRightHand->GetModel()->SetPosition(m_pRightHand->GetPosition());
-		m_pPhantomRightHand->SetOrientation(m_pRightHand->GetOrientation());
+	if (m_pLeftHand->GetPhantomModel() != nullptr && m_pRightHand->GetPhantomModel() != nullptr &&
+		m_pPhantomLeftHand == nullptr && m_pPhantomRightHand == nullptr) {
+		m_pPhantomLeftHand = m_pLeftHand->GetPhantomModel();
+		m_pPhantomLeftHand->SetVisible(true, false);
 		
-		m_pPhantomLeftHand->Update();
-		m_pPhantomRightHand->Update();
+		GetDOS()->AddAuxObject(m_pPhantomLeftHand.get());
+
+		m_pPhantomRightHand = m_pRightHand->GetPhantomModel();
+		m_pPhantomRightHand->SetVisible(true, false);
+		
+		GetDOS()->AddAuxObject(m_pPhantomRightHand.get());
+	}
+	
+	if (m_pPhantomRightHand != nullptr && m_pPhantomLeftHand != nullptr) {
+		m_pPhantomLeftHand->SetVisible(m_fHeadsetAndHandsTracked);
+		m_pPhantomRightHand->SetVisible(m_fHeadsetAndHandsTracked);
 	}
 
 	CR(UpdateHysteresisObject());
@@ -641,8 +643,10 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 	type = pHand->GetHandState().handType;
 	CBR(type == HAND_TYPE::HAND_LEFT || type == HAND_TYPE::HAND_RIGHT, R_SKIPPED);
 
-	pDreamOS->AddObject(pHand, false);
-	
+	//pDreamOS->AddObject(pHand->GetModel().get());
+	//pDreamOS->AddObject(pHand->GetMalletHead());
+	pDreamOS->AddObject(pHand->m_pHMDComposite.get(), false);
+
 	CR(pHand->InitializeWithContext(pDreamOS));
 
 	CR(m_pPointingArea->RegisterObject(pHand));
