@@ -57,9 +57,9 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestDreamBrowser());
-
 	CR(AddTestDreamVCam());
+
+	CR(AddTestDreamBrowser());
 	
 	CR(AddTestDreamDesktop());
 
