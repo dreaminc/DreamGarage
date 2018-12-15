@@ -659,7 +659,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 			else {
 				Show();
 			}
-		}
+		}	
 		else {
 			m_pDreamTabView->AddContent(m_pActiveSource);
 		}
@@ -688,6 +688,15 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 			// new desktop can't be the current content
 			m_pUserControls->SetSharingFlag(false);
 			
+			CRM(pEnvironmentControllerProxy->RequestOpenCamera(), "Failed to share environment asset");
+		}
+		else {
+			m_pActiveSource = m_pDreamVCam;
+			m_pDreamVCam->InitializeWithParent(this);
+			m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
+			// new desktop can't be the current content
+			m_pUserControls->SetSharingFlag(false);
+
 			CRM(pEnvironmentControllerProxy->RequestOpenCamera(), "Failed to share environment asset");
 		}
 	}
@@ -792,9 +801,9 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 
 		//pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	}
-	else if(pEnvironmentAsset->GetStorageProviderScope() == m_strCameraScope) {
-	//	m_pDreamVCam->SetEnvironmentAsset(pEnvironmentAsset);
-		m_pUserControls->SetTitleText(pEnvironmentAsset->GetTitle());
+	else if(pEnvironmentAsset->GetContentType() == CAMERA_CONTENT_CONTROL_TYPE) {
+		m_pDreamVCam->SetEnvironmentAsset(pEnvironmentAsset);
+		m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
 	}
 	else if(pEnvironmentAsset->GetStorageProviderScope() == m_strDesktopScope) {
 		// TODO: desktop setup
@@ -864,6 +873,9 @@ RESULT DreamUserControlArea::ShutdownSource() {
 	if (m_pDreamDesktop == m_pActiveSource) {
 		GetDOS()->ShutdownDreamApp<DreamDesktopApp>(m_pDreamDesktop);
 		m_pDreamDesktop = nullptr;
+	}
+	else if (m_pDreamVCam == m_pActiveSource) {
+		m_pDreamVCam->CloseSource();
 	}
 	else {	
 		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);

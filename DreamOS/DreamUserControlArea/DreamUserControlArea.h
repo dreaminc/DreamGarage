@@ -39,6 +39,7 @@ class quad;
 #define SCOPE_DESKTOP "MenuProviderScope.DesktopMenuProvider"
 #define SCOPE_WEBSITE "MenuProviderScope.WebsiteMenuProvider"
 #define SCOPE_CAMERA "MenuProviderScope.CameraMenuProvider"
+#define CAMERA_CONTENT_CONTROL_TYPE "ContentControlType.Camera"
  
 class DreamUserControlArea : public DreamApp<DreamUserControlArea>, 
 	public Subscriber<InteractionObjectEvent>,

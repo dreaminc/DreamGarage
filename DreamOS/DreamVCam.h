@@ -100,6 +100,8 @@ private:
 	// This node is used to run the render
 	OGLProgram *m_pOGLEndNode = nullptr;
 
+	bool m_fIsRunning = false;
+
 	long m_assetID = -1;
 	std::string m_strPath;
 	std::string m_strScope;
