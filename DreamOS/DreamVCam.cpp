@@ -43,6 +43,15 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 
 	m_pCameraModel->SetVisible(false);
 	//m_pCameraModel->GetFirstChild<mesh>()->RotateYByDeg(180.0f);
+
+	// TODO: 
+	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
+	CN(m_pCamera);
+	CB(m_pCamera->incRefCount());
+
+	m_pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
+	CN(m_pDreamGamepadCamera);
+	CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
 	
 
 Error:
@@ -75,25 +84,6 @@ RESULT DreamVCam::InitializePipeline() {
 
 	// Set up the aux camera and local pipeline
 
-	// TODO: 
-	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
-	CN(m_pCamera);
-	CB(m_pCamera->incRefCount());
-
-	m_pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
-	CN(m_pDreamGamepadCamera);
-	CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
-
-	m_pCameraModel = GetDOS()->AddModel(L"\\camera\\camera.fbx");
-	CN(m_pCameraModel);
-	m_pCameraModel->SetScale(0.003f);
-	
-Error:
-	return r;
-}
-
-RESULT DreamVCam::InitializePipeline() {
-	RESULT r = R_PASS;
 
 	r = GetDOS()->MakePipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode, SandboxApp::PipelineType::AUX);
 	if (r != R_NOT_IMPLEMENTED) {
