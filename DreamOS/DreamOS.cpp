@@ -1375,8 +1375,8 @@ RESULT DreamOS::RegisterUserObserver(CloudController::UserObserver *pUserObserve
 	return m_pSandbox->RegisterUserObserver(pUserObserver);
 }
 
-RESULT DreamOS::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
-	return m_pSandbox->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels);
+RESULT DreamOS::BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	return m_pSandbox->BroadcastVideoFrame(strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels);
 }
 
 RESULT DreamOS::SendDataMessage(long userID, Message *pDataMessage) {

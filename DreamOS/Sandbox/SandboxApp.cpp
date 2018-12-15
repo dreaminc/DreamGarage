@@ -1851,8 +1851,8 @@ RESULT SandboxApp::RegisterUserObserver(CloudController::UserObserver *pUserObse
 	return m_pCloudController->RegisterUserObserver(pUserObserver);
 }
 
-RESULT SandboxApp::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
-	return m_pCloudController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels);
+RESULT SandboxApp::BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	return m_pCloudController->BroadcastVideoFrame(strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels);
 }
 
 RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {

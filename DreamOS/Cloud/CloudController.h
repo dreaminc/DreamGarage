@@ -131,11 +131,11 @@ public:
 	RESULT BroadcastDataMessage(Message *pDataMessage);
 
 	// Video
-	RESULT StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
-	RESULT StopVideoStreaming();
-	bool IsVideoStreamingRunning();
-	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
-	RESULT BroadcastTextureFrame(texture *pTexture, int level, PIXEL_FORMAT pixelFormat);
+	RESULT StartVideoStreaming(const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
+	RESULT StopVideoStreaming(const std::string &strVideoTrackLabel);
+	bool IsVideoStreamingRunning(const std::string &strVideoTrackLabel);
+	RESULT BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT BroadcastTextureFrame(const std::string &strVideoTrackLabel, texture *pTexture, int level, PIXEL_FORMAT pixelFormat);
 
 	// Audio 
 	RESULT BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket);

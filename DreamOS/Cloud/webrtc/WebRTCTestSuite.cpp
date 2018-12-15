@@ -41,13 +41,13 @@ WebRTCTestSuite::~WebRTCTestSuite() {
 RESULT WebRTCTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestWebRTCVideoStream());
+
 	CR(AddTestWebRTCMultiPeer());
 
 	CR(AddTestWebRTCAudio());
 
 	CR(AddTestChromeMultiBrowser());
-
-	CR(AddTestWebRTCVideoStream());
 
 	// TODO: Need a data channel test
 
@@ -312,6 +312,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 
 		CRM(pTestContext->pCloudController->RegisterPeerConnectionObserver(pTestContext), "Failed to register Peer Connection Observer");
 		CRM(pTestContext->pCloudController->RegisterUserObserver(pTestContext), "Failed to register user observer");
+
+		CRM(pTestContext->pCloudController->Start(), "Failed to start cloud controller");
 
 		// Log in 
 		{
@@ -881,7 +883,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 				//GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
 
 				// Testing: Memory Leak
-				pCloudController->BroadcastTextureFrame(pSourceTexture, 0, PIXEL_FORMAT::RGBA);
+				pCloudController->BroadcastTextureFrame(kChromeVideoLabel, pSourceTexture, 0, PIXEL_FORMAT::RGBA);
 			}
 			else if (pTestContext->m_pendingVideoBuffer.fPendingBufferReady && pTestContext->m_pendingVideoBuffer.pPendingBuffer != nullptr) {
 				
@@ -971,7 +973,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
 
-	struct TestContext : public CloudController::PeerConnectionObserver {
+	struct TestContext : 
+		public CloudController::PeerConnectionObserver,
+		public CloudController::UserObserver
+	{
+		UserController *pUserController = nullptr;
+
 		quad *pQuad = nullptr;
 		texture *pQuadTexture = nullptr;
 
@@ -979,6 +986,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		texture *pSourceTexture = nullptr;
 
 		CloudController *pCloudController = nullptr;
+
+		bool fExitTest = false;
+		int testUserNum = -1;
 
 		struct PendingVideoBuffer {
 			uint8_t *pPendingBuffer = nullptr;
@@ -1036,6 +1046,98 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			return r;
 		}
 
+		// CloudController::UserObserver
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
+			DEBUG_LINEOUT("OnGetSettings");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnSetSettings() override {
+			DEBUG_LINEOUT("OnSetSettings");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnLogin() override {
+			DEBUG_LINEOUT("OnLogin");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnLogout() override {
+			DEBUG_LINEOUT("OnLogout");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnPendLogout() override {
+			DEBUG_LINEOUT("OnPendLogout");
+
+			fExitTest = true;
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnSwitchTeams() override {
+			DEBUG_LINEOUT("OnSwitchTeams");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
+			DEBUG_LINEOUT("OnFormURL");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDreamVersion(version dreamVersion) override {
+			DEBUG_LINEOUT("OnDreamVersion");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override {
+			DEBUG_LINEOUT("OnAPIConnectionCheck");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
+			RESULT r = R_PASS;
+
+			DEBUG_LINEOUT("OnAccessToken");
+
+			CBM(fSuccess, "Request of access token failed");
+
+			CRM(pUserController->RequestUserProfile(strAccessToken), "Failed to request user profile");
+
+			CRM(pUserController->RequestTwilioNTSInformation(strAccessToken), "Failed to request twilio info");
+
+			CRM(pUserController->RequestTeam(strAccessToken), "Failed to request team");
+
+		Error:
+			return r;
+		};
+
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) override {
+			RESULT r = R_PASS;
+
+			DEBUG_LINEOUT("OnGetToken");
+
+			CB(fSuccess);
+
+			//CRM(pUserController->SetUserDefaultEnvironmentID(environmentId), "Failed to set default environment id");
+
+			// Using environment 170 for testing
+			CRM(pUserController->SetUserDefaultEnvironmentID(168), "Failed to set default environment id");
+
+			CRM(pUserController->UpdateLoginState(), "Failed to update login status");
+
+		Error:
+			return r;
+		};
+
 	} *pTestContext = new TestContext();
 
 	// Initialize the test
@@ -1046,6 +1148,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		int pxWidth = 500;
 		int pxHeight = 500;
 		int channels = 4;
+
+		std::string strTestValue;
 
 		std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
@@ -1138,29 +1242,30 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
 
+		strTestValue = pCommandLineManager->GetParameterValue("testval");
+		int testUserNumber = atoi(strTestValue.c_str());
+
 		// Cloud Controller
+		DEBUG_LINEOUT("Initializing Cloud Controller");
 		pTestContext->pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, nullptr);
 		CNM(pTestContext->pCloudController, "Cloud Controller failed to initialize");
 
-		DEBUG_LINEOUT("Initializing Cloud Controller");
-		CRM(pTestContext->pCloudController->Initialize(), "Failed to initialize cloud controller");
-
 		CRM(pTestContext->pCloudController->RegisterPeerConnectionObserver(pTestContext), "Failed to register Peer Connection Observer");
+		CRM(pTestContext->pCloudController->RegisterUserObserver(pTestContext), "Failed to register user observer");
+
+		CRM(pTestContext->pCloudController->Start(), "Failed to start cloud controller");
 
 		// Log in 
 		{
-			// TODO: This way to start the cloud controller thread is not great
-			std::string strUsername = "test";
-			strUsername += pCommandLineManager->GetParameterValue("testval");
-			strUsername += "@dreamos.com";
+			pTestContext->pUserController = dynamic_cast<UserController*>(pTestContext->pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+			CNM(pTestContext->pUserController, "Failed to acquire User Controller Proxy");
 
-			std::string strPassword = "nightmare";
+			pTestContext->testUserNum = testUserNumber;
 
-			CR(pCommandLineManager->SetParameterValue("username", strUsername));
-			CR(pCommandLineManager->SetParameterValue("password", strPassword));
-			CR(pCommandLineManager->SetParameterValue("environment", std::to_string(6)));
-
-			CRM(pTestContext->pCloudController->Start(true), "Failed to start cloud controller");
+			// m_tokens stores the refresh token of users test0-9,
+			// so use -t 0 to login as test0@dreamos.com
+			std::string strTestUserRefreshToken = CloudTestSuite::GetTestUserRefreshToken(testUserNumber);
+			CRM(pTestContext->pUserController->RequestAccessToken(strTestUserRefreshToken), "Failed to request access token");
 		}
 
 	Error:
@@ -1202,7 +1307,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		// Replace with BroadcastTexture
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - g_lastTestUpdate).count() > UPDATE_SCREENCAST_MS) {
 			if (pTestContext->pCloudController != nullptr) {
-				pTestContext->pCloudController->BroadcastTextureFrame(pTestContext->pSourceTexture, 0, PIXEL_FORMAT::RGBA);
+				pTestContext->pCloudController->BroadcastTextureFrame(kChromeVideoLabel, pTestContext->pSourceTexture, 0, PIXEL_FORMAT::RGBA);
 
 				/*
 				HALImp *pHAL = m_pDreamOS->GetHALImp();
@@ -1215,7 +1320,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 						pTestContext->pCloudController->BroadcastTextureFrame(pScreenQuadTexture, 0, texture::PixelFormat::RGBA);
 					}
 				}
-				*/
+				//*/
 			}
 	
 			g_lastTestUpdate = std::chrono::system_clock::now();

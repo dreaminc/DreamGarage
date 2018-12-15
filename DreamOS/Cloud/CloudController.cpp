@@ -975,19 +975,19 @@ RESULT CloudController::SetRunTimeMicAverage(float runTimeMicAverage) {
 }
 
 // Video
-RESULT CloudController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+RESULT CloudController::BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
 
 	CN(m_pEnvironmentController);
-	CR(m_pEnvironmentController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+	CR(m_pEnvironmentController->BroadcastVideoFrame(strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels));
 
 Error:
 	return r;
 }
 
-RESULT CloudController::BroadcastTextureFrame(texture *pTexture, int level, PIXEL_FORMAT pixelFormat) {
+RESULT CloudController::BroadcastTextureFrame(const std::string &strVideoTrackLabel, texture *pTexture, int level, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
@@ -999,44 +999,44 @@ RESULT CloudController::BroadcastTextureFrame(texture *pTexture, int level, PIXE
 
 	// Broadcast the data
 	CR(m_pEnvironmentController->BroadcastVideoFrame(
-		pTexture->GetImageBuffer(), pTexture->GetWidth(), pTexture->GetHeight(), pTexture->GetChannels()
+		strVideoTrackLabel, pTexture->GetImageBuffer(), pTexture->GetWidth(), pTexture->GetHeight(), pTexture->GetChannels()
 	));
 
 Error:
 	return r;
 }
 
-RESULT CloudController::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+RESULT CloudController::StartVideoStreaming(const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
 	CN(m_pEnvironmentController);
 
-	CR(m_pEnvironmentController->StartVideoStreaming(pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
+	CR(m_pEnvironmentController->StartVideoStreaming(strVideoTrackLabel, pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
 
 Error:
 	return r;
 }
 
-RESULT CloudController::StopVideoStreaming() {
+RESULT CloudController::StopVideoStreaming(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
 	CN(m_pEnvironmentController);
 
-	CR(m_pEnvironmentController->StopVideoStreaming());
+	CR(m_pEnvironmentController->StopVideoStreaming(strVideoTrackLabel));
 
 Error:
 	return r;
 }
 
-bool CloudController::IsVideoStreamingRunning() {
+bool CloudController::IsVideoStreamingRunning(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
 	CN(m_pEnvironmentController);
 
-	return m_pEnvironmentController->IsVideoStreamingRunning();
+	return m_pEnvironmentController->IsVideoStreamingRunning(strVideoTrackLabel);
 
 Error:
 	return false;

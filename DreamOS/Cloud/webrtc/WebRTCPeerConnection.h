@@ -27,6 +27,7 @@
 
 #include "WebRTCLocalAudioSource.h"
 #include "WebRTCAudioTrackSink.h"
+#include "WebRTCVideoSink.h"
 
 class WebRTConductor;
 //class WebRTCLocalAudioSource;
@@ -93,7 +94,7 @@ public:
 	// TODO: Generalize this when we add renegotiation 
 	// so that they're not hard coded per WebRTCCommon
 	RESULT AddStreams(bool fAddDataChannel = true);
-	RESULT AddVideoStream();
+	RESULT AddVideoStream(const std::string &strVideoCaptureDevice, const std::string &strVideoTrackLabel, const std::string &strMediaStreamLabel);
 	RESULT AddAudioStream(const std::string &strAudioTrackLabel);
 	RESULT AddLocalAudioSource(const std::string &strAudioTrackLabel, const std::string &strMediaStreamLabel);
 	RESULT AddDataChannel();
@@ -160,10 +161,10 @@ public:
 	RESULT SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 	// Video
-	RESULT SendVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
-	RESULT StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
-	RESULT StopVideoStreaming();
-	bool IsVideoStreamingRunning();
+	RESULT SendVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT StartVideoStreaming(const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
+	RESULT StopVideoStreaming(const std::string &strVideoTrackLabel);
+	bool IsVideoStreamingRunning(const std::string &strVideoTrackLabel);
 
 	// Audio
 	RESULT SendAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket);
@@ -178,7 +179,11 @@ public:
 	std::unique_ptr<cricket::VideoCapturer> OpenVideoCaptureDevice();
 
 	RESULT InitializeVideoCaptureDevice(std::string strDeviceName);
-	std::unique_ptr<cricket::VideoCapturer> m_pCricketVideoCapturer = nullptr;
+	cricket::VideoCapturer* GetVideoCaptureDevice(std::string strDeviceName);
+
+	std::map<std::string, std::unique_ptr<cricket::VideoCapturer>> m_videoCaptureDevices;
+
+	//std::unique_ptr<cricket::VideoCapturer> m_pCricketVideoCapturer = nullptr;
 
 public:
 	long GetPeerConnectionID() { return m_peerConnectionID; }

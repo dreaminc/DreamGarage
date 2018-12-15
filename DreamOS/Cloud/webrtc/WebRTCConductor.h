@@ -140,10 +140,10 @@ public:
 	RESULT SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage);
 	RESULT SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
-	RESULT SendVideoFrame(long peerConnectionID, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
-	RESULT StartVideoStreaming(long peerConnectionID, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
-	RESULT StopVideoStreaming(long peerConnectionID);
-	bool IsVideoStreamingRunning(long peerConnectionID);
+	RESULT SendVideoFrame(long peerConnectionID, const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT StartVideoStreaming(long peerConnectionID, const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
+	RESULT StopVideoStreaming(long peerConnectionID, const std::string &strVideoTrackLabel);
+	bool IsVideoStreamingRunning(long peerConnectionID, const std::string &strVideoTrackLabel);
 
 	RESULT SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket);
 	float GetRunTimeMicAverage();
