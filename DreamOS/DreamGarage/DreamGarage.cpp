@@ -200,7 +200,7 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 	{
 		OGLProgram* pRenderProgramNode = nullptr;
 		OGLProgram* pUIProgramNode = nullptr;
-		MakePipeline(m_pAuxCamera, pRenderProgramNode, pUIProgramNode, false);
+		MakePipeline(m_pAuxCamera, pRenderProgramNode, pUIProgramNode, SandboxApp::PipelineType::MAIN);
 
 		//m_pUIMirrorProgramNode = pUIProgramNode;
 		m_pUIMirrorProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
@@ -222,7 +222,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, bool fMainPipe) {
+RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) {
 	RESULT r = R_PASS;
 
 	{
@@ -280,7 +280,7 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 		// Everything else
 		ProgramNode* pRenderProgramNode = MakeProgramNode("standard", PIPELINE_FLAGS::PASSTHRU);
 		CN(pRenderProgramNode);
-		if (fMainPipe) {
+		if (static_cast<int>(pipelineType & SandboxApp::PipelineType::MAIN) != 0) {
 			CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		}
 		else {
@@ -313,7 +313,7 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 
 		ProgramNode* pUIProgramNode = MakeProgramNode("uistage", PIPELINE_FLAGS::PASSTHRU);
 		CN(pUIProgramNode);
-		if (fMainPipe) {
+		if (static_cast<int>(pipelineType & SandboxApp::PipelineType::MAIN) != 0) {
 			CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
 			CR(pUIProgramNode->ConnectToInput("clippingscenegraph", GetUIClippingSceneGraphNode()->Output("objectstore")));
 		}
@@ -400,7 +400,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 	{
 		OGLProgram* pRenderProgramNode = nullptr;
 		OGLProgram* pUIProgramNode = nullptr;
-		MakePipeline(GetCameraNode(), pRenderProgramNode, pUIProgramNode, true);
+		MakePipeline(GetCameraNode(), pRenderProgramNode, pUIProgramNode, SandboxApp::PipelineType::MAIN);
 
 		// save interface for UI apps
 		m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);

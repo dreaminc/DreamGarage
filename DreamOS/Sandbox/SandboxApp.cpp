@@ -899,23 +899,14 @@ std::shared_ptr<NamedPipeServer> SandboxApp::MakeNamedPipeServer(std::wstring st
 	return nullptr;
 }
 
-RESULT SandboxApp::AddObject(VirtualObj *pObject, PIPELINE_TYPE pipelineType) {
+RESULT SandboxApp::AddObject(VirtualObj *pObject, PipelineType pipelineType) {
 	RESULT r = R_PASS;
 
-	switch (pipelineType) {
-
-	case PIPELINE_TYPE::ALL: {
-		CR(m_pAuxSceneGraph->PushObject(pObject));
+	if (static_cast<int>(pipelineType & PipelineType::MAIN) != 0) {
 		CR(m_pSceneGraph->PushObject(pObject));
-	} break;
-
-	case PIPELINE_TYPE::MAIN: {
-		CR(m_pSceneGraph->PushObject(pObject));
-	} break;
-
-	case PIPELINE_TYPE::AUX: {
+	}
+	if (static_cast<int>(pipelineType & PipelineType::AUX) != 0) {
 		CR(m_pAuxSceneGraph->PushObject(pObject));
-	} break;
 	}
 
 Error:
@@ -955,24 +946,15 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject, PIPELINE_TYPE pipelineType) {
+RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject, PipelineType pipelineType) {
 	RESULT r = R_PASS;
 
-	switch(pipelineType) {
-	
-	case PIPELINE_TYPE::ALL: {
-		CR(m_pAuxUISceneGraph->PushObject(pObject));
+	if (static_cast<int>(pipelineType & PipelineType::MAIN) != 0) {
 		CR(m_pUISceneGraph->PushObject(pObject));
-	} break;
-
-	case PIPELINE_TYPE::MAIN: {
-		CR(m_pUISceneGraph->PushObject(pObject));
-	} break;
-
-	case PIPELINE_TYPE::AUX: {
+	}
+	if (static_cast<int>(pipelineType & PipelineType::AUX) != 0) {
 		CR(m_pAuxUISceneGraph->PushObject(pObject));
-	} break;
-	};
+	}
 
 Error:
 	return r;

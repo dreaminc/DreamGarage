@@ -66,13 +66,6 @@ class DreamModuleManager;
 class NamedPipeClient;
 class NamedPipeServer;
 
-enum class PIPELINE_TYPE : int {
-	ALL,
-	MAIN,
-	AUX,
-	INVALID
-};
-
 class SandboxApp : 
 	public Subscriber<SenseKeyboardEvent>, 
 	public Subscriber<SenseTypingEvent>,
@@ -96,6 +89,13 @@ public:
 		unsigned fHideWindow : 1;
 		unsigned fInitUserApp : 1;
 		HMD_TYPE hmdType = HMD_ANY_AVAILABLE;
+	};
+
+	enum class PipelineType : uint16_t {
+		NONE = 0,
+		MAIN = 1 << 0,
+		AUX = 1 << 1,
+		INVALID = 0xFFFF
 	};
 
 private:
@@ -219,7 +219,7 @@ public:
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
-	RESULT AddObjectToUIGraph(VirtualObj *pObject, PIPELINE_TYPE pipelineType = PIPELINE_TYPE::ALL);
+	RESULT AddObjectToUIGraph(VirtualObj *pObject, PipelineType pipelineType = PipelineType::MAIN);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
 
 	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
@@ -229,7 +229,7 @@ public:
 	RESULT RemoveAllObjects();
 	RESULT RemoveObject(VirtualObj *pObject);
 
-	RESULT AddObject(VirtualObj *pObject, PIPELINE_TYPE pipelineType = PIPELINE_TYPE::ALL);
+	RESULT AddObject(VirtualObj *pObject, PipelineType pipelineType = PipelineType::MAIN);
 	FlatContext* AddFlatContext(int width, int height, int channels);
 	RESULT RenderToTexture(FlatContext* pContext);
 
@@ -515,6 +515,18 @@ public:
 protected:
 	std::wstring m_strHardwareID;
 };
+
+inline constexpr SandboxApp::PipelineType operator | (const SandboxApp::PipelineType &lhs, const SandboxApp::PipelineType &rhs) {
+	return static_cast<SandboxApp::PipelineType>(
+		static_cast<std::underlying_type<SandboxApp::PipelineType>::type>(lhs) | static_cast<std::underlying_type<SandboxApp::PipelineType>::type>(rhs)
+		);
+}
+
+inline constexpr SandboxApp::PipelineType operator & (const SandboxApp::PipelineType &lhs, const SandboxApp::PipelineType &rhs) {
+	return static_cast<SandboxApp::PipelineType>(
+		static_cast<std::underlying_type<SandboxApp::PipelineType>::type>(lhs) & static_cast<std::underlying_type<SandboxApp::PipelineType>::type>(rhs)
+		);
+}
 
 #endif // ! SANDBOX_APP_H_
 

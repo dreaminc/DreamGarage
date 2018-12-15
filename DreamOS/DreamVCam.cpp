@@ -78,7 +78,7 @@ Error:
 RESULT DreamVCam::InitializePipeline() {
 	RESULT r = R_PASS;
 
-	r = GetDOS()->MakePipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode, false);
+	r = GetDOS()->MakePipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode, SandboxApp::PipelineType::AUX);
 	if (r != R_NOT_IMPLEMENTED) {
 		CR(r);
 	}

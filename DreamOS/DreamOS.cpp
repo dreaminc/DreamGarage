@@ -979,7 +979,7 @@ RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
 }
 
-RESULT DreamOS::AddObject(VirtualObj *pObject, PIPELINE_TYPE pipelineType) {
+RESULT DreamOS::AddObject(VirtualObj *pObject, SandboxApp::PipelineType pipelineType) {
 	return m_pSandbox->AddObject(pObject, pipelineType);
 }
 
@@ -1341,7 +1341,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject, PIPELINE_TYPE pipelineType) {
+RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject, SandboxApp::PipelineType pipelineType) {
 	return m_pSandbox->AddObjectToUIGraph(pObject, pipelineType);
 }
 

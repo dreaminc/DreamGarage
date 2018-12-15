@@ -78,7 +78,7 @@ public:
 	virtual RESULT Update(void) override;
 
 	RESULT SetupMirrorPipeline(Pipeline *pRenderPipeline);
-	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, bool fMainPipeline) override;
+	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) override;
 	virtual version GetDreamVersion() override;
 
 	// Cloud Controller

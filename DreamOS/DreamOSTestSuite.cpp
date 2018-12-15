@@ -1279,6 +1279,7 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 			// Create the VCam		
 			pTestContext->pDreamVCam = m_pDreamOS->LaunchDreamModule<DreamVCam>(this);
 			CNM(pTestContext->pDreamVCam, "Failed to create dream virtual camera");
+			pTestContext->pDreamVCam->InitializePipeline();
 
 			//pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"Brick_1280x720.jpg");
 			//CN(pTestContext->pTexture);

@@ -113,7 +113,7 @@ version DreamTestApp::GetDreamVersion() {
 	return version("0.0.0");		// This is... a placeholder?
 }
 
-RESULT DreamTestApp::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, bool fMainPipeline) {
+RESULT DreamTestApp::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) {
 	return R_NOT_IMPLEMENTED;
 }
 

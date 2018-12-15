@@ -351,7 +351,7 @@ public:
 
 	std::shared_ptr<DreamAppBase> GetDreamAppFromUID(UID appUID);
 
-	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, bool fMainPipeline) = 0;
+	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) = 0;
 
 	//template<class derivedAppType>
 	//RESULT ReleaseApp(DreamAppHandleBase* pAppHandle, DreamAppBase* pHoldingApp);
@@ -387,14 +387,14 @@ public:
 	std::shared_ptr<NamedPipeClient> MakeNamedPipeClient(std::wstring strPipename);
 	std::shared_ptr<NamedPipeServer> MakeNamedPipeServer(std::wstring strPipename);
 	
-	RESULT AddObject(VirtualObj *pObject, PIPELINE_TYPE pipelineType = PIPELINE_TYPE::ALL);
+	RESULT AddObject(VirtualObj *pObject, SandboxApp::PipelineType pipelineType = (SandboxApp::PipelineType::MAIN | SandboxApp::PipelineType::AUX));
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
 	RESULT RemoveObjectFromInteractionGraph(VirtualObj *pObject);
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
-	RESULT AddObjectToUIGraph(VirtualObj *pObject, PIPELINE_TYPE pipelineType = PIPELINE_TYPE::MAIN);
+	RESULT AddObjectToUIGraph(VirtualObj *pObject, SandboxApp::PipelineType pipelineType = SandboxApp::PipelineType::MAIN);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
 
 	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);

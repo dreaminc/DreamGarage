@@ -274,7 +274,9 @@ RESULT DreamUserApp::Update(void *pContext) {
 			
 			if (m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT) != nullptr) {
 				m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT)->SetVisible(false);
-			}			
+			}
+			// Doing this here for now, it's possible we want to just have AddUser add to both pipes though.
+			GetDOS()->AddObject(m_pUserModel.get(), SandboxApp::PipelineType::AUX);
 		}
 	}
 	
@@ -283,12 +285,12 @@ RESULT DreamUserApp::Update(void *pContext) {
 		m_pPhantomLeftHand = m_pLeftHand->GetPhantomModel();
 		m_pPhantomLeftHand->SetVisible(true, false);
 		
-		GetDOS()->AddObject(m_pPhantomLeftHand.get(), PIPELINE_TYPE::AUX);
+		GetDOS()->AddObject(m_pPhantomLeftHand.get(), SandboxApp::PipelineType::AUX);
 
 		m_pPhantomRightHand = m_pRightHand->GetPhantomModel();
 		m_pPhantomRightHand->SetVisible(true, false);
 		
-		GetDOS()->AddObject(m_pPhantomRightHand.get(), PIPELINE_TYPE::AUX);
+		GetDOS()->AddObject(m_pPhantomRightHand.get(), SandboxApp::PipelineType::AUX);
 	}
 	
 	if (m_pPhantomRightHand != nullptr && m_pPhantomLeftHand != nullptr) {
@@ -645,7 +647,7 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 
 	//pDreamOS->AddObject(pHand->GetModel().get());
 	//pDreamOS->AddObject(pHand->GetMalletHead());
-	pDreamOS->AddObject(pHand->m_pHMDComposite.get(), PIPELINE_TYPE::MAIN);
+	pDreamOS->AddObject(pHand->m_pHMDComposite.get(), SandboxApp::PipelineType::MAIN);
 
 	CR(pHand->InitializeWithContext(pDreamOS));
 
