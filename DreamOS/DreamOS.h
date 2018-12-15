@@ -320,6 +320,7 @@ public:
 	CloudController *GetCloudController();
 	std::shared_ptr<DreamSoundSystem> GetDreamSoundSystem();
 	long GetUserID();
+	long GetUserAvatarID();
 
 protected:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
@@ -350,7 +351,7 @@ public:
 
 	std::shared_ptr<DreamAppBase> GetDreamAppFromUID(UID appUID);
 
-	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode) = 0;
+	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) = 0;
 
 	//template<class derivedAppType>
 	//RESULT ReleaseApp(DreamAppHandleBase* pAppHandle, DreamAppBase* pHoldingApp);
@@ -386,18 +387,19 @@ public:
 	std::shared_ptr<NamedPipeClient> MakeNamedPipeClient(std::wstring strPipename);
 	std::shared_ptr<NamedPipeServer> MakeNamedPipeServer(std::wstring strPipename);
 	
-	RESULT AddObject(VirtualObj *pObject);
+	RESULT AddObject(VirtualObj *pObject, SandboxApp::PipelineType pipelineType = (SandboxApp::PipelineType::MAIN | SandboxApp::PipelineType::AUX));
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
 	RESULT RemoveObjectFromInteractionGraph(VirtualObj *pObject);
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
-	RESULT AddObjectToUIGraph(VirtualObj *pObject);
+	RESULT AddObjectToUIGraph(VirtualObj *pObject, SandboxApp::PipelineType pipelineType = SandboxApp::PipelineType::MAIN);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
 
 	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
 	RESULT RemoveObjectFromUIClippingGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromAuxUIGraph(VirtualObj *pObject);
 
 	RESULT RemoveObject(VirtualObj *pObject);
 	RESULT RemoveAllObjects();
@@ -494,8 +496,10 @@ public:
 
 	CameraNode* GetCameraNode() { return m_pSandbox->GetCameraNode(); }
 	ObjectStoreNode* GetSceneGraphNode() { return m_pSandbox->GetSceneGraphNode(); }
+	ObjectStoreNode* GetAuxSceneGraphNode() { return m_pSandbox->GetAuxSceneGraphNode(); }
 	ObjectStoreNode* GetUISceneGraphNode() { return m_pSandbox->GetUISceneGraphNode(); }
 	ObjectStoreNode* GetUIClippingSceneGraphNode() { return m_pSandbox->GetUIClippingSceneGraphNode(); }
+	ObjectStoreNode* GetAuxUISceneGraphNode() { return m_pSandbox->GetAuxUISceneGraphNode(); }
 
 	// Hands
 	hand *GetHand(HAND_TYPE handType);

@@ -129,10 +129,13 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 
 	m_pUniformAR->SetUniform(m_fIsAugmented);
 
-	m_pUniformClippingEnabled->SetUniform(true);
-	RenderObjectStore(m_pClippingSceneGraph);
+	if (m_pClippingSceneGraph != nullptr) {
+		m_pUniformClippingEnabled->SetUniform(true);
+		RenderObjectStore(m_pClippingSceneGraph);
 
-	m_pUniformClippingEnabled->SetUniform(false);
+		m_pUniformClippingEnabled->SetUniform(false);
+	}
+
 	RenderObjectStore(m_pSceneGraph);
 
 	UnbindFramebuffer();

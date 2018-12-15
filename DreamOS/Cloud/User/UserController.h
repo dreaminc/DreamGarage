@@ -132,6 +132,7 @@ public:
 	TwilioNTSInformation GetTwilioNTSInformation();
 
 	long GetUserID() { return m_user.GetUserID(); }
+	long GetUserAvatarModelID() { return m_user.GetAvatarID(); }
 
 // new login flow api calls
 public:

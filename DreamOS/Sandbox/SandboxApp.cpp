@@ -37,8 +37,10 @@ SandboxApp::SandboxApp() :
 	m_pCommandLineManager(nullptr),
 	m_pOpenGLRenderingContext(nullptr),
 	m_pSceneGraph(nullptr),
+	m_pAuxSceneGraph(nullptr),
 	m_pUISceneGraph(nullptr),
 	m_pUIClippingSceneGraph(nullptr),
+	m_pAuxUISceneGraph(nullptr),
 	m_pPhysicsGraph(nullptr),
 	m_pInteractionGraph(nullptr),
 	m_pFlatSceneGraph(nullptr),
@@ -468,6 +470,7 @@ RESULT SandboxApp::RunAppLoop() {
 		// TODO: why
 		OGLProgram::UpdateObjectStore(m_pUIClippingSceneGraph);
 		OGLProgram::UpdateObjectStore(m_pUISceneGraph);
+		OGLProgram::UpdateObjectStore(m_pAuxUISceneGraph);
 
 		// TODO: MODULE
 		// Update Physics
@@ -560,8 +563,14 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
 
+	m_pAuxSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pAuxSceneGraph, "Failed to allocate Scene Graph");
+
 	m_pUISceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pUISceneGraph, "Failed to allocate UI Scene Graph");
+
+	m_pAuxUISceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pAuxUISceneGraph, "Failed to allocate Aux UI Scene Graph");
 
 	m_pUIClippingSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pUIClippingSceneGraph, "Failed to allocate UI Clipping Scene Graph");
@@ -569,8 +578,10 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	// This will prevent scene graph from being deleted when not connected
 	// TODO: Attach to Sandbox somehow?
 	CB(m_pSceneGraph->incRefCount());
+	CB(m_pAuxSceneGraph->incRefCount());
 	CB(m_pUISceneGraph->incRefCount());
 	CB(m_pUIClippingSceneGraph->incRefCount());
+	CB(m_pAuxUISceneGraph->incRefCount());
 
 	// Set up flat graph
 	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
@@ -888,10 +899,15 @@ std::shared_ptr<NamedPipeServer> SandboxApp::MakeNamedPipeServer(std::wstring st
 	return nullptr;
 }
 
-RESULT SandboxApp::AddObject(VirtualObj *pObject) {
+RESULT SandboxApp::AddObject(VirtualObj *pObject, PipelineType pipelineType) {
 	RESULT r = R_PASS;
 
-	CR(m_pSceneGraph->PushObject(pObject));
+	if (static_cast<int>(pipelineType & PipelineType::MAIN) != 0) {
+		CR(m_pSceneGraph->PushObject(pObject));
+	}
+	if (static_cast<int>(pipelineType & PipelineType::AUX) != 0) {
+		CR(m_pAuxSceneGraph->PushObject(pObject));
+	}
 
 Error:
 	return r;
@@ -930,10 +946,15 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject) {
+RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject, PipelineType pipelineType) {
 	RESULT r = R_PASS;
 
-	CR(m_pUISceneGraph->PushObject(pObject));
+	if (static_cast<int>(pipelineType & PipelineType::MAIN) != 0) {
+		CR(m_pUISceneGraph->PushObject(pObject));
+	}
+	if (static_cast<int>(pipelineType & PipelineType::AUX) != 0) {
+		CR(m_pAuxUISceneGraph->PushObject(pObject));
+	}
 
 Error:
 	return r;
@@ -954,6 +975,10 @@ RESULT SandboxApp::RemoveObjectFromUIGraph(VirtualObj *pObject) {
 
 RESULT SandboxApp::RemoveObjectFromUIClippingGraph(VirtualObj *pObject) {
 	return m_pUIClippingSceneGraph->RemoveObject(pObject);
+}
+
+RESULT SandboxApp::RemoveObjectFromAuxUIGraph(VirtualObj *pObject) {
+	return m_pAuxUISceneGraph->RemoveObject(pObject);
 }
 
 /*
@@ -978,8 +1003,10 @@ RESULT SandboxApp::RemoveObject(VirtualObj *pObject) {
 
 	CR(m_pPhysicsGraph->RemoveObject(pObject));
 	CR(m_pSceneGraph->RemoveObject(pObject));
+	CR(m_pAuxSceneGraph->RemoveObject(pObject));
 	CR(m_pUISceneGraph->RemoveObject(pObject));
 	CR(m_pUIClippingSceneGraph->RemoveObject(pObject));
+	CR(m_pAuxUISceneGraph->RemoveObject(pObject));
 
 	CR(m_pInteractionEngine->RemoveObject(pObject, m_pInteractionGraph));
 	CR(m_pInteractionGraph->RemoveObject(pObject));
@@ -1002,8 +1029,10 @@ RESULT SandboxApp::RemoveAllObjects() {
 
 	CR(m_pPhysicsGraph->RemoveAllObjects());
 	CR(m_pSceneGraph->RemoveAllObjects());
+	CR(m_pAuxSceneGraph->RemoveAllObjects());
 	CR(m_pUISceneGraph->RemoveAllObjects());
 	CR(m_pUIClippingSceneGraph->RemoveAllObjects());
+	CR(m_pAuxUISceneGraph->RemoveAllObjects());
 	CR(m_pInteractionGraph->RemoveAllObjects());
 
 Error:

@@ -90,6 +90,8 @@ public:
 	RESULT PendCreateHandModel(long avatarModelID);
 	RESULT LoadHandModel();
 	std::shared_ptr<composite> GetModel();
+	std::shared_ptr<composite> GetPhantomModel();
+	std::shared_ptr<composite> m_pHMDComposite = nullptr;
 
 	// Overlay - deprecated currently
 	RESULT SetOverlayVisible(bool fVisible);
@@ -133,12 +135,14 @@ protected:
 
 	HAND_TYPE m_handType;
 
+
 	std::shared_ptr<composite> m_pModel = nullptr;
+	std::shared_ptr<composite> m_pPhantomModel = nullptr;
 	std::shared_ptr<sphere> m_pPalm = nullptr;
 
 	// this is a state of the hand to represent whether the hand is tracked or not.
 	// For example when using a leap motion, a hand is not tracked when it goes out of the sensor.
-	bool	m_fTracked;
+	bool m_fTracked;
 
 
 	// context for animations, HMD controllers, etc.

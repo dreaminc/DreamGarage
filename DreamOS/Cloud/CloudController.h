@@ -49,6 +49,7 @@ public:
 	//virtual CLOUD_CONTROLLER_TYPE GetControllerType() = 0;
 	//virtual RESULT RequestSubMenu(std::string strScope = "", std::string strPath = "", std::string strTitle = "") = 0;
 	virtual long GetUserID() = 0;
+	virtual long GetUserAvatarID() = 0;
 };
 
 class CloudController : public Controller, 
@@ -174,6 +175,7 @@ public:
 	bool IsEnvironmentConnected();
 
 	virtual long GetUserID() override;
+	virtual long GetUserAvatarID() override;
 
 	//RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON);
 	//std::string GetSDPOfferString();

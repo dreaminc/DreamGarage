@@ -200,7 +200,7 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 	{
 		OGLProgram* pRenderProgramNode = nullptr;
 		OGLProgram* pUIProgramNode = nullptr;
-		MakePipeline(m_pAuxCamera, pRenderProgramNode, pUIProgramNode);
+		MakePipeline(m_pAuxCamera, pRenderProgramNode, pUIProgramNode, SandboxApp::PipelineType::MAIN);
 
 		//m_pUIMirrorProgramNode = pUIProgramNode;
 		m_pUIMirrorProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
@@ -222,7 +222,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode) {
+RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) {
 	RESULT r = R_PASS;
 
 	{
@@ -280,7 +280,12 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 		// Everything else
 		ProgramNode* pRenderProgramNode = MakeProgramNode("standard", PIPELINE_FLAGS::PASSTHRU);
 		CN(pRenderProgramNode);
-		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		if (static_cast<int>(pipelineType & SandboxApp::PipelineType::MAIN) != 0) {
+			CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		}
+		else {
+			CR(pRenderProgramNode->ConnectToInput("scenegraph", GetAuxSceneGraphNode()->Output("objectstore")));
+		}
 		CR(pRenderProgramNode->ConnectToInput("camera", pCamera->Output("stereocamera")));
 		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_irradiance_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
 		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_environment_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
@@ -308,8 +313,13 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 
 		ProgramNode* pUIProgramNode = MakeProgramNode("uistage", PIPELINE_FLAGS::PASSTHRU);
 		CN(pUIProgramNode);
-		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", GetUIClippingSceneGraphNode()->Output("objectstore")));
-		CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
+		if (static_cast<int>(pipelineType & SandboxApp::PipelineType::MAIN) != 0) {
+			CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
+			CR(pUIProgramNode->ConnectToInput("clippingscenegraph", GetUIClippingSceneGraphNode()->Output("objectstore")));
+		}
+		else {
+			CR(pUIProgramNode->ConnectToInput("scenegraph", GetAuxUISceneGraphNode()->Output("objectstore")));
+		}
 		CR(pUIProgramNode->ConnectToInput("camera", pCamera->Output("stereocamera")));
 
 		// Connect output as pass-thru to internal blend program
@@ -357,7 +367,7 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 			else if (m_pReflectionProgramNodeMirror == nullptr && GetSandboxConfiguration().f3rdPersonCamera) {	// an extra check in case we add more pipelines pre-environment
 				m_pReflectionProgramNodeMirror = pReflectionProgramNode;
 				m_pRefractionProgramNodeMirror = pRefractionProgramNode;
-				m_pRenderEnvironmentProgramNodeMirror = pRenderEnvironmentProgramNode;
+				m_pRenderEnvironmentProgramNodeMirror = pRenderEnvironmentProgramNode;	
 			}
 		}
 		else {
@@ -390,7 +400,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 	{
 		OGLProgram* pRenderProgramNode = nullptr;
 		OGLProgram* pUIProgramNode = nullptr;
-		MakePipeline(GetCameraNode(), pRenderProgramNode, pUIProgramNode);
+		MakePipeline(GetCameraNode(), pRenderProgramNode, pUIProgramNode, SandboxApp::PipelineType::MAIN);
 
 		// save interface for UI apps
 		m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);

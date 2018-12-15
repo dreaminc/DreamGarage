@@ -40,7 +40,7 @@ RESULT DreamPeerApp::InitializeApp(void *pContext) {
 
 	m_pUIObjectComposite = GetComposite()->MakeComposite();
 	m_pUIObjectComposite->SetPosition(GetComposite()->GetPosition(true));
-	GetDOS()->AddObjectToUIGraph(m_pUIObjectComposite.get());
+	GetDOS()->AddObjectToUIGraph(m_pUIObjectComposite.get(), (SandboxApp::PipelineType::AUX | SandboxApp::PipelineType::MAIN));
 
 	m_pUserLabelComposite = m_pUIObjectComposite->MakeComposite();
 	m_pUserLabelComposite = m_pUIObjectComposite->AddComposite();

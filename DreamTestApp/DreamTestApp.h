@@ -34,7 +34,7 @@ public:
 	virtual RESULT Update(void) override;
 	virtual version GetDreamVersion() override;
 
-	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode) override;
+	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) override;
 
 	// Cloud
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) override;

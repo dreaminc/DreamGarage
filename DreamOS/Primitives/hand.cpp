@@ -42,6 +42,9 @@ RESULT hand::Initialize(HAND_TYPE type, long avatarModelID) {
 	m_handType = type;
 	
 	m_fTracked = false;
+
+	m_pHMDComposite = AddComposite();
+
 	//Start all visibility at false
 	CR(OnLostTrack());	//CR here because the only other C is inside of the #ifndef
 
@@ -83,6 +86,9 @@ RESULT hand::LoadHandModel() {
 	if (m_pModel != nullptr) {
 		RemoveChild(m_pModel);
 		m_pModel = nullptr;
+
+		RemoveChild(m_pPhantomModel);
+		m_pPhantomModel = nullptr;
 	}
 
 #ifndef _DEBUG
@@ -92,32 +98,44 @@ RESULT hand::LoadHandModel() {
 	if (m_handType == HAND_TYPE::HAND_LEFT) {
 
 		std::wstring wstrModel = wstrAssetPath + k_wstrFolder + std::to_wstring(m_avatarModelId) + L"/" + k_wstrLeft + k_wstrFileType;
-		m_pModel = AddModel(wstrModel);
+		m_pModel = m_pHMDComposite->AddModel(wstrModel);
+		m_pPhantomModel = AddModel(wstrModel);
 
 		vector vLeftHandOffset = vector(0.0f, (float)(M_PI), (float)(M_PI_2));
 		m_pModel->SetOrientationOffset(vLeftHandOffset);
+		m_pPhantomModel->SetOrientationOffset(vLeftHandOffset);
 	}
 	
 	if (m_handType == HAND_TYPE::HAND_RIGHT) {
 
 		std::wstring wstrModel = wstrAssetPath + k_wstrFolder + std::to_wstring(m_avatarModelId) + L"/" + k_wstrRight + k_wstrFileType;
-		m_pModel = AddModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
+		m_pModel = m_pHMDComposite->AddModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
+		m_pPhantomModel = AddModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
 
 		vector vRightHandOffset = vector(0.0f, (float)(M_PI), (float)(-M_PI_2));
 		m_pModel->SetOrientationOffset(vRightHandOffset);
+		m_pPhantomModel->SetOrientationOffset(vRightHandOffset);
 	}
 
 	CN(m_pModel);
+	CN(m_pPhantomModel);
 
 	m_pModel->SetPosition(ptModel);
 	m_pModel->SetScale(scaleModel);
 
 	m_pModel->SetVisible(m_fTracked && m_modelState == ModelState::HAND);
 
+	m_pPhantomModel->SetPosition(ptModel);
+	m_pPhantomModel->SetScale(scaleModel);
+	m_pPhantomModel->SetVisible(true);
+
 	// TODO: this is bad
 	modelColor = ((model*)(m_pModel.get()))->GetChildMesh(0)->GetDiffuseColor();
 	((model*)(m_pModel.get()))->SetMaterialSpecularColor(modelColor, true);
 	((model*)(m_pModel.get()))->SetMaterialShininess(4.0f, true);
+
+	((model*)(m_pPhantomModel.get()))->SetMaterialSpecularColor(modelColor, true);
+	((model*)(m_pPhantomModel.get()))->SetMaterialShininess(4.0f, true);
 
 #else
 
@@ -146,6 +164,10 @@ Error:
 
 std::shared_ptr<composite> hand::GetModel() {
 	return m_pModel;
+}
+
+std::shared_ptr<composite> hand::GetPhantomModel() {
+	return m_pPhantomModel;
 }
 
 RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
@@ -225,7 +247,7 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 
 	m_headOffset = point(0.0f, m_distance * sin(m_angle), -m_distance * cos(m_angle));
 
-	m_pHead = AddSphere(m_radius, 20.0f, 20.0f);
+	m_pHead = m_pHMDComposite->AddSphere(m_radius, 20.0f, 20.0f);
 	m_pHead->SetVisible(false);
 	m_pHead->SetPosition(m_headOffset);
 

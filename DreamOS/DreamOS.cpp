@@ -747,6 +747,10 @@ long DreamOS::GetUserID() {
 	return m_pSandbox->m_pCloudController->GetUserID();
 }
 
+long DreamOS::GetUserAvatarID() {
+	return m_pSandbox->m_pCloudController->GetUserAvatarID();
+}
+
 ControllerProxy* DreamOS::GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controllerType) {
 	return GetCloudController()->GetControllerProxy(controllerType);
 }
@@ -975,8 +979,8 @@ RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
 }
 
-RESULT DreamOS::AddObject(VirtualObj *pObject) {
-	return m_pSandbox->AddObject(pObject);
+RESULT DreamOS::AddObject(VirtualObj *pObject, SandboxApp::PipelineType pipelineType) {
+	return m_pSandbox->AddObject(pObject, pipelineType);
 }
 
 // This is a pass-thru at the moment
@@ -1337,8 +1341,8 @@ Error:
 	return r;
 }
 
-RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject) {
-	return m_pSandbox->AddObjectToUIGraph(pObject);
+RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject, SandboxApp::PipelineType pipelineType) {
+	return m_pSandbox->AddObjectToUIGraph(pObject, pipelineType);
 }
 
 RESULT DreamOS::AddObjectToUIClippingGraph(VirtualObj *pObject) {
@@ -1351,6 +1355,10 @@ RESULT DreamOS::RemoveObjectFromUIGraph(VirtualObj *pObject) {
 
 RESULT DreamOS::RemoveObjectFromUIClippingGraph(VirtualObj *pObject) {
 	return m_pSandbox->RemoveObjectFromUIClippingGraph(pObject);
+}
+
+RESULT DreamOS::RemoveObjectFromAuxUIGraph(VirtualObj *pObject) {
+	return m_pSandbox->RemoveObjectFromAuxUIGraph(pObject);
 }
 
 // Cloud Controller

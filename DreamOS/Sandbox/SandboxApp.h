@@ -91,6 +91,13 @@ public:
 		HMD_TYPE hmdType = HMD_ANY_AVAILABLE;
 	};
 
+	enum class PipelineType : uint16_t {
+		NONE = 0,
+		MAIN = 1 << 0,
+		AUX = 1 << 1,
+		INVALID = 0xFFFF
+	};
+
 private:
 	SandboxApp::configuration m_SandboxConfiguration;
 
@@ -212,16 +219,17 @@ public:
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
-	RESULT AddObjectToUIGraph(VirtualObj *pObject);
+	RESULT AddObjectToUIGraph(VirtualObj *pObject, PipelineType pipelineType = PipelineType::MAIN);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
 
 	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
 	RESULT RemoveObjectFromUIClippingGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromAuxUIGraph(VirtualObj *pObject);
 
 	RESULT RemoveAllObjects();
 	RESULT RemoveObject(VirtualObj *pObject);
 
-	RESULT AddObject(VirtualObj *pObject);	
+	RESULT AddObject(VirtualObj *pObject, PipelineType pipelineType = PipelineType::MAIN);
 	FlatContext* AddFlatContext(int width, int height, int channels);
 	RESULT RenderToTexture(FlatContext* pContext);
 
@@ -424,8 +432,10 @@ public:
 
 	CameraNode* GetCameraNode() { return m_pCamera; }
 	ObjectStoreNode* GetSceneGraphNode() { return m_pSceneGraph; }
+	ObjectStoreNode* GetAuxSceneGraphNode() { return m_pAuxSceneGraph; }
 	ObjectStoreNode* GetUISceneGraphNode() { return m_pUISceneGraph; }
 	ObjectStoreNode* GetUIClippingSceneGraphNode() { return m_pUIClippingSceneGraph; }
+	ObjectStoreNode* GetAuxUISceneGraphNode() { return m_pAuxUISceneGraph; }
 
 	hand *GetHand(HAND_TYPE handType);
 
@@ -450,8 +460,10 @@ protected:
 
 	//ObjectStore *m_pSceneGraph;
 	ObjectStoreNode *m_pSceneGraph = nullptr;
+	ObjectStoreNode *m_pAuxSceneGraph = nullptr;
 	ObjectStoreNode *m_pUISceneGraph = nullptr;
 	ObjectStoreNode *m_pUIClippingSceneGraph = nullptr;
+	ObjectStoreNode *m_pAuxUISceneGraph = nullptr;
 
 	CloudController *m_pCloudController = nullptr;
 	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine = nullptr;
@@ -503,6 +515,18 @@ public:
 protected:
 	std::wstring m_strHardwareID;
 };
+
+inline constexpr SandboxApp::PipelineType operator | (const SandboxApp::PipelineType &lhs, const SandboxApp::PipelineType &rhs) {
+	return static_cast<SandboxApp::PipelineType>(
+		static_cast<std::underlying_type<SandboxApp::PipelineType>::type>(lhs) | static_cast<std::underlying_type<SandboxApp::PipelineType>::type>(rhs)
+		);
+}
+
+inline constexpr SandboxApp::PipelineType operator & (const SandboxApp::PipelineType &lhs, const SandboxApp::PipelineType &rhs) {
+	return static_cast<SandboxApp::PipelineType>(
+		static_cast<std::underlying_type<SandboxApp::PipelineType>::type>(lhs) & static_cast<std::underlying_type<SandboxApp::PipelineType>::type>(rhs)
+		);
+}
 
 #endif // ! SANDBOX_APP_H_
 

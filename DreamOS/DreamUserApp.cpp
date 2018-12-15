@@ -256,21 +256,46 @@ RESULT DreamUserApp::Update(void *pContext) {
 		}
 	}
 	
-	if (GetDOS()->GetSandboxConfiguration().f3rdPersonCamera && m_pUserModel == nullptr) {
-		m_pUserModel = std::shared_ptr<user>(GetDOS()->AddUser());
-		CN(m_pUserModel);
+	if (m_pUserModel == nullptr) {
+		int avatarID = GetDOS()->GetUserAvatarID();
+		if (avatarID != -1) {	// don't do this step until the user profile info is loaded
+			m_pUserModel = std::shared_ptr<user>(GetDOS()->AddUser());
+			CN(m_pUserModel);
 
-		CR(m_pUserModel->SetDreamOS(GetDOS()));
-		CR(m_pUserModel->UpdateAvatarModelWithID(12));
-		CR(m_pUserModel->SetVisible(true));
+			CR(m_pUserModel->SetDreamOS(GetDOS()));
+			CR(m_pUserModel->UpdateAvatarModelWithID(GetDOS()->GetUserAvatarID()));
+			CR(m_pUserModel->SetVisible(true));
 
-		if (m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT) != nullptr) {
-			CR(m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT)->SetVisible(false));
+			CR(m_pUserModel->GetMouth()->SetVisible(true));
+
+			if (m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT) != nullptr) {
+				m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT)->SetVisible(false);
+			}
+			
+			if (m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT) != nullptr) {
+				m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT)->SetVisible(false);
+			}
+			// Doing this here for now, it's possible we want to just have AddUser add to both pipes though.
+			GetDOS()->AddObject(m_pUserModel.get(), SandboxApp::PipelineType::AUX);
 		}
+	}
+	
+	if (m_pLeftHand->GetPhantomModel() != nullptr && m_pRightHand->GetPhantomModel() != nullptr &&
+		m_pPhantomLeftHand == nullptr && m_pPhantomRightHand == nullptr) {
+		m_pPhantomLeftHand = m_pLeftHand->GetPhantomModel();
+		m_pPhantomLeftHand->SetVisible(true, false);
+		
+		GetDOS()->AddObject(m_pPhantomLeftHand.get(), SandboxApp::PipelineType::AUX);
 
-		if (m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT) != nullptr) {
-			CR(m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT)->SetVisible(false));
-		}
+		m_pPhantomRightHand = m_pRightHand->GetPhantomModel();
+		m_pPhantomRightHand->SetVisible(true, false);
+		
+		GetDOS()->AddObject(m_pPhantomRightHand.get(), SandboxApp::PipelineType::AUX);
+	}
+	
+	if (m_pPhantomRightHand != nullptr && m_pPhantomLeftHand != nullptr) {
+		m_pPhantomLeftHand->SetVisible(m_fHeadsetAndHandsTracked);
+		m_pPhantomRightHand->SetVisible(m_fHeadsetAndHandsTracked);
 	}
 
 	CR(UpdateHysteresisObject());
@@ -620,19 +645,23 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 	type = pHand->GetHandState().handType;
 	CBR(type == HAND_TYPE::HAND_LEFT || type == HAND_TYPE::HAND_RIGHT, R_SKIPPED);
 
-	pDreamOS->AddObject(pHand);
+	//pDreamOS->AddObject(pHand->GetModel().get());
+	//pDreamOS->AddObject(pHand->GetMalletHead());
+	pDreamOS->AddObject(pHand->m_pHMDComposite.get(), SandboxApp::PipelineType::MAIN);
+
 	CR(pHand->InitializeWithContext(pDreamOS));
 
 	CR(m_pPointingArea->RegisterObject(pHand));
 
 	if (type == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;
-		m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft);	
+		m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft);
 	}
 	else {
 		m_pRightHand = pHand;
 		m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight);
 	}
+
 
 	// if the second hand is created later on, make sure that the states match
 
@@ -669,6 +698,12 @@ RESULT DreamUserApp::ClearHands() {
 
 	GetDOS()->RemoveObject(m_pRightHand);
 	m_pRightHand = nullptr;
+
+	GetDOS()->RemoveObject(m_pPhantomLeftHand.get());
+	m_pPhantomLeftHand = nullptr;
+
+	GetDOS()->RemoveObject(m_pPhantomRightHand.get());
+	m_pPhantomRightHand = nullptr;
 
 Error:
 	return r;
