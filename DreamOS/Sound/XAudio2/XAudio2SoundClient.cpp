@@ -259,7 +259,7 @@ RESULT XAudio2SoundClient::PushAudioPacket(const AudioPacket &pendingAudioPacket
 
 		//m_pXAudio2SourceVoiceStereoSignedInt16->FlushSourceBuffers();
 
-		DEBUG_LINEOUT("%d frames", pendingAudioPacket.GetNumFrames());
+//		DEBUG_LINEOUT("%d frames", pendingAudioPacket.GetNumFrames());
 
 		CRM((RESULT)m_pXAudio2SourceVoiceStereoSignedInt16->SubmitSourceBuffer(&xAudio2SoundBuffer), "Failed to submit source buffer");
 
@@ -302,7 +302,7 @@ RESULT XAudio2SoundClient::PlayAudioPacketSigned16Bit(const AudioPacket &pending
 
 														  //m_pXAudio2SourceVoiceStereoSignedInt16->FlushSourceBuffers();
 
-		DEBUG_LINEOUT("%d frames", pendingAudioPacket.GetNumFrames());
+//		DEBUG_LINEOUT("%d frames", pendingAudioPacket.GetNumFrames());
 
 		CRM((RESULT)m_xaudio2MonoSignedInt16Sources[channel]->SubmitSourceBuffer(&xAudio2SoundBuffer), "Failed to submit source buffer");
 

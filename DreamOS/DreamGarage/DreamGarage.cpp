@@ -935,7 +935,7 @@ RESULT DreamGarage::Update(void) {
 	// TODO: this should go up into DreamOS or even sandbox
 	std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
-	///*
+	/*
 	if(std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastHeadUpdateTime).count() > UPDATE_HEAD_COUNT_MS) {
 		SendHeadPosition();
 		g_lastHeadUpdateTime = timeNow;
@@ -1474,28 +1474,37 @@ Error:
 RESULT DreamGarage::OnSendCameraPlacement() {
 	RESULT r = R_PASS;
 
-	// not great
-	//CR(m_pDreamUserControlArea->AddEnvironmentAsset(nullptr));
-
-	// TODO: start sending data messages
+	CR(m_pDreamUserControlArea->GetVCam()->SetIsSendingCameraPlacement(true));
 
 Error:
 	return r;
 }
 
 RESULT DreamGarage::OnStopSendingCameraPlacement() {
-	// TODO:: update data sending flag
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	CR(m_pDreamUserControlArea->GetVCam()->SetIsSendingCameraPlacement(false));
+
+Error:
+	return r;
 }
 
 RESULT DreamGarage::OnReceiveCameraPlacement(long userID) {
-	// TODO:: update data receiving flag
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	CR(m_pDreamUserControlArea->GetVCam()->SetIsReceivingCameraPlacement(true));
+
+Error:
+	return r;
 }
 
 RESULT DreamGarage::OnStopReceivingCameraPlacement() {
-	// TODO:: update data receiving flag
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	CR(m_pDreamUserControlArea->GetVCam()->SetIsReceivingCameraPlacement(false));
+
+Error:
+	return r;
 }
 
 

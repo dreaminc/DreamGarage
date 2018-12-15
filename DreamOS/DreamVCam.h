@@ -86,6 +86,9 @@ public:
 	bool IsSendingCameraPlacement();
 	bool IsReceivingCameraPlacement();
 
+	RESULT BroadcastVCamMessage();
+	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
+
 protected:
 	static DreamVCam* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -118,6 +121,7 @@ private:
 	// flags for sending/receiving data
 	bool m_fSendingCameraPlacement = false;
 	bool m_fReceivingCameraPlacement = false;
+	//bool m_fPip
 };
 
 #endif // ! DREAM_VCAM_SYSTEM_H_

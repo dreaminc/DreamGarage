@@ -1,15 +1,16 @@
 #ifndef UPDATE_VCAM_MESSAGE_H_
 #define UPDATE_VCAM_MESSAGE_H_
 
-#define DREAM_VCAM_APP_NAME "DreamVCam"
+//#define DREAM_VCAM_APP_NAME "DreamVCam"
+#define DREAM_VCAM_APP_NAME "hello"
 
 #include "DreamAppMessage.h"
 #include "Primitives/point.h"
 #include "Primitives/quaternion.h"
 
 class DreamUpdateVCamMessage : public DreamAppMessage {
-private:
-	__declspec(align(4)) struct MessageBody {
+public:
+	__declspec(align(8)) struct MessageBody {
 		point ptPosition;
 		quaternion qOrientation;
 	} m_body;

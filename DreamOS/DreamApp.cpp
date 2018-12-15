@@ -73,7 +73,7 @@ RESULT DreamAppBase::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage)
 	DreamOS *pDOS = GetDOS();
 
 	CN(pDOS);
-	CR(pDOS->BroadcastDreamAppMessage(pDreamAppMessage));
+	CR(pDOS->BroadcastDreamAppMessage(pDreamAppMessage, DreamAppMessage::flags::SHARE_NETWORK));
 
 Error:
 	return r;

@@ -40,6 +40,8 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_fCanPressButton[0] = false;
 	m_fCanPressButton[1] = false;
 
+	SetAppName("hello");
+
 Error:
 	return r;
 }
@@ -58,6 +60,10 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBar>(this, false);
 		CN(m_pDreamUIBar);
+
+		m_pDreamVCam = GetDOS()->LaunchDreamModule<DreamVCam>(this);
+		m_pDreamVCam->InitializeWithParent(this);
+		CN(m_pDreamVCam);
 
 		m_pView = GetComposite()->AddUIView(GetDOS());
 		CN(m_pView);
@@ -679,10 +685,9 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 	}
 
 	else if (strScope == m_strCameraScope) {
-		if (m_pDreamVCam == nullptr) {
-			m_pDreamVCam = GetDOS()->LaunchDreamModule<DreamVCam>(this);
+		// TODO: temp
+		if (m_pDreamVCam != nullptr) {
 			m_pActiveSource = m_pDreamVCam;
-			m_pDreamVCam->InitializeWithParent(this);
 			m_pDreamVCam->InitializePipeline();
 			m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
 			// new desktop can't be the current content
@@ -1171,4 +1176,29 @@ WebBrowserPoint DreamUserControlArea::GetRelativePointofContact(point ptContact)
 RESULT DreamUserControlArea::SetDreamUserApp(std::shared_ptr<DreamUserApp> pDreamUserApp) {
 	m_pDreamUserApp = pDreamUserApp;
 	return R_PASS;
+}
+
+RESULT DreamUserControlArea::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	CR(DreamAppBase::BroadcastDreamAppMessage(pDreamAppMessage));
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::HandleDreamAppMessage(PeerConnection *pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	// DreamModule doesn't have access to these, so UserControlArea is acting as a passthrough
+	if (pDreamAppMessage->GetDreamAppName() == "hello") {
+		m_pDreamVCam->HandleDreamAppMessage(pPeerConnection, pDreamAppMessage);
+	}
+
+Error:
+	return r;
+}
+
+std::shared_ptr<DreamVCam> DreamUserControlArea::GetVCam() {
+	return m_pDreamVCam;
 }

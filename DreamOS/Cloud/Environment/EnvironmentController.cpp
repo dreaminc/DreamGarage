@@ -498,7 +498,8 @@ RESULT EnvironmentController::RequestOpenCamera() {
 	//jsonPayload["environment_camera"]["path"] = "";
 
 	//jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
-	//jsonPayload["environment_camera"]["scope"] = "MenuProviderScope.CameraMenuProvider";
+	jsonPayload["environment_camera"]["scope"] = "MenuProviderScope.CameraMenuProvider";
+	jsonPayload["environment_camera"]["storage_provider_scope"] = "MenuProviderScope.CameraMenuProvider";
 	jsonPayload["environment_camera"]["title"] = "Dream Virtual Camera";
 	jsonPayload["environment_camera"]["user"] = GetCloudController()->GetUserID();
 

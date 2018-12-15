@@ -179,6 +179,11 @@ public:
 public:
 	RESULT SetDreamUserApp(std::shared_ptr<DreamUserApp> pDreamUserApp);
 
+	// DreamModule doesn't have access to these, so UserControlArea is acting as a passthrough, since is it the parent app
+	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
+	virtual RESULT HandleDreamAppMessage(PeerConnection *pPeerConnection, DreamAppMessage *pDreamAppMessage) override;
+	std::shared_ptr<DreamVCam> GetVCam();
+
 private:
 
 	// positioning helper

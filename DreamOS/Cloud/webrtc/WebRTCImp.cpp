@@ -15,6 +15,8 @@
 #include "Cloud/User/User.h"
 #include "Cloud/User/TwilioNTSInformation.h"
 
+#include "DreamUpdateVCamMessage.h"
+
 WebRTCImp::WebRTCImp(CloudController *pParentCloudController) :
 	CloudImp(pParentCloudController),
 	m_pWebRTCConductor(nullptr),
@@ -203,6 +205,11 @@ Error:
 RESULT WebRTCImp::SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 
+	DreamUpdateVCamMessage* pMessage = (DreamUpdateVCamMessage*)(pDataChannelBuffer);
+	if (pMessage != nullptr) {
+	//	pMessage->GetDreamAppName();
+		pMessage->PrintMessage();
+	}
 	CN(m_pWebRTCConductor);
 
 	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
@@ -404,6 +411,7 @@ Error:
 
 RESULT WebRTCImp::OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
+
 
 	if (m_pWebRTCObserver != nullptr) {
 		CR(m_pWebRTCObserver->OnDataChannelMessage(peerConnectionID, pDataChannelBuffer, pDataChannelBuffer_n));
