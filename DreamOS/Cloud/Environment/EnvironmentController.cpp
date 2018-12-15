@@ -861,17 +861,54 @@ Error:
 }
 
 RESULT EnvironmentController::OnReceiveCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {
-	// TODO: if the user sends a share camera placement request, the peers will receive a receive
-	// camera placement request 
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_camera"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnSendCameraPlacement());
+		}
+	}
+
+Error:
+	return r;
 }
 
 RESULT EnvironmentController::OnStopSendingCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_camera"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnSendCameraPlacement());
+		}
+	}
+
+Error:
+	return r;
 }
 
 RESULT EnvironmentController::OnStopReceivingCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_camera"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnSendCameraPlacement());
+		}
+	}
+
+Error:
+	return r;
 }
 
 RESULT EnvironmentController::OnCloseAsset(std::shared_ptr<CloudMessage> pCloudMessage) {

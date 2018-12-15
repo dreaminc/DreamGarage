@@ -455,11 +455,10 @@ RESULT DreamVCam::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAp
 
 	DreamUpdateVCamMessage* pMessage = (DreamUpdateVCamMessage*)(pDreamAppMessage);
 
-//	if (m_fReceivingCameraPlacement) {
-		m_pCameraModel->SetVisible(true);
+	if (m_fReceivingCameraPlacement) {
 		m_pCameraModel->SetPosition(pMessage->m_body.ptPosition);
 		m_pCameraModel->SetOrientation(pMessage->m_body.qOrientation);
-//	}
+	}
 
 Error:
 	return r;
