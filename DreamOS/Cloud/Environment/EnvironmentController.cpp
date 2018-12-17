@@ -888,7 +888,7 @@ RESULT EnvironmentController::OnStopSendingCameraPlacement(std::shared_ptr<Cloud
 	if (jsonEnvironmentAsset.size() != 0) {
 
 		if (m_pEnvironmentControllerObserver != nullptr) {
-			CR(m_pEnvironmentControllerObserver->OnSendCameraPlacement());
+			CR(m_pEnvironmentControllerObserver->OnStopSendingCameraPlacement());
 		}
 	}
 
@@ -905,7 +905,7 @@ RESULT EnvironmentController::OnStopReceivingCameraPlacement(std::shared_ptr<Clo
 	if (jsonEnvironmentAsset.size() != 0) {
 
 		if (m_pEnvironmentControllerObserver != nullptr) {
-			CR(m_pEnvironmentControllerObserver->OnSendCameraPlacement());
+			CR(m_pEnvironmentControllerObserver->OnStopReceivingCameraPlacement());
 		}
 	}
 
