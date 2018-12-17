@@ -1312,7 +1312,7 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 			//*/
 			auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 			//CR(pDreamGamepadCamera->SetCamera(pAuxCamera));
-			CR(pDreamGamepadCamera->SetCamera(pTestContext->pDreamVCam->GetCameraNode()));
+			CR(pDreamGamepadCamera->SetCamera(pTestContext->pDreamVCam->GetCameraNode(), DreamGamepadCameraApp::CameraControlType::GAMEPAD));
 		}
 		
 
@@ -2223,7 +2223,7 @@ RESULT DreamOSTestSuite::AddTestGamepadCamera() {
 		// Create the Shared View App
 		{
 			auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
-			CR(pDreamGamepadCamera->SetCamera(m_pDreamOS->GetCamera()));
+			CR(pDreamGamepadCamera->SetCamera(m_pDreamOS->GetCamera(), DreamGamepadCameraApp::CameraControlType::GAMEPAD));
 		}
 		//CNM(pTestContext->pDreamUserApp, "Failed to create dream user app");
 

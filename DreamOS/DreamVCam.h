@@ -80,6 +80,15 @@ public:
 	virtual std::string GetTitle() override;
 	virtual std::string GetContentType() override;
 
+	// Sharing Camera Placement
+	RESULT SetIsSendingCameraPlacement(bool fSendingCameraPlacement);
+	RESULT SetIsReceivingCameraPlacement(bool fReceivingCameraPlacement);
+	bool IsSendingCameraPlacement();
+	bool IsReceivingCameraPlacement();
+
+	RESULT BroadcastVCamMessage();
+	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
+
 protected:
 	static DreamVCam* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -108,6 +117,10 @@ private:
 	std::string m_strContentType;
 	std::string m_strTitle = "Dream Virtual Camera";
 	DreamUserControlArea* m_pParentApp = nullptr;
+
+	// flags for sending/receiving data
+	bool m_fSendingCameraPlacement = false;
+	bool m_fReceivingCameraPlacement = false;
 };
 
 #endif // ! DREAM_VCAM_SYSTEM_H_

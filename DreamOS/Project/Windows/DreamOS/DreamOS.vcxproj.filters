@@ -1031,6 +1031,7 @@
     <ClCompile Include="..\..\..\Cloud\Environment\CameraController.cpp">
       <Filter>Cloud\Environment</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamUpdateVCamMessage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2241,6 +2242,7 @@
     <ClInclude Include="..\..\..\Cloud\Environment\CameraController.h">
       <Filter>Cloud\Environment</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DreamUpdateVCamMessage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

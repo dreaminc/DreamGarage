@@ -36,6 +36,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestModel());
+
 	CR(AddTestPBOTextureReadback());
 	
 	CR(AddTestPBOTextureUpload());
@@ -60,8 +62,6 @@ RESULT HALTestSuite::AddTests() {
 	
 	CR(AddTestGeometryShader());
   
-	CR(AddTestModel());
-
 	CR(AddTestCamera());
 
 	CR(AddTestWaterShader());
@@ -1594,7 +1594,7 @@ RESULT HALTestSuite::AddTestEnvironmentMapping() {
 
 			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 			CN(pDreamGamepadApp);
-			pDreamGamepadApp->SetCamera(m_pDreamOS->GetCamera());
+			CR(pDreamGamepadApp->SetCamera(m_pDreamOS->GetCamera(), DreamGamepadCameraApp::CameraControlType::GAMEPAD));
 
 		}
 
@@ -2713,6 +2713,7 @@ RESULT HALTestSuite::AddTestModel() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
+		//CR(SetupSkyboxPipeline("blinnphong_texture"));
 		CR(SetupSkyboxPipeline("standard"));
 
 		// Objects 
@@ -2753,10 +2754,11 @@ RESULT HALTestSuite::AddTestModel() {
 			PathManager *pPathManager = PathManager::instance();
 			std::wstring wstrAssetPath;
 			pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
-			std::wstring wstrHeadModel = wstrAssetPath + L"/avatar/" + std::to_wstring(6) + L"/head.fbx";
-			pTestContext->pModel = m_pDreamOS->AddModel(wstrHeadModel);
+			std::wstring wstrHeadModel = wstrAssetPath + L"/camera/camera.fbx";
+			//std::wstring wstrHeadModel = wstrAssetPath + L"/avatar/" + std::to_wstring(6) + L"/head.fbx";
+			pTestContext->pModel = m_pDreamOS->AddModel(L"//camera//camera.fbx");
 			pTestContext->pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
-			pTestContext->pModel->SetScale(0.1f);
+			pTestContext->pModel->SetScale(0.003f);
 
 			/*
 			pTestContext->pModel = m_pDreamOS->AddModel(L"\\nanosuit\\nanosuit.obj");
@@ -5726,7 +5728,7 @@ RESULT HALTestSuite::AddTest3rdPersonCamera() {
 		{
 
 			auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
-			CR(pDreamGamepadCamera->SetCamera(pAuxCamera));
+			CR(pDreamGamepadCamera->SetCamera(m_pDreamOS->GetCamera(), DreamGamepadCameraApp::CameraControlType::GAMEPAD));
 
 			volume *pVolume;
 			pVolume = nullptr;
@@ -5909,7 +5911,7 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 
 			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 			CN(pDreamGamepadApp);
-			pDreamGamepadApp->SetCamera(m_pDreamOS->GetCamera());
+			CR(pDreamGamepadApp->SetCamera(m_pDreamOS->GetCamera(), DreamGamepadCameraApp::CameraControlType::GAMEPAD));
 
 		}
 

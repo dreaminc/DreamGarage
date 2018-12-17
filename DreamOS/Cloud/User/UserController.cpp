@@ -707,7 +707,7 @@ RESULT UserController::OnGetSettings(std::string&& strResponse) {
 		cameraID = jsonSettings["id"].get<int>();
 		userID = jsonSettings["user"].get<int>();
 
-		if (jsonSettings["camera_position_x"].is_number_float()) {
+		if (!jsonSettings["camera_position_x"].is_null()) {
 			ptX = jsonSettings["camera_position_x"].get<float>();
 			ptY = jsonSettings["camera_position_y"].get<float>();
 			ptZ = jsonSettings["camera_position_z"].get<float>();

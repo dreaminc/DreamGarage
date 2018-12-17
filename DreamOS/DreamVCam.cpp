@@ -19,6 +19,8 @@
 #include "HAL/opengl/OGLProgramWater.h"
 #include "HAL/opengl/OGLProgramSkybox.h"
 
+#include "DreamUpdateVCamMessage.h"
+
 DreamVCam::DreamVCam(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamVCam>(pDreamOS, pContext)
 {
@@ -34,6 +36,30 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 
 	SetName("DreamVCam");
 	SetModuleDescription("The Dream Virtual Camera Module");
+
+	m_pCameraModel = GetDOS()->AddModel(L"\\camera\\camera.fbx");
+	CN(m_pCameraModel);
+	m_pCameraModel->SetScale(0.0005f);
+
+	m_pCameraModel->SetVisible(false);
+	//m_pCameraModel->GetFirstChild<mesh>()->RotateYByDeg(180.0f);
+
+	// TODO: 
+	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
+	CN(m_pCamera);
+	CB(m_pCamera->incRefCount());
+
+	m_pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
+	CN(m_pDreamGamepadCamera);
+	CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
+	
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::InitializePipeline() {
+	RESULT r = R_PASS;
 
 	// Pass in a context if needed in future
 	//CRM(StartModuleProcess(), "Failed to start module process");
@@ -58,25 +84,6 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 
 	// Set up the aux camera and local pipeline
 
-	// TODO: 
-	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
-	CN(m_pCamera);
-	CB(m_pCamera->incRefCount());
-
-	m_pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
-	CN(m_pDreamGamepadCamera);
-	CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
-
-	m_pCameraModel = GetDOS()->AddModel(L"\\Bear\\bear-obj.obj");
-	CN(m_pCameraModel);
-	m_pCameraModel->SetScale(0.01f);
-	
-Error:
-	return r;
-}
-
-RESULT DreamVCam::InitializePipeline() {
-	RESULT r = R_PASS;
 
 	r = GetDOS()->MakePipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode, SandboxApp::PipelineType::AUX);
 	if (r != R_NOT_IMPLEMENTED) {
@@ -117,7 +124,6 @@ RESULT DreamVCam::InitializePipeline() {
 
 	CNM(m_pOGLRenderNode, "Failed to create mirror pipeline for virtual camera");
 	CNM(m_pOGLEndNode, "Failed to create mirror pipeline for virtual camera");
-
 	m_pSourceTexture = m_pOGLRenderNode->GetOGLFramebufferColorTexture();
 	m_pSourceTexture->SetUVVerticalFlipped();
 
@@ -150,6 +156,8 @@ RESULT DreamVCam::Update(void *pContext) {
 
 	CBR(m_fIsRunning, R_SKIPPED);
 
+	CNR(m_pOGLEndNode, R_SKIPPED);
+	CNR(m_pOGLRenderNode, R_SKIPPED);
 	//*
 	// TODO: Some more logic around texture / buffer sizes etc 
 	//if (m_pNamedPipeServer != nullptr && m_pSourceTexture != nullptr) {
@@ -205,6 +213,13 @@ RESULT DreamVCam::Update(void *pContext) {
 		m_pCameraModel->SetPosition(m_pCamera->GetPosition(true));
 		m_pCameraModel->SetOrientation(m_pCamera->GetWorldOrientation());
 	}
+
+	// With better communication with Gamepad, potentially could send this less often
+	//*
+	if (m_fSendingCameraPlacement) {
+		CR(BroadcastVCamMessage());
+	}
+	//*/
 
 Error:
 	return r;
@@ -302,7 +317,6 @@ RESULT DreamVCam::InitializeWithParent(DreamUserControlArea *pParentApp) {
 
 	m_pParentApp = pParentApp;	
 	m_fIsRunning = true;
-	m_pCameraModel->SetVisible(true);
 
 Error:
 	return r;
@@ -354,6 +368,8 @@ RESULT DreamVCam::SendFirstFrame() {
 
 RESULT DreamVCam::CloseSource() {
 	m_fIsRunning = false;
+
+	// TODO: OnCloseAsset
 	m_pCameraModel->SetVisible(false);
 	return R_PASS;
 }
@@ -372,4 +388,60 @@ std::string DreamVCam::GetTitle() {
 
 std::string DreamVCam::GetContentType() {
 	return m_strContentType;
+}
+
+RESULT DreamVCam::SetIsSendingCameraPlacement(bool fSendingCameraPlacement) {
+	m_fSendingCameraPlacement = fSendingCameraPlacement;
+	m_pCameraModel->SetVisible(m_fSendingCameraPlacement);
+	return R_PASS;
+}
+
+RESULT DreamVCam::SetIsReceivingCameraPlacement(bool fReceivingCameraPlacement) {
+	m_fReceivingCameraPlacement = fReceivingCameraPlacement;
+	m_pCameraModel->SetVisible(m_fSendingCameraPlacement);
+	return R_PASS;
+}
+
+bool DreamVCam::IsSendingCameraPlacement() {
+	return m_fSendingCameraPlacement;
+}
+
+bool DreamVCam::IsReceivingCameraPlacement() {
+	return m_fReceivingCameraPlacement;
+}
+
+RESULT DreamVCam::BroadcastVCamMessage() {
+	RESULT r = R_PASS;
+
+	DreamUpdateVCamMessage *pMessage = nullptr;
+
+	CN(m_pCamera);
+	CN(m_pCameraModel);
+
+	CBR(m_fSendingCameraPlacement, R_SKIPPED);
+
+	pMessage = new DreamUpdateVCamMessage(0, 0, m_pCamera->GetPosition(), m_pCamera->GetOrientation(), GetUID());
+	CN(pMessage);
+
+	CN(m_pParentApp);
+	CR(m_pParentApp->BroadcastDreamAppMessage(pMessage));
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	DreamUpdateVCamMessage* pMessage = (DreamUpdateVCamMessage*)(pDreamAppMessage);
+
+	if (m_fReceivingCameraPlacement) {
+		m_pCameraModel->SetPosition(pMessage->m_body.ptPosition);
+		m_pCameraModel->SetOrientation(pMessage->m_body.qOrientation);
+		// TODO: temp
+		m_pCameraModel->SetVisible(true);
+	}
+
+Error:
+	return r;
 }
