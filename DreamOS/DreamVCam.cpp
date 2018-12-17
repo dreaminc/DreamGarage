@@ -152,25 +152,12 @@ RESULT DreamVCam::Update(void *pContext) {
 
 	static int count = 0;
 
-<<<<<<< 08397485edfa3df6fddb71978583b396aaf17894
 	static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
 
 	CBR(m_fIsRunning, R_SKIPPED);
 
-	//*
-	// TODO: Some more logic around texture / buffer sizes etc 
-	//if (m_pNamedPipeServer != nullptr && m_pSourceTexture != nullptr) {
-	{
-		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
-
-		// Approximately 30 FPS
-		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 41) {
-=======
-	static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
-
 	CNR(m_pOGLEndNode, R_SKIPPED);
 	CNR(m_pOGLRenderNode, R_SKIPPED);
-
 	//*
 	// TODO: Some more logic around texture / buffer sizes etc 
 	//if (m_pNamedPipeServer != nullptr && m_pSourceTexture != nullptr) {
@@ -179,7 +166,6 @@ RESULT DreamVCam::Update(void *pContext) {
 
 		// Approximately 30 FPS
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 41) {
->>>>>>> hacks, but a working version
 			
 			texture *pTexture = m_pOGLRenderNode->GetOGLFramebufferColorTexture();
 			OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTexture);
@@ -330,6 +316,7 @@ RESULT DreamVCam::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	RESULT r = R_PASS;
 
 	m_pParentApp = pParentApp;	
+	m_fIsRunning = true;
 
 Error:
 	return r;
@@ -380,7 +367,10 @@ RESULT DreamVCam::SendFirstFrame() {
 }
 
 RESULT DreamVCam::CloseSource() {
-	Shutdown();
+	m_fIsRunning = false;
+
+	// TODO: OnCloseAsset
+	m_pCameraModel->SetVisible(false);
 	return R_PASS;
 }
 
