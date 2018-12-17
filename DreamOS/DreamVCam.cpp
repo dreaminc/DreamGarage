@@ -37,8 +37,9 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	SetName("DreamVCam");
 	SetModuleDescription("The Dream Virtual Camera Module");
 
-	m_pCameraModel = GetDOS()->AddModel(L"\\camera\\camera.fbx");
+	m_pCameraModel = GetDOS()->MakeModel(L"\\camera\\camera.fbx");
 	CN(m_pCameraModel);
+	GetDOS()->AddObject(m_pCameraModel, SandboxApp::PipelineType::MAIN);
 	m_pCameraModel->SetScale(0.0005f);
 
 	m_pCameraModel->SetVisible(false);
