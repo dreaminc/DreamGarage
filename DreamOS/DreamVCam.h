@@ -9,6 +9,7 @@
 
 #include "DreamModule.h"
 #include "DreamUserControlArea/DreamContentSource.h"
+#include "Sandbox/NamedPipeServer.h"
 
 #include <memory>
 
@@ -17,7 +18,6 @@ class SoundFile;
 class HMD;
 class texture;
 
-class NamedPipeServer;
 class ProgramNode;
 class OGLProgram;
 class CameraNode;
@@ -30,7 +30,8 @@ class EnvironmentAsset;
 
 class DreamVCam : 
 	public DreamModule<DreamVCam>,
-	public DreamContentSource
+	public DreamContentSource,
+	public NamedPipeServer::observer
 {
 	friend class DreamModuleManager;
 
@@ -79,6 +80,10 @@ public:
 
 	virtual std::string GetTitle() override;
 	virtual std::string GetContentType() override;
+
+	// NamedPipeServerObserver
+	virtual RESULT OnConnection() override;
+	virtual RESULT OnDisconnect() override;
 
 	// Sharing Camera Placement
 	RESULT SetIsSendingCameraPlacement(bool fSendingCameraPlacement);
