@@ -869,7 +869,9 @@ RESULT EnvironmentController::OnReceiveCameraPlacement(std::shared_ptr<CloudMess
 	if (jsonEnvironmentAsset.size() != 0) {
 
 		if (m_pEnvironmentControllerObserver != nullptr) {
-			CR(m_pEnvironmentControllerObserver->OnSendCameraPlacement());
+			CR(m_pEnvironmentControllerObserver->OnReceiveCameraPlacement(jsonEnvironmentAsset["id"].get<long>()));
+		//	jsonEnvironmentAsset["session"];
+		//	jsonEnvironmentAsset["user"];
 		}
 	}
 

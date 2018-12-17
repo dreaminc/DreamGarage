@@ -280,8 +280,10 @@ RESULT DreamUserApp::Update(void *pContext) {
 		}
 	}
 	
-	if (m_pLeftHand->GetPhantomModel() != nullptr && m_pRightHand->GetPhantomModel() != nullptr &&
+	if (m_pLeftHand != nullptr && m_pRightHand != nullptr && 
+		m_pLeftHand->GetPhantomModel() != nullptr && m_pRightHand->GetPhantomModel() != nullptr &&
 		m_pPhantomLeftHand == nullptr && m_pPhantomRightHand == nullptr) {
+
 		m_pPhantomLeftHand = m_pLeftHand->GetPhantomModel();
 		m_pPhantomLeftHand->SetVisible(true, false);
 		
