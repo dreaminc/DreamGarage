@@ -41,6 +41,7 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	CN(m_pCameraModel);
 	GetDOS()->AddObject(m_pCameraModel, SandboxApp::PipelineType::MAIN);
 	m_pCameraModel->SetScale(0.0005f);
+	m_pCameraModel->SetOrientationOffsetDeg(0, 180, 0);
 
 	m_pCameraModel->SetVisible(false);
 	//m_pCameraModel->GetFirstChild<mesh>()->RotateYByDeg(180.0f);
