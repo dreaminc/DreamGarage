@@ -147,6 +147,9 @@ RESULT DreamVCam::Update(void *pContext) {
 	static int count = 0;
 
 	static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+
+	CBR(m_fIsRunning, R_SKIPPED);
+
 	//*
 	// TODO: Some more logic around texture / buffer sizes etc 
 	//if (m_pNamedPipeServer != nullptr && m_pSourceTexture != nullptr) {
@@ -298,6 +301,8 @@ RESULT DreamVCam::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	RESULT r = R_PASS;
 
 	m_pParentApp = pParentApp;	
+	m_fIsRunning = true;
+	m_pCameraModel->SetVisible(true);
 
 Error:
 	return r;
@@ -348,7 +353,8 @@ RESULT DreamVCam::SendFirstFrame() {
 }
 
 RESULT DreamVCam::CloseSource() {
-	Shutdown();
+	m_fIsRunning = false;
+	m_pCameraModel->SetVisible(false);
 	return R_PASS;
 }
 

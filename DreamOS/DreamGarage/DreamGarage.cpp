@@ -1461,8 +1461,14 @@ Error:
 }
 
 RESULT DreamGarage::OnCloseCamera() { 
-	// TODO: fix shutdown problems with vcam
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	if (m_pDreamUserControlArea != nullptr) {
+		CR(m_pDreamUserControlArea->CloseActiveAsset());
+	}
+
+Error:
+	return r;
 }
 
 RESULT DreamGarage::OnSendCameraPlacement() {

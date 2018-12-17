@@ -273,7 +273,12 @@ RESULT UserAreaControls::HandleClosePressed(UIButton* pButtonContext, void* pCon
 
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 	CNR(pActiveSource, R_SKIPPED);	// double tapping close? 
-	CRM(m_pEnvironmentControllerProxy->RequestCloseAsset(pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
+	if (pActiveSource->GetContentType() == CAMERA_CONTENT_CONTROL_TYPE) {
+		CRM(m_pEnvironmentControllerProxy->RequestCloseCamera(pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
+	}
+	else {
+		CRM(m_pEnvironmentControllerProxy->RequestCloseAsset(pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
+	}
 
 Error:
 	return R_PASS;
