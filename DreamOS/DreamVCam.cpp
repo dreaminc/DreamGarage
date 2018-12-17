@@ -67,8 +67,9 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	CN(m_pDreamGamepadCamera);
 	CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
 
-	m_pCameraModel = GetDOS()->AddModel(L"\\Bear\\bear-obj.obj");
+	m_pCameraModel = GetDOS()->MakeModel(L"\\Bear\\bear-obj.obj");
 	CN(m_pCameraModel);
+	GetDOS()->AddObject(m_pCameraModel, SandboxApp::PipelineType::MAIN);
 	m_pCameraModel->SetScale(0.01f);
 	
 Error:
