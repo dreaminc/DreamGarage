@@ -178,8 +178,8 @@ public:
 	// Video
 	std::unique_ptr<cricket::VideoCapturer> OpenVideoCaptureDevice();
 
-	RESULT InitializeVideoCaptureDevice(std::string strDeviceName);
-	cricket::VideoCapturer* GetVideoCaptureDevice(std::string strDeviceName);
+	RESULT InitializeVideoCaptureDevice(std::string strDeviceName, std::string strVideoTrackLabel);
+	cricket::VideoCapturer* GetVideoCaptureDeviceByTrackName(std::string strTrackName);
 
 	std::map<std::string, std::unique_ptr<cricket::VideoCapturer>> m_videoCaptureDevices;
 

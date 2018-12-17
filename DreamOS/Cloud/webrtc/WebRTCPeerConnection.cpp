@@ -218,24 +218,24 @@ std::unique_ptr<cricket::VideoCapturer> WebRTCPeerConnection::OpenVideoCaptureDe
 
 
 
-RESULT WebRTCPeerConnection::InitializeVideoCaptureDevice(std::string strDeviceName) {
+RESULT WebRTCPeerConnection::InitializeVideoCaptureDevice(std::string strDeviceName, std::string strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	WebRTCCustomVideoCapturerFactory webrtcCustomVideoCapturerFactory;
 	
 	// First check such a device doesn't exist
-	CBM((m_videoCaptureDevices.find(strDeviceName) == m_videoCaptureDevices.end()), "Video Device %s already exists", strDeviceName.c_str());
+	CBM((m_videoCaptureDevices.find(strVideoTrackLabel) == m_videoCaptureDevices.end()), "Video Track %s already exists", strVideoTrackLabel.c_str());
 
-	m_videoCaptureDevices[strDeviceName] = webrtcCustomVideoCapturerFactory.Create(cricket::Device(strDeviceName, 0));
-	CNM(m_videoCaptureDevices[strDeviceName], "Failed to create video capturer");
+	m_videoCaptureDevices[strVideoTrackLabel] = webrtcCustomVideoCapturerFactory.Create(cricket::Device(strDeviceName, 0));
+	CNM(m_videoCaptureDevices[strVideoTrackLabel], "Failed to create video capturer");
 
 Error:
 	return r;
 }
 
-cricket::VideoCapturer* WebRTCPeerConnection::GetVideoCaptureDevice(std::string strDeviceName) {
-	if(m_videoCaptureDevices.find(strDeviceName) != m_videoCaptureDevices.end()) {
-		return (m_videoCaptureDevices[strDeviceName]).get();
+cricket::VideoCapturer* WebRTCPeerConnection::GetVideoCaptureDeviceByTrackName(std::string strTrackName) {
+	if(m_videoCaptureDevices.find(strTrackName) != m_videoCaptureDevices.end()) {
+		return (m_videoCaptureDevices[strTrackName]).get();
 	}
 	else {
 		return nullptr;
@@ -257,9 +257,9 @@ RESULT WebRTCPeerConnection::AddVideoStream(const std::string &strVideoCaptureDe
 	//CN(pVideoCapturer);
 
 	//CR(InitializeVideoCaptureDevice("default_capture"));
-	CR(InitializeVideoCaptureDevice(strVideoCaptureDevice));
+	CR(InitializeVideoCaptureDevice(strVideoCaptureDevice, strVideoTrackLabel));
 
-	pVideoCapturer = GetVideoCaptureDevice(strVideoCaptureDevice);
+	pVideoCapturer = GetVideoCaptureDeviceByTrackName(strVideoTrackLabel);
 	CN(pVideoCapturer);
 
 	pVideoTrackSource = m_pWebRTCPeerConnectionFactory->CreateVideoSource(pVideoCapturer, &videoSourceConstraints);
