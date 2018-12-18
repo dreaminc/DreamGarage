@@ -180,7 +180,7 @@ public:
         typename std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
         
         CNM(pSubscriber, "Subscriber cannot be NULL");
-		CBM((it == m_events.end()), "Event %s not registered", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
+		CBM((it != m_events.end()), "Event %s not registered", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 
 		pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
 

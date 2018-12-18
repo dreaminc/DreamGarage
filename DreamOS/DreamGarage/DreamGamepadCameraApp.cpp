@@ -98,6 +98,11 @@ Error:
 	return r;
 }
 
+DreamGamepadCameraApp::CameraControlType DreamGamepadCameraApp::GetCameraControlType() {
+	return m_controlType;
+}
+
+
 RESULT DreamGamepadCameraApp::Shutdown(void *pContext) {
 	return R_PASS;
 }

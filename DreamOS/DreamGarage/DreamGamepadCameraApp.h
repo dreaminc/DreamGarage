@@ -40,6 +40,7 @@ public:
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
 	RESULT SetCamera(camera *pCamera, CameraControlType controlType = CameraControlType::GAMEPAD);
+	CameraControlType GetCameraControlType();
 
 	RESULT UnregisterFromEvents();
 
