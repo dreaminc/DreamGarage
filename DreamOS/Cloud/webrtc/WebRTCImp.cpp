@@ -213,14 +213,14 @@ Error:
 	return r;
 }
 
-RESULT WebRTCImp::SendVideoFrame(long peerConnectionID, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+RESULT WebRTCImp::SendVideoFrame(long peerConnectionID, const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
 	CN(m_pWebRTCConductor);
 
 	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
 
-	CR(m_pWebRTCConductor->SendVideoFrame(peerConnectionID, pVideoFrameBuffer, pxWidth, pxHeight, channels));
+	CR(m_pWebRTCConductor->SendVideoFrame(peerConnectionID, strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels));
 
 Error:
 	return r;
@@ -245,40 +245,40 @@ Error:
 	return r;
 }
 
-RESULT WebRTCImp::StartVideoStreaming(long peerConnectionID, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+RESULT WebRTCImp::StartVideoStreaming(long peerConnectionID, const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	CN(m_pWebRTCConductor);
 
 	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
 
-	CR(m_pWebRTCConductor->StartVideoStreaming(peerConnectionID, pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
+	CR(m_pWebRTCConductor->StartVideoStreaming(peerConnectionID, strVideoTrackLabel, pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
 
 Error:
 	return r;
 }
 
-RESULT WebRTCImp::StopVideoStreaming(long peerConnectionID) {
+RESULT WebRTCImp::StopVideoStreaming(long peerConnectionID, const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	CN(m_pWebRTCConductor);
 
 	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
 
-	CR(m_pWebRTCConductor->StopVideoStreaming(peerConnectionID));
+	CR(m_pWebRTCConductor->StopVideoStreaming(peerConnectionID, strVideoTrackLabel));
 
 Error:
 	return r;
 }
 
-bool WebRTCImp::IsVideoStreamingRunning(long peerConnectionID) {
+bool WebRTCImp::IsVideoStreamingRunning(long peerConnectionID, const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	CN(m_pWebRTCConductor);
 
 	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
 
-	return m_pWebRTCConductor->IsVideoStreamingRunning(peerConnectionID);
+	return m_pWebRTCConductor->IsVideoStreamingRunning(peerConnectionID, strVideoTrackLabel);
 
 Error:
 	return false;
@@ -447,11 +447,11 @@ Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT WebRTCImp::OnVideoFrame(const std::string &strVideoTrackLabel, long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnVideoFrame(peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		CR(m_pWebRTCObserver->OnVideoFrame(strVideoTrackLabel, peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight));
 	}
 
 Error:

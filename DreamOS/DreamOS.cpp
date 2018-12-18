@@ -1375,8 +1375,8 @@ RESULT DreamOS::RegisterUserObserver(CloudController::UserObserver *pUserObserve
 	return m_pSandbox->RegisterUserObserver(pUserObserver);
 }
 
-RESULT DreamOS::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
-	return m_pSandbox->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels);
+RESULT DreamOS::BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	return m_pSandbox->BroadcastVideoFrame(strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels);
 }
 
 RESULT DreamOS::SendDataMessage(long userID, Message *pDataMessage) {
@@ -1468,11 +1468,11 @@ bool DreamOS::IsRegisteredVideoStreamSubscriber(DreamVideoStreamSubscriber *pVid
 	return (m_pVideoStreamSubscriber == pVideoStreamSubscriber);
 }
 
-RESULT DreamOS::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT DreamOS::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_NOT_HANDLED;
 
 	if (m_pVideoStreamSubscriber != nullptr && pPeerConnection == m_pVideoSteamPeerConnectionSource) {
-		CR(m_pVideoStreamSubscriber->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		CR(m_pVideoStreamSubscriber->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
 	}
 
 Error:

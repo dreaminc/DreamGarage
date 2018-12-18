@@ -1299,41 +1299,41 @@ Error:
 }
 
 // Video
-RESULT EnvironmentController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+RESULT EnvironmentController::BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
 	CN(m_pPeerConnectionController);
-	CR(m_pPeerConnectionController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+	CR(m_pPeerConnectionController->BroadcastVideoFrame(strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels));
 
 Error:
 	return r;
 }
 
-RESULT EnvironmentController::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+RESULT EnvironmentController::StartVideoStreaming(const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	CN(m_pPeerConnectionController);
-	CR(m_pPeerConnectionController->StartVideoStreaming(pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
+	CR(m_pPeerConnectionController->StartVideoStreaming(strVideoTrackLabel, pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
 
 Error:
 	return r;
 }
 
-RESULT EnvironmentController::StopVideoStreaming() {
+RESULT EnvironmentController::StopVideoStreaming(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	CN(m_pPeerConnectionController);
-	CR(m_pPeerConnectionController->StopVideoStreaming());
+	CR(m_pPeerConnectionController->StopVideoStreaming(strVideoTrackLabel));
 
 Error:
 	return r;
 }
 
-bool EnvironmentController::IsVideoStreamingRunning() {
+bool EnvironmentController::IsVideoStreamingRunning(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	CN(m_pPeerConnectionController);
-	return m_pPeerConnectionController->IsVideoStreamingRunning();
+	return m_pPeerConnectionController->IsVideoStreamingRunning(strVideoTrackLabel);
 
 Error:
 	return false;
@@ -1454,11 +1454,11 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT EnvironmentController::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		CR(m_pEnvironmentControllerObserver->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
 	}
 
 Error:

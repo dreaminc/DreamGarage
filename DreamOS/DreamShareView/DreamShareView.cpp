@@ -173,7 +173,7 @@ RESULT DreamShareView::HandleShareMessage(PeerConnection* pPeerConnection, Dream
 			case DreamShareViewShareMessage::type::REQUEST_STREAMING_START: {
 				if (IsStreaming()) {
 					// For non-changing stuff we need to send the current frame
-					CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pCastTexture, 0, PIXEL_FORMAT::BGRA));
+					CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(kChromeVideoLabel, m_pCastTexture, 0, PIXEL_FORMAT::BGRA));
 				}
 			} break;
 			}
@@ -444,7 +444,7 @@ RESULT DreamShareView::BroadcastVideoFrame(const void *pBuffer, int width, int h
 
 		//*
 		if (IsStreaming()) {
-			CR(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
+			CR(GetDOS()->GetCloudController()->BroadcastVideoFrame(kChromeVideoLabel, (unsigned char*)(pBuffer), width, height, 4));
 		}
 	}
 Error:
@@ -472,7 +472,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT DreamShareView::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	// TODO: Create a pending frame thing

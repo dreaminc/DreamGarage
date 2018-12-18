@@ -2360,8 +2360,8 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBasic() {
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
-			//DEVENV_LINEOUT(L"OnVideoFrame");
+		virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
+			//DEVENV_LINEOUT(L"OnVideoFrame %s", strVideoTrackLabel.c_str());
 
 			return R_NOT_HANDLED;
 		}
@@ -2548,8 +2548,8 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBrowser() {
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
-			//DEVENV_LINEOUT(L"OnVideoFrame");
+		virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
+			//DEVENV_LINEOUT(L"OnVideoFrame %s", strVideoTrackLabel.c_str());
 
 			return R_NOT_HANDLED;
 		}

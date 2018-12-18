@@ -148,8 +148,10 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
 	
 	// Chrome Video
-	CR(AddVideoStream());
+	CR(AddVideoStream(kChromeCaptureDevice, kChromeVideoLabel, kChromeStreamLabel));
 
+	// Virtual Camera Video
+	CR(AddVideoStream(kVCamCaptureDevice, kVCamVideoLabel, kUserStreamLabel));
 	
 	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
 
@@ -216,19 +218,31 @@ std::unique_ptr<cricket::VideoCapturer> WebRTCPeerConnection::OpenVideoCaptureDe
 
 
 
-RESULT WebRTCPeerConnection::InitializeVideoCaptureDevice(std::string strDeviceName) {
+RESULT WebRTCPeerConnection::InitializeVideoCaptureDevice(std::string strDeviceName, std::string strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
-	WebRTCCustomVideoCapturerFactory webrtcCustomVideoCapturer;
+	WebRTCCustomVideoCapturerFactory webrtcCustomVideoCapturerFactory;
 	
-	m_pCricketVideoCapturer = webrtcCustomVideoCapturer.Create(cricket::Device(strDeviceName, 0));
-	CNM(m_pCricketVideoCapturer, "Failed to create video capturer");
+	// First check such a device doesn't exist
+	CBM((m_videoCaptureDevices.find(strVideoTrackLabel) == m_videoCaptureDevices.end()), "Video Track %s already exists", strVideoTrackLabel.c_str());
+
+	m_videoCaptureDevices[strVideoTrackLabel] = webrtcCustomVideoCapturerFactory.Create(cricket::Device(strDeviceName, 0));
+	CNM(m_videoCaptureDevices[strVideoTrackLabel], "Failed to create video capturer");
 
 Error:
 	return r;
 }
 
-RESULT WebRTCPeerConnection::AddVideoStream() {
+cricket::VideoCapturer* WebRTCPeerConnection::GetVideoCaptureDeviceByTrackName(std::string strTrackName) {
+	if(m_videoCaptureDevices.find(strTrackName) != m_videoCaptureDevices.end()) {
+		return (m_videoCaptureDevices[strTrackName]).get();
+	}
+	else {
+		return nullptr;
+	}
+}
+
+RESULT WebRTCPeerConnection::AddVideoStream(const std::string &strVideoCaptureDevice, const std::string &strVideoTrackLabel, const std::string &strMediaStreamLabel) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<webrtc::VideoTrackInterface> pVideoTrack = nullptr;
@@ -242,20 +256,23 @@ RESULT WebRTCPeerConnection::AddVideoStream() {
 	//pVideoCapturer = OpenVideoCaptureDevice();
 	//CN(pVideoCapturer);
 
-	CR(InitializeVideoCaptureDevice("default_capture"));
-	pVideoCapturer = m_pCricketVideoCapturer.get();
+	//CR(InitializeVideoCaptureDevice("default_capture"));
+	CR(InitializeVideoCaptureDevice(strVideoCaptureDevice, strVideoTrackLabel));
+
+	pVideoCapturer = GetVideoCaptureDeviceByTrackName(strVideoTrackLabel);
 	CN(pVideoCapturer);
 
 	pVideoTrackSource = m_pWebRTCPeerConnectionFactory->CreateVideoSource(pVideoCapturer, &videoSourceConstraints);
 	CN(pVideoTrackSource);
 
 	pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(
-		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(kChromeVideoLabel, pVideoTrackSource)
-		);
-	//CN(pVideoTrack);
+		//m_pWebRTCPeerConnectionFactory->CreateVideoTrack(kChromeVideoLabel, pVideoTrackSource)
+		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(strVideoTrackLabel, pVideoTrackSource)
+	);
+	CN(pVideoTrack);
 
 	pVideoTrack->AddRef();
-	m_pWebRTCPeerConnectionInterface->AddTrack(pVideoTrack, {kUserStreamLabel});
+	m_pWebRTCPeerConnectionInterface->AddTrack(pVideoTrack, {strMediaStreamLabel});
 
 Error:
 	return r;
@@ -571,7 +588,7 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 		}
 	}
 	
-	// Video track
+	// Chrome Video track
 	auto pVideoTrack = pMediaStreamInterface->FindVideoTrack(kChromeVideoLabel);
 	if (pVideoTrack != nullptr) {
 		DOSLOG(INFO, "Found VideoTrackSourceInterface");
@@ -579,27 +596,14 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 		auto pVideoTrackSource = pVideoTrack->GetSource();
 	
 		if (pVideoTrackSource != nullptr) {
-			// Get some information
-			webrtc::VideoTrackSourceInterface::Stats stats;
-			pVideoTrackSource->GetStats(&stats);
+			if (R_PASS != InitializeVideoSink(kChromeVideoLabel, pVideoTrackSource)) {
+				DEBUG_LINEOUT("Failed to initialize video sink for vcam");
+			}
 	
-			// This object informs the source of the format requirements of the sink
-			rtc::VideoSinkWants videoSinkWants = rtc::VideoSinkWants();
-	
-			pVideoTrackSource->AddOrUpdateSink(this, videoSinkWants);
-			//bool res = track->GetSource()->is_screencast();
-			
-			//const int64_t interval = 1000000000;//33333333
-			//cricket::VideoFormat format(512, 512, 1000000000, cricket::FOURCC_RGBA);
-			//g_capturer->Start(format);
-			
-			//track->GetSource()->Restart();
-	
-			// Kick off our capturer (testing)
 			///*
-			if (m_pCricketVideoCapturer != nullptr) {
+			if (m_videoCaptureDevices[kChromeCaptureDevice] != nullptr) {
 				cricket::VideoFormat videoCaptureFormat(1280, 960, cricket::VideoFormat::FpsToInterval(30), cricket::FOURCC_ARGB);
-				m_pCricketVideoCapturer->Start(videoCaptureFormat);
+				m_videoCaptureDevices[kChromeCaptureDevice]->Start(videoCaptureFormat);
 			}
 			//*/
 	
@@ -607,11 +611,59 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 		else {
 			DOSLOG(INFO, "Cannot VideoTrackInterface::GetSource");
 		}
-	
 	}	
+
+	// VCam Video track
+	pVideoTrack = pMediaStreamInterface->FindVideoTrack(kVCamVideoLabel);
+	if (pVideoTrack != nullptr) {
+		DOSLOG(INFO, "Found VideoTrackSourceInterface");
+
+		auto pVideoTrackSource = pVideoTrack->GetSource();
+
+		if (pVideoTrackSource != nullptr) {
+
+			if (R_PASS != InitializeVideoSink(kVCamVideoLabel, pVideoTrackSource)) {
+				DEBUG_LINEOUT("Failed to initialize video sink for vcam");
+			}
+
+			///*
+			// TODO: Put into function?
+			if (m_videoCaptureDevices[kVCamCaptureDevice] != nullptr) {
+				cricket::VideoFormat videoCaptureFormat(1280, 960, cricket::VideoFormat::FpsToInterval(30), cricket::FOURCC_ARGB);
+				m_videoCaptureDevices[kVCamCaptureDevice]->Start(videoCaptureFormat);
+			}
+			//*/
+
+		}
+		else {
+			DOSLOG(INFO, "Cannot VideoTrackInterface::GetSource");
+		}
+	}
 	
 	if (m_pParentObserver != nullptr) {
 		m_pParentObserver->OnAddStream(m_peerConnectionID, pMediaStreamInterface);
+	}
+}
+
+RESULT WebRTCPeerConnection::InitializeVideoSink(std::string strTrackName, webrtc::VideoTrackSourceInterface* pVideoTrackSource) {
+	RESULT r = R_PASS;
+
+	// First check such a device doesn't exist
+	CBM((m_videoSinks.find(strTrackName) == m_videoSinks.end()), "Video Sink %s already exists", strTrackName.c_str());
+
+	m_videoSinks[strTrackName] = std::unique_ptr<WebRTCVideoSink>(WebRTCVideoSink::MakeWebRTCVideoSink(strTrackName, this, pVideoTrackSource));
+	CNM(m_videoSinks[strTrackName], "Failed to create video capturer");
+
+Error:
+	return r;
+}
+
+WebRTCVideoSink* WebRTCPeerConnection::GetVideoSink(std::string strTrackName) {
+	if (m_videoSinks.find(strTrackName) != m_videoSinks.end()) {
+		return (m_videoSinks[strTrackName]).get();
+	}
+	else {
+		return nullptr;
 	}
 }
 
@@ -698,9 +750,11 @@ void WebRTCPeerConnection::OnAudioTrackSinkData(std::string strAudioTrackLabel, 
 
 }
 
+/*
 // TODO: Update WebRTC version and move to webrtc::video_frame since 
 // I'm not sure what the hell cricket is all about
 
+// TODO: Create a per-stream video sink! 
 // TODO: Need to be wary of memory stuff
 // Might want to give observer the handle for the memory and 
 // they will deallocate it
@@ -716,23 +770,19 @@ void WebRTCPeerConnection::OnFrame(const webrtc::VideoFrame& cricketVideoFrame) 
 	const rtc::scoped_refptr<webrtc::VideoFrameBuffer>& webRTCVideoFrameBuffer = cricketVideoFrame.video_frame_buffer();
 	webrtc::VideoFrame webRTCVideoFrame(webRTCVideoFrameBuffer, 0, 0, webrtc::VideoRotation::kVideoRotation_0);
 	
-	/*
-	VideoFrame(const rtc::scoped_refptr<webrtc::VideoFrameBuffer>& buffer,
-	uint32_t timestamp,
-	int64_t render_time_ms,
-	VideoRotation rotation);
-	*/
+	//VideoFrame(const rtc::scoped_refptr<webrtc::VideoFrameBuffer>& buffer,
+	//uint32_t timestamp,
+	//int64_t render_time_ms,
+	//VideoRotation rotation);
 
 	int convertFromI420Result = webrtc::ConvertFromI420(webRTCVideoFrame, webrtc::VideoType::kARGB, 0, pVideoFrameDataBuffer);
 	CBM((convertFromI420Result == 0), "YUV I420 conversion failed");
 	
-	/*
-	{
-		std::lock_guard<std::mutex> lock(g_UpdateTextureMutex);
-		memcpy_s(m_pRecieveBuffer, m_ScreenWidth * m_ScreenHeight * 4, dst_frame, frame.height()*frame.width() * 4);
-		g_updateTexture = true;
-	}
-	*/
+	//{
+	//	std::lock_guard<std::mutex> lock(g_UpdateTextureMutex);
+	//	memcpy_s(m_pRecieveBuffer, m_ScreenWidth * m_ScreenHeight * 4, dst_frame, frame.height()*frame.width() * 4);
+	//	g_updateTexture = true;
+	//}
 
 	if (m_pParentObserver != nullptr) {
 		m_pParentObserver->OnVideoFrame(m_peerConnectionID, pVideoFrameDataBuffer, videoFrameWidth, videoFrameHeight);
@@ -749,6 +799,19 @@ Error:
 
 	return;
 }
+*/
+
+RESULT WebRTCPeerConnection::OnVideoFrame(std::string strVideoTrackName, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnVideoFrame(strVideoTrackName, m_peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight);
+	}
+
+Error:
+	return r;
+}
+
 
 // TODO: Add callbacks
 void WebRTCPeerConnection::OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) {
@@ -1313,12 +1376,12 @@ Error:
 	return r;
 }
 
-RESULT WebRTCPeerConnection::SendVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+RESULT WebRTCPeerConnection::SendVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
-	CN(m_pCricketVideoCapturer);
+	CN(m_videoCaptureDevices[strVideoTrackLabel]);
 
-	WebRTCCustomVideoCapturer* pWebRTCCustomVideoCapturer = (WebRTCCustomVideoCapturer*)(m_pCricketVideoCapturer.get());
+	WebRTCCustomVideoCapturer* pWebRTCCustomVideoCapturer = (WebRTCCustomVideoCapturer*)(m_videoCaptureDevices[strVideoTrackLabel].get());
 
 	CR(pWebRTCCustomVideoCapturer->SubmitNewFrameBuffer(pVideoFrameBuffer, pxWidth, pxHeight, channels));
 
@@ -1353,12 +1416,12 @@ uint32_t GetCricketVideoFormatColorSpace(PIXEL_FORMAT pixelFormat) {
 // this is because WebRTC doesn't really seem to work this way.  Not providing frames
 // to the video source is the same as not streaming. 
 
-RESULT WebRTCPeerConnection::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+RESULT WebRTCPeerConnection::StartVideoStreaming(const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	return R_DEPRECATED;
 
-	CN(m_pCricketVideoCapturer);
+	CN(m_videoCaptureDevices[strVideoTrackLabel]);
 
 	{
 		cricket::VideoFormat desiredVideoFormat;
@@ -1371,40 +1434,40 @@ RESULT WebRTCPeerConnection::StartVideoStreaming(int pxDesiredWidth, int pxDesir
 		);
 
 		cricket::VideoFormat streamingVideoFormat;
-		CB(m_pCricketVideoCapturer->GetBestCaptureFormat(desiredVideoFormat, &streamingVideoFormat));
+		CB(m_videoCaptureDevices[strVideoTrackLabel]->GetBestCaptureFormat(desiredVideoFormat, &streamingVideoFormat));
 
-		m_pCricketVideoCapturer->Start(streamingVideoFormat);
+		m_videoCaptureDevices[strVideoTrackLabel]->Start(streamingVideoFormat);
 
-		CB((IsVideoStreamingRunning()));
+		CB((IsVideoStreamingRunning(strVideoTrackLabel)));
 	}
 
 Error:
 	return r;
 }
 
-RESULT WebRTCPeerConnection::StopVideoStreaming() {
+RESULT WebRTCPeerConnection::StopVideoStreaming(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	return R_DEPRECATED;
 
-	CN(m_pCricketVideoCapturer);
+	CN(m_videoCaptureDevices[strVideoTrackLabel]);
 
 	{
-		m_pCricketVideoCapturer->Stop();
+		m_videoCaptureDevices[strVideoTrackLabel]->Stop();
 
-		CB((IsVideoStreamingRunning() == false));
+		CB((IsVideoStreamingRunning(strVideoTrackLabel) == false));
 	}
 
 Error:
 	return r;
 }
 
-bool WebRTCPeerConnection::IsVideoStreamingRunning() {
+bool WebRTCPeerConnection::IsVideoStreamingRunning(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
-	CN(m_pCricketVideoCapturer);
+	CN(m_videoCaptureDevices[strVideoTrackLabel]);
 
-	return m_pCricketVideoCapturer->IsRunning();
+	return m_videoCaptureDevices[strVideoTrackLabel]->IsRunning();
 
 Error:
 	return false; 

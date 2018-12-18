@@ -664,10 +664,10 @@ TwilioNTSInformation WebRTCConductor::GetTwilioNTSInformation() {
 	return m_pParentObserver->GetTwilioNTSInformation();
 }
 
-RESULT WebRTCConductor::OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT WebRTCConductor::OnVideoFrame(const std::string &strVideoTrackLabel, long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 
 	if (m_pParentObserver != nullptr) {
-		return m_pParentObserver->OnVideoFrame(peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight);
+		return m_pParentObserver->OnVideoFrame(strVideoTrackLabel, peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight);
 	}
 
 	return R_NOT_HANDLED;
@@ -760,49 +760,49 @@ Error:
 	return r;
 }
 
-RESULT WebRTCConductor::SendVideoFrame(long peerConnectionID, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+RESULT WebRTCConductor::SendVideoFrame(long peerConnectionID, const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
 	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
 
-	CR(pWebRTCPeerConnection->SendVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+	CR(pWebRTCPeerConnection->SendVideoFrame(strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels));
 
 Error:
 	return r;
 }
 
-RESULT WebRTCConductor::StartVideoStreaming(long peerConnectionID, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+RESULT WebRTCConductor::StartVideoStreaming(long peerConnectionID, const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
 	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
 
-	CR(pWebRTCPeerConnection->StartVideoStreaming(pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
+	CR(pWebRTCPeerConnection->StartVideoStreaming(strVideoTrackLabel, pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
 
 Error:
 	return r;
 }
 
-RESULT WebRTCConductor::StopVideoStreaming(long peerConnectionID) {
+RESULT WebRTCConductor::StopVideoStreaming(long peerConnectionID, const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
 	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
 
-	CR(pWebRTCPeerConnection->StopVideoStreaming());
+	CR(pWebRTCPeerConnection->StopVideoStreaming(strVideoTrackLabel));
 
 Error:
 	return r;
 }
 
-bool WebRTCConductor::IsVideoStreamingRunning(long peerConnectionID) {
+bool WebRTCConductor::IsVideoStreamingRunning(long peerConnectionID, const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
 	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
 
-	return pWebRTCPeerConnection->IsVideoStreamingRunning();
+	return pWebRTCPeerConnection->IsVideoStreamingRunning(strVideoTrackLabel);
 
 Error:
 	return false;

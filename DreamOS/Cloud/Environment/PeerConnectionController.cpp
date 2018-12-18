@@ -760,14 +760,14 @@ Error:
 	return r;
 }
 
-RESULT PeerConnectionController::OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT PeerConnectionController::OnVideoFrame(const std::string &strVideoTrackLabel, long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
 	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		CR(m_pPeerConnectionControllerObserver->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		CR(m_pPeerConnectionControllerObserver->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
 	}
 
 Error:
@@ -836,7 +836,7 @@ Error:
 	return r;
 }
 
-RESULT PeerConnectionController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+RESULT PeerConnectionController::BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
 	// Copy
@@ -846,7 +846,7 @@ RESULT PeerConnectionController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer,
 
 	for (const auto &pPeerConnection : peerVectorCopy) {
 		if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
-			CR(m_pWebRTCImp->SendVideoFrame(pPeerConnection->GetPeerConnectionID(), pVideoFrameBuffer, pxWidth, pxHeight, channels));
+			CR(m_pWebRTCImp->SendVideoFrame(pPeerConnection->GetPeerConnectionID(), strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels));
 		}
 	}
 
@@ -883,7 +883,7 @@ float PeerConnectionController::GetRunTimeMicAverage() {
 	return 0.0f;
 }
 
-RESULT PeerConnectionController::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+RESULT PeerConnectionController::StartVideoStreaming(const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	// Copy
@@ -893,7 +893,7 @@ RESULT PeerConnectionController::StartVideoStreaming(int pxDesiredWidth, int pxD
 
 	for (const auto &pPeerConnection : peerVectorCopy) {
 		if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
-			CR(m_pWebRTCImp->StartVideoStreaming(pPeerConnection->GetPeerConnectionID(), pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
+			CR(m_pWebRTCImp->StartVideoStreaming(pPeerConnection->GetPeerConnectionID(), strVideoTrackLabel, pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
 		}
 	}
 
@@ -901,7 +901,7 @@ Error:
 	return r;
 }
 
-RESULT PeerConnectionController::StopVideoStreaming() {
+RESULT PeerConnectionController::StopVideoStreaming(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	// Copy
@@ -911,7 +911,7 @@ RESULT PeerConnectionController::StopVideoStreaming() {
 
 	for (const auto &pPeerConnection : peerVectorCopy) {
 		if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
-			CR(m_pWebRTCImp->StopVideoStreaming(pPeerConnection->GetPeerConnectionID()));
+			CR(m_pWebRTCImp->StopVideoStreaming(pPeerConnection->GetPeerConnectionID(), strVideoTrackLabel));
 		}
 	}
 
@@ -919,7 +919,7 @@ Error:
 	return r;
 }
 
-bool PeerConnectionController::IsVideoStreamingRunning() {
+bool PeerConnectionController::IsVideoStreamingRunning(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 	bool fRetVal = false;
 
@@ -930,7 +930,7 @@ bool PeerConnectionController::IsVideoStreamingRunning() {
 
 	for (const auto &pPeerConnection : peerVectorCopy) {
 		if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
-			fRetVal = m_pWebRTCImp->IsVideoStreamingRunning(pPeerConnection->GetPeerConnectionID());
+			fRetVal = m_pWebRTCImp->IsVideoStreamingRunning(pPeerConnection->GetPeerConnectionID(), strVideoTrackLabel);
 
 			if (fRetVal == false) {
 				return fRetVal;
