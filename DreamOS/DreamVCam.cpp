@@ -206,9 +206,11 @@ RESULT DreamVCam::Update(void *pContext) {
 		
 		// Check if Active Source
 		if (m_pParentApp->GetActiveSource()->GetSourceTexture() == m_pSourceTexture) {
-			CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
+			if (m_pDreamGamepadCamera->GetCameraControlType() != DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER) {
+				CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
+			}
 		}
-		else {
+		else if (m_pDreamGamepadCamera->GetCameraControlType() != DreamGamepadCameraApp::CameraControlType::INVALID) {
 			CR(m_pDreamGamepadCamera->UnregisterFromEvents());
 		}
 		
