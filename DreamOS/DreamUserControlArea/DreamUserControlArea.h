@@ -211,6 +211,7 @@ private:
 	// ControlViewObserver?
 	std::shared_ptr<DreamContentSource> m_pActiveSource = nullptr;
 
+	std::shared_ptr<DreamContentSource> m_pActiveCameraSource = nullptr;
 	//TODO: list of objects that relate to the right bar
 	//std::vector<std::shared_ptr<DreamApp>> m_openApps;
 

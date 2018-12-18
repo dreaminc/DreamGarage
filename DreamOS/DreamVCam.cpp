@@ -21,6 +21,8 @@
 
 #include "DreamUpdateVCamMessage.h"
 
+#include "DreamGarage/UICommon.h"
+
 DreamVCam::DreamVCam(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamVCam>(pDreamOS, pContext)
 {
@@ -34,17 +36,48 @@ DreamVCam::~DreamVCam() {
 RESULT DreamVCam::InitializeModule(void *pContext) {
 	RESULT r = R_PASS;
 
+	float screenWidth = 0.72f;
+
 	SetName("DreamVCam");
 	SetModuleDescription("The Dream Virtual Camera Module");
 
-	m_pCameraModel = GetDOS()->MakeModel(L"\\camera\\camera.fbx");
-	CN(m_pCameraModel);
-	GetDOS()->AddObject(m_pCameraModel, SandboxApp::PipelineType::MAIN);
-	m_pCameraModel->SetScale(0.0005f);
-	m_pCameraModel->SetOrientationOffsetDeg(0, 180, 0);
+	m_pCameraComposite = GetDOS()->MakeComposite();
+	CN(m_pCameraComposite);
+	GetDOS()->AddObject(m_pCameraComposite);
+	m_pCameraComposite->SetOrientationOffsetDeg(0, 180, 0);
+	m_pCameraComposite->SetVisible(true, false);
 
+	m_pCameraModel = m_pCameraComposite->AddModel(L"\\camera\\camera.fbx");
+	CN(m_pCameraModel);
+	GetDOS()->AddObject(m_pCameraComposite);
+	m_pCameraModel->SetScale(0.0005f);
 	m_pCameraModel->SetVisible(false);
-	//m_pCameraModel->GetFirstChild<mesh>()->RotateYByDeg(180.0f);
+
+	m_pCameraQuad = m_pCameraComposite->AddQuad(screenWidth, screenWidth*9.0f / 16.0f);
+	CN(m_pCameraQuad);
+	m_pCameraQuad->RotateXByDeg(90.0f);
+	m_pCameraQuad->SetPosition(0.0f, screenWidth/2.0f, 0.0f);
+	m_pCameraQuad->SetVisible(false);
+
+	m_pCameraQuad->FlipUVVertical(); // TODO: shouldn't this not have to happen?
+
+	m_pCameraQuadBackground = m_pCameraComposite->AddQuad(screenWidth*BORDER_WIDTH, screenWidth*BORDER_HEIGHT);
+	CN(m_pCameraQuadBackground);
+	m_pCameraQuadBackground->RotateXByDeg(90.0f);
+	m_pCameraQuadBackground->SetPosition(0.0f, screenWidth/2.0f, -0.001f);
+	m_pCameraQuadBackground->SetVisible(false);
+
+	m_pCameraQuadBackgroundTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"control-view-main-background.png");
+	CN(m_pCameraQuadBackgroundTexture);
+	m_pCameraQuadBackground->SetDiffuseTexture(m_pCameraQuadBackgroundTexture);
+	
+
+	/*
+	m_pCameraQuad = GetDOS()->MakeQuad(0.12f*test, 0.12f*9.0f / 16.0f*test);
+	//*/
+	//GetDOS()->AddObject(m_pCameraQuad.get(), SandboxApp::PipelineType::MAIN);
+
+	//m_pCameraQuad->SetPosition(0.0f, 0.12f, 0.0f);
 
 	// TODO: 
 	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
@@ -205,17 +238,26 @@ RESULT DreamVCam::Update(void *pContext) {
 	if (m_pCameraModel != nullptr && m_pCamera != nullptr && m_pParentApp != nullptr) {
 		
 		// Check if Active Source
-		if (m_pParentApp->GetActiveSource()->GetSourceTexture() == m_pSourceTexture) {
-			if (m_pDreamGamepadCamera->GetCameraControlType() != DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER) {
-				CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
+		if (m_pParentApp->GetActiveSource() != nullptr) {
+			if (m_pParentApp->GetActiveSource()->GetSourceTexture() == m_pSourceTexture) {
+				if (m_pDreamGamepadCamera->GetCameraControlType() != DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER) {
+					CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
+				}
+			}
+			else if (m_pDreamGamepadCamera->GetCameraControlType() != DreamGamepadCameraApp::CameraControlType::INVALID) {
+				CR(m_pDreamGamepadCamera->UnregisterFromEvents());
 			}
 		}
-		else if (m_pDreamGamepadCamera->GetCameraControlType() != DreamGamepadCameraApp::CameraControlType::INVALID) {
-			CR(m_pDreamGamepadCamera->UnregisterFromEvents());
-		}
 		
+		m_pCameraComposite->SetPosition(m_pCamera->GetPosition(true));
+		m_pCameraComposite->SetOrientation(m_pCamera->GetWorldOrientation());
+		/*
 		m_pCameraModel->SetPosition(m_pCamera->GetPosition(true));
 		m_pCameraModel->SetOrientation(m_pCamera->GetWorldOrientation());
+
+		m_pCameraQuad->SetPosition(m_pCamera->GetPosition(true) + point(0.0f, 0.12f, 0.0f));
+		m_pCameraQuad->SetOrientation(m_pCamera->GetWorldOrientation());
+		//*/
 	}
 
 	// With better communication with Gamepad, potentially could send this less often
@@ -398,6 +440,9 @@ RESULT DreamVCam::OnClientConnect() {
 	RESULT r = R_PASS;
 
 	CR(m_pParentApp->OnVirtualCameraCaptured());
+	m_pCameraQuad->SetVisible(true);
+	m_pCameraQuadBackground->SetVisible(true);
+	m_pCameraQuad->SetDiffuseTexture(m_pParentApp->GetActiveSource()->GetSourceTexture());
 
 Error:
 	return r;
@@ -407,6 +452,8 @@ RESULT DreamVCam::OnClientDisconnect() {
 	RESULT r = R_PASS;
 
 	CR(m_pParentApp->OnVirtualCameraReleased());
+	m_pCameraQuad->SetVisible(false);
+	m_pCameraQuadBackground->SetVisible(false);
 
 Error:
 	return r;
