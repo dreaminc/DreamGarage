@@ -82,8 +82,8 @@ public:
 	virtual std::string GetContentType() override;
 
 	// NamedPipeServerObserver
-	virtual RESULT OnConnection() override;
-	virtual RESULT OnDisconnect() override;
+	virtual RESULT OnClientConnect() override;
+	virtual RESULT OnClientDisconnect() override;
 
 	// Sharing Camera Placement
 	RESULT SetIsSendingCameraPlacement(bool fSendingCameraPlacement);

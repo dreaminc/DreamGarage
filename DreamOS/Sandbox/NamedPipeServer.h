@@ -14,8 +14,8 @@ class NamedPipeServer {
 public:
 	class observer {
 	public:
-		virtual RESULT OnConnection() = 0;
-		virtual RESULT OnDisconnect() = 0;
+		virtual RESULT OnClientConnect() = 0;
+		virtual RESULT OnClientDisconnect() = 0;
 	};
 
 	NamedPipeServer(std::wstring wstrPipename);

@@ -240,7 +240,9 @@ RESULT Win64NamedPipeServer::NamedPipeServerProcess() {
 
 				// Allocate storage for next instance. 
 				AddPendingConnectionInstanceAndAllocateNew();
-				m_pObserver->OnConnection();
+				if (m_pObserver != nullptr) {
+					m_pObserver->OnClientConnect();
+				}
 			} break;
 
 			// The wait is satisfied by a completed read or write 
@@ -301,7 +303,9 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 				else if (err == ERROR_NO_DATA) {
 					pClientConnection->m_fConnected = false;
 					DEBUG_LINEOUT("Client connection %d closed", pClientConnection->m_connectionID);
-					m_pObserver->OnDisconnect();
+					if (m_pObserver != nullptr) {
+						m_pObserver->OnClientDisconnect();
+					}
 				}
 				else {
 					CBM((false), "WriteFile failed with GLE: %d", (int)err);
