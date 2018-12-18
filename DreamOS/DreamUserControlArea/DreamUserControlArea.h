@@ -142,6 +142,11 @@ public:
 	virtual RESULT HandleCanTabNext(bool fCanNext) override;
 	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override;
 
+// DreamVCam
+public:
+	RESULT OnVirtualCameraCaptured();
+	RESULT OnVirtualCameraReleased();
+
 // DreamGarage compatability (temp?)
 public:
 	RESULT ResetAppComposite();

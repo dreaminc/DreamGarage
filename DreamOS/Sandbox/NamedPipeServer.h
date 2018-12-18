@@ -12,6 +12,12 @@
 
 class NamedPipeServer {
 public:
+	class observer {
+	public:
+		virtual RESULT OnClientConnect() = 0;
+		virtual RESULT OnClientDisconnect() = 0;
+	};
+
 	NamedPipeServer(std::wstring wstrPipename);
 	~NamedPipeServer();
 
@@ -21,6 +27,7 @@ public:
 	RESULT Start();
 	RESULT Stop();
 
+	RESULT RegisterNamedPipeServerObserver(NamedPipeServer::observer* pObserver);
 	RESULT RegisterMessageHandler(std::function<RESULT(void*, size_t)> fnPipeMessageHandler);
 	RESULT UnregisterMessageHandler();
 
@@ -33,6 +40,7 @@ protected:
 	std::thread m_namedPipeServerProcess;
 	bool m_fRunning = false;
 
+	NamedPipeServer::observer* m_pObserver = nullptr;
 	std::function<RESULT(void*, size_t)> m_fnPipeMessageHandler = nullptr;
 };
 

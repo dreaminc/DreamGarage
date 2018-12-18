@@ -44,6 +44,16 @@ Error:
 	return r;
 }
 
+RESULT NamedPipeServer::RegisterNamedPipeServerObserver(NamedPipeServer::observer* pObserver) {
+	RESULT r = R_PASS;
+
+	CBM((m_pObserver == nullptr), "Observer for Named Pipe Server already set!");
+	m_pObserver = pObserver;
+
+Error:
+	return r;
+}
+
 RESULT NamedPipeServer::RegisterMessageHandler(std::function<RESULT(void*, size_t)> fnPipeMessageHandler) {
 	RESULT r = R_PASS;
 

@@ -54,7 +54,6 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	m_pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
 	CN(m_pDreamGamepadCamera);
 	CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
-	
 
 Error:
 	return r;
@@ -65,13 +64,14 @@ RESULT DreamVCam::InitializePipeline() {
 
 	// Pass in a context if needed in future
 	//CRM(StartModuleProcess(), "Failed to start module process");
-
+	
 	// Set up named pipe server
 	m_pNamedPipeServer = GetDOS()->MakeNamedPipeServer(L"dreamvcampipe");
 	CN(m_pNamedPipeServer);
 
-	CRM(m_pNamedPipeServer->RegisterMessageHandler(std::bind(&DreamVCam::HandleServerPipeMessage, this, std::placeholders::_1, std::placeholders::_2)), 
+	CRM(m_pNamedPipeServer->RegisterMessageHandler(std::bind(&DreamVCam::HandleServerPipeMessage, this, std::placeholders::_1, std::placeholders::_2)),
 		"Failed to register message handler");
+	CR(m_pNamedPipeServer->RegisterNamedPipeServerObserver(this));
 
 	CRM(m_pNamedPipeServer->Start(), "Failed to start server");
 
@@ -391,6 +391,25 @@ std::string DreamVCam::GetTitle() {
 std::string DreamVCam::GetContentType() {
 	return m_strContentType;
 }
+
+RESULT DreamVCam::OnClientConnect() {
+	RESULT r = R_PASS;
+
+	CR(m_pParentApp->OnVirtualCameraCaptured());
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::OnClientDisconnect() {
+	RESULT r = R_PASS;
+
+	CR(m_pParentApp->OnVirtualCameraReleased());
+
+Error:
+	return r;
+}
+
 
 RESULT DreamVCam::SetIsSendingCameraPlacement(bool fSendingCameraPlacement) {
 	m_fSendingCameraPlacement = fSendingCameraPlacement;

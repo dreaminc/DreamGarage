@@ -581,6 +581,26 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::OnVirtualCameraCaptured() {
+	RESULT r = R_PASS;
+
+	// TODO: set active source to texture above camera
+	int a = 5;
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::OnVirtualCameraReleased() {
+	RESULT r = R_PASS;
+
+	// TODO: hide texture above camera
+	int a = 5;
+
+Error:
+	return r;
+}
+
 int DreamUserControlArea::GetWidth() {
 	return m_pActiveSource->GetWidth();
 }
