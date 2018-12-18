@@ -585,8 +585,7 @@ Error:
 RESULT DreamUserControlArea::OnVirtualCameraCaptured() {
 	RESULT r = R_PASS;
 
-	// TODO: set active source to texture above camera
-	int a = 5;
+	m_pActiveCameraSource = m_pActiveSource;
 
 Error:
 	return r;
@@ -595,8 +594,7 @@ Error:
 RESULT DreamUserControlArea::OnVirtualCameraReleased() {
 	RESULT r = R_PASS;
 
-	// TODO: hide texture above camera
-	int a = 5;
+	m_pActiveCameraSource = nullptr;
 
 Error:
 	return r;

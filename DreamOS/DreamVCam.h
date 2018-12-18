@@ -16,13 +16,17 @@
 class SpatialSoundObject;
 class SoundFile;
 class HMD;
-class texture;
 
 class ProgramNode;
 class OGLProgram;
 class CameraNode;
-class model;
+
 class DreamGamepadCameraApp;
+
+class texture;
+class model;
+class quad;
+
 //class SoundBuffer;
 
 class DreamUserControlArea;
@@ -106,7 +110,10 @@ private:
 
 	std::shared_ptr<DreamGamepadCameraApp> m_pDreamGamepadCamera = nullptr;
 	CameraNode* m_pCamera = nullptr;
+
 	model* m_pCameraModel = nullptr;
+	quad* m_pCameraQuad = nullptr;
+	texture *m_pShareTexture = nullptr;
 
 	// This node is used for the render texture
 	OGLProgram *m_pOGLRenderNode = nullptr;

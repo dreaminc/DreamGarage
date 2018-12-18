@@ -45,6 +45,13 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 
 	m_pCameraModel->SetVisible(false);
 	//m_pCameraModel->GetFirstChild<mesh>()->RotateYByDeg(180.0f);
+	//m_pCameraQuad = m_pCameraModel->AddQuad(0.12f, 0.12f*9.0f / 16.0f);
+	m_pCameraQuad = GetDOS()->MakeQuad(0.12f, 0.12f*9.0f / 16.0f);
+	GetDOS()->AddObject(m_pCameraQuad, SandboxApp::PipelineType::MAIN);
+
+	m_pCameraQuad->SetPosition(0.0f, 0.12f, 0.0f);
+	m_pCameraQuad->RotateXByDeg(90.0f);
+	m_pCameraQuad->SetVisible(true);
 
 	// TODO: 
 	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
@@ -398,6 +405,7 @@ RESULT DreamVCam::OnClientConnect() {
 	RESULT r = R_PASS;
 
 	CR(m_pParentApp->OnVirtualCameraCaptured());
+	m_pCameraQuad->SetVisible(true);
 
 Error:
 	return r;
@@ -407,6 +415,7 @@ RESULT DreamVCam::OnClientDisconnect() {
 	RESULT r = R_PASS;
 
 	CR(m_pParentApp->OnVirtualCameraReleased());
+	m_pCameraQuad->SetVisible(false);
 
 Error:
 	return r;
