@@ -63,6 +63,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		m_pDreamVCam = GetDOS()->LaunchDreamModule<DreamVCam>(this);
 		m_pDreamVCam->InitializeWithParent(this);
+		m_pDreamVCam->InitializePipeline();
 		CN(m_pDreamVCam);
 
 		m_pView = GetComposite()->AddUIView(GetDOS());
@@ -708,7 +709,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		// TODO: temp
 		if (m_pDreamVCam != nullptr) {
 			m_pActiveSource = m_pDreamVCam;
-			m_pDreamVCam->InitializePipeline();
+			//m_pDreamVCam->InitializePipeline();
 			m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
 			// new desktop can't be the current content
 			m_pUserControls->SetSharingFlag(false);
