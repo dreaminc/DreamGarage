@@ -664,10 +664,10 @@ TwilioNTSInformation WebRTCConductor::GetTwilioNTSInformation() {
 	return m_pParentObserver->GetTwilioNTSInformation();
 }
 
-RESULT WebRTCConductor::OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT WebRTCConductor::OnVideoFrame(const std::string &strVideoTrackLabel, long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 
 	if (m_pParentObserver != nullptr) {
-		return m_pParentObserver->OnVideoFrame(peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight);
+		return m_pParentObserver->OnVideoFrame(strVideoTrackLabel, peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight);
 	}
 
 	return R_NOT_HANDLED;

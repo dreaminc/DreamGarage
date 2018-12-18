@@ -177,8 +177,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
-			//DEVENV_LINEOUT(L"OnVideoFrame");
+		virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
+			//DEVENV_LINEOUT(L"OnVideoFrame: %s", strVideoTrackLabel.c_str());
 
 			return R_NOT_HANDLED;
 		}
@@ -593,12 +593,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
+		virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
 			RESULT r = R_PASS;
 
 			CBM((m_pendingVideoBuffer.fPendingBufferReady == false), "Buffer already pending");
 
-			//DEBUG_LINEOUT("on video frame");
+			//DEBUG_LINEOUT("on video frame %s", strVideoTrackLabel.c_str());
 
 			m_pendingVideoBuffer.pPendingBuffer = pVideoFrameDataBuffer;
 			m_pendingVideoBuffer.pxWidth = pxWidth;
@@ -963,7 +963,7 @@ Error:
 	return r;
 }
 
-#define UPDATE_SCREENCAST_COUNT 5	
+#define UPDATE_SCREENCAST_COUNT 30	
 #define UPDATE_SCREENCAST_MS ((1000.0f) / UPDATE_SCREENCAST_COUNT)
 std::chrono::system_clock::time_point g_lastTestUpdate = std::chrono::system_clock::now();
 
@@ -978,12 +978,18 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		public CloudController::UserObserver
 	{
 		UserController *pUserController = nullptr;
+		
+		// Chrome Source / Dest
+		quad *pChromeDestQuad = nullptr;
+		texture *pChromeDestQuadTexture = nullptr;
+		quad *pChromeSourceQuad = nullptr;
+		texture *pChromeSourceTexture = nullptr;
 
-		quad *pQuad = nullptr;
-		texture *pQuadTexture = nullptr;
-
-		quad *pSourceQuad = nullptr;
-		texture *pSourceTexture = nullptr;
+		// VCam Source / Dest
+		quad *pVCamDestQuad = nullptr;
+		texture *pVCamDestQuadTexture = nullptr;
+		quad *pVCamSourceQuad = nullptr;
+		texture *pVCamSourceTexture = nullptr;
 
 		CloudController *pCloudController = nullptr;
 
@@ -995,9 +1001,13 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			int pxWidth = 0;
 			int pxHeight = 0;
 			bool fPendingBufferReady = false;
-		} m_pendingVideoBuffer;
+		};
 
-		uint8_t *pTestVideoFrameBuffer = nullptr;
+		PendingVideoBuffer m_pendingChromeVideoBuffer;
+		PendingVideoBuffer m_pendingVCamVideoBuffer;
+
+		uint8_t *pTestChromeVideoFrameBuffer = nullptr;
+		uint8_t *pTestVCamVideoFrameBuffer = nullptr;
 
 		// PeerConnectionObserver
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
@@ -1032,15 +1042,25 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
+		virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
 			RESULT r = R_PASS;
 
-			CBM((m_pendingVideoBuffer.fPendingBufferReady == false), "Buffer already pending");
+			if (strVideoTrackLabel == kChromeVideoLabel) {
+				CBM((m_pendingChromeVideoBuffer.fPendingBufferReady == false), "Chrome Buffer already pending");
 
-			m_pendingVideoBuffer.pPendingBuffer = pVideoFrameDataBuffer;
-			m_pendingVideoBuffer.pxWidth = pxWidth;
-			m_pendingVideoBuffer.pxHeight = pxHeight;
-			m_pendingVideoBuffer.fPendingBufferReady = true;
+				m_pendingChromeVideoBuffer.pPendingBuffer = pVideoFrameDataBuffer;
+				m_pendingChromeVideoBuffer.pxWidth = pxWidth;
+				m_pendingChromeVideoBuffer.pxHeight = pxHeight;
+				m_pendingChromeVideoBuffer.fPendingBufferReady = true;
+			}
+			else if (strVideoTrackLabel == kVCamVideoLabel) {
+				CBM((m_pendingVCamVideoBuffer.fPendingBufferReady == false), "VCam Buffer already pending");
+
+				m_pendingVCamVideoBuffer.pPendingBuffer = pVideoFrameDataBuffer;
+				m_pendingVCamVideoBuffer.pxWidth = pxWidth;
+				m_pendingVCamVideoBuffer.pxHeight = pxHeight;
+				m_pendingVCamVideoBuffer.fPendingBufferReady = true;
+			}
 
 		Error:
 			return r;
@@ -1161,19 +1181,34 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		// Objects 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 		
-		pTestContext->pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1);
-		CN(pTestContext->pQuad);
-		pTestContext->pQuad->RotateXByDeg(45.0f);
-		pTestContext->pQuad->translateX(-1.0f);
+		pTestContext->pChromeDestQuad = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1);
+		CN(pTestContext->pChromeDestQuad);
+		pTestContext->pChromeDestQuad->RotateXByDeg(45.0f);
+		pTestContext->pChromeDestQuad->translateX(-1.0f);
+		pTestContext->pChromeDestQuad->translateY(1.0f);
 
-		pTestContext->pSourceQuad = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1);
-		CN(pTestContext->pSourceQuad);
-		pTestContext->pSourceQuad->RotateXByDeg(45.0f);
-		pTestContext->pSourceQuad->translateX(1.0f);
+		pTestContext->pChromeSourceQuad = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1);
+		CN(pTestContext->pChromeSourceQuad);
+		pTestContext->pChromeSourceQuad->RotateXByDeg(45.0f);
+		pTestContext->pChromeSourceQuad->translateX(1.0f);
+		pTestContext->pChromeSourceQuad->translateY(1.0f);
+
+		pTestContext->pVCamDestQuad = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1);
+		CN(pTestContext->pVCamDestQuad);
+		pTestContext->pVCamDestQuad->RotateXByDeg(45.0f);
+		pTestContext->pVCamDestQuad->translateX(-1.0f);
+		pTestContext->pVCamDestQuad->translateY(-1.0f);
+
+		pTestContext->pVCamSourceQuad = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1);
+		CN(pTestContext->pVCamSourceQuad);
+		pTestContext->pVCamSourceQuad->RotateXByDeg(45.0f);
+		pTestContext->pVCamSourceQuad->translateX(1.0f);
+		pTestContext->pVCamSourceQuad->translateY(-1.0f);
 
 		// Temporary
 		///*
-		pTestContext->pQuadTexture = m_pDreamOS->MakeTexture(
+		// Chrome
+		pTestContext->pChromeDestQuadTexture = m_pDreamOS->MakeTexture(
 			texture::type::TEXTURE_2D, 
 			pxWidth, 
 			pxHeight, 
@@ -1183,10 +1218,10 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			pxWidth * pxHeight * 4
 		);
 
-		CN(pTestContext->pQuadTexture);
-		pTestContext->pQuad->SetDiffuseTexture(pTestContext->pQuadTexture);
+		CN(pTestContext->pChromeDestQuadTexture);
+		pTestContext->pChromeDestQuad->SetDiffuseTexture(pTestContext->pChromeDestQuadTexture);
 
-		pTestContext->pSourceTexture = m_pDreamOS->MakeTexture(
+		pTestContext->pChromeSourceTexture = m_pDreamOS->MakeTexture(
 			texture::type::TEXTURE_2D,
 			pxWidth,
 			pxHeight,
@@ -1196,45 +1231,93 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			pxWidth * pxHeight * 4
 		);
 
-		CN(pTestContext->pSourceTexture);
-		pTestContext->pSourceQuad->SetDiffuseTexture(pTestContext->pSourceTexture);
+		CN(pTestContext->pChromeSourceTexture);
+		pTestContext->pChromeSourceQuad->SetDiffuseTexture(pTestContext->pChromeSourceTexture);
+
+		// VCam
+		pTestContext->pVCamDestQuadTexture = m_pDreamOS->MakeTexture(
+			texture::type::TEXTURE_2D,
+			pxWidth,
+			pxHeight,
+			PIXEL_FORMAT::RGBA,
+			4,
+			&vectorByteBuffer[0],
+			pxWidth * pxHeight * 4
+		);
+
+		CN(pTestContext->pVCamDestQuadTexture);
+		pTestContext->pVCamDestQuad->SetDiffuseTexture(pTestContext->pVCamDestQuadTexture);
+
+		pTestContext->pVCamSourceTexture = m_pDreamOS->MakeTexture(
+			texture::type::TEXTURE_2D,
+			pxWidth,
+			pxHeight,
+			PIXEL_FORMAT::RGBA,
+			4,
+			&vectorByteBuffer[0],
+			pxWidth * pxHeight * 4
+		);
+
+		CN(pTestContext->pVCamSourceTexture);
+		pTestContext->pVCamSourceQuad->SetDiffuseTexture(pTestContext->pVCamSourceTexture);
 
 		size_t bufSize = sizeof(uint8_t) * pxWidth * pxHeight * channels;
 
-		pTestContext->pTestVideoFrameBuffer = (uint8_t*)malloc(bufSize);
-		CN(pTestContext->pTestVideoFrameBuffer);
-		int styleCounter = 0;
+		pTestContext->pTestChromeVideoFrameBuffer = (uint8_t*)malloc(bufSize);
+		CN(pTestContext->pTestChromeVideoFrameBuffer);
+
+		pTestContext->pTestVCamVideoFrameBuffer = (uint8_t*)malloc(bufSize);
+		CN(pTestContext->pTestVCamVideoFrameBuffer);
+
+		int chromeStyleCounter = 0;
+		int vcamStyleCounter = 0;
 
 		for (int i = 0; i < pxHeight; i++) {
 			for (int j = 0; j < pxWidth; j++) {
-				uint8_t cPixel[4] = { 0x00, 0x00, 0x00, 0xFF };
-				cPixel[styleCounter] = 0xFF;
+				uint8_t cChromePixel[4] = { 0x00, 0x00, 0x00, 0xFF };
+				cChromePixel[chromeStyleCounter] = 0xFF;
+
+				uint8_t cVCamPixel[4] = { 0x00, 0x00, 0x00, 0xFF };
+				cVCamPixel[vcamStyleCounter] = 0xFF;
 
 				size_t offset = (i * ((pxWidth - 1)) + (j));
 				offset *= 4;
 
 				CB((offset < bufSize));
 
-				uint8_t *pPixelMemLocation = pTestContext->pTestVideoFrameBuffer + offset;
+				uint8_t *pPixelMemLocation = pTestContext->pTestChromeVideoFrameBuffer + offset;
+				memcpy(pPixelMemLocation, cChromePixel, sizeof(cChromePixel));
 
-				memcpy(pPixelMemLocation, cPixel, sizeof(cPixel));
+				pPixelMemLocation = pTestContext->pTestVCamVideoFrameBuffer + offset;
+				memcpy(pPixelMemLocation, cVCamPixel, sizeof(cVCamPixel));
 			}
 
 			if (i % 50 == 0) {
-				if (++styleCounter > 3) {
-					styleCounter = 0;
+				if (++chromeStyleCounter > 3) {
+					chromeStyleCounter = 0;
+				}
+
+				if (--vcamStyleCounter < 0) {
+					vcamStyleCounter = 3;
 				}
 			}
 		}
 
-		CR(pTestContext->pSourceTexture->Update(
-			(unsigned char*)(pTestContext->pTestVideoFrameBuffer),
+		CR(pTestContext->pChromeSourceTexture->Update(
+			(unsigned char*)(pTestContext->pTestChromeVideoFrameBuffer),
 			pxWidth,
 			pxHeight,
 			PIXEL_FORMAT::RGBA)
 		);
+		CR(pTestContext->pChromeSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
 
-		CR(pTestContext->pSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
+		CR(pTestContext->pVCamSourceTexture->Update(
+			(unsigned char*)(pTestContext->pTestVCamVideoFrameBuffer),
+			pxWidth,
+			pxHeight,
+			PIXEL_FORMAT::RGBA)
+		);
+		CR(pTestContext->pVCamSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
 
 		//*/
 
@@ -1294,20 +1377,83 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		if (pTestContext->m_pendingVideoBuffer.fPendingBufferReady && pTestContext->m_pendingVideoBuffer.pPendingBuffer != nullptr) {
+		if (pTestContext->m_pendingChromeVideoBuffer.fPendingBufferReady && pTestContext->m_pendingChromeVideoBuffer.pPendingBuffer != nullptr) {
 			// Update the video buffer to texture
-			CR(pTestContext->pQuadTexture->Update(
-				(unsigned char*)(pTestContext->m_pendingVideoBuffer.pPendingBuffer),
-				pTestContext->m_pendingVideoBuffer.pxWidth,
-				pTestContext->m_pendingVideoBuffer.pxHeight,
+			CR(pTestContext->pChromeDestQuadTexture->Update(
+				(unsigned char*)(pTestContext->m_pendingChromeVideoBuffer.pPendingBuffer),
+				pTestContext->m_pendingChromeVideoBuffer.pxWidth,
+				pTestContext->m_pendingChromeVideoBuffer.pxHeight,
 				PIXEL_FORMAT::RGBA)
 			);
+		}
+
+		if (pTestContext->m_pendingVCamVideoBuffer.fPendingBufferReady && pTestContext->m_pendingVCamVideoBuffer.pPendingBuffer != nullptr) {
+			// Update the video buffer to texture
+			CR(pTestContext->pVCamDestQuadTexture->Update(
+				(unsigned char*)(pTestContext->m_pendingVCamVideoBuffer.pPendingBuffer),
+				pTestContext->m_pendingVCamVideoBuffer.pxWidth,
+				pTestContext->m_pendingVCamVideoBuffer.pxHeight,
+				PIXEL_FORMAT::RGBA)
+			);
+		}
+
+		// Scroll/Update the buffers
+		int pxWidth = pTestContext->pChromeSourceTexture->GetWidth();
+		int pxHeight = pTestContext->pChromeSourceTexture->GetHeight();
+		int channels = pTestContext->pChromeSourceTexture->GetChannels();
+
+		size_t bufSize = sizeof(uint8_t) * pxWidth * pxHeight * channels;
+		size_t bufRowSize = sizeof(uint8_t) * pxWidth * channels;
+
+		uint8_t *tempRow = (uint8_t*)malloc(bufRowSize);
+		CN(tempRow);
+
+		// Chrome Buffer
+		// Save the row
+		memcpy(tempRow, pTestContext->pTestChromeVideoFrameBuffer, bufRowSize);
+		memcpy(pTestContext->pTestChromeVideoFrameBuffer,
+			pTestContext->pTestChromeVideoFrameBuffer + bufRowSize,
+			(bufSize - bufRowSize));
+		memcpy(pTestContext->pTestChromeVideoFrameBuffer + (bufSize - bufRowSize),
+			tempRow,
+			bufRowSize);
+
+		memcpy(tempRow, pTestContext->pTestVCamVideoFrameBuffer + (bufSize - bufRowSize), bufRowSize);
+		memcpy(pTestContext->pTestVCamVideoFrameBuffer + bufRowSize,
+			pTestContext->pTestVCamVideoFrameBuffer,
+			(bufSize - bufRowSize));
+		memcpy(pTestContext->pTestVCamVideoFrameBuffer,
+			tempRow,
+			bufRowSize);
+
+		CR(pTestContext->pChromeSourceTexture->Update(
+			(unsigned char*)(pTestContext->pTestChromeVideoFrameBuffer),
+			pxWidth,
+			pxHeight,
+			PIXEL_FORMAT::RGBA)
+		);
+		CR(pTestContext->pChromeSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
+
+		CR(pTestContext->pVCamSourceTexture->Update(
+			(unsigned char*)(pTestContext->pTestVCamVideoFrameBuffer),
+			pxWidth,
+			pxHeight,
+			PIXEL_FORMAT::RGBA)
+		);
+		CR(pTestContext->pVCamSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
+
+
+		if (tempRow != nullptr) {
+			free(tempRow);
+			tempRow = nullptr;
 		}
 
 		// Replace with BroadcastTexture
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - g_lastTestUpdate).count() > UPDATE_SCREENCAST_MS) {
 			if (pTestContext->pCloudController != nullptr) {
-				pTestContext->pCloudController->BroadcastTextureFrame(kChromeVideoLabel, pTestContext->pSourceTexture, 0, PIXEL_FORMAT::RGBA);
+				pTestContext->pCloudController->BroadcastTextureFrame(kChromeVideoLabel, pTestContext->pChromeSourceTexture, 0, PIXEL_FORMAT::RGBA);
+
+				pTestContext->pCloudController->BroadcastTextureFrame(kVCamVideoLabel, pTestContext->pVCamSourceTexture, 0, PIXEL_FORMAT::RGBA);
 
 				/*
 				HALImp *pHAL = m_pDreamOS->GetHALImp();
@@ -1322,16 +1468,26 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 				}
 				//*/
 			}
-	
+
+			
+
 			g_lastTestUpdate = std::chrono::system_clock::now();
 		}
 
 	Error:
-		pTestContext->m_pendingVideoBuffer.fPendingBufferReady = false;
 
-		if (pTestContext->m_pendingVideoBuffer.pPendingBuffer != nullptr) {
-			delete pTestContext->m_pendingVideoBuffer.pPendingBuffer;
-			pTestContext->m_pendingVideoBuffer.pPendingBuffer = nullptr;
+		// Release Chrome pending buffer
+		pTestContext->m_pendingChromeVideoBuffer.fPendingBufferReady = false;
+		if (pTestContext->m_pendingChromeVideoBuffer.pPendingBuffer != nullptr) {
+			delete pTestContext->m_pendingChromeVideoBuffer.pPendingBuffer;
+			pTestContext->m_pendingChromeVideoBuffer.pPendingBuffer = nullptr;
+		}
+
+		// Release VCam Pending Buffer
+		pTestContext->m_pendingVCamVideoBuffer.fPendingBufferReady = false;
+		if (pTestContext->m_pendingVCamVideoBuffer.pPendingBuffer != nullptr) {
+			delete pTestContext->m_pendingVCamVideoBuffer.pPendingBuffer;
+			pTestContext->m_pendingVCamVideoBuffer.pPendingBuffer = nullptr;
 		}
 
 		return r;

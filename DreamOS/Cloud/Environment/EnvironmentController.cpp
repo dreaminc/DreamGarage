@@ -1454,11 +1454,11 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT EnvironmentController::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		CR(m_pEnvironmentControllerObserver->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
 	}
 
 Error:

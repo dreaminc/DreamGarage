@@ -447,11 +447,11 @@ Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT WebRTCImp::OnVideoFrame(const std::string &strVideoTrackLabel, long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnVideoFrame(peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		CR(m_pWebRTCObserver->OnVideoFrame(strVideoTrackLabel, peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight));
 	}
 
 Error:

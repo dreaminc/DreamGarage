@@ -645,14 +645,14 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT CloudController::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	long senderUserID = pPeerConnection->GetPeerUserID();
 	long recieverUserID = pPeerConnection->GetUserID();
 
 	if (m_pPeerConnectionObserver != nullptr) {
-		CR(m_pPeerConnectionObserver->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		CR(m_pPeerConnectionObserver->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
 	}
 
 Error:

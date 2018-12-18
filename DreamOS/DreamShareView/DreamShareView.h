@@ -72,7 +72,7 @@ public:
 
 	// Video Stream Subscriber
 	RESULT BroadcastVideoFrame(const void *pBuffer, int width, int height);
-	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
+	virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 	RESULT SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
 	RESULT UpdateFromPendingVideoFrame();
 

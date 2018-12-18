@@ -760,14 +760,14 @@ Error:
 	return r;
 }
 
-RESULT PeerConnectionController::OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT PeerConnectionController::OnVideoFrame(const std::string &strVideoTrackLabel, long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
 	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		CR(m_pPeerConnectionControllerObserver->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		CR(m_pPeerConnectionControllerObserver->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
 	}
 
 Error:

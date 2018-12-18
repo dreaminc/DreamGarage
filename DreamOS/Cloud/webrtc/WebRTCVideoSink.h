@@ -11,6 +11,7 @@
 #include "media/base/videocommon.h"
 #include "api/video/video_frame.h"
 #include "api/video/video_sink_interface.h"
+#include "api/mediastreaminterface.h"
 
 class WebRTCVideoSink : public rtc::VideoSinkInterface<webrtc::VideoFrame> {
 public:
@@ -20,16 +21,22 @@ public:
 	};
 
 public:
-	WebRTCVideoSink(const std::string &strVideoTrackName, WebRTCVideoSink::observer *pParentObserver);
+	WebRTCVideoSink(const std::string &strVideoTrackName, WebRTCVideoSink::observer *pParentObserver, webrtc::VideoTrackSourceInterface* m_pVideoTrackSource);
 	~WebRTCVideoSink();
-
 
 	// rtc::VideoSinkInterface<cricket::VideoFrame>
 	virtual void OnFrame(const webrtc::VideoFrame& cricketVideoFrame) override;
 
+	RESULT Initialize();
+
+public:
+	static WebRTCVideoSink* MakeWebRTCVideoSink(const std::string &strVideoTrackName, WebRTCVideoSink::observer *pParentObserver, webrtc::VideoTrackSourceInterface* pVideoTrackSource);
+
 private:
 	std::string m_strVideoTrackName;
 	WebRTCVideoSink::observer *m_pParentObserver = nullptr;
+
+	webrtc::VideoTrackSourceInterface* m_pVideoTrackSource = nullptr;
 
 };
 

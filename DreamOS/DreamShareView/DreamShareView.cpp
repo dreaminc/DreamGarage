@@ -472,7 +472,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT DreamShareView::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	// TODO: Create a pending frame thing

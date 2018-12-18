@@ -3,9 +3,10 @@
 #include "api/video/video_frame.h"
 #include "common_video/libyuv/include/webrtc_libyuv.h"
 
-WebRTCVideoSink::WebRTCVideoSink(const std::string &strVideoTrackName, WebRTCVideoSink::observer *pParentObserver) :
+WebRTCVideoSink::WebRTCVideoSink(const std::string &strVideoTrackName, WebRTCVideoSink::observer *pParentObserver, webrtc::VideoTrackSourceInterface* pVideoTrackSource) :
 	m_pParentObserver(pParentObserver),
-	m_strVideoTrackName(strVideoTrackName)
+	m_strVideoTrackName(strVideoTrackName),
+	m_pVideoTrackSource(pVideoTrackSource)
 {
 	// empty
 }
@@ -60,4 +61,51 @@ Error:
 	}
 
 	return;
+}
+
+RESULT WebRTCVideoSink::Initialize() {
+	RESULT r = R_PASS;
+
+	webrtc::VideoTrackSourceInterface::Stats stats;
+	rtc::VideoSinkWants videoSinkWants = rtc::VideoSinkWants();
+
+	CN(m_pParentObserver);
+	CN(m_pVideoTrackSource);
+
+	// Get some information
+	m_pVideoTrackSource->GetStats(&stats);
+
+	// This object informs the source of the format requirements of the sink
+	m_pVideoTrackSource->AddOrUpdateSink(this, videoSinkWants);
+	//bool res = track->GetSource()->is_screencast();
+
+	//const int64_t interval = 1000000000;//33333333
+	//cricket::VideoFormat format(512, 512, 1000000000, cricket::FOURCC_RGBA);
+	//g_capturer->Start(format);
+
+	//track->GetSource()->Restart();
+
+Error:
+	return r;
+}
+
+WebRTCVideoSink* WebRTCVideoSink::MakeWebRTCVideoSink(const std::string &strVideoTrackName, WebRTCVideoSink::observer *pParentObserver, webrtc::VideoTrackSourceInterface* pVideoTrackSource) {
+	RESULT r = R_PASS;
+	
+	WebRTCVideoSink* pWebRTCVideoSink = nullptr;
+
+	pWebRTCVideoSink = new WebRTCVideoSink(strVideoTrackName, pParentObserver, pVideoTrackSource);
+	CNM(pWebRTCVideoSink, "Failed to allocate WebRTCVideoSink");
+
+	CRM(pWebRTCVideoSink->Initialize(), "Failed to initialize web rtc video sink");
+
+	return pWebRTCVideoSink;
+
+Error:
+	if (pWebRTCVideoSink != nullptr) {
+		delete pWebRTCVideoSink;
+		pWebRTCVideoSink = nullptr;
+	}
+
+	return nullptr;
 }

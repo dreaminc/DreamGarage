@@ -45,9 +45,10 @@ class WebRTCPeerConnection :
 	public webrtc::PeerConnectionObserver, 
 	public webrtc::DataChannelObserver,
 	public webrtc::CreateSessionDescriptionObserver,
-	public rtc::VideoSinkInterface<webrtc::VideoFrame>,
+	//public rtc::VideoSinkInterface<webrtc::VideoFrame>,
 	public WebRTCPeerConnectionProxy,
-	public WebRTCAudioTrackSink::observer
+	public WebRTCAudioTrackSink::observer,
+	public WebRTCVideoSink::observer
 {
 public:
 	
@@ -76,7 +77,7 @@ public:
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
 
 		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
-		virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
+		virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 	};
 
 	friend class WebRTCPeerConnectionObserver;
@@ -144,7 +145,10 @@ protected:
 	virtual void OnFailure(const std::string& error) override;
 
 	// rtc::VideoSinkInterface<cricket::VideoFrame>
-	virtual void OnFrame(const webrtc::VideoFrame& cricketVideoFrame) override;
+	//virtual void OnFrame(const webrtc::VideoFrame& cricketVideoFrame) override;
+
+	// WebRTCVideoSink::observer
+	virtual RESULT OnVideoFrame(std::string strVideoTrackName, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 
 	// WebRTCAudioTrackSink::observer
 	virtual void OnAudioTrackSinkData(std::string strAudioTrackLabel, const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
@@ -182,6 +186,11 @@ public:
 	cricket::VideoCapturer* GetVideoCaptureDeviceByTrackName(std::string strTrackName);
 
 	std::map<std::string, std::unique_ptr<cricket::VideoCapturer>> m_videoCaptureDevices;
+	
+	RESULT InitializeVideoSink(std::string strTrackName, webrtc::VideoTrackSourceInterface* pVideoTrackSource);
+	WebRTCVideoSink *GetVideoSink(std::string strTrackName);
+	
+	std::map<std::string, std::unique_ptr<WebRTCVideoSink>> m_videoSinks;
 
 	//std::unique_ptr<cricket::VideoCapturer> m_pCricketVideoCapturer = nullptr;
 
