@@ -303,11 +303,24 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 				else if (err == ERROR_NO_DATA) {
 					pClientConnection->m_fConnected = false;
 					DEBUG_LINEOUT("Client connection %d closed", pClientConnection->m_connectionID);
-					/*
-					if (m_pObserver != nullptr) {
-						m_pObserver->OnClientDisconnect();
+
+					// Send Disconnect event if all connections are disconnected
+					bool fShouldCloseConnection = true;
+
+					fShouldCloseConnection = fShouldCloseConnection && m_clientConnections.size() > 0;
+
+					// if any clientConnection is connected, fShouldCloseConnection will be false
+					for (auto &pClientConnection : m_clientConnections) {
+						fShouldCloseConnection = fShouldCloseConnection && !pClientConnection->IsConnected();
 					}
-					//*/
+
+					if (fShouldCloseConnection && m_pObserver != nullptr) {
+						m_pObserver->OnClientDisconnect();
+
+						// Close clears the client connections
+						m_clientConnections.clear();
+						goto Error;
+					}
 				}
 				else {
 					CBM((false), "WriteFile failed with GLE: %d", (int)err);
@@ -320,22 +333,6 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 
 	}
 
-	// Send Disconnect event if all connections are disconnected
-	bool fShouldCloseConnection = true;
-
-	fShouldCloseConnection = fShouldCloseConnection && m_clientConnections.size() > 0;
-
-	// if any clientConnection is connected, fShouldCloseConnection will be false
-	for (auto &pClientConnection : m_clientConnections) {
-		fShouldCloseConnection = fShouldCloseConnection && !pClientConnection->IsConnected();
-	}
-
-	if (fShouldCloseConnection && m_pObserver != nullptr) {
-		m_pObserver->OnClientDisconnect();
-
-		// Close clears the client connections
-		Close();
-	}
 
 Error:
 	if (pTempBuffer != nullptr) {
