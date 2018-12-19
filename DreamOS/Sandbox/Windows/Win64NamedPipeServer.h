@@ -66,6 +66,7 @@ private:
 
 private:
 	std::vector<Win64NamedPipeConnection*> m_clientConnections;
+	bool m_fAnyConnected = false;
 
 	Win64NamedPipeConnection *m_pPendingConnection = nullptr;
 

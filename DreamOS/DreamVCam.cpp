@@ -453,9 +453,8 @@ RESULT DreamVCam::OnClientDisconnect() {
 
 	CR(m_pParentApp->OnVirtualCameraReleased());
 
-	// TODO: doesn't work with webcam test
-	//m_pCameraQuad->SetVisible(false);
-	//m_pCameraQuadBackground->SetVisible(false);
+	m_pCameraQuad->SetVisible(false);
+	m_pCameraQuadBackground->SetVisible(false);
 
 Error:
 	return r;
