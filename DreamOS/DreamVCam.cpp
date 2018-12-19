@@ -94,6 +94,8 @@ Error:
 	return r;
 }
 
+const wchar_t kDreamVCamNamedPipeServerName[] = L"dreamvcampipe";
+
 RESULT DreamVCam::InitializePipeline() {
 	RESULT r = R_PASS;
 
@@ -101,7 +103,7 @@ RESULT DreamVCam::InitializePipeline() {
 	//CRM(StartModuleProcess(), "Failed to start module process");
 	
 	// Set up named pipe server
-	m_pNamedPipeServer = GetDOS()->MakeNamedPipeServer(L"dreamvcampipe");
+	m_pNamedPipeServer = GetDOS()->MakeNamedPipeServer(kDreamVCamNamedPipeServerName);
 	CN(m_pNamedPipeServer);
 
 	CRM(m_pNamedPipeServer->RegisterMessageHandler(std::bind(&DreamVCam::HandleServerPipeMessage, this, std::placeholders::_1, std::placeholders::_2)),
@@ -180,7 +182,7 @@ RESULT DreamVCam::HandleServerPipeMessage(void *pBuffer, size_t pBuffer_n) {
 	char *pszMessage = (char *)(pBuffer);
 	CN(pszMessage);
 
-	DEBUG_LINEOUT("HandleServerPipeMessage: %s", pszMessage);
+	DEBUG_LINEOUT("DreamVCam::HandleServerPipeMessage: %s", pszMessage);
 
 Error:
 	return r;

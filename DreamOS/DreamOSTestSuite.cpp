@@ -1194,7 +1194,7 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 			//CR(m_pDreamOS->RegisterSoundSystemObserver(pTestContext));
 
 			//CR(m_pDreamOS->PlaySoundFile(pNewSoundFile));
-			CR(m_pDreamOS->LoopSoundFile(pNewSoundFile));
+			//CR(m_pDreamOS->LoopSoundFile(pNewSoundFile));
 		}
 
 	Error:

@@ -71,7 +71,7 @@ public:
 	virtual int GetBitsPerSample() { return 0; }
 
 public:
-	virtual RESULT GetInterlacedAudioDataBuffer(int numFrames, void* &n_pDataBuffer, size_t &m_pDataBuffer_n) = 0;
+	virtual RESULT GetInterlacedAudioDataBuffer(int numFrames, void* &n_pDataBuffer, size_t &m_pDataBuffer_n, bool fUpdateSoundBufferPosition = true) = 0;
 	
 public:
 	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(uint8_t *pTargetDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
@@ -394,11 +394,12 @@ public:
 		return (sizeof(CBType) << 3);
 	}
 
-	virtual RESULT GetInterlacedAudioDataBuffer(int numFrames, void* &n_pDataBuffer, size_t &m_pDataBuffer_n) override {
+	virtual RESULT GetInterlacedAudioDataBuffer(int numFrames, void* &n_pDataBuffer, size_t &m_pDataBuffer_n, bool fUpdateSoundBufferPosition) override {
 		RESULT r = R_SKIPPED;
 
 		CBType *pTargetDataBuffer = nullptr;
 		size_t bufferLength = 0;
+		CircularBufferState circularBufferState;
 
 		CB((n_pDataBuffer == nullptr));
 
@@ -406,9 +407,23 @@ public:
 		pTargetDataBuffer = new CBType[bufferLength];
 		CN(pTargetDataBuffer);
 
+		// Save buffer state if this is a no-effect operation
+		// NOTE: This assumes (like many of the multi-channel circular buffer operations) that 
+		// each circular buffer is synced
+		if (fUpdateSoundBufferPosition == false) {
+			circularBufferState = m_ppCircularBuffers[0]->GetCircularBufferState();
+		}
+
 		CR(LoadDataToInterlacedTargetBuffer(pTargetDataBuffer, numFrames));
 		n_pDataBuffer = (void*)(pTargetDataBuffer);
 		m_pDataBuffer_n = bufferLength * sizeof(CBType);
+
+		// Set the buffer states back to before (no memory is manipulated in LoadData after all
+		if (fUpdateSoundBufferPosition == false) {
+			for (int i = 0; i < m_channels; i++) {
+				CR(m_ppCircularBuffers[i]->SetCircularBufferState(circularBufferState));
+			}
+		}
 
 		return r;
 

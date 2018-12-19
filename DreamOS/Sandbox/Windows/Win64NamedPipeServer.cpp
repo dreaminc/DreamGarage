@@ -206,7 +206,7 @@ RESULT Win64NamedPipeServer::NamedPipeServerProcess() {
 	// Call a subroutine to create one instance, and wait for 
 	// the client to connect. 
 
-	DEBUG_LINEOUT("Starting server...");
+	DEBUG_LINEOUT("Starting %S server...", m_strPipename.c_str());
 
 	while (m_fRunning)  {
 
@@ -250,6 +250,7 @@ RESULT Win64NamedPipeServer::NamedPipeServerProcess() {
 			// completion routine. 
 			case WAIT_IO_COMPLETION: {
 				//
+				int a = 5;
 			} break;
 
 			// An error occurred in the wait function. 

@@ -131,8 +131,50 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 		//*/
 	}
 
+	// Named Pipe Server
+	CR(InitializeNamedPipeServer());
+
 Error:
 	return r;
+}
+
+const wchar_t kDreamSoundSystemNamedPipeServerName[] = L"dreamsoundsystempipe";
+
+RESULT DreamSoundSystem::HandleServerPipeMessage(void *pBuffer, size_t pBuffer_n) {
+	RESULT r = R_PASS;
+
+	char *pszMessage = (char *)(pBuffer);
+	CN(pszMessage);
+
+	DEBUG_LINEOUT("DreamSoundSystem::HandleServerPipeMessage: %s", pszMessage);
+
+Error:
+	return r;
+}
+
+RESULT DreamSoundSystem::InitializeNamedPipeServer() {
+	RESULT r = R_PASS;
+
+	// Set up named pipe server
+	m_pNamedPipeServer = GetDOS()->MakeNamedPipeServer(kDreamSoundSystemNamedPipeServerName);
+	CN(m_pNamedPipeServer);
+
+	CRM(m_pNamedPipeServer->RegisterMessageHandler(std::bind(&DreamSoundSystem::HandleServerPipeMessage, this, std::placeholders::_1, std::placeholders::_2)),
+		"Failed to register message handler");
+	CR(m_pNamedPipeServer->RegisterNamedPipeServerObserver(this));
+
+	CRM(m_pNamedPipeServer->Start(), "Failed to start server");
+
+Error:
+	return r;
+}
+
+RESULT DreamSoundSystem::OnClientConnect() {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamSoundSystem::OnClientDisconnect() {
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
@@ -158,9 +200,19 @@ RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptur
 	}
 	//*/
 
+	if (m_pNamedPipeServer != nullptr) {
+		void *pDataBuffer = nullptr;
+		size_t pDataBuffer_n = 0;
+
+		CR(pCaptureBuffer->GetInterlacedAudioDataBuffer(numFrames, pDataBuffer, pDataBuffer_n, false));
+		m_pNamedPipeServer->SendMessage((void*)(pDataBuffer), pDataBuffer_n);
+	}
+
 	if (m_pObserver) {
 		CRM(m_pObserver->OnAudioDataCaptured(numFrames, pCaptureBuffer), "OnAudioDataCaptured in observer failed");
 	}
+
+	
 
 Error:
 	return r;

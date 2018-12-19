@@ -15,6 +15,8 @@
 
 #include "Sound/SoundFile.h"
 
+#include "Sandbox/NamedPipeServer.h"
+
 #include <memory>
 
 class SpatialSoundObject;
@@ -24,7 +26,8 @@ class HMD;
 
 class DreamSoundSystem : 
 	public DreamModule<DreamSoundSystem>, 
-	public SoundClient::observer 
+	public SoundClient::observer ,
+	public NamedPipeServer::observer
 {
 	friend class DreamModuleManager;
 
@@ -42,6 +45,8 @@ public:
 	virtual RESULT OnDidFinishInitializing(void *pContext = nullptr) override;
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
+
+	
 
 	RESULT RegisterObserver(DreamSoundSystem::observer *pObserver);
 	RESULT UnregisterObserver();
@@ -82,6 +87,17 @@ private:
 private:	
 	std::shared_ptr<SpatialSoundObject> m_pTestSpatialSoundObject = nullptr;
 	std::shared_ptr<SoundFile> m_pSoundFile = nullptr;
+
+private:
+	RESULT InitializeNamedPipeServer();
+	RESULT HandleServerPipeMessage(void *pBuffer, size_t pBuffer_n);
+
+	std::shared_ptr<NamedPipeServer> m_pNamedPipeServer = nullptr;
+
+public:
+	// NamedPipeServerObserver
+	virtual RESULT OnClientConnect() override;
+	virtual RESULT OnClientDisconnect() override;
 };
 
 #endif // ! DREAM_SOUND_SYSTEM_H_
