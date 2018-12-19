@@ -473,10 +473,7 @@ Error:
 RESULT DreamVCam::HandleSettings(point ptPosition, quaternion qOrientation) {
 	RESULT r = R_PASS;
 
-	if (ptPosition == point(-1, -1, -1) && qOrientation == quaternion(-1, -1, -1, -1)) {
-		// No setting saved, use default values
-	}
-	else {
+	if (ptPosition != point(-1, -1, -1) && qOrientation != quaternion(-1, -1, -1, -1)) {
 		m_pCamera->SetPosition(ptPosition);
 		m_pCamera->SetOrientation(qOrientation);
 	}

@@ -718,7 +718,7 @@ RESULT UserController::OnGetSettings(std::string&& strResponse) {
 			qZ = jsonSettings["camera_orientation_z"].get<float>();
 
 			ptCamera = point(ptX, ptY, ptZ);
-			qCamera = quaternion({ qW, qX, qY, qZ });
+			qCamera = quaternion(quaternionXYZW(qW, qX, qY, qZ));
 		}
 		else {
 			ptCamera = point(-1, -1, -1);

@@ -217,7 +217,7 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 	}
 	//DEBUG_LINEOUT_RETURN("Camera Rotating: x: %0.8f y: %0.8f", m_lookXVelocity, m_lookYVelocity);
 	
-	bool fAtRest = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_pCamera->GetMomentum().magnitude() < 0.00000001);	// because double precision things
+	bool fAtRest = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_pCamera->GetMomentum().magnitude() < m_cameraAtRestMomentum);	
 	if (!fAtRest) {
 		m_fAtRest = false;
 	}
