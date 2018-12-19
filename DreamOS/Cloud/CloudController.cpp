@@ -370,33 +370,33 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnReceiveAsset(long userID) {
+RESULT CloudController::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	if (m_pEnvironmentObserver != nullptr) {
-		CR(m_pEnvironmentObserver->OnReceiveAsset(userID));
+		CR(m_pEnvironmentObserver->OnReceiveAsset(pEnvironmentShare));
 	}
 
 Error:
 	return r;
 }
 
-RESULT CloudController::OnStopSending() {
+RESULT CloudController::OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	if (m_pEnvironmentObserver != nullptr) {
-		CR(m_pEnvironmentObserver->OnStopSending());
+		CR(m_pEnvironmentObserver->OnStopSending(pEnvironmentShare));
 	}
 
 Error:
 	return r;
 }
 
-RESULT CloudController::OnShareAsset() {
+RESULT CloudController::OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	if (m_pEnvironmentObserver != nullptr) {
-		CR(m_pEnvironmentObserver->OnShareAsset());
+		CR(m_pEnvironmentObserver->OnShareAsset(pEnvironmentShare));
 	}
 
 Error:
@@ -414,11 +414,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnStopReceiving() {
+RESULT CloudController::OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	if (m_pEnvironmentObserver != nullptr) {
-		CR(m_pEnvironmentObserver->OnStopReceiving());
+		CR(m_pEnvironmentObserver->OnStopReceiving(pEnvironmentShare));
 	}
 
 Error:

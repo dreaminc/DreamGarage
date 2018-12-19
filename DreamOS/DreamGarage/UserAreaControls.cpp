@@ -301,7 +301,7 @@ RESULT UserAreaControls::HandleShareTogglePressed(UIButton *pButtonContext, void
 	else {
 		CR(m_pParentApp->ForceStopSharing());
 		CR(m_pDreamOS->SetSharedContentTexture(pActiveSource->GetSourceTexture()));
-		CRM(m_pEnvironmentControllerProxy->RequestShareAsset(pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
+		CRM(m_pEnvironmentControllerProxy->RequestShareAsset(pActiveSource->GetCurrentAssetID(), SHARE_TYPE_SCREEN), "Failed to share environment asset");
 	}
 
 	CR(pButtonContext->Toggle());

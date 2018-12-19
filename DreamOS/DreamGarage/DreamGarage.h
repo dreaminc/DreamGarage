@@ -104,9 +104,9 @@ public:
 
 	// Environment
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
-	virtual RESULT OnReceiveAsset(long userID) override;
-	virtual RESULT OnStopSending() override;
-	virtual RESULT OnStopReceiving() override;
+	virtual RESULT OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+	virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+	virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
 
 	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override;
 
@@ -114,7 +114,7 @@ public:
 	virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override;
 
 	// Desktop Sharing
-	virtual RESULT OnShareAsset() override;
+	virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
 	virtual RESULT OnCloseAsset() override;
 
 	// Virtual Camera

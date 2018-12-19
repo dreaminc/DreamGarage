@@ -1035,6 +1035,9 @@
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCVideoSink.cpp">
       <Filter>Cloud\webrtc</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentShare.cpp">
+      <Filter>Cloud\Environment</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2248,6 +2251,9 @@
     <ClInclude Include="..\..\..\DreamUpdateVCamMessage.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCVideoSink.h">
       <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentShare.h">
+      <Filter>Cloud\Environment</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

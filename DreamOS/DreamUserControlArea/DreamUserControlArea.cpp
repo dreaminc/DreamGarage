@@ -873,13 +873,14 @@ RESULT DreamUserControlArea::ForceStopSharing() {
 	CNR(m_pActiveSource, R_SKIPPED);
 	if (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 	//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
-		GetDOS()->OnStopSending();
+		//TODO: maintain list of shares
+//		GetDOS()->OnStopSending();
 	}
 	else {
 		for (auto pSource : m_pDreamTabView->GetAllSources()) {
 			if (pSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 			//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(pSource->GetCurrentAssetID()), "Failed to share environment asset");
-				GetDOS()->OnStopSending();
+//				GetDOS()->OnStopSending();
 			}
 		}
 	}
@@ -922,13 +923,13 @@ RESULT DreamUserControlArea::ShutdownAllSources() {
 	CNR(m_pActiveSource, R_SKIPPED);
 	if (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 	//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
-		GetDOS()->OnStopSending();
+//		GetDOS()->OnStopSending();
 	}
 	else {
 		for (auto pSource : m_pDreamTabView->GetAllSources()) {
 			if (pSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 			//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(pSource->GetCurrentAssetID()), "Failed to share environment asset");
-				GetDOS()->OnStopSending();
+//				GetDOS()->OnStopSending();
 			}
 		}
 	}
