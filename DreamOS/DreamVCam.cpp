@@ -87,6 +87,7 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	m_pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
 	CN(m_pDreamGamepadCamera);
 	CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
+	CR(m_pDreamGamepadCamera->RegisterGamepadCameraObserver(this));
 
 Error:
 	return r;
@@ -415,8 +416,9 @@ RESULT DreamVCam::SendFirstFrame() {
 RESULT DreamVCam::CloseSource() {
 	m_fIsRunning = false;
 
-	// TODO: OnCloseAsset
+	GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(), m_pCamera->GetOrientation());
 	m_pCameraModel->SetVisible(false);
+
 	return R_PASS;
 }
 
@@ -459,6 +461,26 @@ Error:
 	return r;
 }
 
+RESULT DreamVCam::OnCameraMoved() {
+	RESULT r = R_PASS;
+
+	GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(), m_pCamera->GetOrientation());
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::HandleSettings(point ptPosition, quaternion qOrientation) {
+	RESULT r = R_PASS;
+
+	if (ptPosition != point(-1, -1, -1) && qOrientation != quaternion(-1, -1, -1, -1)) {
+		m_pCamera->SetPosition(ptPosition);
+		m_pCamera->SetOrientation(qOrientation);
+	}
+
+Error:
+	return r;
+}
 
 RESULT DreamVCam::SetIsSendingCameraPlacement(bool fSendingCameraPlacement) {
 	m_fSendingCameraPlacement = fSendingCameraPlacement;

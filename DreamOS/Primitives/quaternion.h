@@ -28,8 +28,12 @@ constexpr quaternion_precision operator "" _q(long double number)
 	return static_cast<quaternion_precision>(number);
 }
 
-typedef struct {
+typedef struct quaternionXYZW {
 	quaternion_precision x, y, z, w;
+
+	quaternionXYZW(float qW, float qX, float qY, float qZ) : w(qW), x(qX), y(qY), z(qZ)
+	{	// empty
+	}
 } quaternionXYZW;
 
 class quaternion {

@@ -147,6 +147,8 @@ public:
 	RESULT OnVirtualCameraCaptured();
 	RESULT OnVirtualCameraReleased();
 
+	RESULT OnVirtualCameraSettings(point ptPosition, quaternion qOrientation);
+
 // DreamGarage compatability (temp?)
 public:
 	RESULT ResetAppComposite();

@@ -1507,6 +1507,15 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::SaveCameraSettings(point ptPosition, quaternion qOrientation) {
+	RESULT r = R_PASS;
+
+	CN(m_pUserController);
+	CR(m_pUserController->RequestSetSettings(m_strAccessToken, ptPosition, qOrientation));
+
+Error:
+	return r;
+}
 
 RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	RESULT r = R_PASS;
@@ -1821,6 +1830,7 @@ RESULT DreamGarage::OnGetSettings(point ptPosition, quaternion qOrientation) {
 
 	CN(m_pDreamUserControlArea);
 	CN(m_pDreamUserControlArea->GetActiveSource());
+	CR(m_pDreamUserControlArea->OnVirtualCameraSettings(ptPosition, qOrientation));
 	CR(pEnvironmentControllerProxy->RequestShareCamera(m_pDreamUserControlArea->GetActiveSource()->GetCurrentAssetID()));
 
 Error:

@@ -98,6 +98,16 @@ Error:
 	return r;
 }
 
+RESULT DreamGamepadCameraApp::RegisterGamepadCameraObserver(DreamGamepadCameraApp::observer *pObserver) {
+	RESULT r = R_PASS;
+
+	CBM(m_pObserver == nullptr, "DreamGamepadCameraApp already has an observer");
+	m_pObserver = pObserver;
+
+Error:
+	return r;
+}
+
 DreamGamepadCameraApp::CameraControlType DreamGamepadCameraApp::GetCameraControlType() {
 	return m_controlType;
 }
@@ -126,8 +136,14 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 	}
 
 	if (m_fUpdateRightStick) {
-		m_ptRightStick.x() = m_ptPendRightStick.x();
-		m_ptRightStick.y() = m_ptPendRightStick.y();
+		if (abs(m_ptPendRightStick.x()) > abs(m_ptPendRightStick.y())) {
+			m_ptRightStick.x() = m_ptPendRightStick.x();
+			m_ptRightStick.y() = 0.0f;
+		}
+		else {
+			m_ptRightStick.y() = m_ptPendRightStick.y();
+			m_ptRightStick.x() = 0.0f;
+		}
 	}
 	
 	if (m_fUpdateLeftTrigger) {
@@ -199,7 +215,20 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 	if (m_lookYVelocity < 0.01 && m_lookYVelocity > -0.01) {
 		m_lookYVelocity = 0.0f;
 	}
-	DEBUG_LINEOUT_RETURN("Camera Rotating: x: %0.8f y: %0.8f", m_lookXVelocity, m_lookYVelocity);
+	//DEBUG_LINEOUT_RETURN("Camera Rotating: x: %0.8f y: %0.8f", m_lookXVelocity, m_lookYVelocity);
+	
+	bool fAtRest = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_pCamera->GetMomentum().magnitude() < m_cameraAtRestMomentum);	
+	if (!fAtRest) {
+		m_fAtRest = false;
+	}
+	else if (!m_fAtRest && fAtRest) {
+		//DEBUG_LINEOUT("Camera at rest at x: %0.2f y: %0.2f z: %0.2f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
+		m_fAtRest = true;
+		if (m_pObserver != nullptr) {
+			m_pObserver->OnCameraMoved();
+		}
+	}
+
 	//*/
 
 	if (m_pCamera != nullptr) {

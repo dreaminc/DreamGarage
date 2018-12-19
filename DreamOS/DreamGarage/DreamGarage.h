@@ -125,6 +125,8 @@ public:
 	virtual RESULT OnReceiveCameraPlacement(long userID) override;
 	virtual RESULT OnStopReceivingCameraPlacement() override;
 
+	virtual RESULT SaveCameraSettings(point ptPosition, quaternion qOrientation) override;
+
 	// User Observer
 	virtual RESULT OnDreamVersion(version dreamVersion) override;
 	virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override;

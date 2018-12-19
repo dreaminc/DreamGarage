@@ -62,9 +62,8 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		CN(m_pDreamUIBar);
 
 		m_pDreamVCam = GetDOS()->LaunchDreamModule<DreamVCam>(this);
-		m_pDreamVCam->InitializeWithParent(this);
-		m_pDreamVCam->InitializePipeline();
 		CN(m_pDreamVCam);
+		m_pDreamVCam->InitializePipeline();	
 
 		m_pView = GetComposite()->AddUIView(GetDOS());
 		CN(m_pView);
@@ -600,6 +599,16 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::OnVirtualCameraSettings(point ptPosition, quaternion qOrientation) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamVCam, "Received vcam settings but vcam was null?!");
+	CR(m_pDreamVCam->HandleSettings(ptPosition, qOrientation));
+
+Error:
+	return r;
+}
+
 int DreamUserControlArea::GetWidth() {
 	return m_pActiveSource->GetWidth();
 }
@@ -707,20 +716,11 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		// TODO: temp
 		if (m_pDreamVCam != nullptr) {
 			m_pActiveSource = m_pDreamVCam;
-			//m_pDreamVCam->InitializePipeline();
-			m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
-			// new desktop can't be the current content
-			m_pUserControls->SetSharingFlag(false);
-			
-			CRM(pEnvironmentControllerProxy->RequestOpenCamera(), "Failed to share environment asset");
-		}
-		else {
-			m_pActiveSource = m_pDreamVCam;
 			m_pDreamVCam->InitializeWithParent(this);
 			m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
 			// new desktop can't be the current content
 			m_pUserControls->SetSharingFlag(false);
-
+			
 			CRM(pEnvironmentControllerProxy->RequestOpenCamera(), "Failed to share environment asset");
 		}
 	}

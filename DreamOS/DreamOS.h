@@ -567,6 +567,8 @@ public:
 	RESULT GetCredential(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType);
 	RESULT RemoveCredential(std::wstring wstrKey, CredentialManager::type credType);
 
+	virtual RESULT SaveCameraSettings(point ptPosition, quaternion qOrientation) = 0;
+
 	bool IsSandboxInternetConnectionValid();
 
 protected:
