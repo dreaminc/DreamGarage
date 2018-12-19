@@ -452,8 +452,10 @@ RESULT DreamVCam::OnClientDisconnect() {
 	RESULT r = R_PASS;
 
 	CR(m_pParentApp->OnVirtualCameraReleased());
-	m_pCameraQuad->SetVisible(false);
-	m_pCameraQuadBackground->SetVisible(false);
+
+	// TODO: doesn't work with webcam test
+	//m_pCameraQuad->SetVisible(false);
+	//m_pCameraQuadBackground->SetVisible(false);
 
 Error:
 	return r;
@@ -478,6 +480,16 @@ bool DreamVCam::IsSendingCameraPlacement() {
 
 bool DreamVCam::IsReceivingCameraPlacement() {
 	return m_fReceivingCameraPlacement;
+}
+
+RESULT DreamVCam::HideCameraSource() {
+	RESULT r = R_PASS;
+	
+	m_pCameraQuad->SetVisible(false);
+	m_pCameraQuadBackground->SetVisible(false);
+
+Error:
+	return r;
 }
 
 RESULT DreamVCam::BroadcastVCamMessage() {
