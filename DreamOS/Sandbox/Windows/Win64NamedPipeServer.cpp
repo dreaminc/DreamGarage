@@ -242,7 +242,6 @@ RESULT Win64NamedPipeServer::NamedPipeServerProcess() {
 				AddPendingConnectionInstanceAndAllocateNew();
 				if (m_pObserver != nullptr) {
 					m_pObserver->OnClientConnect();
-					m_fAnyConnected = true;
 				}
 			} break;
 
@@ -324,7 +323,7 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 	// Send Disconnect event if all connections are disconnected
 	bool fShouldCloseConnection = true;
 
-	fShouldCloseConnection = fShouldCloseConnection && m_clientConnections.size() > 0 && m_fAnyConnected;
+	fShouldCloseConnection = fShouldCloseConnection && m_clientConnections.size() > 0;
 
 	// if any clientConnection is connected, fShouldCloseConnection will be false
 	for (auto &pClientConnection : m_clientConnections) {
@@ -333,7 +332,9 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 
 	if (fShouldCloseConnection && m_pObserver != nullptr) {
 		m_pObserver->OnClientDisconnect();
-		m_fAnyConnected = false;
+
+		// Close clears the client connections
+		Close();
 	}
 
 Error:
