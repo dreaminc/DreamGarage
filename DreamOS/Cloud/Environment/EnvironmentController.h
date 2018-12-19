@@ -25,6 +25,7 @@
 class Websocket;
 class CloudMessage;
 class EnvironmentAsset;
+class EnvironmentShare;
 class CameraController;
 
 class EnvironmentControllerProxy : public ControllerProxy {
@@ -32,8 +33,8 @@ public:
 	//virtual CLOUD_CONTROLLER_TYPE GetControllerType() = 0;
 	virtual RESULT RequestOpenAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") = 0;
 	virtual RESULT RequestCloseAsset(long assetID) = 0;
-	virtual RESULT RequestShareAsset(long assetID) = 0;
-	virtual RESULT RequestStopSharing(long assetID) = 0;
+	virtual RESULT RequestShareAsset(long assetID, std::string strShareType) = 0;
+	virtual RESULT RequestStopSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
 
 	virtual RESULT RequestForm(std::string strKey) = 0;
 
@@ -117,10 +118,10 @@ public:
 		// Opening and sharing
 		virtual long GetUserID() = 0;
 		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
-		virtual RESULT OnStopSending() = 0;
-		virtual RESULT OnReceiveAsset(long userID) = 0;
-		virtual RESULT OnStopReceiving() = 0;;
-		virtual RESULT OnShareAsset() = 0;
+		virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
+		virtual RESULT OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
+		virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;;
+		virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
 		virtual RESULT OnCloseAsset() = 0;
 
 		// Virtual Camera
@@ -165,8 +166,8 @@ public:
 	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
 	virtual RESULT RequestOpenAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") override;
 	virtual RESULT RequestCloseAsset(long assetID) override;
-	virtual RESULT RequestShareAsset(long assetID) override;
-	virtual RESULT RequestStopSharing(long assetID) override;
+	virtual RESULT RequestShareAsset(long assetID, std::string strShareType) override;
+	virtual RESULT RequestStopSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
 
 	virtual RESULT RequestForm(std::string strKey) override;
 
@@ -290,6 +291,8 @@ private:
 	std::unique_ptr<CameraController> m_pCameraController;
 
 	EnvironmentControllerObserver *m_pEnvironmentControllerObserver;
+
+	std::vector<EnvironmentShare*> m_activeShares;
 };
 
 #endif	// ! ENVIRONMENT_CONTROLLER_H_

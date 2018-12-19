@@ -42,6 +42,7 @@ light *g_pLight = nullptr;
 #include "Core/Utilities.h"
 
 #include "Cloud/Environment/PeerConnection.h"
+#include "Cloud/Environment/EnvironmentShare.h"
 
 #include "DreamGarageMessage.h"
 #include "UpdateHeadMessage.h"
@@ -1719,7 +1720,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnShareAsset() {
+RESULT DreamGarage::OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	CN(m_pDreamUserControlArea);
@@ -1729,7 +1730,7 @@ RESULT DreamGarage::OnShareAsset() {
 	CR(m_pDreamShareView->BeginStream());
 	CR(m_pDreamShareView->Show());
 
-	CR(m_pDreamUserControlArea->StartSharing());
+	CR(m_pDreamUserControlArea->StartSharing(pEnvironmentShare));
 
 Error:
 	return r;
@@ -1752,7 +1753,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnReceiveAsset(long userID) {
+RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 	if (m_pDreamShareView != nullptr) {
 
@@ -1763,8 +1764,8 @@ RESULT DreamGarage::OnReceiveAsset(long userID) {
 		// if not connected yet, save the userID and start receiving during
 		// OnNewPeerConnection; otherwise this user should receive the dream message
 		// to start receiving
-		if (FindPeer(userID) == nullptr) {
-			m_pendingAssetReceiveUserID = userID;
+		if (FindPeer(pEnvironmentShare->GetUserID()) == nullptr) {
+			m_pendingAssetReceiveUserID = pEnvironmentShare->GetUserID();
 		}
 
 		//m_pDreamBrowser->StartReceiving();
@@ -1772,14 +1773,14 @@ RESULT DreamGarage::OnReceiveAsset(long userID) {
 	return r;
 }
 
-RESULT DreamGarage::OnStopSending() {
+RESULT DreamGarage::OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 	CR(m_pDreamShareView->StopSending());
 Error:
 	return r;
 }
 
-RESULT DreamGarage::OnStopReceiving() {
+RESULT DreamGarage::OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 	CR(m_pDreamShareView->StopReceiving());
 

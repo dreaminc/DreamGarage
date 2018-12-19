@@ -169,19 +169,19 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT OnReceiveAsset(long userID) override {
+	virtual RESULT OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT OnStopSending() override {
+	virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT OnStopReceiving() override {
+	virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT OnShareAsset() override {
+	virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
 		return R_NOT_IMPLEMENTED;
 	}
 

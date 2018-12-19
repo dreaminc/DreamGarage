@@ -22,6 +22,7 @@ class DreamVCam;
 class CEFBrowserManager;
 struct WebBrowserPoint;
 class EnvironmentAsset;
+class EnvironmentShare;
 
 class AudioPacket;
 
@@ -162,8 +163,10 @@ public:
 	RESULT CloseActiveAsset();
 	RESULT OnReceiveAsset();
 
-	RESULT StartSharing();
+	RESULT StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare);
 	RESULT ForceStopSharing();
+
+	std::shared_ptr<EnvironmentShare> GetCurrentScreenShare();
 
 // Animations
 public:
@@ -233,6 +236,8 @@ private:
 
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
 	std::shared_ptr<DreamVCam> m_pDreamVCam = nullptr;
+
+	std::shared_ptr<EnvironmentShare> m_pCurrentScreenShare = nullptr;
 
 	float m_animationScale = ANIMATION_SCALE;
 

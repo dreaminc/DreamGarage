@@ -504,14 +504,7 @@ Error:
 
 RESULT DreamBrowser::HandleStopEvent() {
 	RESULT r = R_PASS;
-/*
-	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-	CR(m_pEnvironmentControllerProxy->RequestStopSharing(m_currentEnvironmentAssetID, m_strScope, m_strPath));
-	CR(SetStreamingState(false));
-Error:
-//*/
 	return r;
 }
 

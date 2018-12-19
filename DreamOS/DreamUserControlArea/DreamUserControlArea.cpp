@@ -855,10 +855,12 @@ RESULT DreamUserControlArea::OnReceiveAsset() {
 	return r;
 }
 
-RESULT DreamUserControlArea::StartSharing() {
+RESULT DreamUserControlArea::StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	CR(m_pActiveSource->SendFirstFrame());
+
+	m_pCurrentScreenShare = pEnvironmentShare;
 
 Error:
 	return r;
@@ -873,19 +875,24 @@ RESULT DreamUserControlArea::ForceStopSharing() {
 	CNR(m_pActiveSource, R_SKIPPED);
 	if (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 	//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
-		GetDOS()->OnStopSending();
+		//TODO: maintain list of shares
+		GetDOS()->OnStopSending(m_pCurrentScreenShare);
 	}
 	else {
 		for (auto pSource : m_pDreamTabView->GetAllSources()) {
 			if (pSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 			//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(pSource->GetCurrentAssetID()), "Failed to share environment asset");
-				GetDOS()->OnStopSending();
+				GetDOS()->OnStopSending(m_pCurrentScreenShare);
 			}
 		}
 	}
 
 Error:
 	return r;
+}
+
+std::shared_ptr<EnvironmentShare> DreamUserControlArea::GetCurrentScreenShare() {
+	return m_pCurrentScreenShare;
 }
 
 RESULT DreamUserControlArea::ShutdownSource() {
@@ -922,13 +929,13 @@ RESULT DreamUserControlArea::ShutdownAllSources() {
 	CNR(m_pActiveSource, R_SKIPPED);
 	if (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 	//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
-		GetDOS()->OnStopSending();
+		GetDOS()->OnStopSending(m_pCurrentScreenShare);
 	}
 	else {
 		for (auto pSource : m_pDreamTabView->GetAllSources()) {
 			if (pSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 			//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(pSource->GetCurrentAssetID()), "Failed to share environment asset");
-				GetDOS()->OnStopSending();
+				GetDOS()->OnStopSending(m_pCurrentScreenShare);
 			}
 		}
 	}

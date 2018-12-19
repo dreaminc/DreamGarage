@@ -21,6 +21,7 @@
 #include "Core/Utilities.h"
 
 #include "EnvironmentAsset.h"
+#include "EnvironmentShare.h"
 
 EnvironmentController::EnvironmentController(Controller* pParentController, long environmentID) :
 	Controller(pParentController),
@@ -69,7 +70,7 @@ RESULT EnvironmentController::Initialize() {
 	// Register Methods
 	CR(RegisterMethod("open", std::bind(&EnvironmentController::OnOpenAsset, this, std::placeholders::_1)));
 	CR(RegisterMethod("close", std::bind(&EnvironmentController::OnCloseAsset, this, std::placeholders::_1)));
-	CR(RegisterMethod("share", std::bind(&EnvironmentController::OnSharedAsset, this, std::placeholders::_1)));
+	CR(RegisterMethod("create", std::bind(&EnvironmentController::OnSharedAsset, this, std::placeholders::_1)));
 	CR(RegisterMethod("send", std::bind(&EnvironmentController::OnSharedAsset, this, std::placeholders::_1)));
 	CR(RegisterMethod("receive", std::bind(&EnvironmentController::OnReceiveAsset, this, std::placeholders::_1)));
 	CR(RegisterMethod("stop_sending", std::bind(&EnvironmentController::OnStopSending, this, std::placeholders::_1)));
@@ -472,7 +473,7 @@ RESULT EnvironmentController::RequestOpenAsset(std::string strStorageProviderSco
 	jsonPayload["environment_asset"] = nlohmann::json::object();
 	jsonPayload["environment_asset"]["path"] = strPath;
 
-	//jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
+	//jsonPayload["environment_share"]["storage_provider_scope"] = strStorageProviderScope;
 	jsonPayload["environment_asset"]["scope"] = strStorageProviderScope;
 	jsonPayload["environment_asset"]["title"] = strTitle;
 
@@ -497,7 +498,7 @@ RESULT EnvironmentController::RequestOpenCamera() {
 	jsonPayload["environment_camera"] = nlohmann::json::object();
 	//jsonPayload["environment_camera"]["path"] = "";
 
-	//jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
+	//jsonPayload["environment_share"]["storage_provider_scope"] = strStorageProviderScope;
 	jsonPayload["environment_camera"]["scope"] = "MenuProviderScope.CameraMenuProvider";
 	jsonPayload["environment_camera"]["storage_provider_scope"] = "MenuProviderScope.CameraMenuProvider";
 	jsonPayload["environment_camera"]["title"] = "Dream Virtual Camera";
@@ -563,12 +564,12 @@ RESULT EnvironmentController::RequestCloseAsset(long assetID) {
 	guid guidMessage;
 	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
-	jsonPayload["environment_asset"] = nlohmann::json::object();
-	jsonPayload["environment_asset"]["id"] = assetID;
+	jsonPayload["environment_share"] = nlohmann::json::object();
+	jsonPayload["environment_share"]["id"] = assetID;
 
 	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
-	CR(pCloudRequest->SetControllerMethod("environment_asset.close"));
+	CR(pCloudRequest->SetControllerMethod("environment_share.close"));
 
 	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_ASSET_CLOSE));
 
@@ -576,7 +577,7 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::RequestShareAsset(long assetID) {
+RESULT EnvironmentController::RequestShareAsset(long assetID, std::string strShareType) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload;
@@ -584,12 +585,13 @@ RESULT EnvironmentController::RequestShareAsset(long assetID) {
 	guid guidMessage;
 	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
-	jsonPayload["environment_asset"] = nlohmann::json::object();
-	jsonPayload["environment_asset"]["id"] = assetID;
+	jsonPayload["environment_share"] = nlohmann::json::object();
+	jsonPayload["environment_share"]["asset"] = assetID;
+	jsonPayload["environment_share"]["share_type"] = strShareType;
 
 	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
-	CR(pCloudRequest->SetControllerMethod("environment_asset.share"));
+	CR(pCloudRequest->SetControllerMethod("environment_share.create"));
 
 	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_ASSET_SHARE));
 
@@ -597,20 +599,16 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::RequestStopSharing(long assetID) {
+RESULT EnvironmentController::RequestStopSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
-	nlohmann::json jsonPayload;
-	std::string strData;
-	guid guidMessage;
 	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
-	jsonPayload["environment_asset"] = nlohmann::json::object();
-	jsonPayload["environment_asset"]["id"] = assetID;
+	CN(pEnvironmentShare);
 
-	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), pEnvironmentShare->MakeJsonPayload());
 	CN(pCloudRequest);
-	CR(pCloudRequest->SetControllerMethod("environment_asset.stop_sharing"));
+	CR(pCloudRequest->SetControllerMethod("environment_share.delete"));
 
 	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_STOP_SHARING));
 
@@ -812,6 +810,7 @@ RESULT EnvironmentController::OnOpenCamera(std::shared_ptr<CloudMessage> pCloudM
 		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentCamera);
 		CN(pEnvironmentAsset);
 
+		// environment asset and DreamContentSource should be more closely linked
 		pEnvironmentAsset->SetContentType("ContentControlType.Camera");
 
 		if (m_pEnvironmentControllerObserver != nullptr) {
@@ -917,7 +916,7 @@ RESULT EnvironmentController::OnCloseAsset(std::shared_ptr<CloudMessage> pCloudM
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_share"_json_pointer];
 
 	if (jsonEnvironmentAsset.size() != 0) {
 
@@ -933,20 +932,17 @@ Error:
 RESULT EnvironmentController::OnSharedAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
+	std::shared_ptr<EnvironmentShare> pEnvironmentShare = nullptr;
+
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+	nlohmann::json jsonEnvironmentShare = jsonPayload["/environment_share"_json_pointer];
+	CBR(jsonEnvironmentShare.size() != 0, R_SKIPPED);
 
-	if (jsonEnvironmentAsset.size() != 0) {
-		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
-		CN(pEnvironmentAsset);
+	pEnvironmentShare = std::make_shared<EnvironmentShare>(jsonEnvironmentShare);
+	CN(pEnvironmentShare);
 
-		//CR(pEnvironmentAsset->PrintEnvironmentAsset());
-
-		if (m_pEnvironmentControllerObserver != nullptr) {
-			// Moving to Send/Receive paradigm
-			CR(m_pEnvironmentControllerObserver->OnShareAsset());
-		}
-	}
+	CNR(m_pEnvironmentControllerObserver, R_SKIPPED);
+	CR(m_pEnvironmentControllerObserver->OnShareAsset(pEnvironmentShare));
 
 Error:
 	return r;
@@ -956,7 +952,7 @@ RESULT EnvironmentController::OnSendAsset(std::shared_ptr<CloudMessage> pCloudMe
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_share"_json_pointer];
 
 	if (jsonEnvironmentAsset.size() != 0) {
 		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
@@ -974,20 +970,17 @@ Error:
 RESULT EnvironmentController::OnReceiveAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
-	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
-	//int peerID = jsonPayload["/user"_json_pointer].get<int>();
+	std::shared_ptr<EnvironmentShare> pEnvironmentShare = nullptr;
 
-	//*
-	if (jsonEnvironmentAsset.size() != 0) {
-		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
-		CN(pEnvironmentAsset);
-		// actually doesn't need to do anything, OnVideoFrame in DOS does a peer connection check
-		if (m_pEnvironmentControllerObserver != nullptr) {
-			CR(m_pEnvironmentControllerObserver->OnReceiveAsset(pEnvironmentAsset->GetUserID()));
-		}
-	}
-	//*/
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentShare = jsonPayload["/environment_share"_json_pointer];
+	CBR(jsonEnvironmentShare.size() != 0, R_SKIPPED);
+
+	pEnvironmentShare = std::make_shared<EnvironmentShare>(jsonEnvironmentShare);
+	CN(pEnvironmentShare);
+
+	CNR(m_pEnvironmentControllerObserver, R_SKIPPED);
+	CR(m_pEnvironmentControllerObserver->OnReceiveAsset(pEnvironmentShare));
 
 Error:
 	return r;
@@ -996,14 +989,18 @@ Error:
 RESULT EnvironmentController::OnStopReceiving(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
-	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+	std::shared_ptr<EnvironmentShare> pEnvironmentShare = nullptr;
 
-	if (jsonEnvironmentAsset.size() != 0) {
-		if (m_pEnvironmentControllerObserver != nullptr) {
-			CR(m_pEnvironmentControllerObserver->OnStopReceiving());
-		}
-	}
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentShare = jsonPayload["/environment_share"_json_pointer];
+	CBR(jsonEnvironmentShare.size() != 0, R_SKIPPED);
+
+	pEnvironmentShare = std::make_shared<EnvironmentShare>(jsonEnvironmentShare);
+	CN(pEnvironmentShare);
+
+	CNR(m_pEnvironmentControllerObserver, R_SKIPPED);
+	CR(m_pEnvironmentControllerObserver->OnStopReceiving(pEnvironmentShare));
+
 Error:
 	return r;
 }
@@ -1032,14 +1029,18 @@ Error:
 RESULT EnvironmentController::OnStopSending(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
-	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+	std::shared_ptr<EnvironmentShare> pEnvironmentShare = nullptr;
 
-	if (jsonEnvironmentAsset.size() != 0) {
-		if (m_pEnvironmentControllerObserver != nullptr) {
-			CR(m_pEnvironmentControllerObserver->OnStopSending());
-		}
-	}
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentShare = jsonPayload["/environment_share"_json_pointer];
+	CBR(jsonEnvironmentShare.size() != 0, R_SKIPPED);
+
+	pEnvironmentShare = std::make_shared<EnvironmentShare>(jsonEnvironmentShare);
+	CN(pEnvironmentShare);
+
+	CNR(m_pEnvironmentControllerObserver, R_SKIPPED);
+	CR(m_pEnvironmentControllerObserver->OnStopSending(pEnvironmentShare));
+
 Error:
 	return r;
 }
@@ -1119,7 +1120,8 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 	if (pCloudMessage->GetController() == "menu") {
 		m_pMenuController->HandleEnvironmentSocketMessage(pCloudMessage);
 	}
-	else if (pCloudMessage->GetController() == "environment_asset") {
+	// environment_asset is for open, while environment_share is for everything else
+	else if (pCloudMessage->GetController() == "environment_share" || pCloudMessage->GetController() == "environment_asset") {
 		RESULT r = HandleOnMethodCallback(pCloudMessage);
 		// TODO: Handle error 
 	}

@@ -10,6 +10,9 @@
 #define CONTENT_TYPE_DESKTOP "ContentControlType.Desktop"
 #define CONTENT_TYPE_DEFAULT ""	// conforms with the string UIControlBar is expecting
 
+#define SHARE_TYPE_SCREEN "EnvironmentShareType.Screen"
+#define SHARE_TYPE_CAMERA "EnvironmentShareType.Camera"
+
 class texture;
 class point;
 
