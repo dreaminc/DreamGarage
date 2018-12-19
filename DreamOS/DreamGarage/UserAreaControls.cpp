@@ -296,7 +296,8 @@ RESULT UserAreaControls::HandleShareTogglePressed(UIButton *pButtonContext, void
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 
 	if (pButtonContext->IsToggled()) {
-		CRM(m_pEnvironmentControllerProxy->RequestStopSharing(pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
+		CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pParentApp->GetCurrentScreenShare()), "Failed to share environment asset");
+
 	}
 	else {
 		CR(m_pParentApp->ForceStopSharing());

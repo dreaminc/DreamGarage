@@ -34,7 +34,7 @@ public:
 	virtual RESULT RequestOpenAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") = 0;
 	virtual RESULT RequestCloseAsset(long assetID) = 0;
 	virtual RESULT RequestShareAsset(long assetID, std::string strShareType) = 0;
-	virtual RESULT RequestStopSharing(long assetID) = 0;
+	virtual RESULT RequestStopSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
 
 	virtual RESULT RequestForm(std::string strKey) = 0;
 
@@ -167,7 +167,7 @@ public:
 	virtual RESULT RequestOpenAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") override;
 	virtual RESULT RequestCloseAsset(long assetID) override;
 	virtual RESULT RequestShareAsset(long assetID, std::string strShareType) override;
-	virtual RESULT RequestStopSharing(long assetID) override;
+	virtual RESULT RequestStopSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
 
 	virtual RESULT RequestForm(std::string strKey) override;
 
@@ -291,6 +291,8 @@ private:
 	std::unique_ptr<CameraController> m_pCameraController;
 
 	EnvironmentControllerObserver *m_pEnvironmentControllerObserver;
+
+	std::vector<EnvironmentShare*> m_activeShares;
 };
 
 #endif	// ! ENVIRONMENT_CONTROLLER_H_

@@ -599,18 +599,14 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::RequestStopSharing(long assetID) {
+RESULT EnvironmentController::RequestStopSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
-	nlohmann::json jsonPayload;
-	std::string strData;
-	guid guidMessage;
 	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
-	jsonPayload["environment_share"] = nlohmann::json::object();
-	jsonPayload["environment_share"]["id"] = assetID;
+	CN(pEnvironmentShare);
 
-	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), pEnvironmentShare->MakeJsonPayload());
 	CN(pCloudRequest);
 	CR(pCloudRequest->SetControllerMethod("environment_share.delete"));
 

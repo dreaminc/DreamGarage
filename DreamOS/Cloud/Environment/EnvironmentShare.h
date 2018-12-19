@@ -20,6 +20,8 @@ public:
 
 	std::string GetShareType();
 
+	nlohmann::json MakeJsonPayload();
+
 private:
 	// share
 

@@ -1730,7 +1730,7 @@ RESULT DreamGarage::OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentS
 	CR(m_pDreamShareView->BeginStream());
 	CR(m_pDreamShareView->Show());
 
-	CR(m_pDreamUserControlArea->StartSharing());
+	CR(m_pDreamUserControlArea->StartSharing(pEnvironmentShare));
 
 Error:
 	return r;

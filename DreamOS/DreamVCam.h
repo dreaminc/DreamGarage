@@ -22,6 +22,8 @@ class ProgramNode;
 class OGLProgram;
 class CameraNode;
 
+class EnvironmentShare;
+
 class texture;
 class model;
 class quad;
@@ -130,6 +132,8 @@ private:
 
 	// This node is used to run the render
 	OGLProgram *m_pOGLEndNode = nullptr;
+
+	std::shared_ptr<EnvironmentShare> m_pCurrentCameraShare = nullptr;
 
 	bool m_fIsRunning = false;
 
