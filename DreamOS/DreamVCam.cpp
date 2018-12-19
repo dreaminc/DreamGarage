@@ -453,8 +453,7 @@ RESULT DreamVCam::OnClientDisconnect() {
 
 	CR(m_pParentApp->OnVirtualCameraReleased());
 
-	m_pCameraQuad->SetVisible(false);
-	m_pCameraQuadBackground->SetVisible(false);
+	CR(HideCameraSource());
 
 Error:
 	return r;
