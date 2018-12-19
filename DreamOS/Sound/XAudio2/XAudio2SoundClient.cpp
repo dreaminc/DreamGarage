@@ -198,6 +198,41 @@ Error:
 //	return r;
 //}
 
+// TODO: Consolidate the two functions
+RESULT XAudio2SoundClient::LoopSoundFile(SoundFile *pSoundFile) {
+	RESULT r = R_PASS;
+
+	CN(m_pXAudio2SourceVoiceStereoFloat32);
+
+	// TODO: Temporary workaround to play this sound now and flush the rest of the queue
+	CRM((RESULT)m_pXAudio2SourceVoiceStereoFloat32->FlushSourceBuffers(), "Failed to flush buffer");
+
+	{
+		float *pFloatAudioBuffer = nullptr;
+		size_t pFloatAudioBuffer_n = 0;
+
+		CR(pSoundFile->GetAudioBuffer(pFloatAudioBuffer));
+
+		// TODO: Blah, sound buffer is a float - this is not general
+		pFloatAudioBuffer_n = pSoundFile->GetNumSamples() * sizeof(float);
+
+		XAUDIO2_BUFFER xAudio2SoundBuffer = { 0 };
+		BYTE *pByteAudioBuffer = reinterpret_cast<BYTE*>(pFloatAudioBuffer);
+
+		CN(pByteAudioBuffer);
+
+		xAudio2SoundBuffer.AudioBytes = (UINT32)pFloatAudioBuffer_n;	// Size of the audio buffer in bytes
+		xAudio2SoundBuffer.pAudioData = pByteAudioBuffer;				// Buffer containing audio data
+		xAudio2SoundBuffer.Flags = XAUDIO2_END_OF_STREAM;				// Tell the source voice not to expect any data after this buffer
+		xAudio2SoundBuffer.LoopCount = XAUDIO2_LOOP_INFINITE;			// Loop it
+
+		CRM((RESULT)m_pXAudio2SourceVoiceStereoFloat32->SubmitSourceBuffer(&xAudio2SoundBuffer), "Failed to submit source buffer");
+	}
+
+Error:
+	return r;
+}
+
 RESULT XAudio2SoundClient::PlaySoundFile(SoundFile *pSoundFile) {
 	RESULT r = R_PASS;
 	

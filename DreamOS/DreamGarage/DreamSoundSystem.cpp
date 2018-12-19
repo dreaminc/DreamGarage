@@ -265,6 +265,18 @@ Error:
 	return r;
 }
 
+RESULT DreamSoundSystem::LoopSoundFile(std::shared_ptr<SoundFile> pSoundFile) {
+	RESULT r = R_PASS;
+
+	CN(m_pXAudio2AudioClient);
+	CN(pSoundFile);
+
+	CRM(m_pXAudio2AudioClient->LoopSoundFile(pSoundFile.get()), "Failed to loop sound file");
+
+Error:
+	return r;
+}
+
 RESULT DreamSoundSystem::PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile) {
 	RESULT r = R_PASS;
 

@@ -90,6 +90,7 @@ public:
 	RESULT PushMonoAudioBufferToRenderBuffer(int numFrames, SoundBuffer *pSourceBuffer);
 
 	virtual RESULT PlaySoundFile(SoundFile *pSoundFile);
+	virtual RESULT LoopSoundFile(SoundFile *pSoundFile);
 
 	virtual RESULT PushAudioPacket(const AudioPacket &pendingAudioPacket);
 	virtual RESULT PlayAudioPacketSigned16Bit(const AudioPacket &pendingAudioPacket, std::string strAudioTrackLabel, int channel);

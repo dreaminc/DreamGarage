@@ -963,6 +963,17 @@ Error:
 	return nullptr;
 }
 
+RESULT DreamOS::LoopSoundFile(std::shared_ptr<SoundFile> pSoundFile) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamSoundSystem, "Sound system not initialized");
+
+	return m_pDreamSoundSystem->LoopSoundFile(pSoundFile);
+
+Error:
+	return r;
+}
+
 RESULT DreamOS::PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile) {
 	RESULT r = R_PASS;
 

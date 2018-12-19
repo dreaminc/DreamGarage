@@ -38,6 +38,7 @@ public:
 
 	// XAudio doesn't need buffers apparently 
 	virtual RESULT PlaySoundFile(SoundFile *pSoundFile) override;
+	virtual RESULT LoopSoundFile(SoundFile *pSoundFile) override;
 	virtual RESULT PushAudioPacket(const AudioPacket &pendingAudioPacket) override;
 	virtual RESULT PlayAudioPacketSigned16Bit(const AudioPacket &pendingAudioPacket, std::string strAudioTrackLabel, int channel) override;
 

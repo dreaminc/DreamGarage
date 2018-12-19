@@ -24,7 +24,8 @@ public:
 public:
 
 	// Sound System Module Test
-	RESULT AddTestSoundSystemModule();
+	// 12.18.18 <depr>: This has been moved to DreamOS
+	// RESULT AddTestSoundSystemModule();
 
 	// Enumerate
 	RESULT AddTestEnumerateDevices();

@@ -230,6 +230,10 @@ Error:
 	return r;
 }
 
+RESULT SoundClient::LoopSoundFile(SoundFile *pSoundFile) {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT SoundClient::PlaySoundFile(SoundFile *pSoundFile) {
 	RESULT r = R_PASS;
 	float *pFloatAudioBuffer = nullptr;
