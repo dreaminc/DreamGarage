@@ -95,6 +95,8 @@ public:
 	bool IsSendingCameraPlacement();
 	bool IsReceivingCameraPlacement();
 
+	RESULT HideCameraSource();
+
 	RESULT BroadcastVCamMessage();
 	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
 

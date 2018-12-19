@@ -594,7 +594,7 @@ Error:
 RESULT DreamUserControlArea::OnVirtualCameraReleased() {
 	RESULT r = R_PASS;
 
-	m_pActiveCameraSource = nullptr;
+	//m_pActiveCameraSource = nullptr;
 
 Error:
 	return r;
@@ -955,6 +955,13 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 		RESULT r = R_PASS;
 
 		auto pView = m_pControlView->GetViewQuad();
+
+		// Update VCam
+		if (m_pActiveCameraSource == m_pActiveSource) {
+			m_pDreamVCam->HideCameraSource();
+			m_pActiveCameraSource = nullptr;
+		}
+
 		CR(ShutdownSource());
 		m_pActiveSource = m_pDreamTabView->RemoveContent();
 		//m_pControlView->GetViewQuad()->SetVisible(false);
