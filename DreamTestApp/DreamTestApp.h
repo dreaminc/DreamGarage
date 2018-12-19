@@ -46,6 +46,8 @@ public:
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
 	virtual RESULT OnNewSocketConnection(int seatPosition) override;
 
+	virtual RESULT SaveCameraSettings(point ptPosition, quaternion qOrientation) override;
+
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 	virtual RESULT Notify(CollisionObjectEvent *oEvent) override;

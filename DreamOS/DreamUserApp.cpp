@@ -255,7 +255,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 			}
 		}
 	}
-	
+#ifndef _DEBUG	
 	if (m_pUserModel == nullptr) {
 		int avatarID = GetDOS()->GetUserAvatarID();
 		if (avatarID != -1) {	// don't do this step until the user profile info is loaded
@@ -299,7 +299,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 		m_pPhantomLeftHand->SetVisible(m_fHeadsetAndHandsTracked);
 		m_pPhantomRightHand->SetVisible(m_fHeadsetAndHandsTracked);
 	}
-
+#endif
 	CR(UpdateHysteresisObject());
 
 Error:

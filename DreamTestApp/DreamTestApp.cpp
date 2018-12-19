@@ -187,6 +187,10 @@ RESULT DreamTestApp::OnNewSocketConnection(int seatPosition) {
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT DreamTestApp::SaveCameraSettings(point ptPosition, quaternion qOrientation) {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 

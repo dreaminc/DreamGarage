@@ -3,7 +3,7 @@
 
 #define GAMEPAD_MOVE_SCALE 23914.0f;
 #define GAMEPAD_UP_SPEED_SCALE 25000000.0f;		// joystick values are 0-1, triggers are 0-255
-#define GAMEPAD_CAMERA_ROTATE_SCALE 1.41178f;
+#define GAMEPAD_CAMERA_ROTATE_SCALE	1.1f		// 1.41178f;
 
 #include "RESULT/EHM.h"
 
@@ -31,6 +31,11 @@ public:
 		INVALID
 	};
 
+	class observer {
+	public:
+		virtual RESULT OnCameraMoved() = 0;
+	};
+
 	DreamGamepadCameraApp(DreamOS *pDreamOS, void *pContext = nullptr);
 	~DreamGamepadCameraApp();
 
@@ -43,6 +48,8 @@ public:
 	CameraControlType GetCameraControlType();
 
 	RESULT UnregisterFromEvents();
+
+	RESULT RegisterGamepadCameraObserver(DreamGamepadCameraApp::observer *pObserver);
 
 protected:
 	static DreamGamepadCameraApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -82,8 +89,11 @@ private:
 	bool m_fUpdateRightTrigger = false;
 	
 	bool m_fLockY = false;
+	bool m_fAtRest = true;
 	
 	CameraControlType m_controlType = CameraControlType::INVALID;
+	DreamGamepadCameraApp::observer *m_pObserver = nullptr;
+
 	std::list<ForceGenerator*> m_pForceGenerators;
 };
 

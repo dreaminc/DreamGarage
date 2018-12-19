@@ -10,6 +10,7 @@
 #include "DreamModule.h"
 #include "DreamUserControlArea/DreamContentSource.h"
 #include "Sandbox/NamedPipeServer.h"
+#include "DreamGarage/DreamGamepadCameraApp.h"
 
 #include <memory>
 
@@ -20,8 +21,6 @@ class HMD;
 class ProgramNode;
 class OGLProgram;
 class CameraNode;
-
-class DreamGamepadCameraApp;
 
 class texture;
 class model;
@@ -35,7 +34,8 @@ class EnvironmentAsset;
 class DreamVCam : 
 	public DreamModule<DreamVCam>,
 	public DreamContentSource,
-	public NamedPipeServer::observer
+	public NamedPipeServer::observer,
+	public DreamGamepadCameraApp::observer
 {
 	friend class DreamModuleManager;
 
@@ -89,7 +89,12 @@ public:
 	virtual RESULT OnClientConnect() override;
 	virtual RESULT OnClientDisconnect() override;
 
+	// DreamGamepadCameraApp
+	virtual RESULT OnCameraMoved() override;
+
 	// Sharing Camera Placement
+	RESULT HandleSettings(point ptPosition, quaternion qOrientation);
+
 	RESULT SetIsSendingCameraPlacement(bool fSendingCameraPlacement);
 	RESULT SetIsReceivingCameraPlacement(bool fReceivingCameraPlacement);
 	bool IsSendingCameraPlacement();
