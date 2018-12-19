@@ -307,8 +307,6 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 					// Send Disconnect event if all connections are disconnected
 					bool fShouldCloseConnection = true;
 
-					fShouldCloseConnection = fShouldCloseConnection && m_clientConnections.size() > 0;
-
 					// if any clientConnection is connected, fShouldCloseConnection will be false
 					for (auto &pClientConnection : m_clientConnections) {
 						fShouldCloseConnection = fShouldCloseConnection && !pClientConnection->IsConnected();
