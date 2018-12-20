@@ -71,6 +71,7 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	CN(m_pCameraQuadBackgroundTexture);
 	m_pCameraQuadBackground->SetDiffuseTexture(m_pCameraQuadBackgroundTexture);
 	
+	m_pMuteTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"camera-mute.png");
 
 	/*
 	m_pCameraQuad = GetDOS()->MakeQuad(0.12f*test, 0.12f*9.0f / 16.0f*test);
@@ -213,19 +214,39 @@ RESULT DreamVCam::Update(void *pContext) {
 			if (pOGLTexture->IsOGLPBOPackEnabled()) {
 				CR(pOGLTexture->EnableOGLPBOPack());
 			}
-			
+
 			UnsetSourceTexture();
-			CRM(SetSourceTexture(pTexture), "Failed to set source texture for Dream VCam");
+			CRM(SetSourceTexture(pTexture), "Failed to set source texture from render node in Dream VCam");
 
 			// Update the local render
 			CR(m_pOGLEndNode->RenderNode(count++));
+
+			if (m_fIsMuted) {
+				m_pStreamingTexture = m_pMuteTexture;
+			}
+			else {
+				switch (m_sourceType) {
+				case(DreamVCam::SourceType::CAMERA): {	
+					m_pStreamingTexture = m_pSourceTexture;
+				} break;
+
+				case(DreamVCam::SourceType::SHARE_SCREEN): {
+					if (GetDOS()->GetSharedContentTexture() != nullptr) {
+						m_pStreamingTexture = GetDOS()->GetSharedContentTexture();
+					}
+					else {	// could also just cascade close event from ControlArea?
+						m_sourceType = SourceType::CAMERA;
+					}
+				} break;
+				}
+			}
 			//*
-			size_t bufferSize = m_pSourceTexture->GetTextureSize();
+			size_t bufferSize = m_pStreamingTexture->GetTextureSize();
 
 			if (bufferSize == m_pLoadBuffer_n) {
 				// TODO: We currently don't support multi-sample, so need to make sure
 				// to render one sample (expose with flag)
-				m_pSourceTexture->LoadBufferFromTexture(m_pLoadBuffer, bufferSize);
+				m_pStreamingTexture->LoadBufferFromTexture(m_pLoadBuffer, bufferSize);
 
 				m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer), m_pLoadBuffer_n);
 
@@ -243,7 +264,7 @@ RESULT DreamVCam::Update(void *pContext) {
 		
 		// Check if Active Source
 		if (m_pParentApp->GetActiveSource() != nullptr) {
-			if (m_pParentApp->GetActiveSource()->GetSourceTexture() == m_pSourceTexture) {
+			if (m_pParentApp->GetActiveSource().get() == this) {
 				if (m_pDreamGamepadCamera->GetCameraControlType() != DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER) {
 					CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
 				}
@@ -335,9 +356,11 @@ RESULT DreamVCam::SetSourceTexture(texture* pTexture) {
 
 	m_pSourceTexture = pTexture;
 	
-	if (!m_pSourceTexture->IsUVVerticalFlipped()) {
-		m_pSourceTexture->SetUVVerticalFlipped();
-	}	
+	if (m_sourceType == DreamVCam::SourceType::CAMERA) {
+		if (!m_pSourceTexture->IsUVVerticalFlipped()) {
+			m_pSourceTexture->SetUVVerticalFlipped();
+		}
+	}
 
 	if (m_pParentApp != nullptr) {
 		std::shared_ptr<DreamContentSource> pContentSource = std::dynamic_pointer_cast<DreamContentSource>(GetDOS()->GetDreamModuleFromUID(GetUID()));
@@ -369,6 +392,7 @@ RESULT DreamVCam::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	m_pParentApp = pParentApp;	
 	m_fIsRunning = true;
 	CR(m_pNamedPipeServer->RegisterNamedPipeServerObserver(this));
+	m_sourceType = SourceType::CAMERA;	// defaulting to camera on open
 
 Error:
 	return r;
@@ -703,4 +727,24 @@ Error:
 
 texture* DreamVCam::GetCameraQuadTexture() {
 	return m_pCameraQuadTexture;
+}
+
+RESULT DreamVCam::SetSourceType(DreamVCam::SourceType sourceType) {
+	RESULT r = R_PASS;
+	
+	DOSLOG(INFO, "Switching camera source to %d", (int)sourceType);
+	m_sourceType = sourceType;
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::Mute(bool fMute) {
+	RESULT r = R_PASS;
+
+	m_fIsMuted = fMute;
+	GetDOS()->MuteDreamVCamAudio(fMute);
+
+Error:
+	return r;
 }

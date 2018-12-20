@@ -44,6 +44,13 @@ class DreamVCam :
 	friend class DreamModuleManager;
 
 public:
+	enum class SourceType {
+		CAMERA,
+		SHARE_SCREEN,
+		INVALID
+	};
+
+public:
 	DreamVCam(DreamOS *pDreamOS, void *pContext = nullptr);
 	~DreamVCam();
 
@@ -130,12 +137,15 @@ public:
 		size_t pDataBuffer_n = 0;
 	} m_pendingFrame;
 
+	RESULT SetSourceType(DreamVCam::SourceType sourceType);
+	RESULT Mute(bool fMute);
+
 private:
 	// streaming members
 	bool m_fStreaming = false;
 	bool m_fReceivingSteam = false;
 	bool m_fShouldBeginStream = false;
-	bool m_fReadyForFrame = false;
+	bool m_fReadyForFrame = false;	
 
 protected:
 	static DreamVCam* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -143,6 +153,7 @@ protected:
 private:
 	std::shared_ptr<NamedPipeServer> m_pNamedPipeServer = nullptr;
 	texture* m_pSourceTexture = nullptr;
+	texture* m_pStreamingTexture = nullptr;
 
 	unsigned char *m_pLoadBuffer = nullptr;
 	size_t m_pLoadBuffer_n = 0;
@@ -157,6 +168,7 @@ private:
 	std::shared_ptr<quad> m_pCameraQuadBackground = nullptr;
 	texture *m_pCameraQuadBackgroundTexture = nullptr;
 	texture *m_pShareTexture = nullptr;
+	texture *m_pMuteTexture = nullptr;
 
 	// This node is used for the render texture
 	OGLProgram *m_pOGLRenderNode = nullptr;
@@ -167,6 +179,8 @@ private:
 	std::shared_ptr<EnvironmentShare> m_pCurrentCameraShare = nullptr;
 
 	bool m_fIsRunning = false;
+	bool m_fIsMuted = false;
+	DreamVCam::SourceType m_sourceType = SourceType::INVALID;
 
 	long m_assetID = -1;
 	std::string m_strPath;

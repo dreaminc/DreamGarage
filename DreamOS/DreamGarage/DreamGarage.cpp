@@ -1808,7 +1808,10 @@ RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmen
 
 RESULT DreamGarage::OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
+	
 	CR(m_pDreamShareView->StopSending());
+	CR(m_pDreamUserControlArea->HandleStopSending());
+
 Error:
 	return r;
 }
