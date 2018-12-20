@@ -590,6 +590,7 @@ public:
 
 	virtual bool IsSharing();
 	virtual texture* GetSharedContentTexture();
+	virtual texture* GetSharedCameraTexture();
 	virtual RESULT SetSharedContentTexture(texture* pSharedTexture);
 	virtual RESULT BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight);
 	virtual RESULT BroadcastSharedAudioPacket(const AudioPacket &pendingAudioPacket);

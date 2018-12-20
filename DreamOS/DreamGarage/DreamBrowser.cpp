@@ -776,9 +776,13 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height) {
 	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
 	CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);
-	CBR(GetSourceTexture() == GetDOS()->GetSharedContentTexture(), R_SKIPPED);
-
-	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
+	if (GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
+		GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
+	}
+	else if (GetSourceTexture() == GetDOS()->GetSharedCameraTexture()) {
+		// TODO: does VCam need to do the same kind of texture updates that ShareView does?
+		GetDOS()->GetCloudController()->BroadcastVideoFrame(kVCamVideoLabel, (unsigned char*)(pBuffer), width, height, 4);
+	}
 
 Error:
 	return r;

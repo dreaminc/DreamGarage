@@ -633,7 +633,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pUserController);
 
 	// DEBUG:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	{
 		m_fHasCredentials = true;
 
@@ -662,7 +662,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->RequestAccessToken(strDebugRefreshToken);
 		}
 	}
-#endif
+//#endif
 
 	// Initial step of login flow:
 	DOSLOG(INFO, "Checking API connection (internet access)");
@@ -1877,4 +1877,16 @@ RESULT DreamGarage::Notify(SenseTypingEvent *kbEvent) {
 
 Error:
 	return r;
+}
+
+texture* DreamGarage::GetSharedCameraTexture() {
+	RESULT r = R_PASS;
+
+	CN(m_pDreamUserControlArea);
+	CN(m_pDreamUserControlArea->GetVCam());
+
+	return m_pDreamUserControlArea->GetVCam()->GetCameraQuadTexture();
+
+Error:
+	return nullptr;
 }

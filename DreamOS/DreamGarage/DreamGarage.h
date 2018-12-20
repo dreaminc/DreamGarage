@@ -19,6 +19,7 @@ class DreamBrowser;
 class UIControlView;
 class DreamDesktopApp;
 class DreamUserControlArea;
+class DreamVCam;
 class DreamShareView;
 class DreamDesktopApp;
 class DreamGamepadCameraApp;
@@ -166,6 +167,9 @@ public:
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 	virtual RESULT Notify(SenseTypingEvent *kbEvent) override;
+
+	// Camera Sharing
+	virtual texture* GetSharedCameraTexture() override;
 
 private:
 	//std::map<long, user*> m_peerUsers;

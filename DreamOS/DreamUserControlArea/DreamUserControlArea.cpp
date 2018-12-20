@@ -13,6 +13,7 @@
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
 #include "WebBrowser/DOMNode.h"
 #include "Cloud/Environment/EnvironmentAsset.h"	
+#include "Cloud/Environment/EnvironmentShare.h"	
 
 #include "InteractionEngine/InteractionObjectEvent.h"
 #include "InteractionEngine/AnimationCurve.h"
@@ -858,9 +859,15 @@ RESULT DreamUserControlArea::OnReceiveAsset() {
 RESULT DreamUserControlArea::StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
-	CR(m_pActiveSource->SendFirstFrame());
+	CN(pEnvironmentShare);
+	if (pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
+		CR(m_pActiveSource->SendFirstFrame());
 
-	m_pCurrentScreenShare = pEnvironmentShare;
+		m_pCurrentScreenShare = pEnvironmentShare;
+	}
+	else if (pEnvironmentShare->GetShareType() == SHARE_TYPE_CAMERA) {
+		CR(m_pDreamVCam->StartSharing(pEnvironmentShare));
+	}
 
 Error:
 	return r;

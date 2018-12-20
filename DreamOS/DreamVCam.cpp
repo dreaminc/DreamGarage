@@ -441,10 +441,15 @@ std::string DreamVCam::GetContentType() {
 RESULT DreamVCam::OnClientConnect() {
 	RESULT r = R_PASS;
 
+	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+
 	CR(m_pParentApp->OnVirtualCameraCaptured());
 	m_pCameraQuad->SetVisible(true);
 	m_pCameraQuadBackground->SetVisible(true);
-	m_pCameraQuad->SetDiffuseTexture(m_pParentApp->GetActiveSource()->GetSourceTexture());
+	m_pCameraQuadTexture = m_pParentApp->GetActiveSource()->GetSourceTexture();
+	m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);
+
+	CR(pEnvironmentControllerProxy->RequestShareAsset(m_assetID, SHARE_TYPE_CAMERA));
 
 Error:
 	return r;
@@ -546,4 +551,62 @@ RESULT DreamVCam::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAp
 
 Error:
 	return r;
+}
+
+RESULT DreamVCam::StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+	RESULT r = R_PASS;
+
+	CN(pEnvironmentShare);
+	m_pCurrentCameraShare = pEnvironmentShare;
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::StopSharing() {
+	RESULT r = R_PASS;
+
+	m_pCurrentCameraShare = nullptr;
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	int castBufferSize = pxWidth * pxHeight * 4;
+	CBR(strVideoTrackLabel == kVCamVideoLabel, R_SKIPPED);
+
+	CNM(pVideoFrameDataBuffer, "no data buffer");
+
+	if (m_pCameraQuadTexture == nullptr ||
+		castBufferSize != m_pCameraQuadTexture->GetHeight() * m_pCameraQuadTexture->GetWidth() * m_pCameraQuadTexture->GetChannels()) {
+
+		m_pCameraQuadTexture = GetDOS()->MakeTexture(
+			texture::type::TEXTURE_2D,
+			pxWidth,
+			pxHeight,
+			PIXEL_FORMAT::RGBA,
+			4,
+			&pVideoFrameDataBuffer[0],
+			(int)(sizeof(uint8_t) * pxWidth * pxHeight * 4)
+		);
+
+		CR(m_pCameraQuadTexture->UpdateDimensions(pxWidth, pxHeight));
+	}
+	else {
+		if (m_pCameraQuad->GetTextureDiffuse() != m_pCameraQuadTexture) {
+			m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);
+		}
+
+		CRM(m_pCameraQuadTexture->Update((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from frame");
+	}
+
+Error:
+	return r;
+}
+
+texture* DreamVCam::GetCameraQuadTexture() {
+	return m_pCameraQuadTexture;
 }

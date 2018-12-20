@@ -477,6 +477,7 @@ RESULT DreamShareView::OnVideoFrame(const std::string &strVideoTrackLabel, PeerC
 
 	// TODO: Create a pending frame thing
 	//CR(m_pBrowserTexture->Update((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight, texture::PixelFormat::RGBA));
+	CBR(strVideoTrackLabel == kChromeVideoLabel, R_SKIPPED);
 
 	if (m_fReceivingStream) {
 		r = SetupPendingVideoFrame((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight);
