@@ -115,7 +115,7 @@ public:
 	RESULT StartReceiving(PeerConnection *pPeerConnection, std::shared_ptr<EnvironmentShare> pEnvironmentShare);
 	RESULT StopReceiving();
 
-
+	// TODO: this pattern is copied from DreamShareView, move to interface
 	virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 	RESULT SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
 	RESULT UpdateFromPendingVideoFrame();
