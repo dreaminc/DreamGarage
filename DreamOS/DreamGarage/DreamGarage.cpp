@@ -1724,13 +1724,20 @@ RESULT DreamGarage::OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentS
 	RESULT r = R_PASS;
 
 	CN(m_pDreamUserControlArea);
-	CN(m_pDreamShareView);
 
-	CR(m_pDreamShareView->ShowCastingTexture());
-	CR(m_pDreamShareView->BeginStream());
-	CR(m_pDreamShareView->Show());
+	if (pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
+		CN(m_pDreamShareView);
 
-	CR(m_pDreamUserControlArea->StartSharing(pEnvironmentShare));
+		CR(m_pDreamShareView->ShowCastingTexture());
+		CR(m_pDreamShareView->BeginStream());
+		CR(m_pDreamShareView->Show());
+
+		CR(m_pDreamUserControlArea->StartSharing(pEnvironmentShare));
+	}
+	else if (pEnvironmentShare->GetShareType() == SHARE_TYPE_CAMERA) {
+		CN(m_pDreamUserControlArea->GetVCam());
+		CR(m_pDreamUserControlArea->GetVCam()->StartSharing(pEnvironmentShare));
+	}
 
 Error:
 	return r;

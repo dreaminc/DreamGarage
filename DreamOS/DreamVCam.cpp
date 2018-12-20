@@ -267,6 +267,10 @@ RESULT DreamVCam::Update(void *pContext) {
 	}
 	//*/
 
+	if (m_pendingFrame.fPending) {
+
+	}
+
 Error:
 	return r;
 }
@@ -450,7 +454,7 @@ RESULT DreamVCam::OnClientConnect() {
 	m_pCameraQuadTexture = m_pParentApp->GetActiveSource()->GetSourceTexture();
 	m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);
 
-	CR(pEnvironmentControllerProxy->RequestShareAsset(m_assetID, SHARE_TYPE_CAMERA));
+	CR(pEnvironmentControllerProxy->RequestShareAsset(m_pParentApp->GetActiveSource()->GetCurrentAssetID(), SHARE_TYPE_CAMERA));
 
 Error:
 	return r;
@@ -528,7 +532,7 @@ RESULT DreamVCam::BroadcastVCamMessage() {
 
 	CBR(m_fSendingCameraPlacement, R_SKIPPED);
 
-	pMessage = new DreamUpdateVCamMessage(0, 0, m_pCamera->GetPosition(), m_pCamera->GetWorldOrientation(), GetUID());
+	pMessage = new DreamUpdateVCamMessage(0, 0, m_pCamera->GetPosition(true), m_pCamera->GetWorldOrientation(), GetUID());
 	CN(pMessage);
 
 	CN(m_pParentApp);
@@ -606,32 +610,85 @@ Error:
 RESULT DreamVCam::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
-	int castBufferSize = pxWidth * pxHeight * 4;
 	CBR(strVideoTrackLabel == kVCamVideoLabel, R_SKIPPED);
-
 	CNM(pVideoFrameDataBuffer, "no data buffer");
 
+	r = SetupPendingVideoFrame((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight);
+
+	if (r == R_OVERFLOW) {
+		DEBUG_LINEOUT("Overflow frame!");
+		return R_PASS;
+	}
+
+	CRM(r, "Failed for other reason");
+
+	/*
+	if (!GetComposite()->IsVisible()) {
+		GetComposite()->SetVisible(true);
+	}
+	//*/
+
+	if (!m_pCameraQuad->IsVisible()) {
+		m_pCameraQuad->SetVisible(true);
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+
+	RESULT r = R_PASS;
+
+	// TODO: programmatic 
+	int channels = 4;
+
+	CBRM((m_pendingFrame.fPending == false), R_OVERFLOW, "Buffer already pending");
+
+	m_pendingFrame.fPending = true;
+	m_pendingFrame.pxWidth = pxWidth;
+	m_pendingFrame.pxHeight = pxHeight;
+
+	// Allocate
+	// TODO: Might be able to avoid this if the video buffer is not changing size
+	// and just keep the memory allocated instead
+	m_pendingFrame.pDataBuffer_n = sizeof(uint8_t) * pxWidth * pxHeight * channels;
+	//m_pendingFrame.pDataBuffer = (uint8_t*)malloc(m_pendingFrame.pDataBuffer_n);
+
+	m_pendingFrame.pDataBuffer = pVideoFrameDataBuffer;
+
+	CNM(m_pendingFrame.pDataBuffer, "Failed to allocate video buffer mem");
+
+	// Copy
+	//memcpy(m_pendingFrame.pDataBuffer, pVideoFrameDataBuffer, m_pendingFrame.pDataBuffer_n);
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::UpdateFromPendingVideoFrame() {
+	RESULT r = R_PASS;
+
 	if (m_pCameraQuadTexture == nullptr ||
-		castBufferSize != m_pCameraQuadTexture->GetHeight() * m_pCameraQuadTexture->GetWidth() * m_pCameraQuadTexture->GetChannels()) {
+		m_pendingFrame.pDataBuffer_n != m_pCameraQuadTexture->GetHeight() * m_pCameraQuadTexture->GetWidth() * m_pCameraQuadTexture->GetChannels()) {
 
 		m_pCameraQuadTexture = GetDOS()->MakeTexture(
 			texture::type::TEXTURE_2D,
-			pxWidth,
-			pxHeight,
+			m_pendingFrame.pxWidth,
+			m_pendingFrame.pxHeight,
 			PIXEL_FORMAT::RGBA,
 			4,
-			&pVideoFrameDataBuffer[0],
-			(int)(sizeof(uint8_t) * pxWidth * pxHeight * 4)
-		);
+			&m_pendingFrame.pDataBuffer[0],
+			(int)m_pendingFrame.pDataBuffer_n);
 
-		CR(m_pCameraQuadTexture->UpdateDimensions(pxWidth, pxHeight));
+		CR(m_pCameraQuadTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
 	}
 	else {
 		if (m_pCameraQuad->GetTextureDiffuse() != m_pCameraQuadTexture) {
 			m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);
 		}
 
-		CRM(m_pCameraQuadTexture->Update((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from frame");
+		CRM(m_pCameraQuadTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from pending frame");
 	}
 
 Error:
