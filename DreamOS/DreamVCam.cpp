@@ -189,6 +189,10 @@ RESULT DreamVCam::Update(void *pContext) {
 
 	static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
 
+	if (m_pendingFrame.fPending) {
+		CR(UpdateFromPendingVideoFrame());
+	}
+
 	CBR(m_fIsRunning, R_SKIPPED);
 
 	CNR(m_pOGLEndNode, R_SKIPPED);
@@ -266,10 +270,6 @@ RESULT DreamVCam::Update(void *pContext) {
 		CR(BroadcastVCamMessage());
 	}
 	//*/
-
-	if (m_pendingFrame.fPending) {
-		CR(UpdateFromPendingVideoFrame());
-	}
 
 Error:
 	return r;
@@ -692,6 +692,12 @@ RESULT DreamVCam::UpdateFromPendingVideoFrame() {
 	}
 
 Error:
+	if (m_pendingFrame.pDataBuffer != nullptr) {
+		delete[] m_pendingFrame.pDataBuffer;
+		m_pendingFrame.pDataBuffer = nullptr;
+
+		memset(&m_pendingFrame, 0, sizeof(PendingFrame));
+	}
 	return r;
 }
 
