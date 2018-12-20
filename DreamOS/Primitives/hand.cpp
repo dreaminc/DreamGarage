@@ -362,6 +362,10 @@ RESULT hand::Update() {
 		CR(LoadHandModel());
 	}
 
+	if (m_pPhantomModel != nullptr) {
+		m_pPhantomModel->SetVisible(m_fTracked);
+	}
+
 	switch (m_modelState) {
 	case ModelState::HAND: {
 		if (m_pModel != nullptr) {
@@ -371,6 +375,7 @@ RESULT hand::Update() {
 	case ModelState::CONTROLLER: {
 		m_pController->SetVisible(m_fTracked);
 		m_pHead->SetVisible(m_fTracked);
+		m_pHMDComposite->SetVisible(m_fTracked, false);
 	} break;
 	}
 

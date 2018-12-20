@@ -277,6 +277,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 			}
 			// Doing this here for now, it's possible we want to just have AddUser add to both pipes though.
 			GetDOS()->AddObject(m_pUserModel.get(), SandboxApp::PipelineType::AUX);
+			GetDOS()->AddObjectToUIGraph(m_pUserModel->GetMouth().get(), SandboxApp::PipelineType::AUX);
 		}
 	}
 	
@@ -295,10 +296,6 @@ RESULT DreamUserApp::Update(void *pContext) {
 		GetDOS()->AddObject(m_pPhantomRightHand.get(), SandboxApp::PipelineType::AUX);
 	}
 	
-	if (m_pPhantomRightHand != nullptr && m_pPhantomLeftHand != nullptr) {
-		m_pPhantomLeftHand->SetVisible(m_fHeadsetAndHandsTracked);
-		m_pPhantomRightHand->SetVisible(m_fHeadsetAndHandsTracked);
-	}
 #endif
 	CR(UpdateHysteresisObject());
 

@@ -81,6 +81,8 @@ RESULT user::RemoveMouth() {
 	CNR(m_pMouthComposite, R_SKIPPED);
 
 	m_pDreamOS->RemoveObjectFromUIGraph(m_pMouthComposite.get());
+	m_pDreamOS->RemoveObjectFromAuxUIGraph(m_pMouthComposite.get());
+
 	m_pMouthComposite = nullptr;
 
 Error:
@@ -124,7 +126,7 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 	m_pHead->SetMaterialShininess(4.0f, true);
 
 	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[0].get());
-	m_pDreamOS->AddObjectToUIGraph(m_pMouthComposite.get(), (SandboxApp::PipelineType::AUX | SandboxApp::PipelineType::MAIN));
+	m_pDreamOS->AddObjectToUIGraph(m_pMouthComposite.get(), SandboxApp::PipelineType::MAIN);
 
 	// for now the mouth is in a hardcoded position attached to the face model
 	m_pLeftHand = AddHand(HAND_TYPE::HAND_LEFT, m_avatarModelId);

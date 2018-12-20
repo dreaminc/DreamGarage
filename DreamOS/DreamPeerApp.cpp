@@ -40,7 +40,7 @@ RESULT DreamPeerApp::InitializeApp(void *pContext) {
 
 	m_pUIObjectComposite = GetComposite()->MakeComposite();
 	m_pUIObjectComposite->SetPosition(GetComposite()->GetPosition(true));
-	GetDOS()->AddObjectToUIGraph(m_pUIObjectComposite.get(), (SandboxApp::PipelineType::AUX | SandboxApp::PipelineType::MAIN));
+	GetDOS()->AddObjectToUIGraph(m_pUIObjectComposite.get(), SandboxApp::PipelineType::MAIN);
 
 	m_pUserLabelComposite = m_pUIObjectComposite->MakeComposite();
 	m_pUserLabelComposite = m_pUIObjectComposite->AddComposite();
@@ -67,9 +67,8 @@ RESULT DreamPeerApp::Shutdown(void *pContext) {
 	m_pUserModel = nullptr;
 
 	GetDOS()->RemoveObjectFromUIGraph(m_pUIObjectComposite.get());
-	GetDOS()->RemoveObjectFromAuxUIGraph(m_pUIObjectComposite.get());
-	m_pUIObjectComposite = nullptr;
 
+	m_pUIObjectComposite = nullptr;
 
 Error:
 	return r;
