@@ -392,7 +392,6 @@ RESULT OVRHMD::UpdateHMD() {
 			ptControllerPosition = qOffset * ptControllerPosition;
 			hand->SetPosition(ptControllerPosition + offset);
 			pModel->SetPosition(ptControllerPosition + offset);
-			hand->GetPhantomModel()->SetPosition(ptControllerPosition + offset);
 
 			quaternion qOrientation = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HandPoses[i].ThePose.Orientation)));
 
@@ -403,7 +402,11 @@ RESULT OVRHMD::UpdateHMD() {
 
 			hand->SetOrientation(qOrientation);
 			pModel->SetOrientation(qOrientation);
-			hand->GetPhantomModel()->SetOrientation(qOrientation);
+
+			if (hand->GetPhantomModel() != nullptr) {
+				hand->GetPhantomModel()->SetPosition(ptControllerPosition + offset);
+				hand->GetPhantomModel()->SetOrientation(qOrientation);
+			}
 			
 			HAND_TYPE hType = i == 0 ? HAND_TYPE::HAND_LEFT : HAND_TYPE::HAND_RIGHT;
 			hand->SetTracked(true);

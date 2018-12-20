@@ -177,7 +177,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 	quaternion qOrientation;
 
 	// update user interaction ray
-	auto pCameraNode = GetDOS()->GetCameraNode();
+	auto pCameraNode = GetDOS()->GetCamera();
 	CN(pCameraNode);
 
 	if (m_pOrientationRay == nullptr) {
@@ -297,7 +297,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 	}
 	
 #endif
-	CR(UpdateHysteresisObject());
+//	CR(UpdateHysteresisObject());
 
 Error:
 	return r;
