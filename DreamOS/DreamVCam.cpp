@@ -445,7 +445,8 @@ RESULT DreamVCam::SendFirstFrame() {
 RESULT DreamVCam::CloseSource() {
 	m_fIsRunning = false;
 
-	GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(), m_pCamera->GetOrientation());
+	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
+	GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(true), m_pCamera->GetOrientation());
 	m_pCameraModel->SetVisible(false);
 
 	return R_PASS;
@@ -498,7 +499,8 @@ Error:
 RESULT DreamVCam::OnCameraMoved() {
 	RESULT r = R_PASS;
 
-	GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(), m_pCamera->GetOrientation());
+	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
+	GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(true), m_pCamera->GetOrientation());
 
 Error:
 	return r;
