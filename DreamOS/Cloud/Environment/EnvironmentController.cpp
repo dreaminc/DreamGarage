@@ -564,12 +564,12 @@ RESULT EnvironmentController::RequestCloseAsset(long assetID) {
 	guid guidMessage;
 	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
-	jsonPayload["environment_share"] = nlohmann::json::object();
-	jsonPayload["environment_share"]["id"] = assetID;
+	jsonPayload["environment_asset"] = nlohmann::json::object();
+	jsonPayload["environment_asset"]["id"] = assetID;
 
 	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
-	CR(pCloudRequest->SetControllerMethod("environment_share.close"));
+	CR(pCloudRequest->SetControllerMethod("environment_asset.close"));
 
 	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_ASSET_CLOSE));
 
@@ -916,7 +916,7 @@ RESULT EnvironmentController::OnCloseAsset(std::shared_ptr<CloudMessage> pCloudM
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_share"_json_pointer];
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
 
 	if (jsonEnvironmentAsset.size() != 0) {
 
