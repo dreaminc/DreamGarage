@@ -112,7 +112,7 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 
 	m_pSendButton = AddButton(shareOffset, buttonWidth, buttonHeight,
 		std::bind(&UserAreaControls::HandleSendTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[16], controlTextures[15]);
+		controlTextures[15], controlTextures[16]);
 
 	m_pCameraSourceButton->SetVisible(false);
 	m_pSendButton->SetVisible(false);
