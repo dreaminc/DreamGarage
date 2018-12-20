@@ -193,6 +193,7 @@ private:
 	float m_tick = 0.0f;
 
 	long m_pendingAssetReceiveUserID = -1;
+	std::shared_ptr<EnvironmentShare> m_pPendingEnvironmentShare = nullptr;
 
 	bool m_fPendLogout = false;
 	bool m_fPendSwitchTeams = false;
