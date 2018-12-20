@@ -71,7 +71,7 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	CN(m_pCameraQuadBackgroundTexture);
 	m_pCameraQuadBackground->SetDiffuseTexture(m_pCameraQuadBackgroundTexture);
 	
-	m_pDefaultTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"Brick_1280x720.jpg");
+	m_pMuteTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"camera-mute.png");
 
 	/*
 	m_pCameraQuad = GetDOS()->MakeQuad(0.12f*test, 0.12f*9.0f / 16.0f*test);
@@ -207,25 +207,24 @@ RESULT DreamVCam::Update(void *pContext) {
 		// Approximately 30 FPS
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 41) {
 			
+			texture *pTexture = m_pOGLRenderNode->GetOGLFramebufferColorTexture();
+			OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTexture);
+			CN(pOGLTexture);
+
+			if (pOGLTexture->IsOGLPBOPackEnabled()) {
+				CR(pOGLTexture->EnableOGLPBOPack());
+			}
+
+			UnsetSourceTexture();
+			CRM(SetSourceTexture(pTexture), "Failed to set source texture from render node in Dream VCam");
+
+			// Update the local render
+			CR(m_pOGLEndNode->RenderNode(count++));
+
 			if (m_fIsMuted) {
-				UnsetSourceTexture();
-				SetSourceTexture(m_pDefaultTexture);
+				m_pStreamingTexture = m_pMuteTexture;
 			}
 			else {
-				texture *pTexture = m_pOGLRenderNode->GetOGLFramebufferColorTexture();
-				OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTexture);
-				CN(pOGLTexture);
-
-				if (pOGLTexture->IsOGLPBOPackEnabled()) {
-					CR(pOGLTexture->EnableOGLPBOPack());
-				}
-
-				UnsetSourceTexture();
-				CRM(SetSourceTexture(pTexture), "Failed to set source texture from render node in Dream VCam");
-
-				// Update the local render
-				CR(m_pOGLEndNode->RenderNode(count++));
-
 				switch (m_sourceType) {
 				case(DreamVCam::SourceType::CAMERA): {	
 					m_pStreamingTexture = m_pSourceTexture;

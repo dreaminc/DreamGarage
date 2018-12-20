@@ -168,7 +168,7 @@ private:
 	std::shared_ptr<quad> m_pCameraQuadBackground = nullptr;
 	texture *m_pCameraQuadBackgroundTexture = nullptr;
 	texture *m_pShareTexture = nullptr;
-	texture *m_pDefaultTexture = nullptr;
+	texture *m_pMuteTexture = nullptr;
 
 	// This node is used for the render texture
 	OGLProgram *m_pOGLRenderNode = nullptr;
