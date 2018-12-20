@@ -137,14 +137,15 @@ public:
 		size_t pDataBuffer_n = 0;
 	} m_pendingFrame;
 
+	RESULT SetSourceType(DreamVCam::SourceType sourceType);
+	RESULT Mute(bool fMute);
+
 private:
 	// streaming members
 	bool m_fStreaming = false;
 	bool m_fReceivingSteam = false;
 	bool m_fShouldBeginStream = false;
-	bool m_fReadyForFrame = false;
-	RESULT SetSourceType(DreamVCam::SourceType sourceType);
-	RESULT Mute(bool fMute);
+	bool m_fReadyForFrame = false;	
 
 protected:
 	static DreamVCam* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -152,6 +153,7 @@ protected:
 private:
 	std::shared_ptr<NamedPipeServer> m_pNamedPipeServer = nullptr;
 	texture* m_pSourceTexture = nullptr;
+	texture* m_pStreamingTexture = nullptr;
 
 	unsigned char *m_pLoadBuffer = nullptr;
 	size_t m_pLoadBuffer_n = 0;

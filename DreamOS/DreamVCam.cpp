@@ -212,37 +212,42 @@ RESULT DreamVCam::Update(void *pContext) {
 				SetSourceTexture(m_pDefaultTexture);
 			}
 			else {
+				texture *pTexture = m_pOGLRenderNode->GetOGLFramebufferColorTexture();
+				OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTexture);
+				CN(pOGLTexture);
+
+				if (pOGLTexture->IsOGLPBOPackEnabled()) {
+					CR(pOGLTexture->EnableOGLPBOPack());
+				}
+
+				UnsetSourceTexture();
+				CRM(SetSourceTexture(pTexture), "Failed to set source texture from render node in Dream VCam");
+
+				// Update the local render
+				CR(m_pOGLEndNode->RenderNode(count++));
+
 				switch (m_sourceType) {
-				case(DreamVCam::SourceType::CAMERA): {
-					texture *pTexture = m_pOGLRenderNode->GetOGLFramebufferColorTexture();
-					OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTexture);
-					CN(pOGLTexture);
-
-					if (pOGLTexture->IsOGLPBOPackEnabled()) {
-						CR(pOGLTexture->EnableOGLPBOPack());
-					}
-
-					UnsetSourceTexture();
-					CRM(SetSourceTexture(pTexture), "Failed to set source texture from render node in Dream VCam");
-
-					// Update the local render
-					CR(m_pOGLEndNode->RenderNode(count++));
+				case(DreamVCam::SourceType::CAMERA): {	
+					m_pStreamingTexture = m_pSourceTexture;
 				} break;
 
 				case(DreamVCam::SourceType::SHARE_SCREEN): {
-					CBR(GetDOS()->GetSharedContentTexture() != nullptr, R_SKIPPED);
-					UnsetSourceTexture();
-					CRM(SetSourceTexture(GetDOS()->GetSharedContentTexture()), "Failed to set source texture to share texture in Dream VCam");
+					if (GetDOS()->GetSharedContentTexture() != nullptr) {
+						m_pStreamingTexture = GetDOS()->GetSharedContentTexture();
+					}
+					else {	// could also just cascade close event from ControlArea?
+						m_sourceType = SourceType::CAMERA;
+					}
 				} break;
 				}
 			}
 			//*
-			size_t bufferSize = m_pSourceTexture->GetTextureSize();
+			size_t bufferSize = m_pStreamingTexture->GetTextureSize();
 
 			if (bufferSize == m_pLoadBuffer_n) {
 				// TODO: We currently don't support multi-sample, so need to make sure
 				// to render one sample (expose with flag)
-				m_pSourceTexture->LoadBufferFromTexture(m_pLoadBuffer, bufferSize);
+				m_pStreamingTexture->LoadBufferFromTexture(m_pLoadBuffer, bufferSize);
 
 				m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer), m_pLoadBuffer_n);
 
