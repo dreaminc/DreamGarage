@@ -1492,6 +1492,10 @@ texture* DreamOS::GetSharedContentTexture() {
 	return nullptr;
 }
 
+texture* DreamOS::GetSharedCameraTexture() {
+	return nullptr;
+}
+
 RESULT DreamOS::SetSharedContentTexture(texture* pSharedTexture) {
 	if (m_pDreamShareView != nullptr) {
 		m_pDreamShareView->SetCastingTexture(pSharedTexture);

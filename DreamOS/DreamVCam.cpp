@@ -105,7 +105,6 @@ RESULT DreamVCam::InitializePipeline() {
 
 	CRM(m_pNamedPipeServer->RegisterMessageHandler(std::bind(&DreamVCam::HandleServerPipeMessage, this, std::placeholders::_1, std::placeholders::_2)),
 		"Failed to register message handler");
-	CR(m_pNamedPipeServer->RegisterNamedPipeServerObserver(this));
 
 	CRM(m_pNamedPipeServer->Start(), "Failed to start server");
 
@@ -189,6 +188,10 @@ RESULT DreamVCam::Update(void *pContext) {
 	static int count = 0;
 
 	static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+
+	if (m_pendingFrame.fPending) {
+		CR(UpdateFromPendingVideoFrame());
+	}
 
 	CBR(m_fIsRunning, R_SKIPPED);
 
@@ -362,8 +365,10 @@ RESULT DreamVCam::UnsetSourceTexture() {
 RESULT DreamVCam::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	RESULT r = R_PASS;
 
+	CN(pParentApp);
 	m_pParentApp = pParentApp;	
 	m_fIsRunning = true;
+	CR(m_pNamedPipeServer->RegisterNamedPipeServerObserver(this));
 
 Error:
 	return r;
@@ -441,10 +446,15 @@ std::string DreamVCam::GetContentType() {
 RESULT DreamVCam::OnClientConnect() {
 	RESULT r = R_PASS;
 
+	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+
 	CR(m_pParentApp->OnVirtualCameraCaptured());
 	m_pCameraQuad->SetVisible(true);
 	m_pCameraQuadBackground->SetVisible(true);
-	m_pCameraQuad->SetDiffuseTexture(m_pParentApp->GetActiveSource()->GetSourceTexture());
+	m_pCameraQuadTexture = m_pParentApp->GetActiveSource()->GetSourceTexture();
+	m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);
+
+	CR(pEnvironmentControllerProxy->RequestShareAsset(m_pParentApp->GetActiveSource()->GetCurrentAssetID(), SHARE_TYPE_CAMERA));
 
 Error:
 	return r;
@@ -522,7 +532,7 @@ RESULT DreamVCam::BroadcastVCamMessage() {
 
 	CBR(m_fSendingCameraPlacement, R_SKIPPED);
 
-	pMessage = new DreamUpdateVCamMessage(0, 0, m_pCamera->GetPosition(), m_pCamera->GetOrientation(), GetUID());
+	pMessage = new DreamUpdateVCamMessage(0, 0, m_pCamera->GetPosition(true), m_pCamera->GetWorldOrientation(), GetUID());
 	CN(pMessage);
 
 	CN(m_pParentApp);
@@ -538,12 +548,159 @@ RESULT DreamVCam::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAp
 	DreamUpdateVCamMessage* pMessage = (DreamUpdateVCamMessage*)(pDreamAppMessage);
 
 	if (m_fReceivingCameraPlacement) {
-		m_pCameraModel->SetPosition(pMessage->m_body.ptPosition);
-		m_pCameraModel->SetOrientation(pMessage->m_body.qOrientation);
+		m_pCameraComposite->SetPosition(pMessage->m_body.ptPosition);
+		m_pCameraComposite->SetOrientation(pMessage->m_body.qOrientation);
 		// TODO: temp
 		m_pCameraModel->SetVisible(true);
 	}
 
 Error:
 	return r;
+}
+
+RESULT DreamVCam::StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+	RESULT r = R_PASS;
+
+	CN(pEnvironmentShare);
+	m_pCurrentCameraShare = pEnvironmentShare;
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::StopSharing() {
+	RESULT r = R_PASS;
+
+	m_pCurrentCameraShare = nullptr;
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::StartReceiving(PeerConnection *pPeerConnection, std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+	RESULT r = R_PASS;
+
+	if (GetDOS()->IsRegisteredVideoStreamSubscriber(this)) {
+		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+	}
+
+	CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
+
+	m_pCameraQuad->SetVisible(true);
+
+//	m_pCurrentCameraShare = pEnvironmentShare;
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::StopReceiving() {
+	RESULT r = R_PASS;
+
+	m_pCameraQuad->SetVisible(false);
+
+	CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+
+//	m_pCurrentCameraShare = nullptr;
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	CBR(strVideoTrackLabel == kVCamVideoLabel, R_SKIPPED);
+	CNM(pVideoFrameDataBuffer, "no data buffer");
+
+	r = SetupPendingVideoFrame((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight);
+
+	if (r == R_OVERFLOW) {
+		DEBUG_LINEOUT("Overflow frame!");
+		return R_PASS;
+	}
+
+	CRM(r, "Failed for other reason");
+
+	/*
+	if (!GetComposite()->IsVisible()) {
+		GetComposite()->SetVisible(true);
+	}
+	//*/
+
+	if (!m_pCameraQuad->IsVisible()) {
+		m_pCameraQuad->SetVisible(true);
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+
+	RESULT r = R_PASS;
+
+	// TODO: programmatic 
+	int channels = 4;
+
+	CBRM((m_pendingFrame.fPending == false), R_OVERFLOW, "Buffer already pending");
+
+	m_pendingFrame.fPending = true;
+	m_pendingFrame.pxWidth = pxWidth;
+	m_pendingFrame.pxHeight = pxHeight;
+
+	// Allocate
+	// TODO: Might be able to avoid this if the video buffer is not changing size
+	// and just keep the memory allocated instead
+	m_pendingFrame.pDataBuffer_n = sizeof(uint8_t) * pxWidth * pxHeight * channels;
+	//m_pendingFrame.pDataBuffer = (uint8_t*)malloc(m_pendingFrame.pDataBuffer_n);
+
+	m_pendingFrame.pDataBuffer = pVideoFrameDataBuffer;
+
+	CNM(m_pendingFrame.pDataBuffer, "Failed to allocate video buffer mem");
+
+	// Copy
+	//memcpy(m_pendingFrame.pDataBuffer, pVideoFrameDataBuffer, m_pendingFrame.pDataBuffer_n);
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::UpdateFromPendingVideoFrame() {
+	RESULT r = R_PASS;
+
+	if (m_pCameraQuadTexture == nullptr ||
+		m_pendingFrame.pDataBuffer_n != m_pCameraQuadTexture->GetHeight() * m_pCameraQuadTexture->GetWidth() * m_pCameraQuadTexture->GetChannels()) {
+
+		m_pCameraQuadTexture = GetDOS()->MakeTexture(
+			texture::type::TEXTURE_2D,
+			m_pendingFrame.pxWidth,
+			m_pendingFrame.pxHeight,
+			PIXEL_FORMAT::RGBA,
+			4,
+			&m_pendingFrame.pDataBuffer[0],
+			(int)m_pendingFrame.pDataBuffer_n);
+
+		CR(m_pCameraQuadTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
+	}
+	else {
+		if (m_pCameraQuad->GetTextureDiffuse() != m_pCameraQuadTexture) {
+			m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);
+		}
+
+		CRM(m_pCameraQuadTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from pending frame");
+	}
+
+Error:
+	if (m_pendingFrame.pDataBuffer != nullptr) {
+		delete[] m_pendingFrame.pDataBuffer;
+		m_pendingFrame.pDataBuffer = nullptr;
+
+		memset(&m_pendingFrame, 0, sizeof(PendingFrame));
+	}
+	return r;
+}
+
+texture* DreamVCam::GetCameraQuadTexture() {
+	return m_pCameraQuadTexture;
 }

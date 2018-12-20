@@ -11,6 +11,7 @@
 #include "DreamUserControlArea/DreamContentSource.h"
 #include "Sandbox/NamedPipeServer.h"
 #include "DreamGarage/DreamGamepadCameraApp.h"
+#include "DreamVideoStreamSubscriber.h"
 
 #include <memory>
 
@@ -37,7 +38,8 @@ class DreamVCam :
 	public DreamModule<DreamVCam>,
 	public DreamContentSource,
 	public NamedPipeServer::observer,
-	public DreamGamepadCameraApp::observer
+	public DreamGamepadCameraApp::observer,
+	public DreamVideoStreamSubscriber
 {
 	friend class DreamModuleManager;
 
@@ -94,7 +96,7 @@ public:
 	// DreamGamepadCameraApp
 	virtual RESULT OnCameraMoved() override;
 
-	// Sharing Camera Placement
+	// Sharing Camera Placement Data
 	RESULT HandleSettings(point ptPosition, quaternion qOrientation);
 
 	RESULT SetIsSendingCameraPlacement(bool fSendingCameraPlacement);
@@ -106,6 +108,34 @@ public:
 
 	RESULT BroadcastVCamMessage();
 	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
+
+	// Sharing Camera Texture over Socket
+	RESULT StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare);
+	RESULT StopSharing();
+	RESULT StartReceiving(PeerConnection *pPeerConnection, std::shared_ptr<EnvironmentShare> pEnvironmentShare);
+	RESULT StopReceiving();
+
+	// TODO: this pattern is copied from DreamShareView, move to interface
+	virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
+	RESULT SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
+	RESULT UpdateFromPendingVideoFrame();
+
+	texture* GetCameraQuadTexture();
+
+	struct PendingFrame {
+		bool fPending = false;
+		int pxWidth = 0;
+		int pxHeight = 0;
+		uint8_t *pDataBuffer = nullptr;
+		size_t pDataBuffer_n = 0;
+	} m_pendingFrame;
+
+private:
+	// streaming members
+	bool m_fStreaming = false;
+	bool m_fReceivingSteam = false;
+	bool m_fShouldBeginStream = false;
+	bool m_fReadyForFrame = false;
 
 protected:
 	static DreamVCam* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -123,6 +153,7 @@ private:
 	composite *m_pCameraComposite = nullptr;
 	std::shared_ptr<model> m_pCameraModel = nullptr;
 	std::shared_ptr<quad> m_pCameraQuad = nullptr;
+	texture* m_pCameraQuadTexture = nullptr;
 	std::shared_ptr<quad> m_pCameraQuadBackground = nullptr;
 	texture *m_pCameraQuadBackgroundTexture = nullptr;
 	texture *m_pShareTexture = nullptr;

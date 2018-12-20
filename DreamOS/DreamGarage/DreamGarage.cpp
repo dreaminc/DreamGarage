@@ -633,7 +633,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pUserController);
 
 	// DEBUG:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	{
 		m_fHasCredentials = true;
 
@@ -662,7 +662,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->RequestAccessToken(strDebugRefreshToken);
 		}
 	}
-#endif
+//#endif
 
 	// Initial step of login flow:
 	DOSLOG(INFO, "Checking API connection (internet access)");
@@ -1724,13 +1724,20 @@ RESULT DreamGarage::OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentS
 	RESULT r = R_PASS;
 
 	CN(m_pDreamUserControlArea);
-	CN(m_pDreamShareView);
 
-	CR(m_pDreamShareView->ShowCastingTexture());
-	CR(m_pDreamShareView->BeginStream());
-	CR(m_pDreamShareView->Show());
+	if (pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
+		CN(m_pDreamShareView);
 
-	CR(m_pDreamUserControlArea->StartSharing(pEnvironmentShare));
+		CR(m_pDreamShareView->ShowCastingTexture());
+		CR(m_pDreamShareView->BeginStream());
+		CR(m_pDreamShareView->Show());
+
+		CR(m_pDreamUserControlArea->StartSharing(pEnvironmentShare));
+	}
+	else if (pEnvironmentShare->GetShareType() == SHARE_TYPE_CAMERA) {
+		CN(m_pDreamUserControlArea->GetVCam());
+		CR(m_pDreamUserControlArea->GetVCam()->StartSharing(pEnvironmentShare));
+	}
 
 Error:
 	return r;
@@ -1755,7 +1762,8 @@ Error:
 
 RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
-	if (m_pDreamShareView != nullptr) {
+
+	if (m_pDreamShareView != nullptr && pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
 
 		m_pDreamShareView->PendReceiving();
 
@@ -1770,6 +1778,18 @@ RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmen
 
 		//m_pDreamBrowser->StartReceiving();
 	}
+	else if (pEnvironmentShare->GetShareType() == SHARE_TYPE_CAMERA) {
+		auto pPeer = FindPeer(pEnvironmentShare->GetUserID());
+
+		if (pPeer == nullptr) {
+			// TODO
+		}
+		else {
+			m_pDreamUserControlArea->GetVCam()->StartReceiving(pPeer->GetPeerConnection(), pEnvironmentShare);
+		}
+	}
+
+
 	return r;
 }
 
@@ -1877,4 +1897,16 @@ RESULT DreamGarage::Notify(SenseTypingEvent *kbEvent) {
 
 Error:
 	return r;
+}
+
+texture* DreamGarage::GetSharedCameraTexture() {
+	RESULT r = R_PASS;
+
+	CN(m_pDreamUserControlArea);
+	CN(m_pDreamUserControlArea->GetVCam());
+
+	return m_pDreamUserControlArea->GetVCam()->GetCameraQuadTexture();
+
+Error:
+	return nullptr;
 }
