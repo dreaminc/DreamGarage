@@ -689,10 +689,14 @@ RESULT OpenVRDevice::UpdateHMD() {
 						if (m_deviceType == HMDDeviceType::OCULUS) {
 							m_pLeftHand->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
 							m_pLeftHand->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+							m_pLeftHand->GetPhantomModel()->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
+							m_pLeftHand->GetPhantomModel()->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
 						}
 						else {
 							m_pLeftHand->SetPosition(ptControllerPosition);
 							m_pLeftHand->SetOrientation(qOrientation);
+							m_pLeftHand->GetPhantomModel()->SetPosition(ptControllerPosition);
+							m_pLeftHand->GetPhantomModel()->SetOrientation(qOrientation);
 						}
 
 						fLeftHandTracked = true;

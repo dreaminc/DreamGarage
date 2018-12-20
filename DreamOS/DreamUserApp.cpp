@@ -644,9 +644,10 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 	type = pHand->GetHandState().handType;
 	CBR(type == HAND_TYPE::HAND_LEFT || type == HAND_TYPE::HAND_RIGHT, R_SKIPPED);
 
-	//pDreamOS->AddObject(pHand->GetModel().get());
-	//pDreamOS->AddObject(pHand->GetMalletHead());
-	pDreamOS->AddObject(pHand->m_pHMDComposite.get(), SandboxApp::PipelineType::MAIN);
+	//pDreamOS->AddObject(pHand->GetModel().get(), SandboxApp::PipelineType::MAIN);
+	//pDreamOS->AddObject(pHand->GetMalletHead(), SandboxApp::PipelineType::MAIN);
+	pDreamOS->AddObject(pHand, SandboxApp::PipelineType::MAIN);
+	//pDreamOS->AddObject(pHand->m_pHMDComposite.get(), SandboxApp::PipelineType::MAIN);
 
 	CR(pHand->InitializeWithContext(pDreamOS));
 
