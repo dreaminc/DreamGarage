@@ -67,6 +67,7 @@ RESULT DreamPeerApp::Shutdown(void *pContext) {
 	m_pUserModel = nullptr;
 
 	GetDOS()->RemoveObjectFromUIGraph(m_pUIObjectComposite.get());
+	GetDOS()->RemoveObjectFromAuxUIGraph(m_pUIObjectComposite.get());
 	m_pUIObjectComposite = nullptr;
 
 
