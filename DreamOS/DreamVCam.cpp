@@ -105,7 +105,6 @@ RESULT DreamVCam::InitializePipeline() {
 
 	CRM(m_pNamedPipeServer->RegisterMessageHandler(std::bind(&DreamVCam::HandleServerPipeMessage, this, std::placeholders::_1, std::placeholders::_2)),
 		"Failed to register message handler");
-	CR(m_pNamedPipeServer->RegisterNamedPipeServerObserver(this));
 
 	CRM(m_pNamedPipeServer->Start(), "Failed to start server");
 
@@ -362,8 +361,10 @@ RESULT DreamVCam::UnsetSourceTexture() {
 RESULT DreamVCam::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	RESULT r = R_PASS;
 
+	CN(pParentApp);
 	m_pParentApp = pParentApp;	
 	m_fIsRunning = true;
+	CR(m_pNamedPipeServer->RegisterNamedPipeServerObserver(this));
 
 Error:
 	return r;
@@ -527,7 +528,7 @@ RESULT DreamVCam::BroadcastVCamMessage() {
 
 	CBR(m_fSendingCameraPlacement, R_SKIPPED);
 
-	pMessage = new DreamUpdateVCamMessage(0, 0, m_pCamera->GetPosition(), m_pCamera->GetOrientation(), GetUID());
+	pMessage = new DreamUpdateVCamMessage(0, 0, m_pCamera->GetPosition(), m_pCamera->GetWorldOrientation(), GetUID());
 	CN(pMessage);
 
 	CN(m_pParentApp);
