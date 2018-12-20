@@ -689,10 +689,19 @@ RESULT OpenVRDevice::UpdateHMD() {
 						if (m_deviceType == HMDDeviceType::OCULUS) {
 							m_pLeftHand->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
 							m_pLeftHand->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+
+							if (m_pLeftHand->GetPhantomModel() != nullptr) {
+								m_pLeftHand->GetPhantomModel()->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
+								m_pLeftHand->GetPhantomModel()->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+							}
 						}
 						else {
 							m_pLeftHand->SetPosition(ptControllerPosition);
 							m_pLeftHand->SetOrientation(qOrientation);
+							if (m_pLeftHand->GetPhantomModel() != nullptr) {
+								m_pLeftHand->GetPhantomModel()->SetPosition(ptControllerPosition);
+								m_pLeftHand->GetPhantomModel()->SetOrientation(qOrientation);
+							}
 						}
 
 						fLeftHandTracked = true;
@@ -707,10 +716,18 @@ RESULT OpenVRDevice::UpdateHMD() {
 						if (m_deviceType == HMDDeviceType::OCULUS) {
 							m_pRightHand->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
 							m_pRightHand->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+							if (m_pRightHand->GetPhantomModel() != nullptr) {
+								m_pRightHand->GetPhantomModel()->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
+								m_pRightHand->GetPhantomModel()->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+							}
 						}
 						else {
 							m_pRightHand->SetPosition(ptControllerPosition);
 							m_pRightHand->SetOrientation(qOrientation);
+							if (m_pRightHand->GetPhantomModel() != nullptr) {
+								m_pRightHand->GetPhantomModel()->SetPosition(ptControllerPosition);
+								m_pRightHand->GetPhantomModel()->SetOrientation(qOrientation);
+							}
 						}
 
 						fRightHandTracked = true;

@@ -43,7 +43,7 @@ RESULT hand::Initialize(HAND_TYPE type, long avatarModelID) {
 	
 	m_fTracked = false;
 
-	m_pHMDComposite = AddComposite();
+	//m_pHMDComposite = AddComposite();
 
 	//Start all visibility at false
 	CR(OnLostTrack());	//CR here because the only other C is inside of the #ifndef
@@ -98,8 +98,9 @@ RESULT hand::LoadHandModel() {
 	if (m_handType == HAND_TYPE::HAND_LEFT) {
 
 		std::wstring wstrModel = wstrAssetPath + k_wstrFolder + std::to_wstring(m_avatarModelId) + L"/" + k_wstrLeft + k_wstrFileType;
-		m_pModel = m_pHMDComposite->AddModel(wstrModel);
-		m_pPhantomModel = AddModel(wstrModel);
+		//m_pModel = m_pHMDComposite->AddModel(wstrModel);
+		m_pModel = AddModel(wstrModel);
+		m_pPhantomModel = MakeModel(wstrModel);
 
 		vector vLeftHandOffset = vector(0.0f, (float)(M_PI), (float)(M_PI_2));
 		m_pModel->SetOrientationOffset(vLeftHandOffset);
@@ -109,8 +110,9 @@ RESULT hand::LoadHandModel() {
 	if (m_handType == HAND_TYPE::HAND_RIGHT) {
 
 		std::wstring wstrModel = wstrAssetPath + k_wstrFolder + std::to_wstring(m_avatarModelId) + L"/" + k_wstrRight + k_wstrFileType;
-		m_pModel = m_pHMDComposite->AddModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
-		m_pPhantomModel = AddModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
+		//m_pModel = m_pHMDComposite->AddModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
+		m_pModel = AddModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
+		m_pPhantomModel = MakeModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
 
 		vector vRightHandOffset = vector(0.0f, (float)(M_PI), (float)(-M_PI_2));
 		m_pModel->SetOrientationOffset(vRightHandOffset);
@@ -247,7 +249,8 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 
 	m_headOffset = point(0.0f, m_distance * sin(m_angle), -m_distance * cos(m_angle));
 
-	m_pHead = m_pHMDComposite->AddSphere(m_radius, 20.0f, 20.0f);
+	//m_pHead = m_pHMDComposite->AddSphere(m_radius, 20.0f, 20.0f);
+	m_pHead = AddSphere(m_radius, 20.0f, 20.0f);
 	m_pHead->SetVisible(false);
 	m_pHead->SetPosition(m_headOffset);
 
@@ -362,6 +365,10 @@ RESULT hand::Update() {
 		CR(LoadHandModel());
 	}
 
+	if (m_pPhantomModel != nullptr) {
+		m_pPhantomModel->SetVisible(m_fTracked);
+	}
+
 	switch (m_modelState) {
 	case ModelState::HAND: {
 		if (m_pModel != nullptr) {
@@ -371,6 +378,7 @@ RESULT hand::Update() {
 	case ModelState::CONTROLLER: {
 		m_pController->SetVisible(m_fTracked);
 		m_pHead->SetVisible(m_fTracked);
+		//m_pHMDComposite->SetVisible(m_fTracked, false);
 	} break;
 	}
 

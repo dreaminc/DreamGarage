@@ -177,7 +177,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 	quaternion qOrientation;
 
 	// update user interaction ray
-	auto pCameraNode = GetDOS()->GetCameraNode();
+	auto pCameraNode = GetDOS()->GetCamera();
 	CN(pCameraNode);
 
 	if (m_pOrientationRay == nullptr) {
@@ -277,6 +277,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 			}
 			// Doing this here for now, it's possible we want to just have AddUser add to both pipes though.
 			GetDOS()->AddObject(m_pUserModel.get(), SandboxApp::PipelineType::AUX);
+			GetDOS()->AddObjectToUIGraph(m_pUserModel->GetMouth().get(), SandboxApp::PipelineType::AUX);
 		}
 	}
 	
@@ -295,12 +296,8 @@ RESULT DreamUserApp::Update(void *pContext) {
 		GetDOS()->AddObject(m_pPhantomRightHand.get(), SandboxApp::PipelineType::AUX);
 	}
 	
-	if (m_pPhantomRightHand != nullptr && m_pPhantomLeftHand != nullptr) {
-		m_pPhantomLeftHand->SetVisible(m_fHeadsetAndHandsTracked);
-		m_pPhantomRightHand->SetVisible(m_fHeadsetAndHandsTracked);
-	}
 #endif
-	CR(UpdateHysteresisObject());
+//	CR(UpdateHysteresisObject());
 
 Error:
 	return r;
@@ -647,9 +644,10 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 	type = pHand->GetHandState().handType;
 	CBR(type == HAND_TYPE::HAND_LEFT || type == HAND_TYPE::HAND_RIGHT, R_SKIPPED);
 
-	//pDreamOS->AddObject(pHand->GetModel().get());
-	//pDreamOS->AddObject(pHand->GetMalletHead());
-	pDreamOS->AddObject(pHand->m_pHMDComposite.get(), SandboxApp::PipelineType::MAIN);
+	//pDreamOS->AddObject(pHand->GetModel().get(), SandboxApp::PipelineType::MAIN);
+	//pDreamOS->AddObject(pHand->GetMalletHead(), SandboxApp::PipelineType::MAIN);
+	pDreamOS->AddObject(pHand, SandboxApp::PipelineType::MAIN);
+	//pDreamOS->AddObject(pHand->m_pHMDComposite.get(), SandboxApp::PipelineType::MAIN);
 
 	CR(pHand->InitializeWithContext(pDreamOS));
 

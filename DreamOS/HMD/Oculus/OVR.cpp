@@ -402,6 +402,11 @@ RESULT OVRHMD::UpdateHMD() {
 
 			hand->SetOrientation(qOrientation);
 			pModel->SetOrientation(qOrientation);
+
+			if (hand->GetPhantomModel() != nullptr) {
+				hand->GetPhantomModel()->SetPosition(ptControllerPosition + offset);
+				hand->GetPhantomModel()->SetOrientation(qOrientation);
+			}
 			
 			HAND_TYPE hType = i == 0 ? HAND_TYPE::HAND_LEFT : HAND_TYPE::HAND_RIGHT;
 			hand->SetTracked(true);
