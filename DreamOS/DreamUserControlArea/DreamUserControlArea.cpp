@@ -610,6 +610,24 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::SetVirtualCameraSource(DreamVCam::SourceType sourceType) {
+	RESULT r = R_PASS;
+
+	CR(m_pDreamVCam->SetSourceType(sourceType));
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::MuteVirtualCamera(bool fMute) {
+	RESULT r = R_PASS;
+
+	CR(m_pDreamVCam->Mute(fMute));
+
+Error:
+	return r;
+}
+
 int DreamUserControlArea::GetWidth() {
 	return m_pActiveSource->GetWidth();
 }
@@ -898,8 +916,17 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::HandleStopSending() {
+	m_pCurrentScreenShare = nullptr;
+	return R_PASS;
+}
+
 std::shared_ptr<EnvironmentShare> DreamUserControlArea::GetCurrentScreenShare() {
 	return m_pCurrentScreenShare;
+}
+
+bool DreamUserControlArea::IsSharingScreen() {
+	return (m_pCurrentScreenShare != nullptr);
 }
 
 RESULT DreamUserControlArea::ShutdownSource() {

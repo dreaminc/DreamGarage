@@ -7,6 +7,7 @@
 #include "DreamGarage/UserAreaControls.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "Primitives/Subscriber.h"
+#include "DreamVCam.h"
 
 #include <vector>
 #include <map>
@@ -17,7 +18,6 @@ class DreamUIBar;
 class UITabView;
 class DreamContentSource;
 class DreamDesktopApp;
-class DreamVCam;
 
 class CEFBrowserManager;
 struct WebBrowserPoint;
@@ -40,6 +40,7 @@ class quad;
 #define SCOPE_DESKTOP "MenuProviderScope.DesktopMenuProvider"
 #define SCOPE_WEBSITE "MenuProviderScope.WebsiteMenuProvider"
 #define SCOPE_CAMERA "MenuProviderScope.CameraMenuProvider"
+
 #define CAMERA_CONTENT_CONTROL_TYPE "ContentControlType.Camera"
  
 class DreamUserControlArea : public DreamApp<DreamUserControlArea>, 
@@ -150,6 +151,9 @@ public:
 
 	RESULT OnVirtualCameraSettings(point ptPosition, quaternion qOrientation);
 
+	RESULT SetVirtualCameraSource(DreamVCam::SourceType sourceType);
+	RESULT MuteVirtualCamera(bool fMute);
+
 // DreamGarage compatability (temp?)
 public:
 	RESULT ResetAppComposite();
@@ -165,8 +169,10 @@ public:
 
 	RESULT StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare);
 	RESULT ForceStopSharing();
+	RESULT HandleStopSending();
 
 	std::shared_ptr<EnvironmentShare> GetCurrentScreenShare();
+	bool IsSharingScreen();
 
 // Animations
 public:

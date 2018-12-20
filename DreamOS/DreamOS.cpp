@@ -974,6 +974,12 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::MuteDreamVCamAudio(bool fMute) {
+	// TODO: imp this lmao
+	return R_NOT_IMPLEMENTED;
+}
+
+
 // This is a pass-thru at the moment
 RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);

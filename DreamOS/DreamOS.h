@@ -551,6 +551,8 @@ public:
 	std::shared_ptr<SoundFile> LoadSoundFile(const std::wstring &wstrFilename, SoundFile::type soundFileType);
 	RESULT PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile);
 
+	RESULT MuteDreamVCamAudio(bool fMute);
+
 	// IO
 //protected:
 public:

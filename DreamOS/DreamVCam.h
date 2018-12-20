@@ -44,6 +44,13 @@ class DreamVCam :
 	friend class DreamModuleManager;
 
 public:
+	enum class SourceType {
+		CAMERA,
+		SHARE_SCREEN,
+		INVALID
+	};
+
+public:
 	DreamVCam(DreamOS *pDreamOS, void *pContext = nullptr);
 	~DreamVCam();
 
@@ -136,6 +143,8 @@ private:
 	bool m_fReceivingSteam = false;
 	bool m_fShouldBeginStream = false;
 	bool m_fReadyForFrame = false;
+	RESULT SetSourceType(DreamVCam::SourceType sourceType);
+	RESULT Mute(bool fMute);
 
 protected:
 	static DreamVCam* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -157,6 +166,7 @@ private:
 	std::shared_ptr<quad> m_pCameraQuadBackground = nullptr;
 	texture *m_pCameraQuadBackgroundTexture = nullptr;
 	texture *m_pShareTexture = nullptr;
+	texture *m_pDefaultTexture = nullptr;
 
 	// This node is used for the render texture
 	OGLProgram *m_pOGLRenderNode = nullptr;
@@ -167,6 +177,8 @@ private:
 	std::shared_ptr<EnvironmentShare> m_pCurrentCameraShare = nullptr;
 
 	bool m_fIsRunning = false;
+	bool m_fIsMuted = false;
+	DreamVCam::SourceType m_sourceType = SourceType::INVALID;
 
 	long m_assetID = -1;
 	std::string m_strPath;

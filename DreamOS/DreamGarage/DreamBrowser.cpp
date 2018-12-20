@@ -751,6 +751,7 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
 	m_fFirstFrameIsReady = true;
+	m_fSendFrame = true;
 
 	if (m_pBrowserTexture == nullptr) {
 		DOSLOG(INFO, "browser texture not initialized");

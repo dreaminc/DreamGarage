@@ -333,7 +333,15 @@ Error:
 RESULT UserAreaControls::HandleSourceTogglePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
-	// TODO: vcam release integration
+	CBR(m_pParentApp->IsSharingScreen(), R_SKIPPED);
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
+	CR(pButtonContext->Toggle());
+	if (pButtonContext->IsToggled()) {
+		CR(m_pParentApp->SetVirtualCameraSource(DreamVCam::SourceType::CAMERA));
+	}
+	else {
+		CR(m_pParentApp->SetVirtualCameraSource(DreamVCam::SourceType::SHARE_SCREEN));
+	}
 
 Error:
 	return r;
@@ -342,7 +350,10 @@ Error:
 RESULT UserAreaControls::HandleSendTogglePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
-	// TODO: vcam release integration
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
+	CR(pButtonContext->Toggle());
+
+	CR(m_pParentApp->MuteVirtualCamera(!pButtonContext->IsToggled()));
 
 Error:
 	return r;
