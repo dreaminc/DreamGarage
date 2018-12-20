@@ -1189,9 +1189,21 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 		pWebRTCPeerConnectionProxy->SetAudioVolume(1.0f);
 	}
 
+	/*
 	if (pPeerConnection->GetPeerUserID() == m_pendingAssetReceiveUserID) {
 		m_pDreamShareView->StartReceiving(pPeerConnection);
 		m_pendingAssetReceiveUserID = -1;
+	}
+	//*/
+
+	if (m_pPendingEnvironmentShare != nullptr && pPeerConnection->GetPeerUserID() == m_pPendingEnvironmentShare->GetUserID()) {
+		if (m_pPendingEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
+			m_pDreamShareView->StartReceiving(pPeerConnection);
+		}
+		else if (m_pPendingEnvironmentShare->GetShareType() == SHARE_TYPE_CAMERA) {
+			m_pDreamUserControlArea->GetVCam()->StartReceiving(pPeerConnection, m_pPendingEnvironmentShare);
+		}
+		m_pPendingEnvironmentShare = nullptr;
 	}
 
 Error:
@@ -1773,7 +1785,8 @@ RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmen
 		// OnNewPeerConnection; otherwise this user should receive the dream message
 		// to start receiving
 		if (FindPeer(pEnvironmentShare->GetUserID()) == nullptr) {
-			m_pendingAssetReceiveUserID = pEnvironmentShare->GetUserID();
+			//m_pendingAssetReceiveUserID = pEnvironmentShare->GetUserID();
+			m_pPendingEnvironmentShare = pEnvironmentShare;
 		}
 
 		//m_pDreamBrowser->StartReceiving();
@@ -1782,7 +1795,7 @@ RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmen
 		auto pPeer = FindPeer(pEnvironmentShare->GetUserID());
 
 		if (pPeer == nullptr) {
-			// TODO
+			m_pPendingEnvironmentShare = pEnvironmentShare;
 		}
 		else {
 			m_pDreamUserControlArea->GetVCam()->StartReceiving(pPeer->GetPeerConnection(), pEnvironmentShare);
@@ -1802,9 +1815,16 @@ Error:
 
 RESULT DreamGarage::OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
-	CR(m_pDreamShareView->StopReceiving());
+
+	if (pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
+		CR(m_pDreamShareView->StopReceiving());
+	}
+	else if (pEnvironmentShare->GetShareType() == SHARE_TYPE_CAMERA) {
+		CR(m_pDreamUserControlArea->GetVCam()->StopReceiving());
+	}
 
 	m_pendingAssetReceiveUserID = -1;
+	m_pPendingEnvironmentShare = nullptr;
 
 Error:
 	return r;
