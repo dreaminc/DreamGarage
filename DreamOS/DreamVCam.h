@@ -112,6 +112,9 @@ public:
 	// Sharing Camera Texture over Socket
 	RESULT StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare);
 	RESULT StopSharing();
+	RESULT StartReceiving(PeerConnection *pPeerConnection, std::shared_ptr<EnvironmentShare> pEnvironmentShare);
+	RESULT StopReceiving();
+
 
 	virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 

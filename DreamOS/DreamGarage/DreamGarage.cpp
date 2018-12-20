@@ -1755,7 +1755,8 @@ Error:
 
 RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
-	if (m_pDreamShareView != nullptr) {
+
+	if (m_pDreamShareView != nullptr && pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
 
 		m_pDreamShareView->PendReceiving();
 
@@ -1770,6 +1771,18 @@ RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmen
 
 		//m_pDreamBrowser->StartReceiving();
 	}
+	else if (pEnvironmentShare->GetShareType() == SHARE_TYPE_CAMERA) {
+		auto pPeer = FindPeer(pEnvironmentShare->GetUserID());
+
+		if (pPeer == nullptr) {
+			// TODO
+		}
+		else {
+			m_pDreamUserControlArea->GetVCam()->StartReceiving(pPeer->GetPeerConnection(), pEnvironmentShare);
+		}
+	}
+
+
 	return r;
 }
 

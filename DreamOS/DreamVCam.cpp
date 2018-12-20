@@ -573,6 +573,36 @@ Error:
 	return r;
 }
 
+RESULT DreamVCam::StartReceiving(PeerConnection *pPeerConnection, std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+	RESULT r = R_PASS;
+
+	if (GetDOS()->IsRegisteredVideoStreamSubscriber(this)) {
+		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+	}
+
+	CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
+
+	m_pCameraQuad->SetVisible(true);
+
+//	m_pCurrentCameraShare = pEnvironmentShare;
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::StopReceiving() {
+	RESULT r = R_PASS;
+
+	m_pCameraQuad->SetVisible(false);
+
+	CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+
+//	m_pCurrentCameraShare = nullptr;
+
+Error:
+	return r;
+}
+
 RESULT DreamVCam::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
