@@ -268,7 +268,7 @@ RESULT DreamVCam::Update(void *pContext) {
 	//*/
 
 	if (m_pendingFrame.fPending) {
-
+		CR(UpdateFromPendingVideoFrame());
 	}
 
 Error:
