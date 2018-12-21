@@ -1451,7 +1451,7 @@ RESULT DreamOS::RegisterVideoStreamSubscriber(PeerConnection *pVideoSteamPeerCon
 	CN(pVideoStreamSubscriber);
 	CBM((m_pVideoStreamSubscriber == nullptr), "Video Steam Subscriber is already set");
 
-	m_pVideoSteamPeerConnectionSource = pVideoSteamPeerConnectionSource;
+	m_pVideoStreamPeerConnectionSource = pVideoSteamPeerConnectionSource;
 	m_pVideoStreamSubscriber = pVideoStreamSubscriber;
 
 Error:
@@ -1480,7 +1480,7 @@ RESULT DreamOS::RegisterCameraVideoStreamSubscriber(PeerConnection *pVideoSteamP
 	CN(pVideoStreamSubscriber);
 	CBM((m_pCameraVideoStreamSubscriber == nullptr), "Video Steam Subscriber is already set");
 
-	m_pCameraVideoSteamPeerConnectionSource = pVideoSteamPeerConnectionSource;
+	m_pCameraVideoStreamPeerConnectionSource = pVideoSteamPeerConnectionSource;
 	m_pCameraVideoStreamSubscriber = pVideoStreamSubscriber;
 
 Error:
@@ -1507,12 +1507,12 @@ RESULT DreamOS::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnecti
 	RESULT r = R_NOT_HANDLED;
 
 	if (strVideoTrackLabel == kChromeVideoLabel) {
-		if (m_pVideoStreamSubscriber != nullptr && pPeerConnection == m_pVideoSteamPeerConnectionSource) {
+		if (m_pVideoStreamSubscriber != nullptr && pPeerConnection == m_pVideoStreamPeerConnectionSource) {
 			CR(m_pVideoStreamSubscriber->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
 		}
 	}
 	else if (strVideoTrackLabel == kVCamVideoLabel) {
-		if (m_pCameraVideoStreamSubscriber != nullptr && pPeerConnection == m_pVideoSteamPeerConnectionSource) {
+		if (m_pCameraVideoStreamSubscriber != nullptr && pPeerConnection == m_pCameraVideoStreamPeerConnectionSource) {
 			CR(m_pCameraVideoStreamSubscriber->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
 		}
 	}
