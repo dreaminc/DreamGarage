@@ -606,11 +606,11 @@ Error:
 RESULT DreamVCam::StartReceiving(PeerConnection *pPeerConnection, std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
-	if (GetDOS()->IsRegisteredVideoStreamSubscriber(this)) {
-		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+	if (GetDOS()->IsRegisteredCameraVideoStreamSubscriber(this)) {
+		CR(GetDOS()->UnregisterCameraVideoStreamSubscriber(this));
 	}
 
-	CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
+	CR(GetDOS()->RegisterCameraVideoStreamSubscriber(pPeerConnection, this));
 
 	m_pCameraQuad->SetVisible(true);
 
@@ -625,7 +625,7 @@ RESULT DreamVCam::StopReceiving() {
 
 	m_pCameraQuad->SetVisible(false);
 
-	CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+	CR(GetDOS()->UnregisterCameraVideoStreamSubscriber(this));
 
 //	m_pCurrentCameraShare = nullptr;
 

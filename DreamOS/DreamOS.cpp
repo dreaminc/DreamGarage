@@ -1474,11 +1474,47 @@ bool DreamOS::IsRegisteredVideoStreamSubscriber(DreamVideoStreamSubscriber *pVid
 	return (m_pVideoStreamSubscriber == pVideoStreamSubscriber);
 }
 
+RESULT DreamOS::RegisterCameraVideoStreamSubscriber(PeerConnection *pVideoSteamPeerConnectionSource, DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
+	RESULT r = R_PASS;
+
+	CN(pVideoStreamSubscriber);
+	CBM((m_pCameraVideoStreamSubscriber == nullptr), "Video Steam Subscriber is already set");
+
+	m_pCameraVideoSteamPeerConnectionSource = pVideoSteamPeerConnectionSource;
+	m_pCameraVideoStreamSubscriber = pVideoStreamSubscriber;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::UnregisterCameraVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
+	RESULT r = R_PASS;
+
+	CN(pVideoStreamSubscriber);
+	CBM((m_pCameraVideoStreamSubscriber == pVideoStreamSubscriber), "Video Steam Subscriber is not set to this object");
+
+	m_pCameraVideoStreamSubscriber = nullptr;
+
+Error:
+	return r;
+}
+
+bool DreamOS::IsRegisteredCameraVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
+	return (m_pCameraVideoStreamSubscriber == pVideoStreamSubscriber);
+}
+
 RESULT DreamOS::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_NOT_HANDLED;
 
-	if (m_pVideoStreamSubscriber != nullptr && pPeerConnection == m_pVideoSteamPeerConnectionSource) {
-		CR(m_pVideoStreamSubscriber->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+	if (strVideoTrackLabel == kChromeVideoLabel) {
+		if (m_pVideoStreamSubscriber != nullptr && pPeerConnection == m_pVideoSteamPeerConnectionSource) {
+			CR(m_pVideoStreamSubscriber->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		}
+	}
+	else if (strVideoTrackLabel == kVCamVideoLabel) {
+		if (m_pCameraVideoStreamSubscriber != nullptr && pPeerConnection == m_pVideoSteamPeerConnectionSource) {
+			CR(m_pCameraVideoStreamSubscriber->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		}
 	}
 
 Error:

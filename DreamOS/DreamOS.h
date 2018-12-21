@@ -116,6 +116,13 @@ public:
 	RESULT UnregisterVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
 	bool IsRegisteredVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
 
+	DreamVideoStreamSubscriber* m_pCameraVideoStreamSubscriber = nullptr;
+	PeerConnection *m_pCameraVideoSteamPeerConnectionSource = nullptr;
+
+	RESULT RegisterCameraVideoStreamSubscriber(PeerConnection *pVideoSteamPeerConnectionSource, DreamVideoStreamSubscriber *pVideoStreamSubscriber);
+	RESULT UnregisterCameraVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
+	bool IsRegisteredCameraVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
+
 public:
 	// Log (pass through to Dream logger)
 	template <typename... Args>
