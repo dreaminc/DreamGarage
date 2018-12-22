@@ -521,7 +521,7 @@ Error:
 RESULT DreamVCam::SetIsSendingCameraPlacement(bool fSendingCameraPlacement) {
 	m_fSendingCameraPlacement = fSendingCameraPlacement;
 	m_pCameraComposite->SetVisible(m_fSendingCameraPlacement, false);
-	m_pCameraModel->SetVisible(m_fReceivingCameraPlacement);
+	m_pCameraModel->SetVisible(m_fSendingCameraPlacement);
 	return R_PASS;
 }
 
