@@ -208,12 +208,25 @@ RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptur
 
 	//PushAudioPacketToMixdown(numFrames, pendingAudioPacket);
 
+	// TODO: Remove this, useful for testing
 	if (m_pNamedPipeServer != nullptr) {
-
-		void *pDataBuffer = pendingAudioPacket.GetDataBuffer();
+	
+		//void *pDataBuffer = pendingAudioPacket.GetDataBuffer();
 		//size_t pDataBuffer_n = pendingAudioPacket.GetDataBufferSize();
-		size_t pDataBuffer_n = pendingAudioPacket.GetDataBufferSize();
 
+		size_t numFrames = pendingAudioPacket.GetDataBufferSize() / 2;
+		size_t numSamples = numFrames * 2;
+		int16_t *pDataBuffer = new int16_t[numSamples];
+		size_t pDataBuffer_n = numSamples * sizeof(int16_t);
+		int16_t *pSourceBuffer = (int16_t*)pendingAudioPacket.GetDataBuffer();
+		
+		for (int i = 0; i < numFrames; i++) {
+			int16_t val = pSourceBuffer[i];
+		
+			pDataBuffer[i * 2] = val;
+			pDataBuffer[(i * 2) + 1] = val;
+		}
+	
 		m_pNamedPipeServer->SendMessage((void*)(pDataBuffer), pDataBuffer_n);
 	}
 
