@@ -239,7 +239,8 @@ RESULT user::UpdateHand(const hand::HandState& pHandState) {
 	pHand->SetPosition(ptHand);
 	pHand->SetOrientation(qHandOrientation);
 	pHand->SetTracked(pHandState.fTracked);
-	pHand->SetVisible(pHand->IsTracked(), false);
+
+	pHand->Update();
 
 Error:
 	return r;

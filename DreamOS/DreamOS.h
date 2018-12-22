@@ -110,11 +110,18 @@ class DreamOS :
 
 public:
 	DreamVideoStreamSubscriber* m_pVideoStreamSubscriber = nullptr;
-	PeerConnection *m_pVideoSteamPeerConnectionSource = nullptr;
+	PeerConnection *m_pVideoStreamPeerConnectionSource = nullptr;
 
 	RESULT RegisterVideoStreamSubscriber(PeerConnection *pVideoSteamPeerConnectionSource, DreamVideoStreamSubscriber *pVideoStreamSubscriber);
 	RESULT UnregisterVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
 	bool IsRegisteredVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
+
+	DreamVideoStreamSubscriber* m_pCameraVideoStreamSubscriber = nullptr;
+	PeerConnection *m_pCameraVideoStreamPeerConnectionSource = nullptr;
+
+	RESULT RegisterCameraVideoStreamSubscriber(PeerConnection *pVideoSteamPeerConnectionSource, DreamVideoStreamSubscriber *pVideoStreamSubscriber);
+	RESULT UnregisterCameraVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
+	bool IsRegisteredCameraVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
 
 public:
 	// Log (pass through to Dream logger)

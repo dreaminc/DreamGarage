@@ -528,6 +528,10 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 	m_pUIObjectComposite->SetVisible(true);
 	//CR(ShowUserNameField());
 
+	GetDOS()->AddObjectToUIGraph(m_pUserModel->GetMouth().get(), SandboxApp::PipelineType::AUX);
+	GetDOS()->AddObject(m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT)->GetPhantomModel().get(), SandboxApp::PipelineType::AUX);
+	GetDOS()->AddObject(m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT)->GetPhantomModel().get(), SandboxApp::PipelineType::AUX);
+
 Error:
 	return r;
 }

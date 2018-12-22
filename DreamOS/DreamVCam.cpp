@@ -520,13 +520,15 @@ Error:
 
 RESULT DreamVCam::SetIsSendingCameraPlacement(bool fSendingCameraPlacement) {
 	m_fSendingCameraPlacement = fSendingCameraPlacement;
+	m_pCameraComposite->SetVisible(m_fSendingCameraPlacement, false);
 	m_pCameraModel->SetVisible(m_fSendingCameraPlacement);
 	return R_PASS;
 }
 
 RESULT DreamVCam::SetIsReceivingCameraPlacement(bool fReceivingCameraPlacement) {
 	m_fReceivingCameraPlacement = fReceivingCameraPlacement;
-	m_pCameraModel->SetVisible(m_fSendingCameraPlacement);
+	m_pCameraComposite->SetVisible(m_fReceivingCameraPlacement, false);
+	m_pCameraModel->SetVisible(m_fReceivingCameraPlacement);
 	return R_PASS;
 }
 
@@ -562,7 +564,7 @@ RESULT DreamVCam::BroadcastVCamMessage() {
 	CN(pMessage);
 
 	CN(m_pParentApp);
-	CR(m_pParentApp->BroadcastDreamAppMessage(pMessage));
+	m_pParentApp->BroadcastDreamAppMessage(pMessage);
 
 Error:
 	return r;
@@ -606,13 +608,14 @@ Error:
 RESULT DreamVCam::StartReceiving(PeerConnection *pPeerConnection, std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
-	if (GetDOS()->IsRegisteredVideoStreamSubscriber(this)) {
-		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+	if (GetDOS()->IsRegisteredCameraVideoStreamSubscriber(this)) {
+		CR(GetDOS()->UnregisterCameraVideoStreamSubscriber(this));
 	}
 
-	CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
+	CR(GetDOS()->RegisterCameraVideoStreamSubscriber(pPeerConnection, this));
 
 	m_pCameraQuad->SetVisible(true);
+	m_pCameraQuadBackground->SetVisible(true);
 
 //	m_pCurrentCameraShare = pEnvironmentShare;
 
@@ -624,8 +627,9 @@ RESULT DreamVCam::StopReceiving() {
 	RESULT r = R_PASS;
 
 	m_pCameraQuad->SetVisible(false);
+	m_pCameraQuadBackground->SetVisible(false);
 
-	CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+	CR(GetDOS()->UnregisterCameraVideoStreamSubscriber(this));
 
 //	m_pCurrentCameraShare = nullptr;
 
