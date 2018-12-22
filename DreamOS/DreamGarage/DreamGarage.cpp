@@ -633,7 +633,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pUserController);
 
 	// DEBUG:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	{
 		m_fHasCredentials = true;
 
@@ -662,7 +662,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->RequestAccessToken(strDebugRefreshToken);
 		}
 	}
-#endif
+//#endif
 
 	// Initial step of login flow:
 	DOSLOG(INFO, "Checking API connection (internet access)");
@@ -1196,15 +1196,18 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	}
 	//*/
 
-	if (m_pPendingEnvironmentShare != nullptr && pPeerConnection->GetPeerUserID() == m_pPendingEnvironmentShare->GetUserID()) {
-		if (m_pPendingEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
-			m_pDreamShareView->StartReceiving(pPeerConnection);
+	for (auto pPendingShare : m_pPendingEnvironmentShares) {
+		if (pPendingShare != nullptr && pPeerConnection->GetPeerUserID() == pPendingShare->GetUserID()) {
+			if (pPendingShare->GetShareType() == SHARE_TYPE_SCREEN) {
+				m_pDreamShareView->StartReceiving(pPeerConnection);
+			}
+			if (pPendingShare->GetShareType() == SHARE_TYPE_CAMERA) {
+				m_pDreamUserControlArea->GetVCam()->StartReceiving(pPeerConnection, pPendingShare);
+			}
+			pPendingShare = nullptr;
 		}
-		else if (m_pPendingEnvironmentShare->GetShareType() == SHARE_TYPE_CAMERA) {
-			m_pDreamUserControlArea->GetVCam()->StartReceiving(pPeerConnection, m_pPendingEnvironmentShare);
-		}
-		m_pPendingEnvironmentShare = nullptr;
 	}
+	// TODO clear m_pPendingEnvironmentShares
 
 Error:
 	return r;
@@ -1786,7 +1789,7 @@ RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmen
 		// to start receiving
 		if (FindPeer(pEnvironmentShare->GetUserID()) == nullptr) {
 			//m_pendingAssetReceiveUserID = pEnvironmentShare->GetUserID();
-			m_pPendingEnvironmentShare = pEnvironmentShare;
+			m_pPendingEnvironmentShares.emplace_back(pEnvironmentShare);
 		}
 
 		//m_pDreamBrowser->StartReceiving();
@@ -1795,7 +1798,7 @@ RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmen
 		auto pPeer = FindPeer(pEnvironmentShare->GetUserID());
 
 		if (pPeer == nullptr) {
-			m_pPendingEnvironmentShare = pEnvironmentShare;
+			m_pPendingEnvironmentShares.emplace_back(pEnvironmentShare);
 		}
 		else {
 			m_pDreamUserControlArea->GetVCam()->StartReceiving(pPeer->GetPeerConnection(), pEnvironmentShare);
@@ -1827,7 +1830,13 @@ RESULT DreamGarage::OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironme
 	}
 
 	m_pendingAssetReceiveUserID = -1;
-	m_pPendingEnvironmentShare = nullptr;
+
+	for (auto pPendingShare : m_pPendingEnvironmentShares) {
+		if (pPendingShare == pEnvironmentShare) {
+			pPendingShare = nullptr;
+		}
+	}
+//	m_pPendingEnvironmentShares.clear();
 
 Error:
 	return r;
