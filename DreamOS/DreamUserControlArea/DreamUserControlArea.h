@@ -158,6 +158,7 @@ public:
 public:
 	RESULT ResetAppComposite();
 	RESULT AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
+	RESULT PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetUIProgramNode(UIStageProgram *pUIProgramNode);
 
 	RESULT OnDreamFormSuccess();
@@ -257,6 +258,8 @@ private:
 	std::string m_strCameraScope = SCOPE_CAMERA;
 
 	bool m_fUpdateDreamUIBar = false;
+
+	std::shared_ptr<EnvironmentAsset> m_pPendingEnvironmentAsset = nullptr;
 };
 
 #endif // ! DREAM_USER_CONTROL_AREA_H_

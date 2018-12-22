@@ -93,7 +93,7 @@ const std::string& EnvironmentAsset::GetPath() {
 	return m_strPath;
 }
 
-const std::string& EnvironmentAsset::GetStorageProviderScope() {
+const std::string& EnvironmentAsset::GetScope() {
 	return m_strStorageProviderScope;
 }
 

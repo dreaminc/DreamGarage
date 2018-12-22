@@ -194,6 +194,11 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		
 	}
 
+	if (m_pPendingEnvironmentAsset != nullptr) {
+		AddEnvironmentAsset(m_pPendingEnvironmentAsset);
+		m_pPendingEnvironmentAsset = nullptr;
+	}
+
 Error:
 	return r;
 }
@@ -702,62 +707,22 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-	if (m_pActiveSource != nullptr) {													// If content is already open
-		if (strScope == m_strDesktopScope && m_pDreamDesktop != nullptr) {				// and we're trying to share the desktop for not the first time
-			if (m_pDreamDesktop != m_pActiveSource) {									// and desktop is in the tabview	
-				SetIsAnimating(false);
-				m_fFromMenu = true;
-				m_pDreamTabView->SelectByContent(m_pDreamDesktop);						// pull desktop out of tabview
-			}
-			else {
-				Show();
-			}
-		}	
-		else {
-			m_pDreamTabView->AddContent(m_pActiveSource);
-		}
-	}
-
 	if (strScope == m_strDesktopScope) {
 		if (m_pDreamDesktop == nullptr) {
 			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
-
-			m_pDreamDesktop = GetDOS()->LaunchDreamApp<DreamDesktopApp>(this);
-			m_pActiveSource = m_pDreamDesktop;
-			m_pDreamDesktop->InitializeWithParent(this);
-			m_pUserControls->SetTitleText(m_pDreamDesktop->GetTitle());
-			// new desktop can't be the current content
-			m_pUserControls->SetSharingFlag(false);
 		}
 	}
 
 	else if (strScope == m_strCameraScope) {
 		// TODO: temp
 		if (m_pDreamVCam != nullptr) {
-			m_pActiveSource = m_pDreamVCam;
-			m_pDreamVCam->InitializeWithParent(this);
-			m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
-			// new desktop can't be the current content
-			m_pUserControls->SetSharingFlag(false);
 			
 			CRM(pEnvironmentControllerProxy->RequestOpenCamera(), "Failed to share environment asset");
 		}
 	}
 
 	else {
-		std::shared_ptr<DreamBrowser> pBrowser = nullptr;
-		pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
-
-		m_pActiveSource = pBrowser;
-
-		pBrowser->SetScope(strScope);
-		pBrowser->SetPath(strPath);
-
 		CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
-
-		if (strTitle != "website") {
-			UpdateControlBarText(strTitle);
-		}
 	}
 
 Error:
@@ -824,33 +789,73 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	m_pPendingEnvironmentAsset = pEnvironmentAsset;
+	return R_PASS;
+}
+
 RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 	
-	//TODO: multi-content
+	if (m_pActiveSource != nullptr) {													// If content is already open
+		if (pEnvironmentAsset->GetScope() == m_strDesktopScope && m_pDreamDesktop != nullptr) {				// and we're trying to share the desktop for not the first time
+			if (m_pDreamDesktop != m_pActiveSource) {									// and desktop is in the tabview	
+				SetIsAnimating(false);
+				m_fFromMenu = true;
+				m_pDreamTabView->SelectByContent(m_pDreamDesktop);						// pull desktop out of tabview
+			}
+			else {
+				Show();
+			}
+		}	
+		else {
+			m_pDreamTabView->AddContent(m_pActiveSource);
+		}
+	}
+
 	
 	//it is not safe to set the environment asset until after the browser is finished initializing
 	// this is because LoadRequest requires a URL to have been set (about:blank in InitializeWithBrowserManager)
 	m_fHasOpenApp = true;
 	m_pDreamUserApp->SetHasOpenApp(true);
-	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
-	if (pBrowser != nullptr) {	
-		
+	if(pEnvironmentAsset->GetContentType() == CAMERA_CONTENT_CONTROL_TYPE && m_pDreamVCam != nullptr) {
+		m_pDreamVCam->InitializeWithParent(this);
+		m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
+		// new desktop can't be the current content
+		m_pUserControls->SetSharingFlag(false);
+		m_pDreamVCam->SetEnvironmentAsset(pEnvironmentAsset);
+		m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
+		m_pActiveSource = m_pDreamVCam;
+	}
+	else if(pEnvironmentAsset->GetScope() == m_strDesktopScope && m_pDreamDesktop == nullptr) {
+		// TODO: desktop setup
+		m_pDreamDesktop = GetDOS()->LaunchDreamApp<DreamDesktopApp>(this);
+		m_pActiveSource = m_pDreamDesktop;
+		m_pDreamDesktop->InitializeWithParent(this);
+		m_pUserControls->SetTitleText(m_pDreamDesktop->GetTitle());
+		// new desktop can't be the current content
+		m_pUserControls->SetSharingFlag(false);
+		m_pDreamDesktop->SetEnvironmentAsset(pEnvironmentAsset);
+	}
+	else {
+		std::shared_ptr<DreamBrowser> pBrowser = nullptr;
+		pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+
+		m_pActiveSource = pBrowser;
+
+		pBrowser->SetScope(pEnvironmentAsset->GetScope());
+		pBrowser->SetPath(pEnvironmentAsset->GetPath());
 		pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 
 		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset->GetURL());
 		pBrowser->RegisterObserver(this);
 		m_pUserControls->SetTitleText(pBrowser->GetTitle());
 
+		if (pEnvironmentAsset->GetTitle() != "website") {
+			std::string strTitle = pEnvironmentAsset->GetTitle();
+			UpdateControlBarText(strTitle);
+		}
 		//pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
-	}
-	else if(pEnvironmentAsset->GetContentType() == CAMERA_CONTENT_CONTROL_TYPE) {
-		m_pDreamVCam->SetEnvironmentAsset(pEnvironmentAsset);
-		m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
-	}
-	else if(pEnvironmentAsset->GetStorageProviderScope() == m_strDesktopScope) {
-		// TODO: desktop setup
-		m_pDreamDesktop->SetEnvironmentAsset(pEnvironmentAsset);
 	}
 
 	//m_pActiveBrowser->SetEnvironmentAsset(pEnvironmentAsset);
