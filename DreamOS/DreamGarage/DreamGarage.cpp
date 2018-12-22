@@ -4,6 +4,7 @@
 
 #include <string>
 #include <array>
+#include <algorithm>
 
 light *g_pLight = nullptr;
 
@@ -1152,6 +1153,7 @@ Error:
 RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	RESULT r = R_PASS;
 
+	std::vector<std::shared_ptr<EnvironmentShare>> pendingDeleteShares;
 	///*
 	//int index = pPeerConnection->GetLoca
 	PeerConnection *pPeerConnection = pDreamPeer->GetPeerConnection();
@@ -1196,7 +1198,9 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	}
 	//*/
 
-	for (auto pPendingShare : m_pPendingEnvironmentShares) {
+
+	for (int i = 0; i < m_pPendingEnvironmentShares.size(); i++) {
+		auto pPendingShare = m_pPendingEnvironmentShares[0];
 		if (pPendingShare != nullptr && pPeerConnection->GetPeerUserID() == pPendingShare->GetUserID()) {
 			if (pPendingShare->GetShareType() == SHARE_TYPE_SCREEN) {
 				m_pDreamShareView->StartReceiving(pPeerConnection);
@@ -1204,10 +1208,13 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 			if (pPendingShare->GetShareType() == SHARE_TYPE_CAMERA) {
 				m_pDreamUserControlArea->GetVCam()->StartReceiving(pPeerConnection, pPendingShare);
 			}
-			pPendingShare = nullptr;
+			pendingDeleteShares.emplace_back(pPendingShare);
 		}
 	}
-	// TODO clear m_pPendingEnvironmentShares
+
+	for (auto deleteShare : pendingDeleteShares) {
+		m_pPendingEnvironmentShares.erase(std::find(m_pPendingEnvironmentShares.begin(), m_pPendingEnvironmentShares.end(), deleteShare));
+	}
 
 Error:
 	return r;
@@ -1836,7 +1843,13 @@ RESULT DreamGarage::OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironme
 			pPendingShare = nullptr;
 		}
 	}
-//	m_pPendingEnvironmentShares.clear();
+
+	{
+		auto deleteShare = std::find(m_pPendingEnvironmentShares.begin(), m_pPendingEnvironmentShares.end(), pEnvironmentShare);
+		if (deleteShare != m_pPendingEnvironmentShares.end()) {
+			m_pPendingEnvironmentShares.erase(deleteShare);
+		}
+	}
 
 Error:
 	return r;
