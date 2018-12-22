@@ -15,6 +15,7 @@ struct CircularBufferState {
 	size_t m_circularBuffer_e = 0;
 	size_t m_circularBuffer_c = 0;
 	size_t m_numPendingBufferSamples = 0;
+	size_t m_numDirtyBufferFrames = 0;
 };
 
 template <class CBType>
@@ -23,6 +24,18 @@ class CircularBuffer {
 private:
 	inline void WriteNextValue(CBType value) {
 		m_circularBuffer[m_state.m_circularBuffer_e] = value;
+		m_state.m_circularBuffer_e += 1;
+		m_state.m_numPendingBufferSamples++;
+
+		if (m_state.m_circularBuffer_e >= m_state.m_circularBuffer_n) {
+			m_state.m_circularBuffer_e = 0;
+		}
+	}
+
+	// Same as above, but will add value instead of set it
+	inline void MixIntoNextValue(CBType value) {
+		m_circularBuffer[m_state.m_circularBuffer_e] += value;
+		
 		m_state.m_circularBuffer_e += 1;
 		m_state.m_numPendingBufferSamples++;
 
@@ -43,6 +56,39 @@ public:
 
 		m_state.m_circularBuffer_c++;
 		m_state.m_numPendingBufferSamples--;
+
+		// Reduce dirty frames by one if this is set
+		if (m_state.m_numDirtyBufferFrames > 0) {
+			m_state.m_numDirtyBufferFrames--;
+		}
+
+		// Circle up
+		if (m_state.m_circularBuffer_c >= m_state.m_circularBuffer_n) {
+			m_state.m_circularBuffer_c = 0;
+		}
+
+		return R_PASS;
+	}
+
+	inline RESULT ForceReadNextValue(CBType &retVal) {
+		retVal = 0;
+
+		if (m_state.m_circularBuffer_c == m_state.m_circularBuffer_e) {
+			m_state.m_circularBuffer_e++;
+
+			if (m_state.m_circularBuffer_e >= m_state.m_circularBuffer_n) {
+				m_state.m_circularBuffer_e = 0;
+			}
+		}
+
+		retVal = m_circularBuffer[m_state.m_circularBuffer_c];
+
+		m_state.m_circularBuffer_c++;
+
+		// Reduce dirty frames by one if this is set
+		if (m_state.m_numDirtyBufferFrames > 0) {
+			m_state.m_numDirtyBufferFrames--;
+		}
 
 		// Circle up
 		if (m_state.m_circularBuffer_c >= m_state.m_circularBuffer_n) {
@@ -124,12 +170,36 @@ public:
 		return r;
 	}
 
+	RESULT MixIntoBuffer(CBType *pDataBuffer, size_t pDataBuffer_n) {
+		RESULT r = R_PASS;
+
+		CBR((NumAvailableBufferBytes() > 0), R_BUFFER_FULL);
+
+		for (size_t byteCount = 0; byteCount < pDataBuffer_n; byteCount++) {
+			MixIntoNextValue(pDataBuffer[byteCount]);
+		}
+
+	Error:
+		return r;
+	}
+
 	RESULT WriteToBuffer(CBType value) {
 		RESULT r = R_PASS;
 
 		CBR((NumAvailableBufferBytes() > 0), R_BUFFER_FULL);
 
 		WriteNextValue(value);
+
+	Error:
+		return r;
+	}
+
+	RESULT MixIntoBuffer(CBType value) {
+		RESULT r = R_PASS;
+
+		CBR((NumAvailableBufferBytes() > 0), R_BUFFER_FULL);
+
+		MixIntoNextValue(value);
 
 	Error:
 		return r;
@@ -145,6 +215,10 @@ public:
 	
 	size_t NumPendingBufferSamples() {
 		return m_state.m_numPendingBufferSamples;
+	}
+
+	size_t NumDirtyBufferSamples() {
+		return m_state.m_numDirtyBufferFrames;
 	}
 
 	bool IsPendingBufferEmpty() {

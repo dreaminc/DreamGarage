@@ -46,8 +46,6 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
-	
-
 	RESULT RegisterObserver(DreamSoundSystem::observer *pObserver);
 	RESULT UnregisterObserver();
 
@@ -98,6 +96,19 @@ public:
 	// NamedPipeServerObserver
 	virtual RESULT OnClientConnect() override;
 	virtual RESULT OnClientDisconnect() override;
+
+private:
+	RESULT MixdownProcess();
+	RESULT StartMixdownServer();
+	RESULT InitalizeMixdownSendBuffer();
+	SoundBuffer *m_pMixdownBuffer = nullptr;
+
+	sound::state m_mixdownState = sound::state::UNINITIALIZED;
+
+	std::thread	m_mixdownBufferProcessThread;
+
+public:
+	RESULT PushAudioPacketToMixdown(int numFrames, const AudioPacket &pendingAudioPacket);
 };
 
 #endif // ! DREAM_SOUND_SYSTEM_H_

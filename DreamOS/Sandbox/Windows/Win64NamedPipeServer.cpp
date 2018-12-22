@@ -151,8 +151,8 @@ RESULT Win64NamedPipeServer::AllocateAndConnectPendingConnectionInstance() {
 
 	// Create the pipe
 	HANDLE handlePipe = CreateNamedPipe(
-		//GetWindowsNamedPipeServerName(m_strPipename).c_str(),				// pipe name 
-		L"\\\\.\\pipe\\dreamvcampipe",	// pipe name 
+		GetWindowsNamedPipeServerName(m_strPipename).c_str(),				// pipe name 
+		//L"\\\\.\\pipe\\dreamvcampipe",	// pipe name 
 		PIPE_ACCESS_DUPLEX |												// read/write access 
 		FILE_FLAG_OVERLAPPED,												// overlapped mode 
 		PIPE_TYPE_MESSAGE |													// message-type pipe 
@@ -184,7 +184,7 @@ RESULT Win64NamedPipeServer::AddPendingConnectionInstanceAndAllocateNew() {
 
 	m_pPendingConnection->m_fConnected = true;
 	m_pPendingConnection->m_fPendingConnection = false;
-	DEBUG_LINEOUT("Connection %d connected!", m_pPendingConnection->m_connectionID);
+	DEBUG_LINEOUT("%S: Connection %d connected!", m_strPipename.c_str(), m_pPendingConnection->m_connectionID);
 
 	m_clientConnections.push_back(m_pPendingConnection);
 	m_pPendingConnection = nullptr;
@@ -303,7 +303,8 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 				}
 				else if (err == ERROR_NO_DATA) {
 					pClientConnection->m_fConnected = false;
-					DEBUG_LINEOUT("Client connection %d closed", pClientConnection->m_connectionID);
+
+					DEBUG_LINEOUT("%S: Client connection %d closed", m_strPipename.c_str(), pClientConnection->m_connectionID);
 
 					// Send Disconnect event if all connections are disconnected
 					bool fShouldCloseConnection = true;

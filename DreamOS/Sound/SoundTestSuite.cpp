@@ -555,7 +555,7 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 
 			m_pDreamOS->GetCamera()->SetPosition(0.0f, 0.0f, 0.0f);
 
-			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			//auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 		}
 
 	Error:

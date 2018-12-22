@@ -8,6 +8,8 @@
 #include "Sound/SoundFile.h"
 #include "Sound/SpatialSoundObject.h"
 
+#include "Sound/AudioPacket.h"
+
 DreamSoundSystem::DreamSoundSystem(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamSoundSystem>(pDreamOS, pContext)
 {
@@ -131,8 +133,8 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 		//*/
 	}
 
-	// Named Pipe Server
-	CR(InitializeNamedPipeServer());
+	CR(InitalizeMixdownSendBuffer());
+	CR(StartMixdownServer());
 
 Error:
 	return r;
@@ -200,19 +202,24 @@ RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptur
 	}
 	//*/
 
-	if (m_pNamedPipeServer != nullptr) {
-		void *pDataBuffer = nullptr;
-		size_t pDataBuffer_n = 0;
+	// This pushes the mic input into the chromium mixdown bridge
+	AudioPacket pendingAudioPacket;
+	pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket, false);
 
-		CR(pCaptureBuffer->GetInterlacedAudioDataBuffer(numFrames, pDataBuffer, pDataBuffer_n, false));
+	//PushAudioPacketToMixdown(numFrames, pendingAudioPacket);
+
+	if (m_pNamedPipeServer != nullptr) {
+
+		void *pDataBuffer = pendingAudioPacket.GetDataBuffer();
+		//size_t pDataBuffer_n = pendingAudioPacket.GetDataBufferSize();
+		size_t pDataBuffer_n = pendingAudioPacket.GetDataBufferSize();
+
 		m_pNamedPipeServer->SendMessage((void*)(pDataBuffer), pDataBuffer_n);
 	}
 
 	if (m_pObserver) {
 		CRM(m_pObserver->OnAudioDataCaptured(numFrames, pCaptureBuffer), "OnAudioDataCaptured in observer failed");
 	}
-
-	
 
 Error:
 	return r;
@@ -383,4 +390,114 @@ float DreamSoundSystem::GetRunTimeCaptureAverage() {
 	}
 
 	return 0.0f;
+}
+
+RESULT DreamSoundSystem::InitalizeMixdownSendBuffer() {
+	RESULT r = R_PASS;
+
+	// Initialize the mix-down buffer
+	m_pMixdownBuffer = SoundBuffer::Make(2, 44100, sound::type::SIGNED_16_BIT);
+	CN(m_pMixdownBuffer);
+
+Error:
+	return r;
+}
+
+RESULT DreamSoundSystem::StartMixdownServer() {
+	RESULT r = R_PASS;
+
+	// Set up the Named Pipe Server
+	CR(InitializeNamedPipeServer());	
+
+	// This will kick off the audio capture process defined in the sound client implementation
+	m_mixdownState = sound::state::RUNNING;
+	m_mixdownBufferProcessThread = std::thread(&DreamSoundSystem::MixdownProcess, this);
+
+Error:
+	return r;
+}
+
+RESULT DreamSoundSystem::PushAudioPacketToMixdown(int numFrames, const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	m_pMixdownBuffer->LockBuffer();
+
+	// TODO: Make a mix data
+	//CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket));
+	CR(m_pMixdownBuffer->PushAudioPacket(pendingAudioPacket));
+
+	m_pMixdownBuffer->UnlockBuffer();
+
+Error:
+	return r;
+}
+
+// TODO: This is not cross platform 
+// TODO: Need to create a thread platform capability and wrap these functions 
+// in there
+#include <avrt.h>
+
+RESULT DreamSoundSystem::MixdownProcess() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("DreamSoundSsytem::MixdownProccess started");
+
+	int64_t pendingBytes = 0;
+	DWORD taskIndex = 0;
+	HANDLE hAudioRenderProcessTask = AvSetMmThreadCharacteristics(TEXT("Pro Audio"), &taskIndex);
+
+	CBM((m_mixdownState == sound::state::RUNNING), "Dream Browser Audio Process not running");
+
+	while (m_mixdownState == sound::state::RUNNING) {
+
+		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+
+		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+		auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+
+		int audioBufferSampleLength10ms = m_pMixdownBuffer->GetSamplingRate() / 100;
+
+		//int dirtyFrames = m_pMixdownBuffer->NumDirtyFrames();
+		int pendingFrames = m_pMixdownBuffer->NumPendingFrames();
+
+		//if (m_pMixdownBuffer != nullptr && diffVal >= 10) {
+		//if (m_pMixdownBuffer != nullptr && dirtyFrames >= audioBufferSampleLength10ms) {
+		if (m_pMixdownBuffer != nullptr && pendingFrames >= audioBufferSampleLength10ms) {
+			m_pMixdownBuffer->LockBuffer();
+
+			{
+				//DEBUG_LINEOUT("pending %d", (int)pendingBytes)
+
+				lastUpdateTime = timeNow;// -std::chrono::microseconds(diffVal - 10);
+
+				AudioPacket pendingAudioPacket;
+				//m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket, true, false);
+				m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket);
+
+				// Send to named pipe
+
+				if (m_pNamedPipeServer != nullptr) {
+						
+					void *pDataBuffer = pendingAudioPacket.GetDataBuffer();
+					//size_t pDataBuffer_n = pendingAudioPacket.GetDataBufferSize();
+					size_t pDataBuffer_n = pendingAudioPacket.GetDataBufferSize();
+
+					m_pNamedPipeServer->SendMessage((void*)(pDataBuffer), pDataBuffer_n);
+				}
+			}
+
+			m_pMixdownBuffer->UnlockBuffer();
+
+		}
+
+		// Sleep the thread for 10 ms
+		Sleep(1);
+		//std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+
+
+Error:
+	DEBUG_LINEOUT("DreamSoundSsytem::MixdownProccess ended");
+
+	return r;
 }
