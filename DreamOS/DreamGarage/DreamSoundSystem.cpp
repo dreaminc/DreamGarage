@@ -88,6 +88,12 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 		}
 	}
 
+	// Slight race condition with mixdown buffer
+	// and capture - good to initialize this before we
+	// start the device
+	CR(InitalizeMixdownSendBuffer());
+	CR(StartMixdownServer());
+
 	{
 		// WASAPI Capture Client
 		// This can fail - if this is the case then capture will not fire (obviously)
@@ -132,9 +138,6 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 		}
 		//*/
 	}
-
-	CR(InitalizeMixdownSendBuffer());
-	CR(StartMixdownServer());
 
 Error:
 	return r;
@@ -206,9 +209,10 @@ RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptur
 	AudioPacket pendingAudioPacket;
 	pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket, false);
 
-	//PushAudioPacketToMixdown(numFrames, pendingAudioPacket);
+	PushAudioPacketToMixdown(numFrames, pendingAudioPacket);
 
-	// TODO: Remove this, useful for testing
+	/*
+	// TEST: Useful for pass through testing of the pipe
 	if (m_pNamedPipeServer != nullptr) {
 	
 		//void *pDataBuffer = pendingAudioPacket.GetDataBuffer();
@@ -229,6 +233,7 @@ RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptur
 	
 		m_pNamedPipeServer->SendMessage((void*)(pDataBuffer), pDataBuffer_n);
 	}
+	*/
 
 	if (m_pObserver) {
 		CRM(m_pObserver->OnAudioDataCaptured(numFrames, pCaptureBuffer), "OnAudioDataCaptured in observer failed");
@@ -432,6 +437,8 @@ Error:
 
 RESULT DreamSoundSystem::PushAudioPacketToMixdown(int numFrames, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
+
+	CNM(m_pMixdownBuffer, "Mixdown buffer not initialized!");
 
 	m_pMixdownBuffer->LockBuffer();
 
