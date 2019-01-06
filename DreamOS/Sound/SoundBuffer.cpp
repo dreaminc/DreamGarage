@@ -99,19 +99,19 @@ RESULT SoundBuffer::MixAudioPacket(const AudioPacket &audioPacket) {
 
 	switch (audioPacket.GetSoundType()) {
 	case sound::type::UNSIGNED_8_BIT: {
-		CR(MixData((uint8_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+		CR(MixData((uint8_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
 	} break;
 
 	case sound::type::SIGNED_16_BIT: {
-		CR(MixData((int16_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+		CR(MixData((int16_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
 	} break;
 
 	case sound::type::FLOATING_POINT_32_BIT: {
-		CR(MixData((float*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+		CR(MixData((float*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
 	} break;
 
 	case sound::type::FLOATING_POINT_64_BIT: {
-		CR(MixData((double*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+		CR(MixData((double*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
 	} break;
 	}
 
@@ -200,7 +200,7 @@ Error:
 	return r;
 }
 
-RESULT SoundBuffer::GetAudioPacket(int numFrames, AudioPacket *pAudioPacket, bool fUpdateSoundBufferPosition, bool fRequirePending) {
+RESULT SoundBuffer::GetAudioPacket(int numFrames, AudioPacket *pAudioPacket, bool fUpdateSoundBufferPosition, bool fRequirePending, bool fClearOut) {
 	RESULT r = R_PASS;
 
 	CN(pAudioPacket);
@@ -208,7 +208,7 @@ RESULT SoundBuffer::GetAudioPacket(int numFrames, AudioPacket *pAudioPacket, boo
 	void* pDataBuffer = nullptr;
 	size_t pDataBuffer_n = 0;
 
-	CR(GetInterlacedAudioDataBuffer(numFrames, pDataBuffer, pDataBuffer_n, fUpdateSoundBufferPosition, fRequirePending));
+	CR(GetInterlacedAudioDataBuffer(numFrames, pDataBuffer, pDataBuffer_n, fUpdateSoundBufferPosition, fRequirePending, fClearOut));
 	CN(pDataBuffer);
 
 	// Set it

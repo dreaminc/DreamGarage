@@ -48,6 +48,7 @@ class SoundBuffer;
 
 #include "DreamShareViewShareMessage.h"
 
+// TODO: Move to the standard DreamBrowser::observer arch
 class DreamBrowserObserver {
 public:
 	virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) = 0;
@@ -144,6 +145,8 @@ public:
 	virtual RESULT HandleBackEvent();
 	virtual RESULT HandleForwardEvent();
 	virtual RESULT HandleStopEvent();
+
+	RESULT SetForceObserverAudio(bool fForceObserverAudio);
 
 	RESULT HandleTabEvent();
 	RESULT HandleBackTabEvent();
@@ -259,6 +262,9 @@ private:
 	bool m_fUpdateControlBarInfo = false;
 
 	long m_assetID = -1;
+
+	// TODO: Convert into configuration struct or flag system
+	bool m_fForceObserverAudio = false;
 
 private:
 	// when the user goes to a URL that starts with these strings, we send their auth token as well

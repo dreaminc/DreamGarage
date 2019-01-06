@@ -443,8 +443,8 @@ RESULT DreamSoundSystem::PushAudioPacketToMixdown(int numFrames, const AudioPack
 	m_pMixdownBuffer->LockBuffer();
 
 	// TODO: Make a mix data
-	//CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket));
-	CR(m_pMixdownBuffer->PushAudioPacket(pendingAudioPacket));
+	CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket));
+	//CR(m_pMixdownBuffer->PushAudioPacket(pendingAudioPacket));
 
 	m_pMixdownBuffer->UnlockBuffer();
 
@@ -477,12 +477,12 @@ RESULT DreamSoundSystem::MixdownProcess() {
 
 		int audioBufferSampleLength10ms = m_pMixdownBuffer->GetSamplingRate() / 100;
 
-		//int dirtyFrames = m_pMixdownBuffer->NumDirtyFrames();
+		int dirtyFrames = m_pMixdownBuffer->NumDirtyFrames();
 		int pendingFrames = m_pMixdownBuffer->NumPendingFrames();
 
 		//if (m_pMixdownBuffer != nullptr && diffVal >= 10) {
-		//if (m_pMixdownBuffer != nullptr && dirtyFrames >= audioBufferSampleLength10ms) {
-		if (m_pMixdownBuffer != nullptr && pendingFrames >= audioBufferSampleLength10ms) {
+		if (m_pMixdownBuffer != nullptr && dirtyFrames >= audioBufferSampleLength10ms) {
+		//if (m_pMixdownBuffer != nullptr && pendingFrames >= audioBufferSampleLength10ms) {
 			m_pMixdownBuffer->LockBuffer();
 
 			{
@@ -491,15 +491,14 @@ RESULT DreamSoundSystem::MixdownProcess() {
 				lastUpdateTime = timeNow;// -std::chrono::microseconds(diffVal - 10);
 
 				AudioPacket pendingAudioPacket;
-				//m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket, true, false);
-				m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket);
+				m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket, true, false, true);
+				//m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket);
 
 				// Send to named pipe
 
 				if (m_pNamedPipeServer != nullptr) {
 						
 					void *pDataBuffer = pendingAudioPacket.GetDataBuffer();
-					//size_t pDataBuffer_n = pendingAudioPacket.GetDataBufferSize();
 					size_t pDataBuffer_n = pendingAudioPacket.GetDataBufferSize();
 
 					m_pNamedPipeServer->SendMessage((void*)(pDataBuffer), pDataBuffer_n);

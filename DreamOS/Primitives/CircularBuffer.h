@@ -45,7 +45,7 @@ private:
 	}
 
 public:
-	inline RESULT ReadNextValue(CBType &retVal) {
+	inline RESULT ReadNextValue(CBType &retVal, bool fClear = false) {
 		retVal = 0;
 		
 		if (m_state.m_circularBuffer_c == m_state.m_circularBuffer_e) {
@@ -53,6 +53,9 @@ public:
 		}
 			
 		retVal = m_circularBuffer[m_state.m_circularBuffer_c];
+		
+		if (fClear)
+			m_circularBuffer[m_state.m_circularBuffer_c] = 0;
 
 		m_state.m_circularBuffer_c++;
 		m_state.m_numPendingBufferSamples--;
@@ -70,7 +73,7 @@ public:
 		return R_PASS;
 	}
 
-	inline RESULT ForceReadNextValue(CBType &retVal) {
+	inline RESULT ForceReadNextValue(CBType &retVal, bool fClear = false) {
 		retVal = 0;
 
 		if (m_state.m_circularBuffer_c == m_state.m_circularBuffer_e) {
@@ -82,6 +85,9 @@ public:
 		}
 
 		retVal = m_circularBuffer[m_state.m_circularBuffer_c];
+
+		if (fClear)
+			m_circularBuffer[m_state.m_circularBuffer_c] = 0;
 
 		m_state.m_circularBuffer_c++;
 
