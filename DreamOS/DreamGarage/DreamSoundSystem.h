@@ -101,7 +101,9 @@ private:
 	RESULT MixdownProcess();
 	RESULT StartMixdownServer();
 	RESULT InitalizeMixdownSendBuffer();
+	
 	SoundBuffer *m_pMixdownBuffer = nullptr;
+	std::chrono::system_clock::time_point m_lastMixdownReadTime;
 
 	sound::state m_mixdownState = sound::state::UNINITIALIZED;
 

@@ -442,9 +442,17 @@ RESULT DreamSoundSystem::PushAudioPacketToMixdown(int numFrames, const AudioPack
 
 	m_pMixdownBuffer->LockBuffer();
 
-	// TODO: Make a mix data
-	CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket));
-	//CR(m_pMixdownBuffer->PushAudioPacket(pendingAudioPacket));
+	{
+		// TODO: Make a mix data
+
+		auto usOffset = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - m_lastMixdownReadTime).count();
+
+		//CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket));
+
+		CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket, usOffset));
+
+		//CR(m_pMixdownBuffer->PushAudioPacket(pendingAudioPacket));
+	}
 
 	m_pMixdownBuffer->UnlockBuffer();
 
@@ -462,42 +470,49 @@ RESULT DreamSoundSystem::MixdownProcess() {
 
 	DEBUG_LINEOUT("DreamSoundSsytem::MixdownProccess started");
 
+	int bufferCount = 0;
 	int64_t pendingBytes = 0;
 	DWORD taskIndex = 0;
 	HANDLE hAudioRenderProcessTask = AvSetMmThreadCharacteristics(TEXT("Pro Audio"), &taskIndex);
 
 	CBM((m_mixdownState == sound::state::RUNNING), "Dream Browser Audio Process not running");
 
+	m_lastMixdownReadTime = std::chrono::system_clock::now();
+
 	while (m_mixdownState == sound::state::RUNNING) {
 
-		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
-
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
-		auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+		auto usDifference = std::chrono::duration_cast<std::chrono::microseconds>(timeNow - m_lastMixdownReadTime).count();
 
-		int audioBufferSampleLength10ms = m_pMixdownBuffer->GetSamplingRate() / 100;
+		int audioBufferSampleLength = m_pMixdownBuffer->GetSamplingRate() / 100;
+		//int audioBufferSampleLength = (int)((float)m_pMixdownBuffer->GetSamplingRate() * ((float)usDifference / 1000000.0f));
 
 		int dirtyFrames = m_pMixdownBuffer->NumDirtyFrames();
 		int pendingFrames = m_pMixdownBuffer->NumPendingFrames();
 
-		//if (m_pMixdownBuffer != nullptr && diffVal >= 10) {
-		if (m_pMixdownBuffer != nullptr && dirtyFrames >= audioBufferSampleLength10ms) {
-		//if (m_pMixdownBuffer != nullptr && pendingFrames >= audioBufferSampleLength10ms) {
+		// Pull from the mix down buffer ever 10 ms
+		if (m_pMixdownBuffer != nullptr && usDifference >= 10000) {
+		//if (m_pMixdownBuffer != nullptr && pendingFrames >= audioBufferSampleLength) {
+
+			//m_lastMixdownReadTime = timeNow - std::chrono::microseconds(usDifference - 10000);
+
+			//if (m_pMixdownBuffer != nullptr && dirtyFrames >= audioBufferSampleLength10ms && diffVal >= 10) {
+			//if (m_pMixdownBuffer != nullptr && pendingFrames >= audioBufferSampleLength10ms) {
 			m_pMixdownBuffer->LockBuffer();
+
+			m_lastMixdownReadTime += std::chrono::microseconds(10000);
 
 			{
 				//DEBUG_LINEOUT("pending %d", (int)pendingBytes)
 
-				lastUpdateTime = timeNow;// -std::chrono::microseconds(diffVal - 10);
-
 				AudioPacket pendingAudioPacket;
-				m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket, true, false, true);
-				//m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket);
+				m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength, &pendingAudioPacket, true, false, true);
+				//m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength, &pendingAudioPacket);
 
 				// Send to named pipe
 
 				if (m_pNamedPipeServer != nullptr) {
-						
+
 					void *pDataBuffer = pendingAudioPacket.GetDataBuffer();
 					size_t pDataBuffer_n = pendingAudioPacket.GetDataBufferSize();
 
@@ -506,6 +521,7 @@ RESULT DreamSoundSystem::MixdownProcess() {
 			}
 
 			m_pMixdownBuffer->UnlockBuffer();
+			
 
 		}
 

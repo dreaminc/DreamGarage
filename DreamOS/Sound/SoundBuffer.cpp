@@ -62,26 +62,26 @@ const char* SoundBuffer::TypeString(sound::type bufferType) {
 	return "invalid";
 }
 
-RESULT SoundBuffer::MixMonoAudioPacket(const AudioPacket &audioPacket) {
+RESULT SoundBuffer::MixMonoAudioPacket(const AudioPacket &audioPacket, float usOffset) {
 	RESULT r = R_PASS;
 
 	// Just run mono to all of the channels 
 	for (int i = 0; i < m_channels; i++) {
 		switch (audioPacket.GetSoundType()) {
 		case sound::type::UNSIGNED_8_BIT: {
-			CR(MixDataToChannel(i, (uint8_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+			CR(MixDataToChannel(i, (uint8_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), usOffset));
 		} break;
 
 		case sound::type::SIGNED_16_BIT: {
-			CR(MixDataToChannel(i, (int16_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+			CR(MixDataToChannel(i, (int16_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), usOffset));
 		} break;
 
 		case sound::type::FLOATING_POINT_32_BIT: {
-			CR(MixDataToChannel(i, (float*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+			CR(MixDataToChannel(i, (float*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), usOffset));
 		} break;
 
 		case sound::type::FLOATING_POINT_64_BIT: {
-			CR(MixDataToChannel(i, (double*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+			CR(MixDataToChannel(i, (double*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), usOffset));
 		} break;
 		}
 	}
@@ -90,28 +90,28 @@ Error:
 	return r;
 }
 
-RESULT SoundBuffer::MixAudioPacket(const AudioPacket &audioPacket) {
+RESULT SoundBuffer::MixAudioPacket(const AudioPacket &audioPacket, float usOffset) {
 	RESULT r = R_PASS;
 
 	if (audioPacket.GetNumChannels() == 1) {
-		return MixMonoAudioPacket(audioPacket);
+		return MixMonoAudioPacket(audioPacket, usOffset);
 	}
 
 	switch (audioPacket.GetSoundType()) {
 	case sound::type::UNSIGNED_8_BIT: {
-		CR(MixData((uint8_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
+		CR(MixData((uint8_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate(), usOffset));
 	} break;
 
 	case sound::type::SIGNED_16_BIT: {
-		CR(MixData((int16_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
+		CR(MixData((int16_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate(), usOffset));
 	} break;
 
 	case sound::type::FLOATING_POINT_32_BIT: {
-		CR(MixData((float*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
+		CR(MixData((float*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate(), usOffset));
 	} break;
 
 	case sound::type::FLOATING_POINT_64_BIT: {
-		CR(MixData((double*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
+		CR(MixData((double*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate(), usOffset));
 	} break;
 	}
 
@@ -180,19 +180,19 @@ RESULT SoundBuffer::PushAudioPacket(const AudioPacket &audioPacket, bool fClobbe
 
 	switch (audioPacket.GetSoundType()) {
 		case sound::type::UNSIGNED_8_BIT: {
-			CR(PushData((uint8_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+			CR(PushData((uint8_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
 		} break;
 
 		case sound::type::SIGNED_16_BIT: {
-			CR(PushData((int16_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+			CR(PushData((int16_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
 		} break;
 
 		case sound::type::FLOATING_POINT_32_BIT: {
-			CR(PushData((float*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+			CR(PushData((float*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
 		} break;
 
 		case sound::type::FLOATING_POINT_64_BIT: {
-			CR(PushData((double*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+			CR(PushData((double*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
 		} break;
 	}
 

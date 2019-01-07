@@ -44,6 +44,16 @@ private:
 		}
 	}
 
+	inline void MixIntoIndex(CBType value, size_t circularBufferIndex) {
+		
+		if (circularBufferIndex < m_state.m_circularBuffer_n) {
+			m_circularBuffer[circularBufferIndex] += value;
+		}
+		else {
+			m_circularBuffer[(circularBufferIndex - m_state.m_circularBuffer_n)] += value;
+		}
+	}
+
 public:
 	inline RESULT ReadNextValue(CBType &retVal, bool fClear = false) {
 		retVal = 0;
@@ -176,13 +186,14 @@ public:
 		return r;
 	}
 
-	RESULT MixIntoBuffer(CBType *pDataBuffer, size_t pDataBuffer_n) {
+	RESULT MixIntoBuffer(CBType *pDataBuffer, size_t pDataBuffer_n, int sampleOffset) {
 		RESULT r = R_PASS;
 
-		CBR((NumAvailableBufferBytes() > 0), R_BUFFER_FULL);
+		//CBR((NumAvailableBufferBytes() > 0), R_BUFFER_FULL);
 
 		for (size_t byteCount = 0; byteCount < pDataBuffer_n; byteCount++) {
-			MixIntoNextValue(pDataBuffer[byteCount]);
+			//MixIntoNextValue(pDataBuffer[byteCount]);
+			MixIntoIndex(pDataBuffer[byteCount], m_state.m_circularBuffer_c + sampleOffset + byteCount);
 		}
 
 	Error:
@@ -200,12 +211,13 @@ public:
 		return r;
 	}
 
-	RESULT MixIntoBuffer(CBType value) {
+	RESULT MixIntoBuffer(CBType value, int sampleOffset) {
 		RESULT r = R_PASS;
 
-		CBR((NumAvailableBufferBytes() > 0), R_BUFFER_FULL);
+		//CBR((NumAvailableBufferBytes() > 0), R_BUFFER_FULL);
 
-		MixIntoNextValue(value);
+		//MixIntoNextValue(value);
+		MixIntoIndex(value, m_state.m_circularBuffer_c + sampleOffset);
 
 	Error:
 		return r;

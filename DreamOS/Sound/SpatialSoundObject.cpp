@@ -38,7 +38,7 @@ RESULT SpatialSoundObject::PushMonoAudioBuffer(int numFrames, const float *pSoun
 	m_pSoundBuffer->LockBuffer();
 	{
 		if (m_pSoundBuffer->IsFull() == false) {
-			m_pSoundBuffer->PushData((float*)(pSoundBuffer), numFrames);
+			m_pSoundBuffer->PushData((float*)(pSoundBuffer), numFrames, m_samplingRate);
 		}
 		else {
 			DEBUG_LINEOUT("Render buffer is full");
@@ -58,7 +58,7 @@ RESULT SpatialSoundObject::PushMonoAudioBuffer(int numFrames, const int16_t *pSo
 	m_pSoundBuffer->LockBuffer();
 	{
 		if (m_pSoundBuffer->IsFull() == false) {
-			m_pSoundBuffer->PushData((int16_t*)(pSoundBuffer), numFrames);
+			m_pSoundBuffer->PushData((int16_t*)(pSoundBuffer), numFrames, m_samplingRate);
 		}
 		else {
 			DEBUG_LINEOUT("Render buffer is full");
@@ -110,7 +110,8 @@ RESULT SpatialSoundObject::LoadSoundFile(SoundFile *pSoundFile) {
 			
 			CR(pSoundFile->GetAudioBuffer(pFloatAudioBuffer, 1));
 
-			CR(m_pSoundBuffer->PushData(pFloatAudioBuffer, pSoundFile->GetNumFrames()));
+			// TODO: Sound file sampling rates!
+			CR(m_pSoundBuffer->PushData(pFloatAudioBuffer, pSoundFile->GetNumFrames(), m_samplingRate));
 		}
 	}
 	m_pSoundBuffer->UnlockBuffer();
