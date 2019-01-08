@@ -1053,7 +1053,7 @@ RESULT DreamBrowser::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnv
 		m_pPendingEnvironmentAsset = pEnvironmentAsset;
 
 		if (pEnvironmentAsset != nullptr) {
-			m_strScope = pEnvironmentAsset->GetStorageProviderScope();
+			m_strScope = pEnvironmentAsset->GetScope();
 			m_strPath = pEnvironmentAsset->GetPath();
 		}
 	}

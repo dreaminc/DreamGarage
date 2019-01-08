@@ -1450,7 +1450,8 @@ RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 	RESULT r = R_PASS;
 
 	if (m_pDreamUserControlArea != nullptr) {
-		CR(m_pDreamUserControlArea->AddEnvironmentAsset(pEnvironmentAsset));
+		//CR(m_pDreamUserControlArea->AddEnvironmentAsset(pEnvironmentAsset));
+		CR(m_pDreamUserControlArea->PendEnvironmentAsset(pEnvironmentAsset));
 	}
 
 Error:
@@ -1477,7 +1478,8 @@ RESULT DreamGarage::OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentA
 
 	CN(m_pDreamUserControlArea);
 
-	CR(m_pDreamUserControlArea->AddEnvironmentAsset(pEnvironmentAsset));
+//	CR(m_pDreamUserControlArea->AddEnvironmentAsset(pEnvironmentAsset));
+	CR(m_pDreamUserControlArea->PendEnvironmentAsset(pEnvironmentAsset));
 
 Error:
 	return r;

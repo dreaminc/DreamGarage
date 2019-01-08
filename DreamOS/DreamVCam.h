@@ -112,6 +112,7 @@ public:
 	bool IsReceivingCameraPlacement();
 
 	RESULT HideCameraSource();
+	RESULT ShareCameraSource();
 
 	RESULT BroadcastVCamMessage();
 	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
@@ -192,6 +193,8 @@ private:
 	// flags for sending/receiving data
 	bool m_fSendingCameraPlacement = false;
 	bool m_fReceivingCameraPlacement = false;
+
+	bool m_fPendCameraPlacement = false;
 };
 
 #endif // ! DREAM_VCAM_SYSTEM_H_

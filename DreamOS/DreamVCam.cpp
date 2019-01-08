@@ -109,6 +109,9 @@ RESULT DreamVCam::InitializePipeline() {
 
 	CRM(m_pNamedPipeServer->Start(), "Failed to start server");
 
+	CR(m_pNamedPipeServer->RegisterNamedPipeServerObserver(this));
+	m_sourceType = SourceType::CAMERA;	// defaulting to camera on open
+
 	// TODO: Parameterize this eventually
 	int width = 1280;
 	int height = 720;
@@ -292,6 +295,13 @@ RESULT DreamVCam::Update(void *pContext) {
 	}
 	//*/
 
+	/*
+	if (m_fPendCameraPlacement) {
+		m_fPendCameraPlacement = false;
+		CR(ShareCameraSource());
+	}
+	//*/
+
 Error:
 	return r;
 }
@@ -391,8 +401,11 @@ RESULT DreamVCam::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	CN(pParentApp);
 	m_pParentApp = pParentApp;	
 	m_fIsRunning = true;
-	CR(m_pNamedPipeServer->RegisterNamedPipeServerObserver(this));
-	m_sourceType = SourceType::CAMERA;	// defaulting to camera on open
+
+	if (m_fPendCameraPlacement) {
+		m_fPendCameraPlacement = false;
+		CR(ShareCameraSource());
+	}
 
 Error:
 	return r;
@@ -473,13 +486,13 @@ RESULT DreamVCam::OnClientConnect() {
 
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 
-	CR(m_pParentApp->OnVirtualCameraCaptured());
-	m_pCameraQuad->SetVisible(true);
-	m_pCameraQuadBackground->SetVisible(true);
-	m_pCameraQuadTexture = m_pParentApp->GetActiveSource()->GetSourceTexture();
-	m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);
-
-	CR(pEnvironmentControllerProxy->RequestShareAsset(m_pParentApp->GetActiveSource()->GetCurrentAssetID(), SHARE_TYPE_CAMERA));
+	if (m_fSendingCameraPlacement && m_pCurrentCameraShare == nullptr) {
+		CR(ShareCameraSource());
+	}
+	else {
+		pEnvironmentControllerProxy->RequestOpenCamera();
+		m_fPendCameraPlacement = true;
+	}
 
 Error:
 	return r;
@@ -519,10 +532,14 @@ Error:
 }
 
 RESULT DreamVCam::SetIsSendingCameraPlacement(bool fSendingCameraPlacement) {
+	RESULT r = R_PASS;
+
 	m_fSendingCameraPlacement = fSendingCameraPlacement;
 	m_pCameraComposite->SetVisible(m_fSendingCameraPlacement, false);
 	m_pCameraModel->SetVisible(m_fSendingCameraPlacement);
-	return R_PASS;
+
+Error:
+	return r;
 }
 
 RESULT DreamVCam::SetIsReceivingCameraPlacement(bool fReceivingCameraPlacement) {
@@ -545,6 +562,24 @@ RESULT DreamVCam::HideCameraSource() {
 	
 	m_pCameraQuad->SetVisible(false);
 	m_pCameraQuadBackground->SetVisible(false);
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::ShareCameraSource() {
+	RESULT r = R_PASS;
+
+	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CN(pEnvironmentControllerProxy);
+
+	CR(m_pParentApp->OnVirtualCameraCaptured());
+	m_pCameraQuad->SetVisible(true);
+	m_pCameraQuadBackground->SetVisible(true);
+	m_pCameraQuadTexture = m_pParentApp->GetActiveSource()->GetSourceTexture();
+	m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);
+
+	CR(pEnvironmentControllerProxy->RequestShareAsset(m_pParentApp->GetActiveSource()->GetCurrentAssetID(), SHARE_TYPE_CAMERA));
 
 Error:
 	return r;
