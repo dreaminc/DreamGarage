@@ -440,8 +440,14 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 
 	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
 	size_t pBuffer_n = width * height * 4;
-
+	
 	m_vectorBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
+	if (type == PET_POPUP) {
+		m_paintType = WebBrowserController::PAINT_ELEMENT_TYPE::PET_POPUP;
+	}
+	else {
+		m_paintType = WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW;
+	}
 
 	bool fSizeChanged = (width != m_bufferWidth) || (height != m_bufferHeight);
 
@@ -455,6 +461,10 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 
 //Error:
 	return r;
+}
+
+RESULT CEFBrowserController::OnPopupSize(const CefRect& rect) {
+	m_popupRect = rect;
 }
 
 RESULT CEFBrowserController::OnAfterCreated() {

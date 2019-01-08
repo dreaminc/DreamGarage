@@ -61,6 +61,16 @@ Error:
 	return r;
 }
 
+RESULT CEFApp::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect) {
+	RESULT r = R_PASS;
+
+	CN(m_pCEFAppObserver);
+	CR(m_pCEFAppObserver->OnPopupSize(browser, rect));
+
+Error:
+	return r;
+}
+
 RESULT CEFApp::OnLoadingStateChanged(CefRefPtr<CefBrowser> pCEFBrowser, bool fLoading, bool fCanGoBack, bool fCanGoForward) {
 	RESULT r = R_PASS;
 

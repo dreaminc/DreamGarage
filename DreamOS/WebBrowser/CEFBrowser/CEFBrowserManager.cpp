@@ -149,6 +149,19 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserManager::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect) {
+	RESULT r = R_PASS;
+	//DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(browser);
+	CN(pCEFBrowserController);
+
+	CR(pCEFBrowserController->OnPopupSize(rect));
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserManager::OnLoadingStateChanged(CefRefPtr<CefBrowser> pCEFBrowser, bool fLoading, bool fCanGoBack, bool fCanGoForward) {
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadingStateChanged");
