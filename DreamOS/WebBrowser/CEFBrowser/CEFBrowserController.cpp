@@ -67,7 +67,7 @@ RESULT CEFBrowserController::PollFrame() {
 	
 	if (m_pWebBrowserControllerObserver != nullptr) {
 		WebBrowserRect rect = { 0, 0, m_bufferWidth, m_bufferHeight };
-		CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
+		CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorBuffer[0], m_bufferWidth, m_bufferHeight, m_paintType, rect));
 	}
 
 Error:
@@ -83,9 +83,9 @@ RESULT CEFBrowserController::PollNewDirtyFrames(int &rNumFramesProcessed) {
 
 	if (m_pWebBrowserControllerObserver != nullptr) {
 		for (auto& dirtyFrame : m_NewDirtyFrames) {
-			//WebBrowserRect rect = { dirtyFrame.x, dirtyFrame.y, dirtyFrame.width, dirtyFrame.height };
+			WebBrowserRect rect = { m_popupRect.x, m_popupRect.y, m_popupRect.width, m_popupRect.height };
 			
-			CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
+			CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorBuffer[0], m_bufferWidth, m_bufferHeight, m_paintType, rect));
 		
 			rNumFramesProcessed++;
 		}
@@ -465,6 +465,7 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 
 RESULT CEFBrowserController::OnPopupSize(const CefRect& rect) {
 	m_popupRect = rect;
+	return R_PASS;
 }
 
 RESULT CEFBrowserController::OnAfterCreated() {

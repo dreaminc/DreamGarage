@@ -747,7 +747,7 @@ Error:
 
 // TODO: Only update the rect
 // TODO: Turn off CEF when we're not using it
-RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height) {
+RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrowserController::PAINT_ELEMENT_TYPE type, WebBrowserRect rect) {
 	RESULT r = R_PASS;
 
 	m_fFirstFrameIsReady = true;
@@ -768,7 +768,12 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height) {
 	}
 
 	if (dynamic_cast<OGLTexture*>(m_pBrowserTexture.get())->IsOGLPBOUnpackEnabled()) {
-		m_pBrowserTexture->UpdateTextureFromBuffer((unsigned char*)pBuffer, width * height * 4);
+		if (type == WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW) {
+			m_pBrowserTexture->UpdateTextureFromBuffer((unsigned char*)pBuffer, width * height * 4);
+		}
+		else {
+			m_pBrowserTexture->UpdateTextureRegionFromBuffer((unsigned char*)pBuffer, rect.pt.x, rect.pt.y, rect.width, rect.height);
+		}
 	}
 	else {
 		CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
