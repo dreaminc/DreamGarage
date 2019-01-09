@@ -56,7 +56,7 @@ public:
 public:
 	class observer {
 	public:
-		virtual RESULT OnPaint(const void *pBuffer, int width, int height) = 0;
+		virtual RESULT OnPaint(const void *pBuffer, int width, int height, WebBrowserController::PAINT_ELEMENT_TYPE type, WebBrowserRect rect) = 0;
 		virtual RESULT OnAudioPacket(const AudioPacket &pendingAudioPacket) = 0;
 		virtual RESULT OnAfterCreated() = 0;
 		virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) = 0;

@@ -627,6 +627,10 @@ Error:
 	return r;
 }
 
+RESULT OGLTexture::UpdateTextureRegionFromBuffer(void *pBuffer, int x, int y, int width, int height) {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT OGLTexture::Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 

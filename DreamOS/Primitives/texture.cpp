@@ -294,6 +294,10 @@ RESULT texture::UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) {
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT texture::UpdateTextureRegionFromBuffer(void *pBuffer, int x, int y, int width, int height) {
+	return R_NOT_IMPLEMENTED;
+}
+
 bool texture::IsDistanceMapped() {
 	return ((m_flags & texture::flags::DISTANCE_MAP) != texture::flags::NONE);
 }

@@ -72,6 +72,7 @@ public:
 	RESULT OnGetViewRect(CefRect &cefRect);
 	RESULT OnAfterCreated();
 	RESULT OnPaint(CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height);
+	RESULT OnPopupSize(const CefRect& rect);
 	RESULT OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer);
 	RESULT OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL);
 	RESULT OnLoadStart(CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type);
@@ -131,7 +132,10 @@ private:
 
 	// Buffer for the browser content to render into
 	std::vector<unsigned char> m_vectorBuffer;
-											   
+	WebBrowserController::PAINT_ELEMENT_TYPE m_paintType;
+	
+	CefRect m_popupRect;
+	
 	// browser physical size (buffer size)
 	int m_bufferWidth = 0;
 	int m_bufferHeight = 0;

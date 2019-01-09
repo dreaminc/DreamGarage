@@ -55,6 +55,7 @@ public:
 
 	virtual RESULT Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) override;
 	virtual RESULT UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) override;
+	virtual RESULT UpdateTextureRegionFromBuffer(void *pBuffer, int x, int y, int width, int height) override;
 	virtual RESULT UpdateDimensions(int width, int height) override;
 
 	GLenum GetOGLTextureTarget() { return m_glTextureTarget; }

@@ -360,6 +360,17 @@ Error:
 	return;
 }
 
+void CEFHandler::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect) {
+	RESULT r = R_PASS;
+	//DEBUG_LINEOUT("CEFHANDLE: OnPaint");
+
+	CN(m_pCEFHandlerObserver);
+	CR(m_pCEFHandlerObserver->OnPopupSize(browser, rect));
+
+Error:
+	return;
+}
+
 #ifdef CEF_AUDIO_MIRROR
 // Audio Handler
 void CEFHandler::OnAudioData(CefRefPtr<CefBrowser> browser, int frames, int channels, int bits_per_sample, const void* data_buffer) {
