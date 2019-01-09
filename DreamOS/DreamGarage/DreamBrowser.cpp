@@ -771,8 +771,27 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrow
 		if (type == WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW) {
 			m_pBrowserTexture->UpdateTextureFromBuffer((unsigned char*)pBuffer, width * height * 4);
 		}
-		else {
-			m_pBrowserTexture->UpdateTextureRegionFromBuffer((unsigned char*)pBuffer, rect.pt.x, rect.pt.y, rect.width, rect.height);
+		else if (type == WebBrowserController::PAINT_ELEMENT_TYPE::PET_POPUP && rect.width > 0 && rect.height > 0) {	// not sure why that check is necessary but better safe than sorry?
+			
+			// bounds checking and adjusting
+			int x = rect.pt.x;
+			int y = rect.pt.y;
+
+			if (x < 0) {
+				x = 0;
+			}
+			if (y < 0) {
+				y = 0;
+			}
+
+			if (x + rect.width > m_pBrowserTexture->GetWidth()) {
+				rect.width -= x + rect.width - m_pBrowserTexture->GetWidth();
+			}
+			if (y + rect.height > m_pBrowserTexture->GetHeight()) {
+				rect.height -= y + rect.height - m_pBrowserTexture->GetHeight();
+			}
+			
+			m_pBrowserTexture->UpdateTextureRegionFromBuffer((unsigned char*)pBuffer, x, y, rect.width, rect.height);
 		}
 	}
 	else {
