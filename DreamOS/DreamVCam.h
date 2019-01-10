@@ -101,7 +101,8 @@ public:
 	virtual RESULT OnClientDisconnect() override;
 
 	// DreamGamepadCameraApp
-	virtual RESULT OnCameraMoved() override;
+	virtual RESULT OnCameraAtRest() override;
+	virtual RESULT OnCameraInMotion() override;
 
 	// Sharing Camera Placement Data
 	RESULT HandleSettings(point ptPosition, quaternion qOrientation);

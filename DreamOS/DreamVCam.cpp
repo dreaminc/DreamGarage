@@ -519,7 +519,11 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::OnCameraMoved() {
+RESULT DreamVCam::OnCameraInMotion() {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamVCam::OnCameraAtRest() {
 	RESULT r = R_PASS;
 
 	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());

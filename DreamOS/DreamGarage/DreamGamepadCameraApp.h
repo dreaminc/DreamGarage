@@ -3,8 +3,11 @@
 
 #define GAMEPAD_MOVE_SCALE 23914.0f;
 #define GAMEPAD_UP_SPEED_SCALE 25000000.0f;		// joystick values are 0-1, triggers are 0-255
-#define GAMEPAD_CAMERA_ROTATE_SCALE	1.1f		// 1.41178f;
-#define CAMERA_AT_REST_MOMENTUM 0.00000001		// because double precision
+#define GAMEPAD_CAMERA_ROTATE_SCALE	0.7f		// 1.41178f;
+#define CAMERA_AT_REST_MOMENTUM 0.0000001		// because double precision
+
+#define MOMENTUM_CAMERA_ACCELERATION_CONSTANT 0.005f;
+#define MOMENTUM_CAMERA_DECCELERATION_CONSTANT 0.002f;	// 1/500
 
 #include "RESULT/EHM.h"
 
@@ -32,9 +35,16 @@ public:
 		INVALID
 	};
 
+	enum class CameraMovementType {
+		MOMENTUM,
+		PRECISION,
+		INVALID
+	};
+
 	class observer {
 	public:
-		virtual RESULT OnCameraMoved() = 0;
+		virtual RESULT OnCameraAtRest() = 0;
+		virtual RESULT OnCameraInMotion() = 0;
 	};
 
 	DreamGamepadCameraApp(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -44,6 +54,9 @@ public:
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
+
+	RESULT UpdateAsMomentumCamera(float msTimeStep);
+	RESULT UpdateAsPrecisionCamera(float msTimeStep);
 
 	RESULT SetCamera(camera *pCamera, CameraControlType controlType = CameraControlType::GAMEPAD);
 	CameraControlType GetCameraControlType();
@@ -84,6 +97,9 @@ private:
 	float m_cameraUpSpeedScale = GAMEPAD_UP_SPEED_SCALE;
 	float m_cameraRotateSpeed = GAMEPAD_CAMERA_ROTATE_SCALE;
 
+	float m_momentumAccelerationConstant = MOMENTUM_CAMERA_ACCELERATION_CONSTANT;
+	float m_momentumDecelerationConstant = MOMENTUM_CAMERA_DECCELERATION_CONSTANT;
+
 	double m_cameraAtRestMomentum = CAMERA_AT_REST_MOMENTUM;
 	
 	bool m_fUpdateLeftStick = false;
@@ -95,6 +111,7 @@ private:
 	bool m_fAtRest = true;
 	
 	CameraControlType m_controlType = CameraControlType::INVALID;
+	CameraMovementType m_movementType = CameraMovementType::MOMENTUM;
 	DreamGamepadCameraApp::observer *m_pObserver = nullptr;
 
 	std::list<ForceGenerator*> m_pForceGenerators;
