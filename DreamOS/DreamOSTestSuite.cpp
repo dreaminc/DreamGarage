@@ -44,6 +44,8 @@
 #include <wincred.h>
 #include "DDCIPCMessage.h"
 
+#include "Sound/AudioPacket.h"
+
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -56,6 +58,8 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
+
+	CR(AddTestDreamSoundSystem());
 
 	CR(AddTestDreamVCam());
 
@@ -1134,6 +1138,190 @@ Error:
 	return r;
 }
 
+RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+	float radius = 2.0f;
+
+	struct TestContext : 
+		public DreamSoundSystem::observer,
+		public DreamBrowserObserver
+	{
+
+		sphere *pSphere = nullptr;
+
+		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
+			RESULT r = R_PASS;
+
+			//// Simply pushes the capture buffer to the render buffer
+			//if (pSoundClient != nullptr) {
+			//	CR(pSoundClient->PushMonoAudioBufferToRenderBuffer(numFrames, pCaptureBuffer));
+			//}
+
+			CR(r);
+
+		Error:
+			return r;
+		}
+
+		// DreamBrowserObserver
+		virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) { 
+			RESULT r = R_PASS;
+
+			if (m_pParentDOS != nullptr) {
+				int numFrames = pendingAudioPacket.GetNumFrames();
+				CRM(m_pParentDOS->PushAudioPacketToMixdown(numFrames, pendingAudioPacket), "Failed to push packet to sound system");
+			}
+
+		Error:
+			return r;
+		};
+
+		virtual RESULT UpdateControlBarText(std::string& strTitle) { return R_NOT_IMPLEMENTED; };
+		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) { return R_NOT_IMPLEMENTED; };
+
+		virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) { return R_NOT_IMPLEMENTED; };
+
+		virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) { return R_NOT_IMPLEMENTED; };
+		virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) { return R_NOT_IMPLEMENTED; };
+		virtual RESULT HandleLoadEnd() { return R_NOT_IMPLEMENTED; };
+
+		virtual RESULT HandleDreamFormSuccess() { return R_NOT_IMPLEMENTED; };
+		virtual RESULT HandleDreamFormCancel() { return R_NOT_IMPLEMENTED; };
+		virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) { return R_NOT_IMPLEMENTED; };
+		virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) { return R_NOT_IMPLEMENTED; };
+
+		virtual RESULT HandleCanTabNext(bool fCanNext) { return R_NOT_IMPLEMENTED; };
+		virtual RESULT HandleCanTabPrevious(bool fCanPrevious) { return R_NOT_IMPLEMENTED; };
+
+		// Browser
+		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
+		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+		quad *m_pBrowserQuad = nullptr;
+		DreamOS *m_pParentDOS = nullptr;
+
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		std::string strURL = "https://www.youtube.com/watch?v=Ic4xAuIkoFE";
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline("standard"));
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		// Need for the push packet to mixdown
+		pTestContext->m_pParentDOS = m_pDreamOS;
+
+		{
+			light *pLight;
+			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
+
+			point ptPosition = point(0.0f, 0.0f, -radius);
+			vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
+			vector vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
+
+			pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+			CN(pTestContext->pSphere);
+			pTestContext->pSphere->SetPosition(ptPosition);
+
+			//// Open a sound file
+			auto pNewSoundFile = m_pDreamOS->LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
+			CN(pNewSoundFile);
+
+			// Should work without sound client
+			//CR(m_pDreamOS->RegisterSoundSystemObserver(pTestContext));
+
+			//CR(m_pDreamOS->PlaySoundFile(pNewSoundFile));
+			//CR(m_pDreamOS->LoopSoundFile(pNewSoundFile));
+
+
+			///*
+			// Set up Browser to test the mix down code (timing)
+			pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+			CN(pTestContext->m_pWebBrowserManager);
+			CR(pTestContext->m_pWebBrowserManager->Initialize());
+
+			// This presents a timing issue if it works 
+			pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(4.8f, 2.7f);
+			CN(pTestContext->m_pBrowserQuad);
+			pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
+			pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
+			pTestContext->m_pBrowserQuad->SetMaterialAmbient(1.0f);
+
+			// Create the Shared View App
+			pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+			pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+			CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
+			CR(pTestContext->m_pDreamBrowser->SetForceObserverAudio(true));
+			CRM(pTestContext->m_pDreamBrowser->RegisterObserver(pTestContext), "Failed to set browser observer");
+
+			pTestContext->m_pDreamBrowser->SetURI(strURL);
+			//*/
+		}
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Update Code
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		{
+			if (pTestContext->m_pBrowserQuad != nullptr) {
+				pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture());
+			}
+		}
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Sound System Play Sound");
+	pUITest->SetTestDescription("Testing playing a sound by way of the sound system module");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT DreamOSTestSuite::AddTestDreamVCam() {
 	RESULT r = R_PASS;
 
@@ -1246,7 +1434,7 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 			auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 			CN(pTestContext);
 
-			///*
+			/*
 			// Set up Browser to test
 			pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 			CN(pTestContext->m_pWebBrowserManager);

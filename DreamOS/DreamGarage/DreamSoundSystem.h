@@ -15,6 +15,8 @@
 
 #include "Sound/SoundFile.h"
 
+#include "Sandbox/NamedPipeServer.h"
+
 #include <memory>
 
 class SpatialSoundObject;
@@ -24,7 +26,8 @@ class HMD;
 
 class DreamSoundSystem : 
 	public DreamModule<DreamSoundSystem>, 
-	public SoundClient::observer 
+	public SoundClient::observer ,
+	public NamedPipeServer::observer
 {
 	friend class DreamModuleManager;
 
@@ -54,6 +57,7 @@ public:
 	std::shared_ptr<SpatialSoundObject> AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection);
 	std::shared_ptr<SoundFile> LoadSoundFile(const std::wstring &wstrFilename, SoundFile::type soundFileType);
 	RESULT PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile);
+	RESULT LoopSoundFile(std::shared_ptr<SoundFile> pSoundFile);
 	RESULT PlayAudioPacket(const AudioPacket &pendingAudioPacket);
 	RESULT PlayAudioPacketSigned16Bit(const AudioPacket &pendingAudioPacket, std::string strAudioTrackLabel, int channel);
 
@@ -81,6 +85,32 @@ private:
 private:	
 	std::shared_ptr<SpatialSoundObject> m_pTestSpatialSoundObject = nullptr;
 	std::shared_ptr<SoundFile> m_pSoundFile = nullptr;
+
+private:
+	RESULT InitializeNamedPipeServer();
+	RESULT HandleServerPipeMessage(void *pBuffer, size_t pBuffer_n);
+
+	std::shared_ptr<NamedPipeServer> m_pNamedPipeServer = nullptr;
+
+public:
+	// NamedPipeServerObserver
+	virtual RESULT OnClientConnect() override;
+	virtual RESULT OnClientDisconnect() override;
+
+private:
+	RESULT MixdownProcess();
+	RESULT StartMixdownServer();
+	RESULT InitalizeMixdownSendBuffer();
+	
+	SoundBuffer *m_pMixdownBuffer = nullptr;
+	std::chrono::system_clock::time_point m_lastMixdownReadTime;
+
+	sound::state m_mixdownState = sound::state::UNINITIALIZED;
+
+	std::thread	m_mixdownBufferProcessThread;
+
+public:
+	RESULT PushAudioPacketToMixdown(int numFrames, const AudioPacket &pendingAudioPacket);
 };
 
 #endif // ! DREAM_SOUND_SYSTEM_H_

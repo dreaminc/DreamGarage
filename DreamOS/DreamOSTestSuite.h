@@ -47,6 +47,7 @@ public:
 	// Modules
 	RESULT AddTestModuleManager();
 	RESULT AddTestDreamVCam();
+	RESULT AddTestDreamSoundSystem();
 
 	// Apps
 	RESULT AddTestUIKeyboard();

@@ -31,6 +31,7 @@ public:
 
 	virtual bool IsFull() = 0;
 	virtual int64_t NumPendingFrames(int64_t *optMinFrames = nullptr, int64_t *optMaxFrames = nullptr) = 0;
+	virtual int64_t NumDirtyFrames(int64_t *optMinFrames = nullptr, int64_t *optMaxFrames = nullptr) = 0;
 
 	int NumChannels() {
 		return m_channels;
@@ -59,9 +60,12 @@ public:
 	virtual RESULT PushMonoAudioBuffer(int numFrames, SoundBuffer *pSourceBuffer) = 0;
 	virtual RESULT IncrementBuffer(int numFrames) = 0;
 	virtual RESULT IncrementBufferChannel(int channel, int numFrames) = 0;
-	virtual RESULT GetAudioPacket(int numFrames, AudioPacket *pAudioPacket);
+	virtual RESULT GetAudioPacket(int numFrames, AudioPacket *pAudioPacket, bool fUpdateSoundBufferPosition = true, bool fRequirePending = true, bool fClearOut = false);
 	virtual RESULT PushAudioPacket(const AudioPacket &audioPacket, bool fClobber = false);
 	virtual RESULT PushMonoAudioPacket(const AudioPacket &audioPacket, bool fClobber = false);
+
+	virtual RESULT MixAudioPacket(const AudioPacket &audioPacket, float msOffset = 0.0f);
+	virtual RESULT MixMonoAudioPacket(const AudioPacket &audioPacket, float msOffset = 0.0f);
 
 	virtual RESULT ResetBuffer(size_t startPosition, size_t numPendingFrames) = 0;
 
@@ -71,7 +75,7 @@ public:
 	virtual int GetBitsPerSample() { return 0; }
 
 public:
-	virtual RESULT GetInterlacedAudioDataBuffer(int numFrames, void* &n_pDataBuffer, size_t &m_pDataBuffer_n) = 0;
+	virtual RESULT GetInterlacedAudioDataBuffer(int numFrames, void* &n_pDataBuffer, size_t &m_pDataBuffer_n, bool fUpdateSoundBufferPosition = true, bool fRequirePending = true, bool fClearOut = false) = 0;
 	
 public:
 	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(uint8_t *pTargetDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
@@ -80,10 +84,10 @@ public:
 	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(double *pTargetDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
 
 public:
-	virtual RESULT LoadDataToInterlacedTargetBuffer(uint8_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
-	virtual RESULT LoadDataToInterlacedTargetBuffer(int16_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
-	virtual RESULT LoadDataToInterlacedTargetBuffer(float *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
-	virtual RESULT LoadDataToInterlacedTargetBuffer(double *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
+	virtual RESULT LoadDataToInterlacedTargetBuffer(uint8_t *pDataBuffer, int numFrameCount, bool fRequirePending = true, bool fClearOut = false) { return R_INVALID_PARAM; }
+	virtual RESULT LoadDataToInterlacedTargetBuffer(int16_t *pDataBuffer, int numFrameCount, bool fRequirePending = true, bool fClearOut = false) { return R_INVALID_PARAM; }
+	virtual RESULT LoadDataToInterlacedTargetBuffer(float *pDataBuffer, int numFrameCount, bool fRequirePending = true, bool fClearOut = false) { return R_INVALID_PARAM; }
+	virtual RESULT LoadDataToInterlacedTargetBuffer(double *pDataBuffer, int numFrameCount, bool fRequirePending = true, bool fClearOut = false) { return R_INVALID_PARAM; }
 
 public:
 	virtual RESULT MixIntoInterlacedTargetBuffer(uint8_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
@@ -93,16 +97,31 @@ public:
 
 public:
 	// These are stubs to be picked up by the appropriate template implementation
-	virtual RESULT PushData(uint8_t *pDataBuffer, int numFrames) { return R_INVALID_PARAM; }
-	virtual RESULT PushData(int16_t *pDataBuffer, int numFrames) { return R_INVALID_PARAM; }
-	virtual RESULT PushData(float *pDataBuffer, int numFrames) { return R_INVALID_PARAM; }
-	virtual RESULT PushData(double *pDataBuffer, int numFrames) { return R_INVALID_PARAM; }
+	virtual RESULT PushData(uint8_t *pDataBuffer, int numFrames, int samplingRate) { return R_INVALID_PARAM; }
+	virtual RESULT PushData(int16_t *pDataBuffer, int numFrames, int samplingRate) { return R_INVALID_PARAM; }
+	virtual RESULT PushData(float *pDataBuffer, int numFrames, int samplingRate) { return R_INVALID_PARAM; }
+	virtual RESULT PushData(double *pDataBuffer, int numFrames, int samplingRate) { return R_INVALID_PARAM; }
 
 public:
 	virtual RESULT PushDataToChannel(int channel, uint8_t *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
 	virtual RESULT PushDataToChannel(int channel, int16_t *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
 	virtual RESULT PushDataToChannel(int channel, float *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
 	virtual RESULT PushDataToChannel(int channel, double *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
+
+public:
+	// These are stubs to be picked up by the appropriate template implementation
+
+	// TODO: Apply up/down sampling to other functions
+	virtual RESULT MixData(uint8_t *pDataBuffer, int numFrames, int samplingRate, float usOffset) { return R_INVALID_PARAM; }
+	virtual RESULT MixData(int16_t *pDataBuffer, int numFrames, int samplingRate, float usOffset) { return R_INVALID_PARAM; }
+	virtual RESULT MixData(float *pDataBuffer, int numFrames, int samplingRate, float usOffset) { return R_INVALID_PARAM; }
+	virtual RESULT MixData(double *pDataBuffer, int numFrames, int samplingRate, float usOffset) { return R_INVALID_PARAM; }
+
+public:
+	virtual RESULT MixDataToChannel(int channel, uint8_t *pDataBuffer, size_t numFrames, float usOffset) { return R_INVALID_PARAM; }
+	virtual RESULT MixDataToChannel(int channel, int16_t *pDataBuffer, size_t numFrames, float usOffset) { return R_INVALID_PARAM; }
+	virtual RESULT MixDataToChannel(int channel, float *pDataBuffer, size_t numFrames, float usOffset) { return R_INVALID_PARAM; }
+	virtual RESULT MixDataToChannel(int channel, double *pDataBuffer, size_t numFrames, float usOffset) { return R_INVALID_PARAM; }
 
 public:
 	inline virtual RESULT ReadNextValue(int channel, uint8_t &value) { return R_INVALID_PARAM; }
@@ -198,6 +217,30 @@ public:
 		}
 
 		return numPendingBytes;
+	}
+
+	virtual int64_t NumDirtyFrames(int64_t *optMinFrames = nullptr, int64_t *optMaxFrames = nullptr) override {
+		int64_t numDirtyBytes = -1;
+		bool fFirst = true;
+
+		// TODO: Right now a lot of work is going into maintaining 
+		// the two channel buffers as separate entities and it might 
+		// make more sense to just have ONE circular buffer and simply 
+		// have SoundBuffer manage the frame structure 
+
+		for (int i = 0; i < m_channels; i++) {
+			if (fFirst) {
+				numDirtyBytes = m_ppCircularBuffers[i]->NumDirtyBufferSamples();
+				fFirst = false;
+			}
+			else {
+				if (numDirtyBytes != m_ppCircularBuffers[i]->NumDirtyBufferSamples()) {
+					return -1;
+				}
+			}
+		}
+
+		return numDirtyBytes;
 	}
 
 	virtual RESULT ResetBuffer(size_t startPosition, size_t numPendingFrames) override {
@@ -296,7 +339,7 @@ public:
 	}
 
 	// Pushes interlaced data
-	RESULT PushData(CBType *pDataBuffer, int numFrames) {
+	RESULT PushData(CBType *pDataBuffer, int numFrames, int samplingRate) {
 		RESULT r = R_PASS;
 
 		int sampleCount = 0;
@@ -314,11 +357,60 @@ public:
 				CB((pChannelCircBuf->NumAvailableBufferBytes() >= numFrames));
 			}
 
-			// This will de-interlace the samples
-			for (int i = 0; i < numFrames; i++) {
-				for (int j = 0; j < m_channels; j++) {
-					m_ppCircularBuffers[j]->WriteToBuffer(pDataBuffer[sampleCount++]);
+			//// This will de-interlace the samples
+			//for (int i = 0; i < numFrames; i++) {
+			//	for (int j = 0; j < m_channels; j++) {
+			//		m_ppCircularBuffers[j]->WriteToBuffer(pDataBuffer[sampleCount++]);
+			//	}
+			//}
+
+			if (samplingRate == m_samplingRate) {
+				// This will de-interlace the samples
+				for (int i = 0; i < numFrames; i++) {
+					for (int j = 0; j < m_channels; j++) {
+						m_ppCircularBuffers[j]->WriteToBuffer(pDataBuffer[sampleCount++]);
+					}
 				}
+			}
+			else {
+				// We need to up/down sample the buffer to our effective sampling rate
+
+				// recalculate effective numFrames
+				int numBufferFrames = (int)(((float)m_samplingRate / (float)samplingRate)*((float)numFrames));
+
+				float frameLocation = 0.0f;
+				int frameFloor = 0;
+				int frameCeiling = 0;
+				int sampleFloor = 0;
+				int sampleCeiling = 0;
+				float ratio = 0.0f;
+				CBType interpolatedValue = 0;
+
+				// This will de-interlace the samples
+				for (int i = 0; i < numBufferFrames; i++) {
+
+					// Calculate the interpolation (linear) value
+					frameLocation = ((float)(i) / (float)(numBufferFrames)) * numFrames;
+
+					// Get the effective frame
+					frameFloor = (int)floor(frameLocation);
+					frameCeiling = (int)ceil(frameLocation);
+					ratio = frameLocation - frameFloor;
+
+					for (int j = 0; j < m_channels; j++) {
+
+						// Convert to sample (per channel)
+						sampleFloor = (frameFloor * 2) + j;
+						sampleCeiling = (frameCeiling * 2) + j;
+
+						interpolatedValue = (CBType)(((float)pDataBuffer[sampleFloor] * (1.0f - ratio)) + ((float)pDataBuffer[sampleCeiling] * (ratio)));
+
+						m_ppCircularBuffers[j]->WriteToBuffer(interpolatedValue);
+
+						sampleCount += 1;
+					}
+				}
+
 			}
 
 		m_bufferLock.unlock();
@@ -326,8 +418,6 @@ public:
 	Error:
 		return r;
 	}
-
-	
 
 	// Pushes de-interlaced data to a specific channel
 	virtual RESULT PushDataToChannel(int channel, CBType *pDataBuffer, size_t pDataBuffer_n) override {
@@ -348,6 +438,143 @@ public:
 		CB((pChannelCircBuf->NumAvailableBufferBytes() >= pDataBuffer_n));
 	
 		pChannelCircBuf->WriteToBuffer(pDataBuffer, pDataBuffer_n);
+
+		m_bufferLock.unlock();
+
+	Error:
+		return r;
+	}
+
+	// Pushes interlaced data
+	RESULT MixData(CBType *pDataBuffer, int numFrames, int samplingRate, float usOffset) {
+		RESULT r = R_PASS;
+
+		int sampleCount = 0;
+		int sampleOffset = 0;
+		CircularBufferState circularBufferState;
+
+		CN(m_ppCircularBuffers);
+
+		// This will block
+		m_bufferLock.lock();
+
+		// Make sure the buffers have enough space
+		for (int i = 0; i < m_channels; i++) {
+			CircularBuffer<CBType> *pChannelCircBuf = m_ppCircularBuffers[i];
+			CN(pChannelCircBuf);
+
+			CB((pChannelCircBuf->NumAvailableBufferBytes() >= numFrames));
+		}
+
+		// Save the state of the circ buffer
+		circularBufferState = m_ppCircularBuffers[0]->GetCircularBufferState();
+
+		if(usOffset != 0)
+			sampleOffset = (int)((usOffset / 1000000.0f) * (float)m_samplingRate);
+
+		if (samplingRate == m_samplingRate) {
+			// This will de-interlace the samples
+			for (int i = 0; i < numFrames; i++) {
+				for (int j = 0; j < m_channels; j++) {
+					m_ppCircularBuffers[j]->MixIntoBuffer(pDataBuffer[sampleCount++], sampleOffset + i);
+				}
+			}
+		}
+		else {
+			// We need to up/down sample the buffer to our effective sampling rate
+
+			// recalculate effective numFrames
+			int numBufferFrames = (int)(((float)m_samplingRate / (float)samplingRate)*((float)numFrames));
+
+			float frameLocation = 0.0f;
+			int frameFloor = 0;
+			int frameCeiling = 0;
+			int sampleFloor = 0;
+			int sampleCeiling = 0;
+			float ratio = 0.0f;
+			CBType interpolatedValue = 0;
+
+			// This will de-interlace the samples
+			for (int i = 0; i < numBufferFrames; i++) {
+
+				// Calculate the interpolation (linear) value
+				frameLocation = ((float)(i) / (float)(numBufferFrames)) * numFrames;
+
+				// Get the effective frame
+				frameFloor = (int)floor(frameLocation);
+				frameCeiling = (int)ceil(frameLocation);
+				ratio = frameLocation - frameFloor;
+
+				for (int j = 0; j < m_channels; j++) {
+
+					// Convert to sample (per channel)
+					sampleFloor = (frameFloor * 2) + j;
+					sampleCeiling = (frameCeiling * 2) + j;
+
+					interpolatedValue = (CBType)(((float)pDataBuffer[sampleFloor] * (1.0f - ratio)) + ((float)pDataBuffer[sampleCeiling] * (ratio)));
+
+					m_ppCircularBuffers[j]->MixIntoBuffer(interpolatedValue, sampleOffset + i);
+
+					sampleCount += 1;
+				}
+			}
+
+		}
+
+		// Update the dirty frames - do this as an OR type operation vs additive 
+		// this assumes a separate process is going to be reading from the buffer 
+		// at some period and simply needs to know that there's data in the buffer
+		// that is waiting
+		if(numFrames > circularBufferState.m_numDirtyBufferFrames)
+			circularBufferState.m_numDirtyBufferFrames = numFrames;
+
+		// Set the circ buffer state
+		for (int i = 0; i < m_channels; i++) {	
+			CR(m_ppCircularBuffers[i]->SetCircularBufferState(circularBufferState));
+		}
+
+		m_bufferLock.unlock();
+
+	Error:
+		return r;
+	}
+
+	// Pushes de-interlaced data to a specific channel
+	virtual RESULT MixDataToChannel(int channel, CBType *pDataBuffer, size_t pDataBuffer_n, float usOffset) override {
+		RESULT r = R_PASS;
+
+		CircularBuffer<CBType> *pChannelCircBuf = nullptr;
+		CircularBufferState circularBufferState;
+		int sampleOffset = 0;
+
+		CN(m_ppCircularBuffers);
+		CBM((channel < m_channels), "Channel %d does not exist in SoundBuffer of width %d", channel, m_channels);
+
+		// This will block
+		m_bufferLock.lock();
+
+		// Make sure the buffer has enough space
+		pChannelCircBuf = m_ppCircularBuffers[channel];
+		CN(pChannelCircBuf);
+
+		circularBufferState = m_ppCircularBuffers[channel]->GetCircularBufferState();
+
+		if (usOffset != 0)
+			sampleOffset = (int)((usOffset/1000000.0f) * (float)m_samplingRate);
+
+		CB((pChannelCircBuf->NumAvailableBufferBytes() >= pDataBuffer_n));
+
+		pChannelCircBuf->MixIntoBuffer(pDataBuffer, pDataBuffer_n, sampleOffset);
+		
+		// Update the dirty frames - do this as an OR type operation vs additive 
+		// this assumes a separate process is going to be reading from the buffer 
+		// at some period and simply needs to know that there's data in the buffer
+		// that is waiting
+		//circularBufferState.m_numDirtyBufferFrames += pDataBuffer_n;
+		if (pDataBuffer_n > circularBufferState.m_numDirtyBufferFrames)
+			circularBufferState.m_numDirtyBufferFrames = pDataBuffer_n;
+
+		CR(m_ppCircularBuffers[channel]->SetCircularBufferState(circularBufferState));
 
 		m_bufferLock.unlock();
 
@@ -394,11 +621,12 @@ public:
 		return (sizeof(CBType) << 3);
 	}
 
-	virtual RESULT GetInterlacedAudioDataBuffer(int numFrames, void* &n_pDataBuffer, size_t &m_pDataBuffer_n) override {
+	virtual RESULT GetInterlacedAudioDataBuffer(int numFrames, void* &n_pDataBuffer, size_t &m_pDataBuffer_n, bool fUpdateSoundBufferPosition, bool fRequirePending, bool fClearOut) override {
 		RESULT r = R_SKIPPED;
 
 		CBType *pTargetDataBuffer = nullptr;
 		size_t bufferLength = 0;
+		CircularBufferState circularBufferState;
 
 		CB((n_pDataBuffer == nullptr));
 
@@ -406,9 +634,23 @@ public:
 		pTargetDataBuffer = new CBType[bufferLength];
 		CN(pTargetDataBuffer);
 
-		CR(LoadDataToInterlacedTargetBuffer(pTargetDataBuffer, numFrames));
+		// Save buffer state if this is a no-effect operation
+		// NOTE: This assumes (like many of the multi-channel circular buffer operations) that 
+		// each circular buffer is synced
+		if (fUpdateSoundBufferPosition == false) {
+			circularBufferState = m_ppCircularBuffers[0]->GetCircularBufferState();
+		}
+
+		CR(LoadDataToInterlacedTargetBuffer(pTargetDataBuffer, numFrames, fRequirePending, fClearOut));
 		n_pDataBuffer = (void*)(pTargetDataBuffer);
 		m_pDataBuffer_n = bufferLength * sizeof(CBType);
+
+		// Set the buffer states back to before (no memory is manipulated in LoadData after all
+		if (fUpdateSoundBufferPosition == false) {
+			for (int i = 0; i < m_channels; i++) {
+				CR(m_ppCircularBuffers[i]->SetCircularBufferState(circularBufferState));
+			}
+		}
 
 		return r;
 
@@ -421,12 +663,14 @@ public:
 		return r;
 	}
 
-	virtual RESULT LoadDataToInterlacedTargetBuffer(CBType *pTargetDataBuffer, int numFrameCount) override {
+	virtual RESULT LoadDataToInterlacedTargetBuffer(CBType *pTargetDataBuffer, int numFrameCount, bool fRequirePending, bool fClearOut) override {
 		RESULT r = R_PASS;
 
 		//if (NumPendingBytes() >= numFrameCount) 
 		
-		CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
+		if (fRequirePending) {
+			CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
+		}
 
 		{	
 			size_t bufferCounter = 0;
@@ -435,7 +679,12 @@ public:
 			for (int j = 0; j < numFrameCount; j++) {
 				for (int i = 0; i < m_channels; i++) {
 
-					CRM(m_ppCircularBuffers[i]->ReadNextValue(tempVal), "Read next value failed");
+					if (fRequirePending) {
+						CRM(m_ppCircularBuffers[i]->ReadNextValue(tempVal, fClearOut), "Read next value failed");
+					}
+					else {
+						CRM(m_ppCircularBuffers[i]->ForceReadNextValue(tempVal, fClearOut), "Read next value failed");
+					}
 
 					pTargetDataBuffer[bufferCounter] = tempVal;
 					bufferCounter++;

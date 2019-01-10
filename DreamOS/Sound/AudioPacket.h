@@ -21,6 +21,10 @@ public:
 		return m_pDataBuffer;
 	}
 
+	size_t GetDataBufferSize() const {
+		return m_pDataBuffer_n;
+	}
+
 	int GetNumFrames() const {
 		return m_frames;
 	}

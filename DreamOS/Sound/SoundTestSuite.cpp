@@ -36,8 +36,6 @@ RESULT SoundTestSuite::AddTests() {
 
 	CR(AddTestSpatialSound());
 
-	CR(AddTestSoundSystemModule());
-
 	CR(AddTestBrowserSoundRouting());
 
 	CR(AddTestPlaySound());
@@ -244,120 +242,6 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 
 	pUITest->SetTestName("Audio Play Spatial Sound");
 	pUITest->SetTestDescription("Basic test of playing a spatial sound");
-	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(nRepeats);
-
-Error:
-	return r;
-}
-
-// TODO:
-RESULT SoundTestSuite::AddTestSoundSystemModule() {
-	RESULT r = R_PASS;
-
-	double sTestTime = 6000.0f;
-	int nRepeats = 1;
-	float radius = 2.0f;
-
-	struct TestContext : public DreamSoundSystem::observer {
-		
-		sphere *pSphere = nullptr;
-
-		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
-			RESULT r = R_PASS;
-
-			//// Simply pushes the capture buffer to the render buffer
-			//if (pSoundClient != nullptr) {
-			//	CR(pSoundClient->PushMonoAudioBufferToRenderBuffer(numFrames, pCaptureBuffer));
-			//}
-
-			CR(r);
-
-		Error:
-			return r;
-		}
-
-	} *pTestContext = new TestContext();
-
-	auto fnInitialize = [=](void *pContext) {
-		RESULT r = R_PASS;
-
-		CN(m_pDreamOS);
-
-		CR(SetupPipeline("standard"));
-
-		TestContext *pTestContext;
-		pTestContext = reinterpret_cast<TestContext*>(pContext);
-		CN(pTestContext);
-
-		{
-			light *pLight;
-			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
-
-			point ptPosition = point(0.0f, 0.0f, -radius);
-			vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
-			vector vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
-
-			pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
-			CN(pTestContext->pSphere);
-			pTestContext->pSphere->SetPosition(ptPosition);
-
-			//// Open a sound file
-			auto pNewSoundFile = m_pDreamOS->LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
-			CN(pNewSoundFile);
-
-			// Should work without sound client
-			CR(m_pDreamOS->RegisterSoundSystemObserver(pTestContext));
-
-			CR(m_pDreamOS->PlaySoundFile(pNewSoundFile));
-		}
-
-	Error:
-		return R_PASS;
-	};
-
-	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		CR(r);
-
-	Error:
-		return r;
-	};
-
-	// Update Code
-	auto fnUpdate = [=](void *pContext) {
-		RESULT r = R_PASS;
-
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-		CN(pTestContext);
-
-		{
-			// empty
-		}
-
-	Error:
-		return r;
-	};
-
-	// Reset Code
-	auto fnReset = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		// Will reset the sandbox as needed between tests
-		CN(m_pDreamOS);
-		CR(m_pDreamOS->RemoveAllObjects());
-
-	Error:
-		return r;
-	};
-
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
-	CN(pUITest);
-
-	pUITest->SetTestName("Sound System Play Sound");
-	pUITest->SetTestDescription("Testing playing a sound by way of the sound system module");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -671,7 +555,7 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 
 			m_pDreamOS->GetCamera()->SetPosition(0.0f, 0.0f, 0.0f);
 
-			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			//auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 		}
 
 	Error:

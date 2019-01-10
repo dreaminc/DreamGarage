@@ -409,7 +409,7 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 				m_pCaptureSoundBuffer->LockBuffer();
 				{
 					if (m_pCaptureSoundBuffer->IsFull() == false) {
-						CR(m_pCaptureSoundBuffer->PushData(pSigned16IntBuffer, numFramesAvailable));
+						CR(m_pCaptureSoundBuffer->PushData(pSigned16IntBuffer, numFramesAvailable, m_pCaptureWaveFormatX->nSamplesPerSec));
 
 						// This will trigger the observer 
 						CR(HandleAudioDataCaptured(numFramesAvailable));

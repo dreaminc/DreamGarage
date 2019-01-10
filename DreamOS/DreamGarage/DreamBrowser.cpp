@@ -508,6 +508,13 @@ RESULT DreamBrowser::HandleStopEvent() {
 	return r;
 }
 
+RESULT DreamBrowser::SetForceObserverAudio(bool fForceObserverAudio) {
+	
+	m_fForceObserverAudio = fForceObserverAudio;
+
+	return R_PASS;
+}
+
 RESULT DreamBrowser::HandleTabEvent() {
 	return m_pWebBrowserController->TabNext();
 }
@@ -918,17 +925,20 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 
 	// TODO: Handle this (if streaming we broadcast into webrtc
 	// TODO: Either put this back in or move it to a different layer
-	if (m_pObserver != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture.get()) {
+	if (m_pObserver != nullptr) {
 
-		if (m_pRenderSoundBuffer != nullptr) {
+		if (m_fForceObserverAudio || GetDOS()->GetSharedContentTexture() == m_pBrowserTexture.get()) {
 
-			m_pRenderSoundBuffer->LockBuffer();
+			if (m_pRenderSoundBuffer != nullptr) {
 
-			{
-				CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
+				m_pRenderSoundBuffer->LockBuffer();
+
+				{
+					CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
+				}
+
+				m_pRenderSoundBuffer->UnlockBuffer();
 			}
-
-			m_pRenderSoundBuffer->UnlockBuffer();
 		}
 	}
 

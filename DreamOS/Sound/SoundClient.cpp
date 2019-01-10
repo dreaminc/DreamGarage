@@ -230,6 +230,10 @@ Error:
 	return r;
 }
 
+RESULT SoundClient::LoopSoundFile(SoundFile *pSoundFile) {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT SoundClient::PlaySoundFile(SoundFile *pSoundFile) {
 	RESULT r = R_PASS;
 	float *pFloatAudioBuffer = nullptr;
@@ -242,7 +246,9 @@ RESULT SoundClient::PlaySoundFile(SoundFile *pSoundFile) {
 	{
 		if (m_pRenderSoundBuffer->IsFull() == false) {
 			CR(pSoundFile->GetAudioBuffer(pFloatAudioBuffer));
-			CR(m_pRenderSoundBuffer->PushData(pFloatAudioBuffer, pSoundFile->GetNumFrames()));
+			
+			// TODO: Add sampling rate to sound files!
+			CR(m_pRenderSoundBuffer->PushData(pFloatAudioBuffer, pSoundFile->GetNumFrames(), 44100));
 		}
 	}
 	m_pRenderSoundBuffer->UnlockBuffer();
