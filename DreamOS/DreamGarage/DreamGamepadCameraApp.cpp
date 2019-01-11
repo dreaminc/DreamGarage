@@ -163,11 +163,12 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 
 	//DEBUG_LINEOUT_RETURN("Camera Rotating: x: %0.8f y: %0.8f", m_lookXVelocity, m_lookYVelocity);
 	
-	bool fAtRest = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_pCamera->GetMomentum().magnitude() < m_cameraAtRestMomentum);	
-	if (!fAtRest) {
-		if (m_fAtRest) {
-			m_pObserver->OnCameraInMotion();
-		}
+	// TODO: replace this with state machine?
+	//bool fAtRest = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_pCamera->GetMomentum().magnitude() < m_cameraAtRestMomentum);		// Momentum at rest - some false positives, underlying bug with decel?
+	bool fAtRest = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_ptLeftStick.IsZero() && m_ptRightStick.IsZero() && m_leftTriggerValue < 0.01 && m_rightTriggerValue < 0.01);
+	if (!fAtRest && m_fAtRest) {
+		//DEBUG_LINEOUT("Camera In Motion!");
+		m_pObserver->OnCameraInMotion();
 		m_fAtRest = false;
 	}
 	else if (!m_fAtRest && fAtRest) {
@@ -189,38 +190,47 @@ RESULT DreamGamepadCameraApp::UpdateAsPrecisionCamera(float msTimeStep) {
 	RESULT r = R_PASS;
 
 	float velocityX = 0.0f;
-	float velocityY = 0.0f;
 	float velocityZ = 0.0f;
 
 	// X
 	// moving right
 	if (m_ptLeftStick.x() > 0.15) {
-		velocityX += m_ptLeftStick.x() * msTimeStep;	// between 100 and 500 feels alright
-		util::Clamp<float>(velocityX, 0.0001f, 15.0f);
+		velocityX += m_ptLeftStick.x() * msTimeStep * m_precisionSpeedConstant;
 	}
 	// moving left
 	else if (m_ptLeftStick.x() < -0.15) {
-		velocityX += m_ptLeftStick.x() * msTimeStep;
-		util::Clamp<float>(velocityX, 15.0f, -.0001f);
+		velocityX += m_ptLeftStick.x() * msTimeStep * m_precisionSpeedConstant;
 	}
 	else {
-		if (velocityX < 0) {
-			velocityX += msTimeStep / 200.0;
-		}
-		else {
-			velocityX -= msTimeStep / 200.0f;
-		}
+		velocityX = 0.0f;
 	}
+	// Y
+	// moving forward
+	if (m_ptLeftStick.y() > 0.15) {
+		velocityZ += m_ptLeftStick.y() * msTimeStep * m_precisionSpeedConstant;
+	}
+	// moving backwards
+	else if (m_ptLeftStick.y() < -0.15) {
+		velocityZ += m_ptLeftStick.y() * msTimeStep * m_precisionSpeedConstant;
+	}
+	else {
+		velocityZ = 0.0f;
+	}
+
 	// cutoffs
 	if (velocityX < 0.001 && velocityX > -0.001) {
 		velocityX = 0.0f;
 	}
-	
+	if (velocityZ < 0.001 && velocityZ > -0.001) {
+		velocityZ = 0.0f;
+	}
+
 	m_pCamera->MoveStrafe(velocityX / m_cameraMoveSpeedScale);
-	m_pCamera->MoveForward(m_ptLeftStick.y() / m_cameraMoveSpeedScale);
-	m_pCamera->RotateCameraByDiffXY(m_ptRightStick.x(), -m_ptRightStick.y());
-	m_pCamera->MoveUp(m_leftTriggerValue + m_rightTriggerValue);
-	DEBUG_LINEOUT_RETURN("Camera moving: vel:%0.8f stick:%0.8f", (double)velocityX, (double)m_ptLeftStick.x());	
+	m_pCamera->MoveForward(velocityZ / m_cameraMoveSpeedScale);
+	m_pCamera->RotateCameraByDiffXY(m_ptRightStick.x() * m_cameraLookSensitivity, -m_ptRightStick.y() * m_cameraLookSensitivity);
+
+	m_pCamera->MoveUp((m_leftTriggerValue + m_rightTriggerValue) * m_precisionUpSpeedConstant);
+	//DEBUG_LINEOUT_RETURN("Camera moving: vel:%0.8f stick:%0.8f", (double)velocityX, (double)m_ptLeftStick.x());	
 
 Error:
 	return r;
