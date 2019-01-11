@@ -50,6 +50,7 @@ public:
 		MAYBE_IN_MOTION,
 		IN_MOTION,
 		MAYBE_AT_REST,
+		INVALID
 	};
 
 	class observer {

@@ -173,6 +173,9 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 			if (!fAtRestThreshold) {
 				m_movementState = CameraMovementState::MAYBE_IN_MOTION;
 			}
+			else {
+				m_movementState = CameraMovementState::AT_REST;
+			}
 		} break;
 
 		case CameraMovementState::MAYBE_IN_MOTION: {
@@ -182,20 +185,22 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 			}
 			else {
 				m_movementStateTransitionCounter++;	
-			}
-
-			if (m_movementStateTransitionCounter > m_movementStateTransitionCounterThreshold) {
-				if (m_pObserver != nullptr) {
-					m_pObserver->OnCameraInMotion();
+				if (m_movementStateTransitionCounter > m_movementStateTransitionCounterThreshold) {
+					if (m_pObserver != nullptr) {
+						m_pObserver->OnCameraInMotion();
+					}
+					m_movementState = CameraMovementState::IN_MOTION;
+					m_movementStateTransitionCounter = 0;
 				}
-				m_movementState = CameraMovementState::IN_MOTION;
-				m_movementStateTransitionCounter = 0;
-			}
+			}	
 		} break;
 
 		case CameraMovementState::IN_MOTION: {
 			if (fAtRestThreshold) {
 				m_movementState = CameraMovementState::MAYBE_AT_REST;
+			}
+			else {
+				m_movementState = CameraMovementState::IN_MOTION;
 			}
 		} break;
 
@@ -206,15 +211,19 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 			else {
 				m_movementState = CameraMovementState::IN_MOTION;
 				m_movementStateTransitionCounter = 0;
-			}
-			
-			if (m_movementStateTransitionCounter > m_movementStateTransitionCounterThreshold) {
-				if (m_pObserver != nullptr) {
-					m_pObserver->OnCameraAtRest();
+				if (m_movementStateTransitionCounter > m_movementStateTransitionCounterThreshold) {
+					if (m_pObserver != nullptr) {
+						m_pObserver->OnCameraAtRest();
+					}
+					m_movementState = CameraMovementState::AT_REST;
+					m_movementStateTransitionCounter = 0;
 				}
-				m_movementState = CameraMovementState::AT_REST;
-				m_movementStateTransitionCounter = 0;
-			}
+			}	
+		} break;
+		
+		case CameraMovementState::INVALID: {
+			m_movementState = CameraMovementState::AT_REST;
+			m_movementStateTransitionCounter = 0;
 		} break;
 		}
 	}
