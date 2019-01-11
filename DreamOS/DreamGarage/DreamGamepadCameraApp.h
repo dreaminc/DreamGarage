@@ -3,8 +3,15 @@
 
 #define GAMEPAD_MOVE_SCALE 23914.0f;
 #define GAMEPAD_UP_SPEED_SCALE 25000000.0f;		// joystick values are 0-1, triggers are 0-255
-#define GAMEPAD_CAMERA_ROTATE_SCALE	1.1f		// 1.41178f;
-#define CAMERA_AT_REST_MOMENTUM 0.00000001		// because double precision
+#define GAMEPAD_CAMERA_ROTATE_SCALE	0.7f		// 1.41178f;
+#define CAMERA_AT_REST_MOMENTUM 0.000001		// because double precision
+
+#define PRECISION_CAMERA_SENSE_CONTROLLER_UP_SPEED_CONSTANT 0.0000102f;		// this is 255 / GamepadUpSpeedScale, probably because sense controller is normalizing trigger values
+#define PRECISION_CAMERA_SPEED_CONSTANT 10.0f;
+#define PRECISION_CAMERA_LOOK_SENSITIVITY 1.5f;
+
+#define MOMENTUM_CAMERA_ACCELERATION_CONSTANT 0.005f;
+#define MOMENTUM_CAMERA_DECCELERATION_CONSTANT 0.002f;	// 1/500
 
 #include "RESULT/EHM.h"
 
@@ -32,9 +39,24 @@ public:
 		INVALID
 	};
 
+	enum class CameraMovementType {
+		MOMENTUM,
+		PRECISION,
+		INVALID
+	};
+
+	enum class CameraMovementState {
+		AT_REST,
+		MAYBE_IN_MOTION,
+		IN_MOTION,
+		MAYBE_AT_REST,
+		INVALID
+	};
+
 	class observer {
 	public:
-		virtual RESULT OnCameraMoved() = 0;
+		virtual RESULT OnCameraAtRest() = 0;
+		virtual RESULT OnCameraInMotion() = 0;
 	};
 
 	DreamGamepadCameraApp(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -44,6 +66,9 @@ public:
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
+
+	RESULT UpdateAsMomentumCamera(float msTimeStep);
+	RESULT UpdateAsPrecisionCamera(float msTimeStep);
 
 	RESULT SetCamera(camera *pCamera, CameraControlType controlType = CameraControlType::GAMEPAD);
 	CameraControlType GetCameraControlType();
@@ -84,6 +109,13 @@ private:
 	float m_cameraUpSpeedScale = GAMEPAD_UP_SPEED_SCALE;
 	float m_cameraRotateSpeed = GAMEPAD_CAMERA_ROTATE_SCALE;
 
+	float m_cameraLookSensitivity = PRECISION_CAMERA_LOOK_SENSITIVITY;
+	float m_precisionUpSpeedConstant = PRECISION_CAMERA_SENSE_CONTROLLER_UP_SPEED_CONSTANT;
+	float m_precisionSpeedConstant = PRECISION_CAMERA_SPEED_CONSTANT;
+
+	float m_momentumAccelerationConstant = MOMENTUM_CAMERA_ACCELERATION_CONSTANT;
+	float m_momentumDecelerationConstant = MOMENTUM_CAMERA_DECCELERATION_CONSTANT;
+
 	double m_cameraAtRestMomentum = CAMERA_AT_REST_MOMENTUM;
 	
 	bool m_fUpdateLeftStick = false;
@@ -92,9 +124,13 @@ private:
 	bool m_fUpdateRightTrigger = false;
 	
 	bool m_fLockY = false;
-	bool m_fAtRest = true;
 	
+	CameraMovementState m_movementState = CameraMovementState::AT_REST;
+	int m_movementStateTransitionCounter = 0;
+	int m_movementStateTransitionCounterThreshold = 3;
+
 	CameraControlType m_controlType = CameraControlType::INVALID;
+	CameraMovementType m_movementType = CameraMovementType::PRECISION;	// temp
 	DreamGamepadCameraApp::observer *m_pObserver = nullptr;
 
 	std::list<ForceGenerator*> m_pForceGenerators;

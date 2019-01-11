@@ -153,9 +153,145 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 	if (m_fUpdateRightTrigger) {
 		m_rightTriggerValue = m_pendRightTriggerValue;
 	}
+	
+	switch (m_movementType) {
+	case CameraMovementType::MOMENTUM: {
+		CR(UpdateAsMomentumCamera(msTimeStep));
+	} break;
+
+	case CameraMovementType::PRECISION: {
+		CR(UpdateAsPrecisionCamera(msTimeStep));
+	} break;
+	}
+
+	//(m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_pCamera->GetMomentum().magnitude() < m_cameraAtRestMomentum);		// Momentum at rest - some false positives, need to threshold trigger values (they'll return like -.0000123 when released) 
+	{
+		bool fAtRestThreshold = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_ptLeftStick.IsZero() && m_ptRightStick.IsZero() && m_leftTriggerValue < 0.01 && m_rightTriggerValue < 0.01);
+
+		switch (m_movementState) {
+		case CameraMovementState::AT_REST: {
+			if (!fAtRestThreshold) {
+				m_movementState = CameraMovementState::MAYBE_IN_MOTION;
+			}
+			else {
+				m_movementState = CameraMovementState::AT_REST;
+			}
+		} break;
+
+		case CameraMovementState::MAYBE_IN_MOTION: {
+			if (fAtRestThreshold) {
+				m_movementState = CameraMovementState::AT_REST;
+				m_movementStateTransitionCounter = 0;
+			}
+			else {
+				m_movementStateTransitionCounter++;	
+				if (m_movementStateTransitionCounter > m_movementStateTransitionCounterThreshold) {
+					if (m_pObserver != nullptr) {
+						m_pObserver->OnCameraInMotion();
+					}
+					m_movementState = CameraMovementState::IN_MOTION;
+					m_movementStateTransitionCounter = 0;
+				}
+			}	
+		} break;
+
+		case CameraMovementState::IN_MOTION: {
+			if (fAtRestThreshold) {
+				m_movementState = CameraMovementState::MAYBE_AT_REST;
+			}
+			else {
+				m_movementState = CameraMovementState::IN_MOTION;
+			}
+		} break;
+
+		case CameraMovementState::MAYBE_AT_REST: {
+			if (fAtRestThreshold) {
+				m_movementStateTransitionCounter++;	
+			}
+			else {
+				m_movementState = CameraMovementState::IN_MOTION;
+				m_movementStateTransitionCounter = 0;
+				if (m_movementStateTransitionCounter > m_movementStateTransitionCounterThreshold) {
+					if (m_pObserver != nullptr) {
+						m_pObserver->OnCameraAtRest();
+					}
+					m_movementState = CameraMovementState::AT_REST;
+					m_movementStateTransitionCounter = 0;
+				}
+			}	
+		} break;
+		
+		case CameraMovementState::INVALID: {
+			m_movementState = CameraMovementState::AT_REST;
+			m_movementStateTransitionCounter = 0;
+		} break;
+		}
+	}
+	
+
+	//DEBUG_LINEOUT_RETURN("Camera Rotating: x: %0.8f y: %0.8f", m_lookXVelocity, m_lookYVelocity);
+	//DEBUG_LINEOUT_RETURN("vel mag: %0.8f", m_pCamera->GetVelocity().magnitude());
+	//DEBUG_LINEOUT_RETURN("Velocity: x: %0.8f y: %0.8f z: %0.8f", m_pCamera->GetVelocity().x(), m_pCamera->GetVelocity().y(), m_pCamera->GetVelocity().z());
+
+Error:
+	return r;
+}
+
+RESULT DreamGamepadCameraApp::UpdateAsPrecisionCamera(float msTimeStep) {
+	RESULT r = R_PASS;
+
+	float velocityX = 0.0f;
+	float velocityZ = 0.0f;
+
+	// X
+	// moving right
+	if (m_ptLeftStick.x() > 0.15) {
+		velocityX += m_ptLeftStick.x() * msTimeStep * m_precisionSpeedConstant;
+	}
+	// moving left
+	else if (m_ptLeftStick.x() < -0.15) {
+		velocityX += m_ptLeftStick.x() * msTimeStep * m_precisionSpeedConstant;
+	}
+	else {
+		velocityX = 0.0f;
+	}
+	// Y
+	// moving forward
+	if (m_ptLeftStick.y() > 0.15) {
+		velocityZ += m_ptLeftStick.y() * msTimeStep * m_precisionSpeedConstant;
+	}
+	// moving backwards
+	else if (m_ptLeftStick.y() < -0.15) {
+		velocityZ += m_ptLeftStick.y() * msTimeStep * m_precisionSpeedConstant;
+	}
+	else {
+		velocityZ = 0.0f;
+	}
+
+	// cutoffs
+	if (velocityX < 0.001 && velocityX > -0.001) {
+		velocityX = 0.0f;
+	}
+	if (velocityZ < 0.001 && velocityZ > -0.001) {
+		velocityZ = 0.0f;
+	}
+
+	m_pCamera->MoveStrafe(velocityX / m_cameraMoveSpeedScale);
+	m_pCamera->MoveForward(velocityZ / m_cameraMoveSpeedScale);
+	m_pCamera->RotateCameraByDiffXY(m_ptRightStick.x() * m_cameraLookSensitivity, -m_ptRightStick.y() * m_cameraLookSensitivity);
+
+	m_pCamera->MoveUp((m_leftTriggerValue + m_rightTriggerValue) * m_precisionUpSpeedConstant);
+	//DEBUG_LINEOUT_RETURN("Camera moving: vel:%0.8f stick:%0.8f", (double)velocityX, (double)m_ptLeftStick.x());	
+
+Error:
+	return r;
+}
+
+RESULT DreamGamepadCameraApp::UpdateAsMomentumCamera(float msTimeStep) {
+	RESULT r = R_PASS;
 
 	float totalTriggerValue = (m_leftTriggerValue + m_rightTriggerValue);
-		
+
 	m_pCamera->Impulse(m_pCamera->GetRightVector() * (m_ptLeftStick.x() / m_cameraMoveSpeedScale));
 	m_pCamera->Impulse(m_pCamera->GetUpVector() * (totalTriggerValue / m_cameraUpSpeedScale));
 
@@ -171,37 +307,37 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 	// Rotation
 	// looking left
 	if (m_ptRightStick.x() > 0.15) {
-		m_lookXVelocity += msTimeStep / (200.0 / m_ptRightStick.x());	// between 100 and 500 feels alright
+		m_lookXVelocity += (m_ptRightStick.x() * m_momentumAccelerationConstant) * msTimeStep;	// between 100 and 500 feels alright
 	}
 	// looking right
 	else if (m_ptRightStick.x() < -0.15) {
-		m_lookXVelocity += msTimeStep / (200.0 / m_ptRightStick.x());
+		m_lookXVelocity += (m_ptRightStick.x() * m_momentumAccelerationConstant) * msTimeStep;
 	}
 	else {
 		if (m_lookXVelocity < 0) {
-			m_lookXVelocity += msTimeStep / 500.0;
+			m_lookXVelocity += m_momentumDecelerationConstant * msTimeStep;
 		}
 		else if (m_lookXVelocity > 0) {
-			m_lookXVelocity -= msTimeStep / 500.0f;
+			m_lookXVelocity -= m_momentumDecelerationConstant * msTimeStep;
 		}
 	}
 	// looking up
 	if (m_ptRightStick.y() > 0.1) {
-		m_lookYVelocity += msTimeStep / (200.0 / m_ptRightStick.y());
+		m_lookYVelocity += (m_ptRightStick.y() * m_momentumAccelerationConstant) * msTimeStep;
 	}
 	// looking down
 	else if (m_ptRightStick.y() < -0.1) {
-		m_lookYVelocity += msTimeStep / (200.0 / m_ptRightStick.y());
+		m_lookYVelocity += (m_ptRightStick.y() * m_momentumAccelerationConstant) * msTimeStep;
 	}
 	else {
 		if (m_lookYVelocity < 0) {
-			m_lookYVelocity += msTimeStep / 500.0;
+			m_lookYVelocity += m_momentumDecelerationConstant * msTimeStep;
 		}
 		else if (m_lookYVelocity > 0) {
-			m_lookYVelocity -= msTimeStep / 500.0f;
+			m_lookYVelocity -= m_momentumDecelerationConstant * msTimeStep;
 		}
 	}
-	
+
 	if (m_lookXVelocity > 1.0 || m_lookXVelocity < -1.0) {
 		util::Clamp(m_lookXVelocity, -1.0f, 1.0f);
 	}
@@ -215,19 +351,6 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 	if (m_lookYVelocity < 0.01 && m_lookYVelocity > -0.01) {
 		m_lookYVelocity = 0.0f;
 	}
-	//DEBUG_LINEOUT_RETURN("Camera Rotating: x: %0.8f y: %0.8f", m_lookXVelocity, m_lookYVelocity);
-	
-	bool fAtRest = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_pCamera->GetMomentum().magnitude() < m_cameraAtRestMomentum);	
-	if (!fAtRest) {
-		m_fAtRest = false;
-	}
-	else if (!m_fAtRest && fAtRest) {
-		//DEBUG_LINEOUT("Camera at rest at x: %0.2f y: %0.2f z: %0.2f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
-		m_fAtRest = true;
-		if (m_pObserver != nullptr) {
-			m_pObserver->OnCameraMoved();
-		}
-	}
 
 	//*/
 
@@ -237,10 +360,6 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 		m_pCamera->RotateCameraByDiffXY(m_lookXVelocity / m_cameraRotateSpeed, -m_lookYVelocity / m_cameraRotateSpeed);
 		m_pCamera->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_pForceGenerators);
 	}
-
-	//DEBUG_LINEOUT_RETURN("vel mag: %0.8f", m_pCamera->GetVelocity().magnitude());
-	//DEBUG_LINEOUT_RETURN("Velocity: x: %0.8f y: %0.8f z: %0.8f", m_pCamera->GetVelocity().x(), m_pCamera->GetVelocity().y(), m_pCamera->GetVelocity().z());
-
 
 Error:
 	return r;
