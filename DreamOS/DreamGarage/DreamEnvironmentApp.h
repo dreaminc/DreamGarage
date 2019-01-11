@@ -18,6 +18,13 @@ class OGLProgramScreenFade;
 class user;
 class ObjectStoreNode;
 
+#define SCENE_SCALE 0.025f
+
+#define TABLE_LENGTH (187.5f * SCENE_SCALE)
+
+#define SHARED_SCREEN_SCALE 0.55f
+#define SHARED_SCREEN_POSITION point(0.5f * TABLE_LENGTH, 0.125f, 0.0f)
+
 namespace environment {
 	typedef enum type {
 		LOBBY = 0,
@@ -62,7 +69,8 @@ public:
 	RESULT SendOnFadeInMessage(void *pContext);
 
 	RESULT SwitchToEnvironment(environment::type type);
-	RESULT GetSharedScreenPosition(point& ptPosition, quaternion& qOrientation, float& scale);
+	RESULT GetSharedScreenPlacement(point& ptPosition, quaternion& qOrientation, float& scale);
+	RESULT GetDefaultCameraPlacement(point& ptPosition, quaternion& qOrientation);
 
 	ObjectStoreNode *GetSceneGraphNode() {
 		return m_pSceneGraph;
@@ -104,10 +112,10 @@ public:
 	quaternion GetUIOffsetOrientation(int seatIndex);
 
 private:
-	float m_environmentSceneScale = 0.025f;
+	float m_environmentSceneScale = SCENE_SCALE;
 
 	float m_tableWidth = 112.5f * m_environmentSceneScale;
-	float m_tableLength = 187.5f * m_environmentSceneScale;
+	float m_tableLength = TABLE_LENGTH;
 	float m_tableHeight = 25.0f * m_environmentSceneScale;
 
 	float m_baseTableAngle = 270.0f * (float)M_PI / 180.0f;
@@ -118,6 +126,9 @@ private:
 	int m_maxSeatingIndex = 6;
 
 	std::string m_strOnFadeInString = "DreamEnvironmentApp.OnFadeIn";
+
+	point m_ptSharedScreen = SHARED_SCREEN_POSITION;
+	float m_sharedScreenScale = SHARED_SCREEN_SCALE;
 
 private:
 	ObjectStoreNode *m_pSceneGraph = nullptr;

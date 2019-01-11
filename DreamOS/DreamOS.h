@@ -235,7 +235,7 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
+	virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override {
 		return R_NOT_IMPLEMENTED;
 	}
 

@@ -36,7 +36,14 @@ DreamVCam::~DreamVCam() {
 RESULT DreamVCam::InitializeModule(void *pContext) {
 	RESULT r = R_PASS;
 
-	float screenWidth = 0.72f;
+	float cameraScale = 0.0004f;
+
+	float cameraScreenWidth = 0.6f;
+	point ptCameraModel = point(0.0f, -0.24f, 0.0f);
+
+	float cameraScreenDepth = -0.05f;
+	// offset so the background rendering doesn't conflict with the screen
+	float cameraScreenBackgroundOffset = -0.001f;
 
 	SetName("DreamVCam");
 	SetModuleDescription("The Dream Virtual Camera Module");
@@ -50,21 +57,22 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	m_pCameraModel = m_pCameraComposite->AddModel(L"\\camera\\camera.fbx");
 	CN(m_pCameraModel);
 	GetDOS()->AddObject(m_pCameraComposite);
-	m_pCameraModel->SetScale(0.0005f);
+	m_pCameraModel->SetScale(cameraScale);
+	m_pCameraModel->SetPosition(ptCameraModel);
 	m_pCameraModel->SetVisible(false);
 
-	m_pCameraQuad = m_pCameraComposite->AddQuad(screenWidth, screenWidth*9.0f / 16.0f);
+	m_pCameraQuad = m_pCameraComposite->AddQuad(cameraScreenWidth, cameraScreenWidth*9.0f / 16.0f);
 	CN(m_pCameraQuad);
 	m_pCameraQuad->RotateXByDeg(90.0f);
-	m_pCameraQuad->SetPosition(0.0f, screenWidth/2.0f, 0.0f);
+	m_pCameraQuad->SetPosition(point(0.0f, 0.0f, cameraScreenDepth));
 	m_pCameraQuad->SetVisible(false);
 
 	m_pCameraQuad->FlipUVVertical(); // TODO: shouldn't this not have to happen?
 
-	m_pCameraQuadBackground = m_pCameraComposite->AddQuad(screenWidth*BORDER_WIDTH, screenWidth*BORDER_HEIGHT);
+	m_pCameraQuadBackground = m_pCameraComposite->AddQuad(cameraScreenWidth*BORDER_WIDTH, cameraScreenWidth*BORDER_HEIGHT);
 	CN(m_pCameraQuadBackground);
 	m_pCameraQuadBackground->RotateXByDeg(90.0f);
-	m_pCameraQuadBackground->SetPosition(0.0f, screenWidth/2.0f, -0.001f);
+	m_pCameraQuadBackground->SetPosition(point(0.0f, 0.0f, cameraScreenDepth + cameraScreenBackgroundOffset));
 	m_pCameraQuadBackground->SetVisible(false);
 
 	m_pCameraQuadBackgroundTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"control-view-main-background.png");
