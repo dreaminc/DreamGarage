@@ -278,9 +278,9 @@ RESULT DreamGamepadCameraApp::UpdateAsPrecisionCamera(float msTimeStep) {
 
 	m_pCamera->MoveStrafe(velocityX / m_cameraMoveSpeedScale);
 	m_pCamera->MoveForward(velocityZ / m_cameraMoveSpeedScale);
-	m_pCamera->RotateCameraByDiffXY(m_ptRightStick.x() * m_cameraLookSensitivity, -m_ptRightStick.y() * m_cameraLookSensitivity);
+	m_pCamera->RotateCameraByDiffXY(m_ptRightStick.x() * msTimeStep * m_cameraLookSensitivity, -m_ptRightStick.y() * msTimeStep * m_cameraLookSensitivity);
 
-	m_pCamera->MoveUp((m_leftTriggerValue + m_rightTriggerValue) * m_precisionUpSpeedConstant);
+	m_pCamera->MoveUp((m_leftTriggerValue + m_rightTriggerValue) * m_precisionUpSpeedConstant * msTimeStep);
 	//DEBUG_LINEOUT_RETURN("Camera moving: vel:%0.8f stick:%0.8f", (double)velocityX, (double)m_ptLeftStick.x());	
 
 Error:

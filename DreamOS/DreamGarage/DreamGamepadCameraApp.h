@@ -2,13 +2,13 @@
 #define DREAM_GAMEPAD_CAMERA_APP_H_
 
 #define GAMEPAD_MOVE_SCALE 23914.0f;
-#define GAMEPAD_UP_SPEED_SCALE 25000000.0f;		// joystick values are 0-1, triggers are 0-255
+#define GAMEPAD_UP_SPEED_SCALE 100000000.0f;		// joystick values are 0-1, triggers are 0-255
 #define GAMEPAD_CAMERA_ROTATE_SCALE	0.7f		// 1.41178f;
 #define CAMERA_AT_REST_MOMENTUM 0.000001		// because double precision
 
-#define PRECISION_CAMERA_SENSE_CONTROLLER_UP_SPEED_CONSTANT 0.0000102f;		// this is 255 / GamepadUpSpeedScale, probably because sense controller is normalizing trigger values
-#define PRECISION_CAMERA_SPEED_CONSTANT 10.0f;
-#define PRECISION_CAMERA_LOOK_SENSITIVITY 1.5f;
+#define PRECISION_CAMERA_SPEED_CONSTANT 20.0f;
+#define PRECISION_CAMERA_SENSE_CONTROLLER_UP_SPEED_CONSTANT 0.00000255f;	// this is 255 / GamepadUpSpeedScale, probably because sense controller is normalizing trigger values
+#define PRECISION_CAMERA_LOOK_SENSITIVITY 0.375f;
 
 #define MOMENTUM_CAMERA_ACCELERATION_CONSTANT 0.005f;
 #define MOMENTUM_CAMERA_DECCELERATION_CONSTANT 0.002f;	// 1/500
