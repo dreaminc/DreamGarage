@@ -45,6 +45,13 @@ public:
 		INVALID
 	};
 
+	enum class CameraMovementState {
+		AT_REST,
+		MAYBE_IN_MOTION,
+		IN_MOTION,
+		MAYBE_AT_REST,
+	};
+
 	class observer {
 	public:
 		virtual RESULT OnCameraAtRest() = 0;
@@ -116,8 +123,11 @@ private:
 	bool m_fUpdateRightTrigger = false;
 	
 	bool m_fLockY = false;
-	bool m_fAtRest = true;
 	
+	CameraMovementState m_movementState = CameraMovementState::AT_REST;
+	int m_movementStateTransitionCounter = 0;
+	int m_movementStateTransitionCounterThreshold = 3;
+
 	CameraControlType m_controlType = CameraControlType::INVALID;
 	CameraMovementType m_movementType = CameraMovementType::PRECISION;	// temp
 	DreamGamepadCameraApp::observer *m_pObserver = nullptr;

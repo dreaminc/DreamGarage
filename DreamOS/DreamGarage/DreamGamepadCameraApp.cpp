@@ -154,31 +154,73 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 		m_rightTriggerValue = m_pendRightTriggerValue;
 	}
 	
-	if (m_movementType == CameraMovementType::MOMENTUM) {
-		UpdateAsMomentumCamera(msTimeStep);
+	switch (m_movementType) {
+	case CameraMovementType::MOMENTUM: {
+		CR(UpdateAsMomentumCamera(msTimeStep));
+	} break;
+
+	case CameraMovementType::PRECISION: {
+		CR(UpdateAsPrecisionCamera(msTimeStep));
+	} break;
 	}
-	else if (m_movementType == CameraMovementType::PRECISION) {
-		UpdateAsPrecisionCamera(msTimeStep);
+
+	//(m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_pCamera->GetMomentum().magnitude() < m_cameraAtRestMomentum);		// Momentum at rest - some false positives, need to threshold trigger values (they'll return like -.0000123 when released) 
+	{
+		bool fAtRestThreshold = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_ptLeftStick.IsZero() && m_ptRightStick.IsZero() && m_leftTriggerValue < 0.01 && m_rightTriggerValue < 0.01);
+
+		switch (m_movementState) {
+		case CameraMovementState::AT_REST: {
+			if (!fAtRestThreshold) {
+				m_movementState = CameraMovementState::MAYBE_IN_MOTION;
+			}
+		} break;
+
+		case CameraMovementState::MAYBE_IN_MOTION: {
+			if (fAtRestThreshold) {
+				m_movementState = CameraMovementState::AT_REST;
+				m_movementStateTransitionCounter = 0;
+			}
+			else {
+				m_movementStateTransitionCounter++;	
+			}
+
+			if (m_movementStateTransitionCounter > m_movementStateTransitionCounterThreshold) {
+				if (m_pObserver != nullptr) {
+					m_pObserver->OnCameraInMotion();
+				}
+				m_movementState = CameraMovementState::IN_MOTION;
+				m_movementStateTransitionCounter = 0;
+			}
+		} break;
+
+		case CameraMovementState::IN_MOTION: {
+			if (fAtRestThreshold) {
+				m_movementState = CameraMovementState::MAYBE_AT_REST;
+			}
+		} break;
+
+		case CameraMovementState::MAYBE_AT_REST: {
+			if (fAtRestThreshold) {
+				m_movementStateTransitionCounter++;	
+			}
+			else {
+				m_movementState = CameraMovementState::IN_MOTION;
+				m_movementStateTransitionCounter = 0;
+			}
+			
+			if (m_movementStateTransitionCounter > m_movementStateTransitionCounterThreshold) {
+				if (m_pObserver != nullptr) {
+					m_pObserver->OnCameraAtRest();
+				}
+				m_movementState = CameraMovementState::AT_REST;
+				m_movementStateTransitionCounter = 0;
+			}
+		} break;
+		}
 	}
+	
 
 	//DEBUG_LINEOUT_RETURN("Camera Rotating: x: %0.8f y: %0.8f", m_lookXVelocity, m_lookYVelocity);
-	
-	// TODO: replace this with state machine?
-	//bool fAtRest = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_pCamera->GetMomentum().magnitude() < m_cameraAtRestMomentum);		// Momentum at rest - some false positives, need to threshold trigger values (they'll return like -.0000123 when released) 
-	bool fAtRest = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_ptLeftStick.IsZero() && m_ptRightStick.IsZero() && m_leftTriggerValue < 0.01 && m_rightTriggerValue < 0.01);
-	if (!fAtRest && m_fAtRest) {
-		//DEBUG_LINEOUT("Camera In Motion!");
-		m_pObserver->OnCameraInMotion();
-		m_fAtRest = false;
-	}
-	else if (!m_fAtRest && fAtRest) {
-		//DEBUG_LINEOUT("Camera at rest at x: %0.2f y: %0.2f z: %0.2f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
-		m_fAtRest = true;
-		if (m_pObserver != nullptr) {
-			m_pObserver->OnCameraAtRest();
-		}
-	}	
-
 	//DEBUG_LINEOUT_RETURN("vel mag: %0.8f", m_pCamera->GetVelocity().magnitude());
 	//DEBUG_LINEOUT_RETURN("Velocity: x: %0.8f y: %0.8f z: %0.8f", m_pCamera->GetVelocity().x(), m_pCamera->GetVelocity().y(), m_pCamera->GetVelocity().z());
 
