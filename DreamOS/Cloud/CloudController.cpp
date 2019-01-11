@@ -546,11 +546,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnGetSettings(point ptPosition, quaternion qOrientation) {
+RESULT CloudController::OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) {
 	RESULT r = R_PASS;
 
 	if (m_pUserObserver != nullptr) {
-		CR(m_pUserObserver->OnGetSettings(ptPosition, qOrientation));
+		CR(m_pUserObserver->OnGetSettings(ptPosition, qOrientation, fIsSet));
 	}
 
 Error:

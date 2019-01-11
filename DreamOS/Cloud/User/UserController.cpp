@@ -698,7 +698,7 @@ RESULT UserController::OnGetSettings(std::string&& strResponse) {
 	if (statusCode == 404) {
 		// user does not have camera settings
 		// TODO: may want a default camera location from elsewhere
-		CR(m_pUserControllerObserver->OnGetSettings(point(0.0f, 0.0f, 0.0f), quaternion()));
+		CR(m_pUserControllerObserver->OnGetSettings(point(0.0f, 0.0f, 0.0f), quaternion(), false));
 	}
 	//TODO: combine with the json rpc response
 	else if (statusCode == 200) {
@@ -726,7 +726,7 @@ RESULT UserController::OnGetSettings(std::string&& strResponse) {
 		}
 	}
 
-	CR(m_pUserControllerObserver->OnGetSettings(ptCamera, qCamera));
+	CR(m_pUserControllerObserver->OnGetSettings(ptCamera, qCamera, true));
 
 Error:
 	return r;

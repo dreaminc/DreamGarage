@@ -1118,7 +1118,7 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 			return R_PASS;
 		};
 
-		CR(m_pDreamEnvironmentApp->GetSharedScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
+		CR(m_pDreamEnvironmentApp->GetSharedScreenPlacement(ptScreenPosition, qScreenRotation, screenScale));
 		CR(m_pDreamShareView->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 
 		//CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr, fnOnFadeInCallback));
@@ -1889,7 +1889,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnGetSettings(point ptPosition, quaternion qOrientation) {
+RESULT DreamGarage::OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) {
 	RESULT r = R_PASS;
 
 	long assetID = -1;
@@ -1898,7 +1898,13 @@ RESULT DreamGarage::OnGetSettings(point ptPosition, quaternion qOrientation) {
 
 	CN(m_pDreamUserControlArea);
 	CN(m_pDreamUserControlArea->GetActiveSource());
+
+	// if the user does not have settings, use the defaults for the current environment
+	if (!fIsSet) {
+		CR(m_pDreamEnvironmentApp->GetDefaultCameraPlacement(ptPosition, qOrientation));
+	}
 	CR(m_pDreamUserControlArea->OnVirtualCameraSettings(ptPosition, qOrientation));
+
 	CR(pEnvironmentControllerProxy->RequestShareCamera(m_pDreamUserControlArea->GetActiveSource()->GetCurrentAssetID()));
 
 Error:

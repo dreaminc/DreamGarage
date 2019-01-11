@@ -133,7 +133,7 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 		int environmentIDs_n = 2;
 		int curEnvID = 0;
 
-		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override {
 			return R_NOT_IMPLEMENTED;
 		}
 
@@ -416,7 +416,7 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 	{
 		UserController *pUserController = nullptr;
 
-		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override { 
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override { 
 			return R_NOT_IMPLEMENTED; 
 		}
 		

@@ -296,7 +296,7 @@ Error:
 	return r;
 }
 
-RESULT DreamEnvironmentApp::GetSharedScreenPosition(point& ptPosition, quaternion& qOrientation, float& scale) {
+RESULT DreamEnvironmentApp::GetSharedScreenPlacement(point& ptPosition, quaternion& qOrientation, float& scale) {
 	RESULT r = R_PASS;
 
 	switch (m_currentType) {
@@ -307,13 +307,26 @@ RESULT DreamEnvironmentApp::GetSharedScreenPosition(point& ptPosition, quaternio
 		scale = 1.0f;
 	} break;
 	case environment::CAVE: {
-		ptPosition = point(m_tableLength*0.75f, 0.0f, 0.0f);
+		ptPosition = m_ptSharedScreen;
 		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
-		scale = 0.75f;
+		scale = m_sharedScreenScale;
 	} break;
 	}
 
 //Error:
+	return r;
+}
+
+RESULT DreamEnvironmentApp::GetDefaultCameraPlacement(point& ptPosition, quaternion& qOrientation) {
+	RESULT r = R_PASS;
+
+	switch (m_currentType) {
+	case environment::CAVE: {
+		ptPosition = point(-0.5f, 0.2f, 0.0f);
+		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
+	} break;
+	}
+
 	return r;
 }
 

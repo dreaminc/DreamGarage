@@ -187,7 +187,7 @@ public:
 		virtual RESULT OnSwitchTeams() = 0;
 
 		// api methods
-		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) = 0;
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) = 0;
 		virtual RESULT OnSetSettings() = 0;
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) = 0;

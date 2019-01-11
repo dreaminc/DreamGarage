@@ -714,7 +714,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			return r;
 		}
 
-		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override {
 			RESULT r = R_PASS;
 
 			//CR(pUserApp->UpdateHeight(height));
@@ -1131,7 +1131,7 @@ RESULT MultiContentTestSuite::AddTestCameraSettings() {
 		point ptTest = point(3.0f, 3.0f, 3.0f);
 		quaternion qTest = quaternion();
 
-		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override {
 			RESULT r = R_PASS;
 
 			CBM(ptPosition == ptTest, "User settings are different than test set settings");
@@ -1332,7 +1332,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 			return r;
 		};
 
-		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override {
 			RESULT r = R_PASS;
 
 			pUserControlArea->GetDOS()->GetKeyboardApp()->Show();
