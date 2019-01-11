@@ -764,6 +764,26 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::OnCameraInMotion() {
+	RESULT r = R_PASS;
+
+	m_pControlView->FlipViewUp();
+	m_pDreamTabView->Hide();
+	m_pUserControls->Hide();
+
+	return r;
+}
+
+RESULT DreamUserControlArea::OnCameraAtRest() {
+	RESULT r = R_PASS;
+
+	m_pControlView->FlipViewDown();
+	m_pDreamTabView->Show();
+	m_pUserControls->Show();
+
+	return r;
+}
+
 RESULT DreamUserControlArea::ResetAppComposite() {
 	RESULT r = R_PASS;
 

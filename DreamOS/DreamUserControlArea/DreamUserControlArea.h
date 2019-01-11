@@ -110,6 +110,9 @@ public:
 	RESULT CreateBrowserSource(std::string strScope);
 	RESULT HideWebsiteTyping();
 
+	RESULT OnCameraInMotion();
+	RESULT OnCameraAtRest();
+
 // DreamControlBar
 public:
 	bool CanPressButton(UIButton *pButtonContext);
