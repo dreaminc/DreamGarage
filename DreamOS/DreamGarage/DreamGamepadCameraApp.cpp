@@ -166,7 +166,7 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 
 	//(m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_pCamera->GetMomentum().magnitude() < m_cameraAtRestMomentum);		// Momentum at rest - some false positives, need to threshold trigger values (they'll return like -.0000123 when released) 
 	{
-		bool fAtRestThreshold = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_ptLeftStick.IsZero() && m_ptRightStick.IsZero() && m_leftTriggerValue < 0.01 && m_rightTriggerValue < 0.01);
+		bool fAtRestThreshold = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_ptLeftStick.IsZero() && m_ptRightStick.IsZero() && m_leftTriggerValue > -0.05 && m_rightTriggerValue < 0.05);
 
 		switch (m_movementState) {
 		case CameraMovementState::AT_REST: {
@@ -207,10 +207,6 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 		case CameraMovementState::MAYBE_AT_REST: {
 			if (fAtRestThreshold) {
 				m_movementStateTransitionCounter++;	
-			}
-			else {
-				m_movementState = CameraMovementState::IN_MOTION;
-				m_movementStateTransitionCounter = 0;
 				if (m_movementStateTransitionCounter > m_movementStateTransitionCounterThreshold) {
 					if (m_pObserver != nullptr) {
 						m_pObserver->OnCameraAtRest();
@@ -218,6 +214,11 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 					m_movementState = CameraMovementState::AT_REST;
 					m_movementStateTransitionCounter = 0;
 				}
+			}
+			else {
+				m_movementState = CameraMovementState::IN_MOTION;
+				m_movementStateTransitionCounter = 0;
+				
 			}	
 		} break;
 		

@@ -520,7 +520,13 @@ Error:
 }
 
 RESULT DreamVCam::OnCameraInMotion() {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	CNR(m_pParentApp, R_SKIPPED);
+	CR(m_pParentApp->OnCameraInMotion());
+
+Error:
+	return r;
 }
 
 RESULT DreamVCam::OnCameraAtRest() {
@@ -528,6 +534,9 @@ RESULT DreamVCam::OnCameraAtRest() {
 
 	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
 	GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(true), m_pCamera->GetOrientation());
+
+	CNR(m_pParentApp, R_SKIPPED);
+	CR(m_pParentApp->OnCameraAtRest());
 
 Error:
 	return r;
