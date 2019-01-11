@@ -4,8 +4,8 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramBlinnPhongShadow::OGLProgramBlinnPhongShadow(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglblinnphongshadow"),
+OGLProgramBlinnPhongShadow::OGLProgramBlinnPhongShadow(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglblinnphongshadow", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)
 {
@@ -67,7 +67,7 @@ RESULT OGLProgramBlinnPhongShadow::OGLInitialize() {
 	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());
 	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
 	*/
-	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	///*
@@ -86,8 +86,8 @@ RESULT OGLProgramBlinnPhongShadow::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
 	CR(MakeInput<OGLFramebuffer>("input_shadowdepth_framebuffer", &m_pInputFramebufferShadowDepth));

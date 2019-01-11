@@ -5,8 +5,8 @@
 #include "OGLAttachment.h"
 #include "OGLTexture.h"
 
-OGLProgramShadowDepth::OGLProgramShadowDepth(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglshadowdepth"),
+OGLProgramShadowDepth::OGLProgramShadowDepth(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglshadowdepth", optFlags),
 	m_pShadowEmitter(nullptr)
 {
 	// empty
@@ -35,7 +35,7 @@ RESULT OGLProgramShadowDepth::OGLInitialize() {
 	CR(m_pOGLFramebuffer->SetSampleCount(4));
 
 	CR(m_pOGLFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT32, GL_FLOAT));
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(texture::type::TEXTURE_2D, GL_DEPTH_COMPONENT32, GL_FLOAT));
 	
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR));
@@ -56,7 +56,7 @@ RESULT OGLProgramShadowDepth::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 
 	// Outputs
 	// TODO: Handle more than one light for shadows

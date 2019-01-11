@@ -461,9 +461,9 @@ bool quaternion::operator!=(const quaternion& rhs) {
 	return !(quaternion(*this) == rhs);
 }
 
-const quaternion& quaternion::operator-(const quaternion& arg) const {
-	return (new quaternion(*this))->operator-=(arg);
-}
+//const quaternion& quaternion::operator-(const quaternion& arg) const {
+//	return (new quaternion(*this))->operator-=(arg);
+//}
 
 // Utility
 quaternion quaternion::iQuaternion(quaternion_precision theta) {

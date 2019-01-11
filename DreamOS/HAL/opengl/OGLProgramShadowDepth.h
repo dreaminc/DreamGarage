@@ -16,16 +16,7 @@
 
 class OGLProgramShadowDepth : public OGLProgram {
 public:
-<<<<<<< HEAD
-	OGLProgramShadowDepth(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) :
-		OGLProgram(pParentImp, "oglshadowdepth", optFlags),
-		m_pShadowEmitter(nullptr)
-	{
-		// empty
-	}
-=======
-	OGLProgramShadowDepth(OpenGLImp *pParentImp);
->>>>>>> shadow HAL test set up and relevant shaders (using blinn phong shadow for now) moved to new arch
+	OGLProgramShadowDepth(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 
