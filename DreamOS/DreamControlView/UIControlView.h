@@ -60,6 +60,9 @@ public:
 	RESULT HandleKeyboardUp();
 	RESULT HandleKeyboardDown();
 
+	RESULT FlipViewUp();
+	RESULT FlipViewDown();
+
 private:
 	RESULT ShowView();
 	RESULT HideView();

@@ -345,17 +345,8 @@ RESULT UIControlView::HandleKeyboardDown() {
 	RESULT r = R_PASS;
 	
 	CR(m_pDreamOS->GetKeyboardApp()->Hide());
+	CR(FlipViewDown());
 
-	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-		this,
-		m_ptVisiblePosition,	
-		m_qViewQuadOrientation,
-		vector(1.0f, 1.0f, 1.0f),
-		m_keyboardAnimationDuration,
-		AnimationCurveType::EASE_OUT_QUAD,
-		AnimationFlags()
-	));
-	
 Error:
 	return r;
 }
@@ -363,28 +354,56 @@ Error:
 RESULT UIControlView::HandleKeyboardUp() {
 	RESULT r = R_PASS;
 
-	point ptTypingPosition;
-	float textBoxYOffset;
-	float verticalAngle;
-	// Position the ControlView behind the keyboard with a slight height offset (center should be above keyboard textbox).
-	point ptTypingOffset;
 
 	std::shared_ptr<UIKeyboard> pKeyboardApp = m_pDreamOS->GetKeyboardApp();
-	std::shared_ptr<DreamUserApp> pDreamUserApp = m_pDreamOS->GetUserApp();
 	CNR(pKeyboardApp, R_SKIPPED);
-	CNR(pDreamUserApp, R_SKIPPED);
 
 	CBR(IsVisible(), R_SKIPPED);
 	CBR(!IsAnimating(), R_SKIPPED);
 
-	float viewHeight;
-	viewHeight = m_pViewQuad->GetHeight();
+	CR(FlipViewUp());
+
+	CBR(!pKeyboardApp->IsVisible(), R_SKIPPED);
+	CR(pKeyboardApp->Show());
+
+Error:
+	return r;
+}
+
+RESULT UIControlView::FlipViewDown() {
+	RESULT r = R_PASS;
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		this,
+		m_ptVisiblePosition,
+		m_qViewQuadOrientation,
+		vector(1.0f, 1.0f, 1.0f),
+		m_keyboardAnimationDuration,
+		AnimationCurveType::EASE_OUT_QUAD,
+		AnimationFlags()
+	));
+
+Error:
+	return r;
+}
+
+RESULT UIControlView::FlipViewUp() {
+	RESULT r = R_PASS;
+
+	// Position the ControlView behind the keyboard with a slight height offset (center should be above keyboard textbox).
+	point ptTypingPosition;
+	point ptTypingOffset;
+
+	float viewHeight = m_pViewQuad->GetHeight();
+	float textBoxYOffset = viewHeight/2.0f;
+	float verticalAngle;
+
+	std::shared_ptr<DreamUserApp> pDreamUserApp = m_pDreamOS->GetUserApp();
+	CNR(pDreamUserApp, R_SKIPPED);
 
 	// currently always fully shown
-	textBoxYOffset = viewHeight/2.0f;
-	//textBoxYOffset *= 0.8f;
 
-	// 58 degrees is the old typing angle (straight up), move the y offset down to accomodate
+	// 58 degrees is the old typing angle (straight up), move the y offset down to accommodate
 	// tilting the screen up
 	verticalAngle = (90.0f - pDreamUserApp->GetViewAngle()) * M_PI / 180.0;
 	textBoxYOffset *= 1.0f - sin(verticalAngle - TYPING_ANGLE); 
@@ -392,9 +411,6 @@ RESULT UIControlView::HandleKeyboardUp() {
 	ptTypingOffset = point(0.0f, 0.0f, -m_pViewBackground->GetHeight() * 0.5f);	// so that it'll appear past the keyboard quad
 
 	ptTypingPosition = ptTypingOffset +point(0.0f, sin(TYPING_ANGLE) * textBoxYOffset, -cos(TYPING_ANGLE) * textBoxYOffset);
-
-	CBR(!pKeyboardApp->IsVisible(), R_SKIPPED);
-	CR(pKeyboardApp->Show());
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		this,
@@ -410,6 +426,7 @@ RESULT UIControlView::HandleKeyboardUp() {
 Error:
 	return r;
 }
+
 
 float UIControlView::GetBackgroundWidth() {
 	return m_pViewBackground->GetWidth();
