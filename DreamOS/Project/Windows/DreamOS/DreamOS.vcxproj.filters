@@ -777,27 +777,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\DreamOSMain.h">
-      <Filter>Main</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\RESULT\EHM.h">
-      <Filter>RESULT</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\RESULT\RESULT.h">
-      <Filter>RESULT</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Test\TestObject.h">
-      <Filter>Test</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\RESULT\STDTYPES.h">
-      <Filter>RESULT</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\DimObj.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\point.h">
-      <Filter>Primitives</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp">
       <Filter>DreamLogger</Filter>
     </ClCompile>
@@ -1072,6 +1051,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+	<ClInclude Include="..\..\..\DreamOSMain.h">
+      <Filter>Main</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
       <Filter>RESULT</Filter>
     </ClInclude>
