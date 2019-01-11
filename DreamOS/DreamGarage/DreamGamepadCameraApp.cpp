@@ -164,7 +164,7 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 	//DEBUG_LINEOUT_RETURN("Camera Rotating: x: %0.8f y: %0.8f", m_lookXVelocity, m_lookYVelocity);
 	
 	// TODO: replace this with state machine?
-	//bool fAtRest = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_pCamera->GetMomentum().magnitude() < m_cameraAtRestMomentum);		// Momentum at rest - some false positives, underlying bug with decel?
+	//bool fAtRest = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_pCamera->GetMomentum().magnitude() < m_cameraAtRestMomentum);		// Momentum at rest - some false positives, need to threshold trigger values (they'll return like -.0000123 when released) 
 	bool fAtRest = (m_lookXVelocity == 0.0f && m_lookYVelocity == 0.0f && m_ptLeftStick.IsZero() && m_ptRightStick.IsZero() && m_leftTriggerValue < 0.01 && m_rightTriggerValue < 0.01);
 	if (!fAtRest && m_fAtRest) {
 		//DEBUG_LINEOUT("Camera In Motion!");
