@@ -628,7 +628,51 @@ Error:
 }
 
 RESULT OGLTexture::UpdateTextureRegionFromBuffer(void *pBuffer, int x, int y, int width, int height) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	size_t pBuffer_n = width * height * m_channels;
+
+	CBM((GetTextureSize() >= pBuffer_n), "texture region cannot be larger than the texture");
+
+	CR(Bind());
+	/*
+	if (IsOGLPBOUnpackEnabled()) {
+		CR(BindPixelUnpackBuffer());
+
+		CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GetOpenGLPixelFormat(m_pixelFormat), GL_UNSIGNED_BYTE, NULL));
+
+		// Needed?  Only if we want to do two PBOs for unpack?
+		CR(BindPixelUnpackBuffer());
+
+		CR(m_pParentImp->glBufferData(GL_PIXEL_UNPACK_BUFFER, pBuffer_n, 0, GL_STREAM_DRAW));
+
+		void* pUnpackPBO = m_pParentImp->glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
+		CN(pUnpackPBO);
+
+		// update the data here
+		//updatePixels(ptr, DATA_SIZE);
+
+		// Update data directly on the mapped buffer
+		memcpy((void*)pUnpackPBO, (void*)pBuffer, pBuffer_n);
+
+		// release pointer to mapping buffer
+		m_pParentImp->glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+
+
+		// It is good idea to release PBOs with ID 0 after use.
+		// Once bound with 0, all pixel operations behave normal ways.
+		(m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
+
+	}
+	else {
+	*/
+	CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GetOpenGLPixelFormat(m_pixelFormat), GL_UNSIGNED_BYTE, pBuffer));
+	//}
+
+	CRM(m_pParentImp->CheckGLError(), "UpdateTextureRegionFromBuffer failed");
+
+Error:
+	return r;
 }
 
 RESULT OGLTexture::Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) {
