@@ -784,7 +784,7 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrow
 			// bounds checking and adjusting
 			int x = rect.pt.x;
 			int y = rect.pt.y;
-			/*
+		
 			if (x < 0) {
 				x = 0;
 			}
@@ -798,7 +798,7 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrow
 			if (y + rect.height > m_pBrowserTexture->GetHeight()) {
 				rect.height -= y + rect.height - m_pBrowserTexture->GetHeight();
 			}
-			//*/
+			
 			DOSLOG(INFO, "x: %d, y: %d, width: %d, height: %d", x, y, width, height);
 			m_pBrowserTexture->UpdateTextureRegionFromBuffer((unsigned char*)pBuffer, x, y, width, height);
 		}
