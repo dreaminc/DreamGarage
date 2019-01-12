@@ -614,8 +614,8 @@ RESULT DreamBrowser::Update(void *pContext) {
 	// Really strange, we need to send 8 frames for the share to go through? As in OnVideoFrame isn't called on the receiver side until the 4th one is sent
 	if (m_fSendFrame && m_fFirstFrameIsReady) {
 		for (m_sentFrames = 0; m_sentFrames < 8; m_sentFrames++) {
-			int a = 0;
-			CR(m_pWebBrowserController->PollNewDirtyFrames(a));
+			int numFramesProcessed = 0;
+			CR(m_pWebBrowserController->PollNewDirtyFrames(numFramesProcessed));
 		}
 		m_fSendFrame = false;
 		m_sentFrames = 0;
