@@ -562,7 +562,7 @@ RESULT DreamUserControlArea::HandleLoadEnd() {
 }
 
 bool DreamUserControlArea::IsContentVisible() {
-	return true;
+	return m_pControlView != nullptr && m_pControlView->IsVisible();
 }
 
 RESULT DreamUserControlArea::HandleDreamFormSuccess() {
@@ -767,9 +767,11 @@ Error:
 RESULT DreamUserControlArea::OnCameraInMotion() {
 	RESULT r = R_PASS;
 
+	/*
 	m_pControlView->FlipViewUp();
 	m_pDreamTabView->Hide();
 	m_pUserControls->Hide();
+	//*/
 
 	return r;
 }
@@ -777,9 +779,11 @@ RESULT DreamUserControlArea::OnCameraInMotion() {
 RESULT DreamUserControlArea::OnCameraAtRest() {
 	RESULT r = R_PASS;
 
+	/*
 	m_pControlView->FlipViewDown();
 	m_pDreamTabView->Show();
 	m_pUserControls->Show();
+	//*/
 
 	return r;
 }
