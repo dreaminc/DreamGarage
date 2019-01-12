@@ -56,6 +56,8 @@ public:
 	RESULT AddTestPBOTextureUpload();
 	RESULT AddTestPBOTextureReadback();
 
+	RESULT AddTestTextureSubRegionUpdate();
+
 	// Environments
 	RESULT AddTestStandardShader();
 	RESULT AddTestEnvironments();

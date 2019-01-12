@@ -614,7 +614,8 @@ RESULT DreamBrowser::Update(void *pContext) {
 	// Really strange, we need to send 8 frames for the share to go through? As in OnVideoFrame isn't called on the receiver side until the 4th one is sent
 	if (m_fSendFrame && m_fFirstFrameIsReady) {
 		for (m_sentFrames = 0; m_sentFrames < 8; m_sentFrames++) {
-			CR(m_pWebBrowserController->PollFrame());
+			int a = 0;
+			CR(m_pWebBrowserController->PollNewDirtyFrames(a));
 		}
 		m_fSendFrame = false;
 		m_sentFrames = 0;
@@ -766,7 +767,7 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrow
 
 	CNR(m_pBrowserTexture, R_SKIPPED);
 
-	if (m_browserHeight != height || m_browserWidth != width) {
+	if (type == WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW && (m_browserHeight != height || m_browserWidth != width)) {
 		// Update texture dimensions if needed
 		CR(m_pBrowserTexture->UpdateDimensions(width, height));
 		if (r != R_NOT_HANDLED) {
@@ -783,7 +784,7 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrow
 			// bounds checking and adjusting
 			int x = rect.pt.x;
 			int y = rect.pt.y;
-
+			/*
 			if (x < 0) {
 				x = 0;
 			}
@@ -797,8 +798,9 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrow
 			if (y + rect.height > m_pBrowserTexture->GetHeight()) {
 				rect.height -= y + rect.height - m_pBrowserTexture->GetHeight();
 			}
-			
-			m_pBrowserTexture->UpdateTextureRegionFromBuffer((unsigned char*)pBuffer, x, y, rect.width, rect.height);
+			//*/
+			DOSLOG(INFO, "x: %d, y: %d, width: %d, height: %d", x, y, width, height);
+			m_pBrowserTexture->UpdateTextureRegionFromBuffer((unsigned char*)pBuffer, x, y, width, height);
 		}
 	}
 	else {
