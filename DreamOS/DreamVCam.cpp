@@ -511,7 +511,8 @@ Error:
 RESULT DreamVCam::OnClientDisconnect() {
 	RESULT r = R_PASS;
 
-	CR(m_pParentApp->OnVirtualCameraReleased());
+	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	pEnvironmentControllerProxy->RequestStopSharing(m_pCurrentCameraShare);
 
 	CR(HideCameraSource());
 

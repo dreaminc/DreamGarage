@@ -1821,8 +1821,15 @@ RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmen
 RESULT DreamGarage::OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 	
-	CR(m_pDreamShareView->StopSending());
-	CR(m_pDreamUserControlArea->HandleStopSending());
+	CN(pEnvironmentShare);
+
+	if (pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
+		CR(m_pDreamShareView->StopSending());
+		CR(m_pDreamUserControlArea->HandleStopSending());
+	}
+	else if (pEnvironmentShare->GetShareType() == SHARE_TYPE_CAMERA) {
+		CR(m_pDreamUserControlArea->OnVirtualCameraReleased());
+	}
 
 Error:
 	return r;

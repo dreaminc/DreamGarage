@@ -599,7 +599,8 @@ Error:
 RESULT DreamUserControlArea::OnVirtualCameraReleased() {
 	RESULT r = R_PASS;
 
-	//m_pActiveCameraSource = nullptr;
+	CR(m_pDreamVCam->StopSharing());
+	m_pActiveCameraSource = nullptr;
 
 Error:
 	return r;
