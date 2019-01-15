@@ -533,6 +533,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->RegisterParameter("environment", "env", "default"));
 	CR(m_pCommandLineManager->RegisterParameter("testval", "t", "1"));
 	CR(m_pCommandLineManager->RegisterParameter("leap", "lp", ""));
+	CR(m_pCommandLineManager->RegisterParameter("namedpipe", "n", ""));
 
 	//CR(m_pCommandLineManager->RegisterParameter("otk.id", "otk.id", "INVALIDONETIMEKEY"));
 	//CR(m_pCommandLineManager->RegisterParameter("username", "u", "defaulttestuser@dreamos.com"));
@@ -611,6 +612,9 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	// TODO: Time manager should be converted to a module
 	CRM(InitializeTimeManager(), "Failed to initialize time manager");
 
+	if ((m_pCommandLineManager->GetParameterValue("namedpipe").compare("") == 0) == false) {
+		m_SandboxConfiguration.fInitNamedPipe = false;
+	}
 	CRM(InitializeDreamAppManager(), "Failed to initialize app manager");
 	DOSLOG(INFO, "Finished Initializing DreamAppManager");
 
