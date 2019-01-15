@@ -60,59 +60,58 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 	SetVisible(true);
 
 	// this can be local, because all values are saved to specific buttons
-	std::vector<std::shared_ptr<texture>> controlTextures;
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBack));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBackDisabled));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForward));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForwardDisabled));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszClose));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszURL));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszOpen));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszStopSharing));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShare));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszHide));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShow));
+	m_buttonTextureMap[buttonType::BACK] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBack));
+	m_buttonTextureMap[buttonType::BACK_DISABLED] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBackDisabled));
+	m_buttonTextureMap[buttonType::FORWARD] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForward));
+	m_buttonTextureMap[buttonType::FORWARD_DISABLED] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForwardDisabled));
+	m_buttonTextureMap[buttonType::CLOSE] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszClose));
+	m_buttonTextureMap[buttonType::URL] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszURL));
+	m_buttonTextureMap[buttonType::OPEN] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszOpen));
+	m_buttonTextureMap[buttonType::STOP_SHARING] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszStopSharing));
+	m_buttonTextureMap[buttonType::SHARE] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShare));
+	m_buttonTextureMap[buttonType::HIDE] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszHide));
+	m_buttonTextureMap[buttonType::SHOW] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShow));
 
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszKeyboard));
+	m_buttonTextureMap[buttonType::KEYBOARD] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszKeyboard));
 
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSourceCamera));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSourceShare));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSourceNoShare));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSend));
-	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszStopSending));
+	m_buttonTextureMap[buttonType::SOURCE_CAMERA] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSourceCamera));
+	m_buttonTextureMap[buttonType::SOURCE_SHARE] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSourceShare));
+	m_buttonTextureMap[buttonType::SOURCE_NO_SHARE] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSourceNoShare));
+	m_buttonTextureMap[buttonType::SEND] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSend));
+	m_buttonTextureMap[buttonType::STOP_SENDING] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszStopSending));
 
-	for (auto pTexture : controlTextures) {
-		CN(pTexture);
+	for (int i = 0; i < (int)(buttonType::INVALID); i++) {
+		CN(m_buttonTextureMap[(buttonType)(i)]);
 	}
 
 	// browser
 	m_pBackButton = AddButton(backOffset, buttonWidth, buttonHeight,
 		std::bind(&UserAreaControls::HandleBackPressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[0], controlTextures[1]);
+		m_buttonTextureMap[buttonType::BACK], m_buttonTextureMap[buttonType::BACK_DISABLED]);
 
 	m_pForwardButton = AddButton(forwardOffset, buttonWidth, buttonHeight,
 		std::bind(&UserAreaControls::HandleForwardPressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[2], controlTextures[3]);
+		m_buttonTextureMap[buttonType::FORWARD], m_buttonTextureMap[buttonType::FORWARD_DISABLED]);
 
 	m_pShareButton = AddButton(shareOffset, buttonWidth, buttonHeight,
 		std::bind(&UserAreaControls::HandleShareTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[7], controlTextures[8]);
+		m_buttonTextureMap[buttonType::STOP_SHARING], m_buttonTextureMap[buttonType::SHARE]);
 
 	// desktop
 	m_pKeyboardButton = AddButton(backSourceOffset, buttonWidth*2.0f + spacingSize, buttonHeight,
 		std::bind(&UserAreaControls::HandleKeyboardPressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[11]);
+		m_buttonTextureMap[buttonType::KEYBOARD]);
 
 	m_pKeyboardButton->SetVisible(false);
 
 	// camera
 	m_pCameraSourceButton = AddButton(backSourceOffset, buttonWidth*2.0f + spacingSize, buttonHeight,
 		std::bind(&UserAreaControls::HandleSourceTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[14], controlTextures[13]);
+		m_buttonTextureMap[buttonType::SOURCE_NO_SHARE], m_buttonTextureMap[buttonType::SOURCE_CAMERA]);
 
 	m_pSendButton = AddButton(shareOffset, buttonWidth, buttonHeight,
 		std::bind(&UserAreaControls::HandleSendTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[15], controlTextures[16]);
+		m_buttonTextureMap[buttonType::SEND], m_buttonTextureMap[buttonType::STOP_SENDING]);
 
 	m_pCameraSourceButton->SetVisible(false);
 	m_pSendButton->SetVisible(false);
@@ -121,19 +120,19 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 //	CR(AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth * width, 
 //		std::bind(&UIContentControlBar::HandleURLPressed, this, std::placeholders::_1, std::placeholders::_2)));
 
-	m_pURLButton = AddButton(urlOffset, m_urlWidth, buttonHeight, nullptr, controlTextures[5]);
+	m_pURLButton = AddButton(urlOffset, m_urlWidth, buttonHeight, nullptr, m_buttonTextureMap[buttonType::URL]);
 
 	m_pOpenButton = AddButton(openOffset, buttonWidth, buttonHeight, 
 		std::bind(&UserAreaControls::HandleOpenPressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[6]);
+		m_buttonTextureMap[buttonType::OPEN]);
 
 	m_pMinimizeButton = AddButton(hideOffset, buttonWidth, buttonHeight,
 		std::bind(&UserAreaControls::HandleShowTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[9], controlTextures[10]);
+		m_buttonTextureMap[buttonType::HIDE], m_buttonTextureMap[buttonType::SHOW]);
 
 	m_pCloseButton = AddButton(closeOffset, buttonWidth, buttonHeight,
 		std::bind(&UserAreaControls::HandleClosePressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[4]);
+		m_buttonTextureMap[buttonType::CLOSE]);
 
 	CN(m_pBackButton);
 	CN(m_pForwardButton);

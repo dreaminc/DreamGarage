@@ -9,6 +9,8 @@
 
 #include "DreamUserControlArea/DreamContentSource.h"
 
+#include <map>
+
 //#include "DreamUserControlArea/DreamUserControlArea.h"
 class DreamUserControlArea;
 class text;
@@ -17,6 +19,34 @@ class text;
 #define URL_WIDTH 0.5484
 
 class UserAreaControls : public UIView {
+public:
+	enum class buttonType {
+		// Browser
+		BACK,
+		BACK_DISABLED,
+		FORWARD,
+		FORWARD_DISABLED,
+		CLOSE,
+		URL,
+		OPEN,
+		SHARE,
+		STOP_SHARING,
+		HIDE,
+		SHOW,
+
+		// Desktop
+		KEYBOARD,
+
+		// Virtual Camera
+		SOURCE_CAMERA,
+		SOURCE_SHARE,
+		SOURCE_NO_SHARE,
+		SEND,
+		STOP_SENDING,
+		// TODO: Re-centering
+
+		INVALID
+	};
 
 public:
 	UserAreaControls(HALImp *pHALImp, DreamOS *pDreamOS);
@@ -93,6 +123,8 @@ private:
 	double m_spacingSize;
 	double m_urlWidth = URL_WIDTH;
 	double m_urlHeight = ITEM_SIZE;
+
+	std::map<buttonType, std::shared_ptr<texture>> m_buttonTextureMap;
 
 	// browser
 	std::shared_ptr<UIButton> m_pBackButton = nullptr;
