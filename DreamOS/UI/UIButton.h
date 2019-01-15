@@ -44,6 +44,9 @@ public:
 
 	RESULT SwitchToTexture(bool fIsEnabledTexture);
 
+	RESULT SetEnabledTexture(std::shared_ptr<texture> pEnabledTexture);
+	RESULT SetDisabledTexture(std::shared_ptr<texture> pDisabledTexture);
+
 protected:
 	// objects (TODO: could be in subclass)
 

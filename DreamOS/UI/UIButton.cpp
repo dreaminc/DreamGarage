@@ -220,3 +220,39 @@ RESULT UIButton::SwitchToTexture(bool fIsEnabledTexture) {
 Error:
 	return r;
 }
+
+RESULT UIButton::SetEnabledTexture(std::shared_ptr<texture> pEnabledTexture) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pSurface = GetSurface();
+
+	CN(pSurface);
+	CN(pEnabledTexture);
+
+	if (IsToggled()) {
+		CR(pSurface->SetDiffuseTexture(pEnabledTexture.get()));
+	}
+
+	m_pEnabledTexture = pEnabledTexture;
+
+Error:
+	return r;
+}
+
+RESULT UIButton::SetDisabledTexture(std::shared_ptr<texture> pDisabledTexture) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pSurface = GetSurface();
+
+	CN(pSurface);
+	CN(pDisabledTexture);
+
+	if (!IsToggled()) {
+		CR(pSurface->SetDiffuseTexture(pDisabledTexture.get()));
+	}
+
+	m_pDisabledTexture = pDisabledTexture;
+
+Error:
+	return r;
+}
