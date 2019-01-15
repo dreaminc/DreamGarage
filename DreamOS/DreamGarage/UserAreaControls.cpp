@@ -107,13 +107,15 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 	// camera
 	m_pCameraSourceButton = AddButton(backSourceOffset, buttonWidth*2.0f + spacingSize, buttonHeight,
 		std::bind(&UserAreaControls::HandleSourceTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
-		m_buttonTextureMap[buttonType::SOURCE_NO_SHARE], m_buttonTextureMap[buttonType::SOURCE_CAMERA]);
+		m_buttonTextureMap[buttonType::SOURCE_SHARE], m_buttonTextureMap[buttonType::SOURCE_NO_SHARE]);
 
 	m_pSendButton = AddButton(shareOffset, buttonWidth, buttonHeight,
 		std::bind(&UserAreaControls::HandleSendTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
 		m_buttonTextureMap[buttonType::SEND], m_buttonTextureMap[buttonType::STOP_SENDING]);
 
 	m_pCameraSourceButton->SetVisible(false);
+	//m_pCameraSourceButton->SetEnabledFlag(false);
+	m_pCameraSourceButton->Toggle();
 	m_pSendButton->SetVisible(false);
 
 // Re-enable for selectability of the URL button
@@ -416,6 +418,29 @@ RESULT UserAreaControls::UpdateNavigationButtons(bool fCanGoBack, bool fCanGoFor
 
 	CR(m_pBackButton->SetEnabledFlag(fCanGoBack));
 	CR(m_pForwardButton->SetEnabledFlag(fCanGoForward));
+
+Error:
+	return r;
+}
+
+RESULT UserAreaControls::UpdateIsSharing(bool fSharing) {
+	RESULT r = R_PASS;
+
+	// TODO: would prefer that SetEnabled/Disabled texture calls didn't exist, however today
+	// the UIButton architecture supports buttons with up to two states through toggling,
+	// and m_pCameraSourceButton has three states, a toggle conditional on whether there is shared content
+
+	if (fSharing) {
+		m_pCameraSourceButton->SetDisabledTexture(m_buttonTextureMap[buttonType::SOURCE_CAMERA]);
+	}
+	else {
+		m_pCameraSourceButton->SetDisabledTexture(m_buttonTextureMap[buttonType::SOURCE_NO_SHARE]);
+
+		// switch button off if no longer sharing
+		if (m_pCameraSourceButton->IsToggled()) {
+			CR(m_pCameraSourceButton->Toggle());
+		}
+	}
 
 Error:
 	return r;

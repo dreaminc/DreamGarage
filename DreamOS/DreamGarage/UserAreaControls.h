@@ -79,6 +79,7 @@ public:
 	RESULT UpdateControlBarButtonsWithType(std::string strContentType);
 	RESULT UpdateButtonVisibility(std::string strContentType, bool fVisible);
 	RESULT UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward);
+	RESULT UpdateIsSharing(bool fSharing);
 
 	std::shared_ptr<text> GetURLText();
 
