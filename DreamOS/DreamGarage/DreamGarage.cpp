@@ -1547,7 +1547,13 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	RESULT r = R_PASS;
 
 	auto pCloudController = GetCloudController();
-	if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {
+	if (strMessage == "DreamShareView.IsActive") {
+
+	}
+	else if (strMessage == "DreamShareView.IsNotActive") {
+
+	}
+	else if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {
 		// Resuming Dream functions if form was accessed out of Menu
 		if (strMessage == "DreamEnvironmentApp.OnFadeIn") {
 			m_pDreamUserApp->ResetAppComposite();

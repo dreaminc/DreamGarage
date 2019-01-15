@@ -296,7 +296,7 @@ RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
 	//*/
 
 	CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
-	m_fReceivingStream = true;
+	CR(SetReceivingState(true));
 
 	CR(BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type::ACK, DreamShareViewShareMessage::type::REQUEST_STREAMING_START));
 
@@ -309,7 +309,7 @@ RESULT DreamShareView::PendReceiving() {
 
 	//ShowCastingTexture();
 	m_pCastQuad->SetDiffuseTexture(m_pVideoCastTexture.get());
-	m_fReceivingStream = true;
+	CR(SetReceivingState(true));
 	//CR(SetVisible(true));
 
 Error:
@@ -320,7 +320,7 @@ RESULT DreamShareView::StopReceiving() {
 	RESULT r = R_PASS;
 
 	m_pStreamerPeerConnection = nullptr;
-	m_fReceivingStream = false;
+	CR(SetReceivingState(false));
 
 	//CR(GetComposite()->SetVisible(false));
 	CR(Hide());
@@ -385,7 +385,7 @@ RESULT DreamShareView::BeginStream() {
 
 	if (m_fReceivingStream) {
 		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
-		m_fReceivingStream = false;
+		CR(SetReceivingState(false));
 	}
 
 	SetStreamingState(false);
@@ -407,6 +407,32 @@ RESULT DreamShareView::SetStreamingState(bool fStreaming) {
 
 	m_fStreaming = fStreaming;
 
+	bool fReceiving;
+	IsReceivingStream(fReceiving);
+
+	bool fIsActive = m_fStreaming || fReceiving;
+
+	if (m_fIsActive != fIsActive) {
+		m_fIsActive = fIsActive;
+		SendDOSMessage();
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::SetReceivingState(bool fReceiving) {
+	RESULT r = R_PASS;
+
+	m_fReceivingStream = fReceiving;
+
+	bool fIsActive = IsStreaming() || m_fReceivingStream;
+
+	if (m_fIsActive != fIsActive) {
+		m_fIsActive = fIsActive;
+		SendDOSMessage();
+	}
+
 Error:
 	return r;
 }
@@ -415,6 +441,21 @@ bool DreamShareView::IsStreaming() {
 	return m_fStreaming;
 }
 
+RESULT DreamShareView::SendDOSMessage() {
+	RESULT r = R_PASS;
+
+	if (m_fIsActive) {
+		std::string strActive = "DreamShareView.IsActive";
+		GetDOS()->SendDOSMessage(strActive);
+	}
+	else {
+		std::string strNotActive = "DreamShareView.IsNotActive";
+		GetDOS()->SendDOSMessage(strNotActive);
+	}
+
+Error:
+	return r;
+}
 
 RESULT DreamShareView::BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType) {
 	RESULT r = R_PASS;
