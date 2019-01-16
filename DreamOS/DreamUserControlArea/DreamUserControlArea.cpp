@@ -970,7 +970,7 @@ bool DreamUserControlArea::IsSharingScreen() {
 RESULT DreamUserControlArea::UpdateIsActive(bool fIsActive) {
 	RESULT r = R_PASS;
 
-	CR(m_pUserControls->UpdateIsSharing(fIsActive));
+	CR(m_pUserControls->UpdateIsActive(fIsActive));
 
 Error:
 	return r;

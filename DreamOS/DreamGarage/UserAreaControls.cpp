@@ -335,7 +335,7 @@ RESULT UserAreaControls::HandleSourceTogglePressed(UIButton* pButtonContext, voi
 	RESULT r = R_PASS;
 
 	//CBR(m_pParentApp->IsSharingScreen(), R_SKIPPED);
-	CBR(m_fIsSharing, R_SKIPPED);
+	CBR(m_fIsActive, R_SKIPPED);
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	CR(pButtonContext->Toggle());
 	if (pButtonContext->IsToggled()) {
@@ -424,16 +424,16 @@ Error:
 	return r;
 }
 
-RESULT UserAreaControls::UpdateIsSharing(bool fSharing) {
+RESULT UserAreaControls::UpdateIsActive(bool fActive) {
 	RESULT r = R_PASS;
 
 	// TODO: would prefer that SetEnabled/Disabled texture calls didn't exist, however today
 	// the UIButton architecture supports buttons with up to two states through toggling,
 	// and m_pCameraSourceButton has three states, a toggle conditional on whether there is shared content
 
-	m_fIsSharing = fSharing;
+	m_fIsActive = fActive;
 
-	if (fSharing) {
+	if (fActive) {
 		m_pCameraSourceButton->SetDisabledTexture(m_buttonTextureMap[buttonType::SOURCE_CAMERA]);
 	}
 	else {
