@@ -47,6 +47,7 @@
 #include "Sound/AudioPacket.h"
 
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
+	TestSuite("dreamos"),
 	m_pDreamOS(pDreamOS)
 {
 	// empty

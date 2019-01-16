@@ -25,6 +25,7 @@
 #include "Sense/SenseController.h"
 
 UIViewTestSuite::UIViewTestSuite(DreamOS *pDreamOS) :
+	TestSuite("uiview"),
 	m_pDreamOS(pDreamOS)
 {
 	RESULT r = R_PASS;

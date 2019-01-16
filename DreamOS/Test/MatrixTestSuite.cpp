@@ -3,7 +3,9 @@
 #include "Primitives/matrix/matrix.h"
 #include "Primitives/matrix/TranslationMatrix.h"
 
-MatrixTestSuite::MatrixTestSuite() {
+MatrixTestSuite::MatrixTestSuite() :
+	TestSuite("matrix")
+{
 	// empty 
 }
 
@@ -26,7 +28,7 @@ RESULT MatrixTestSuite::AddTests() {
 	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestProjectionMatrix, this));
 	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestScaleMatrix, this));
 
-//Error:
+Error:
 	return r;
 }
 

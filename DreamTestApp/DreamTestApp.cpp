@@ -12,6 +12,14 @@ volume *g_pVolume = nullptr;
 volume *g_pVolume2 = nullptr;
 sphere *pSphere5 = nullptr;
 
+DreamTestApp::DreamTestApp() {
+	// empty
+}
+
+DreamTestApp::~DreamTestApp() {
+	// empty
+}
+
 RESULT DreamTestApp::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
@@ -38,6 +46,9 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	auto pCommandLineManager = CommandLineManager::instance();
 	CN(pCommandLineManager);
 
+	// Test CLI selector
+	CR(pCommandLineManager->RegisterParameter("testsuite", "ts", "dreamos"));
+
 	// previous AWS server
 	// CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "http://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
 	// CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
@@ -57,12 +68,11 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	CR(pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.develop.dreamos.com:443"));
 	CR(pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.develop.dreamos.com:443"));
 
-#ifdef USE_LOCALHOST
-	CR(pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://localhost:8000"));
-#else
-	CR(pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
-#endif
-
+	#ifdef USE_LOCALHOST
+		CR(pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://localhost:8000"));
+	#else
+		CR(pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
+	#endif
 #endif
 
 Error:
@@ -72,61 +82,78 @@ Error:
 RESULT DreamTestApp::LoadScene() {
 	RESULT r = R_PASS;
 
+	std::string strTestName;
+
 	// IO
 	RegisterSubscriber((SenseVirtualKey)('N'), this);
 
-	// Set up the HAL Configuration as needed
-	///*
+	// Set up the HAL Configuration 
 	HALImp::HALConfiguration halconf;
 	halconf.fRenderReferenceGeometry = false;
 	halconf.fDrawWireframe = false;
 	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);
-	//*/
 
-	// Push to a test suite factory in testing
+	// Set up command line manager
+	auto pCommandLineManager = CommandLineManager::instance();
+	CN(pCommandLineManager);
 
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::COLLISION, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::SOUND, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::WEBRTC, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::MULTICONTENT, this);
-	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::HAL, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UIVIEW, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::OS, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::CLOUD, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::INTERACTION, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::ANIMATION, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::SANDBOX, this);
+	strTestName = pCommandLineManager->GetParameterValue("testsuite");
 
-	CN(m_pTestSuite);
+	// Register Test Suites
+	CRM(RegisterTestSuites(), "Failed to register test suites");
+
+	CRM(SelectTestSuite(strTestName), "Failed to select %s test suite", strTestName.c_str());
 
 	AddSkybox();
 
-	//light *pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
-	//pLight->EnableShadows();
+Error:
+	return r;
+}
 
-	/*
-	quad *pBQuad = AddQuad(10.0f, 20.0f, 200, 200);// , pHeightTextureCobble);
-	pBQuad->MoveTo(point(0.0f, -1.0f, 0.0f));
+RESULT DreamTestApp::RegisterTestSuite(std::shared_ptr<TestSuite> pTestSuite) {
+	RESULT r = R_PASS;
 
-	sphere *pSphere = AddSphere(0.5f, 10, 10, color(COLOR_RED));
-	pSphere->MoveTo(1.5f, 0.5f, 0.0f);
+	CBM((m_registeredTestSuites.find(pTestSuite->GetName()) == m_registeredTestSuites.end()), 
+		"%s test suite already registered", pTestSuite->GetName().c_str());
 
-	volume *pVolume = AddVolume(0.5f, false);
-	pVolume->MoveTo(-1.5f, 0.5f, 0.0f);
-	pVolume->SetWireframe(true);
-	*/
+	m_registeredTestSuites[pTestSuite->GetName()] = pTestSuite;
 
-	/*
-	pComposite = AddModel(L"\\Models\\Boar\\boar-obj.obj", nullptr, point(0.0f, 0.0f, 0.0f), 0.15f, vector(0.0f, 0.0f, 0.0f));
-	pComposite->SetMass(1.0f);
-	AddPhysicsObject(pComposite);
-	//*/
+Error:
+	return r;
+}
 
-	//*/
+RESULT DreamTestApp::RegisterTestSuites() {
+	RESULT r = R_PASS;
+
+	m_registeredTestSuites = std::map<std::string, std::shared_ptr<TestSuite>>();
+
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::COLLISION, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::SOUND, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::WEBRTC, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::MULTICONTENT, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::HAL, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UIVIEW, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::OS, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::CLOUD, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::INTERACTION, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::ANIMATION, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::SANDBOX, this));
+
+Error:
+	return r;
+}
+
+RESULT DreamTestApp::SelectTestSuite(std::string strName) {
+	RESULT r = R_PASS;
+
+	CBM((m_registeredTestSuites.find(strName) != m_registeredTestSuites.end()),
+		"%s test suite not registered", strName.c_str());
+
+	m_pCurrentTestSuite = m_registeredTestSuites[strName];
 
 Error:
 	return r;
@@ -135,7 +162,9 @@ Error:
 RESULT DreamTestApp::Update(void) {
 	RESULT r = R_PASS;
 
-	CR(m_pTestSuite->UpdateAndRunTests((void*)(this)));
+	CNM(m_pCurrentTestSuite, "No test suite selected");
+
+	CR(m_pCurrentTestSuite->UpdateAndRunTests((void*)(this)));
 
 Error:
 	return r;
@@ -198,7 +227,7 @@ RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 		case (SenseVirtualKey)('N') : {
 			if (kbEvent->KeyState != 0) {
 				//HUD_OUT("Key 'N' is pressed - next test");
-				m_pTestSuite->NextTest();
+				m_pCurrentTestSuite->NextTest();
 			}
 		} break;
 	}

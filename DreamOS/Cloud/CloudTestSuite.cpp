@@ -80,6 +80,7 @@ Error:
 }
 
 CloudTestSuite::CloudTestSuite(DreamOS *pDreamOS) :
+	TestSuite("cloud"),
 	m_pDreamOS(pDreamOS)
 {
 	// empty

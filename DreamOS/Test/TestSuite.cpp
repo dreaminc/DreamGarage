@@ -1,6 +1,8 @@
 #include "TestSuite.h"
 
-TestSuite::TestSuite() {
+TestSuite::TestSuite(std::string strName) :
+	m_strName(strName)
+{
 	ClearTests();
 }
 

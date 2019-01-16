@@ -24,6 +24,7 @@
 #include "DreamGarage\DreamGamepadCameraApp.h"
 
 HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
+	TestSuite("hal"),
 	m_pDreamOS(pDreamOS)
 {
 	// empty

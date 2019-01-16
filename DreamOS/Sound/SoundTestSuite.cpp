@@ -18,6 +18,7 @@
 #include "DreamGarage\DreamGamepadCameraApp.h"
 
 SoundTestSuite::SoundTestSuite(DreamOS *pDreamOS) :
+	TestSuite("sound"),
 	m_pDreamOS(pDreamOS)
 {
 	// empty
