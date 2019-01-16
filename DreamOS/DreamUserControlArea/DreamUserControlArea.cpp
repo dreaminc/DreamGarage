@@ -64,7 +64,10 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		m_pDreamVCam = GetDOS()->LaunchDreamModule<DreamVCam>(this);
 		CN(m_pDreamVCam);
-		m_pDreamVCam->InitializePipeline();	
+
+		if (GetDOS()->GetSandboxConfiguration().fInitNamedPipe) {
+			m_pDreamVCam->InitializePipeline();
+		}
 
 		m_pView = GetComposite()->AddUIView(GetDOS());
 		CN(m_pView);

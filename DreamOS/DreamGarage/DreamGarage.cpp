@@ -89,6 +89,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fInitCloud = true;
 	sandboxconfig.fInitSound = true;
 	sandboxconfig.fInitUserApp = true;
+	sandboxconfig.fInitNamedPipe = true;
 
 	sandboxconfig.fHideWindow = true;
 	sandboxconfig.fHMDMirror = false;

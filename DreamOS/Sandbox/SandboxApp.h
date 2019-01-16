@@ -88,6 +88,7 @@ public:
 		unsigned f3rdPersonCamera : 1;
 		unsigned fHideWindow : 1;
 		unsigned fInitUserApp : 1;
+		unsigned fInitNamedPipe : 1;
 		HMD_TYPE hmdType = HMD_ANY_AVAILABLE;
 	};
 
