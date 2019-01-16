@@ -178,6 +178,8 @@ public:
 	std::shared_ptr<EnvironmentShare> GetCurrentScreenShare();
 	bool IsSharingScreen();
 
+	RESULT UpdateIsActive(bool fIsActive);
+
 // Animations
 public:
 	float GetAnimationDuration();

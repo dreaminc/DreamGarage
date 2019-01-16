@@ -915,7 +915,6 @@ RESULT DreamUserControlArea::StartSharing(std::shared_ptr<EnvironmentShare> pEnv
 		CR(m_pActiveSource->SendFirstFrame());
 
 		m_pCurrentScreenShare = pEnvironmentShare;
-		m_pUserControls->UpdateIsSharing(true);
 	}
 	else if (pEnvironmentShare->GetShareType() == SHARE_TYPE_CAMERA) {
 		CR(m_pDreamVCam->StartSharing(pEnvironmentShare));
@@ -954,7 +953,6 @@ RESULT DreamUserControlArea::HandleStopSending() {
 	RESULT r = R_PASS;
 
 	m_pCurrentScreenShare = nullptr;
-	CR(m_pUserControls->UpdateIsSharing(false));
 	CR(SetVirtualCameraSource(DreamVCam::SourceType::CAMERA));
 
 Error:
@@ -967,6 +965,15 @@ std::shared_ptr<EnvironmentShare> DreamUserControlArea::GetCurrentScreenShare() 
 
 bool DreamUserControlArea::IsSharingScreen() {
 	return (m_pCurrentScreenShare != nullptr);
+}
+
+RESULT DreamUserControlArea::UpdateIsActive(bool fIsActive) {
+	RESULT r = R_PASS;
+
+	CR(m_pUserControls->UpdateIsActive(fIsActive));
+
+Error:
+	return r;
 }
 
 RESULT DreamUserControlArea::ShutdownSource() {

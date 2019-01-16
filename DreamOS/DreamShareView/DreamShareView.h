@@ -56,7 +56,6 @@ public:
 	RESULT PendReceiving();
 	RESULT StopReceiving();
 	RESULT StopSending();
-	RESULT IsReceivingStream(bool &fReceivingStream);
 	RESULT HandleStopEvent();
 
 	// App Messaging
@@ -65,6 +64,11 @@ public:
 
 	bool IsStreaming();
 	RESULT SetStreamingState(bool fStreaming);
+
+	RESULT IsReceivingStream(bool &fReceivingStream);
+	RESULT SetReceivingState(bool fReceiving);
+
+	RESULT SendDOSMessage();
 
 	RESULT BroadcastAudioPacket(const AudioPacket &pendingAudioPacket);
 
@@ -125,6 +129,9 @@ private:
 	bool m_fReceivingStream = false;
 	bool m_fShouldBeginStream = false;
 	bool m_fReadyForFrame = false;
+
+	// flag represents m_fStreaming || m_fReceivingStream
+	bool m_fIsActive = false;
 
 	// Dream app message members
 	DreamShareViewShareMessage::type m_currentMessageType;

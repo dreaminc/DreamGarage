@@ -79,7 +79,7 @@ public:
 	RESULT UpdateControlBarButtonsWithType(std::string strContentType);
 	RESULT UpdateButtonVisibility(std::string strContentType, bool fVisible);
 	RESULT UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward);
-	RESULT UpdateIsSharing(bool fSharing);
+	RESULT UpdateIsActive(bool fActive);
 
 	std::shared_ptr<text> GetURLText();
 
@@ -146,6 +146,8 @@ private:
 	std::shared_ptr<UIButton> m_pCloseButton = nullptr;
 
 	std::string m_strCurrentContentType = CONTENT_TYPE_BROWSER;
+
+	bool m_fIsActive = false;
 };
 
 #endif // ! DREAM_CONTROL_BAR_H_
