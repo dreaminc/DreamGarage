@@ -37,10 +37,14 @@ OGLTexture::~OGLTexture() {
 		m_glTextureIndex = 0;
 	}
 
-	if (m_glFramebufferIndex[0] != 0 && m_glFramebufferIndex[1] != 0) {
-		m_pParentImp->glDeleteFramebuffers(2, m_glFramebufferIndex);
-		m_glFramebufferIndex[0] = 0;
-		m_glFramebufferIndex[1] = 0;
+	if (m_glFramebufferIndex != 0) {
+		m_pParentImp->glDeleteFramebuffers(1, &m_glFramebufferIndex);
+		m_glFramebufferIndex = 0;
+	}
+
+	if (m_glFlippedTextureIndex != 0) {
+		m_pParentImp->DeleteTextures(1, &m_glFlippedTextureIndex);
+		m_glFlippedTextureIndex = 0;
 	}
 
 	CR(DeallocateOGLPBOPack());
@@ -597,56 +601,38 @@ RESULT OGLTexture::LoadFlippedBufferFromTexture(void *pBuffer, size_t pBuffer_n)
 
 	{
 		CR(m_pParentImp->CheckGLError());
-		if (m_glFramebufferIndex[0] == 0 && m_glFramebufferIndex[1] == 0) {
-			CR(m_pParentImp->glGenFramebuffers(2, m_glFramebufferIndex));
-			CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_glFramebufferIndex[0]));
+		if (m_glFramebufferIndex == 0) {
+			CR(m_pParentImp->glGenFramebuffers(1, &m_glFramebufferIndex));
+			CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_glFramebufferIndex));
 			CR(m_pParentImp->glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_glTextureIndex, 0));
-			
-			CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_glFramebufferIndex[1]));
-			//CR(m_pParentImp->glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_glFlippedTextureIndex, 0));
-
-			CR(m_pParentImp->CheckGLError());
 
 			CR(m_pParentImp->GenerateTextures(1, &m_glFlippedTextureIndex));
 			CR(m_pParentImp->BindTexture(GL_TEXTURE_2D, m_glFlippedTextureIndex));
-
-			CR(m_pParentImp->CheckGLError());
-
 			CR(m_pParentImp->TexImage2D(m_glTextureTarget, 0, m_glInternalFormat, m_width, m_height, 0, m_glFormat, m_glPixelDataType, 0));
-			CR(m_pParentImp->CheckGLError());
+			SetDefaultTextureParams();
 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-			CR(m_pParentImp->CheckGLError());
-
-			CR(m_pParentImp->glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_glFlippedTextureIndex, 0));
-			//CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
+			CR(m_pParentImp->glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_glFlippedTextureIndex, 0));
 		}
-		CR(m_pParentImp->CheckGLError());
 
-		CR(m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_glFramebufferIndex[0]));
-		CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_glFramebufferIndex[1]));
+		CR(m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_glFramebufferIndex));
+		CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_glFramebufferIndex));
+
 		glReadBuffer(GL_COLOR_ATTACHMENT0);
-		glDrawBuffer(GL_COLOR_ATTACHMENT0);
-
-		CR(m_pParentImp->CheckGLError());
+		glDrawBuffer(GL_COLOR_ATTACHMENT1);
 
 		CR(m_pParentImp->glBlitFramebuffer(0, 0, m_width, m_height,
 			0, m_height, m_width, 0,
 			GL_COLOR_BUFFER_BIT, GL_NEAREST));
 
-		CR(m_pParentImp->CheckGLError());
-
+		CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
 		CR(m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
 	}
 
 	if (IsOGLPBOPackEnabled()) {
 		// Set the target framebuffer to read
-		CR(m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_glFramebufferIndex[1]));
-		glReadBuffer(GL_COLOR_ATTACHMENT0);
-		CR(m_pParentImp->CheckGLError());
-
+		CR(m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_glFramebufferIndex));
+		glReadBuffer(GL_COLOR_ATTACHMENT1);
+		
 		// read pixels from framebuffer to PBO
 		// glReadPixels() should return immediately.
 
@@ -673,13 +659,12 @@ RESULT OGLTexture::LoadFlippedBufferFromTexture(void *pBuffer, size_t pBuffer_n)
 		// back to conventional pixel operation
 		m_pParentImp->glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
+		CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
+		CR(m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
 	}
 	else {
 		//CR(m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
-
-		//CR(m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
-
-
+		CR(m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
 	}
 
 	CN(pBuffer);

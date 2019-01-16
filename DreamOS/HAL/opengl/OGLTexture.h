@@ -85,7 +85,7 @@ public:
 private:
 	OpenGLImp *m_pParentImp = nullptr;
 
-	GLuint m_glFramebufferIndex[2] = { 0 };
+	GLuint m_glFramebufferIndex = 0;
 	GLuint m_glFlippedTextureIndex = 0;
 
 	GLuint m_glTextureIndex = 0;
