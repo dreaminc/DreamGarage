@@ -201,6 +201,10 @@ RESULT texture::LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT texture::LoadFlippedBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT texture::LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) {
 	return R_NOT_HANDLED;
 }
