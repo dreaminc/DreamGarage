@@ -766,6 +766,14 @@
     <ClCompile Include="..\..\..\Primitives\LeapHand.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongShadow.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp">
       <Filter>DreamLogger</Filter>
     </ClCompile>

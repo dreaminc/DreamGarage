@@ -30,16 +30,19 @@ Error:
 RESULT OGLRenderbuffer::OGLInitialize() {
 	RESULT r = R_PASS;
 	
+	// TODO: Push up into param etc
+	GLenum internalFormat = GL_DEPTH_COMPONENT24;
+
 	CR(m_pParentImp->glGenRenderbuffers(1, &m_OGLRenderbufferIndex));
 	CB((m_OGLRenderbufferIndex != 0));
 
 	CR(m_pParentImp->glBindRenderbuffer(GL_RENDERBUFFER, m_OGLRenderbufferIndex));
 
 	if (m_sampleCount > 1) {
-		CR(m_pParentImp->glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_sampleCount, GL_DEPTH_COMPONENT, m_width, m_height));
+		CR(m_pParentImp->glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_sampleCount, internalFormat, m_width, m_height));
 	}
 	else {
-		CR(m_pParentImp->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height));
+		CR(m_pParentImp->glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, m_width, m_height));
 	}
 
 Error:

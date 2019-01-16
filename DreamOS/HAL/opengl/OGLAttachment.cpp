@@ -157,6 +157,7 @@ RESULT OGLAttachment::MakeOGLDepthTexture(texture::type type, GLenum internalGLF
 		m_channels,
 		internalGLFormat, GL_DEPTH_COMPONENT, pixelDataType
 	);
+
 	CN(m_pOGLTexture);
 
 Error:

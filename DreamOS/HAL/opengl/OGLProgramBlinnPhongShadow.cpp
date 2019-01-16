@@ -1,23 +1,18 @@
-#include "OGLProgramBlinnPhong.h"
-
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
-
-#include "Primitives/stereocamera.h"
+#include "OGLProgramBlinnPhongShadow.h"
 
 #include "OpenGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramBlinnPhong::OGLProgramBlinnPhong(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
-	OGLProgram(pParentImp, "oglblinnphong", optFlags),
+OGLProgramBlinnPhongShadow::OGLProgramBlinnPhongShadow(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglblinnphongshadow", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)
 {
 	// empty
 }
 
-RESULT OGLProgramBlinnPhong::OGLInitialize() {
+RESULT OGLProgramBlinnPhongShadow::OGLInitialize() {
 	RESULT r = R_PASS;
 
 	CR(OGLProgram::OGLInitialize());
@@ -33,17 +28,30 @@ RESULT OGLProgramBlinnPhong::OGLInitialize() {
 	// Uniforms
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewMatrix), std::string("u_mat4View")));
-	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformDepthViewProjectionMatrix), std::string("u_mat4DepthVP")));
+	
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformShadowEmitterDirection), std::string("u_vec4ShadowEmitterDirection")));
+
+	// Billboard boolean uniforms
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformfBillboard), std::string("u_fBillboard")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformfScale), std::string("u_fScale")));
+
+	// Object position uniforms
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformObjectCenter), std::string("u_vec4ObjectCenter")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformEyePosition), std::string("u_vec4EyePosition")));
 
 	// Uniform Blocks
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
+	// Depth Map Texture
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureDepth), std::string("u_textureDepth")));
+
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
-	
+
 	//pxWidth = 1024;
 	//pxHeight = 1024;
 
@@ -51,11 +59,10 @@ RESULT OGLProgramBlinnPhong::OGLInitialize() {
 	CR(m_pOGLFramebuffer->OGLInitialize());
 	CR(m_pOGLFramebuffer->Bind());
 
-	//CR(m_pOGLFramebuffer->SetSampleCount(4));
-	CR(m_pOGLFramebuffer->SetSampleCount(1));
+	CR(m_pOGLFramebuffer->SetSampleCount(4));
 
 	CR(m_pOGLFramebuffer->MakeColorAttachment());
-	
+
 	/*
 	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());
 	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
@@ -70,64 +77,20 @@ RESULT OGLProgramBlinnPhong::OGLInitialize() {
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
 	//*/
 
-	
 
 Error:
 	return r;
 }
 
-RESULT OGLProgramBlinnPhong::OGLInitialize(version versionOGL) {
-	RESULT r = R_PASS;
-
-	CR(OGLInitialize());
-
-	m_versionOGL = versionOGL;
-
-	// Create and set the shaders
-	
-	// Global
-	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
-	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
-	CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
-
-	// Vertex
-	CRM(MakeVertexShader(L"blinnphong.vert"), "Failed to create vertex shader");
-
-	// Fragment
-	CRM(MakeFragmentShader(L"blinnphong.frag"), "Failed to create fragment shader");
-
-	// Link the program
-	CRM(LinkProgram(), "Failed to link program");
-
-	// TODO: This could all be done in one call in the OGLShader honestly
-	// Attributes
-	// TODO: Tabulate attributes (get them from shader, not from class)
-	WCR(GetVertexAttributesFromProgram());
-	WCR(BindAttributes());
-
-	//CR(PrintActiveAttributes());
-
-	// Uniform Variables
-	CR(GetUniformVariablesFromProgram());
-
-	// Uniform Blocks
-	CR(GetUniformBlocksFromProgram());
-	CR(BindUniformBlocks());
-
-	// TODO:  Currently using a global material 
-	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
-
-Error:
-	return r;
-}
-
-RESULT OGLProgramBlinnPhong::SetupConnections() {
+RESULT OGLProgramBlinnPhongShadow::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
+
+	CR(MakeInput<OGLFramebuffer>("input_shadowdepth_framebuffer", &m_pInputFramebufferShadowDepth));
 
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
@@ -136,7 +99,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramBlinnPhong::ProcessNode(long frameID) {
+RESULT OGLProgramBlinnPhongShadow::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
 	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
@@ -148,19 +111,15 @@ RESULT OGLProgramBlinnPhong::ProcessNode(long frameID) {
 	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
 	UseProgram();
-	
+
 	if (m_pOGLFramebuffer != nullptr)
 		BindToFramebuffer(m_pOGLFramebuffer);
-
-	glEnable(GL_DEPTH_TEST);	// Enable depth test
-	glDepthFunc(GL_LEQUAL);		// Accept fragment if it closer to the camera than the former one
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
-	// 3D Object / skybox
+	// 3D Object 
 	RenderObjectStore(m_pSceneGraph);
 
 	UnbindFramebuffer();
@@ -169,11 +128,11 @@ RESULT OGLProgramBlinnPhong::ProcessNode(long frameID) {
 	return r;
 }
 
-RESULT OGLProgramBlinnPhong::SetObjectTextures(OGLObj *pOGLObj) {
+RESULT OGLProgramBlinnPhongShadow::SetObjectTextures(OGLObj *pOGLObj) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT OGLProgramBlinnPhong::SetLights(std::vector<light*> *pLights) {
+RESULT OGLProgramBlinnPhongShadow::SetLights(std::vector<light*> *pLights) {
 	RESULT r = R_PASS;
 
 	if (m_pLightsBlock != nullptr) {
@@ -185,7 +144,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramBlinnPhong::SetMaterial(material *pMaterial) {
+RESULT OGLProgramBlinnPhongShadow::SetMaterial(material *pMaterial) {
 	RESULT r = R_PASS;
 
 	if (m_pMaterialsBlock != nullptr) {
@@ -197,14 +156,20 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramBlinnPhong::SetObjectUniforms(DimObj *pDimObj) {
+RESULT OGLProgramBlinnPhongShadow::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
+
+	m_pUniformObjectCenter->SetUniform(pDimObj->GetOrigin());
+
+	quad *pQuad = dynamic_cast<quad *>(pDimObj);
+	m_pUniformfBillboard->SetUniform(pQuad != nullptr && pQuad->IsBillboard());
+	m_pUniformfScale->SetUniform(pQuad != nullptr && pQuad->IsScaledBillboard());
 
 	return R_PASS;
 }
 
-RESULT OGLProgramBlinnPhong::SetCameraUniforms(camera *pCamera) {
+RESULT OGLProgramBlinnPhongShadow::SetCameraUniforms(camera *pCamera) {
 
 	auto ptEye = pCamera->GetOrigin();
 	auto matV = pCamera->GetViewMatrix();
@@ -212,23 +177,61 @@ RESULT OGLProgramBlinnPhong::SetCameraUniforms(camera *pCamera) {
 	auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 
 	m_pUniformViewMatrix->SetUniform(matV);
-	//m_pUniformProjectionMatrix->SetUniform(matP);
-	//m_pUniformModelViewMatrix
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
+
+	if (m_pInputFramebufferShadowDepth != nullptr) {
+		DConnection *pInputDConnection = Connection("input_shadowdepth_framebuffer", CONNECTION_TYPE::INPUT)->GetConnectionEntry(0);
+		DNode *pProgramNode = pInputDConnection->GetParentNode();
+		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(pProgramNode);
+		if (pOGLProgramShadowDepth != nullptr) {
+			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
+			m_pUniformShadowEmitterDirection->SetUniform(pOGLProgramShadowDepth->GetShadowEmitterDirection());
+		}
+		
+		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+		m_pParentImp->BindTexture(m_pInputFramebufferShadowDepth->GetDepthAttachment()->GetOGLTextureTarget(), 
+								  m_pInputFramebufferShadowDepth->GetDepthAttachment()->GetOGLTextureIndex());
+
+		m_pUniformTextureDepth->SetUniform(0);
+	}
+
+	point origin = pCamera->GetOrigin();
+	m_pUniformEyePosition->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
 
 	return R_PASS;
 }
 
-RESULT OGLProgramBlinnPhong::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
+RESULT OGLProgramBlinnPhongShadow::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	auto ptEye = pStereoCamera->GetEyePosition(eye);
 	auto matV = pStereoCamera->GetViewMatrix(eye);
 	auto matP = pStereoCamera->GetProjectionMatrix(eye);
 	auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 
 	m_pUniformViewMatrix->SetUniform(matV);
-	//m_pUniformProjectionMatrix->SetUniform(matP);
-	//m_pUniformModelViewMatrix->SetUniform(matM)
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
+
+	if (m_pInputFramebufferShadowDepth != nullptr) {
+		DConnection *pInputDConnection = Connection("input_shadowdepth_framebuffer", CONNECTION_TYPE::INPUT)->GetConnectionEntry(0);
+		DNode *pProgramNode = pInputDConnection->GetParentNode();
+		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(pProgramNode);
+		if (pOGLProgramShadowDepth != nullptr) {
+			if(m_pUniformDepthViewProjectionMatrix != nullptr)
+				m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
+			
+			if(m_pUniformShadowEmitterDirection != nullptr)
+				m_pUniformShadowEmitterDirection->SetUniform(pOGLProgramShadowDepth->GetShadowEmitterDirection());
+		}
+
+		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+		m_pParentImp->BindTexture(m_pInputFramebufferShadowDepth->GetDepthAttachment()->GetOGLTextureTarget(),
+			m_pInputFramebufferShadowDepth->GetDepthAttachment()->GetOGLTextureIndex());
+
+		if(m_pUniformTextureDepth != nullptr)
+			m_pUniformTextureDepth->SetUniform(0);
+	}
+
+	point origin = pStereoCamera->GetOrigin();
+	m_pUniformEyePosition->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
 
 	return R_PASS;
 }

@@ -17,6 +17,7 @@
 #include "DreamOS.h"
 
 class HALImp;
+class composite;
 
 class HALTestSuite : public TestSuite {
 public:
@@ -80,7 +81,9 @@ public:
 	RESULT AddTestRotation();
 
 	RESULT AddTestMouseDrag();
-	
+
+	RESULT AddTestBlinnPhongShadowShader();
+
 	RESULT AddTestSenseHaptics();
 
 	RESULT AddTestRenderToTextureQuad();

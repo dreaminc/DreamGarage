@@ -35,6 +35,8 @@ HALTestSuite::~HALTestSuite() {
 
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
+	
+	CR(AddTestBlinnPhongShadowShader());
 
 	CR(AddTestTextureSubRegionUpdate());
 
@@ -144,6 +146,148 @@ RESULT HALTestSuite::ResetTest(void *pContext) {
 	Pipeline* pPipeline;
 	pPipeline = pHAL->GetRenderPipelineHandle();
 	CR(pPipeline->Reset(false));
+
+Error:
+	return r;
+}
+
+light *g_pLightTest = nullptr;
+
+RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
+	RESULT r = R_PASS;
+
+	struct TestContext {
+		model *pModelClouds = nullptr;
+		model *pModelEnvironment = nullptr;
+	} *pTestContext = new TestContext();
+
+	double sTestTime = 180.0f;
+	int nRepeats = 1;
+
+	float width = 1.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	float adjs = 1.0f;
+	float sceneScale = 0.1f / adjs;
+	point ptSceneOffset = point(90.0f / adjs, -5.0f / adjs, -25.0f / adjs);
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+		
+		{
+
+			ProgramNode* pShadowDepthProgramNode = pHAL->MakeProgramNode("shadow_depth");
+			CN(pShadowDepthProgramNode);
+			CR(pShadowDepthProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+
+			ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
+			//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_shadow");
+			CN(pRenderProgramNode);
+			CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			//CR(pRenderProgramNode->ConnectToInput("input_shadowdepth_framebuffer", pShadowDepthProgramNode->Output("output_framebuffer")));
+
+			// Reference Geometry Shader Program
+			ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+			CN(pReferenceGeometryProgram);
+			CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+			ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+			CN(pSkyboxProgram);
+			CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			// Connect output as pass-thru to internal blend program
+			CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+
+			ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+			CN(pRenderScreenQuad);
+			CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+			CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+			CR(pHAL->ReleaseCurrentContext());
+
+			// Objects 
+
+			volume *pVolume = nullptr;
+
+			//g_pLightTest = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.15f, -1.0f, -0.0f).Normal());
+			//g_pLightTest = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f, -1.0f, -0.0f).Normal());
+			g_pLightTest = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f).Normal());
+			g_pLightTest->EnableShadows();
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(width, 0.0f, (length + padding) * -3.0f));
+
+			auto pSphere = m_pDreamOS->AddSphere(0.5f, 20, 20);
+			CN(pSphere);
+			pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
+
+			auto pQuad = m_pDreamOS->AddQuad(10.0f, 10.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
+			CN(pQuad)
+			pQuad->SetPosition(point(0.0f, -2.5f, 0.0f));
+
+			m_pDreamOS->GetSceneGraphNode()->UpdateMinMax();
+
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+
+		if(g_pLightTest != nullptr) {
+			//g_pLightTest->RotateLightDirection(0.001f, 0.0f, 0.0f);
+		}
+
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Blinn Phong Texture Shadow Shader");
+	pNewTest->SetTestDescription("Blinn phong texture shader test with shadows");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;

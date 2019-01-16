@@ -20,10 +20,12 @@ in Data {
 	vec4 vertViewSpace;
 
 	vec4 vertShadowCoordinate;
-	vec3 directionShadowCastingLight;
+	vec3 shadowEmitterDirection;
 } DataIn;
 
-uniform sampler2D u_textureDepth;
+uniform sampler2DShadow u_textureDepth;
+//uniform sampler2D u_textureDepth;
+//uniform sampler2DRectShadow u_textureDepth;
 
 // Light Structure
 struct Light {
@@ -61,11 +63,11 @@ layout (location = 0) out vec4 out_vec4Color;
 
 float g_ambient = 0.01f;
 
-vec2 poissonDisk[4] = vec2[](
-  vec2( -0.94201624, -0.39906216 ),
-  vec2( 0.94558609, -0.76890725 ),
-  vec2( -0.094184101, -0.92938870 ),
-  vec2( 0.34495938, 0.29387760 )
+vec2 samplingLookup[] = vec2[](
+  vec2( -1.0f, -1.0f ),
+  vec2( -1.0f, 1.0 ),
+  vec2( 1.0f, -1.0f ),
+  vec2( 1.0f, 1.0f )
 );
 
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
@@ -95,30 +97,31 @@ void main(void) {
 	float diffuseValue = 0.0f, specularValue = 0.0f;
 	
 	vec3 normal = normalize(DataIn.normal.xyz);
-	//vec3 directionEye = normalize(DataIn.directionEye);
 	vec3 directionEye = -normalize(DataIn.vertViewSpace.xyz);
 
 	// TODO: This is a hack, currently hard coded values
 	float lightVisibility = 1.0f;
-	float cosTheta = dot(normal, DataIn.directionShadowCastingLight);
-	float bias = 0.005f * tan(acos(cosTheta)); // cosTheta is dot( n,l ), clamped between 0 and 1
-	bias = clamp(bias, 0.0f, 0.01f);
-	bias = 0.0f;
+	float cosTheta = dot(normal, normalize(DataIn.shadowEmitterDirection.xyz));
+	
+	float offset = 0.005f + clamp(tan(acos(cosTheta)), 0.0f, 0.01f); // cosTheta is dot( n,l ), clamped between 0 and 1
 
-	///*
-	if(texture(u_textureDepth, DataIn.vertShadowCoordinate.xy).x  <  (DataIn.vertShadowCoordinate.z - bias)) {
-		lightVisibility = 0.5;
+	//float shadowVal = textureProj(u_textureDepth, vec4(DataIn.vertShadowCoordinate.xy, DataIn.vertShadowCoordinate.w, 1.0f), 0.0);
+	//float shadowVal = textureProj(u_textureDepth, DataIn.vertShadowCoordinate);
+	//float shadowVal = textureProj(u_textureDepth, vec4(DataIn.vertShadowCoordinate.xy,DataIn.vertShadowCoordinate.z, DataIn.vertShadowCoordinate.w + 0.005f));
+
+	vec3 ProjCoords = DataIn.vertShadowCoordinate.xyz / DataIn.vertShadowCoordinate.w;
+	float depth = texture(u_textureDepth, vec3(ProjCoords.xy, 0.0f));
+
+	if (depth < (DataIn.vertShadowCoordinate.z + 0.005)) {
+		lightVisibility = 0.25;
 	}
-	//*/
 
 	/*
-	for (int i=0; i < 4; i++){
-		if(texture(u_textureDepth, DataIn.vertShadowCoordinate.xy + poissonDisk[i]/700.0).x  <  (DataIn.vertShadowCoordinate.z - bias)){
-			//lightVisibility = 0.5;
-			lightVisibility -= 0.2;
-		}
+	//if(shadowVal == 0.0f || (cosTheta < 0.0)) {
+	if(cosTheta < 0.005 || shadowVal < 1.0f) {
+		lightVisibility = 0.25;
 	}
-	//*/
+	*/
 
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
@@ -135,4 +138,5 @@ void main(void) {
 	vec4 ambientColor = g_vec4AmbientLightLevel;
 	// TODO: This is only good for one light
 	out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
+	out_vec4Color = out_vec4Color * 0.000001 + vec4(vec3(lightVisibility), 1.0f);
 }

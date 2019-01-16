@@ -14,6 +14,7 @@
 #include "Primitives/skybox.h"
 
 class ray;
+class point;
 
 class ObjectStoreImp {
 public:
@@ -43,6 +44,8 @@ public:
 	virtual std::vector<VirtualObj*> GetObjects(const ray &rCast) = 0;
 	virtual std::vector<VirtualObj*> GetObjects(DimObj *pDimObj) = 0;
 	virtual std::vector<std::vector<VirtualObj*>> GetObjectCollisionGroups() = 0;		// This returns groups of objects that are collided 
+
+	virtual RESULT GetMinMaxPoint(point *pPtMax, point *pPtMin) = 0;
 };
 
 #endif // ! SCENE_GRAPH_STORE_H_
