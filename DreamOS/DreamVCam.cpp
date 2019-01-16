@@ -78,7 +78,7 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	m_pCameraQuadBackgroundTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"control-view-main-background.png");
 	CN(m_pCameraQuadBackgroundTexture);
 	m_pCameraQuadBackground->SetDiffuseTexture(m_pCameraQuadBackgroundTexture);
-	
+
 	m_pMuteTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"camera-mute.png");
 
 	/*
@@ -259,7 +259,17 @@ RESULT DreamVCam::Update(void *pContext) {
 			if (bufferSize == m_pLoadBuffer_n) {
 				// TODO: We currently don't support multi-sample, so need to make sure
 				// to render one sample (expose with flag)
-				m_pStreamingTexture->LoadBufferFromTexture(m_pLoadBuffer, bufferSize);
+				if (m_sourceType == SourceType::CAMERA) {
+					m_pStreamingTexture->LoadBufferFromTexture(m_pLoadBuffer, bufferSize);
+				}
+				else {
+					OGLTexture* pOGLStreamingTexture = dynamic_cast<OGLTexture*>(m_pStreamingTexture);
+					if (!pOGLStreamingTexture->IsOGLPBOPackEnabled()) {
+						pOGLStreamingTexture->EnableOGLPBOPack();
+					}
+
+					m_pStreamingTexture->LoadFlippedBufferFromTexture(m_pLoadBuffer, bufferSize);
+				}
 
 				m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer), m_pLoadBuffer_n);
 

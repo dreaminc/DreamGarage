@@ -66,6 +66,8 @@ public:
 	virtual RESULT LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) override;
 	virtual RESULT LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) override;
 
+	virtual RESULT LoadFlippedBufferFromTexture(void *pBuffer, size_t pBuffer_n) override;
+
 private:
 	GLenum GetOGLPixelFormat();
 	RESULT CopyTextureBufferFromTexture(OGLTexture *pTexture);
@@ -82,6 +84,9 @@ public:
 
 private:
 	OpenGLImp *m_pParentImp = nullptr;
+
+	GLuint m_glFramebufferIndex = 0;
+	GLuint m_glFlippedTextureIndex = 0;
 
 	GLuint m_glTextureIndex = 0;
 	GLenum m_glTextureTarget = 0;

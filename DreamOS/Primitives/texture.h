@@ -68,6 +68,7 @@ public:
 	
 	RESULT CopyTextureImageBuffer(int width, int height, int channels, void *pBuffer, size_t pBuffer_n);
 	virtual RESULT LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n);
+	virtual RESULT LoadFlippedBufferFromTexture(void *pBuffer, size_t pBuffer_n);
 	virtual RESULT UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n);
 	virtual RESULT UpdateTextureRegionFromBuffer(void *pBuffer, int x, int y, int width, int height);
 
