@@ -146,6 +146,8 @@ private:
 	std::shared_ptr<UIButton> m_pCloseButton = nullptr;
 
 	std::string m_strCurrentContentType = CONTENT_TYPE_BROWSER;
+
+	bool m_fIsSharing = false;
 };
 
 #endif // ! DREAM_CONTROL_BAR_H_
