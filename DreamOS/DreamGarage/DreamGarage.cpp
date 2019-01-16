@@ -1201,7 +1201,7 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 
 
 	for (int i = 0; i < m_pPendingEnvironmentShares.size(); i++) {
-		auto pPendingShare = m_pPendingEnvironmentShares[0];
+		auto pPendingShare = m_pPendingEnvironmentShares[i];
 		if (pPendingShare != nullptr && pPeerConnection->GetPeerUserID() == pPendingShare->GetUserID()) {
 			if (pPendingShare->GetShareType() == SHARE_TYPE_SCREEN) {
 				m_pDreamShareView->StartReceiving(pPeerConnection);
