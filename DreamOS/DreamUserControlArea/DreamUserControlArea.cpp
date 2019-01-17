@@ -637,6 +637,21 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::ResetVirtualCamera() {
+	RESULT r = R_PASS;
+
+	point ptPosition;
+	quaternion qOrientation;
+
+	CR(GetDOS()->GetDefaultVCamPlacement(ptPosition, qOrientation));
+
+	CN(m_pDreamVCam);
+	CR(m_pDreamVCam->HandleSettings(ptPosition, qOrientation));
+
+Error:
+	return r;
+}
+
 int DreamUserControlArea::GetWidth() {
 	return m_pActiveSource->GetWidth();
 }

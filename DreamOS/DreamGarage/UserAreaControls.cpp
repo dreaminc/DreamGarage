@@ -79,6 +79,7 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 	m_buttonTextureMap[buttonType::SOURCE_NO_SHARE] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSourceNoShare));
 	m_buttonTextureMap[buttonType::SEND] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSend));
 	m_buttonTextureMap[buttonType::STOP_SENDING] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszStopSending));
+	m_buttonTextureMap[buttonType::RESET] = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszCameraReset));
 
 	for (int i = 0; i < (int)(buttonType::INVALID); i++) {
 		CN(m_buttonTextureMap[(buttonType)(i)]);
@@ -109,14 +110,21 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 		std::bind(&UserAreaControls::HandleSourceTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
 		m_buttonTextureMap[buttonType::SOURCE_SHARE], m_buttonTextureMap[buttonType::SOURCE_NO_SHARE]);
 
+	//*
 	m_pSendButton = AddButton(shareOffset, buttonWidth, buttonHeight,
 		std::bind(&UserAreaControls::HandleSendTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
 		m_buttonTextureMap[buttonType::SEND], m_buttonTextureMap[buttonType::STOP_SENDING]);
+	//*/
+
+	m_pResetButton = AddButton(shareOffset, buttonWidth, buttonHeight,
+		std::bind(&UserAreaControls::HandleResetPressed, this, std::placeholders::_1, std::placeholders::_2),
+		m_buttonTextureMap[buttonType::RESET]);
 
 	m_pCameraSourceButton->SetVisible(false);
 	//m_pCameraSourceButton->SetEnabledFlag(false);
 	m_pCameraSourceButton->Toggle();
 	m_pSendButton->SetVisible(false);
+	m_pResetButton->SetVisible(false);
 
 // Re-enable for selectability of the URL button
 //	CR(AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth * width, 
@@ -361,6 +369,16 @@ Error:
 	return r;
 }
 
+RESULT UserAreaControls::HandleResetPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
+	CR(m_pParentApp->ResetVirtualCamera());
+
+Error:
+	return r;
+}
+
 RESULT UserAreaControls::UpdateControlBarButtonsWithType(std::string strContentType) {
 	RESULT r = R_PASS;
 
@@ -402,7 +420,8 @@ RESULT UserAreaControls::UpdateButtonVisibility(std::string strContentType, bool
 
 	else if (strContentType == CONTENT_TYPE_CAMERA) {
 		m_pCameraSourceButton->SetVisible(fVisible);
-		m_pSendButton->SetVisible(fVisible);
+		//m_pSendButton->SetVisible(fVisible);
+		m_pResetButton->SetVisible(fVisible);
 	}
 
 	else if (strContentType == CONTENT_TYPE_DESKTOP) {

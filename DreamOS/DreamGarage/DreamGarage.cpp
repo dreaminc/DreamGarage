@@ -1986,3 +1986,13 @@ texture* DreamGarage::GetSharedCameraTexture() {
 Error:
 	return nullptr;
 }
+
+RESULT DreamGarage::GetDefaultVCamPlacement(point& ptPosition, quaternion& qOrientation) {
+	RESULT r = R_PASS;
+
+	CN(m_pDreamEnvironmentApp);
+	CR(m_pDreamEnvironmentApp->GetDefaultCameraPlacement(ptPosition, qOrientation));
+
+Error:
+	return r;
+}

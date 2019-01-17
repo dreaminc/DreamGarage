@@ -640,6 +640,10 @@ public:
 	std::shared_ptr<UIKeyboard> GetKeyboardApp();
 	std::shared_ptr<DreamUserApp> GetUserApp();
 
+	virtual RESULT GetDefaultVCamPlacement(point& ptPosition, quaternion& qOrientation) {
+		return R_NOT_IMPLEMENTED;
+	};
+
 private:
 	version m_versionDreamOS;
 	UID m_uid;

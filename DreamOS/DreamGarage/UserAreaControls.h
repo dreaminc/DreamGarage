@@ -43,6 +43,7 @@ public:
 		SOURCE_NO_SHARE,
 		SEND,
 		STOP_SENDING,
+		RESET,
 		// TODO: Re-centering
 
 		INVALID
@@ -72,6 +73,7 @@ public:
 
 	RESULT HandleSourceTogglePressed(UIButton* pButtonContext, void* pContext);
 	RESULT HandleSendTogglePressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleResetPressed(UIButton* pButtonContext, void* pContext);
 
 	// Update functions specific to this type of control bar
 	RESULT SetSharingFlag(bool fIsSharing);
@@ -110,6 +112,7 @@ private:
 	const wchar_t *k_wszSourceNoShare = L"control-view-source-camera-no-share.png";
 	const wchar_t *k_wszSend = L"control-view-send.png";
 	const wchar_t *k_wszStopSending = L"control-view-stop-sending.png";
+	const wchar_t *k_wszCameraReset = L"camera-reset.png";
 
 private:
 
@@ -138,6 +141,7 @@ private:
 	// camera
 	std::shared_ptr<UIButton> m_pCameraSourceButton = nullptr;
 	std::shared_ptr<UIButton> m_pSendButton = nullptr;
+	std::shared_ptr<UIButton> m_pResetButton = nullptr;
 
 	// general
 	std::shared_ptr<UIButton> m_pURLButton = nullptr;
