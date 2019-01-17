@@ -1243,8 +1243,7 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 			//CR(m_pDreamOS->PlaySoundFile(pNewSoundFile));
 			//CR(m_pDreamOS->LoopSoundFile(pNewSoundFile));
 
-
-			///*
+			/*
 			// Set up Browser to test the mix down code (timing)
 			pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 			CN(pTestContext->m_pWebBrowserManager);
