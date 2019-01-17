@@ -19,15 +19,8 @@ class DreamTestApp :
 	public Subscriber<SenseKeyboardEvent>
 {
 public:
-	DreamTestApp() :
-		m_pTestSuite(nullptr)
-	{
-		// empty
-	}
-
-	~DreamTestApp() {
-		// empty
-	}
+	DreamTestApp();
+	~DreamTestApp();
 
 	virtual RESULT ConfigureSandbox() override;
 	virtual RESULT LoadScene() override;
@@ -56,7 +49,12 @@ private:
 	user *m_pPeerUser;
 
 private:
-	std::shared_ptr<TestSuite> m_pTestSuite;
+	RESULT RegisterTestSuite(std::shared_ptr<TestSuite> pTestSuite);
+	RESULT RegisterTestSuites();
+	RESULT SelectTestSuite(std::string strName);
+
+	std::shared_ptr<TestSuite> m_pCurrentTestSuite = nullptr;
+	std::map<std::string, std::shared_ptr<TestSuite>> m_registeredTestSuites;
 };
 
 

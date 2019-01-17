@@ -9,7 +9,9 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
 
-AnimationTestSuite::AnimationTestSuite(DreamOS *pDreamOS) {
+AnimationTestSuite::AnimationTestSuite(DreamOS *pDreamOS) :
+	TestSuite("animation")
+{
 	// empty
 	m_pDreamOS = pDreamOS;
 }

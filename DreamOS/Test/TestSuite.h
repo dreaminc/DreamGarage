@@ -14,7 +14,7 @@ class TestSuite {
 
 
 public:
-	TestSuite();
+	TestSuite(std::string strName);
 	~TestSuite();
 
 	RESULT Initialize();
@@ -50,9 +50,15 @@ public:
 	
 	std::shared_ptr<TestObject> GetCurrentTest();
 
+	std::string GetName() {
+		return m_strName;
+	}
+
 private:
 	std::vector<std::shared_ptr<TestObject>> m_tests;
 	std::vector<std::shared_ptr<TestObject>>::iterator m_currentTest;
+
+	std::string m_strName;
 
 };
 

@@ -17,7 +17,9 @@ class DreamOS;
 class UIStageProgram;
 struct WebBrowserPoint;
 
-class DreamOSTestSuite : public TestSuite, public Subscriber<InteractionObjectEvent>
+class DreamOSTestSuite : 
+	public TestSuite, 
+	public Subscriber<InteractionObjectEvent>
 {
 public:
 	DreamOSTestSuite(DreamOS *pDreamOS);
