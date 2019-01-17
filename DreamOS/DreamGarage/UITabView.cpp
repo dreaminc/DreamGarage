@@ -198,6 +198,37 @@ Error:
 	return nullptr;
 }
 
+RESULT UITabView::RemoveTab(std::shared_ptr<DreamContentSource> pContent) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIButton> pButtonToRemove = nullptr;
+
+	CBR(m_appToTabMap.count(pContent) > 0, R_NOT_FOUND);
+	pButtonToRemove = m_appToTabMap[pContent];
+
+	{
+		auto itButton = std::find(m_tabButtons.begin(), m_tabButtons.end(), pButtonToRemove);
+		auto itSource = std::find(m_sources.begin(), m_sources.end(), pContent);
+
+		CBR(itButton != m_tabButtons.end(), R_NOT_FOUND);
+		CBR(itSource != m_sources.end(), R_NOT_FOUND);
+			
+		for (auto it = std::next(itButton); it < m_tabButtons.end(); it++) {
+			TranslateTabUp((*it).get());
+		}
+
+		m_appToTabMap.erase(pContent);
+		m_tabButtons.erase(itButton);
+		m_sources.erase(itSource);
+	}
+
+	m_pTabPendingRemoval = pButtonToRemove;
+	HideTab(pButtonToRemove.get());
+
+Error:
+	return r;
+}
+
 RESULT UITabView::PendSelectTab(UIButton *pButtonContext, void *pContext) {
 	RESULT r = R_PASS;
 

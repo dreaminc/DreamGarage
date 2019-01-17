@@ -829,12 +829,18 @@ RESULT EnvironmentController::OnCloseCamera(std::shared_ptr<CloudMessage> pCloud
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_camera"_json_pointer];
+	nlohmann::json jsonEnvironmentCamera = jsonPayload["/environment_camera"_json_pointer];
 
-	if (jsonEnvironmentAsset.size() != 0) {
+	if (jsonEnvironmentCamera.size() != 0) {
+
+		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentCamera);
+		CN(pEnvironmentAsset);
+
+		// environment asset and DreamContentSource should be more closely linked
+		pEnvironmentAsset->SetContentType("ContentControlType.Camera");
 
 		if (m_pEnvironmentControllerObserver != nullptr) {
-			CR(m_pEnvironmentControllerObserver->OnCloseCamera());
+			CR(m_pEnvironmentControllerObserver->OnCloseCamera(pEnvironmentAsset));
 		}
 	}
 
@@ -920,8 +926,11 @@ RESULT EnvironmentController::OnCloseAsset(std::shared_ptr<CloudMessage> pCloudM
 
 	if (jsonEnvironmentAsset.size() != 0) {
 
+		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
+		CN(pEnvironmentAsset);
+
 		if (m_pEnvironmentControllerObserver != nullptr) {
-			CR(m_pEnvironmentControllerObserver->OnCloseAsset());
+			CR(m_pEnvironmentControllerObserver->OnCloseAsset(pEnvironmentAsset));
 		}
 	}
 

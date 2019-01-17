@@ -509,9 +509,11 @@ RESULT DreamVCam::OnClientConnect() {
 	if (m_fSendingCameraPlacement && m_pCurrentCameraShare == nullptr) {
 		CR(ShareCameraSource());
 	}
+	// auto-open case
 	else {
 		pEnvironmentControllerProxy->RequestOpenCamera();
 		m_fPendCameraPlacement = true;
+		m_fAutoOpened = true;
 	}
 
 Error:
@@ -522,9 +524,16 @@ RESULT DreamVCam::OnClientDisconnect() {
 	RESULT r = R_PASS;
 
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-	pEnvironmentControllerProxy->RequestStopSharing(m_pCurrentCameraShare);
+
+	if (m_fAutoOpened) {
+		// close camera stream content source (this)
+		pEnvironmentControllerProxy->RequestCloseCamera(m_assetID);
+	}
+
+	CR(pEnvironmentControllerProxy->RequestStopSharing(m_pCurrentCameraShare));
 
 	CR(HideCameraSource());
+	
 
 Error:
 	return r;

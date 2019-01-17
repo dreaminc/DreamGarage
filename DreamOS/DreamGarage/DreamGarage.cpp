@@ -635,7 +635,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pUserController);
 
 	// DEBUG:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	{
 		m_fHasCredentials = true;
 
@@ -664,7 +664,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->RequestAccessToken(strDebugRefreshToken);
 		}
 	}
-#endif
+//#endif
 
 	// Initial step of login flow:
 	DOSLOG(INFO, "Checking API connection (internet access)");
@@ -1459,7 +1459,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnCloseAsset() {
+RESULT DreamGarage::OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
 	if (m_pDreamUserControlArea != nullptr) {
@@ -1486,11 +1486,18 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnCloseCamera() { 
+RESULT DreamGarage::OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) { 
 	RESULT r = R_PASS;
 
+//	m_pDreamUserControlArea->GetA
 	if (m_pDreamUserControlArea != nullptr) {
-		CR(m_pDreamUserControlArea->CloseActiveAsset());
+
+		if (pEnvironmentAsset->GetAssetID() == m_pDreamUserControlArea->GetActiveSource()->GetCurrentAssetID()) {
+			CR(m_pDreamUserControlArea->CloseActiveAsset());
+		}
+		else {
+			CR(m_pDreamUserControlArea->CloseCameraTab());
+		}
 	}
 
 Error:

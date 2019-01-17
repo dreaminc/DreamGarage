@@ -192,7 +192,7 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT OnCloseAsset() override {
+	virtual RESULT OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
 		return R_NOT_IMPLEMENTED;
 	}
 
@@ -201,7 +201,7 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT OnCloseCamera() override {
+	virtual RESULT OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
 		return R_NOT_IMPLEMENTED;
 	}
 

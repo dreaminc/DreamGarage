@@ -1100,6 +1100,15 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::CloseCameraTab() {
+	RESULT r = R_PASS;
+
+	CR(m_pDreamTabView->RemoveTab(m_pDreamVCam));
+
+Error:
+	return r;
+}
+
 RESULT DreamUserControlArea::SetUIProgramNode(UIStageProgram *pUIProgramNode) {
 	m_pUIStageProgram = pUIProgramNode;
 	return R_PASS;

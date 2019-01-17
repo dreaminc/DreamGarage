@@ -45,6 +45,7 @@ public:
 	// called when close is pressed on the control bar,
 	// the top tab is returned after the remaining tabs shift up 
 	std::shared_ptr<DreamContentSource> RemoveContent();
+	RESULT RemoveTab(std::shared_ptr<DreamContentSource> pContent);
 
 	RESULT PendSelectTab(UIButton *pButtonContext, void *pContext);
 	RESULT SelectTab(UIButton *pButtonContext, void *pContext);
