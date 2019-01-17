@@ -234,6 +234,9 @@ void main(void) {
 		colorRefraction = mix(colorDiffuse, colorRefraction, 1.0f - waterOpacity);
 		colorDiffuse = mix(colorDiffuse, colorRefraction, refractionCoefficient);
 	}
+	
+	// We want water to still give out an opaque texture - i.e. vcam
+	colorDiffuse.w = 1.0f;
 
 	vec4 colorAmbient = material.m_ambient * material.m_colorAmbient;
 
