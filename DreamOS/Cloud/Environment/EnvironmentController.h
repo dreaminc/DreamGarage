@@ -122,11 +122,11 @@ public:
 		virtual RESULT OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
 		virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;;
 		virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
-		virtual RESULT OnCloseAsset() = 0;
+		virtual RESULT OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
 
 		// Virtual Camera
 		virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
-		virtual RESULT OnCloseCamera() = 0;
+		virtual RESULT OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
 		virtual RESULT OnSendCameraPlacement() = 0;
 		virtual RESULT OnStopSendingCameraPlacement() = 0;
 		virtual RESULT OnReceiveCameraPlacement(long userID) = 0;

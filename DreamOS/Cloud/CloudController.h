@@ -87,12 +87,12 @@ public:
 		virtual RESULT OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
 		virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
 		virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
-		virtual RESULT OnCloseAsset() = 0;
+		virtual RESULT OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
 		virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 		virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
 
 		virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
-		virtual RESULT OnCloseCamera() = 0;
+		virtual RESULT OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
 		virtual RESULT OnSendCameraPlacement() = 0;
 		virtual RESULT OnStopSendingCameraPlacement() = 0;
 		virtual RESULT OnReceiveCameraPlacement(long userID) = 0;
@@ -207,10 +207,10 @@ public:
 	virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
 	virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
 	virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
-	virtual RESULT OnCloseAsset() override;
+	virtual RESULT OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
 
 	virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
-	virtual RESULT OnCloseCamera() override;
+	virtual RESULT OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
 	virtual RESULT OnSendCameraPlacement() override;
 	virtual RESULT OnStopSendingCameraPlacement() override;
 	virtual RESULT OnReceiveCameraPlacement(long userID) override;

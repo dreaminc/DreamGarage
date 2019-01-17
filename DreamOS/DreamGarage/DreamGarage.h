@@ -105,26 +105,24 @@ public:
 
 	// Environment
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
 	virtual RESULT OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
 	virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
 	virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
 
 	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override;
 
-	// Virtual Camera
-	virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override;
-
-	// Desktop Sharing
 	virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
-	virtual RESULT OnCloseAsset() override;
 
 	// Virtual Camera
 	virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
-	virtual RESULT OnCloseCamera() override;
+	virtual RESULT OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
 	virtual RESULT OnSendCameraPlacement() override;
 	virtual RESULT OnStopSendingCameraPlacement() override;
 	virtual RESULT OnReceiveCameraPlacement(long userID) override;
 	virtual RESULT OnStopReceivingCameraPlacement() override;
+
+	virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override;
 
 	virtual RESULT SaveCameraSettings(point ptPosition, quaternion qOrientation) override;
 

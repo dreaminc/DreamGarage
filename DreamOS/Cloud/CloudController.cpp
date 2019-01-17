@@ -403,11 +403,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnCloseAsset() {
+RESULT CloudController::OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
 	if (m_pEnvironmentObserver != nullptr) {
-		CR(m_pEnvironmentObserver->OnCloseAsset());
+		CR(m_pEnvironmentObserver->OnCloseAsset(pEnvironmentAsset));
 	}
 
 Error:
@@ -436,11 +436,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnCloseCamera() {
+RESULT CloudController::OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
 	if (m_pEnvironmentObserver != nullptr) {
-		CR(m_pEnvironmentObserver->OnCloseCamera());
+		CR(m_pEnvironmentObserver->OnCloseCamera(pEnvironmentAsset));
 	}
 
 Error:

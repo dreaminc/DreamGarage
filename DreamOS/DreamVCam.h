@@ -196,6 +196,7 @@ private:
 	bool m_fReceivingCameraPlacement = false;
 
 	bool m_fPendCameraPlacement = false;
+	bool m_fAutoOpened = false;
 };
 
 #endif // ! DREAM_VCAM_SYSTEM_H_

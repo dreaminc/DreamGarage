@@ -169,6 +169,7 @@ public:
 	RESULT ShutdownAllSources();
 
 	RESULT CloseActiveAsset();
+	RESULT CloseCameraTab();
 	RESULT OnReceiveAsset();
 
 	RESULT StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare);

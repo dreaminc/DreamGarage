@@ -481,6 +481,7 @@ RESULT DreamVCam::CloseSource() {
 	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
 	GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(true), m_pCamera->GetOrientation());
 	m_pCameraModel->SetVisible(false);
+	HideCameraSource();
 
 	return R_PASS;
 }
@@ -505,13 +506,16 @@ RESULT DreamVCam::OnClientConnect() {
 	RESULT r = R_PASS;
 
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CN(pEnvironmentControllerProxy);
 
 	if (m_fSendingCameraPlacement && m_pCurrentCameraShare == nullptr) {
 		CR(ShareCameraSource());
 	}
-	else {
+	// auto-open case
+	else if (!m_fSendingCameraPlacement) {
 		pEnvironmentControllerProxy->RequestOpenCamera();
 		m_fPendCameraPlacement = true;
+		m_fAutoOpened = true;
 	}
 
 Error:
@@ -522,7 +526,9 @@ RESULT DreamVCam::OnClientDisconnect() {
 	RESULT r = R_PASS;
 
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-	pEnvironmentControllerProxy->RequestStopSharing(m_pCurrentCameraShare);
+	CN(pEnvironmentControllerProxy);
+
+	CR(pEnvironmentControllerProxy->RequestStopSharing(m_pCurrentCameraShare));
 
 	CR(HideCameraSource());
 
@@ -667,6 +673,15 @@ RESULT DreamVCam::StopSharing() {
 	RESULT r = R_PASS;
 
 	m_pCurrentCameraShare = nullptr;
+
+	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CN(pEnvironmentControllerProxy);
+
+	if (m_fAutoOpened) {
+		pEnvironmentControllerProxy->RequestCloseCamera(m_assetID);
+	}
+
+	m_fAutoOpened = false;
 
 Error:
 	return r;
