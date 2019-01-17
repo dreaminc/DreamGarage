@@ -220,13 +220,7 @@ RESULT DreamVCam::Update(void *pContext) {
 		// Approximately 30 FPS
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 41) {
 			
-			texture *pTexture = m_pOGLRenderNode->GetOGLFramebufferColorTexture();
-			OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTexture);
-			CN(pOGLTexture);
-
-			if (pOGLTexture->IsOGLPBOPackEnabled()) {
-				CR(pOGLTexture->EnableOGLPBOPack());
-			}
+			texture *pTexture = m_pOGLRenderNode->GetOGLFramebufferColorTexture();	
 
 			UnsetSourceTexture();
 			CRM(SetSourceTexture(pTexture), "Failed to set source texture from render node in Dream VCam");
@@ -259,7 +253,11 @@ RESULT DreamVCam::Update(void *pContext) {
 			if (bufferSize == m_pLoadBuffer_n) {
 				// TODO: We currently don't support multi-sample, so need to make sure
 				// to render one sample (expose with flag)
-				if (m_sourceType == SourceType::CAMERA) {
+				if (m_sourceType == SourceType::CAMERA) {	
+					OGLTexture* pOGLStreamingTexture = dynamic_cast<OGLTexture*>(m_pStreamingTexture);
+					if (!pOGLStreamingTexture->IsOGLPBOPackEnabled()) {
+						pOGLStreamingTexture->EnableOGLPBOPack();
+					}
 					m_pStreamingTexture->LoadBufferFromTexture(m_pLoadBuffer, bufferSize);
 				}
 				else {
@@ -385,6 +383,7 @@ RESULT DreamVCam::SetSourceTexture(texture* pTexture) {
 	CBM((m_pSourceTexture == nullptr), "Source texture already set");
 
 	m_pSourceTexture = pTexture;
+	m_pSourceTexture->SetFormat(PIXEL_FORMAT::BGRA);
 	
 	if (m_sourceType == DreamVCam::SourceType::CAMERA) {
 		if (!m_pSourceTexture->IsUVVerticalFlipped()) {
@@ -788,19 +787,24 @@ RESULT DreamVCam::UpdateFromPendingVideoFrame() {
 			texture::type::TEXTURE_2D,
 			m_pendingFrame.pxWidth,
 			m_pendingFrame.pxHeight,
-			PIXEL_FORMAT::RGBA,
+			PIXEL_FORMAT::BGRA,
 			4,
 			&m_pendingFrame.pDataBuffer[0],
 			(int)m_pendingFrame.pDataBuffer_n);
 
 		CR(m_pCameraQuadTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
+
+		OGLTexture* pOGLTexture = dynamic_cast<OGLTexture*>(m_pCameraQuadTexture);
+		if (!pOGLTexture->IsOGLPBOUnpackEnabled()) {
+			pOGLTexture->EnableOGLPBOUnpack();
+		}
 	}
 	else {
 		if (m_pCameraQuad->GetTextureDiffuse() != m_pCameraQuadTexture) {
 			m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);
 		}
 
-		CRM(m_pCameraQuadTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from pending frame");
+		CRM(m_pCameraQuadTexture->UpdateTextureFromBuffer((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pDataBuffer_n), "Failed to update texture from pending frame");
 	}
 
 Error:

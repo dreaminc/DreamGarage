@@ -5,6 +5,9 @@
 #include "Primitives/texture.h"
 #include "Primitives/color.h"
 
+// TODO: make enabling PBO (un)pack more portable
+#include "HAL/opengl/OGLTexture.h"
+
 #include "DreamShareViewShareMessage.h"
 #include "DreamControlView/UIControlView.h"
 #include "DreamUserApp.h"
@@ -481,7 +484,7 @@ RESULT DreamShareView::BroadcastVideoFrame(const void *pBuffer, int width, int h
 			DEBUG_LINEOUT("Changed chrome texture dimensions");
 		}
 
-		CR(m_pCastTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
+		CR(m_pCastTexture->UpdateTextureFromBuffer((unsigned char*)(pBuffer), width * height * 4));
 
 		//*
 		if (IsStreaming()) {
@@ -619,13 +622,18 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 			texture::type::TEXTURE_2D,
 			m_pendingFrame.pxWidth,
 			m_pendingFrame.pxHeight,
-			PIXEL_FORMAT::RGBA,
+			PIXEL_FORMAT::BGRA,
 			4,
 			&m_pendingFrame.pDataBuffer[0],
 			(int)m_pendingFrame.pDataBuffer_n);
 		//*/
 		
 		CR(m_pVideoCastTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
+
+		OGLTexture* pOGLTexture = dynamic_cast<OGLTexture*>(m_pVideoCastTexture.get());
+		if (!pOGLTexture->IsOGLPBOUnpackEnabled()) {
+			pOGLTexture->EnableOGLPBOUnpack();
+		}
 
 		if (r != R_NOT_HANDLED) {
 			DEBUG_LINEOUT("Changed texture dimensions");
@@ -636,7 +644,7 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 			m_pCastQuad->SetDiffuseTexture(m_pVideoCastTexture.get());
 		}
 
-		CRM(m_pVideoCastTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from pending frame");
+		CRM(m_pVideoCastTexture->UpdateTextureFromBuffer((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pDataBuffer_n), "Failed to update texture from pending frame");
 	}
 
 Error:

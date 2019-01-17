@@ -60,9 +60,9 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestDreamSoundSystem());
-
 	CR(AddTestDreamVCam());
+
+	CR(AddTestDreamSoundSystem());
 
 	CR(AddTestDreamBrowser());
 	

@@ -104,7 +104,6 @@ RESULT DreamTestApp::LoadScene() {
 	CRM(RegisterTestSuites(), "Failed to register test suites");
 
 	CRM(SelectTestSuite(strTestName), "Failed to select %s test suite", strTestName.c_str());
-
 	AddSkybox();
 
 Error:
