@@ -26,6 +26,15 @@ public:
 		COMPLETE
 	};
 
+	struct Functions {
+		std::function<RESULT(void*)> fnInitialize = nullptr;
+		std::function<RESULT(void*)> fnUpdate = nullptr;
+		std::function<RESULT(void*)> fnTest = nullptr;
+		std::function<RESULT(void*)> fnReset = nullptr;
+
+		std::function<RESULT()> fnTestNoContext = nullptr;
+	};
+
 public:
 	TestObject(std::function<RESULT()> fnTestFunction, void *pContext = nullptr);
 	TestObject(std::function<RESULT(void*)> fnTest, void *pContext = nullptr);
@@ -44,6 +53,8 @@ public:
 			   std::function<RESULT(void*)> fnTest,
 			   std::function<RESULT(void*)> fnReset,
 			   void *pContext = nullptr);
+
+	TestObject(const TestObject::Functions &fnStruct, void *pContext = nullptr);
 
 	~TestObject();
 
@@ -89,16 +100,16 @@ private:
 	std::chrono::high_resolution_clock::duration m_timeDurationRunTest;
 	std::chrono::high_resolution_clock::duration m_timeDurationTotal;
 
-	std::function<RESULT(void*)> m_fnInitialize;
+	std::function<RESULT(void*)> m_fnInitialize = nullptr;
 	RESULT m_initializeResult;
 
-	std::function<RESULT(void*)> m_fnUpdate;
+	std::function<RESULT(void*)> m_fnUpdate = nullptr;
 	RESULT m_updateResult;
 
-	std::function<RESULT(void*)> m_fnTest;
+	std::function<RESULT(void*)> m_fnTest = nullptr;
 	RESULT m_testResult;
 
-	std::function<RESULT(void*)> m_fnReset;
+	std::function<RESULT(void*)> m_fnReset = nullptr;
 	RESULT m_resetResult;
 
 	void* m_pContext;

@@ -125,22 +125,36 @@ std::shared_ptr<TestObject> TestSuite::GetCurrentTest() {
 		return nullptr;
 }
 
+std::shared_ptr<TestObject> TestSuite::AddTest(const TestObject::Functions &fnStruct, void *pContext) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnStruct, pContext);
+
+	CNM(pNewTest, "Failed to allocate new test");
+
+	m_tests.push_back(pNewTest);
+
+	return pNewTest;
+
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize,
 	std::function<RESULT(void*)> fnUpdate,
 	std::function<RESULT(void*)> fnTest,
 	std::function<RESULT(void*)> fnReset,
 	void *pContext)
 {
-	RESULT r = R_PASS;
+	TestObject::Functions fnStruct = { nullptr };
 
-	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnInitialize, fnUpdate, fnTest, fnReset, pContext);
-	CNM(pNewTest, "Failed to allocate new test");
-	m_tests.push_back(pNewTest);
+	fnStruct.fnInitialize = fnInitialize;
+	fnStruct.fnUpdate = fnUpdate;
+	fnStruct.fnTest = fnTest;
+	fnStruct.fnReset = fnReset;
+	fnStruct.fnTestNoContext = nullptr;
 
-	return pNewTest;
-
-Error:
-	return nullptr;
+	return AddTest(fnStruct, pContext);
 }
 
 std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize,
@@ -148,55 +162,51 @@ std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnIn
 	std::function<RESULT(void*)> fnTest,
 	void *pContext)
 {
-	RESULT r = R_PASS;
+	TestObject::Functions fnStruct = { nullptr };
 
-	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnInitialize, fnUpdate, fnTest, pContext);
-	CNM(pNewTest, "Failed to allocate new test");
-	m_tests.push_back(pNewTest);
+	fnStruct.fnInitialize = fnInitialize;
+	fnStruct.fnUpdate = fnUpdate;
+	fnStruct.fnTest = fnTest;
+	fnStruct.fnReset = nullptr;
+	fnStruct.fnTestNoContext = nullptr;
 
-	return pNewTest;
-
-Error:
-	return nullptr;
+	return AddTest(fnStruct, pContext);
 }
 
 std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize, std::function<RESULT(void*)> fnTest, void *pContext) {
-	RESULT r = R_PASS;
+	TestObject::Functions fnStruct = { nullptr };
 
-	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnInitialize, fnTest, pContext);
-	CNM(pNewTest, "Failed to allocate new test");
-	m_tests.push_back(pNewTest);
+	fnStruct.fnInitialize = fnInitialize;
+	fnStruct.fnUpdate = nullptr;
+	fnStruct.fnTest = fnTest;
+	fnStruct.fnReset = nullptr;
+	fnStruct.fnTestNoContext = nullptr;
 
-	return pNewTest;
-
-Error:
-	return nullptr;
+	return AddTest(fnStruct, pContext);
 }
 
 std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnTest, void *pContext) {
-	RESULT r = R_PASS;
+	TestObject::Functions fnStruct = { nullptr };
 
-	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnTest, pContext);
-	CNM(pNewTest, "Failed to allocate new test");
-	m_tests.push_back(pNewTest);
+	fnStruct.fnInitialize = nullptr;
+	fnStruct.fnUpdate = nullptr;
+	fnStruct.fnTest = fnTest;
+	fnStruct.fnReset = nullptr;
+	fnStruct.fnTestNoContext = nullptr;
 
-	return pNewTest;
-
-Error:
-	return nullptr;
+	return AddTest(fnStruct, pContext);
 }
 
 std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT()> fnTestFunction, void *pContext) {
-	RESULT r = R_PASS;
+	TestObject::Functions fnStruct = { nullptr };
 
-	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnTestFunction, pContext);
-	CNM(pNewTest, "Failed to allocate new test");
-	m_tests.push_back(pNewTest);
+	fnStruct.fnInitialize = nullptr;
+	fnStruct.fnUpdate = nullptr;
+	fnStruct.fnTest = nullptr;
+	fnStruct.fnReset = nullptr;
+	fnStruct.fnTestNoContext = fnTestFunction;
 
-	return pNewTest;
-
-Error:
-	return nullptr;
+	return AddTest(fnStruct, pContext);
 }
 
 RESULT TestSuite::ClearTests() {
@@ -210,6 +220,9 @@ RESULT TestSuite::Initialize() {
 	RESULT r = R_PASS;
 
 	CR(ClearTests());
+
+	CRM(SetupTestSuite(), "Failed to set up test suite %s", m_strName.c_str());
+
 	CRM(AddTests(), "Failed to add tests");
 
 	m_currentTest = m_tests.begin();
