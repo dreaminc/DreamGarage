@@ -415,10 +415,8 @@ RESULT DreamShareView::SetStreamingState(bool fStreaming) {
 
 	bool fIsActive = m_fStreaming || fReceiving;
 
-	if (m_fIsActive != fIsActive) {
-		m_fIsActive = fIsActive;
-		SendDOSMessage();
-	}
+	m_fIsActive = fIsActive;
+	SendDOSMessage();
 
 Error:
 	return r;
@@ -431,10 +429,8 @@ RESULT DreamShareView::SetReceivingState(bool fReceiving) {
 
 	bool fIsActive = IsStreaming() || m_fReceivingStream;
 
-	if (m_fIsActive != fIsActive) {
-		m_fIsActive = fIsActive;
-		SendDOSMessage();
-	}
+	m_fIsActive = fIsActive;
+	SendDOSMessage();
 
 Error:
 	return r;
