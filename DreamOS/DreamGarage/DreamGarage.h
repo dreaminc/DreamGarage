@@ -169,6 +169,8 @@ public:
 	// Camera Sharing
 	virtual texture* GetSharedCameraTexture() override;
 
+	virtual RESULT GetDefaultVCamPlacement(point& ptPosition, quaternion& qOrientation) override;
+
 private:
 	//std::map<long, user*> m_peerUsers;
 	// User Pool

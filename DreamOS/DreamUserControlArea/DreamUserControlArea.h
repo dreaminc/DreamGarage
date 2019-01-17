@@ -156,6 +156,7 @@ public:
 
 	RESULT SetVirtualCameraSource(DreamVCam::SourceType sourceType);
 	RESULT MuteVirtualCamera(bool fMute);
+	RESULT ResetVirtualCamera();
 
 // DreamGarage compatability (temp?)
 public:
