@@ -213,7 +213,7 @@ RESULT UITabView::RemoveTab(std::shared_ptr<DreamContentSource> pContent) {
 		CBR(itButton != m_tabButtons.end(), R_NOT_FOUND);
 		CBR(itSource != m_sources.end(), R_NOT_FOUND);
 			
-		for (auto it = std::next(itButton); it < m_tabButtons.end(); it++) {
+		for (auto it = m_tabButtons.begin(); it != itButton; it++) {
 			TranslateTabUp((*it).get());
 		}
 

@@ -602,8 +602,8 @@ Error:
 RESULT DreamUserControlArea::OnVirtualCameraReleased() {
 	RESULT r = R_PASS;
 
-	CR(m_pDreamVCam->StopSharing());
 	m_pActiveCameraSource = nullptr;
+	CR(m_pDreamVCam->StopSharing());
 
 Error:
 	return r;
@@ -987,7 +987,10 @@ RESULT DreamUserControlArea::ShutdownSource() {
 		m_pDreamDesktop = nullptr;
 	}
 	else if (m_pDreamVCam == m_pActiveSource) {
-		m_pDreamVCam->CloseSource();
+		// empty (avoid calling ShutdownDreamApp<DreamBrowser>)
+	}
+	else if (m_pActiveSource->GetCurrentAssetID()) {
+		m_pDreamVCam->HideCameraSource();
 	}
 	else {	
 		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
@@ -1045,10 +1048,12 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 		auto pView = m_pControlView->GetViewQuad();
 
 		// Update VCam
+		/*
 		if (m_pActiveCameraSource == m_pActiveSource) {
 			m_pDreamVCam->HideCameraSource();
 			m_pActiveCameraSource = nullptr;
 		}
+		//*/
 
 		CR(ShutdownSource());
 		m_pActiveSource = m_pDreamTabView->RemoveContent();
@@ -1104,6 +1109,7 @@ RESULT DreamUserControlArea::CloseCameraTab() {
 	RESULT r = R_PASS;
 
 	CR(m_pDreamTabView->RemoveTab(m_pDreamVCam));
+	CR(m_pDreamVCam->CloseSource());
 
 Error:
 	return r;
