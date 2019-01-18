@@ -1554,12 +1554,15 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	RESULT r = R_PASS;
 
 	auto pCloudController = GetCloudController();
+	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CN(pEnvironmentControllerProxy);
 
 	if (strMessage == "DreamShareView.IsActive") {
 		m_pDreamUserControlArea->UpdateIsActive(true);
 	}
 	else if (strMessage == "DreamShareView.IsNotActive") {
-		m_pDreamUserControlArea->UpdateIsActive(false);
+	//	m_pDreamUserControlArea->UpdateIsActive(false);
+		CR(pEnvironmentControllerProxy->RequestCurrentScreenShare(SHARE_TYPE_SCREEN));
 	}
 
 	else if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {
@@ -1874,6 +1877,19 @@ RESULT DreamGarage::OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironme
 		if (deleteShare != m_pPendingEnvironmentShares.end()) {
 			m_pPendingEnvironmentShares.erase(deleteShare);
 		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+	RESULT r = R_PASS;
+
+	if (pEnvironmentShare == nullptr) {
+		CNR(m_pDreamUserControlArea, R_SKIPPED);
+		m_pDreamUserControlArea->UpdateIsActive(false);
+		CR(m_pDreamUserControlArea->SetVirtualCameraSource(DreamVCam::SourceType::CAMERA));
 	}
 
 Error:

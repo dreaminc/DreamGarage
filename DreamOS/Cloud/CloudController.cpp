@@ -414,6 +414,17 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnGetByShareType(pEnvironmentShare));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 

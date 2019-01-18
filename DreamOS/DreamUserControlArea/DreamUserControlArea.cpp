@@ -968,7 +968,6 @@ RESULT DreamUserControlArea::HandleStopSending() {
 	RESULT r = R_PASS;
 
 	m_pCurrentScreenShare = nullptr;
-	CR(SetVirtualCameraSource(DreamVCam::SourceType::CAMERA));
 
 Error:
 	return r;

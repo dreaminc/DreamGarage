@@ -75,6 +75,7 @@ RESULT EnvironmentController::Initialize() {
 	CR(RegisterMethod("receive", std::bind(&EnvironmentController::OnReceiveAsset, this, std::placeholders::_1)));
 	CR(RegisterMethod("stop_sending", std::bind(&EnvironmentController::OnStopSending, this, std::placeholders::_1)));
 	CR(RegisterMethod("stop_receiving", std::bind(&EnvironmentController::OnStopReceiving, this, std::placeholders::_1)));
+	CR(RegisterMethod("get_by_share_type", std::bind(&EnvironmentController::OnGetByShareType, this, std::placeholders::_1)));
 
 	CR(RegisterMethod("get_form", std::bind(&EnvironmentController::OnGetForm, this, std::placeholders::_1)));
 	//TODO: no method currently for a stop_sharing response, but could potentially be used for error handling
@@ -616,6 +617,27 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::RequestCurrentScreenShare(std::string strShareType) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+	std::string strData;
+	guid guidMessage;
+	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
+
+	jsonPayload["environment_share"] = nlohmann::json::object();
+	jsonPayload["environment_share"]["share_type"] = strShareType;
+
+	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("environment_share.get_by_share_type"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_GET_BY_SHARE_TYPE));
+
+Error:
+	return r;
+}
+
 RESULT EnvironmentController::RequestForm(std::string key) {
 	RESULT r = R_PASS;
 
@@ -1009,6 +1031,27 @@ RESULT EnvironmentController::OnStopReceiving(std::shared_ptr<CloudMessage> pClo
 
 	CNR(m_pEnvironmentControllerObserver, R_SKIPPED);
 	CR(m_pEnvironmentControllerObserver->OnStopReceiving(pEnvironmentShare));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnGetByShareType(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<EnvironmentShare> pEnvironmentShare = nullptr;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	CBR(jsonPayload.size() != 0, R_SKIPPED);
+
+	if (!jsonPayload["/environment_share"_json_pointer].is_null()) {
+		nlohmann::json jsonEnvironmentShare = jsonPayload["/environment_share"_json_pointer];
+
+		pEnvironmentShare = std::make_shared<EnvironmentShare>(jsonEnvironmentShare);
+	}
+
+	CNR(m_pEnvironmentControllerObserver, R_SKIPPED);
+	CR(m_pEnvironmentControllerObserver->OnGetByShareType(pEnvironmentShare));
 
 Error:
 	return r;

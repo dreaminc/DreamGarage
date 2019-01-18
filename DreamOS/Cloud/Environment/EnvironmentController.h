@@ -35,6 +35,7 @@ public:
 	virtual RESULT RequestCloseAsset(long assetID) = 0;
 	virtual RESULT RequestShareAsset(long assetID, std::string strShareType) = 0;
 	virtual RESULT RequestStopSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
+	virtual RESULT RequestCurrentScreenShare(std::string strShareType) = 0;
 
 	virtual RESULT RequestForm(std::string strKey) = 0;
 
@@ -77,6 +78,7 @@ public:
 		ENVIRONMENT_STOP_SHARING,
 		ENVIRONMENT_ASSET_OPEN,
 		ENVIRONMENT_ASSET_CLOSE,
+		ENVIRONMENT_GET_BY_SHARE_TYPE,
 
 		// Camera
 		ENVIRONMENT_CAMERA_OPEN,
@@ -123,6 +125,7 @@ public:
 		virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;;
 		virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
 		virtual RESULT OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
+		virtual RESULT OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
 
 		// Virtual Camera
 		virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
@@ -168,6 +171,7 @@ public:
 	virtual RESULT RequestCloseAsset(long assetID) override;
 	virtual RESULT RequestShareAsset(long assetID, std::string strShareType) override;
 	virtual RESULT RequestStopSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+	virtual RESULT RequestCurrentScreenShare(std::string strShareType) override;
 
 	virtual RESULT RequestForm(std::string strKey) override;
 
@@ -182,6 +186,7 @@ public:
 	RESULT OnReceiveAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnStopSending(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnStopReceiving(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnGetByShareType(std::shared_ptr<CloudMessage> pCloudMessage);
 
 	RESULT OnOpenCamera(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnCloseCamera(std::shared_ptr<CloudMessage> pCloudMessage);
