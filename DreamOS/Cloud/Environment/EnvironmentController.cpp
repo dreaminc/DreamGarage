@@ -467,8 +467,6 @@ RESULT EnvironmentController::RequestOpenAsset(std::string strStorageProviderSco
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload;
-	std::string strData;
-	guid guidMessage;
 	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
 	jsonPayload["environment_asset"] = nlohmann::json::object();
@@ -492,9 +490,6 @@ RESULT EnvironmentController::RequestOpenCamera() {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload;
-	std::string strData;
-	guid guidMessage;
-	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
 	jsonPayload["environment_camera"] = nlohmann::json::object();
 	//jsonPayload["environment_camera"]["path"] = "";
@@ -505,7 +500,7 @@ RESULT EnvironmentController::RequestOpenCamera() {
 	jsonPayload["environment_camera"]["title"] = "Dream Virtual Camera";
 	jsonPayload["environment_camera"]["user"] = GetCloudController()->GetUserID();
 
-	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
 	CR(pCloudRequest->SetControllerMethod("environment_camera.open"));
 
@@ -519,14 +514,11 @@ RESULT EnvironmentController::RequestCloseCamera(long assetID) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload;
-	std::string strData;
-	guid guidMessage;
-	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
 	jsonPayload["environment_camera"] = nlohmann::json::object();
 	jsonPayload["environment_camera"]["id"] = assetID;
 
-	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
 	CR(pCloudRequest->SetControllerMethod("environment_camera.close"));
 
@@ -540,14 +532,11 @@ RESULT EnvironmentController::RequestShareCamera(long assetID) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload;
-	std::string strData;
-	guid guidMessage;
-	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
 	jsonPayload["environment_camera"] = nlohmann::json::object();
 	jsonPayload["environment_camera"]["id"] = assetID;
 
-	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
 	CR(pCloudRequest->SetControllerMethod("environment_camera.share_placement"));
 
@@ -561,14 +550,11 @@ RESULT EnvironmentController::RequestCloseAsset(long assetID) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload;
-	std::string strData;
-	guid guidMessage;
-	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
 	jsonPayload["environment_asset"] = nlohmann::json::object();
 	jsonPayload["environment_asset"]["id"] = assetID;
 
-	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
 	CR(pCloudRequest->SetControllerMethod("environment_asset.close"));
 
@@ -582,15 +568,12 @@ RESULT EnvironmentController::RequestShareAsset(long assetID, std::string strSha
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload;
-	std::string strData;
-	guid guidMessage;
-	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
 	jsonPayload["environment_share"] = nlohmann::json::object();
 	jsonPayload["environment_share"]["asset"] = assetID;
 	jsonPayload["environment_share"]["share_type"] = strShareType;
 
-	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
 	CR(pCloudRequest->SetControllerMethod("environment_share.create"));
 
@@ -621,14 +604,11 @@ RESULT EnvironmentController::RequestCurrentScreenShare(std::string strShareType
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload;
-	std::string strData;
-	guid guidMessage;
-	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
 	jsonPayload["environment_share"] = nlohmann::json::object();
 	jsonPayload["environment_share"]["share_type"] = strShareType;
 
-	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
 	CR(pCloudRequest->SetControllerMethod("environment_share.get_by_share_type"));
 
@@ -644,6 +624,8 @@ RESULT EnvironmentController::RequestForm(std::string key) {
 	nlohmann::json jsonPayload;
 	CloudController *pParentCloudController = GetCloudController();
 	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
+
+	CN(pParentCloudController);
 
 	jsonPayload["form"] = nlohmann::json::object();
 	jsonPayload["form"]["key"] = key;
