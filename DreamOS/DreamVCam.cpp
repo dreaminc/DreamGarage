@@ -487,7 +487,8 @@ RESULT DreamVCam::CloseSource() {
 	CR(HideCameraSource());
 
 	m_fAutoOpened = false;
-	CR(m_pNamedPipeServer->ClearConnections());
+
+	//CR(m_pNamedPipeServer->ClearConnections());
 
 Error:
 	return r;
