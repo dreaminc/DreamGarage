@@ -635,7 +635,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pUserController);
 
 	// DEBUG:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	{
 		m_fHasCredentials = true;
 
@@ -664,7 +664,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->RequestAccessToken(strDebugRefreshToken);
 		}
 	}
-#endif
+//#endif
 
 	// Initial step of login flow:
 	DOSLOG(INFO, "Checking API connection (internet access)");
@@ -1215,6 +1215,10 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 
 	for (auto deleteShare : pendingDeleteShares) {
 		m_pPendingEnvironmentShares.erase(std::find(m_pPendingEnvironmentShares.begin(), m_pPendingEnvironmentShares.end(), deleteShare));
+	}
+
+	if (m_pDreamUserControlArea->IsSharingScreen()) {
+		m_pDreamUserControlArea->SendFirstFrame();
 	}
 
 Error:

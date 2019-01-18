@@ -939,6 +939,27 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::SendFirstFrame() {
+	RESULT r = R_PASS;
+
+	// It's impossible to be sharing AND have a nullptr active source
+	CNR(m_pActiveSource, R_SKIPPED);
+
+	if (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
+		CR(m_pActiveSource->SendFirstFrame());
+	}
+	else {
+		for (auto pSource : m_pDreamTabView->GetAllSources()) {
+			if (pSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
+				CR(pSource->SendFirstFrame());
+			}
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamUserControlArea::ForceStopSharing() {
 	RESULT r = R_PASS;
 

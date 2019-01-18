@@ -541,6 +541,10 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
+	m_pLoadBuffer_n = pxWidth * pxHeight * 4 * sizeof(unsigned char);
+	m_pLoadBuffer = (unsigned char*)malloc(m_pLoadBuffer_n);
+	CNM(m_pLoadBuffer, "Failed to allocate DreamBrowser buffer");
+
 	SetAppName("DreamBrowser");
 	SetAppDescription("A Shared Content View");
 
@@ -613,12 +617,18 @@ RESULT DreamBrowser::Update(void *pContext) {
 	
 	// Really strange, we need to send 8 frames for the share to go through? As in OnVideoFrame isn't called on the receiver side until the 4th one is sent
 	if (m_fSendFrame && m_fFirstFrameIsReady) {
-		for (m_sentFrames = 0; m_sentFrames < 8; m_sentFrames++) {
-			int numFramesProcessed = 0;
-			CR(m_pWebBrowserController->PollNewDirtyFrames(numFramesProcessed));
+		double msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+		if (msTimeNow - m_msTimeLastSent > m_msTimeBetweenSends) {
+			if (m_sentFrames < 8) {
+				CR(m_pWebBrowserController->PollFrame());
+				m_sentFrames++;
+			}
+			else {
+				m_fSendFrame = false;
+				m_sentFrames = 0;
+			}
+			m_msTimeLastSent = msTimeNow;
 		}
-		m_fSendFrame = false;
-		m_sentFrames = 0;
 	}
 
 	if (m_fScroll) {
@@ -759,7 +769,6 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrow
 	RESULT r = R_PASS;
 
 	m_fFirstFrameIsReady = true;
-	m_fSendFrame = true;
 
 	if (m_pBrowserTexture == nullptr) {
 		DOSLOG(INFO, "browser texture not initialized");
@@ -804,18 +813,22 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrow
 		}
 	}
 	else {
-		CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
+		if (type == WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW) {
+			CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
+		}
 	}
 
 	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
 	CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);
+	m_pBrowserTexture->LoadBufferFromTexture(m_pLoadBuffer, m_pLoadBuffer_n);
+
 	if (GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
-		GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
+		GetDOS()->BroadcastSharedVideoFrame(m_pLoadBuffer, m_browserWidth, m_browserHeight);
 	}
 	else if (GetSourceTexture() == GetDOS()->GetSharedCameraTexture()) {
 		// TODO: does VCam need to do the same kind of texture updates that ShareView does?
-		GetDOS()->GetCloudController()->BroadcastVideoFrame(kVCamVideoLabel, (unsigned char*)(pBuffer), width, height, 4);
+		GetDOS()->GetCloudController()->BroadcastVideoFrame(kVCamVideoLabel, m_pLoadBuffer, m_browserWidth, m_browserHeight, 4);
 	}
 
 Error:
