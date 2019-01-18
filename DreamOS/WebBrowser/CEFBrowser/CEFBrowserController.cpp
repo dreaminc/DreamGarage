@@ -67,7 +67,8 @@ RESULT CEFBrowserController::PollFrame() {
 	
 	if (m_pWebBrowserControllerObserver != nullptr) {
 		WebBrowserRect rect = { 0, 0, m_bufferWidth, m_bufferHeight };
-		CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorBuffer[0], m_bufferWidth, m_bufferHeight, m_paintType, rect));
+		// Only used by browser to force an update on the frame.
+		CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorFrameBuffer[0], m_bufferWidth, m_bufferHeight, m_paintType, rect));
 	}
 
 Error:
@@ -83,9 +84,15 @@ RESULT CEFBrowserController::PollNewDirtyFrames(int &rNumFramesProcessed) {
 
 	if (m_pWebBrowserControllerObserver != nullptr) {
 		for (auto& dirtyFrame : m_NewDirtyFrames) {
-			WebBrowserRect rect = { m_popupRect.x, m_popupRect.y, m_popupRect.width, m_popupRect.height };
 			
-			CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorBuffer[0], m_bufferWidth, m_bufferHeight, m_paintType, rect));
+			if (m_paintType == WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW) {
+				WebBrowserRect rect = { 0, 0, m_bufferWidth, m_bufferHeight };
+				CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorFrameBuffer[0], m_bufferWidth, m_bufferHeight, m_paintType, rect));
+			}
+			else {
+				WebBrowserRect rect = { m_popupRect.x, m_popupRect.y, m_popupRect.width, m_popupRect.height };
+				CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorPopupBuffer[0], m_bufferWidth, m_bufferHeight, m_paintType, rect));
+			}
 		
 			rNumFramesProcessed++;
 		}
@@ -441,12 +448,13 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
 	size_t pBuffer_n = width * height * 4;
 	
-	m_vectorBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
 	if (type == PET_POPUP) {
 		m_paintType = WebBrowserController::PAINT_ELEMENT_TYPE::PET_POPUP;
+		m_vectorPopupBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
 	}
 	else {
 		m_paintType = WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW;
+		m_vectorFrameBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
 	}
 
 	bool fSizeChanged = (width != m_bufferWidth) || (height != m_bufferHeight);

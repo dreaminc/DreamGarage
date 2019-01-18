@@ -253,6 +253,11 @@ private:
 	bool m_fSendFrame = false;
 	bool m_fFirstFrameIsReady = false;
 	int m_sentFrames = 0;
+	double m_msTimeLastSent = 0.0;
+	double m_msTimeBetweenSends = 100.0;
+
+	unsigned char *m_pLoadBuffer = nullptr;
+	size_t m_pLoadBuffer_n = 0;
 
 	std::shared_ptr<EnvironmentAsset> m_pPendingEnvironmentAsset;
 

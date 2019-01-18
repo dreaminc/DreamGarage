@@ -173,6 +173,7 @@ public:
 	RESULT CloseCameraTab();
 	RESULT OnReceiveAsset();
 
+	RESULT SendFirstFrame();
 	RESULT StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare);
 	RESULT ForceStopSharing();
 	RESULT HandleStopSending();

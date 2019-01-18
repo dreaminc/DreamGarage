@@ -1217,6 +1217,10 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 		m_pPendingEnvironmentShares.erase(std::find(m_pPendingEnvironmentShares.begin(), m_pPendingEnvironmentShares.end(), deleteShare));
 	}
 
+	if (m_pDreamUserControlArea->IsSharingScreen()) {
+		m_pDreamUserControlArea->SendFirstFrame();
+	}
+
 Error:
 	return r;
 }

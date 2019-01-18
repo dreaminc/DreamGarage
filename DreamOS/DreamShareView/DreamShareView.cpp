@@ -74,7 +74,7 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 		texture::type::TEXTURE_2D,
 		m_castpxWidth, 
 		m_castpxHeight, 
-		PIXEL_FORMAT::RGBA, 
+		PIXEL_FORMAT::BGRA, 
 		channels, 
 		&vectorByteBuffer[0], 
 		pxSize);	
@@ -473,7 +473,7 @@ RESULT DreamShareView::BroadcastVideoFrame(const void *pBuffer, int width, int h
 
 	if (!m_fReceivingStream) {
 		CN(m_pCastTexture);
-
+		/*
 		// Update texture dimensions if needed
 		CR(m_pCastTexture->UpdateDimensions(width, height));
 		if (r != R_NOT_HANDLED) {
@@ -481,7 +481,7 @@ RESULT DreamShareView::BroadcastVideoFrame(const void *pBuffer, int width, int h
 		}
 
 		CR(m_pCastTexture->UpdateTextureFromBuffer((unsigned char*)(pBuffer), width * height * 4));
-
+		//*/
 		//*
 		if (IsStreaming()) {
 			CR(GetDOS()->GetCloudController()->BroadcastVideoFrame(kChromeVideoLabel, (unsigned char*)(pBuffer), width, height, 4));

@@ -131,7 +131,8 @@ private:
 	int m_browserHeight = 0;
 
 	// Buffer for the browser content to render into
-	std::vector<unsigned char> m_vectorBuffer;
+	std::vector<unsigned char> m_vectorFrameBuffer;
+	std::vector<unsigned char> m_vectorPopupBuffer;
 	WebBrowserController::PAINT_ELEMENT_TYPE m_paintType;
 	
 	CefRect m_popupRect;
