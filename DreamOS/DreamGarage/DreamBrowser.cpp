@@ -784,38 +784,31 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrow
 		}
 	}
 
-	if (dynamic_cast<OGLTexture*>(m_pBrowserTexture.get())->IsOGLPBOUnpackEnabled()) {
-		if (type == WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW) {
-			m_pBrowserTexture->UpdateTextureFromBuffer((unsigned char*)pBuffer, width * height * 4);
-		}
-		else if (type == WebBrowserController::PAINT_ELEMENT_TYPE::PET_POPUP && rect.width > 0 && rect.height > 0) {	// not sure why that check is necessary but better safe than sorry?
-			
-			// bounds checking and adjusting
-			int x = rect.pt.x;
-			int y = rect.pt.y;
-		
-			if (x < 0) {
-				x = 0;
-			}
-			if (y < 0) {
-				y = 0;
-			}
-
-			if (x + rect.width > m_pBrowserTexture->GetWidth()) {
-				rect.width -= x + rect.width - m_pBrowserTexture->GetWidth();
-			}
-			if (y + rect.height > m_pBrowserTexture->GetHeight()) {
-				rect.height -= y + rect.height - m_pBrowserTexture->GetHeight();
-			}
-			
-			DOSLOG(INFO, "x: %d, y: %d, width: %d, height: %d", x, y, width, height);
-			m_pBrowserTexture->UpdateTextureRegionFromBuffer((unsigned char*)pBuffer, x, y, width, height);
-		}
+	if (type == WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW) {
+		m_pBrowserTexture->UpdateTextureFromBuffer((unsigned char*)pBuffer, width * height * 4);
 	}
-	else {
-		if (type == WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW) {
-			CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
+	else if (type == WebBrowserController::PAINT_ELEMENT_TYPE::PET_POPUP && rect.width > 0 && rect.height > 0) {	// not sure why that check is necessary but better safe than sorry?
+
+		// bounds checking and adjusting
+		int x = rect.pt.x;
+		int y = rect.pt.y;
+
+		if (x < 0) {
+			x = 0;
 		}
+		if (y < 0) {
+			y = 0;
+		}
+
+		if (x + rect.width > m_pBrowserTexture->GetWidth()) {
+			rect.width -= x + rect.width - m_pBrowserTexture->GetWidth();
+		}
+		if (y + rect.height > m_pBrowserTexture->GetHeight()) {
+			rect.height -= y + rect.height - m_pBrowserTexture->GetHeight();
+		}
+
+		//DOSLOG(INFO, "x: %d, y: %d, width: %d, height: %d", x, y, width, height);
+		m_pBrowserTexture->UpdateTextureRegionFromBuffer((unsigned char*)pBuffer, x, y, width, height);
 	}
 
 	// When the browser gets a paint event, it checks if its texture is currently shared
