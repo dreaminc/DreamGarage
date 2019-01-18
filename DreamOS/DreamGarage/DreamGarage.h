@@ -110,6 +110,8 @@ public:
 	virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
 	virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
 
+	virtual RESULT OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+
 	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override;
 
 	virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;

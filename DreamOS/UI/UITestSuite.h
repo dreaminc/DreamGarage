@@ -89,6 +89,10 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
+	virtual RESULT OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
 		return R_NOT_IMPLEMENTED;
 	}
