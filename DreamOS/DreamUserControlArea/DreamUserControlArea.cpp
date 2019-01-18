@@ -1024,7 +1024,7 @@ RESULT DreamUserControlArea::ShutdownSource() {
 	else if (m_pDreamVCam == m_pActiveSource) {
 		// empty (avoid calling ShutdownDreamApp<DreamBrowser>)
 	}
-	else if (m_pActiveSource->GetCurrentAssetID()) {
+	else if (m_pActiveSource == m_pActiveCameraSource) {
 		m_pDreamVCam->HideCameraSource();
 	}
 	else {	

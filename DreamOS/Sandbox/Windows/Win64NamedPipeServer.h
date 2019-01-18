@@ -60,6 +60,8 @@ public:
 	virtual RESULT NamedPipeServerProcess() override;
 	virtual RESULT SendMessage(void *pBuffer, size_t pBuffer_n) override;
 
+	virtual RESULT ClearConnections() override;
+
 private:
 	RESULT AllocateAndConnectPendingConnectionInstance();
 	RESULT AddPendingConnectionInstanceAndAllocateNew();

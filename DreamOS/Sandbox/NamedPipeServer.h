@@ -34,6 +34,8 @@ public:
 	virtual RESULT NamedPipeServerProcess() = 0;
 	virtual RESULT SendMessage(void *pBuffer, size_t pBuffer_n) = 0;
 
+	virtual RESULT ClearConnections() = 0;
+
 protected:
 	std::wstring m_strPipename;
 

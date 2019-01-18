@@ -475,14 +475,23 @@ RESULT DreamVCam::SendFirstFrame() {
 }
 
 RESULT DreamVCam::CloseSource() {
+	RESULT r = R_PASS;
+
 	m_fIsRunning = false;
 
 	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
-	GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(true), m_pCamera->GetOrientation());
-	m_pCameraModel->SetVisible(false);
-	HideCameraSource();
 
-	return R_PASS;
+	CR(GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(true), m_pCamera->GetOrientation()));
+
+	m_pCameraModel->SetVisible(false);
+	CR(HideCameraSource());
+
+	m_fAutoOpened = false;
+
+	//CR(m_pNamedPipeServer->ClearConnections());
+
+Error:
+	return r;
 }
 
 int DreamVCam::GetWidth() {
@@ -677,7 +686,7 @@ RESULT DreamVCam::StopSharing() {
 	CN(pEnvironmentControllerProxy);
 
 	if (m_fAutoOpened) {
-		pEnvironmentControllerProxy->RequestCloseCamera(m_assetID);
+		CR(pEnvironmentControllerProxy->RequestCloseCamera(m_assetID));
 	}
 
 	m_fAutoOpened = false;

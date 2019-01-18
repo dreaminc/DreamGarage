@@ -342,3 +342,12 @@ Error:
 
 	return r;
 }
+
+RESULT Win64NamedPipeServer::ClearConnections() {
+	RESULT r = R_PASS;
+
+	m_clientConnections.clear();
+
+Error:
+	return r;
+}
