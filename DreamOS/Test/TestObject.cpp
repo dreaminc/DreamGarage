@@ -1,5 +1,22 @@
 #include "TestObject.h"
 
+TestObject::TestObject(const TestObject::Functions &fnStruct, void *pContext) :
+	m_fnInitialize(fnStruct.fnInitialize),
+	m_fnUpdate(fnStruct.fnUpdate),
+	m_fnTest(fnStruct.fnTest),
+	m_fnReset(fnStruct.fnReset),
+	m_pContext(pContext)
+{
+	if (fnStruct.fnTestNoContext != nullptr) {
+		// Wrap it up
+		m_fnTest = [=](void *pContext) {
+			return fnStruct.fnTestNoContext();
+		};
+	}
+}
+
+// The rest of these can be removed 
+/*
 TestObject::TestObject(std::function<RESULT()> fnTestFunction, void *pContext) :
 	m_fnInitialize(nullptr),
 	m_fnUpdate(nullptr),
@@ -61,6 +78,7 @@ TestObject::TestObject(std::function<RESULT(void*)> fnInitialize,
 {
 	// empty
 }
+*/
 
 TestObject::~TestObject() {
 	/* stub */

@@ -46,6 +46,9 @@ public:
 										std::function<RESULT(void*)> fnReset,
 										void *pContext = nullptr);
 
+	std::shared_ptr<TestObject> AddTest(const TestObject::Functions &fnStruct, void *pContext = nullptr);
+
+	virtual RESULT SetupTestSuite() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT AddTests() = 0;
 	
 	std::shared_ptr<TestObject> GetCurrentTest();

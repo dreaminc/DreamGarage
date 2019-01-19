@@ -1173,6 +1173,14 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 
 			if (m_pParentDOS != nullptr) {
 				int numFrames = pendingAudioPacket.GetNumFrames();
+				
+				//AudioPacket alteredPendingAudioPacket = pendingAudioPacket;
+				//
+				//alteredPendingAudioPacket.SetSamplingRate(44100);
+				//alteredPendingAudioPacket.SetNumFrames(441);
+				//
+				//CRM(m_pParentDOS->PushAudioPacketToMixdown(numFrames, alteredPendingAudioPacket), "Failed to push packet to sound system");
+
 				CRM(m_pParentDOS->PushAudioPacketToMixdown(numFrames, pendingAudioPacket), "Failed to push packet to sound system");
 			}
 

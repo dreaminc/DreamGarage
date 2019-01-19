@@ -445,12 +445,11 @@ RESULT DreamSoundSystem::PushAudioPacketToMixdown(int numFrames, const AudioPack
 	{
 		// TODO: Make a mix data
 
-		auto usOffset = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - m_lastMixdownReadTime).count();
+		//auto usOffset = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - m_lastMixdownReadTime).count();
+		//CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket, usOffset));
 
-		//CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket));
-
-		CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket, usOffset));
-
+		CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket));
+		
 		//CR(m_pMixdownBuffer->PushAudioPacket(pendingAudioPacket));
 	}
 
@@ -509,6 +508,8 @@ RESULT DreamSoundSystem::MixdownProcess() {
 				m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength, &pendingAudioPacket, true, false, true);
 				//m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength, &pendingAudioPacket);
 
+				m_pMixdownBuffer->UnlockBuffer();
+
 				// Send to named pipe
 
 				if (m_pNamedPipeServer != nullptr) {
@@ -519,10 +520,6 @@ RESULT DreamSoundSystem::MixdownProcess() {
 					m_pNamedPipeServer->SendMessage((void*)(pDataBuffer), pDataBuffer_n);
 				}
 			}
-
-			m_pMixdownBuffer->UnlockBuffer();
-			
-
 		}
 
 		// Sleep the thread for 10 ms
