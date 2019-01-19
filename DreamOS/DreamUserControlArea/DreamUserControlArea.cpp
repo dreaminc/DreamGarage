@@ -500,7 +500,7 @@ RESULT DreamUserControlArea::HandleAudioPacket(const AudioPacket &pendingAudioPa
 			CR(GetDOS()->BroadcastSharedAudioPacket(pendingAudioPacket));
 			
 			// if it's not the vcam shared, then send the audio to mixdown
-			if (pContext->GetCurrentAssetID() != m_pDreamVCam->GetCurrentAssetID()) {
+			if (pContext->GetSourceTexture() != GetDOS()->GetSharedCameraTexture()) {
 				CR(GetDOS()->PushAudioPacketToMixdown(pendingAudioPacket.GetNumFrames(), pendingAudioPacket));
 			}
 		}
