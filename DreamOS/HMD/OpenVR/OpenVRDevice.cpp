@@ -769,14 +769,15 @@ RESULT OpenVRDevice::UpdateHMD() {
 			}
 			
 		}
-
-		if (!fLeftHandTracked && m_pLeftHand != nullptr) {
-			m_pLeftHand->SetTracked(fLeftHandTracked);
-		}
-		if (!fRightHandTracked && m_pRightHand != nullptr) {
-			m_pRightHand->SetTracked(fRightHandTracked);
-		}
 	}
+	//*
+	if (!fLeftHandTracked && m_pLeftHand != nullptr) {
+		m_pLeftHand->SetTracked(fLeftHandTracked);
+	}
+	if (!fRightHandTracked && m_pRightHand != nullptr) {
+		m_pRightHand->SetTracked(fRightHandTracked);
+	}
+	//*/
 
 Error:
 	return r;
