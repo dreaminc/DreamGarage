@@ -650,6 +650,8 @@ RESULT DreamUserControlArea::ResetVirtualCamera() {
 	CN(m_pDreamVCam);
 	CR(m_pDreamVCam->HandleSettings(ptPosition, qOrientation));
 
+	CR(GetDOS()->SaveCameraSettings(ptPosition, qOrientation));
+
 Error:
 	return r;
 }
