@@ -181,6 +181,7 @@ private:
 	std::shared_ptr<EnvironmentShare> m_pCurrentCameraShare = nullptr;
 
 	bool m_fIsRunning = false;
+	bool m_fPendDisconnectPipes = false;
 	bool m_fIsMuted = false;
 	DreamVCam::SourceType m_sourceType = SourceType::INVALID;
 
