@@ -211,6 +211,10 @@ Error:
 	return r;
 }
 
+RESULT DreamTestApp::OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT DreamTestApp::OnNewSocketConnection(int seatPosition) {
 	return R_NOT_IMPLEMENTED;
 }
