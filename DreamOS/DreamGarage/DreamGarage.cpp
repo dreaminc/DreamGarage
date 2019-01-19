@@ -1326,6 +1326,9 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 		AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
 		CR(m_pDreamSoundSystem->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, channel));
 
+		// Send audio to Mixdown
+		CR(PushAudioPacketToMixdown((int)frames, pendingPacket));
+
 		// Sets the mouth position
 		CR(HandleUserAudioDataMessage(pPeerConnection, &audioDataMessage));
 	}
@@ -1345,6 +1348,9 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 
 			AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
 			CR(m_pDreamSoundSystem->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, channel));
+
+			// Send audio to Mixdown
+			CR(PushAudioPacketToMixdown((int)frames, pendingPacket));
 		}
 	}
 

@@ -498,6 +498,11 @@ RESULT DreamUserControlArea::HandleAudioPacket(const AudioPacket &pendingAudioPa
 		auto pCloudController = GetDOS()->GetCloudController();
 		if (pCloudController != nullptr) {
 			CR(GetDOS()->BroadcastSharedAudioPacket(pendingAudioPacket));
+			
+			// if it's not the vcam shared, then send the audio to mixdown
+			if (pContext->GetSourceTexture() != GetDOS()->GetSharedCameraTexture()) {
+				CR(GetDOS()->PushAudioPacketToMixdown(pendingAudioPacket.GetNumFrames(), pendingAudioPacket));
+			}
 		}
 	}
 
