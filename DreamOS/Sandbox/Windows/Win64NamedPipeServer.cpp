@@ -301,7 +301,7 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 				if (err == ERROR_PIPE_LISTENING) {
 					CBM((false), "WriteFile warning waiting for connection");
 				}
-				else if (err == ERROR_NO_DATA) {
+				else if (err == ERROR_NO_DATA || err == ERROR_INVALID_HANDLE) {
 					pClientConnection->m_fConnected = false;
 
 					DEBUG_LINEOUT("%S: Client connection %d closed", m_strPipename.c_str(), pClientConnection->m_connectionID);
@@ -346,7 +346,22 @@ Error:
 RESULT Win64NamedPipeServer::ClearConnections() {
 	RESULT r = R_PASS;
 
+	//*
+	for (auto &pClientConnection : m_clientConnections) {
+		pClientConnection->ClosePipe();
+	}
+	//*/
+
+/*
+	for (auto &pClientConnection : m_clientConnections) {
+		pClientConnection->m_fConnected = false;
+	}
+	if (m_pObserver != nullptr) {
+		CR(m_pObserver->OnClientDisconnect());
+	}
+
 	m_clientConnections.clear();
+	//*/
 
 Error:
 	return r;

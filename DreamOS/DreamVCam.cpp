@@ -269,6 +269,11 @@ RESULT DreamVCam::Update(void *pContext) {
 					m_pStreamingTexture->LoadFlippedBufferFromTexture(m_pLoadBuffer, bufferSize);
 				}
 
+				if (m_fPendDisconnectPipes) {
+					m_fPendDisconnectPipes = false;
+					CR(m_pNamedPipeServer->ClearConnections());
+				}
+
 				m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer), m_pLoadBuffer_n);
 
 				lastUpdateTime = timeNow;
@@ -477,8 +482,6 @@ RESULT DreamVCam::SendFirstFrame() {
 RESULT DreamVCam::CloseSource() {
 	RESULT r = R_PASS;
 
-	m_fIsRunning = false;
-
 	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
 
 	CR(GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(true), m_pCamera->GetOrientation()));
@@ -488,7 +491,7 @@ RESULT DreamVCam::CloseSource() {
 
 	m_fAutoOpened = false;
 
-	//CR(m_pNamedPipeServer->ClearConnections());
+	m_fPendDisconnectPipes = true;
 
 Error:
 	return r;
@@ -539,6 +542,8 @@ RESULT DreamVCam::OnClientDisconnect() {
 	CR(pEnvironmentControllerProxy->RequestStopSharing(m_pCurrentCameraShare));
 
 	CR(HideCameraSource());
+
+	m_fIsRunning = false;
 
 Error:
 	return r;
@@ -622,6 +627,8 @@ RESULT DreamVCam::ShareCameraSource() {
 	CR(m_pParentApp->OnVirtualCameraCaptured());
 	m_pCameraQuad->SetVisible(true);
 	m_pCameraQuadBackground->SetVisible(true);
+
+	//GetActiveSource may be a problem
 	m_pCameraQuadTexture = m_pParentApp->GetActiveSource()->GetSourceTexture();
 	m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);
 
