@@ -42,6 +42,8 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	float cameraScreenDepth = -0.05f;
 
 	point ptCameraModel = point(0.0f, -0.24f, -cameraScreenDepth);
+	point ptDefaultCamera;
+	quaternion qDefaultCamera;
 
 	// offset so the background rendering doesn't conflict with the screen
 	float cameraScreenBackgroundOffset = -0.001f;
@@ -81,17 +83,12 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 
 	m_pMuteTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"camera-mute.png");
 
-	/*
-	m_pCameraQuad = GetDOS()->MakeQuad(0.12f*test, 0.12f*9.0f / 16.0f*test);
-	//*/
-	//GetDOS()->AddObject(m_pCameraQuad.get(), SandboxApp::PipelineType::MAIN);
+	GetDOS()->GetDefaultVCamPlacement(ptDefaultCamera, qDefaultCamera);
 
-	//m_pCameraQuad->SetPosition(0.0f, 0.12f, 0.0f);
-
-	// TODO: 
-	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
+	m_pCamera = DNode::MakeNode<CameraNode>(ptDefaultCamera, viewport(1280, 720, 60));
 	CN(m_pCamera);
 	CB(m_pCamera->incRefCount());
+	m_pCamera->SetOrientation(qDefaultCamera);
 
 	m_pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
 	CN(m_pDreamGamepadCamera);
@@ -562,6 +559,8 @@ Error:
 RESULT DreamVCam::OnCameraAtRest() {
 	RESULT r = R_PASS;
 
+	CBR(m_fHasReceivedSettings, R_SKIPPED);
+	
 	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
 	GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(true), m_pCamera->GetOrientation());
 
@@ -574,6 +573,8 @@ Error:
 
 RESULT DreamVCam::HandleSettings(point ptPosition, quaternion qOrientation) {
 	RESULT r = R_PASS;
+
+	m_fHasReceivedSettings = true;
 
 	m_pCamera->SetPosition(ptPosition);
 	m_pCamera->SetOrientation(qOrientation);
