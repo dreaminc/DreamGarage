@@ -603,6 +603,8 @@ RESULT DreamUserControlArea::OnVirtualCameraReleased() {
 	RESULT r = R_PASS;
 
 	m_pActiveCameraSource = nullptr;
+
+	CR(m_pDreamVCam->HideCameraSource());
 	CR(m_pDreamVCam->StopSharing());
 
 Error:
@@ -1015,6 +1017,11 @@ RESULT DreamUserControlArea::ShutdownSource() {
 	RESULT r = R_PASS;
 
 	CNR(m_pActiveSource, R_SKIPPED);
+
+	if (m_pActiveSource == m_pActiveCameraSource) {
+		m_pDreamVCam->HideCameraSource();
+	}
+
 	m_pActiveSource->CloseSource();
 	
 	if (m_pDreamDesktop == m_pActiveSource) {
@@ -1023,9 +1030,6 @@ RESULT DreamUserControlArea::ShutdownSource() {
 	}
 	else if (m_pDreamVCam == m_pActiveSource) {
 		// empty (avoid calling ShutdownDreamApp<DreamBrowser>)
-	}
-	else if (m_pActiveSource == m_pActiveCameraSource) {
-		m_pDreamVCam->HideCameraSource();
 	}
 	else {	
 		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
