@@ -102,10 +102,7 @@ Error:
 const wchar_t kDreamVCamNamedPipeServerName[] = L"dreamvcampipe";
 
 RESULT DreamVCam::InitializePipeline() {
-	RESULT r = R_PASS;
-
-	// Pass in a context if needed in future
-	//CRM(StartModuleProcess(), "Failed to start module process");
+	RESULT r = R_PASS;	
 	
 	// Set up named pipe server
 	m_pNamedPipeServer = GetDOS()->MakeNamedPipeServer(kDreamVCamNamedPipeServerName);
@@ -125,8 +122,10 @@ RESULT DreamVCam::InitializePipeline() {
 	int channels = 4;
 	
 	m_pLoadBuffer_n = width * height * channels * sizeof(unsigned char);
-	m_pLoadBuffer = (unsigned char*) malloc(m_pLoadBuffer_n);
-	CNM(m_pLoadBuffer, "Failed to allocate DreamCam buffer");
+	m_pLoadBuffer[0] = (unsigned char*) malloc(m_pLoadBuffer_n);
+	m_pLoadBuffer[1] = (unsigned char*)malloc(m_pLoadBuffer_n);
+	CNM(m_pLoadBuffer[0], "Failed to allocate DreamCam buffer");
+	CNM(m_pLoadBuffer[1], "Failed to allocate DreamCam buffer");
 
 	// Set up the aux camera and local pipeline
 
@@ -173,6 +172,9 @@ RESULT DreamVCam::InitializePipeline() {
 	m_pSourceTexture = m_pOGLRenderNode->GetOGLFramebufferColorTexture();
 	m_pSourceTexture->SetUVVerticalFlipped();
 
+	// Pass in a context if needed in future
+	CRM(StartModuleProcess(), "Failed to start module process");
+
 Error:
 	return r;
 }
@@ -214,7 +216,7 @@ RESULT DreamVCam::Update(void *pContext) {
 	{
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
-		// Approximately 30 FPS
+		// Approximately 24 FPS
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 41) {
 			
 			texture *pTexture = m_pOGLRenderNode->GetOGLFramebufferColorTexture();	
@@ -244,8 +246,9 @@ RESULT DreamVCam::Update(void *pContext) {
 				} break;
 				}
 			}
-			//*
+			//*	
 			size_t bufferSize = m_pStreamingTexture->GetTextureSize();
+			m_loadBufferIndex = (m_loadBufferIndex + 1) % 2;
 
 			if (bufferSize == m_pLoadBuffer_n) {
 				// TODO: We currently don't support multi-sample, so need to make sure
@@ -255,7 +258,7 @@ RESULT DreamVCam::Update(void *pContext) {
 					if (!pOGLStreamingTexture->IsOGLPBOPackEnabled()) {
 						pOGLStreamingTexture->EnableOGLPBOPack();
 					}
-					m_pStreamingTexture->LoadBufferFromTexture(m_pLoadBuffer, bufferSize);
+					m_pStreamingTexture->LoadBufferFromTexture(m_pLoadBuffer[m_loadBufferIndex], bufferSize);
 				}
 				else {
 					OGLTexture* pOGLStreamingTexture = dynamic_cast<OGLTexture*>(m_pStreamingTexture);
@@ -263,7 +266,7 @@ RESULT DreamVCam::Update(void *pContext) {
 						pOGLStreamingTexture->EnableOGLPBOPack();
 					}
 
-					m_pStreamingTexture->LoadFlippedBufferFromTexture(m_pLoadBuffer, bufferSize);
+					m_pStreamingTexture->LoadFlippedBufferFromTexture(m_pLoadBuffer[m_loadBufferIndex], bufferSize);
 				}
 
 				if (m_fPendDisconnectPipes) {
@@ -271,7 +274,8 @@ RESULT DreamVCam::Update(void *pContext) {
 					CR(m_pNamedPipeServer->ClearConnections());
 				}
 
-				m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer), m_pLoadBuffer_n);
+				// This part can at least go in the thread
+				//m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer[m_loadBufferIndex]), m_pLoadBuffer_n);
 
 				lastUpdateTime = timeNow;
 			}
@@ -355,24 +359,33 @@ RESULT DreamVCam::ModuleProcess(void *pContext) {
 	RESULT r = R_PASS;
 
 	int stayAliveCount = 0;
-	
+	static std::chrono::system_clock::time_point lastSentTime = std::chrono::system_clock::now();
+
 	// TODO: Cross thread OGL calls don't seem to work - need to investigate
 
 	while (true) {
 		DEBUG_LINEOUT("vcam: stayalive - %d", (1 * stayAliveCount++));
 
-		// TODO: Some more logic around texture / buffer sizes etc 
-		if (m_pNamedPipeServer != nullptr && m_pSourceTexture != nullptr) {
-			size_t bufferSize = m_pSourceTexture->GetTextureSize();
+		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
-			CBM((bufferSize == m_pLoadBuffer_n), "Mismatch in buffer size for source texture and virtual camera");
+		// Approximately 24 FPS
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastSentTime).count() > 41) {
 
-			CRM(m_pSourceTexture->LoadBufferFromTexture(m_pLoadBuffer, bufferSize), "Failed to load buffer from texture");
+			if (m_pNamedPipeServer != nullptr && m_pStreamingTexture != nullptr) {
 
-			CRM(m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer), m_pLoadBuffer_n), "Failed to send vcam buffer");
+				size_t bufferSize = m_pStreamingTexture->GetTextureSize();
+
+				m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer[m_loadBufferIndex]), m_pLoadBuffer_n);
+
+				lastSentTime = timeNow;
+			}
+			else {
+				DEBUG_LINEOUT("NamedPipeServer or Streaming Texture were nullptr in VCam Module Process");
+			}
+		
 		}
-
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		
+		//std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 
 Error:
