@@ -274,7 +274,7 @@ RESULT DreamVCam::Update(void *pContext) {
 				}
 
 				// This part can at least go in the thread
-				//m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer), m_pLoadBuffer_n);
+				//m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer[m_loadBufferIndex]), m_pLoadBuffer_n);
 
 				lastUpdateTime = timeNow;
 			}
