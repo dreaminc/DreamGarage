@@ -124,7 +124,8 @@ RESULT DreamVCam::InitializePipeline() {
 	m_pLoadBuffer_n = width * height * channels * sizeof(unsigned char);
 	m_pLoadBuffer[0] = (unsigned char*) malloc(m_pLoadBuffer_n);
 	m_pLoadBuffer[1] = (unsigned char*)malloc(m_pLoadBuffer_n);
-	CNM(m_pLoadBuffer, "Failed to allocate DreamCam buffer");
+	CNM(m_pLoadBuffer[0], "Failed to allocate DreamCam buffer");
+	CNM(m_pLoadBuffer[1], "Failed to allocate DreamCam buffer");
 
 	// Set up the aux camera and local pipeline
 
