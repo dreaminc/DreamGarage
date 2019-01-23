@@ -157,8 +157,9 @@ private:
 	texture* m_pSourceTexture = nullptr;
 	texture* m_pStreamingTexture = nullptr;
 
-	unsigned char *m_pLoadBuffer = nullptr;
+	unsigned char* m_pLoadBuffer[2] = { 0 };
 	size_t m_pLoadBuffer_n = 0;
+	int m_loadBufferIndex = 0;
 
 	std::shared_ptr<DreamGamepadCameraApp> m_pDreamGamepadCamera = nullptr;
 	CameraNode* m_pCamera = nullptr;
