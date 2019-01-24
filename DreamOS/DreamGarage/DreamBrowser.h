@@ -35,6 +35,8 @@
 
 #define DEFAULT_SCROLL_FACTOR 5
 
+#define CEF_UPDATE_MS (1000.0/24.0)
+
 class quad;
 class sphere;
 class texture;
@@ -262,7 +264,7 @@ private:
 	double m_msTimeBetweenSends = 100.0;
 
 	double m_msLastScreenUpdate = 0.0;
-	double m_msTimeBetweenUpdates = (1000.0/24.0);
+	double m_msTimeBetweenUpdates = CEF_UPDATE_MS;
 
 	unsigned char *m_pLoadBuffer = nullptr;
 	size_t m_pLoadBuffer_n = 0;
