@@ -69,7 +69,7 @@ public:
 	std::shared_ptr<UISurface> MakeUISurface();
 	std::shared_ptr<UISurface> AddUISurface();
 
-	RESULT Notify(InteractionObjectEvent *pEvent);
+	virtual RESULT Notify(InteractionObjectEvent *pEvent);
 
 protected:
 	DreamOS *m_pDreamOS = nullptr;

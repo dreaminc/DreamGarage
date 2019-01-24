@@ -163,6 +163,11 @@ RESULT InteractionEngine::UpdateAnimationQueue() {
 	msNow /= 1000.0;
 
 	m_pObjectQueue->Update(msNow);
+
+	auto tCurrent = std::chrono::high_resolution_clock::now();
+	m_msLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(tCurrent - m_tLastUpdate).count();
+	m_tLastUpdate = tCurrent;
+
 //Error:
 	return r;
 }
@@ -899,6 +904,23 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 
 				CR(NotifySubscribers(type, &interactionEvent));
 			}
+
+			float xDiff = -pEvent->state.ptTouchpad.x();
+			float yDiff = pEvent->state.ptTouchpad.y();
+
+			double scale = m_msLastUpdate / FRAME_MS;
+
+			xDiff *= scale;
+			yDiff *= scale;
+
+			pEvent->state.ptTouchpad.x() = -xDiff;
+			pEvent->state.ptTouchpad.y() = yDiff;
+
+			InteractionEventType type = INTERACTION_EVENT_PAD_MOVE;
+			InteractionObjectEvent interactionEvent(type);
+			interactionEvent.SetControllerState(pEvent->state);
+			CR(NotifySubscribers(type, &interactionEvent))
+			
 		} break;
 	}
 

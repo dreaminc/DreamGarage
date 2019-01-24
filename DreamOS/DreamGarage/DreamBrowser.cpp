@@ -156,8 +156,7 @@ RESULT DreamBrowser::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) {
 	ptWebContact.x = (int)(scrollPoint.x());
 	ptWebContact.y = (int)(scrollPoint.y());
 
-	WebBrowserMouseEvent mouseEvent;
-	mouseEvent.pt = ptWebContact;
+	m_mouseScrollEvent.pt = ptWebContact;
 
 	if (abs(pxXDiff) > abs(pxYDiff)) {
 		pxYDiff = 0.0f;
@@ -169,10 +168,8 @@ RESULT DreamBrowser::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) {
 	m_pxXPosition += (int)pxXDiff;
 	m_pxYPosition += (int)pxYDiff;
 	
-	m_fScroll = true;
-	m_pxYScroll = pxYDiff;
-	m_pxXScroll = pxXDiff;
-	m_mouseEvent = mouseEvent;
+	m_pxXScroll += pxXDiff;
+	m_pxYScroll += pxYDiff;
 	//CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, (int)pxXDiff, (int)pxYDiff));
 
 Error:
@@ -267,11 +264,11 @@ Error:
 RESULT DreamBrowser::OnMouseMove(point mousePoint) {
 	RESULT r = R_PASS;
 
-	WebBrowserMouseEvent mouseEvent;
-	mouseEvent.pt.x = (int)mousePoint.x();
-	mouseEvent.pt.y = (int)mousePoint.y();
+	m_mouseDragEvent.pt.x = (int)mousePoint.x();
+	m_mouseDragEvent.pt.y = (int)mousePoint.y();
 
-	CR(m_pWebBrowserController->SendMouseMove(mouseEvent));
+	m_fUpdateDrag = true;
+
 Error:
 	return r;
 }
@@ -582,6 +579,8 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	///*
 	GetComposite()->InitializeOBB();
 	
+	m_tLastUpdate = std::chrono::high_resolution_clock::now();
+
 Error:
 	return r;
 }
@@ -597,6 +596,26 @@ Error:
 
 RESULT DreamBrowser::Update(void *pContext) {
 	RESULT r = R_PASS;
+
+	auto tCurrent = std::chrono::high_resolution_clock::now();
+	double msCurrent = std::chrono::duration_cast<std::chrono::milliseconds>(tCurrent - m_tLastUpdate).count();
+
+	if (msCurrent > m_msTimeBetweenUpdates) {
+		if (m_pxXScroll != 0 || m_pxYScroll != 0) {
+			CR(m_pWebBrowserController->SendMouseWheel(m_mouseScrollEvent, m_pxXScroll, m_pxYScroll));
+
+			m_pxXScroll = 0;
+			m_pxYScroll = 0;
+
+			m_tLastUpdate = tCurrent;
+		}
+
+		if (m_fUpdateDrag) {
+			CR(m_pWebBrowserController->SendMouseMove(m_mouseDragEvent));
+			m_fUpdateDrag = false;
+		}
+	}
+
 	if (m_pWebBrowserManager != nullptr) {
 		CR(m_pWebBrowserManager->Update());
 	}
@@ -629,11 +648,6 @@ RESULT DreamBrowser::Update(void *pContext) {
 			}
 			m_msTimeLastSent = msTimeNow;
 		}
-	}
-
-	if (m_fScroll) {
-		CR(m_pWebBrowserController->SendMouseWheel(m_mouseEvent, (int)m_pxXScroll, (int)m_pxYScroll));
-		m_fScroll = false;
 	}
 	
 Error:

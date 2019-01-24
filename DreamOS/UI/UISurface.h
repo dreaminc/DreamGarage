@@ -3,15 +3,16 @@
 
 #include "UIView.h"
 #include "Primitives/Subscriber.h"
-#include "Sense/SenseController.h"
+#include "InteractionEngine/InteractionObjectEvent.h"
+#include <chrono>
 
 class DreamOS;
 class hand;
 class quad;
 
-#define SCROLL_CONSTANT 10.0f;
+#define SCROLL_CONSTANT 10.0f
 
-class UISurface : public UIView, public Subscriber<SenseControllerEvent> {
+class UISurface : public UIView {
 public:
 	UISurface(HALImp *pHALImp, DreamOS *pDreamOS);
 	~UISurface();
@@ -25,7 +26,7 @@ public:
 	point GetLastEvent();
 	RESULT ResetLastEvent();
 
-	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
+	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 
 private:
 	point m_ptLeftHover;

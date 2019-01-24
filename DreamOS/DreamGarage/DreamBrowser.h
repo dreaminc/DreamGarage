@@ -215,6 +215,8 @@ private:
 
 	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
 
+	std::chrono::high_resolution_clock::time_point m_tLastUpdate;
+
 	WebBrowserPoint m_lastWebBrowserPoint;	// This is so scrolling can get which frame the mouse is on - e.g. drop down menus are now scrollable
 
 	int m_browserWidth = BROWSER_WIDTH;
@@ -226,10 +228,13 @@ private:
 	int m_pxXPosition = 0;
 	int m_pxYPosition = 0;
 
-	bool m_fScroll = false;
 	int m_pxXScroll = 0;
 	int m_pxYScroll = 0;
-	WebBrowserMouseEvent m_mouseEvent;
+
+	WebBrowserMouseEvent m_mouseScrollEvent;
+
+	WebBrowserMouseEvent m_mouseDragEvent;
+	bool m_fUpdateDrag = false;
 
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
 
@@ -255,6 +260,9 @@ private:
 	int m_sentFrames = 0;
 	double m_msTimeLastSent = 0.0;
 	double m_msTimeBetweenSends = 100.0;
+
+	double m_msLastScreenUpdate = 0.0;
+	double m_msTimeBetweenUpdates = (1000.0/24.0);
 
 	unsigned char *m_pLoadBuffer = nullptr;
 	size_t m_pLoadBuffer_n = 0;
