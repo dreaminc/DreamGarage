@@ -108,7 +108,7 @@ RESULT OGLTexture::AllocateGLTexture(size_t optOffset) {
 		pImageBuffer = m_pImage->GetImageBuffer() + (optOffset);
 	}
 
-	CR(AllocateGLTexture(pImageBuffer, internalGLFormat, glFormat, GL_UNSIGNED_BYTE));
+	CR(AllocateGLTexture(pImageBuffer, GL_RGBA8, glFormat, GL_UNSIGNED_BYTE));
 
 Error:
 	return r;
