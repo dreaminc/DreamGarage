@@ -64,6 +64,7 @@ public:
 
 	RESULT SetValue(int val);
 	RESULT SetControllerState(ControllerState state);
+	ControllerState GetControllerState();
 
 } INTERACTION_OBJECT_EVENT;
 

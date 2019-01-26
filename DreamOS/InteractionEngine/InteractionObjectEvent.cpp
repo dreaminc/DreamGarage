@@ -78,3 +78,7 @@ RESULT InteractionObjectEvent::SetControllerState(ControllerState state) {
 	m_state = state;
 	return R_PASS;
 }
+
+ControllerState InteractionObjectEvent::GetControllerState() {
+	return m_state;
+}
