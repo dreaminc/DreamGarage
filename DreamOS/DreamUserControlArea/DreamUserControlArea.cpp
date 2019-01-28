@@ -871,13 +871,13 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	m_fHasOpenApp = true;
 	m_pDreamUserApp->SetHasOpenApp(true);
 	if(pEnvironmentAsset->GetContentType() == CAMERA_CONTENT_CONTROL_TYPE && m_pDreamVCam != nullptr) {
+		m_pActiveSource = m_pDreamVCam;
 		m_pDreamVCam->InitializeWithParent(this);
 		m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
 		// new desktop can't be the current content
 		m_pUserControls->SetSharingFlag(false);
 		m_pDreamVCam->SetEnvironmentAsset(pEnvironmentAsset);
 		m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
-		m_pActiveSource = m_pDreamVCam;
 	}
 	else if(pEnvironmentAsset->GetScope() == m_strDesktopScope && m_pDreamDesktop == nullptr) {
 		// TODO: desktop setup
