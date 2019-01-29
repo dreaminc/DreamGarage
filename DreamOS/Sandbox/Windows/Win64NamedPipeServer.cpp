@@ -335,8 +335,8 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 	}
 
 	if (m_fPendingDisconnect) {
-		double m_msNow = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-		if (m_msNow - m_msTimeDisconnected > m_msDisconnectDelay) {
+		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+		if (msNow - m_msTimeDisconnected > m_msDisconnectDelay) {
 
 			m_pObserver->OnClientDisconnect();
 			// Close clears the client connections

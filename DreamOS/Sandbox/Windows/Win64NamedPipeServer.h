@@ -78,7 +78,7 @@ private:
 	HANDLE m_hConnectEvent = nullptr;
 
 	double m_msDisconnectDelay = 1000.0;
-	double m_msTimeDisconnected;
+	double m_msTimeDisconnected = 0.0;
 	bool m_fPendingDisconnect = false;
 };
 
