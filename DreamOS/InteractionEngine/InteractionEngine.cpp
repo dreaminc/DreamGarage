@@ -33,6 +33,8 @@ RESULT InteractionEngine::Initialize() {
 
 	CR(InitializeActiveObjectQueues());
 
+	m_padInteractionEvent = InteractionObjectEvent(INTERACTION_EVENT_PAD_MOVE);
+
 Error:
 	return r;
 }
@@ -164,14 +166,19 @@ RESULT InteractionEngine::UpdateAnimationQueue() {
 
 	m_pObjectQueue->Update(msNow);
 
+	//*
 	auto tCurrent = std::chrono::high_resolution_clock::now();
 	m_msLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(tCurrent - m_tLastUpdate).count();
+
 	if (m_msLastUpdate >= (int)(FRAME_MS)) {
+		CR(NotifySubscribers(INTERACTION_EVENT_PAD_MOVE, &m_padInteractionEvent));
 
+		m_tLastUpdate = tCurrent;
+		m_padInteractionEvent = InteractionObjectEvent(INTERACTION_EVENT_PAD_MOVE);
 	}
-	m_tLastUpdate = tCurrent;
+	//*/
 
-//Error:
+Error:
 	return r;
 }
 
@@ -920,7 +927,6 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 			pEvent->state.ptTouchpad.y() = m_padInteractionEvent.GetControllerState().ptTouchpad.y()+yDiff;
 
 			m_padInteractionEvent.SetControllerState(pEvent->state);
-			CR(NotifySubscribers(INTERACTION_EVENT_PAD_MOVE, &m_padInteractionEvent))
 			
 		} break;
 	}
