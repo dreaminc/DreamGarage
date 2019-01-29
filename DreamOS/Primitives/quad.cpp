@@ -330,20 +330,17 @@ Error:
 RESULT quad::SetDiffuseTexture(texture* pTexture) {
 	RESULT r = R_PASS;
 
-	bool fIsQuadUVFlipped = false;
 	CN(pTexture);
 	
-	if (m_pTextureDiffuse != nullptr) {
-		if (m_pTextureDiffuse->IsUVVerticalFlipped()) {
-			fIsQuadUVFlipped = true;
-		}
-	}
-
-	if (pTexture->IsUVVerticalFlipped() && !fIsQuadUVFlipped) {
+	// if the new texture is flipped, and quad is not flipped
+	if (pTexture->IsUVVerticalFlipped() && !m_fTextureUVFlipVertical) {
 		FlipUVVertical();
+		m_fTextureUVFlipVertical = true;
 	}
-	else if (!pTexture->IsUVVerticalFlipped() && fIsQuadUVFlipped) {
+	// if the new texture is not flipped and quad is flipped
+	else if (!pTexture->IsUVVerticalFlipped() && m_fTextureUVFlipVertical) {
 		FlipUVVertical();
+		m_fTextureUVFlipVertical = false;
 	}
 
 	m_pTextureDiffuse = pTexture;

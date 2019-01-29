@@ -127,6 +127,8 @@ private:
 	bool m_fBillboard = false;
 	bool m_fScaledBillboard = false;
 
+	bool m_fTextureUVFlipVertical = false;
+
 };
 
 #endif // ! QUAD_H_
