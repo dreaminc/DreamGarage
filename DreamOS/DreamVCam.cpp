@@ -272,6 +272,7 @@ RESULT DreamVCam::Update(void *pContext) {
 				if (m_fPendDisconnectPipes) {
 					m_fPendDisconnectPipes = false;
 					CR(m_pNamedPipeServer->ClearConnections());
+					m_fIsRunning = false;
 				}
 
 				// This part can at least go in the thread
@@ -553,7 +554,7 @@ RESULT DreamVCam::OnClientDisconnect() {
 
 	CR(HideCameraSource());
 
-	m_fIsRunning = false;
+//	m_fIsRunning = false;
 
 Error:
 	return r;
