@@ -130,6 +130,11 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		GetDOS()->AddObjectToUIGraph(GetComposite());
 	}
 
+	if (m_fPendDreamFormSuccess) {
+		m_fPendDreamFormSuccess = false;
+		CR(m_pDreamUIBar->HandleEvent(UserObserverEventType::DISMISS));
+	}
+
 	CR(m_pUserControls->Update());
 	CR(m_pDreamTabView->Update());
 	CR(m_pControlView->Update());
@@ -1187,7 +1192,7 @@ RESULT DreamUserControlArea::OnDreamFormSuccess() {
 	RESULT r = R_PASS;
 	
 	if (!m_pDreamUIBar->IsEmpty()) {
-		CR(m_pDreamUIBar->HandleEvent(UserObserverEventType::DISMISS));
+		m_fPendDreamFormSuccess = true;
 	}
 	if (m_fHasOpenApp) {
 		CR(Show());
