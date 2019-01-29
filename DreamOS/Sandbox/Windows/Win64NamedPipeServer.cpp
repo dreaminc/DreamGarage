@@ -315,11 +315,11 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 					}
 
 					if (fShouldCloseConnection && m_pObserver != nullptr) {
-						m_pObserver->OnClientDisconnect();
+						if (!m_fPendingDisconnect) {
+							m_msTimeDisconnected = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 
-						// Close clears the client connections
-						m_clientConnections.clear();
-						goto Error;
+							m_fPendingDisconnect = true;
+						}
 					}
 				}
 				else {
@@ -327,12 +327,26 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 				}
 			}
 			else {
+				m_fPendingDisconnect = false;
 				CBM((pClientConnection->m_cbToWrite == pClientConnection->m_cbWritten), "Writefile mismatch bytes written");
 			}
 		}
 
 	}
 
+	if (m_fPendingDisconnect) {
+		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+		if (msNow - m_msTimeDisconnected > m_msDisconnectDelay) {
+
+			m_pObserver->OnClientDisconnect();
+			// Close clears the client connections
+			m_clientConnections.clear();
+
+			m_fPendingDisconnect = false;
+
+			goto Error;
+		}
+	}
 
 Error:
 	if (pTempBuffer != nullptr) {

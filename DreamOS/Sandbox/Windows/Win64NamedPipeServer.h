@@ -76,6 +76,10 @@ private:
 	int m_msTimeout = DEFAULT_NAMED_PIPE_TIMEOUT;
 	OVERLAPPED m_overlapped; 
 	HANDLE m_hConnectEvent = nullptr;
+
+	double m_msDisconnectDelay = 1000.0;
+	double m_msTimeDisconnected = 0.0;
+	bool m_fPendingDisconnect = false;
 };
 
 
