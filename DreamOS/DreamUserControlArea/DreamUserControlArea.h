@@ -266,6 +266,7 @@ private:
 	std::string m_strCameraScope = SCOPE_CAMERA;
 
 	bool m_fUpdateDreamUIBar = false;
+	bool m_fPendDreamFormSuccess = false;
 
 	std::shared_ptr<EnvironmentAsset> m_pPendingEnvironmentAsset = nullptr;
 };
