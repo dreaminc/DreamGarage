@@ -1038,6 +1038,9 @@
     <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentShare.cpp">
       <Filter>Cloud\Environment</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\billboard.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2257,6 +2260,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Test\DreamTestSuite.h">
       <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\billboard.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
