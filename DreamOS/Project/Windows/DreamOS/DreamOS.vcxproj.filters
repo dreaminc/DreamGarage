@@ -2534,6 +2534,15 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\billboard.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\billboard.geo">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\billboard.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
