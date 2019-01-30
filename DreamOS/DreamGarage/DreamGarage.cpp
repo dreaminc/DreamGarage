@@ -94,7 +94,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fHideWindow = true;
 	sandboxconfig.fHMDMirror = false;
 	sandboxconfig.f3rdPersonCamera = false;
-	sandboxconfig.hmdType = HMD_ANY_AVAILABLE;
+	sandboxconfig.hmdType = HMD_OPENVR;
 
 	// Enable HMD mirror for non-production builds
 #ifndef PRODUCTION_BUILD

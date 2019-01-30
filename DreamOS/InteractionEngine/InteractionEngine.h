@@ -30,6 +30,7 @@
 #include "Primitives/CapturedObj.h"
 
 #define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.005f
+#define FRAME_MS (1000.0/90.0)
 
 class ObjectStore;
 
@@ -238,7 +239,12 @@ private:
 	double m_diffThreshold = DEFAULT_INTERACTION_DIFF_THRESHOLD;
 
 	SandboxApp *m_pSandbox = nullptr;
+
 	double m_interactionPadAccumulator = 0.0f;
+	InteractionObjectEvent m_padInteractionEvent;
+	bool m_fActiveScroll = false;
+	std::chrono::high_resolution_clock::time_point m_tLastUpdate;
+	double m_msLastUpdate;
 
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_lastUpdateTime;
 	double m_sTimeStep = 0.015f;		// time step in seconds 
