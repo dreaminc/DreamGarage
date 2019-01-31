@@ -37,6 +37,8 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(TestNestedOBB());
 
+	CR(AddTestGeometryShader());
+  
 	CR(AddTestTextureSubRegionUpdate());
 
 	CR(AddTestModel());
@@ -63,8 +65,6 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestBlinnPhongShaderTextureBump());
 	
-	CR(AddTestGeometryShader());
-  
 	CR(AddTestCamera());
 
 	CR(AddTestWaterShader());
@@ -806,9 +806,9 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 		*/
 
 		// Visualize Normals
-		///*
+		//*
 		ProgramNode* pVisualNormalsProgram;
-		pVisualNormalsProgram = pHAL->MakeProgramNode("visualize_normals");
+		pVisualNormalsProgram = pHAL->MakeProgramNode("visualize_normals", PIPELINE_FLAGS::PASSTHRU);
 		//pVisualNormalsProgram = pHAL->MakeProgramNode("minimal");
 		CN(pVisualNormalsProgram);
 		CR(pVisualNormalsProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
@@ -831,7 +831,8 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 
 		// Connected in parallel (order matters)
 		// NOTE: Right now this won't work with mixing for example
-		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		//CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
 		//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 		//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 		//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
@@ -849,32 +850,42 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 			pTestContext = reinterpret_cast<TestContext*>(pContext);
 			CN(pTestContext);
 
-			//texture *pColorTexture;
-			//pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
-			//
-			//volume *pVolume = m_pDreamOS->AddVolume(width, height, length);
-			//CN(pVolume);
-			//pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-			//pVolume->SetDiffuseTexture(pColorTexture);
-			//
-			//pVolume = m_pDreamOS->AddVolume(width, height, length);
-			//CN(pVolume);
-			//pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-			//CR(pVolume->SetVertexColor(COLOR_GREEN));
-			//
-			//pVolume = m_pDreamOS->AddVolume(width, height, length);
-			//CN(pVolume);
-			//pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-			//CR(pVolume->SetVertexColor(COLOR_RED));
-			//
-			//pVolume = m_pDreamOS->AddVolume(width, height, length);
-			//CN(pVolume);
-			//pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-			//CR(pVolume->SetVertexColor(COLOR_BLUE));
-
-			model *pModel = nullptr;
+			/*
+			texture *pColorTexture;
+			pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 			
-			pModel = m_pDreamOS->AddModel(L"\\Avatars\\lefthand_1.FBX");
+			volume *pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
+			pVolume->SetDiffuseTexture(pColorTexture);
+			
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
+			CR(pVolume->SetVertexColor(COLOR_GREEN));
+			
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
+			CR(pVolume->SetVertexColor(COLOR_RED));
+			
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
+			CR(pVolume->SetVertexColor(COLOR_BLUE));
+			//*/
+
+			//*
+			model *pModel = nullptr;
+
+			PathManager *pPathManager = PathManager::instance();
+			std::wstring wstrAssetPath;
+			pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+
+			wstrAssetPath += L"/avatar/3/head.fbx";
+
+			
+			pModel = m_pDreamOS->AddModel(wstrAssetPath);
 			CN(pModel);
 			pModel->SetPosition(point(-1.0f, -3.0f, -3.0f));
 			pModel->SetScale(0.1f);
@@ -882,6 +893,7 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 			//pModel->RotateXByDeg(-90.0f);
 			//pModel->SetMaterialColors(COLOR_WHITE, true);
 			
+			/*
 			pModel = m_pDreamOS->AddModel(L"\\Avatars\\righthand_1.FBX", ModelFactory::flags::FLIP_WINDING);
 			CN(pModel);
 			pModel->SetPosition(point(1.0f, -3.0f, -3.0f));
@@ -890,10 +902,10 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 			//pModel->RotateXByDeg(-90.0f);
 			//pModel->SetMaterialColors(COLOR_WHITE, true);
 			
-			pModel = m_pDreamOS->AddModel(L"\\Avatars\\avatar_1.FBX");
+			pModel = m_pDreamOS->AddModel(L"\\camera\\camera.fbx");
 			CN(pModel);
 			pModel->SetPosition(point(1.0f, -1.0f, -3.0f));
-			pModel->SetScale(0.1f);
+			pModel->SetScale(0.00004f);
 			//pModel->RotateXByDeg(-90.0f);
 			pModel->SetMaterialShininess(2.0f, true);
 			//pModel->SetMaterialColors(COLOR_WHITE, true);
@@ -903,18 +915,21 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 			pModel->SetMaterialAmbientColor(COLOR_WHITE, true);
 
 			pTestContext->pModel = pModel;
+			//*/
 
+			/*
 			sphere *pSphere = m_pDreamOS->AddSphere(0.5f, 20, 20);
 			CN(pSphere);
 			pSphere->SetPosition(point(-1.0f, -1.0f, -3.0f));
 			pSphere->SetMaterialShininess(2.0f, true);
 			pSphere->SetMaterialColors(COLOR_WHITE, true);
 
-			//pModel = m_pDreamOS->AddModel(L"\\Cave\\cave.FBX");
-			//CN(pModel);
-			//pModel->SetScale(0.1f);	
-			//pModel->SetPosition(point(0.0f, -10.0f, 0.0f));
-			//pModel->RotateXByDeg(-90.0f);
+			pModel = m_pDreamOS->AddModel(L"\\Cave\\cave.FBX");
+			CN(pModel);
+			pModel->SetScale(0.1f);	
+			pModel->SetPosition(point(0.0f, -10.0f, 0.0f));
+			pModel->RotateXByDeg(-90.0f);
+			//*/
 		}
 
 	Error:
@@ -930,12 +945,14 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
 
+		/*
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		CN(pTestContext->pModel);
 		pTestContext->pModel->RotateYByDeg(0.015f);
+		//*/
 
 	Error:
 		return r;
