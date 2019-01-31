@@ -1041,6 +1041,9 @@
     <ClCompile Include="..\..\..\Primitives\billboard.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBillboard.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2263,6 +2266,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\billboard.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBillboard.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
