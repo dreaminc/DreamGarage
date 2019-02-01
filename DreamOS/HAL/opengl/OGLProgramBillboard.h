@@ -16,10 +16,6 @@ public:
 	virtual RESULT OGLInitialize() override;
 	virtual RESULT OGLInitialize(version versionOGL) override;
 
-	virtual RESULT SetupConnections() override;
-
-	virtual RESULT SetCameraUniforms(camera *pCamera) override;
-	virtual RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) override;
 	virtual RESULT SetObjectUniforms(DimObj *pDimObj) override;
 
 protected:

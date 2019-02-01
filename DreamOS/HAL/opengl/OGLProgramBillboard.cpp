@@ -21,6 +21,7 @@ RESULT OGLProgramBillboard::OGLInitialize() {
 
 	CR(OGLProgram::OGLInitialize());
 
+	CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributePosition), std::string("inV_vec4Position")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
@@ -93,21 +94,37 @@ Error:
 }
 
 RESULT OGLProgramBillboard::ProcessNode(long frameID) {
-	return R_PASS;
-}
+	RESULT r = R_PASS;
 
-RESULT OGLProgramBillboard::SetupConnections() {
-	return R_PASS;
-}
+	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
 
-RESULT OGLProgramBillboard::SetCameraUniforms(camera *pCamera) {
-	return R_PASS;
-}
+	UseProgram();
 
-RESULT OGLProgramBillboard::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
-	return R_PASS;
+	if (m_pOGLFramebuffer != nullptr) {
+		if (IsPassthru()) {
+			m_pOGLFramebuffer->Bind();
+		}
+		else {
+			BindToFramebuffer(m_pOGLFramebuffer);
+		}
+	}
+
+	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
+
+	RenderObjectStore(m_pSceneGraph);
+
+	UnbindFramebuffer();
+
+Error:
+	return r;
 }
 
 RESULT OGLProgramBillboard::SetObjectUniforms(DimObj *pDimObj) {
+
+	if (m_pUniformModelMatrix != nullptr) {
+		auto matModel = pDimObj->GetModelMatrix();
+		m_pUniformModelMatrix->SetUniform(matModel);
+	}
+
 	return R_PASS;
 }

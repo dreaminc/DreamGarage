@@ -1,6 +1,8 @@
 // billboard.vert
 // shadertype=glsl
 
+layout (location = 0) in vec4 inV_vec4Position;
+
 out VS_OUT {
 	vec3 ptOrigin;
 	vec3 ptPlaneX;
@@ -10,10 +12,8 @@ out VS_OUT {
 uniform mat4 u_mat4Model;
 uniform mat4 u_mat4ViewProjection;
 
-uniform vec3 u_vec3Origin;
-
 void main(void) {
-	vec3 out_ptOrigin = u_mat4ViewProjection * u_mat4Model * vec4(u_vec3Origin.xyz, 1.0f);
+	vec3 out_ptOrigin = u_mat4ViewProjection * u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 
 	gl_position = out_ptOrigin;
 
