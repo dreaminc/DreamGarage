@@ -570,6 +570,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pBrowserTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);
 	
 	CR(dynamic_cast<OGLTexture*>(m_pBrowserTexture.get())->EnableOGLPBOUnpack());
+	CR(dynamic_cast<OGLTexture*>(m_pBrowserTexture.get())->EnableOGLPBOPack());
 
 	m_pLoadingScreenTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, (wchar_t*)(L"client-loading-1366-768.png"));
 	CN(m_pLoadingScreenTexture);
