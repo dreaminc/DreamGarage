@@ -93,6 +93,8 @@ public:
 	FlatContext* MakeFlatContext(int width, int height, int channels);
 	user *MakeUser();
 
+	virtual billboard *MakeBillboard(point ptOrigin, float width, float height, texture *pTexture) override;
+
 	hand* MakeHand(HAND_TYPE type);
 	hand* MakeHand(HAND_TYPE type, long avatarID);
 

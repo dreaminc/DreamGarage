@@ -4,6 +4,7 @@
 #include "Scene/ObjectStore.h"
 
 #include "Primitives/stereocamera.h"
+#include "Primitives/billboard.h"
 
 #include "HAL/opengl/OpenGLImp.h"
 #include "HAL/opengl/OGLFramebuffer.h"
@@ -125,6 +126,11 @@ RESULT OGLProgramBillboard::SetObjectUniforms(DimObj *pDimObj) {
 		auto matModel = pDimObj->GetModelMatrix();
 		m_pUniformModelMatrix->SetUniform(matModel);
 	}
+
+	billboard *pBillboard = reinterpret_cast<billboard*>(pDimObj);
+
+	m_pUniformViewWidth->SetUniform(pBillboard->GetWidth());
+	m_pUniformViewHeight->SetUniform(pBillboard->GetHeight());
 
 	return R_PASS;
 }

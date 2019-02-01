@@ -9,6 +9,7 @@ billboard::billboard(point ptOrigin, float width, float height, texture *pTextur
 	m_height(height)
 {
 	SetVertex(ptOrigin);
+	SetDiffuseTexture(pTexture);
 }
 
 billboard::~billboard() {
@@ -22,6 +23,14 @@ RESULT billboard::SetTexture(texture *pTexture) {
 
 texture* billboard::GetTexture() {
 	return m_pTexture;
+}
+
+float billboard::GetWidth() {
+	return m_width;
+}
+
+float billboard::GetHeight() {
+	return m_height;
 }
 
 RESULT billboard::SetVertex(point ptOrigin) {

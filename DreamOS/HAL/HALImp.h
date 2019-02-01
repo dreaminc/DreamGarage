@@ -32,6 +32,7 @@
 #include "Primitives/user.h"
 #include "Primitives/DimRay.h"
 #include "Primitives/DimPlane.h"
+#include "Primitives/billboard.h"
 
 #include "Pipeline/Pipeline.h"
 #include "Pipeline/PipelineCommon.h"
@@ -206,6 +207,8 @@ public:
 	//virtual composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f)) = 0;
 
 	virtual user *MakeUser() = 0;
+
+	virtual billboard *MakeBillboard(point ptOrigin, float width, float height, texture *pTexture) = 0;
 
 
 	// Composite

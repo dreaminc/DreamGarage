@@ -6,20 +6,22 @@
 class point;
 class texture;
 
-class billboard : public DimObj {
+class billboard : public virtual DimObj {
 public:
 	billboard(point ptOrigin, float width, float height, texture *pTexture);
 	~billboard();
 
+	virtual inline unsigned int NumberIndices() override;
+	virtual inline unsigned int NumberVertices() override;
+	virtual RESULT Allocate() override;
+
 	RESULT SetTexture(texture *pTexture);
 	texture *GetTexture();
 
-	RESULT SetVertex(point ptOrigin);
+	float GetWidth();
+	float GetHeight();
 
-public:
-	virtual unsigned int NumberIndices() override;
-	virtual unsigned int NumberVertices() override;
-	virtual RESULT Allocate() override;
+	RESULT SetVertex(point ptOrigin);
 
 private:
 	texture *m_pTexture = nullptr;

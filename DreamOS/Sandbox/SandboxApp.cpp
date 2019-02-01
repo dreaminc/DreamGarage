@@ -1658,6 +1658,41 @@ Error:
 	return nullptr;
 }
 
+billboard *SandboxApp::AddBillboard(point ptOrigin, float width, float height, texture *pTexture) {
+	RESULT r = R_PASS;
+
+	billboard *pBillboard = MakeBillboard(ptOrigin, width, height, pTexture);
+	CN(pBillboard);
+
+	// billboards are always rendered by the billboard shader right now (also in aux with same scene graph)
+	m_pBillboardSceneGraph->PushObject(pBillboard);
+
+	return pBillboard;
+
+Error:
+	if (pBillboard != nullptr) {
+		delete pBillboard;
+		pBillboard = nullptr;
+	}
+	return nullptr;
+}
+
+billboard *SandboxApp::MakeBillboard(point ptOrigin, float width, float height, texture *pTexture) {
+	RESULT r = R_PASS;
+
+	billboard *pBillboard = m_pHALImp->MakeBillboard(ptOrigin, width, height, pTexture);
+	CN(pBillboard);
+
+	return pBillboard;
+
+Error:
+	if (pBillboard != nullptr) {
+		delete pBillboard;
+		pBillboard = nullptr;
+	}
+	return nullptr;
+}
+
 ProgramNode* SandboxApp::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
 	RESULT r = R_PASS;
 

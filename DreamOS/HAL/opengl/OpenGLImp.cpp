@@ -35,6 +35,7 @@
 #include "OGLRay.h"
 #include "OGLPlane.h"
 #include "OGLAttachment.h"
+#include "OGLBillboard.h"
 
 #include "OGLViewportDisplay.h"
 #include "OGLCameraViewportDisplay.h"
@@ -432,6 +433,21 @@ Error:
 	if (pUser != nullptr) {
 		delete pUser;
 		pUser = nullptr;
+	}
+	return nullptr;
+}
+
+billboard *OpenGLImp::MakeBillboard(point ptOrigin, float width, float height, texture *pTexture) {
+	RESULT r = R_PASS;
+
+	billboard *pBillboard = new OGLBillboard(this, ptOrigin, width, height, pTexture);
+	CN(pBillboard);
+
+	return pBillboard;
+Error:
+	if (pBillboard != nullptr) {
+		delete pBillboard;
+		pBillboard = nullptr;
 	}
 	return nullptr;
 }

@@ -13,7 +13,7 @@ public:
 	OGLBillboard(OpenGLImp *pParentImp, point ptOrigin, float width, float height, texture *pTexture);
 	~OGLBillboard();
 
-	// override to specify GL_POIONT
+	// override to specify GL_POINT
 	virtual RESULT Render() override;
 };
 #pragma warning(pop)
