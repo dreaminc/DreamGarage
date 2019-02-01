@@ -830,11 +830,14 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrow
 	// if so, it tells the shared view to broadcast a frame
 	CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);
 
-	if (GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
+	if ((GetSourceTexture() == GetDOS()->GetSharedCameraTexture()) || (GetSourceTexture() == GetDOS()->GetSharedContentTexture())) {
 		m_pBrowserTexture->LoadBufferFromTexture(m_pLoadBuffer, m_pLoadBuffer_n);
+	}
+
+	if (GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 		GetDOS()->BroadcastSharedVideoFrame(m_pLoadBuffer, m_browserWidth, m_browserHeight);
 	}
-	else if (GetSourceTexture() == GetDOS()->GetSharedCameraTexture()) {
+	if (GetSourceTexture() == GetDOS()->GetSharedCameraTexture()) {
 		// TODO: does VCam need to do the same kind of texture updates that ShareView does?
 		GetDOS()->GetCloudController()->BroadcastVideoFrame(kVCamVideoLabel, m_pLoadBuffer, m_browserWidth, m_browserHeight, 4);
 	}
