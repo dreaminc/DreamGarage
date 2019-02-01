@@ -10,7 +10,7 @@
 
 #include "OGLAttachment.h"
 
-OGLProgramBillboard::OGLProgramBillboard(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) :
+OGLProgramBillboard::OGLProgramBillboard(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgramMinimal(pParentImp, optFlags)
 {
 	// empty
