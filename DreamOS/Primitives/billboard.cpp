@@ -8,6 +8,7 @@ billboard::billboard(point ptOrigin, float width, float height, texture *pTextur
 	m_width(width),
 	m_height(height)
 {
+	Allocate();
 	SetVertex(ptOrigin);
 	SetDiffuseTexture(pTexture);
 }

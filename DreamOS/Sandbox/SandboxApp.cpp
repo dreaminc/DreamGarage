@@ -576,6 +576,9 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	m_pUIClippingSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pUIClippingSceneGraph, "Failed to allocate UI Clipping Scene Graph");
 
+	m_pBillboardSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pBillboardSceneGraph, "Failed to allocate UI Clipping Scene Graph");
+
 	// This will prevent scene graph from being deleted when not connected
 	// TODO: Attach to Sandbox somehow?
 	CB(m_pSceneGraph->incRefCount());

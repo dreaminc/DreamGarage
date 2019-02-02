@@ -37,6 +37,8 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(TestNestedOBB());
 
+	CR(AddTestBillboardShader());
+
 	CR(AddTestGeometryShader());
   
 	CR(AddTestTextureSubRegionUpdate());
@@ -806,7 +808,7 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 		*/
 
 		// Visualize Normals
-		//*
+		/*
 		ProgramNode* pVisualNormalsProgram;
 		pVisualNormalsProgram = pHAL->MakeProgramNode("visualize_normals", PIPELINE_FLAGS::PASSTHRU);
 		//pVisualNormalsProgram = pHAL->MakeProgramNode("minimal");
@@ -824,8 +826,8 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 
 		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pVisualNormalsProgram->Output("output_framebuffer")));
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pVisualNormalsProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
@@ -975,6 +977,106 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 Error:
 	return r;
 }
+
+RESULT HALTestSuite::AddTestBillboardShader() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 400.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		sphere *pGround = nullptr;
+		billboard *pBillboard = nullptr;
+	};
+	TestContext *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+		
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Billboard
+		/*
+		ProgramNode* pBillboardProgram;
+		pBillboardProgram = pHAL->MakeProgramNode("billboard", PIPELINE_FLAGS::PASSTHRU);
+		//pVisualNormalsProgram = pHAL->MakeProgramNode("minimal");
+		CN(pBillboardProgram);
+		CR(pBillboardProgram->ConnectToInput("scenegraph", m_pDreamOS->GetBillboardSceneGraphNode()->Output("objectstore"))); CR(pBillboardProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		CR(pBillboardProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		//*/
+
+		ProgramNode *pRenderScreenQuad;
+		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pBillboardProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, -0.5f));
+
+		{
+			TestContext *pTestContext;
+			pTestContext = reinterpret_cast<TestContext*>(pContext);
+			CN(pTestContext);
+
+			texture *pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			
+			//pTestContext->pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, pTexture);
+			//CN(pTestContext->pBillboard);
+
+			pTestContext->pGround = m_pDreamOS->AddSphere();
+			CN(pTestContext->pGround);
+		}
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Environment Shader");
+	pNewTest->SetTestDescription("Environment shader test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+	
+Error:
+	return r;
+}
+
 
 RESULT HALTestSuite::AddTestFadeShader() {
 	RESULT r = R_PASS;

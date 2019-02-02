@@ -33,6 +33,7 @@ RESULT OGLProgramBillboard::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewHeight), std::string("u_height")));
 
 	// Framebuffer Output
+	/*
 	if (IsPassthru() == false) {
 		int pxWidth = m_pParentImp->GetViewport().Width();
 		int pxHeight = m_pParentImp->GetViewport().Height();
@@ -52,6 +53,8 @@ RESULT OGLProgramBillboard::OGLInitialize() {
 
 		CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
 	}
+	//*/
+
 
 Error:
 	return r;

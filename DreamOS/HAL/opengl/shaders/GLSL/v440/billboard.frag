@@ -7,8 +7,10 @@ in GS_OUT {
 
 layout (binding = 0) uniform sampler2D u_textureColor;
 
+layout (location = 0) out vec4 out_vec4Color;
+
 void main(void) {
 	vec4 color = texture(u_textureColor, gs_out.uvCoord);
 
-	out vec4Color = color;
+	out_vec4Color = color;
 }

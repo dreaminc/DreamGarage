@@ -41,6 +41,7 @@ public:
 	RESULT AddTestWaterShader();
 	RESULT AddTestWaterShaderCube();
 	RESULT AddTestGeometryShader();
+	RESULT AddTestBillboardShader();
 	RESULT AddTestIncludeShader();
 	RESULT AddTestToonShader();
 	RESULT AddTestBlinnPhongShader();

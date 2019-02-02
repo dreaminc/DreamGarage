@@ -8,9 +8,9 @@ uniform float u_width;
 uniform float u_height;
 
 in VS_OUT {
-	vec3 ptOrigin;
-	vec3 ptPlaneX;
-	vec3 ptPlaneY;
+	vec4 ptOrigin;
+	vec4 ptPlaneX;
+	vec4 ptPlaneY;
 } gs_in[];
 
 out GS_OUT {
@@ -19,26 +19,33 @@ out GS_OUT {
 } gs_out;
 
 void GenerateQuad() {
-	VS_OUT in = gs_in[0];
+//	VS_OUT in = gs_in[0];
+	vec4 ptOrigin = gs_in[0].ptOrigin;
+	vec4 ptPlaneX = gs_in[0].ptPlaneX;
+	vec4 ptPlaneY = gs_in[0].ptPlaneY;
 
-	vec3 xDiff = u_width/2.0f * (in.ptPlaneX-in.ptOrigin);
-	vec3 yDiff = u_height/2.0f * (in.ptPlaneY-in.ptOrigin);
+	vec4 xDiff = u_width/2.0f * (ptPlaneX-ptOrigin);
+	vec4 yDiff = u_height/2.0f * (ptPlaneY-ptOrigin);
 
-	gl_position = in.ptOrigin + xDiff + yDiff;
+	gl_Position = ptOrigin + xDiff + yDiff;
 	gs_out.uvCoord = vec2(1.0,1.0);
 	EmitVertex();
 
-	gl_position = in.ptOrigin - xDiff + yDiff;
+	gl_Position = ptOrigin - xDiff + yDiff;
 	gs_out.uvCoord = vec2(0.0,1.0);
 	EmitVertex();
 
-	gl_position = in.ptOrigin + xDiff - yDiff;
+	gl_Position = ptOrigin + xDiff - yDiff;
 	gs_out.uvCoord = vec2(1.0,0.0);
 	EmitVertex();
 
-	gl_position = in.ptOrigin - xDiff - yDiff;
+	gl_Position = ptOrigin - xDiff - yDiff;
 	gs_out.uvCoord = vec2(0.0,0.0);
 	EmitVertex();
 
 	EndPrimitive;
+}
+
+void main(void) {
+	GenerateQuad();
 }
