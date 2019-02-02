@@ -36,6 +36,8 @@ RESULT OGLProgramBillboard::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewWidth), std::string("u_width")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewHeight), std::string("u_height")));
 
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformCameraOrigin), std::string("u_vec4CameraOrigin")));
+
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureColor), std::string("u_hasTextureColor")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 
@@ -131,6 +133,32 @@ RESULT OGLProgramBillboard::ProcessNode(long frameID) {
 	UnbindFramebuffer();
 
 //	glDisable(GL_BLEND);
+
+Error:
+	return r;
+}
+
+RESULT OGLProgramBillboard::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
+	RESULT r = R_PASS;
+
+	CR(OGLProgramMinimal::SetCameraUniforms(pStereoCamera, eye));
+
+	if (m_pUniformCameraOrigin != nullptr) {
+		m_pUniformCameraOrigin->SetUniform(pStereoCamera->GetPosition(true));
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgramBillboard::SetCameraUniforms(camera *pCamera) {
+	RESULT r = R_PASS;
+
+	CR(OGLProgramMinimal::SetCameraUniforms(pCamera));
+
+	if (m_pUniformCameraOrigin != nullptr) {
+		m_pUniformCameraOrigin->SetUniform(pCamera->GetPosition(true));
+	}
 
 Error:
 	return r;

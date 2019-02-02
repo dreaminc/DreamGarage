@@ -16,6 +16,9 @@ public:
 	virtual RESULT OGLInitialize() override;
 	virtual RESULT OGLInitialize(version versionOGL) override;
 
+	virtual RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) override;
+	virtual RESULT SetCameraUniforms(camera *pCamera) override;
+
 	virtual RESULT SetObjectUniforms(DimObj *pDimObj) override;
 
 	virtual RESULT SetObjectTextures(OGLObj *pOGLObj) override;
@@ -24,8 +27,9 @@ protected:
 	OGLUniformMatrix4 *m_pUniformProjectionMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformViewMatrix = nullptr;
 
-	OGLUniform *m_pUniformViewWidth;
-	OGLUniform *m_pUniformViewHeight;
+	OGLUniformPoint *m_pUniformCameraOrigin = nullptr;
+	OGLUniform *m_pUniformViewWidth = nullptr;
+	OGLUniform *m_pUniformViewHeight = nullptr;
 
 	OGLUniformBool *m_pUniformHasTextureColor = nullptr;
 	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;

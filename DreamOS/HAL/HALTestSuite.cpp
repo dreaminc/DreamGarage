@@ -1043,9 +1043,12 @@ RESULT HALTestSuite::AddTestBillboardShader() {
 			
 			pTestContext->pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, pTexture);
 			CN(pTestContext->pBillboard);
+			pTestContext->pBillboard->SetPosition(0.0f, 0.0f, -1.0f);
 
 			pTestContext->pGround = m_pDreamOS->AddSphere();
 			CN(pTestContext->pGround);
+
+			pTestContext->pGround->SetPosition(0.0f, 1.0f, 0.0f);
 		}
 
 	Error:

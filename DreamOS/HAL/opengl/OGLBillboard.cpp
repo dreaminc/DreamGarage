@@ -21,7 +21,6 @@ RESULT OGLBillboard::Render() {
 
 	glDrawElements(GL_POINTS, 1, GL_UNSIGNED_INT, 0);
 	
-	
 Error:
 	return r;
 }
