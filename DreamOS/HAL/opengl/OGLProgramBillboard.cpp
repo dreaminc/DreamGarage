@@ -9,6 +9,9 @@
 #include "HAL/opengl/OpenGLImp.h"
 #include "HAL/opengl/OGLFramebuffer.h"
 
+#include "HAL/opengl/OGLTexture.h"
+#include "HAL/opengl/OGLObj.h"
+
 #include "OGLAttachment.h"
 
 OGLProgramBillboard::OGLProgramBillboard(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
@@ -23,6 +26,7 @@ RESULT OGLProgramBillboard::OGLInitialize() {
 	CR(OGLProgram::OGLInitialize());
 
 	CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributePosition), std::string("inV_vec4Position")));
+	CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeColor), std::string("inV_vec4Color")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
@@ -31,6 +35,11 @@ RESULT OGLProgramBillboard::OGLInitialize() {
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewWidth), std::string("u_width")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewHeight), std::string("u_height")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureColor), std::string("u_hasTextureColor")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
+
+	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
 	// Framebuffer Output
 	/*
@@ -113,11 +122,15 @@ RESULT OGLProgramBillboard::ProcessNode(long frameID) {
 		}
 	}
 
+	glEnable(GL_BLEND);
+
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	RenderObjectStore(m_pSceneGraph);
 
 	UnbindFramebuffer();
+
+//	glDisable(GL_BLEND);
 
 Error:
 	return r;
@@ -136,4 +149,26 @@ RESULT OGLProgramBillboard::SetObjectUniforms(DimObj *pDimObj) {
 	m_pUniformViewHeight->SetUniform(pBillboard->GetHeight());
 
 	return R_PASS;
+}
+
+RESULT OGLProgramBillboard::SetObjectTextures(OGLObj *pOGLObj) {
+	RESULT r = R_PASS;
+
+	OGLTexture *pTexture = nullptr;
+
+	if ((pTexture = pOGLObj->GetOGLTextureDiffuse()) != nullptr) {
+		//pTexture->OGLActivateTexture(0);
+		//m_pUniformTextureColor->SetUniform(pTexture);
+
+		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
+		//unm_pUniformTextureColor->SetUniform(0);
+		m_pUniformHasTextureColor->SetUniform(true);
+	}
+	else {
+		m_pUniformHasTextureColor->SetUniform(false);
+	}
+
+Error:
+	return r;
 }

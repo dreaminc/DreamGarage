@@ -11,7 +11,7 @@ OGLBillboard::~OGLBillboard() {
 	// empty
 }
 
-// override to specify GL_POIONT
+// override to specify GL_POINT
 RESULT OGLBillboard::Render() {
 	RESULT r = R_PASS;
 
@@ -19,7 +19,8 @@ RESULT OGLBillboard::Render() {
 	CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 	CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 
-	glDrawElements(GL_POINT, 1, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_POINTS, 1, GL_UNSIGNED_INT, 0);
+	
 	
 Error:
 	return r;

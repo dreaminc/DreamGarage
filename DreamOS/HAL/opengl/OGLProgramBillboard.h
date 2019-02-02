@@ -18,12 +18,19 @@ public:
 
 	virtual RESULT SetObjectUniforms(DimObj *pDimObj) override;
 
+	virtual RESULT SetObjectTextures(OGLObj *pOGLObj) override;
+
 protected:
 	OGLUniformMatrix4 *m_pUniformProjectionMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformViewMatrix = nullptr;
 
 	OGLUniform *m_pUniformViewWidth;
 	OGLUniform *m_pUniformViewHeight;
+
+	OGLUniformBool *m_pUniformHasTextureColor = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
+
+	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
 };
 
 

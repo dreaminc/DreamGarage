@@ -1011,10 +1011,9 @@ RESULT HALTestSuite::AddTestBillboardShader() {
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 		// Billboard
-		/*
+		//*
 		ProgramNode* pBillboardProgram;
 		pBillboardProgram = pHAL->MakeProgramNode("billboard", PIPELINE_FLAGS::PASSTHRU);
-		//pVisualNormalsProgram = pHAL->MakeProgramNode("minimal");
 		CN(pBillboardProgram);
 		CR(pBillboardProgram->ConnectToInput("scenegraph", m_pDreamOS->GetBillboardSceneGraphNode()->Output("objectstore"))); CR(pBillboardProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
@@ -1025,8 +1024,8 @@ RESULT HALTestSuite::AddTestBillboardShader() {
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pBillboardProgram->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pBillboardProgram->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
 
@@ -1042,8 +1041,8 @@ RESULT HALTestSuite::AddTestBillboardShader() {
 
 			texture *pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 			
-			//pTestContext->pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, pTexture);
-			//CN(pTestContext->pBillboard);
+			pTestContext->pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, pTexture);
+			CN(pTestContext->pBillboard);
 
 			pTestContext->pGround = m_pDreamOS->AddSphere();
 			CN(pTestContext->pGround);
