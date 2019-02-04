@@ -91,6 +91,7 @@ RESULT WebRTCAudioDeviceModule::WebRTCADMProcess() {
 
 		std::chrono::system_clock::time_point timeNow2 = std::chrono::system_clock::now();
 		auto diffVal2 = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+		Sleep(1);
 	}
 
 Error:
