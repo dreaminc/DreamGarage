@@ -171,10 +171,12 @@ RESULT OGLProgramBillboard::SetObjectUniforms(DimObj *pDimObj) {
 		m_pUniformModelMatrix->SetUniform(matModel);
 	}
 
-	billboard *pBillboard = reinterpret_cast<billboard*>(pDimObj);
+	billboard *pBillboard = dynamic_cast<billboard*>(pDimObj);
 
-	m_pUniformViewWidth->SetUniform(pBillboard->GetWidth());
-	m_pUniformViewHeight->SetUniform(pBillboard->GetHeight());
+	float width = pBillboard->GetWidth();
+	float height = pBillboard->GetHeight();
+	m_pUniformViewWidth->SetUniformFloat(reinterpret_cast<GLfloat*>(&width));
+	m_pUniformViewHeight->SetUniformFloat(reinterpret_cast<GLfloat*>(&height));
 
 	return R_PASS;
 }

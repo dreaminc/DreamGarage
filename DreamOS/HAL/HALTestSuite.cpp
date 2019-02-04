@@ -1042,26 +1042,24 @@ RESULT HALTestSuite::AddTestBillboardShader() {
 
 			texture *pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 			
-			pTestContext->pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, pTexture);
+			pTestContext->pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 0.5f, 0.5f, pTexture);
 			CN(pTestContext->pBillboard);
-			pTestContext->pBillboard->SetPosition(0.0f, 0.0f, -1.0f);
+			pTestContext->pBillboard->SetPosition(1.0f, 0.0f, 1.0f);
+			//pTestContext->pBillboard->SetPosition(1.0f, 0.0f, 10.0f);
 			//pTestContext->pBillboard->SetPosition(-2.0f, 0.0f, 5.0f);
 
-//			m_pDreamOS->AddBillboard(point(2.0f, 0.0f, 0.0f), 0.5f, 0.5f, pTexture);
-			/*
-			for (int x = -5; x <= 5; x++) {
-				for (int y = -5; y <= 5; y++) {
-					for (int z = -5; z <= 5; z++) {
-						m_pDreamOS->AddBillboard(point(x, y, z), 0.5f, 0.5f, pTexture);
-					}
-				}
-			}
-			//*/
+			auto pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 0.5f, 0.5f, pTexture);
+			pBillboard->SetPosition(2.0f, 0.0f, 5.0f);
 
+			pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 0.5f, 0.5f, pTexture);
+			pBillboard->SetPosition(-2.0f, 0.5f, 5.0f);
+
+			//*
 			pTestContext->pGround = m_pDreamOS->AddSphere();
 			CN(pTestContext->pGround);
 
 			pTestContext->pGround->SetPosition(0.0f, 1.0f, 0.0f);
+			//*/
 		}
 
 	Error:
