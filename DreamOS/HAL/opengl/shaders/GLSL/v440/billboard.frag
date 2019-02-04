@@ -16,7 +16,8 @@ void main(void) {
 	vec4 color = vec4(1.0f);
 
 	if (u_hasTextureColor) {
-		color = texture(u_textureColor, gs_out.uvCoord);
+		//color = texture(u_textureColor, gs_out.uvCoord);
+		color = 0.01f * color + vec4(1.0f);
 	}
 
 	out_vec4Color = color;

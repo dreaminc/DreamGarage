@@ -1005,7 +1005,8 @@ RESULT HALTestSuite::AddTestBillboardShader() {
 		CR(pHAL->MakeCurrentContext());
 
 		ProgramNode* pRenderProgramNode;
-		pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		//pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		pRenderProgramNode = pHAL->MakeProgramNode("minimal");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -1044,6 +1045,18 @@ RESULT HALTestSuite::AddTestBillboardShader() {
 			pTestContext->pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 1.0f, 1.0f, pTexture);
 			CN(pTestContext->pBillboard);
 			pTestContext->pBillboard->SetPosition(0.0f, 0.0f, -1.0f);
+			//pTestContext->pBillboard->SetPosition(-2.0f, 0.0f, 5.0f);
+
+//			m_pDreamOS->AddBillboard(point(2.0f, 0.0f, 0.0f), 0.5f, 0.5f, pTexture);
+			/*
+			for (int x = -5; x <= 5; x++) {
+				for (int y = -5; y <= 5; y++) {
+					for (int z = -5; z <= 5; z++) {
+						m_pDreamOS->AddBillboard(point(x, y, z), 0.5f, 0.5f, pTexture);
+					}
+				}
+			}
+			//*/
 
 			pTestContext->pGround = m_pDreamOS->AddSphere();
 			CN(pTestContext->pGround);

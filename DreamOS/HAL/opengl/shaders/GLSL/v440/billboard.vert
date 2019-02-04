@@ -11,5 +11,5 @@ void main(void) {
 	vec4 out_ptOrigin = u_mat4ViewProjection * u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 
 	gl_Position = out_ptOrigin;
-	gl_PointSize = 1.0;
+	gl_PointSize = 5.0;
 }
