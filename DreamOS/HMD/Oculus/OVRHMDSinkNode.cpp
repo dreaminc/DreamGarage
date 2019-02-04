@@ -63,6 +63,9 @@ Error:
 RESULT OVRHMDSinkNode::RenderNode(long frameID) {
 	RESULT r = R_PASS;
 
+	static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+	std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+
 	auto pCamera = m_pParentImp->GetCamera();
 	int pxViewportWidth = m_pParentImp->GetViewport().Width();
 	int pxViewportHeight = m_pParentImp->GetViewport().Height();
@@ -73,26 +76,34 @@ RESULT OVRHMDSinkNode::RenderNode(long frameID) {
 	CR((RESULT)ovr_GetSessionStatus(OVRSession, &OVRSessionStatus));
 	CBR((bool)OVRSessionStatus.IsVisible == true, R_SKIPPED);	// If experience is not visible in HMD e.g. they're in oculus menu, don't commit frames
 
-	pCamera->ResizeCamera(m_pParentHMD->GetEyeWidth(), m_pParentHMD->GetEyeHeight());
+	double msDiff = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+	if (msDiff > (MS_90_FPS * m_fpsPadding) - m_msTimeSpentOnRenderAvg) {
+		lastUpdateTime = timeNow;
+		pCamera->ResizeCamera(m_pParentHMD->GetEyeWidth(), m_pParentHMD->GetEyeHeight());
 
-	for (int i = 0; i < HMD_NUM_EYES; i++) {
-		pCamera->SetCameraEye((EYE_TYPE)(i));
+		for (int i = 0; i < HMD_NUM_EYES; i++) {
+			pCamera->SetCameraEye((EYE_TYPE)(i));
 
-		m_pParentImp->ClearHALBuffers();
-		m_pParentImp->ConfigureHAL();
+			m_pParentImp->ClearHALBuffers();
+			m_pParentImp->ConfigureHAL();
 
-		m_pParentHMD->SetAndClearRenderSurface((EYE_TYPE)(i));
+			m_pParentHMD->SetAndClearRenderSurface((EYE_TYPE)(i));
 
-		CR(m_pInputConnection[i]->RenderConnections(frameID));
+			CR(m_pInputConnection[i]->RenderConnections(frameID));
 
-		// Commit Frame to HMD
-		m_pParentHMD->UnsetRenderSurface((EYE_TYPE)(i));
-		m_pParentHMD->CommitSwapChain((EYE_TYPE)(i));
+			// Commit Frame to HMD
+			m_pParentHMD->UnsetRenderSurface((EYE_TYPE)(i));
+			m_pParentHMD->CommitSwapChain((EYE_TYPE)(i));
+		}
+		
+		double msTimeSpentRendering = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - timeNow).count();
+		m_msTimeSpentOnRenderAvg = m_msTimeSpentOnRenderAvg * m_weightOnAverage + msTimeSpentRendering * (1 - m_weightOnAverage);
+
+		m_pParentHMD->SubmitFrame();
+	
+		m_pParentHMD->RenderHMDMirror();
 	}
-
-	m_pParentHMD->SubmitFrame();
-
-	m_pParentHMD->RenderHMDMirror();
+	
 
 Error:
 	return r;
