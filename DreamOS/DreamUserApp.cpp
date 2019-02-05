@@ -216,13 +216,15 @@ RESULT DreamUserApp::Update(void *pContext) {
 			m_pUserModel->SetMouthOrientation(qOrientation);
 			m_pUserModel->SetMouthPosition(pCameraNode->GetPosition());
 
-			// Local mouth scale
-			float mouthScale = GetDOS()->GetDreamSoundSystem()->GetRunTimeCaptureAverage();
-			mouthScale *= 10.0f;
-			util::Clamp<float>(mouthScale, 0.0f, 1.0f);
+			if (GetDOS()->GetSandboxConfiguration().fInitSound) {
+				// Local mouth scale
+				float mouthScale = GetDOS()->GetDreamSoundSystem()->GetRunTimeCaptureAverage();
+				mouthScale *= 10.0f;
+				util::Clamp<float>(mouthScale, 0.0f, 1.0f);
 
-			m_pUserModel->UpdateMouth(mouthScale);
-			m_pUserModel->UpdateMouthPose();
+				m_pUserModel->UpdateMouth(mouthScale);
+				m_pUserModel->UpdateMouthPose();
+			}
 		}
 	}
 

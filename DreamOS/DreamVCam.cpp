@@ -387,6 +387,7 @@ RESULT DreamVCam::ModuleProcess(void *pContext) {
 		}
 		
 		//std::this_thread::sleep_for(std::chrono::seconds(1));
+		Sleep(1);
 	}
 
 Error:
