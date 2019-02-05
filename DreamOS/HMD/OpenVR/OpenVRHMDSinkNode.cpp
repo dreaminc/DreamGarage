@@ -51,7 +51,7 @@ RESULT OpenVRHMDSinkNode::RenderNode(long frameID) {
 
 	auto pCamera = m_pParentImp->GetCamera();
 	double msDiff = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
-	//if (msDiff > (MS_90_FPS * m_fpsPadding) - m_msTimeSpentOnRenderAvg) {
+	if (msDiff > (MS_90_FPS * m_fpsPadding) - m_msTimeSpentOnRenderAvg) {
 		lastUpdateTime = timeNow;
 		pCamera->ResizeCamera(m_pParentHMD->GetEyeWidth(), m_pParentHMD->GetEyeHeight());
 
@@ -72,7 +72,7 @@ RESULT OpenVRHMDSinkNode::RenderNode(long frameID) {
 
 		//m_pParentHMD->RenderHMDMirror();
 		RenderMirrorToBackBuffer();
-	//}
+	}
 
 Error:
 	return r;
