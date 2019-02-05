@@ -89,8 +89,10 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	GetComposite()->SetMaterialSpecularColor(color(0.0f, 0.0f, 0.0f, 1.0f), true);
 
 	// Spatial Audio Object
-	m_pSpatialBrowserObject = GetDOS()->AddSpatialSoundObject(point(0.0f, 0.0f, 0.0f), vector(), vector());
-	CN(m_pSpatialBrowserObject);
+	if (GetDOS()->GetSandboxConfiguration().fInitSound) {
+		m_pSpatialBrowserObject = GetDOS()->AddSpatialSoundObject(point(0.0f, 0.0f, 0.0f), vector(), vector());
+		CN(m_pSpatialBrowserObject);
+	}
 
 	for (int i = 0; i < 12; i++) {
 

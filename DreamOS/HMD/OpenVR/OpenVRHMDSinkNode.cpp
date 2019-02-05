@@ -46,25 +46,33 @@ Error:
 RESULT OpenVRHMDSinkNode::RenderNode(long frameID) {
 	RESULT r = R_PASS;
 
+	static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+	std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+
 	auto pCamera = m_pParentImp->GetCamera();
+	double msDiff = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+	//if (msDiff > (MS_90_FPS * m_fpsPadding) - m_msTimeSpentOnRenderAvg) {
+		lastUpdateTime = timeNow;
+		pCamera->ResizeCamera(m_pParentHMD->GetEyeWidth(), m_pParentHMD->GetEyeHeight());
 
-	pCamera->ResizeCamera(m_pParentHMD->GetEyeWidth(), m_pParentHMD->GetEyeHeight());
+		for (int i = 0; i < HMD_NUM_EYES; i++) {
+			m_pParentImp->ClearHALBuffers();
+			m_pParentImp->ConfigureHAL();
 
-	for (int i = 0; i < HMD_NUM_EYES; i++) {
-		m_pParentImp->ClearHALBuffers();
-		m_pParentImp->ConfigureHAL();
+			pCamera->SetCameraEye((EYE_TYPE)(i));
 
-		pCamera->SetCameraEye((EYE_TYPE)(i));
+			CR(m_pInputConnection[i]->RenderConnections(frameID));
 
-		CR(m_pInputConnection[i]->RenderConnections(frameID));
+			CR(UnsetRenderSurface((EYE_TYPE)(i)));
+		}
+		double msTimeSpentRendering = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - timeNow).count();
+		m_msTimeSpentOnRenderAvg = m_msTimeSpentOnRenderAvg * m_weightOnAverage + msTimeSpentRendering * (1 - m_weightOnAverage);
 
-		CR(UnsetRenderSurface((EYE_TYPE)(i)));
-	}
+		m_pParentHMD->SubmitFrame();
 
-	m_pParentHMD->SubmitFrame();
-
-	//m_pParentHMD->RenderHMDMirror();
-	RenderMirrorToBackBuffer();
+		//m_pParentHMD->RenderHMDMirror();
+		RenderMirrorToBackBuffer();
+	//}
 
 Error:
 	return r;
