@@ -30,7 +30,7 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	sandboxconfig.fMouseLook = true;
 	sandboxconfig.fUseGamepad = true;
 	sandboxconfig.fInitCloud = false;		// TODO: This is currently breaking stuff
-	sandboxconfig.fInitSound = true;
+	sandboxconfig.fInitSound = false;
 	sandboxconfig.fInitUserApp = false;		// Turn on for testing User app related functionality 
 	
 	sandboxconfig.fHMDMirror = true;
@@ -89,7 +89,7 @@ RESULT DreamTestApp::LoadScene() {
 
 	// Set up the HAL Configuration 
 	HALImp::HALConfiguration halconf;
-	halconf.fRenderReferenceGeometry = true;
+	halconf.fRenderReferenceGeometry = false;
 	halconf.fDrawWireframe = false;
 	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);
@@ -127,12 +127,12 @@ RESULT DreamTestApp::RegisterTestSuites() {
 
 	m_registeredTestSuites = std::map<std::string, std::shared_ptr<TestSuite>>();
 
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::WEBRTC, this));
 	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::HAL, this));
 	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::COLLISION, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::SOUND, this));
-	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::WEBRTC, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::MULTICONTENT, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UIVIEW, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::OS, this));

@@ -29,7 +29,7 @@
 #include "WebBrowser\CEFBrowser/CEFBrowserManager.h"
 
 WebRTCTestSuite::WebRTCTestSuite(DreamOS *pDreamOS) :
-	TestSuite("webrtc"),
+	DreamTestSuite("webrtc"),
 	m_pDreamOS(pDreamOS)
 {
 	// empty
@@ -42,11 +42,11 @@ WebRTCTestSuite::~WebRTCTestSuite() {
 RESULT WebRTCTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestWebRTCVideoStream());
-
 	CR(AddTestWebRTCMultiPeer());
 
 	CR(AddTestWebRTCAudio());
+
+	CR(AddTestWebRTCVideoStream());
 
 	CR(AddTestChromeMultiBrowser());
 
@@ -62,7 +62,16 @@ CloudController *WebRTCTestSuite::GetCloudController() {
 
 OGLProgram *g_pRenderProg = nullptr;
 
-RESULT WebRTCTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
+RESULT WebRTCTestSuite::SetupTestSuite() {
+	RESULT r = R_PASS;
+
+	// empty
+
+Error:
+	return r;
+}
+
+RESULT WebRTCTestSuite::SetupPipeline(std::string strRenderShaderName) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -286,7 +295,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 
 		DOSLOG(INFO, "[WebRTCTestingSuite] Multipeer Test Initializing ... ");
 
-		CR(SetupSkyboxPipeline("blinnphong"));
+		CR(SetupPipeline("blinnphong"));
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
@@ -489,7 +498,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			std::chrono::system_clock::time_point timeNow2 = std::chrono::system_clock::now();
 			auto diffVal2 = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow2 - timeNow).count();
 
-		//Error:
+		Error:
 			return r;
 		}
 
@@ -714,7 +723,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
 		std::string strTestValue;
 
-		CR(SetupSkyboxPipeline("standard"));
+		CR(SetupPipeline("standard"));
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
@@ -1174,7 +1183,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 
 		std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
-		CR(SetupSkyboxPipeline("environment"));
+		CR(SetupPipeline("environment"));
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
@@ -1534,7 +1543,7 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
 		std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
 
-		CR(SetupSkyboxPipeline("standard"));
+		CR(SetupPipeline("standard"));
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);

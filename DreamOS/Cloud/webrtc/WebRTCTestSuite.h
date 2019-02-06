@@ -6,7 +6,7 @@
 // DREAM OS
 // DreamOS/Cloud/webrtc/WebRTCTestSuite.h
 
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 #include <functional>
 #include <memory>
@@ -22,13 +22,16 @@ class sphere;
 class quad;
 class composite;
 
-class WebRTCTestSuite : public TestSuite
+class WebRTCTestSuite : public DreamTestSuite
 {
 public:
 	WebRTCTestSuite(DreamOS *pDreamOS);
 	~WebRTCTestSuite();
 
 	virtual RESULT AddTests() override;
+
+	virtual RESULT SetupPipeline(std::string strRenderShaderName) override;
+	virtual RESULT SetupTestSuite() override;
 
 public:
 
@@ -49,7 +52,6 @@ public:
 
 private:
 	CloudController *GetCloudController();
-	RESULT SetupSkyboxPipeline(std::string strRenderShaderName);
 
 private:
 	DreamOS *m_pDreamOS;
