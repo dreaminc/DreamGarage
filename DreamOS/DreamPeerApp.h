@@ -104,6 +104,8 @@ public:
 
 	RESULT InitializeUserNameLabel();
 
+	RESULT UpdateUserNameLabelPlacement();
+
 public:
 	RESULT ShowUserNameField();
 	RESULT HideUserNameField();

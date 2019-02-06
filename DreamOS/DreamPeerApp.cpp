@@ -120,6 +120,8 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		m_pUserLabelComposite->SetPosition(point(ptOrigin.x(), outerDistance, ptOrigin.z()));
 
 		m_pUserModel->UpdateMouthPose();
+
+		UpdateUserNameLabelPlacement();
 	}
 
 	if (m_pPendingPhotoTextureBuffer != nullptr) {
@@ -235,6 +237,32 @@ RESULT DreamPeerApp::InitializeUserNameLabel() {
 	}
 
 	DOSLOG(INFO, "DreamPeerApp username label created");
+
+Error:
+	return r;
+}
+
+RESULT DreamPeerApp::UpdateUserNameLabelPlacement() {
+	RESULT r = R_PASS;
+
+	point ptSeatPosition = m_pUIObjectComposite->GetPosition(true);
+	vector vCameraDirection;
+
+	vCameraDirection = ptSeatPosition - GetDOS()->GetCamera()->GetPosition(true);
+	vCameraDirection = vector(vCameraDirection.x(), 0.0f, vCameraDirection.z()).Normal();
+
+	// Making a quaternion with two vectors uses cross product,
+	// vector(0,0,1) and vector(0,0,-1) are incompatible with vector(0,0,-1)
+	if (vCameraDirection == vector::kVector(1.0f)) {
+		SetUserLabelOrientation(quaternion::MakeQuaternionWithEuler(0.0f, (float)M_PI, 0.0f));
+	}
+	else if (vCameraDirection == vector::kVector(-1.0f)) {
+		SetUserLabelOrientation(quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, 0.0f));
+	}
+	else {
+		SetUserLabelOrientation(quaternion(vector::kVector(-1.0f), vCameraDirection));
+	}
+
 
 Error:
 	return r;
