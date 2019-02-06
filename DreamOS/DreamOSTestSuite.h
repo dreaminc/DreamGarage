@@ -6,7 +6,7 @@
 // DREAM OS
 // DreamOS/Cloud/CloudTestSuite.h
 
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 #include "Primitives/Subscriber.h"
 #include "InteractionEngine/InteractionEngine.h"
 
@@ -18,7 +18,7 @@ class UIStageProgram;
 struct WebBrowserPoint;
 
 class DreamOSTestSuite : 
-	public TestSuite, 
+	public DreamTestSuite, 
 	public Subscriber<InteractionObjectEvent>
 {
 public:
@@ -26,6 +26,12 @@ public:
 	~DreamOSTestSuite();
 
 	virtual RESULT AddTests() override;
+
+	// TODO: in use?
+	//RESULT SetupDreamAppPipeline();
+
+	virtual RESULT SetupPipeline(std::string strRenderProgramName = "standard") override;
+	virtual RESULT SetupTestSuite();
 
 public:
 
@@ -66,8 +72,8 @@ public:
 	RESULT AddTestCredentialStorage();
 
 private:
-	RESULT SetupPipeline(std::string strRenderProgramName = "standard");
-	RESULT SetupDreamAppPipeline();
+	
+	
 
 	// Used for creating a clickable quad in tests
 public:

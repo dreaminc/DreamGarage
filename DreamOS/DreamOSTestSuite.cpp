@@ -47,7 +47,7 @@
 #include "Sound/AudioPacket.h"
 
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
-	TestSuite("dreamos"),
+	DreamTestSuite("dreamos"),
 	m_pDreamOS(pDreamOS)
 {
 	// empty
@@ -60,11 +60,11 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestDreamBrowser());
+
 	CR(AddTestDreamSoundSystem());
 
 	CR(AddTestDreamVCam());
-
-	CR(AddTestDreamBrowser());
 	
 	CR(AddTestDreamDesktop());
 
@@ -105,6 +105,15 @@ RESULT DreamOSTestSuite::AddTests() {
 	CR(AddTestUIKeyboard());
 
 	CR(AddTestCaptureApp());
+
+Error:
+	return r;
+}
+
+RESULT DreamOSTestSuite::SetupTestSuite() {
+	RESULT r = R_PASS;
+
+	// empty
 
 Error:
 	return r;
@@ -177,6 +186,7 @@ Error:
 	return r;
 }
 
+/*
 RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	RESULT r = R_PASS;
 
@@ -213,14 +223,12 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 	// Skybox
-	//*
-	ProgramNode* pSkyboxProgram;
-	pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-	//*/
+	//ProgramNode* pSkyboxProgram;
+	//pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	//CN(pSkyboxProgram);
+	//CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	//CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	ProgramNode* pUIProgramNode;
 	pUIProgramNode = pHAL->MakeProgramNode("uistage");
@@ -232,7 +240,6 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	// Connect output as pass-thru to internal blend program
 	//CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-	//*/
 	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
 	// Screen Quad Shader (opt - we could replace this if we need to)
@@ -249,6 +256,7 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 Error:
 	return r;
 }
+*/
 
 WebBrowserPoint DreamOSTestSuite::GetRelativeBrowserPointFromContact(point ptIntersectionContact) {
 	WebBrowserPoint webPt;
@@ -514,7 +522,8 @@ RESULT DreamOSTestSuite::AddTestMeta() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		//CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -597,7 +606,10 @@ RESULT DreamOSTestSuite::AddTestDreamUIBar() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		//CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
+
+
 		{
 			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this);
 			//CN(pDreamUIBar);	// still fails because it needs a user
@@ -670,7 +682,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		//CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
 
 		light *pLight;
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
@@ -686,6 +699,7 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		// This presents a timing issue if it works 
 		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(4.8f, 2.7f);
 		CN(pTestContext->m_pBrowserQuad);
+		pTestContext->m_pBrowserQuad->FlipUVHorizontal();
 		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
 		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
 	
@@ -843,7 +857,9 @@ RESULT DreamOSTestSuite::AddTestUIKeyboard() {
 		RESULT r = R_PASS;
 
 		CR(Initialize());
-		CR(SetupDreamAppPipeline());
+
+		//CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -2090,7 +2106,9 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		//CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
+
 		{
 			std::shared_ptr<DreamShareView> pDreamShareView = nullptr;
 
@@ -2186,7 +2204,9 @@ RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		//CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
+
 		{
 			std::shared_ptr<DreamShareView> pDreamShareView = nullptr;
 
@@ -2291,7 +2311,8 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 		
-		SetupDreamAppPipeline();
+		//SetupDreamAppPipeline();
+		CR(SetupPipeline());
 
 		light *pLight;
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
