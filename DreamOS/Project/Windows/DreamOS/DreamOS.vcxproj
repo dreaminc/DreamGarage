@@ -929,6 +929,7 @@ __BASE_FILE__="%(Filename)%(Extension)";%(PreprocessorDefinitions)</Preprocessor
     <ClInclude Include="..\..\..\Sound\WASAPI\WASAPISpatialSoundObject.h" />
     <ClInclude Include="..\..\..\Sound\XAudio2\X3DSpatialSoundObject.h" />
     <ClInclude Include="..\..\..\Sound\XAudio2\XAudio2SoundClient.h" />
+    <ClInclude Include="..\..\..\Test\DreamTestSuite.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
     <ClInclude Include="..\..\..\Test\TestSuite.h" />
     <ClInclude Include="..\..\..\Test\TestSuiteFactory.h" />

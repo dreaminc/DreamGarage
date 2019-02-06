@@ -2255,6 +2255,9 @@
     <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentShare.h">
       <Filter>Cloud\Environment</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Test\DreamTestSuite.h">
+      <Filter>Test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
