@@ -1334,10 +1334,12 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 		pendingPacket.SetSoundType(sound::type::SIGNED_16_BIT);
 		
 		// Send audio to Mixdown
-		CR(PushAudioPacketToMixdown((int)frames, pendingPacket));
+		DreamSoundSystem::MIXDOWN_TARGET mixdownTarget = 
+			(DreamSoundSystem::MIXDOWN_TARGET)((int)(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_MIC) + channel);
+		CR(PushAudioPacketToMixdown(mixdownTarget, (int)frames, pendingPacket));
 
 		// Sets the mouth position
-		CR(HandleUserAudioDataMessage(pPeerConnection, &audioDataMessage));
+		CR(HandleUserAudioDataMessage( pPeerConnection, &audioDataMessage));
 	}
 	else if (strAudioTrackLabel == kChromeAudioLabel) {
 
@@ -1361,7 +1363,9 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 			pendingPacket.SetSoundType(sound::type::SIGNED_16_BIT);
 
 			// Send audio to Mixdown
-			CR(PushAudioPacketToMixdown((int)frames, pendingPacket));
+			DreamSoundSystem::MIXDOWN_TARGET mixdownTarget =
+				(DreamSoundSystem::MIXDOWN_TARGET)((int)(DreamSoundSystem::MIXDOWN_TARGET::BROWSER_0) + channel);
+			CR(PushAudioPacketToMixdown(mixdownTarget, (int)frames, pendingPacket));
 		}
 	}
 	else if (strAudioTrackLabel == kVCamAudiolabel) {

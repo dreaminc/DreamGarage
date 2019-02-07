@@ -24,6 +24,9 @@ class SoundFile;
 class HMD;
 //class SoundBuffer;
 
+#define NUM_MONO_MIXDOWN_BUFFERS 6
+#define NUM_STEREO_MIXDOWN_BUFFERS 1
+
 class DreamSoundSystem : 
 	public DreamModule<DreamSoundSystem>, 
 	public SoundClient::observer ,
@@ -36,6 +39,17 @@ public:
 	public:
 		virtual RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) = 0;
 	};
+
+	typedef enum {
+		BROWSER_0,
+		LOCAL_MIC,
+		PEER_1,
+		PEER_2,
+		PEER_3,
+		PEER_4,
+		PEER_5,
+		INVALID
+	} MIXDOWN_TARGET;
 
 public:
 	DreamSoundSystem(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -101,8 +115,11 @@ private:
 	RESULT MixdownProcess();
 	RESULT StartMixdownServer();
 	RESULT InitalizeMixdownSendBuffer();
+	RESULT TeardownMixdownSendBuffer();
+	AudioPacket GetPendingMixdownAudioPacket(int numFrames);
 	
-	SoundBuffer *m_pMixdownBuffer = nullptr;
+	std::vector<SoundBuffer*> m_pMixdownBuffers;
+
 	std::chrono::system_clock::time_point m_lastMixdownReadTime;
 
 	sound::state m_mixdownState = sound::state::UNINITIALIZED;
@@ -110,7 +127,7 @@ private:
 	std::thread	m_mixdownBufferProcessThread;
 
 public:
-	RESULT PushAudioPacketToMixdown(int numFrames, const AudioPacket &pendingAudioPacket);
+	RESULT PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET mixdownTarget, int numFrames, const AudioPacket &pendingAudioPacket);
 };
 
 #endif // ! DREAM_SOUND_SYSTEM_H_

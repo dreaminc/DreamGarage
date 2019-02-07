@@ -1197,7 +1197,7 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 				//
 				//CRM(m_pParentDOS->PushAudioPacketToMixdown(numFrames, alteredPendingAudioPacket), "Failed to push packet to sound system");
 
-				CRM(m_pParentDOS->PushAudioPacketToMixdown(numFrames, pendingAudioPacket), "Failed to push packet to sound system");
+				CRM(m_pParentDOS->PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::BROWSER_0, numFrames, pendingAudioPacket), "Failed to push packet to sound system");
 			}
 
 		Error:

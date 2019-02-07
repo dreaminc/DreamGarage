@@ -97,6 +97,9 @@ public:
 	RESULT GetDataBufferCopy(uint8_t*&pDataBuffer, size_t &pDataBuffer_n) const;
 	RESULT DeleteBuffer();
 
+	RESULT MixInAudioPacket(AudioPacket audioPacket);
+	RESULT MixInMonoAudioPacket(AudioPacket monoAudioPacket);
+
 private:
 	int m_frames;
 	int m_channels;

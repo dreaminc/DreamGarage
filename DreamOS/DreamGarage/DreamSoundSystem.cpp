@@ -206,10 +206,10 @@ RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptur
 	//*/
 
 	// This pushes the mic input into the chromium mixdown bridge
-	/*
+	///*
 	AudioPacket pendingAudioPacket;
 	pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket, false);
-	PushAudioPacketToMixdown(numFrames, pendingAudioPacket);
+	PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_MIC, numFrames, pendingAudioPacket);
 	//*/
 
 	/*
@@ -393,6 +393,8 @@ RESULT DreamSoundSystem::Shutdown(void *pContext) {
 	m_pWASAPICaptureClient->StopCapture();
 	CR(r);
 
+	CR(TeardownMixdownSendBuffer());
+
 Error:
 	return r;
 }
@@ -411,14 +413,43 @@ float DreamSoundSystem::GetRunTimeCaptureAverage() {
 	return 0.0f;
 }
 
+RESULT DreamSoundSystem::TeardownMixdownSendBuffer() {
+	RESULT r = R_PASS;
+
+	while(m_pMixdownBuffers.size() > 0) {
+		SoundBuffer* pMixdownBuffer = m_pMixdownBuffers.back();
+		CN(pMixdownBuffer);
+		m_pMixdownBuffers.pop_back();
+		delete pMixdownBuffer;
+		pMixdownBuffer = nullptr;
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamSoundSystem::InitalizeMixdownSendBuffer() {
 	RESULT r = R_PASS;
 
-	// Initialize the mix-down buffer
-	m_pMixdownBuffer = SoundBuffer::Make(2, 44100, sound::type::SIGNED_16_BIT);
-	//m_pMixdownBuffer = SoundBuffer::Make(2, 48000, sound::type::SIGNED_16_BIT);
+	// Initialize the mix-down buffers
 
-	CN(m_pMixdownBuffer);
+	// Not the most portable implementation - as the enum/format 
+	// would both need to change if new channels are being added
+
+	// Stereo
+	for (int i = 0; i < NUM_STEREO_MIXDOWN_BUFFERS; i++) {
+		auto pSteroMixdownBuffer = SoundBuffer::Make(2, 44100, sound::type::SIGNED_16_BIT);
+		m_pMixdownBuffers.push_back(pSteroMixdownBuffer);
+		CN(pSteroMixdownBuffer);
+	}
+
+	// Mono
+	for (int i = 0; i < NUM_MONO_MIXDOWN_BUFFERS; i++) {
+		auto pMonoMixdownBuffer = SoundBuffer::Make(1, 44100, sound::type::SIGNED_16_BIT);
+		CN(pMonoMixdownBuffer);
+		m_pMixdownBuffers.push_back(pMonoMixdownBuffer);
+	}
+
 
 Error:
 	return r;
@@ -438,12 +469,16 @@ Error:
 	return r;
 }
 
-RESULT DreamSoundSystem::PushAudioPacketToMixdown(int numFrames, const AudioPacket &pendingAudioPacket) {
+RESULT DreamSoundSystem::PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET mixdownTarget, int numFrames, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
-	CNM(m_pMixdownBuffer, "Mixdown buffer not initialized!");
+	SoundBuffer *pBufferTarget = nullptr;
 
-	m_pMixdownBuffer->LockBuffer();
+	pBufferTarget = m_pMixdownBuffers[(int)(mixdownTarget)];
+
+	CNM(pBufferTarget, "Mixdown buffer not initialized!");
+
+	pBufferTarget->LockBuffer();
 
 	{
 		// TODO: Make a mix data
@@ -454,13 +489,54 @@ RESULT DreamSoundSystem::PushAudioPacketToMixdown(int numFrames, const AudioPack
 		//CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket));
 		
 		// This works apparently with up/down sampling
-		CR(m_pMixdownBuffer->PushAudioPacket(pendingAudioPacket));
+		CR(pBufferTarget->PushAudioPacket(pendingAudioPacket));
 	}
 
-	m_pMixdownBuffer->UnlockBuffer();
+	pBufferTarget->UnlockBuffer();
 
 Error:
 	return r;
+}
+
+AudioPacket DreamSoundSystem::GetPendingMixdownAudioPacket(int numFrames) {
+
+	AudioPacket pendingAudioPacket;
+
+	// Try with the browser target - this should work immediately 
+	auto pBufferTarget = m_pMixdownBuffers[DreamSoundSystem::MIXDOWN_TARGET::BROWSER_0];
+
+	pBufferTarget->LockBuffer();
+
+	{
+		// This is non mix-down
+		pBufferTarget->GetAudioPacket(numFrames, &pendingAudioPacket);
+	}
+
+	pBufferTarget->UnlockBuffer();
+
+
+	// Try with the browser target - this should work immediately 
+	//for (int i = (int)(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_MIC]); i < (int)(DreamSoundSystem::MIXDOWN_TARGET::INVALID); i++) {
+	for (int i = (int)(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_MIC); i < (int)(DreamSoundSystem::MIXDOWN_TARGET::INVALID); i++) {
+		AudioPacket tempMonoAudioPacket;
+		auto pBufferTarget = m_pMixdownBuffers[DreamSoundSystem::MIXDOWN_TARGET(i)];
+
+		pBufferTarget->LockBuffer();
+
+		{
+			// This is non mix-down
+			pBufferTarget->GetAudioPacket(numFrames, &tempMonoAudioPacket);
+		}
+
+		pBufferTarget->UnlockBuffer();
+
+		pendingAudioPacket.MixInMonoAudioPacket(tempMonoAudioPacket);
+
+		// temp
+		i = (int)(DreamSoundSystem::MIXDOWN_TARGET::INVALID);
+	}
+
+	return pendingAudioPacket;
 }
 
 // TODO: This is not cross platform 
@@ -490,57 +566,33 @@ RESULT DreamSoundSystem::MixdownProcess() {
 		while (usDifference < 10000) {
 			timeNow = std::chrono::system_clock::now();
 			usDifference = std::chrono::duration_cast<std::chrono::microseconds>(timeNow - m_lastMixdownReadTime).count();
-			//std::this_thread::sleep_for(std::chrono::microseconds(1));
 		}
 
-		int audioBufferSampleLength10ms = m_pMixdownBuffer->GetSamplingRate() / 100;
-		int audioBufferSampleLength = (int)((float)m_pMixdownBuffer->GetSamplingRate() * ((float)usDifference / 1000000.0f));
+		int audioBufferSampleLength10ms = 441;
+		//int audioBufferSampleLength10ms = m_pMixdownBuffer->GetSamplingRate() / 100;
+		//int audioBufferSampleLength = (int)((float)m_pMixdownBuffer->GetSamplingRate() * ((float)usDifference / 1000000.0f));
+		//int pendingFrames = m_pMixdownBuffer->NumPendingFrames();
 
-		int dirtyFrames = m_pMixdownBuffer->NumDirtyFrames();
-		int pendingFrames = m_pMixdownBuffer->NumPendingFrames();
+		m_lastMixdownReadTime += std::chrono::microseconds(10000);
 
-		// Pull from the mix down buffer ever 10 ms
-		//if (m_pMixdownBuffer != nullptr && usDifference >= 10000) {
-		//if (m_pMixdownBuffer != nullptr && pendingFrames >= audioBufferSampleLength10ms) {
-		//if (m_pMixdownBuffer != nullptr && dirtyFrames >= audioBufferSampleLength10ms) {
+		{
+			//DEBUG_LINEOUT("pending %d", (int)pendingBytes)
 
-			//m_lastMixdownReadTime = timeNow - std::chrono::microseconds(usDifference - 10000);
+			AudioPacket pendingAudioPacket = GetPendingMixdownAudioPacket(audioBufferSampleLength10ms);
 
-			//if (m_pMixdownBuffer != nullptr && dirtyFrames >= audioBufferSampleLength10ms && diffVal >= 10) {
-			//if (m_pMixdownBuffer != nullptr && pendingFrames >= audioBufferSampleLength10ms) {
-			m_pMixdownBuffer->LockBuffer();
+			// Send to named pipe
 
-			m_lastMixdownReadTime += std::chrono::microseconds(10000);
-			//m_lastMixdownReadTime += std::chrono::microseconds(usDifference);
-			//m_lastMixdownReadTime = timeNow;
+			if (m_pNamedPipeServer != nullptr) {
 
-			{
-				//DEBUG_LINEOUT("pending %d", (int)pendingBytes)
+				void *pDataBuffer = pendingAudioPacket.GetDataBuffer();
+				size_t pDataBuffer_n = pendingAudioPacket.GetDataBufferSize();
 
-				AudioPacket pendingAudioPacket;
-				//m_pMixdownBuffer->GetAudioPacket(dirtyFrames, &pendingAudioPacket, true, false, true);
-				//m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength, &pendingAudioPacket, true, false, true);
-				//m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket, true, false, true);
-
-				// This is non mix-down
-				m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket);
-
-				m_pMixdownBuffer->UnlockBuffer();
-
-				// Send to named pipe
-
-				if (m_pNamedPipeServer != nullptr) {
-
-					void *pDataBuffer = pendingAudioPacket.GetDataBuffer();
-					size_t pDataBuffer_n = pendingAudioPacket.GetDataBufferSize();
-
-					m_pNamedPipeServer->SendMessage((void*)(pDataBuffer), pDataBuffer_n);
-				}
+				m_pNamedPipeServer->SendMessage((void*)(pDataBuffer), pDataBuffer_n);
 			}
-		//}
+		}
 
 		// Sleep the thread for 10 ms
-		Sleep(7);
+		Sleep(8);
 		//std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 

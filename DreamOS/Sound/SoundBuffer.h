@@ -19,9 +19,10 @@ class SoundBuffer {
 public:
 	static const char *TypeString(sound::type bufferType);
 
+	~SoundBuffer() = default;
+
 protected:
 	SoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
-	~SoundBuffer();
 
 public:
 	virtual sound::type GetType() const = 0;

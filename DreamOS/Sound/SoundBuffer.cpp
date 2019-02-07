@@ -10,10 +10,6 @@ SoundBuffer::SoundBuffer(int numChannels, int samplingRate, sound::type bufferTy
 	// empty
 }
 
-SoundBuffer::~SoundBuffer() {
-	// empty
-}
-
 SoundBuffer* SoundBuffer::Make(int numChannels, int samplingRate, sound::type bufferType) {
 	RESULT r = R_PASS;
 	SoundBuffer *pSoundBuffer = nullptr;
