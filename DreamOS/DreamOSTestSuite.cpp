@@ -1300,7 +1300,7 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 			pTestContext->m_pDreamBrowserSource->SetURI(strURLSource);
 			//*/
 
-			/* Destination (named pipe) Browser
+			///* Destination (named pipe) Browser
 			// Set up Browser to test the mix down code (timing)
 
 			// This presents a timing issue if it works 
