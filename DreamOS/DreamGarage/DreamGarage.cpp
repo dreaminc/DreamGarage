@@ -1067,7 +1067,7 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingP
 	vCameraDirection = ptSeatPosition - GetCamera()->GetPosition(true);
 	vCameraDirection = vector(vCameraDirection.x(), 0.0f, vCameraDirection.z()).Normal();
 
-	pDreamPeer->SetUserLabelPosition(ptSeatPosition);
+//	pDreamPeer->SetUserLabelPosition(ptSeatPosition);
 
 	// Making a quaternion with two vectors uses cross product,
 	// vector(0,0,1) and vector(0,0,-1) are incompatible with vector(0,0,-1)

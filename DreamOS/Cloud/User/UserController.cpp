@@ -477,6 +477,13 @@ RESULT UserController::LoadProfile() {
 		strHttpResponse = strHttpResponse.substr(0, strHttpResponse.find('\r'));
 		nlohmann::json jsonResponse = nlohmann::json::parse(strHttpResponse);
 
+		std::string strProfilePhoto;
+
+		if (!jsonResponse["/data/user_label_photo_url"_json_pointer].is_null()) {
+			strProfilePhoto = jsonResponse["/data/user_label_photo_url"_json_pointer].get<std::string>();
+			m_strProfilePhotoURL = strProfilePhoto;
+		}
+
 		m_user = User(
 			jsonResponse["/data/id"_json_pointer].get<long>(),
 			//jsonResponse["/data/default_environment"_json_pointer].get<long>(),
@@ -486,6 +493,7 @@ RESULT UserController::LoadProfile() {
 			jsonResponse["/data/public_name"_json_pointer].get<std::string>(),
 			jsonResponse["/data/first_name"_json_pointer].get<std::string>(),
 			jsonResponse["/data/last_name"_json_pointer].get<std::string>(),
+			strProfilePhoto,
 			version(1.0f)	// version
 		);
 
@@ -861,6 +869,12 @@ RESULT UserController::OnUserProfile(std::string&& strResponse) {
 	GetResponseData(jsonData, jsonResponse, statusCode);
 	//CB(statusCode == 200);
 
+	std::string strProfilePhoto = "";
+
+	if (!jsonData["/user_label_photo_url"_json_pointer].is_null()) {
+		strProfilePhoto = jsonData["/user_label_photo_url"_json_pointer].get<std::string>();
+	}
+
 	m_user = User(
 		jsonData["/id"_json_pointer].get<long>(),
 		m_defaultEnvironmentId,
@@ -869,8 +883,10 @@ RESULT UserController::OnUserProfile(std::string&& strResponse) {
 		jsonData["/public_name"_json_pointer].get<std::string>(),
 		jsonData["/first_name"_json_pointer].get<std::string>(),
 		jsonData["/last_name"_json_pointer].get<std::string>(),
+		strProfilePhoto,
 		version(1.0f)	// version
 	);
+	m_strProfilePhotoURL = strProfilePhoto;
 
 	m_loginState.fHasUserProfile = true;
 	CR(UpdateLoginState());
