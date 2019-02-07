@@ -208,11 +208,11 @@ RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptur
 	//*/
 
 	// This pushes the mic input into the chromium mixdown bridge
-	/*
+	///*
 	AudioPacket pendingAudioPacket;
 	pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket, false);
 	PushAudioPacketToMixdown(numFrames, pendingAudioPacket);
-	*/
+	//*/
 
 	/*
 	// TEST: Useful for pass through testing of the pipe
