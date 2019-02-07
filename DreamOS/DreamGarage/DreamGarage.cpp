@@ -724,6 +724,10 @@ version DreamGarage::GetDreamVersion() {
 	return m_versionDreamClient;
 }
 
+CameraNode *DreamGarage::GetAuxCameraNode() {
+	return m_pAuxCamera;
+}
+
 RESULT DreamGarage::AuthenticateFromStoredCredentials() {
 	RESULT r = R_PASS;
 

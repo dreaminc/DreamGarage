@@ -236,6 +236,17 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::UpdateAllPeerLabelOrientations(camera *pCamera) {
+	RESULT r = R_PASS;
+
+	for (auto it = m_dreamPeerApps.begin(); it != m_dreamPeerApps.end(); it++) {
+		it->second->UpdateLabelOrientation(pCamera);
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamOS::OnAudioChannel(PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
 

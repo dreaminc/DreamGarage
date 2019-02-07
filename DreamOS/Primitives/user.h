@@ -75,7 +75,7 @@ public:
 
 	RESULT InitializeUserNameLabel();
 
-	RESULT UpdateUserNameLabelPlacement();
+	RESULT UpdateUserNameLabelPlacement(camera *pCamera);
 
 	RESULT ShowUserNameField();
 	RESULT HideUserNameField();
@@ -92,6 +92,7 @@ public:
 	RESULT UpdateProfilePhoto();
 
 	std::shared_ptr<composite> GetUserLabelComposite();
+	std::shared_ptr<composite> GetUserObjectComposite();
 	bool IsUserNameVisible();
 
 private:

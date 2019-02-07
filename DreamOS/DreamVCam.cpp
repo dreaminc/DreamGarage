@@ -224,8 +224,11 @@ RESULT DreamVCam::Update(void *pContext) {
 			UnsetSourceTexture();
 			CRM(SetSourceTexture(pTexture), "Failed to set source texture from render node in Dream VCam");
 
+			GetDOS()->GetUserApp()->UpdateLabelOrientation(m_pCamera);
+			GetDOS()->UpdateAllPeerLabelOrientations(m_pCamera);
 			// Update the local render
 			CR(m_pOGLEndNode->RenderNode(count++));
+			GetDOS()->UpdateAllPeerLabelOrientations(GetDOS()->GetCamera());
 
 			if (m_fIsMuted) {
 				m_pStreamingTexture = m_pMuteTexture;

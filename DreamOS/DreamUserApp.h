@@ -35,6 +35,7 @@ class DimObj;
 class user;
 
 class CEFBrowserManager;
+class CameraNode;
 
 #define MENU_HEIGHT -0.16f
 #define MENU_DEPTH 0.0f
@@ -146,6 +147,8 @@ public:
 	RESULT UpdateOverlayTextures();
 
 	RESULT UpdateHysteresisObject();
+
+	RESULT UpdateLabelOrientation(CameraNode *pCamera);
 
 // user settings
 public:

@@ -14,6 +14,7 @@
 #include "DreamGarage/AudioDataMessage.h"
 
 #include "Core/Utilities.h"
+#include "Primitives/camera.h"
 
 DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext) :
 	DreamApp<DreamPeerApp>(pDOS, pContext),
@@ -53,6 +54,12 @@ Error:
 RESULT DreamPeerApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
+	if (m_pUserModel != nullptr) {
+		m_pUserModel->RemoveMouth();
+
+		GetDOS()->RemoveObjectFromUIGraph(m_pUserModel->GetUserObjectComposite().get());
+	}
+
 Error:
 	return r;
 }
@@ -75,6 +82,11 @@ RESULT DreamPeerApp::Update(void *pContext) {
 
 	if (m_pUserModel != nullptr) {
 		m_pUserModel->Update();
+		m_pUserModel->UpdateUserNameLabelPlacement(GetDOS()->GetCamera());
+
+		// 
+		m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT)->GetPhantomModel()->SetVisible(false);
+		m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT)->GetPhantomModel()->SetVisible(false);
 	}
 
 Error:
@@ -98,6 +110,16 @@ RESULT DreamPeerApp::SetUserLabelOrientation(quaternion qOrientation) {
 
 	m_pUserModel->SetUserLabelOrientation(qOrientation);
 
+	return r;
+}
+
+RESULT DreamPeerApp::UpdateLabelOrientation(camera *pCamera) {
+	RESULT r = R_PASS;
+
+	CNR(m_pUserModel, R_SKIPPED);
+	CR(m_pUserModel->UpdateUserNameLabelPlacement(pCamera));
+
+Error:
 	return r;
 }
 
@@ -217,6 +239,8 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 	CR(m_pUserModel->UpdateAvatarModelWithID(m_avatarModelId));
 
 	m_pUserModel->InitializeObject();
+	GetDOS()->AddObjectToUIGraph(m_pUserModel->GetUserObjectComposite().get(), SandboxApp::PipelineType::MAIN | SandboxApp::PipelineType::AUX);
+
 	m_pUserModel->SetScreenName(m_strScreenName);
 	m_pUserModel->SetProfilePhoto(m_strProfilePhotoURL);
 

@@ -85,6 +85,7 @@ public:
 	const std::string&	GetFirstName() const  { return m_strFirstName; }
 	const std::string&	GetLastName() const  { return m_strLastName; }
 	const std::string&	GetScreenName() const  { return m_strScreenName; }
+	const std::string&	GetProfilePhotoURL() const  { return m_strProfilePhotoURL; }
 	
 	const std::string&	GetToken() const { return m_strToken; }
 	RESULT SetToken(std::string strToken) {

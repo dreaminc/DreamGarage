@@ -28,6 +28,7 @@ class text;
 class font;
 class SpatialSoundObject;
 class AudioDataMessage;
+class CameraNode;
 
 struct InteractionObjectEvent;
 
@@ -144,6 +145,7 @@ public:
 	std::shared_ptr<composite> GetUserLabelComposite();
 	RESULT SetUserLabelPosition(point ptPosition);
 	RESULT SetUserLabelOrientation(quaternion qOrientation);
+	RESULT UpdateLabelOrientation(camera *pCamera);
 
 private:
 	RESULT SetState(DreamPeerApp::state peerState);

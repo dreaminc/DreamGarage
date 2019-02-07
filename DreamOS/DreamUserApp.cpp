@@ -7,6 +7,7 @@
 #include "Core/Utilities.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
+#include "Cloud/User/UserController.h"
 
 #include "Primitives/camera.h"	
 
@@ -211,6 +212,9 @@ RESULT DreamUserApp::Update(void *pContext) {
 		m_pUserModel->SetPosition(pCameraNode->GetPosition());
 		m_pUserModel->SetOrientation(qOrientation);
 
+		m_pUserModel->GetUserObjectComposite()->SetPosition(pCameraNode->GetPosition() + point(0.0f, 0.0f, -0.0f));
+//		m_pUserModel->GetUserObjectComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, (float)M_PI, 0.0f));
+
 		// This is for debug to work
 		if (m_pUserModel->GetMouth() != nullptr) {
 			m_pUserModel->SetMouthOrientation(qOrientation);
@@ -226,6 +230,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 				m_pUserModel->UpdateMouthPose();
 			}
 		}
+		m_pUserModel->Update();
 	}
 
 	// checks for the first time the headset and hands are tracked together
@@ -260,6 +265,11 @@ RESULT DreamUserApp::Update(void *pContext) {
 #ifndef _DEBUG	
 	if (m_pUserModel == nullptr) {
 		int avatarID = GetDOS()->GetUserAvatarID();
+		auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
+		std::string strScreenName = pUserController->GetUser().GetScreenName();
+		std::string strPhotoURL = pUserController->GetUser().GetProfilePhotoURL();
+
 		if (avatarID != -1) {	// don't do this step until the user profile info is loaded
 			m_pUserModel = std::shared_ptr<user>(GetDOS()->MakeUser());
 			CN(m_pUserModel);
@@ -267,6 +277,12 @@ RESULT DreamUserApp::Update(void *pContext) {
 			CR(m_pUserModel->SetDreamOS(GetDOS()));
 			CR(m_pUserModel->UpdateAvatarModelWithID(GetDOS()->GetUserAvatarID()));
 			CR(m_pUserModel->SetVisible(true));
+
+			CR(m_pUserModel->SetScreenName(strScreenName));
+			CR(m_pUserModel->SetProfilePhoto(strPhotoURL));
+
+			CR(m_pUserModel->InitializeObject());
+			//m_pUserModel->SetUserLabelOrientation(quaternion::MakeQuaternionWithEuler(0.0, (float)M_PI, 0.0f));
 
 			CR(m_pUserModel->GetMouth()->SetVisible(true));
 
@@ -280,6 +296,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 			// Doing this here for now, it's possible we want to just have AddUser add to both pipes though.
 			GetDOS()->AddObject(m_pUserModel.get(), SandboxApp::PipelineType::AUX);
 			GetDOS()->AddObjectToUIGraph(m_pUserModel->GetMouth().get(), SandboxApp::PipelineType::AUX);
+			GetDOS()->AddObjectToUIGraph(m_pUserModel->GetUserObjectComposite().get(), SandboxApp::PipelineType::AUX);
 		}
 	}
 	
@@ -339,6 +356,17 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 
 	CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageLeft, messageFlags));
 	CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageRight, messageFlags));
+
+Error:
+	return r;
+}
+
+RESULT DreamUserApp::UpdateLabelOrientation(CameraNode *pCamera) {
+	RESULT r = R_PASS;
+
+	CNR(m_pUserModel, R_SKIPPED);
+
+	m_pUserModel->UpdateUserNameLabelPlacement(pCamera);
 
 Error:
 	return r;

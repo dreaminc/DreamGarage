@@ -880,7 +880,7 @@ RESULT UserController::OnUserProfile(std::string&& strResponse) {
 		m_defaultEnvironmentId,
 		jsonData["/avatar_model_id"_json_pointer].get<int>(),
 		jsonData["/email"_json_pointer].get<std::string>(),
-		jsonData["/public_name"_json_pointer].get<std::string>(),
+		jsonData["/public_name_short"_json_pointer].get<std::string>(),
 		jsonData["/first_name"_json_pointer].get<std::string>(),
 		jsonData["/last_name"_json_pointer].get<std::string>(),
 		strProfilePhoto,

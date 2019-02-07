@@ -82,6 +82,8 @@ public:
 	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) override;
 	virtual version GetDreamVersion() override;
 
+	virtual CameraNode *GetAuxCameraNode() override;
+
 	// Cloud Controller
 	//RESULT InitializeCloudControllerCallbacks();
 

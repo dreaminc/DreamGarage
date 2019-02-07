@@ -231,12 +231,12 @@ RESULT user::InitializeObject() {
 	m_pUIObjectComposite = MakeComposite();
 	m_pUIObjectComposite->SetPosition(GetPosition(true));
 	m_pUIObjectComposite->SetVisible(true, false);
-	m_pDreamOS->AddObjectToUIGraph(m_pUIObjectComposite.get(), SandboxApp::PipelineType::MAIN | SandboxApp::PipelineType::AUX);
+	//m_pDreamOS->AddObjectToUIGraph(m_pUIObjectComposite.get(), SandboxApp::PipelineType::MAIN | SandboxApp::PipelineType::AUX);
 
 	m_pUserLabelComposite = m_pUIObjectComposite->AddComposite();
 
-	m_pSphere = AddSphere(0.1f,10,10);
-	m_pSphere->SetVisible(false);
+//	m_pSphere = AddSphere(0.1f,10,10);
+//	m_pSphere->SetVisible(false);
 
 	DOSLOG(INFO, "DreamPeerApp object composites created");
 
@@ -353,13 +353,13 @@ Error:
 
 }
 
-RESULT user::UpdateUserNameLabelPlacement() {
+RESULT user::UpdateUserNameLabelPlacement(camera *pCamera) {
 	RESULT r = R_PASS;
 
 	point ptSeatPosition = m_pUIObjectComposite->GetPosition(true);
 	vector vCameraDirection;
 
-	vCameraDirection = ptSeatPosition - m_pDreamOS->GetCamera()->GetPosition(true);
+	vCameraDirection = ptSeatPosition - pCamera->GetPosition(true);
 	vCameraDirection = vector(vCameraDirection.x(), 0.0f, vCameraDirection.z()).Normal();
 
 	// Making a quaternion with two vectors uses cross product,
@@ -373,6 +373,32 @@ RESULT user::UpdateUserNameLabelPlacement() {
 	else {
 		SetUserLabelOrientation(quaternion(vector::kVector(-1.0f), vCameraDirection));
 	}
+
+	auto pHead = GetHead();
+
+	BoundingBox* pOuterBoundingVolume = dynamic_cast<BoundingBox*>(pHead->GetBoundingVolume().get());
+	//CN(pOuterBoundingVolume);
+
+	float outerDistance = pOuterBoundingVolume->GetFarthestPointInDirection(vector(0.0f, 1.0f, 0.0f)).y();
+
+	// TODO: test pOuter->GetO * pName->GetO
+	quaternion qNameComposite = m_pUIObjectComposite->GetOrientation();
+	qNameComposite.Reverse();
+	qNameComposite = qNameComposite * pOuterBoundingVolume->GetOrientation(true);
+
+	point ptOrigin = RotationMatrix(qNameComposite) * ScalingMatrix(pOuterBoundingVolume->GetScale(false)) * vector(pOuterBoundingVolume->GetCenter());
+	ptOrigin += pHead->GetOrigin();
+
+	m_pUserLabelComposite->SetPosition(point(ptOrigin.x(), outerDistance, ptOrigin.z()));
+	m_pUserLabelComposite->SetVisible(true);
+	//m_pSphere->SetPosition(point(ptOrigin.x(), outerDistance, ptOrigin.z()));
+
+	UpdateMouthPose();
+
+	if (m_pPendingPhotoTextureBuffer != nullptr) {
+		CR(UpdateProfilePhoto());
+	}
+
 
 Error:
 	return r;
@@ -455,7 +481,6 @@ RESULT user::SetUserLabelPosition(point ptPosition) {
 	RESULT r = R_PASS;
 
 	m_pUIObjectComposite->SetPosition(ptPosition);
-	//m_pSphere->SetPosition(ptPosition);
 	//m_pSphere->SetVisible(true);
 
 	return r;
@@ -536,6 +561,10 @@ std::shared_ptr<composite> user::GetUserLabelComposite() {
 	return m_pUserLabelComposite;
 }
 
+std::shared_ptr<composite> user::GetUserObjectComposite() {
+	return m_pUIObjectComposite;
+}
+
 bool user::IsUserNameVisible() {
 	if (m_pTextUserName != nullptr && m_pNameBackground != nullptr) {
 		return m_pTextUserName->IsVisible() && m_pNameBackground->IsVisible();
@@ -578,7 +607,7 @@ RESULT user::Update() {
 
 		UpdateMouthPose();
 
-		UpdateUserNameLabelPlacement();
+//		UpdateUserNameLabelPlacement();
 
 		if (m_pPendingPhotoTextureBuffer != nullptr) {
 			CR(UpdateProfilePhoto());
