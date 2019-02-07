@@ -206,7 +206,7 @@ RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptur
 	//*/
 
 	// This pushes the mic input into the chromium mixdown bridge
-	///*
+	/*
 	AudioPacket pendingAudioPacket;
 	pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket, false);
 	PushAudioPacketToMixdown(numFrames, pendingAudioPacket);
@@ -416,6 +416,8 @@ RESULT DreamSoundSystem::InitalizeMixdownSendBuffer() {
 
 	// Initialize the mix-down buffer
 	m_pMixdownBuffer = SoundBuffer::Make(2, 44100, sound::type::SIGNED_16_BIT);
+	//m_pMixdownBuffer = SoundBuffer::Make(2, 48000, sound::type::SIGNED_16_BIT);
+
 	CN(m_pMixdownBuffer);
 
 Error:
@@ -449,9 +451,10 @@ RESULT DreamSoundSystem::PushAudioPacketToMixdown(int numFrames, const AudioPack
 		//auto usOffset = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - m_lastMixdownReadTime).count();
 		//CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket, usOffset));
 
-		CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket));
+		//CR(m_pMixdownBuffer->MixAudioPacket(pendingAudioPacket));
 		
-		//CR(m_pMixdownBuffer->PushAudioPacket(pendingAudioPacket));
+		// This works apparently with up/down sampling
+		CR(m_pMixdownBuffer->PushAudioPacket(pendingAudioPacket));
 	}
 
 	m_pMixdownBuffer->UnlockBuffer();
@@ -484,15 +487,22 @@ RESULT DreamSoundSystem::MixdownProcess() {
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 		auto usDifference = std::chrono::duration_cast<std::chrono::microseconds>(timeNow - m_lastMixdownReadTime).count();
 
-		int audioBufferSampleLength = m_pMixdownBuffer->GetSamplingRate() / 100;
-		//int audioBufferSampleLength = (int)((float)m_pMixdownBuffer->GetSamplingRate() * ((float)usDifference / 1000000.0f));
+		while (usDifference < 10000) {
+			timeNow = std::chrono::system_clock::now();
+			usDifference = std::chrono::duration_cast<std::chrono::microseconds>(timeNow - m_lastMixdownReadTime).count();
+			//std::this_thread::sleep_for(std::chrono::microseconds(1));
+		}
+
+		int audioBufferSampleLength10ms = m_pMixdownBuffer->GetSamplingRate() / 100;
+		int audioBufferSampleLength = (int)((float)m_pMixdownBuffer->GetSamplingRate() * ((float)usDifference / 1000000.0f));
 
 		int dirtyFrames = m_pMixdownBuffer->NumDirtyFrames();
 		int pendingFrames = m_pMixdownBuffer->NumPendingFrames();
 
 		// Pull from the mix down buffer ever 10 ms
-		if (m_pMixdownBuffer != nullptr && usDifference >= 10000) {
-		//if (m_pMixdownBuffer != nullptr && pendingFrames >= audioBufferSampleLength) {
+		//if (m_pMixdownBuffer != nullptr && usDifference >= 10000) {
+		//if (m_pMixdownBuffer != nullptr && pendingFrames >= audioBufferSampleLength10ms) {
+		//if (m_pMixdownBuffer != nullptr && dirtyFrames >= audioBufferSampleLength10ms) {
 
 			//m_lastMixdownReadTime = timeNow - std::chrono::microseconds(usDifference - 10000);
 
@@ -501,13 +511,19 @@ RESULT DreamSoundSystem::MixdownProcess() {
 			m_pMixdownBuffer->LockBuffer();
 
 			m_lastMixdownReadTime += std::chrono::microseconds(10000);
+			//m_lastMixdownReadTime += std::chrono::microseconds(usDifference);
+			//m_lastMixdownReadTime = timeNow;
 
 			{
 				//DEBUG_LINEOUT("pending %d", (int)pendingBytes)
 
 				AudioPacket pendingAudioPacket;
-				m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength, &pendingAudioPacket, true, false, true);
-				//m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength, &pendingAudioPacket);
+				//m_pMixdownBuffer->GetAudioPacket(dirtyFrames, &pendingAudioPacket, true, false, true);
+				//m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength, &pendingAudioPacket, true, false, true);
+				//m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket, true, false, true);
+
+				// This is non mix-down
+				m_pMixdownBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket);
 
 				m_pMixdownBuffer->UnlockBuffer();
 
@@ -521,10 +537,10 @@ RESULT DreamSoundSystem::MixdownProcess() {
 					m_pNamedPipeServer->SendMessage((void*)(pDataBuffer), pDataBuffer_n);
 				}
 			}
-		}
+		//}
 
 		// Sleep the thread for 10 ms
-		Sleep(1);
+		Sleep(7);
 		//std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 

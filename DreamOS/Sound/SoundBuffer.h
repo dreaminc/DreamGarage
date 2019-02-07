@@ -479,12 +479,20 @@ public:
 					m_ppCircularBuffers[j]->MixIntoBuffer(pDataBuffer[sampleCount++], sampleOffset + i);
 				}
 			}
+
+			// Update the dirty frames - do this as an OR type operation vs additive 
+			// this assumes a separate process is going to be reading from the buffer 
+			// at some period and simply needs to know that there's data in the buffer
+			// that is waiting
+			if ((numFrames + sampleOffset) > circularBufferState.m_numDirtyBufferFrames)
+				circularBufferState.m_numDirtyBufferFrames = numFrames + sampleOffset;
+
 		}
 		else {
 			// We need to up/down sample the buffer to our effective sampling rate
 
 			// recalculate effective numFrames
-			int numBufferFrames = (int)(((float)m_samplingRate / (float)samplingRate)*((float)numFrames));
+			int numBufferFrames = (int)(((float)m_samplingRate / (float)samplingRate) * ((float)numFrames));
 
 			float frameLocation = 0.0f;
 			int frameFloor = 0;
@@ -493,6 +501,8 @@ public:
 			int sampleCeiling = 0;
 			float ratio = 0.0f;
 			CBType interpolatedValue = 0;
+			float floorSample = 0;
+			float ceilSample = 0;
 
 			// This will de-interlace the samples
 			for (int i = 0; i < numBufferFrames; i++) {
@@ -511,7 +521,10 @@ public:
 					sampleFloor = (frameFloor * 2) + j;
 					sampleCeiling = (frameCeiling * 2) + j;
 
-					interpolatedValue = (CBType)(((float)pDataBuffer[sampleFloor] * (1.0f - ratio)) + ((float)pDataBuffer[sampleCeiling] * (ratio)));
+					floorSample = (float)pDataBuffer[sampleFloor];
+					ceilSample = (float)pDataBuffer[sampleCeiling];
+
+					interpolatedValue = (CBType)((floorSample * (1.0f - ratio)) + (ceilSample * ratio));
 
 					m_ppCircularBuffers[j]->MixIntoBuffer(interpolatedValue, sampleOffset + i);
 
@@ -519,14 +532,14 @@ public:
 				}
 			}
 
-		}
+			// Update the dirty frames - do this as an OR type operation vs additive 
+			// this assumes a separate process is going to be reading from the buffer 
+			// at some period and simply needs to know that there's data in the buffer
+			// that is waiting
+			if ((numBufferFrames + sampleOffset) > circularBufferState.m_numDirtyBufferFrames)
+				circularBufferState.m_numDirtyBufferFrames = numBufferFrames + sampleOffset;
 
-		// Update the dirty frames - do this as an OR type operation vs additive 
-		// this assumes a separate process is going to be reading from the buffer 
-		// at some period and simply needs to know that there's data in the buffer
-		// that is waiting
-		if(numFrames > circularBufferState.m_numDirtyBufferFrames)
-			circularBufferState.m_numDirtyBufferFrames = numFrames;
+		}
 
 		// Set the circ buffer state
 		for (int i = 0; i < m_channels; i++) {	

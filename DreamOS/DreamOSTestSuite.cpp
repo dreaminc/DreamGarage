@@ -1192,8 +1192,8 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 				
 				//AudioPacket alteredPendingAudioPacket = pendingAudioPacket;
 				//
-				//alteredPendingAudioPacket.SetSamplingRate(44100);
-				//alteredPendingAudioPacket.SetNumFrames(441);
+				////alteredPendingAudioPacket.SetSamplingRate(44100);
+				////alteredPendingAudioPacket.SetNumFrames(441);
 				//
 				//CRM(m_pParentDOS->PushAudioPacketToMixdown(numFrames, alteredPendingAudioPacket), "Failed to push packet to sound system");
 
@@ -1300,7 +1300,7 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 			pTestContext->m_pDreamBrowserSource->SetURI(strURLSource);
 			//*/
 
-			///* Destination (named pipe) Browser
+			/* Destination (named pipe) Browser
 			// Set up Browser to test the mix down code (timing)
 
 			// This presents a timing issue if it works 
