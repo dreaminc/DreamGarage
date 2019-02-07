@@ -26,6 +26,7 @@ const char kUserDataLabel[] = "user_data_label";
 
 // User Video Camera
 const char kVCamVideoLabel[] = "vcam_video_label";
+const char kVCamAudiolabel[] = "vcam_audio_label";
 
 // Chrome Stream
 const char kChromeStreamLabel[] = "chrome_stream_label";

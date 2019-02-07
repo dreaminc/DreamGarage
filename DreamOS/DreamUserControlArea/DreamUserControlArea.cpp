@@ -497,9 +497,9 @@ RESULT DreamUserControlArea::HandleAudioPacket(const AudioPacket &pendingAudioPa
 	CNR(pContext, R_SKIPPED);
 	CNR(pContext->GetSourceTexture(), R_SKIPPED);
 	CNR(pDreamOS, R_SKIPPED);
-	CNR(pDreamOS->GetSharedContentTexture(), R_SKIPPED);
+	//CNR(pDreamOS->GetSharedContentTexture(), R_SKIPPED);
 
-	if (pContext->GetSourceTexture() == pDreamOS->GetSharedContentTexture()) {
+	if (pDreamOS->GetSharedContentTexture() != nullptr && pContext->GetSourceTexture() == pDreamOS->GetSharedContentTexture()) {
 		auto pCloudController = GetDOS()->GetCloudController();
 		if (pCloudController != nullptr) {
 			CR(GetDOS()->BroadcastSharedAudioPacket(pendingAudioPacket));
@@ -509,6 +509,9 @@ RESULT DreamUserControlArea::HandleAudioPacket(const AudioPacket &pendingAudioPa
 				CR(GetDOS()->PushAudioPacketToMixdown(pendingAudioPacket.GetNumFrames(), pendingAudioPacket));
 			}
 		}
+	}
+	else if (pDreamOS->GetSharedCameraTexture() != nullptr && pContext->GetSourceTexture() == pDreamOS->GetSharedCameraTexture()) {
+		CR(GetDOS()->GetCloudController()->BroadcastAudioPacket(kVCamAudiolabel, pendingAudioPacket));
 	}
 
 Error:

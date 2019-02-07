@@ -953,7 +953,7 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	// TODO: Either put this back in or move it to a different layer
 	if (m_pObserver != nullptr) {
 
-		if (m_fForceObserverAudio || GetDOS()->GetSharedContentTexture() == m_pBrowserTexture.get()) {
+		if (m_fForceObserverAudio || GetDOS()->GetSharedContentTexture() == m_pBrowserTexture.get() || GetDOS()->GetSharedCameraTexture() == m_pBrowserTexture.get()) {
 
 			if (m_pRenderSoundBuffer != nullptr) {
 

@@ -147,6 +147,9 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	//// Chrome Audio Source
 	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
 	
+	// Virtual Camera Audio Source
+	CR(AddLocalAudioSource(kVCamAudiolabel, kChromeStreamLabel));
+
 	// Chrome Video
 	CR(AddVideoStream(kChromeCaptureDevice, kChromeVideoLabel, kChromeStreamLabel));
 
@@ -588,6 +591,27 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 		}
 	}
 	
+	// VCam Audio Track
+	auto pVCamAudioTrack = pMediaStreamInterface->FindAudioTrack(kVCamAudiolabel);
+	if (pVCamAudioTrack != nullptr && pVCamAudioTrack->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
+
+		std::string strTrackName = pVCamAudioTrack->id();
+
+		DOSLOG(INFO, "OnAddStream: %s", strTrackName.c_str());
+
+		webrtc::AudioSourceInterface* pVCamAudioTrackSource = pVCamAudioTrack->GetSource();
+
+		if (pVCamAudioTrackSource != nullptr) {
+
+			std::shared_ptr<WebRTCAudioTrackSink> pWebRTCAudioTrackSink = std::make_shared<WebRTCAudioTrackSink>(strTrackName);
+			pWebRTCAudioTrackSink->RegisterObserver(this);
+			m_webRTCAudioTrackSinks[strTrackName] = pWebRTCAudioTrackSink;
+
+			pVCamAudioTrackSource->AddSink(pWebRTCAudioTrackSink.get());
+
+		}
+	}
+
 	// Chrome Video track
 	auto pVideoTrack = pMediaStreamInterface->FindVideoTrack(kChromeVideoLabel);
 	if (pVideoTrack != nullptr) {
