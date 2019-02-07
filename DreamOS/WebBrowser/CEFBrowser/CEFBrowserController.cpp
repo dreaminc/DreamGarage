@@ -410,6 +410,7 @@ RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, in
 			frames,
 			channels,
 			bitsPerSample,
+			48000,		// TODO: Should bubble down from CEF or something
 			pNewDataBuffer
 			//pDataBuffer
 		);

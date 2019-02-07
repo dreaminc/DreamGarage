@@ -42,9 +42,9 @@ WebRTCTestSuite::~WebRTCTestSuite() {
 RESULT WebRTCTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestWebRTCMultiPeer());
-
 	CR(AddTestWebRTCAudio());
+
+	CR(AddTestWebRTCMultiPeer());
 
 	CR(AddTestWebRTCVideoStream());
 
@@ -441,6 +441,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		public CloudController::UserObserver,
 		public DreamBrowserObserver
 	{
+		DreamOS *pDreamOS = nullptr;
+
 		CloudController *pCloudController = nullptr;
 		UserController *pUserController = nullptr;
 
@@ -562,13 +564,18 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			
 			DEBUG_LINEOUT("OnAudioData: %s", strAudioTrackLabel.c_str());
 
+			CN(pDreamOS);
+
 			if (strAudioTrackLabel == kUserAudioLabel) {
+
+				//AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
+				//CR(pDreamOS->GetDreamSoundSystem()->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, 1));
 
 				if (pXAudioSpatialSoundObject1 != nullptr) {
 					// Do I need to copy the buffer over (getting over written maybe)
 					int16_t *pInt16Soundbuffer = new int16_t[frames];
 					memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
-
+				
 					if (pInt16Soundbuffer != nullptr) {
 						CR(pXAudioSpatialSoundObject1->PushMonoAudioBuffer((int)frames, pInt16Soundbuffer));
 					}
@@ -576,15 +583,18 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			}
 			else if (strAudioTrackLabel == kChromeAudioLabel) {
 				
-				if (pXAudioSpatialSoundObject1 != nullptr) {
-					// Do I need to copy the buffer over (getting over written maybe)
-					int16_t *pInt16Soundbuffer = new int16_t[frames];
-					memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
-				
-					if (pInt16Soundbuffer != nullptr) {
-						CR(pXAudioSpatialSoundObject2->PushMonoAudioBuffer((int)frames, pInt16Soundbuffer));
-					}
-				}
+				AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
+				CR(pDreamOS->GetDreamSoundSystem()->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, 0));
+
+				//if (pXAudioSpatialSoundObject1 != nullptr) {
+				//	// Do I need to copy the buffer over (getting over written maybe)
+				//	int16_t *pInt16Soundbuffer = new int16_t[frames];
+				//	memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
+				//
+				//	if (pInt16Soundbuffer != nullptr) {
+				//		CR(pXAudioSpatialSoundObject2->PushMonoAudioBuffer((int)frames, pInt16Soundbuffer));
+				//	}
+				//}
 			}
 
 		Error:
@@ -730,11 +740,13 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 		CN(m_pDreamOS);
 
+		pTestContext->pDreamOS = m_pDreamOS;
+
 		// Objects 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
 		// TODO: Why does shit explode with no objects in scene
-		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		//auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
 
 		// Command Line Manager
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
@@ -747,11 +759,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		// This presents a timing issue if it works 
 		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
 		CN(pTestContext->m_pBrowserQuad);
+		pTestContext->m_pBrowserQuad->FlipUVHorizontal();
 		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
 		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
 
 		// Browser
-		if (testUserNumber == 10) {
+		if (testUserNumber == 2) {
 			pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 			CN(pTestContext->m_pWebBrowserManager);
 			CR(pTestContext->m_pWebBrowserManager->Initialize());
@@ -761,6 +774,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
 			CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
 			CRM(pTestContext->m_pDreamBrowser->RegisterObserver(pTestContext), "Failed to register browser observer");
+			pTestContext->m_pDreamBrowser->SetForceObserverAudio(true);
 
 			// Set up the view
 			//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
@@ -806,11 +820,10 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 		DEBUG_LINEOUT("Initializing Cloud Controller");
 
-		
+		CR(m_pDreamOS->UnregisterSoundSystemObserver());
 		CR(m_pDreamOS->RegisterSoundSystemObserver(pTestContext));
 
 		{
-
 			point ptPosition = point(-2.0f, 0.0f, -radius);
 			vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
 			vector vListenerDireciton = vector(0.0f, 0.0f, -1.0f);

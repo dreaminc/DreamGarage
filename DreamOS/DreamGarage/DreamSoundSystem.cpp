@@ -88,11 +88,13 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 		}
 	}
 
+	/*
 	// Slight race condition with mixdown buffer
 	// and capture - good to initialize this before we
 	// start the device
 	CR(InitalizeMixdownSendBuffer());
 	CR(StartMixdownServer());
+	*/
 
 	{
 		// WASAPI Capture Client
@@ -206,10 +208,11 @@ RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptur
 	//*/
 
 	// This pushes the mic input into the chromium mixdown bridge
+	/*
 	AudioPacket pendingAudioPacket;
 	pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket, false);
-
 	PushAudioPacketToMixdown(numFrames, pendingAudioPacket);
+	*/
 
 	/*
 	// TEST: Useful for pass through testing of the pipe

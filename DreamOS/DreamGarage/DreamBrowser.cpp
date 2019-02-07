@@ -916,7 +916,7 @@ RESULT DreamBrowser::AudioProcess() {
 
 					//DEBUG_LINEOUT("pending %d", (int)pendingBytes)
 
-					lastUpdateTime = timeNow - std::chrono::microseconds(diffVal - 10);
+					lastUpdateTime = timeNow - std::chrono::milliseconds(diffVal - 10);
 
 					AudioPacket pendingAudioPacket;
 
