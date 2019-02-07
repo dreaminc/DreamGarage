@@ -635,7 +635,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pUserController);
 
 	// DEBUG:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	{
 		m_fHasCredentials = true;
 
@@ -664,7 +664,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->RequestAccessToken(strDebugRefreshToken);
 		}
 	}
-#endif
+//#endif
 
 	// Initial step of login flow:
 	DOSLOG(INFO, "Checking API connection (internet access)");
@@ -1554,6 +1554,8 @@ Error:
 RESULT DreamGarage::OnReceiveCameraPlacement(long userID) {
 	RESULT r = R_PASS;
 
+	sphere *pSphere = nullptr;
+	pSphere->SetPosition(0.0f, 0.0f, 0.0f);
 	CR(m_pDreamUserControlArea->GetVCam()->SetIsReceivingCameraPlacement(true));
 
 Error:

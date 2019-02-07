@@ -888,6 +888,7 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 				InteractionEventType type = INTERACTION_EVENT_SELECT_DOWN;
 				InteractionObjectEvent interactionEvent(type, pObject);
 
+
 				CR(NotifySubscribers(pObject, type, &interactionEvent));
 			}
 		} break;
