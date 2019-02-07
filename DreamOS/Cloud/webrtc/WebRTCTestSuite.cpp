@@ -568,18 +568,18 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 			if (strAudioTrackLabel == kUserAudioLabel) {
 
-				//AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
-				//CR(pDreamOS->GetDreamSoundSystem()->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, 1));
+				AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
+				CR(pDreamOS->GetDreamSoundSystem()->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, 1));
 
-				if (pXAudioSpatialSoundObject1 != nullptr) {
-					// Do I need to copy the buffer over (getting over written maybe)
-					int16_t *pInt16Soundbuffer = new int16_t[frames];
-					memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
-				
-					if (pInt16Soundbuffer != nullptr) {
-						CR(pXAudioSpatialSoundObject1->PushMonoAudioBuffer((int)frames, pInt16Soundbuffer));
-					}
-				}
+				//if (pXAudioSpatialSoundObject1 != nullptr) {
+				//	// Do I need to copy the buffer over (getting over written maybe)
+				//	int16_t *pInt16Soundbuffer = new int16_t[frames];
+				//	memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
+				//
+				//	if (pInt16Soundbuffer != nullptr) {
+				//		CR(pXAudioSpatialSoundObject1->PushMonoAudioBuffer((int)frames, pInt16Soundbuffer));
+				//	}
+				//}
 			}
 			else if (strAudioTrackLabel == kChromeAudioLabel) {
 				

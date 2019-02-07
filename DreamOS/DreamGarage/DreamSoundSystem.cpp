@@ -88,13 +88,11 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 		}
 	}
 
-	/*
 	// Slight race condition with mixdown buffer
 	// and capture - good to initialize this before we
 	// start the device
 	CR(InitalizeMixdownSendBuffer());
 	CR(StartMixdownServer());
-	*/
 
 	{
 		// WASAPI Capture Client
