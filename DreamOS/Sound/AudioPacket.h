@@ -14,8 +14,9 @@ public:
 	AudioPacket();
 	AudioPacket(int frames, int channels, int bitsPerSample, uint8_t* pDataBuffer);
 	AudioPacket(int frames, int channels, int bitsPerSample, int samplingRate, uint8_t* pDataBuffer);
+	AudioPacket(int frames, int channels, int bitsPerSample, int samplingRate, sound::type soundType, uint8_t* pDataBuffer);
 	
-	~AudioPacket();
+	~AudioPacket() = default;
 
 	uint8_t *GetDataBuffer() const {
 		return m_pDataBuffer;

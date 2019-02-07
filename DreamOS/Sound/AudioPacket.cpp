@@ -31,8 +31,15 @@ AudioPacket::AudioPacket(int frames, int channels, int bitsPerSample, int sampli
 	m_pDataBuffer_n = frames * channels * bitsPerSample;
 }
 
-AudioPacket::~AudioPacket(){
-	// empty for now
+AudioPacket::AudioPacket(int frames, int channels, int bitsPerSample, int samplingRate, sound::type soundType, uint8_t* pDataBuffer) :
+	m_frames(frames),
+	m_channels(channels),
+	m_bitsPerSample(bitsPerSample),
+	m_samplingRate(samplingRate),
+	m_soundType(soundType),
+	m_pDataBuffer(pDataBuffer)
+{
+	m_pDataBuffer_n = frames * channels * bitsPerSample;
 }
 
 RESULT AudioPacket::DeleteBuffer() {
@@ -40,6 +47,11 @@ RESULT AudioPacket::DeleteBuffer() {
 		free(m_pDataBuffer);
 		m_pDataBuffer = nullptr;
 	}
+
+	m_frames = 0;
+	m_channels = 0;
+	m_bitsPerSample = 0;
+	m_pDataBuffer_n = 0;
 
 	return R_PASS;
 }

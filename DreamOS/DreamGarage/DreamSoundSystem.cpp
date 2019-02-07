@@ -500,40 +500,61 @@ Error:
 
 AudioPacket DreamSoundSystem::GetPendingMixdownAudioPacket(int numFrames) {
 
-	AudioPacket pendingAudioPacket;
+	// Create a sink audio packet to mix into
 
-	// Try with the browser target - this should work immediately 
-	auto pBufferTarget = m_pMixdownBuffers[DreamSoundSystem::MIXDOWN_TARGET::BROWSER_0];
+	int numChannels = 2;
+	int samplingRate = 44100;
+	size_t pDataBuffer_n = numFrames * sizeof(int16_t) * numChannels;
+	int16_t *pDataBuffer = (int16_t*)malloc(pDataBuffer_n);
+	memset(pDataBuffer, 0, pDataBuffer_n);
+	
+	AudioPacket pendingAudioPacket(numFrames, numChannels, sizeof(int16_t), samplingRate, sound::type::SIGNED_16_BIT, (uint8_t*)(pDataBuffer));
 
-	pBufferTarget->LockBuffer();
-
-	{
-		// This is non mix-down
-		pBufferTarget->GetAudioPacket(numFrames, &pendingAudioPacket);
-	}
-
-	pBufferTarget->UnlockBuffer();
-
-
-	// Try with the browser target - this should work immediately 
-	//for (int i = (int)(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_MIC]); i < (int)(DreamSoundSystem::MIXDOWN_TARGET::INVALID); i++) {
-	for (int i = (int)(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_MIC); i < (int)(DreamSoundSystem::MIXDOWN_TARGET::INVALID); i++) {
-		AudioPacket tempMonoAudioPacket;
+	// The Stereo channels
+	for (int i = (int)(DreamSoundSystem::MIXDOWN_TARGET::BROWSER_0); i < (int)(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_MIC); i++) {
+		
 		auto pBufferTarget = m_pMixdownBuffers[DreamSoundSystem::MIXDOWN_TARGET(i)];
 
-		pBufferTarget->LockBuffer();
+		if (pBufferTarget->NumPendingFrames() >= numFrames) {
 
-		{
-			// This is non mix-down
-			pBufferTarget->GetAudioPacket(numFrames, &tempMonoAudioPacket);
+			AudioPacket tempMonoAudioPacket;
+
+			pBufferTarget->LockBuffer();
+
+			{
+				// This is non mix-down
+				pBufferTarget->GetAudioPacket(numFrames, &tempMonoAudioPacket);
+			}
+
+			pBufferTarget->UnlockBuffer();
+
+			pendingAudioPacket.MixInAudioPacket(tempMonoAudioPacket);
+
+			tempMonoAudioPacket.DeleteBuffer();
 		}
+	}
 
-		pBufferTarget->UnlockBuffer();
+	// The mono channels
+	for (int i = (int)(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_MIC); i < (int)(DreamSoundSystem::MIXDOWN_TARGET::INVALID); i++) {
+		AudioPacket tempMonoAudioPacket;
+		
+		auto pBufferTarget = m_pMixdownBuffers[DreamSoundSystem::MIXDOWN_TARGET(i)];
+		 
+		if (pBufferTarget->NumPendingFrames() >= numFrames) {
 
-		pendingAudioPacket.MixInMonoAudioPacket(tempMonoAudioPacket);
+			pBufferTarget->LockBuffer();
 
-		// temp
-		i = (int)(DreamSoundSystem::MIXDOWN_TARGET::INVALID);
+			{
+				// This is non mix-down
+				pBufferTarget->GetAudioPacket(numFrames, &tempMonoAudioPacket);
+			}
+
+			pBufferTarget->UnlockBuffer();
+
+			pendingAudioPacket.MixInMonoAudioPacket(tempMonoAudioPacket);
+
+			tempMonoAudioPacket.DeleteBuffer();
+		}
 	}
 
 	return pendingAudioPacket;
@@ -589,6 +610,8 @@ RESULT DreamSoundSystem::MixdownProcess() {
 
 				m_pNamedPipeServer->SendMessage((void*)(pDataBuffer), pDataBuffer_n);
 			}
+
+			pendingAudioPacket.DeleteBuffer();
 		}
 
 		// Sleep the thread for 10 ms
