@@ -85,8 +85,8 @@ public:
 
 		command_line->AppendSwitchWithValue(L"--audio-buffer-size", L"480");
 
-		//command_line->AppendSwitch(L"enable-media-stream");
-		//command_line->AppendSwitch(L"use-dream-device-for-media-stream");
+		command_line->AppendSwitch(L"enable-media-stream");
+		command_line->AppendSwitch(L"use-dream-device-for-media-stream");
 
 		return;
 	}

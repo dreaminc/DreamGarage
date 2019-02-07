@@ -73,8 +73,8 @@ public:
 		//command_line->AppendSwitch(L"mute-audio");
 		command_line->AppendSwitch(L"enable-widevine-cdm");
 
-		//command_line->AppendSwitch(L"enable-media-stream");
-		//command_line->AppendSwitch(L"use-dream-device-for-media-stream");
+		command_line->AppendSwitch(L"enable-media-stream");
+		command_line->AppendSwitch(L"use-dream-device-for-media-stream");
 
 		return;
 	}
