@@ -48,6 +48,7 @@ RESULT WebRTCAudioDeviceModule::WebRTCADMProcess() {
 	while (m_fRunning) {
 
 		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+		static bool fSlept = false;
 
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 		auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
@@ -87,11 +88,17 @@ RESULT WebRTCAudioDeviceModule::WebRTCADMProcess() {
 				m_msOutputDelay = diffVal - 10;
 			}
 
+			fSlept = false;
 		}
 
-		std::chrono::system_clock::time_point timeNow2 = std::chrono::system_clock::now();
-		auto diffVal2 = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
-		Sleep(1);
+		//std::chrono::system_clock::time_point timeNow2 = std::chrono::system_clock::now();
+		//auto diffVal2 = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow2 - lastUpdateTime).count();
+		
+		if (!fSlept) {
+			Sleep(8);
+			fSlept = true;
+		}
+		//Sleep(1);
 	}
 
 Error:
