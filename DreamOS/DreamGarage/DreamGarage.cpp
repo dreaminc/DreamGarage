@@ -1353,6 +1353,14 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 			CR(PushAudioPacketToMixdown((int)frames, pendingPacket));
 		}
 	}
+	else if (strAudioTrackLabel == kVCamAudiolabel) {
+		if (m_pCameraVideoStreamPeerConnectionSource != nullptr && m_pCameraVideoStreamPeerConnectionSource->GetPeerUserID() == pPeerConnection->GetPeerUserID()) {
+			int channel = 0;
+
+			AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
+			CR(m_pDreamSoundSystem->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, channel));
+		}
+	}
 
 Error:
 	return r;
