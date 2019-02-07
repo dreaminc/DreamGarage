@@ -14,6 +14,7 @@
 #include "DreamGarage/AudioDataMessage.h"
 
 #include "Core/Utilities.h"
+#include "Primitives/camera.h"
 
 DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext) :
 	DreamApp<DreamPeerApp>(pDOS, pContext),
@@ -37,16 +38,6 @@ RESULT DreamPeerApp::InitializeApp(void *pContext) {
 	SetAppName("DreamPeerApp");
 	SetAppDescription("A Dream User App");
 
-
-	m_pUIObjectComposite = GetComposite()->MakeComposite();
-	m_pUIObjectComposite->SetPosition(GetComposite()->GetPosition(true));
-	GetDOS()->AddObjectToUIGraph(m_pUIObjectComposite.get(), SandboxApp::PipelineType::MAIN);
-
-	m_pUserLabelComposite = m_pUIObjectComposite->MakeComposite();
-	m_pUserLabelComposite = m_pUIObjectComposite->AddComposite();
-
-	DOSLOG(INFO, "DreamPeerApp object composites created");
-
 Error:
 	return r;
 }
@@ -63,12 +54,11 @@ Error:
 RESULT DreamPeerApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
-	m_pUserModel->RemoveMouth();
-	m_pUserModel = nullptr;
+	if (m_pUserModel != nullptr) {
+		m_pUserModel->RemoveMouth();
 
-	GetDOS()->RemoveObjectFromUIGraph(m_pUIObjectComposite.get());
-
-	m_pUIObjectComposite = nullptr;
+		GetDOS()->RemoveObjectFromUIGraph(m_pUserModel->GetUserObjectComposite().get());
+	}
 
 Error:
 	return r;
@@ -90,169 +80,27 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		CN(m_pSpatialSoundObject);
 	}
 
-	if (m_pNameBackground == nullptr && m_pTextUserName != nullptr && !m_pTextUserName->IsDirty()) {
-		CR(InitializeUserNameLabel());
-	}
-
-	if (m_pTextUserName == nullptr && m_strScreenName != "") {
-		CR(InitializeUserNameText());
-	}
-	
-	
-	// update user label position
 	if (m_pUserModel != nullptr) {
+		m_pUserModel->Update();
+		m_pUserModel->UpdateUserNameLabelPlacement(GetDOS()->GetCamera());
 
-		auto pHead = m_pUserModel->GetHead();
-
-		BoundingBox* pOuterBoundingVolume = dynamic_cast<BoundingBox*>(pHead->GetBoundingVolume().get());
-		CN(pOuterBoundingVolume);
-
-		float outerDistance = pOuterBoundingVolume->GetFarthestPointInDirection(vector(0.0f, 1.0f, 0.0f)).y();
-
-		// TODO: test pOuter->GetO * pName->GetO
-		quaternion qNameComposite = m_pUIObjectComposite->GetOrientation();
-		qNameComposite.Reverse();
-		qNameComposite = qNameComposite * pOuterBoundingVolume->GetOrientation(true);
-
-		point ptOrigin = RotationMatrix(qNameComposite) * ScalingMatrix(pOuterBoundingVolume->GetScale(false)) * vector(pOuterBoundingVolume->GetCenter());
-		ptOrigin += pHead->GetOrigin();
-
-		m_pUserLabelComposite->SetPosition(point(ptOrigin.x(), outerDistance, ptOrigin.z()));
-
-		m_pUserModel->UpdateMouthPose();
+		// 
+		m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT)->GetPhantomModel()->SetVisible(false);
+		m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT)->GetPhantomModel()->SetVisible(false);
 	}
-
-	if (m_pPendingPhotoTextureBuffer != nullptr) {
-		CR(UpdateProfilePhoto());
-	}
-	
-Error:
-	return r;
-}
-
-RESULT DreamPeerApp::InitializeUserNameText() {
-	RESULT r = R_PASS;
-
-	if (m_pFont == nullptr) {
-		m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-		CN(m_pFont);
-		m_pFont->SetLineHeight(0.06f);
-	}
-
-	m_pTextUserName = std::shared_ptr<text>(GetDOS()->MakeText(
-		m_pFont,
-		m_strScreenName,
-		0.4,
-		LABEL_HEIGHT,
-		text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
-
-	CN(m_pTextUserName);
-
-	m_pTextUserName->SetVisible(false);
-
-	m_pTextUserName->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
-
-	CR(m_pUserLabelComposite->AddObject(m_pTextUserName));
-	m_pTextUserName->SetMaterialDiffuseColor(m_hiddenColor);
-
-	DOSLOG(INFO, "DreamPeerApp text object created");
 
 Error:
 	return r;
-}
-
-RESULT DreamPeerApp::InitializeUserNameLabel() {
-	RESULT r = R_PASS;
-
-	vector vCameraDirection;
-
-
-	vCameraDirection = GetComposite()->GetPosition(true) - GetDOS()->GetCamera()->GetPosition(true);
-	vCameraDirection = vector(vCameraDirection.x(), 0.0f, vCameraDirection.z()).Normal();
-
-	float hasPhoto = HasProfilePhoto() ? LABEL_PHOTO_WIDTH : 0;
-	// TODO: switch on profile picture
-	float totalWidth = m_pTextUserName->GetWidth() + hasPhoto + LABEL_GAP_WIDTH * 2.0f;
-	float photoX = -totalWidth/2.0f + LABEL_PHOTO_WIDTH / 2.0f;
-	float leftGapX = -totalWidth/2.0f + hasPhoto + LABEL_GAP_WIDTH / 2.0f;
-	float textboxX = -totalWidth / 2.0f + hasPhoto + LABEL_GAP_WIDTH + m_pTextUserName->GetWidth() / 2.0f;
-	float rightGapX = totalWidth / 2.0f - LABEL_GAP_WIDTH / 2.0f;
-
-	float backgroundDepth = -0.005f;
-
-	CN(m_pUserLabelComposite);
-	m_pUserLabelComposite->SetVisible(true);
-	m_pUserLabelComposite->SetMaterialDiffuseColor(m_backgroundColor);
-
-	if (HasProfilePhoto()) {
-
-		CR(PendProfilePhotoDownload());
-		m_pPhotoQuad = m_pUserLabelComposite->AddQuad(LABEL_PHOTO_WIDTH, LABEL_HEIGHT);
-		CN(m_pPhotoQuad);
-		m_pPhotoQuad->SetPosition(point(photoX, NAMETAG_HEIGHT, backgroundDepth));
-		m_pPhotoQuad->SetDiffuseTexture(m_pDOS->MakeTexture(texture::type::TEXTURE_2D, &k_wstrPhoto[0]));
-		m_pPhotoQuad->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
-		m_pPhotoQuad->SetMaterialDiffuseColor(m_visibleColor);
-	}
-
-	m_pLeftGap = m_pUserLabelComposite->AddQuad(LABEL_GAP_WIDTH, LABEL_HEIGHT);
-	CN(m_pLeftGap);
-	m_pLeftGap->SetPosition(point(leftGapX, NAMETAG_HEIGHT, backgroundDepth));
-
-	if (HasProfilePhoto()) {
-		m_pLeftGap->SetDiffuseTexture(m_pDOS->MakeTexture(texture::type::TEXTURE_2D, &k_wstrLeft[0]));
-	} 
-	else {
-		m_pLeftGap->SetDiffuseTexture(m_pDOS->MakeTexture(texture::type::TEXTURE_2D, &k_wstrLeftEmpty[0]));
-	}
-
-	m_pLeftGap->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
-	m_pLeftGap->SetMaterialDiffuseColor(m_backgroundColor);
-
-	m_pNameBackground = m_pUserLabelComposite->AddQuad(m_pTextUserName->GetWidth(), LABEL_HEIGHT);
-	CN(m_pNameBackground);
-
-	m_pTextBoxTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, &k_wstrMiddle[0]);
-	m_pNameBackground->SetPosition(point(textboxX, NAMETAG_HEIGHT, backgroundDepth));
-	m_pNameBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
-	m_pNameBackground->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
-	m_pNameBackground->SetMaterialDiffuseColor(m_backgroundColor);
-
-	m_pTextUserName->SetPosition(point(textboxX, NAMETAG_HEIGHT-0.005f, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
-
-	m_pRightGap = m_pUserLabelComposite->AddQuad(LABEL_GAP_WIDTH, LABEL_HEIGHT);
-	CN(m_pRightGap);
-	m_pRightGap->SetPosition(point(rightGapX, NAMETAG_HEIGHT, backgroundDepth));
-	m_pRightGap->SetDiffuseTexture(m_pDOS->MakeTexture(texture::type::TEXTURE_2D, &k_wstrRight[0]));
-	m_pRightGap->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
-	m_pRightGap->SetMaterialDiffuseColor(m_backgroundColor);
-
-	if (GetDOS()->GetSandboxConfiguration().f3rdPersonCamera) {
-		m_pUserLabelComposite->SetVisible(false);
-	}
-	else {
-		m_pUserLabelComposite->SetVisible(true);
-	}
-
-	DOSLOG(INFO, "DreamPeerApp username label created");
-
-Error:
-	return r;
-}
-
-RESULT DreamPeerApp::SetUsernameAnimationDuration(float animationDuration) {
-	m_userNameAnimationDuration = animationDuration;
-	return R_PASS;
 }
 
 std::shared_ptr<composite> DreamPeerApp::GetUserLabelComposite() {
-	return m_pUIObjectComposite;
+	return m_pUserModel->GetUserLabelComposite();
 }
 
 RESULT DreamPeerApp::SetUserLabelPosition(point ptPosition) {
 	RESULT r = R_PASS;
 
-	m_pUIObjectComposite->SetPosition(ptPosition);
+	m_pUserModel->SetUserLabelPosition(ptPosition);
 
 	return r;
 }
@@ -260,122 +108,37 @@ RESULT DreamPeerApp::SetUserLabelPosition(point ptPosition) {
 RESULT DreamPeerApp::SetUserLabelOrientation(quaternion qOrientation) {
 	RESULT r = R_PASS;
 
-	m_pUIObjectComposite->SetOrientation(qOrientation);
+	m_pUserModel->SetUserLabelOrientation(qOrientation);
 
 	return r;
 }
 
-bool DreamPeerApp::HasProfilePhoto() {
-	return m_strProfilePhotoURL != "";
+RESULT DreamPeerApp::UpdateLabelOrientation(camera *pCamera) {
+	RESULT r = R_PASS;
+
+	CNR(m_pUserModel, R_SKIPPED);
+	CR(m_pUserModel->UpdateUserNameLabelPlacement(pCamera));
+
+Error:
+	return r;
 }
 
 RESULT DreamPeerApp::HideUserNameField() {
 	RESULT r = R_PASS;
 	
-	auto fnStartCallback = [&](void *pContext) {
-		return R_PASS;
-	};
+	CNR(m_pUserModel, R_SKIPPED);
+	CR(m_pUserModel->HideUserNameField());
 
-	auto fnEndCallback = [&](void *pContext) {
-		m_pUIObjectComposite->SetVisible(false);
-		return R_PASS;
-	};
-	/*
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pTextUserName.get(),
-		m_hiddenColor,
-		0.5,
-		AnimationCurveType::LINEAR,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
-	//*/
-	///*
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pTextUserName.get(),
-		m_hiddenColor,
-		m_userNameAnimationDuration,
-		AnimationCurveType::SIGMOID,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
-
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pUserLabelComposite.get(),
-		m_hiddenColor,
-		m_userNameAnimationDuration,
-		AnimationCurveType::SIGMOID,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
-	//*/
 Error:
-	return r;
-}
-
-RESULT DreamPeerApp::ClearAssets() {
-	RESULT r = R_PASS;
-
 	return r;
 }
 
 RESULT DreamPeerApp::ShowUserNameField() {
 	RESULT r = R_PASS;
 
-	auto fnStartCallback = [&](void *pContext) {
-		m_pUIObjectComposite->SetVisible(true);
-		return R_PASS;
-	};
+	CNR(m_pUserModel, R_SKIPPED);
+	CR(m_pUserModel->ShowUserNameField());
 
-	auto fnEndCallback = [&](void *pContext) {
-
-		return R_PASS;
-	};	
-
-	m_pUserLabelComposite->SetVisible(true);
-	m_pUIObjectComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetDOS()->GetCamera()->GetLookVectorXZ()));
-	//* quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
-	/*
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pNameComposite.get(),
-		m_visibleColor,
-		0.5,
-		AnimationCurveType::LINEAR,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
-	//*/
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pUserLabelComposite.get(),
-		m_backgroundColor,
-		m_userNameAnimationDuration,
-		AnimationCurveType::SIGMOID,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
-
-	/*
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pTextUserName.get(),
-		m_visibleColor,
-		m_userNameAnimationDuration,
-		AnimationCurveType::SIGMOID,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
-	//*/
 Error:
 	return r;
 }
@@ -460,55 +223,6 @@ Error:
 	return r;
 }
 
-RESULT DreamPeerApp::PendProfilePhotoDownload() {
-	RESULT r = R_PASS;
-
-	std::string strAuthorizationToken;
-
-	auto pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-	auto pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
-	//auto strHeaders = HTTPController::ContentHttp();
-
-	CN(pUserControllerProxy);
-	CN(pHTTPControllerProxy);
-
-	CR(pHTTPControllerProxy->RequestFile(m_strProfilePhotoURL, std::vector<std::string>(), "", std::bind(&DreamPeerApp::OnProfilePhotoDownload, this, std::placeholders::_1, std::placeholders::_2), nullptr));
-
-Error:
-	return r;
-}
-
-RESULT DreamPeerApp::OnProfilePhotoDownload(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext) {
-	RESULT r = R_PASS;
-
-	CN(pBufferVector);
-	m_pPendingPhotoTextureBuffer = pBufferVector;
-
-Error:
-	return r;
-}
-
-RESULT DreamPeerApp::UpdateProfilePhoto() {
-	RESULT r = R_PASS;
-
-	texture *pTexture = nullptr;
-
-	CN(m_pPendingPhotoTextureBuffer);
-	uint8_t* pBuffer = &(m_pPendingPhotoTextureBuffer->operator[](0));
-	size_t pBuffer_n = m_pPendingPhotoTextureBuffer->size();
-
-	pTexture = GetDOS()->MakeTextureFromFileBuffer(texture::type::TEXTURE_2D, pBuffer, pBuffer_n);
-	CN(pTexture);
-
-	m_pPhotoQuad->SetDiffuseTexture(pTexture);
-
-Error:
-	if (m_pPendingPhotoTextureBuffer != nullptr) {
-		m_pPendingPhotoTextureBuffer = nullptr;
-	}
-	return r;
-}
-
 std::shared_ptr<user> DreamPeerApp::GetUserModel() {
 	return m_pUserModel;
 }
@@ -524,8 +238,14 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 	m_fPendingAssignedUserModel = true;
 	CR(m_pUserModel->UpdateAvatarModelWithID(m_avatarModelId));
 
+	m_pUserModel->InitializeObject();
+	GetDOS()->AddObjectToUIGraph(m_pUserModel->GetUserObjectComposite().get(), SandboxApp::PipelineType::MAIN | SandboxApp::PipelineType::AUX);
+
+	m_pUserModel->SetScreenName(m_strScreenName);
+	m_pUserModel->SetProfilePhoto(m_strProfilePhotoURL);
+
 	//m_pUserLabelComposite->SetVisible(true);
-	m_pUIObjectComposite->SetVisible(true);
+	m_pUserModel->GetUserLabelComposite()->SetVisible(true);
 	//CR(ShowUserNameField());
 
 	GetDOS()->AddObjectToUIGraph(m_pUserModel->GetMouth().get(), SandboxApp::PipelineType::AUX);
@@ -560,8 +280,8 @@ RESULT DreamPeerApp::SetVisible(bool fVisible) {
 		CR(m_pUserModel->GetMouth()->SetVisible(fVisible));
 	}
 	
-	if (m_pUIObjectComposite != nullptr) {
-		m_pUIObjectComposite->SetVisible(fVisible, false);
+	if (m_pUserModel->GetUserLabelComposite() != nullptr) {
+		m_pUserModel->GetUserLabelComposite()->SetVisible(fVisible, false);
 	}
 
 	pHand = m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT);
@@ -581,12 +301,7 @@ bool DreamPeerApp::IsVisible() {
 }
 
 bool DreamPeerApp::IsUserNameVisible() {
-	if (m_pTextUserName != nullptr && m_pNameBackground != nullptr) {
-		return m_pTextUserName->IsVisible() && m_pNameBackground->IsVisible();
-	}
-	else {
-		return false;
-	}
+	return m_pUserModel != nullptr && m_pUserModel->IsUserNameVisible();
 }
 
 RESULT DreamPeerApp::SetPosition(const point& ptPosition) {

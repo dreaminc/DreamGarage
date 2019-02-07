@@ -319,6 +319,13 @@ protected:
 
 	RESULT CheckDreamPeerAppStates();
 
+public:
+	virtual CameraNode *GetAuxCameraNode() {
+		return nullptr;
+	}
+
+	RESULT UpdateAllPeerLabelOrientations(camera *pCamera);
+
 private:
 	std::map<long, std::shared_ptr<DreamPeerApp>> m_dreamPeerApps;
 
