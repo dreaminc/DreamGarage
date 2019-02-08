@@ -109,7 +109,7 @@ private:
 
 private:
 	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
-	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 0.75f);
+	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 1.0f);
 	color m_visibleColor = color(1.0f, 1.0f, 1.0f, 1.0f);
 
 	std::shared_ptr<std::vector<uint8_t>> m_pPendingPhotoTextureBuffer;
