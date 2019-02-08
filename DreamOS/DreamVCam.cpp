@@ -700,7 +700,13 @@ RESULT DreamVCam::StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentSha
 	m_pCameraQuadBackground->SetVisible(true);
 
 	//GetActiveSource may be a problem
-	m_pCameraQuadTexture = m_pParentApp->GetActiveCameraSource()->GetSourceTexture();
+	if (m_fAutoOpened) {
+		m_pCameraQuadTexture = m_pParentApp->GetActiveCameraSource()->GetSourceTexture();
+	}
+	else {
+		m_pCameraQuadTexture = m_pParentApp->GetActiveSource()->GetSourceTexture();
+	}
+
 	m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);	
 
 Error:
