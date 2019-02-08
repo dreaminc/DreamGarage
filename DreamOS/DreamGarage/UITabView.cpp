@@ -37,14 +37,22 @@ RESULT UITabView::Update() {
 		CR(SelectTab(selectTabArgs.first, selectTabArgs.second));
 	}
 
-	if (m_pTabPendingRemoval != nullptr && m_fAllowObjectRemoval) {
-		m_pScrollView->RemoveChild(m_pTabPendingRemoval);
+	//if (m_pTabPendingRemoval != nullptr && m_fAllowObjectRemoval) {
+	if (!m_tabsPendingRemoval.empty() && m_fAllowObjectRemoval) {
+		while (!m_tabsPendingRemoval.empty()) {
+			auto pTabPendingRemoval = m_tabsPendingRemoval.front();
+			m_pScrollView->RemoveChild(pTabPendingRemoval);
 
-		m_pDreamOS->UnregisterInteractionObject(m_pTabPendingRemoval.get());
-		m_pDreamOS->RemoveObjectFromInteractionGraph(m_pTabPendingRemoval.get());
-		m_pDreamOS->RemoveObjectFromUIGraph(m_pTabPendingRemoval.get());
+			m_pDreamOS->UnregisterInteractionObject(pTabPendingRemoval.get());
+			m_pDreamOS->RemoveObjectFromInteractionGraph(pTabPendingRemoval.get());
+			m_pDreamOS->RemoveObjectFromUIGraph(pTabPendingRemoval.get());
 
-		m_pTabPendingRemoval = nullptr;
+			m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(pTabPendingRemoval.get());
+
+			pTabPendingRemoval = nullptr;
+
+			m_tabsPendingRemoval.pop();
+		}
 		m_fAllowObjectRemoval = false;
 	}
 
@@ -185,7 +193,8 @@ std::shared_ptr<DreamContentSource> UITabView::RemoveContent() {
 		m_sources.pop_back();
 		m_tabButtons.pop_back();
 
-		m_pTabPendingRemoval = pButtonToRemove;
+		//m_pTabPendingRemoval = pButtonToRemove;
+		m_tabsPendingRemoval.push(pButtonToRemove);
 		HideTab(pButtonToRemove.get());
 
 		for (auto pButton : m_tabButtons) {
@@ -222,7 +231,8 @@ RESULT UITabView::RemoveTab(std::shared_ptr<DreamContentSource> pContent) {
 		m_sources.erase(itSource);
 	}
 
-	m_pTabPendingRemoval = pButtonToRemove;
+	//m_pTabPendingRemoval = pButtonToRemove;
+	m_tabsPendingRemoval.push(pButtonToRemove);
 	HideTab(pButtonToRemove.get());
 
 Error:
@@ -262,7 +272,7 @@ RESULT UITabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 		auto pButton = m_tabButtons[i];
 		if (pButton.get() == pButtonContext) {
 
-			m_pTabPendingRemoval = pButton;
+			m_tabsPendingRemoval.push(pButton);
 			HideTab(pButton.get());
 
 			m_pParentApp->SetActiveSource(m_sources[i]);
@@ -399,8 +409,14 @@ RESULT UITabView::HideTab(UIButton *pTabButton) {
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 
+		/*
 		if (m_pTabPendingRemoval != nullptr) {
 			m_pTabPendingRemoval->SetVisible(false);
+			m_fAllowObjectRemoval = true;
+		}
+		//*/
+		if (!m_tabsPendingRemoval.empty()) {
+			m_tabsPendingRemoval.front()->SetVisible(false);
 			m_fAllowObjectRemoval = true;
 		}
 

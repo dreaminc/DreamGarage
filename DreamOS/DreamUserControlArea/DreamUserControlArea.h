@@ -186,6 +186,7 @@ public:
 	bool IsSharingScreen();
 
 	RESULT UpdateIsActive(bool fIsActive);
+	RESULT HandleCameraClosed();
 
 // Animations
 public:

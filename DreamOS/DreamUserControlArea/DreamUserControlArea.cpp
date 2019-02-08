@@ -1049,6 +1049,15 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::HandleCameraClosed() {
+	RESULT r = R_PASS;
+
+	CR(m_pUserControls->HandleCameraClose());
+
+Error:
+	return r;
+}
+
 RESULT DreamUserControlArea::ShutdownSource() {
 	RESULT r = R_PASS;
 
