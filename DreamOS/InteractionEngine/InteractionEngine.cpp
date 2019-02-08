@@ -175,6 +175,7 @@ RESULT InteractionEngine::UpdateAnimationQueue() {
 
 		m_tLastUpdate = tCurrent;
 		m_padInteractionEvent = InteractionObjectEvent(INTERACTION_EVENT_PAD_MOVE);
+		m_padInteractionEvent.m_state = ControllerState();
 	}
 	//*/
 
@@ -887,6 +888,7 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 
 				InteractionEventType type = INTERACTION_EVENT_SELECT_DOWN;
 				InteractionObjectEvent interactionEvent(type, pObject);
+
 
 				CR(NotifySubscribers(pObject, type, &interactionEvent));
 			}
