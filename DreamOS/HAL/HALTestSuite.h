@@ -9,7 +9,7 @@
 // This test suite should cover testing all functionality related to the
 // HAL (graphics) layer and interfaces.
 
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 #include <functional>
 #include <memory>
@@ -18,18 +18,22 @@
 
 class HALImp;
 
-class HALTestSuite : public TestSuite {
+class HALTestSuite : public DreamTestSuite {
 public:
 	HALTestSuite(DreamOS *pDreamOS);
-	~HALTestSuite();
+
+	~HALTestSuite() = default;
 
 	virtual RESULT AddTests() override;
 
 public:
 	// Note: This should eventually call the DreamGarageApp pipeline
 	// function rather than duplicating it
-	RESULT SetupSkyboxPipeline(std::string strRenderShaderName = "standard");
+	virtual RESULT SetupPipeline(std::string strRenderShaderName = "standard") override;
 
+	virtual RESULT SetupTestSuite() override;
+
+	// Skybox Test
 	RESULT AddTestSkybox();
 
 	// Shader Tests
@@ -77,6 +81,7 @@ public:
 	RESULT AddTestIrradianceMap();
 
 	RESULT TestNestedOBB();
+	RESULT TestNestedCompositesQauds();
 	RESULT AddTestRotation();
 
 	RESULT AddTestMouseDrag();

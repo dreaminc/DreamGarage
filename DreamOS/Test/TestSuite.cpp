@@ -6,10 +6,6 @@ TestSuite::TestSuite(std::string strName) :
 	ClearTests();
 }
 
-TestSuite::~TestSuite() {
-	// Empty
-}
-
 // TODO: this should be added when this is a stand alone module
 RESULT TestSuite::EndCurrentTest() {
 	return R_NOT_IMPLEMENTED;
@@ -31,6 +27,14 @@ Error:
 
 RESULT TestSuite::UpdateAndRunTests(void *pContext) {
 	RESULT r = R_PASS;
+
+	// This will run set up the first time
+	// TODO: Would be better for set up / tear down to be run
+	//       for each test
+	if (m_fTestSuiteSetup == false) {
+		CRM(SetupTestSuite(), "Failed to set up test suite %s", m_strName.c_str());
+		m_fTestSuiteSetup = true;
+	}
 
 	CBR((m_currentTest != m_tests.end()), R_COMPLETE);
 
@@ -220,8 +224,6 @@ RESULT TestSuite::Initialize() {
 	RESULT r = R_PASS;
 
 	CR(ClearTests());
-
-	CRM(SetupTestSuite(), "Failed to set up test suite %s", m_strName.c_str());
 
 	CRM(AddTests(), "Failed to add tests");
 

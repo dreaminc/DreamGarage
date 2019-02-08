@@ -47,7 +47,7 @@
 #include "Sound/AudioPacket.h"
 
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
-	TestSuite("dreamos"),
+	DreamTestSuite("dreamos"),
 	m_pDreamOS(pDreamOS)
 {
 	// empty
@@ -62,9 +62,9 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestDreamSoundSystem());
 
-	CR(AddTestDreamVCam());
-
 	CR(AddTestDreamBrowser());
+
+	CR(AddTestDreamVCam());
 	
 	CR(AddTestDreamDesktop());
 
@@ -105,6 +105,15 @@ RESULT DreamOSTestSuite::AddTests() {
 	CR(AddTestUIKeyboard());
 
 	CR(AddTestCaptureApp());
+
+Error:
+	return r;
+}
+
+RESULT DreamOSTestSuite::SetupTestSuite() {
+	RESULT r = R_PASS;
+
+	// empty
 
 Error:
 	return r;
@@ -177,6 +186,7 @@ Error:
 	return r;
 }
 
+/*
 RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	RESULT r = R_PASS;
 
@@ -213,14 +223,12 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 	// Skybox
-	//*
-	ProgramNode* pSkyboxProgram;
-	pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-	//*/
+	//ProgramNode* pSkyboxProgram;
+	//pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	//CN(pSkyboxProgram);
+	//CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	//CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	ProgramNode* pUIProgramNode;
 	pUIProgramNode = pHAL->MakeProgramNode("uistage");
@@ -232,7 +240,6 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	// Connect output as pass-thru to internal blend program
 	//CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-	//*/
 	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
 	// Screen Quad Shader (opt - we could replace this if we need to)
@@ -249,6 +256,7 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 Error:
 	return r;
 }
+*/
 
 WebBrowserPoint DreamOSTestSuite::GetRelativeBrowserPointFromContact(point ptIntersectionContact) {
 	WebBrowserPoint webPt;
@@ -514,7 +522,8 @@ RESULT DreamOSTestSuite::AddTestMeta() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		//CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -597,7 +606,10 @@ RESULT DreamOSTestSuite::AddTestDreamUIBar() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		//CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
+
+
 		{
 			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this);
 			//CN(pDreamUIBar);	// still fails because it needs a user
@@ -670,7 +682,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		//CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
 
 		light *pLight;
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
@@ -686,6 +699,7 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		// This presents a timing issue if it works 
 		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(4.8f, 2.7f);
 		CN(pTestContext->m_pBrowserQuad);
+		pTestContext->m_pBrowserQuad->FlipUVHorizontal();
 		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
 		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
 	
@@ -843,7 +857,9 @@ RESULT DreamOSTestSuite::AddTestUIKeyboard() {
 		RESULT r = R_PASS;
 
 		CR(Initialize());
-		CR(SetupDreamAppPipeline());
+
+		//CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -1176,12 +1192,12 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 				
 				//AudioPacket alteredPendingAudioPacket = pendingAudioPacket;
 				//
-				//alteredPendingAudioPacket.SetSamplingRate(44100);
-				//alteredPendingAudioPacket.SetNumFrames(441);
+				////alteredPendingAudioPacket.SetSamplingRate(44100);
+				////alteredPendingAudioPacket.SetNumFrames(441);
 				//
 				//CRM(m_pParentDOS->PushAudioPacketToMixdown(numFrames, alteredPendingAudioPacket), "Failed to push packet to sound system");
 
-				CRM(m_pParentDOS->PushAudioPacketToMixdown(numFrames, pendingAudioPacket), "Failed to push packet to sound system");
+				CRM(m_pParentDOS->PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_BROWSER_0, numFrames, pendingAudioPacket), "Failed to push packet to sound system");
 			}
 
 		Error:
@@ -1207,8 +1223,13 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 
 		// Browser
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
-		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
-		quad *m_pBrowserQuad = nullptr;
+		
+		std::shared_ptr<DreamBrowser> m_pDreamBrowserSource = nullptr;
+		quad *m_pBrowserSourceQuad = nullptr;
+
+		std::shared_ptr<DreamBrowser> m_pDreamBrowserDest = nullptr;
+		quad *m_pBrowserDestQuad = nullptr;
+		
 		DreamOS *m_pParentDOS = nullptr;
 
 	} *pTestContext = new TestContext();
@@ -1216,7 +1237,10 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 
-		std::string strURL = "https://www.youtube.com/watch?v=Ic4xAuIkoFE";
+		std::string strURLSource = "https://www.youtube.com/watch?v=Ic4xAuIkoFE";
+
+		std::string strURLDest = "https://online-voice-recorder.com/";
+		//std::string strURLDest = "https://www.podcastinsights.com/online-mic-test/";
 
 		CN(m_pDreamOS);
 
@@ -1251,27 +1275,51 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 			//CR(m_pDreamOS->PlaySoundFile(pNewSoundFile));
 			//CR(m_pDreamOS->LoopSoundFile(pNewSoundFile));
 
-			/*
+			///* Source Browser
 			// Set up Browser to test the mix down code (timing)
 			pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 			CN(pTestContext->m_pWebBrowserManager);
 			CR(pTestContext->m_pWebBrowserManager->Initialize());
 
 			// This presents a timing issue if it works 
-			pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(4.8f, 2.7f);
-			CN(pTestContext->m_pBrowserQuad);
-			pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
-			pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
-			pTestContext->m_pBrowserQuad->SetMaterialAmbient(1.0f);
+			pTestContext->m_pBrowserSourceQuad = m_pDreamOS->AddQuad(4.8f, 2.7f);
+			CN(pTestContext->m_pBrowserSourceQuad);
+			pTestContext->m_pBrowserSourceQuad->FlipUVHorizontal();
+			pTestContext->m_pBrowserSourceQuad->RotateXByDeg(90.0f);
+			pTestContext->m_pBrowserSourceQuad->RotateZByDeg(180.0f);
+			pTestContext->m_pBrowserSourceQuad->translateX(-2.5f);
+			pTestContext->m_pBrowserSourceQuad->SetMaterialAmbient(1.0f);
 
 			// Create the Shared View App
-			pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-			pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
-			CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
-			CR(pTestContext->m_pDreamBrowser->SetForceObserverAudio(true));
-			CRM(pTestContext->m_pDreamBrowser->RegisterObserver(pTestContext), "Failed to set browser observer");
+			pTestContext->m_pDreamBrowserSource = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+			pTestContext->m_pDreamBrowserSource->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURLSource);
+			CNM(pTestContext->m_pDreamBrowserSource, "Failed to create source dream browser");
+			CR(pTestContext->m_pDreamBrowserSource->SetForceObserverAudio(true));
+			CRM(pTestContext->m_pDreamBrowserSource->RegisterObserver(pTestContext), "Failed to set browser observer");
 
-			pTestContext->m_pDreamBrowser->SetURI(strURL);
+			pTestContext->m_pDreamBrowserSource->SetURI(strURLSource);
+			//*/
+
+			/* Destination (named pipe) Browser
+			// Set up Browser to test the mix down code (timing)
+
+			// This presents a timing issue if it works 
+			pTestContext->m_pBrowserDestQuad = m_pDreamOS->AddQuad(4.8f, 2.7f);
+			CN(pTestContext->m_pBrowserDestQuad);
+			pTestContext->m_pBrowserDestQuad->FlipUVHorizontal();
+			pTestContext->m_pBrowserDestQuad->RotateXByDeg(90.0f);
+			pTestContext->m_pBrowserDestQuad->RotateZByDeg(180.0f);
+			pTestContext->m_pBrowserDestQuad->translateX(2.5f);
+			pTestContext->m_pBrowserDestQuad->SetMaterialAmbient(1.0f);
+
+			// Create the Shared View App
+			pTestContext->m_pDreamBrowserDest = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+			pTestContext->m_pDreamBrowserDest->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURLSource);
+			CNM(pTestContext->m_pDreamBrowserDest, "Failed to create destination dream browser");
+			//CR(pTestContext->m_pDreamBrowserDest->SetForceObserverAudio(true));
+			//CRM(pTestContext->m_pDreamBrowserDest->RegisterObserver(pTestContext), "Failed to set browser observer");
+
+			pTestContext->m_pDreamBrowserDest->SetURI(strURLDest);
 			//*/
 		}
 
@@ -1297,8 +1345,12 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 		CN(pTestContext);
 
 		{
-			if (pTestContext->m_pBrowserQuad != nullptr) {
-				pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture());
+			if (pTestContext->m_pBrowserSourceQuad != nullptr) {
+				pTestContext->m_pBrowserSourceQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowserSource->GetSourceTexture());
+			}
+
+			if (pTestContext->m_pBrowserDestQuad != nullptr) {
+				pTestContext->m_pBrowserDestQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowserDest->GetSourceTexture());
 			}
 		}
 
@@ -2090,7 +2142,9 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		//CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
+
 		{
 			std::shared_ptr<DreamShareView> pDreamShareView = nullptr;
 
@@ -2186,7 +2240,9 @@ RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		//CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
+
 		{
 			std::shared_ptr<DreamShareView> pDreamShareView = nullptr;
 
@@ -2291,7 +2347,8 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 		
-		SetupDreamAppPipeline();
+		//SetupDreamAppPipeline();
+		CR(SetupPipeline());
 
 		light *pLight;
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));

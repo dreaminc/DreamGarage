@@ -37,6 +37,18 @@ public:
 		virtual RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) = 0;
 	};
 
+	typedef enum {
+		LOCAL_BROWSER_0,
+		LOCAL_MIC,
+		PEER_1,
+		PEER_2,
+		PEER_3,
+		PEER_4,
+		PEER_5,
+		REMOTE_BROWSER_MONO_0,
+		INVALID
+	} MIXDOWN_TARGET;
+
 public:
 	DreamSoundSystem(DreamOS *pDreamOS, void *pContext = nullptr);
 	~DreamSoundSystem();
@@ -101,8 +113,12 @@ private:
 	RESULT MixdownProcess();
 	RESULT StartMixdownServer();
 	RESULT InitalizeMixdownSendBuffer();
+	RESULT TeardownMixdownSendBuffer();
+	AudioPacket GetPendingMixdownAudioPacket(int numFrames);
+	int64_t GetNumPendingFrames();
 	
-	SoundBuffer *m_pMixdownBuffer = nullptr;
+	std::vector<SoundBuffer*> m_pMixdownBuffers;
+
 	std::chrono::system_clock::time_point m_lastMixdownReadTime;
 
 	sound::state m_mixdownState = sound::state::UNINITIALIZED;
@@ -110,7 +126,7 @@ private:
 	std::thread	m_mixdownBufferProcessThread;
 
 public:
-	RESULT PushAudioPacketToMixdown(int numFrames, const AudioPacket &pendingAudioPacket);
+	RESULT PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET mixdownTarget, int numFrames, const AudioPacket &pendingAudioPacket);
 };
 
 #endif // ! DREAM_SOUND_SYSTEM_H_

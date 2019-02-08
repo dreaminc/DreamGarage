@@ -37,7 +37,7 @@
 #include "UI/UIKeyboardLayout.h"
 
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
-	TestSuite("ui"),
+	DreamTestSuite("ui"),
 	m_pDreamOS(pDreamOS)
 {
 	RESULT r = R_PASS;
@@ -52,13 +52,12 @@ Error:
 	return;
 }
 
-UITestSuite::~UITestSuite() {
-	// empty
-}
-
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestUIView());
+
+	// TODO: This test is broken
 	CR(AddTestBrowserRequestWithMenuAPI());
 
 	CR(AddTestFlatContextCompositionQuads());
@@ -73,25 +72,31 @@ RESULT UITestSuite::AddTests() {
 
 	CR(AddTestUIMenuItem());
 
-	CR(AddTestUIView());
-
-
 	//CR(AddTestBrowserRequestWithMenuAPI());
+
 	//CR(AddTestBrowserRequest());
 
 	//CR(AddTestKeyboard());
 
-//	CR(AddTestInteractionFauxUI());
-
+	//CR(AddTestInteractionFauxUI());
 
 Error:
 	return r;
 }
 
-RESULT UITestSuite::Initialize() {
+
+RESULT UITestSuite::SetupTestSuite() {
 	RESULT r = R_PASS;
 
+	CNM(m_pDreamOS, "DreamOS handle is not set");
 
+	m_pDreamOS->SetGravityState(false);
+
+	CR(SetupPipeline());
+
+	light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+	/*
 	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
@@ -102,6 +107,7 @@ RESULT UITestSuite::Initialize() {
 	point sceneOffset = point(90, -5, -25);
 	float sceneScale = 0.1f;
 	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+	*/
 
 	/*
 	m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj",
@@ -133,7 +139,92 @@ RESULT UITestSuite::Initialize() {
 	}
 	//*/
 
-//Error:
+Error:
+	return r;
+}
+
+/*
+RESULT UITestSuite::SetupPipeline(std::string strRenderProgramName) {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	CR(pHAL->MakeCurrentContext());
+
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
+	CN(pRenderProgramNode);
+	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	// Reference Geometry Shader Program
+	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	CN(pReferenceGeometryProgram);
+	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	CN(pRenderScreenQuad);
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+	CR(pHAL->ReleaseCurrentContext());
+
+Error:
+	return r;
+}
+*/
+
+RESULT UITestSuite::SetupPipeline(std::string strRenderProgramName) {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pRenderPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	CR(pHAL->MakeCurrentContext());
+
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
+	CN(pRenderProgramNode);
+	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	// Skybox
+	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	CN(pSkyboxProgram);
+	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	//*
+	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture", PIPELINE_FLAGS::PASSTHRU);
+	CN(pUIProgramNode);
+	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	//*/
+
+	// Screen Quad Shader (opt - we could replace this if we need to)
+	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	CN(pRenderScreenQuad);
+
+	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+
+	// Connect Program to Display
+	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+Error:
 	return r;
 }
 
@@ -230,12 +321,6 @@ RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
 		RESULT r = R_PASS;
 		
 		CN(m_pDreamOS);
-
-		m_pDreamOS->SetGravityState(false);
-
-		CR(SetupPipeline());
-
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		{
 			TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -414,10 +499,6 @@ RESULT UITestSuite::AddTestUIMenuItem() {
 
 		CN(m_pDreamOS);
 
-		m_pDreamOS->SetGravityState(false);
-
-		CR(SetupUINodePipeline());
-
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		{
@@ -500,10 +581,6 @@ RESULT UITestSuite::AddTestFont() {
 		float lineHeight = 0.35f;
 
 		CN(m_pDreamOS);
-
-		m_pDreamOS->SetGravityState(false);
-
-		CR(SetupPipeline());
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
@@ -733,8 +810,6 @@ RESULT UITestSuite::AddTestBrowserRequestWithMenuAPI() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline());
-
 		// Create the Browser
 		m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
 		CNM(m_pDreamBrowser, "Failed to create dream browser");
@@ -747,7 +822,9 @@ RESULT UITestSuite::AddTestBrowserRequestWithMenuAPI() {
 		m_pDreamBrowser->SetPosition(point(0.0f, 1.0f, 0.0f));
 
 		// Cloud Controller
-		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CNM(m_pDreamOS->GetCloudController(), "CloudController is not initialzed, check config flags");
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(m_pDreamOS->GetCloudController());
+
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 		MenuControllerProxy *pMenuControllerProxy = nullptr;
 		CN(pContext);
@@ -783,7 +860,7 @@ RESULT UITestSuite::AddTestBrowserRequestWithMenuAPI() {
 		CRM(pMenuControllerProxy->RequestSubMenu("", "", "menu"), "Failed to request sub menu");
 
 	Error:
-		return R_PASS;
+		return r;
 	};
 
 	// Test Code (this evaluates the test upon completion)
@@ -813,7 +890,7 @@ RESULT UITestSuite::AddTestBrowserRequestWithMenuAPI() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS->GetCloudController());
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pUITest);
 
 	pUITest->SetTestName("Browser Request Test");
@@ -839,12 +916,7 @@ RESULT UITestSuite::AddTestBrowserURL() {
 
 		WebRequest webRequest;
 
-		CN(m_pDreamOS);
-
-		CR(SetupPipeline());
-
-		// Light it up
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		CN(m_pDreamOS);		
 
 		// Create the Shared View App
 		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
@@ -854,7 +926,6 @@ RESULT UITestSuite::AddTestBrowserURL() {
 		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
 		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 		pDreamBrowser->SetDiagonalSize(10.0f);
-
 		
 		pDreamBrowser->SetURI(strURL);
 
@@ -915,8 +986,6 @@ RESULT UITestSuite::AddTestBrowserRequest() {
 		WebRequest webRequest;
 
 		CN(m_pDreamOS);
-
-		CR(SetupPipeline());
 
 		// Create the Shared View App
 		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
@@ -990,92 +1059,6 @@ Error:
 	return r;
 }
 
-RESULT UITestSuite::SetupUINodePipeline() {
-	RESULT r = R_PASS;
-
-	// Set up the pipeline
-	HALImp *pHAL = m_pDreamOS->GetHALImp();
-	Pipeline* pRenderPipeline = pHAL->GetRenderPipelineHandle();
-
-	SinkNode* pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
-	CNM(pDestSinkNode, "Destination sink node isn't set");
-
-	//CR(pHAL->MakeCurrentContext());
-
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
-//	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-//*
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	CN(pUIProgramNode);
-	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	//*/
-
-	// Screen Quad Shader (opt - we could replace this if we need to)
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
-	
-	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
-
-	// Connect Program to Display
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-
-Error:
-	return r;
-}
-
-RESULT UITestSuite::SetupPipeline(std::string strRenderProgramName) {
-	RESULT r = R_PASS;
-
-	// Set up the pipeline
-	HALImp *pHAL = m_pDreamOS->GetHALImp();
-	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
-
-	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
-	CNM(pDestSinkNode, "Destination sink node isn't set");
-
-	CR(pHAL->MakeCurrentContext());
-	
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-	CN(pReferenceGeometryProgram);
-	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-
-	CR(pHAL->ReleaseCurrentContext());
-
-Error:
-	return r;
-}
-
 RESULT UITestSuite::AddTestUIView() {
 	RESULT r = R_PASS;
 
@@ -1086,13 +1069,13 @@ RESULT UITestSuite::AddTestUIView() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline());
-
 		{
 			auto pComposite = m_pDreamOS->AddComposite();
+			CN(pComposite);
 			pComposite->InitializeOBB();
 
 			auto pView = pComposite->AddUIView(m_pDreamOS);
+			CN(pView);
 			pView->InitializeOBB();
 			pView->SetPosition(point(0.0f, 1.0f, 2.0f));
 			
@@ -1183,8 +1166,6 @@ RESULT UITestSuite::AddTestSharedContentView() {
 		std::shared_ptr<DreamContentView> pDreamContentView = nullptr;
 
 		CN(m_pDreamOS);
-
-		CR(SetupPipeline());
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 

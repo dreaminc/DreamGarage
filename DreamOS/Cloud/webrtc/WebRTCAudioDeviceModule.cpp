@@ -98,6 +98,7 @@ RESULT WebRTCAudioDeviceModule::WebRTCADMProcess() {
 			Sleep(8);
 			fSlept = true;
 		}
+
 		//Sleep(1);
 	}
 

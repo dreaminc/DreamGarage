@@ -565,7 +565,7 @@ public:
 	std::shared_ptr<SoundFile> LoadSoundFile(const std::wstring &wstrFilename, SoundFile::type soundFileType);
 	RESULT PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile);
 	RESULT LoopSoundFile(std::shared_ptr<SoundFile> pSoundFile);
-	RESULT PushAudioPacketToMixdown(int numFrames, const AudioPacket &pendingAudioPacket);
+	RESULT PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET mixdownTarget, int numFrames, const AudioPacket &pendingAudioPacket);
 
 	RESULT MuteDreamVCamAudio(bool fMute);
 

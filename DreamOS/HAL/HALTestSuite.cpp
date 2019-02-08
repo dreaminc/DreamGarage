@@ -24,18 +24,18 @@
 #include "DreamGarage\DreamGamepadCameraApp.h"
 
 HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
-	TestSuite("hal"),
+	DreamTestSuite("hal"),
 	m_pDreamOS(pDreamOS)
 {
 	// empty
 }
 
-HALTestSuite::~HALTestSuite() {
-	// empty
-}
-
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
+
+	CR(TestNestedCompositesQauds());
+
+	CR(TestNestedOBB());
 
 	CR(AddTestTextureSubRegionUpdate());
 
@@ -95,8 +95,6 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestFlatContextNesting());
 
-	CR(TestNestedOBB());
-
 	CR(AddTestText());
 
 	CR(AddTestUserModel());
@@ -131,6 +129,15 @@ Error:
 	return r;
 }
 
+RESULT HALTestSuite::SetupTestSuite() {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamOS, "DreamOS handle is not set");
+
+Error:
+	return r;
+}
+
 RESULT HALTestSuite::ResetTest(void *pContext) {
 	RESULT r = R_PASS;
 
@@ -150,7 +157,7 @@ Error:
 	return r;
 }
 
-RESULT HALTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
+RESULT HALTestSuite::SetupPipeline(std::string strRenderShaderName) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -189,8 +196,8 @@ RESULT HALTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
 	ProgramNode *pRenderScreenQuad;
 	pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
@@ -217,7 +224,7 @@ RESULT HALTestSuite::AddTestRemoveObjects() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		SetupSkyboxPipeline();
+		SetupPipeline();
 		Initialize();
 		m_pDreamOS->AddQuad(1.0f, 1.0f)->RotateXByDeg(90.0f);
 	//Error:
@@ -438,7 +445,7 @@ RESULT HALTestSuite::AddTestSkybox() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		CR(SetupSkyboxPipeline("standard"));
+		CR(SetupPipeline("standard"));
 
 		CR(Initialize());
 
@@ -479,7 +486,7 @@ RESULT HALTestSuite::AddTestEnvironments() {
 		float sceneScale = 0.025f;
 
 		// Set up the pipeline
-		CR(SetupSkyboxPipeline("environment"));
+		CR(SetupPipeline("environment"));
 
 		light *pLight;
 		pLight = m_pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
@@ -2154,7 +2161,7 @@ RESULT HALTestSuite::AddTestFlatContextNesting() {
 		float side = 0.25f;
 
 		// Set up the pipeline
-		CR(SetupSkyboxPipeline("environment"));
+		CR(SetupPipeline("environment"));
 
 		light *pLight;
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
@@ -2286,6 +2293,120 @@ Error:
 	return r;
 }
 
+RESULT HALTestSuite::TestNestedCompositesQauds() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 70.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		composite *pTopLevelComposite = nullptr;
+	} *pTestContext = new TestContext();
+
+	float width = 0.5f;
+	float height = width;
+	float length = width;
+	float padding = 0.75f;
+
+	int depth = 5;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		CR(SetupPipeline("standard"));
+
+		// Objects 
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+
+		{
+			pTestContext->pTopLevelComposite = m_pDreamOS->AddComposite();
+			CN(pTestContext->pTopLevelComposite);
+
+			pTestContext->pTopLevelComposite->InitializeOBB();
+			pTestContext->pTopLevelComposite->SetPosition(0.0f, 0.0f, -5.0f);
+			pTestContext->pTopLevelComposite->Scale(0.5f);
+
+			// Turn into for loop
+			auto pComposite = pTestContext->pTopLevelComposite->AddComposite();
+			pComposite->InitializeOBB();
+			auto pQuad = pComposite->AddQuad(width, height);
+			CN(pQuad);
+			pQuad->SetPosition(point(-width * 2.0f, 0.0f, 0.0f));
+			pQuad->RotateXByDeg(45.0f);
+
+			pQuad = pComposite->AddQuad(width, height);
+			CN(pQuad);
+			pQuad->SetPosition(point(width * 2.0f, 0.0f, 0.0f));
+			pQuad->RotateXByDeg(45.0f);
+
+			pComposite->SetPosition(point(-width * 4.0f, 0.0f, 0.0f));
+
+			pComposite = pTestContext->pTopLevelComposite->AddComposite();
+			pComposite->InitializeOBB();
+			pQuad = pComposite->AddQuad(width, height);
+			CN(pQuad);
+			pQuad->SetPosition(point(-width * 2.0f, 0.0f, 0.0f));
+			pQuad->RotateXByDeg(45.0f);
+
+			pQuad = pComposite->AddQuad(width, height);
+			CN(pQuad);
+			pQuad->SetPosition(point(width * 2.0f, 0.0f, 0.0f));
+			pQuad->RotateXByDeg(45.0f);
+
+			pComposite->SetPosition(point(width * 4.0f, 0.0f, 0.0f));			
+		}
+
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		pTestContext->pTopLevelComposite->RotateYByDeg(0.035f);
+		//pTestContext->pVolume[2]->RotateYByDeg(0.035f);
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("HAL Model Test");
+	pNewTest->SetTestDescription("HAL Model test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT HALTestSuite::TestNestedOBB() {
 	RESULT r = R_PASS;
 
@@ -2309,7 +2430,7 @@ RESULT HALTestSuite::TestNestedOBB() {
 		m_pDreamOS->SetGravityState(false);
 
 		// Set up the pipeline
-		CR(SetupSkyboxPipeline("environment"));
+		CR(SetupPipeline("standard"));
 
 		// Objects 
 
@@ -2408,7 +2529,7 @@ RESULT HALTestSuite::AddTestRotation() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupPipeline("minimal"));
 
 		// Objects 
 
@@ -2506,7 +2627,7 @@ RESULT HALTestSuite::AddTestUserModel() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("environment"));
+		CR(SetupPipeline("environment"));
 
 		// Objects 
 		TestContext *pTestContext;
@@ -2616,7 +2737,7 @@ RESULT HALTestSuite::AddTestModelInstancing() {
 		
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("environment"));
+		CR(SetupPipeline("environment"));
 
 		// Objects 
 
@@ -2717,7 +2838,7 @@ RESULT HALTestSuite::AddTestModel() {
 		m_pDreamOS->SetGravityState(false);
 
 		//CR(SetupSkyboxPipeline("blinnphong_texture"));
-		CR(SetupSkyboxPipeline("standard"));
+		CR(SetupPipeline("standard"));
 
 		// Objects 
 
@@ -4413,7 +4534,7 @@ RESULT HALTestSuite::AddTestCamera() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		CR(SetupSkyboxPipeline("minimal_texture"));
+		CR(SetupPipeline("minimal_texture"));
 
 		pTestContext->pVolume1 = m_pDreamOS->AddVolume(0.1f);
 		pTestContext->pVolume1->SetPosition(point(0.0f, 0.0f, 0.0f));

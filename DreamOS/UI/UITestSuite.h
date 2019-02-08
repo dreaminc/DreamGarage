@@ -5,7 +5,7 @@
 
 #include "Primitives/valid.h"
 #include "Primitives/Subscriber.h"
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 #include <string>
 #include <vector>
@@ -37,7 +37,7 @@ struct KeyboardTestContext {
 	quad* pQuad = nullptr;
 };
 
-class UITestSuite : public valid, public TestSuite, 
+class UITestSuite : public valid, public DreamTestSuite, 
 					public Subscriber<SenseControllerEvent>, public Subscriber<SenseKeyboardEvent>, 
 					public Subscriber<SenseMouseEvent>,
 					public Subscriber<UIEvent>,
@@ -46,9 +46,9 @@ class UITestSuite : public valid, public TestSuite,
 {
 public:
 	UITestSuite(DreamOS *pDreamOS);
-	~UITestSuite();
+	~UITestSuite() = default;
 
-	RESULT Initialize();
+	virtual RESULT SetupTestSuite() override;
 
 	RESULT AddTestBrowserURL();
 	RESULT AddTestInteractionFauxUI();
@@ -129,8 +129,8 @@ public:
 	virtual RESULT Notify(UIEvent *mEvent) override;
 
 private:
-	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
-	RESULT SetupUINodePipeline();
+	virtual RESULT SetupPipeline(std::string strRenderProgramName = "environment") override;
+	//RESULT SetupUINodePipeline();
 
 private:
 	DreamOS *m_pDreamOS;

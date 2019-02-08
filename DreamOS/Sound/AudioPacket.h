@@ -14,8 +14,9 @@ public:
 	AudioPacket();
 	AudioPacket(int frames, int channels, int bitsPerSample, uint8_t* pDataBuffer);
 	AudioPacket(int frames, int channels, int bitsPerSample, int samplingRate, uint8_t* pDataBuffer);
+	AudioPacket(int frames, int channels, int bitsPerSample, int samplingRate, sound::type soundType, uint8_t* pDataBuffer);
 	
-	~AudioPacket();
+	~AudioPacket() = default;
 
 	uint8_t *GetDataBuffer() const {
 		return m_pDataBuffer;
@@ -96,6 +97,9 @@ public:
 
 	RESULT GetDataBufferCopy(uint8_t*&pDataBuffer, size_t &pDataBuffer_n) const;
 	RESULT DeleteBuffer();
+
+	RESULT MixInAudioPacket(AudioPacket audioPacket);
+	RESULT MixInMonoAudioPacket(AudioPacket monoAudioPacket);
 
 private:
 	int m_frames;

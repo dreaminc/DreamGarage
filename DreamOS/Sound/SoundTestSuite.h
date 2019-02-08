@@ -6,20 +6,23 @@
 // DREAM OS
 // DreamOS/Sound/SoundTestSuite.h
 
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 #include <functional>
 #include <memory>
 
 class DreamOS;
 
-class SoundTestSuite : public TestSuite
+class SoundTestSuite : public DreamTestSuite
 {
 public:
 	SoundTestSuite(DreamOS *pDreamOS);
-	~SoundTestSuite();
+	~SoundTestSuite() = default;
 
 	virtual RESULT AddTests() override;
+
+	virtual RESULT SetupPipeline(std::string strRenderProgramName = "environment") override;
+	virtual RESULT SetupTestSuite() override;
 
 public:
 
@@ -44,9 +47,6 @@ public:
 
 	// Record Sound
 	//TODO: RESULT AddTestRecordSound();
-
-private:
-	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
 
 private:
 	DreamOS *m_pDreamOS = nullptr;

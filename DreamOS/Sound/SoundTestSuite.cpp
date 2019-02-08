@@ -18,13 +18,9 @@
 #include "DreamGarage\DreamGamepadCameraApp.h"
 
 SoundTestSuite::SoundTestSuite(DreamOS *pDreamOS) :
-	TestSuite("sound"),
+	DreamTestSuite("sound"),
 	m_pDreamOS(pDreamOS)
 {
-	// empty
-}
-
-SoundTestSuite::~SoundTestSuite() {
 	// empty
 }
 
@@ -33,11 +29,11 @@ RESULT SoundTestSuite::AddTests() {
 
 	// Add the tests
 
+	CR(AddTestBrowserSoundRouting());
+
 	CR(AddTestCaptureSound());
 
 	CR(AddTestSpatialSound());
-
-	CR(AddTestBrowserSoundRouting());
 
 	CR(AddTestPlaySound());
 
@@ -46,6 +42,15 @@ RESULT SoundTestSuite::AddTests() {
 	CR(AddTestSoundClient());
 
 	CR(AddTestEnumerateDevices());
+
+Error:
+	return r;
+}
+
+RESULT SoundTestSuite::SetupTestSuite() {
+	RESULT r = R_PASS;
+
+	// empty
 
 Error:
 	return r;
@@ -349,6 +354,9 @@ RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
 			// This presents a timing issue if it works 
 			pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
 			CN(pTestContext->m_pBrowserQuad);
+
+			pTestContext->m_pBrowserQuad->FlipUVHorizontal();
+
 			pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
 			pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
 			pTestContext->m_pBrowserQuad->SetPosition(ptPosition);
@@ -370,8 +378,8 @@ RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
 			pTestContext->pXAudioSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2);
 			CN(pTestContext->pXAudioSoundClient);
 
-			pTestContext->pXAudioSpatialSoundObject = pTestContext->pXAudioSoundClient->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
-			CN(pTestContext->pXAudioSpatialSoundObject);
+			//pTestContext->pXAudioSpatialSoundObject = pTestContext->pXAudioSoundClient->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
+			//CN(pTestContext->pXAudioSpatialSoundObject);
 
 			//CR(pTestContext->pXAudioSoundClient->StartSpatial());
 			//CR(pTestContext->pWASAPISoundClient->StartCapture());

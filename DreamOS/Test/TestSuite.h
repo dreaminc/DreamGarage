@@ -15,7 +15,7 @@ class TestSuite {
 
 public:
 	TestSuite(std::string strName);
-	~TestSuite();
+	~TestSuite() = default;
 
 	RESULT Initialize();
 
@@ -62,6 +62,8 @@ private:
 	std::vector<std::shared_ptr<TestObject>>::iterator m_currentTest;
 
 	std::string m_strName;
+
+	bool m_fTestSuiteSetup = false;
 
 };
 

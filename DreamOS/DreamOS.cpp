@@ -974,12 +974,12 @@ Error:
 	return nullptr;
 }
 
-RESULT DreamOS::PushAudioPacketToMixdown(int numFrames, const AudioPacket &pendingAudioPacket) {
+RESULT DreamOS::PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET mixdownTarget, int numFrames, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	CNM(m_pDreamSoundSystem, "Sound system not initialized");
 
-	return m_pDreamSoundSystem->PushAudioPacketToMixdown(numFrames, pendingAudioPacket);
+	return m_pDreamSoundSystem->PushAudioPacketToMixdown(mixdownTarget, numFrames, pendingAudioPacket);
 
 Error:
 	return r;
