@@ -440,11 +440,11 @@ RESULT DreamVCam::InitializeWithParent(DreamUserControlArea *pParentApp) {
 
 	CN(pParentApp);
 	m_pParentApp = pParentApp;	
-	m_fIsRunning = true;
-
+	
 	if (m_fPendCameraPlacement) {
 		m_fPendCameraPlacement = false;
 		CR(ShareCameraSource());
+		DOSLOG(INFO, "Requesting sharing camera source");
 	}
 
 Error:
@@ -594,6 +594,7 @@ RESULT DreamVCam::HandleSettings(point ptPosition, quaternion qOrientation) {
 	RESULT r = R_PASS;
 
 	m_fHasReceivedSettings = true;
+	DOSLOG(INFO, "Got VCam settings");
 
 	m_pCamera->SetPosition(ptPosition);
 	m_pCamera->SetOrientation(qOrientation);
@@ -644,14 +645,6 @@ RESULT DreamVCam::ShareCameraSource() {
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CN(pEnvironmentControllerProxy);
 
-	CR(m_pParentApp->OnVirtualCameraCaptured());
-	m_pCameraQuad->SetVisible(true);
-	m_pCameraQuadBackground->SetVisible(true);
-
-	//GetActiveSource may be a problem
-	m_pCameraQuadTexture = m_pParentApp->GetActiveSource()->GetSourceTexture();
-	m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);
-
 	CR(pEnvironmentControllerProxy->RequestShareAsset(m_pParentApp->GetActiveSource()->GetCurrentAssetID(), SHARE_TYPE_CAMERA));
 
 Error:
@@ -699,6 +692,16 @@ RESULT DreamVCam::StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentSha
 
 	CN(pEnvironmentShare);
 	m_pCurrentCameraShare = pEnvironmentShare;
+
+	m_pCameraQuad->SetVisible(true);
+	m_pCameraQuadBackground->SetVisible(true);
+
+	//GetActiveSource may be a problem
+	m_pCameraQuadTexture = m_pParentApp->GetActiveCameraSource()->GetSourceTexture();
+	m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);
+
+	m_fIsRunning = true;
+	DOSLOG(INFO, "VCam visible and running");
 
 Error:
 	return r;

@@ -94,7 +94,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fHideWindow = true;
 	sandboxconfig.fHMDMirror = false;
 	sandboxconfig.f3rdPersonCamera = false;
-	sandboxconfig.hmdType = HMD_ANY_AVAILABLE;
+	sandboxconfig.hmdType = HMD_OPENVR;
 
 	// Enable HMD mirror for non-production builds
 #ifndef PRODUCTION_BUILD
@@ -1509,11 +1509,7 @@ RESULT DreamGarage::OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentA
 	auto pUserControllerProxy = (UserControllerProxy*)(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 	CN(pUserControllerProxy);
 	pUserControllerProxy->RequestGetSettings(m_strAccessToken);
-
-	CN(m_pDreamUserControlArea);
-
-//	CR(m_pDreamUserControlArea->AddEnvironmentAsset(pEnvironmentAsset));
-	CR(m_pDreamUserControlArea->PendEnvironmentAsset(pEnvironmentAsset));
+	CN(m_pDreamUserControlArea->PendCameraEnvironmentAsset(pEnvironmentAsset));
 
 Error:
 	return r;
@@ -1539,6 +1535,9 @@ Error:
 
 RESULT DreamGarage::OnSendCameraPlacement() {
 	RESULT r = R_PASS;
+
+	CN(m_pDreamUserControlArea);
+	CR(m_pDreamUserControlArea->AddEnvironmentCameraAsset());
 
 	CR(m_pDreamUserControlArea->GetVCam()->SetIsSendingCameraPlacement(true));
 
@@ -1975,9 +1974,11 @@ RESULT DreamGarage::OnGetSettings(point ptPosition, quaternion qOrientation, boo
 	if (!fIsSet) {
 		CR(m_pDreamEnvironmentApp->GetDefaultCameraPlacement(ptPosition, qOrientation));
 	}
+
+	CR(m_pDreamUserControlArea->OnVirtualCameraCaptured());
 	CR(m_pDreamUserControlArea->OnVirtualCameraSettings(ptPosition, qOrientation));
 
-	CR(pEnvironmentControllerProxy->RequestShareCamera(m_pDreamUserControlArea->GetActiveSource()->GetCurrentAssetID()));
+	CR(pEnvironmentControllerProxy->RequestShareCamera(m_pDreamUserControlArea->GetVCam()->GetCurrentAssetID()));
 
 Error:
 	return r;
