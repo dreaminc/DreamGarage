@@ -88,7 +88,7 @@ private:
 	std::vector<std::shared_ptr<UIButton>> m_tabButtons;
 	std::vector<std::shared_ptr<DreamContentSource>> m_sources;
 
-	std::shared_ptr<UIButton> m_pTabPendingRemoval = nullptr;
+	std::queue <std::shared_ptr<UIButton>> m_tabsPendingRemoval;
 
 	//TODO: hopefully temporary
 	std::shared_ptr<UIView> m_pTabView = nullptr;

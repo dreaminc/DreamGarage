@@ -509,6 +509,9 @@ RESULT DreamVCam::CloseSource() {
 
 	m_fPendDisconnectPipes = true;
 
+	m_pParentApp->HandleCameraClosed();
+	SetSourceType(SourceType::CAMERA);
+
 Error:
 	return r;
 }

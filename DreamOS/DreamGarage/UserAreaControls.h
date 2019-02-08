@@ -82,6 +82,7 @@ public:
 	RESULT UpdateButtonVisibility(std::string strContentType, bool fVisible);
 	RESULT UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward);
 	RESULT UpdateIsActive(bool fActive);
+	RESULT HandleCameraClose();
 
 	std::shared_ptr<text> GetURLText();
 

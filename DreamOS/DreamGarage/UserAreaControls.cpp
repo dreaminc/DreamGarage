@@ -468,6 +468,19 @@ Error:
 	return r;
 }
 
+RESULT UserAreaControls::HandleCameraClose() {
+	RESULT r = R_PASS;
+
+	// switch button off if no longer sharing
+	if (m_pCameraSourceButton->IsToggled()) {
+		CR(m_pCameraSourceButton->Toggle());
+	}
+
+Error:
+	return r;
+
+}
+
 std::shared_ptr<text> UserAreaControls::GetURLText() {
 	return m_pURLText;
 }
