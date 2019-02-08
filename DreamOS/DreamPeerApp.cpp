@@ -58,6 +58,7 @@ RESULT DreamPeerApp::Shutdown(void *pContext) {
 		m_pUserModel->RemoveMouth();
 
 		GetDOS()->RemoveObjectFromUIGraph(m_pUserModel->GetUserObjectComposite().get());
+		GetDOS()->RemoveObjectFromAuxUIGraph(m_pUserModel->GetUserObjectComposite().get());
 	}
 
 Error:

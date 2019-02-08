@@ -175,6 +175,7 @@ RESULT InteractionEngine::UpdateAnimationQueue() {
 
 		m_tLastUpdate = tCurrent;
 		m_padInteractionEvent = InteractionObjectEvent(INTERACTION_EVENT_PAD_MOVE);
+		m_padInteractionEvent.m_state = ControllerState();
 	}
 	//*/
 

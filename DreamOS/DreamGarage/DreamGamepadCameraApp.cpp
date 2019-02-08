@@ -133,6 +133,11 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 	if (m_fUpdateLeftStick) {
 		m_ptLeftStick.x() = m_ptPendLeftStick.x();
 		m_ptLeftStick.y() = m_ptPendLeftStick.y();
+		m_fUpdateLeftStick = false;
+	}
+	else {
+		m_ptLeftStick.x() = 0.0f;
+		m_ptLeftStick.y() = 0.0f;
 	}
 
 	if (m_fUpdateRightStick) {
@@ -144,6 +149,11 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 			m_ptRightStick.y() = m_ptPendRightStick.y();
 			m_ptRightStick.x() = 0.0f;
 		}
+		m_fUpdateRightStick = false;
+	}
+	else {
+		m_ptRightStick.x() = 0.0f;
+		m_ptRightStick.y() = 0.0f;
 	}
 	
 	if (m_fUpdateLeftTrigger) {
