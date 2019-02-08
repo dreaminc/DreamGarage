@@ -39,7 +39,7 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	float cameraScale = 0.0004f;
 
 	float cameraScreenWidth = 0.6f;
-	float cameraScreenHeight = 0.6f * 9.0f / 16.0f;
+	float cameraScreenHeight = cameraScreenWidth * 9.0f / 16.0f;
 	float cameraScreenDepth = -0.05f;
 
 	point ptCameraModel = point(0.0f, -0.24f, -cameraScreenDepth);
