@@ -1968,7 +1968,7 @@ RESULT DreamGarage::OnGetSettings(point ptPosition, quaternion qOrientation, boo
 	CN(pEnvironmentControllerProxy);
 
 	CN(m_pDreamUserControlArea);
-	CN(m_pDreamUserControlArea->GetActiveSource());
+	//CN(m_pDreamUserControlArea->GetActiveSource());
 
 	// if the user does not have settings, use the defaults for the current environment
 	if (!fIsSet) {

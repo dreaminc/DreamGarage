@@ -319,7 +319,7 @@ RESULT DreamVCam::Update(void *pContext) {
 
 	// With better communication with Gamepad, potentially could send this less often
 	//*
-	if (m_fSendingCameraPlacement) {
+	if (m_fSendingCameraPlacement && m_pParentApp != nullptr) {
 		CR(BroadcastVCamMessage());
 	}
 	//*/
@@ -610,6 +610,9 @@ RESULT DreamVCam::SetIsSendingCameraPlacement(bool fSendingCameraPlacement) {
 	m_pCameraComposite->SetVisible(m_fSendingCameraPlacement, false);
 	m_pCameraModel->SetVisible(m_fSendingCameraPlacement);
 
+	m_fIsRunning = true;
+	DOSLOG(INFO, "VCam visible and running");
+
 Error:
 	return r;
 }
@@ -698,10 +701,7 @@ RESULT DreamVCam::StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentSha
 
 	//GetActiveSource may be a problem
 	m_pCameraQuadTexture = m_pParentApp->GetActiveCameraSource()->GetSourceTexture();
-	m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);
-
-	m_fIsRunning = true;
-	DOSLOG(INFO, "VCam visible and running");
+	m_pCameraQuad->SetDiffuseTexture(m_pCameraQuadTexture);	
 
 Error:
 	return r;
