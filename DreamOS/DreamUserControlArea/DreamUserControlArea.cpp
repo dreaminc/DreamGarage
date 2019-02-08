@@ -377,6 +377,10 @@ std::shared_ptr<DreamContentSource> DreamUserControlArea::GetActiveSource() {
 	return m_pActiveSource;
 }
 
+std::shared_ptr<DreamContentSource> DreamUserControlArea::GetActiveCameraSource() {
+	return m_pActiveCameraSource;
+}
+
 RESULT DreamUserControlArea::ShowControlView() {
 	RESULT r = R_PASS;
 
@@ -608,6 +612,7 @@ RESULT DreamUserControlArea::OnVirtualCameraCaptured() {
 	RESULT r = R_PASS;
 
 	m_pActiveCameraSource = m_pActiveSource;
+	DOSLOG(INFO, "Grabbed browser that's using camera");
 
 Error:
 	return r;
@@ -855,6 +860,23 @@ RESULT DreamUserControlArea::PendEnvironmentAsset(std::shared_ptr<EnvironmentAss
 	return R_PASS;
 }
 
+RESULT DreamUserControlArea::PendCameraEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+	CN(m_pDreamVCam);
+
+	m_pPendingEnvironmentCameraAsset = pEnvironmentAsset;
+	m_pDreamVCam->SetEnvironmentAsset(pEnvironmentAsset);
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::AddEnvironmentCameraAsset() {
+	DOSLOG(INFO, "adding environment camera asset");
+	m_pPendingEnvironmentAsset = m_pPendingEnvironmentCameraAsset;
+	return R_PASS;
+}
+
 RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 	
@@ -882,8 +904,6 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	if(pEnvironmentAsset->GetContentType() == CAMERA_CONTENT_CONTROL_TYPE && m_pDreamVCam != nullptr) {
 		m_pDreamVCam->InitializeWithParent(this);
 		m_pActiveSource = m_pDreamVCam;
-		m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
-		// new desktop can't be the current content
 		m_pUserControls->SetSharingFlag(false);
 		m_pDreamVCam->SetEnvironmentAsset(pEnvironmentAsset);
 		m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());

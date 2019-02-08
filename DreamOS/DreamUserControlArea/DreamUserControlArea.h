@@ -123,6 +123,8 @@ public:
 // DreamTabView
 public:
 	std::shared_ptr<DreamContentSource> GetActiveSource();
+	std::shared_ptr<DreamContentSource> GetActiveCameraSource();
+
 	RESULT SetActiveSource(std::shared_ptr<DreamContentSource> pNewContent);
 
 // DreamBrowser
@@ -163,6 +165,8 @@ public:
 	RESULT ResetAppComposite();
 	RESULT AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
+	RESULT AddEnvironmentCameraAsset();
+	RESULT PendCameraEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetUIProgramNode(UIStageProgram *pUIProgramNode);
 
 	RESULT OnDreamFormSuccess();
@@ -269,6 +273,7 @@ private:
 	bool m_fPendDreamFormSuccess = false;
 
 	std::shared_ptr<EnvironmentAsset> m_pPendingEnvironmentAsset = nullptr;
+	std::shared_ptr<EnvironmentAsset> m_pPendingEnvironmentCameraAsset = nullptr;
 };
 
 #endif // ! DREAM_USER_CONTROL_AREA_H_

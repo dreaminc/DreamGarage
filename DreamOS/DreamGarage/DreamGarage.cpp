@@ -1509,11 +1509,7 @@ RESULT DreamGarage::OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentA
 	auto pUserControllerProxy = (UserControllerProxy*)(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 	CN(pUserControllerProxy);
 	pUserControllerProxy->RequestGetSettings(m_strAccessToken);
-
-	CN(m_pDreamUserControlArea);
-
-//	CR(m_pDreamUserControlArea->AddEnvironmentAsset(pEnvironmentAsset));
-	CR(m_pDreamUserControlArea->PendEnvironmentAsset(pEnvironmentAsset));
+	CN(m_pDreamUserControlArea->PendCameraEnvironmentAsset(pEnvironmentAsset));
 
 Error:
 	return r;
@@ -1539,6 +1535,9 @@ Error:
 
 RESULT DreamGarage::OnSendCameraPlacement() {
 	RESULT r = R_PASS;
+
+	CN(m_pDreamUserControlArea);
+	CR(m_pDreamUserControlArea->AddEnvironmentCameraAsset());
 
 	CR(m_pDreamUserControlArea->GetVCam()->SetIsSendingCameraPlacement(true));
 
@@ -1969,15 +1968,17 @@ RESULT DreamGarage::OnGetSettings(point ptPosition, quaternion qOrientation, boo
 	CN(pEnvironmentControllerProxy);
 
 	CN(m_pDreamUserControlArea);
-	CN(m_pDreamUserControlArea->GetActiveSource());
+	//CN(m_pDreamUserControlArea->GetActiveSource());
 
 	// if the user does not have settings, use the defaults for the current environment
 	if (!fIsSet) {
 		CR(m_pDreamEnvironmentApp->GetDefaultCameraPlacement(ptPosition, qOrientation));
 	}
+
+	CR(m_pDreamUserControlArea->OnVirtualCameraCaptured());
 	CR(m_pDreamUserControlArea->OnVirtualCameraSettings(ptPosition, qOrientation));
 
-	CR(pEnvironmentControllerProxy->RequestShareCamera(m_pDreamUserControlArea->GetActiveSource()->GetCurrentAssetID()));
+	CR(pEnvironmentControllerProxy->RequestShareCamera(m_pDreamUserControlArea->GetVCam()->GetCurrentAssetID()));
 
 Error:
 	return r;
