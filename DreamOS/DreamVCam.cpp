@@ -39,6 +39,7 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	float cameraScale = 0.0004f;
 
 	float cameraScreenWidth = 0.6f;
+	float cameraScreenHeight = cameraScreenWidth * 9.0f / 16.0f;
 	float cameraScreenDepth = -0.05f;
 
 	point ptCameraModel = point(0.0f, -0.24f, -cameraScreenDepth);
@@ -64,7 +65,7 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	m_pCameraModel->SetPosition(ptCameraModel);
 	m_pCameraModel->SetVisible(false);
 
-	m_pCameraQuad = m_pCameraComposite->AddQuad(cameraScreenWidth, cameraScreenWidth*9.0f / 16.0f);
+	m_pCameraQuad = m_pCameraComposite->AddQuad(cameraScreenWidth, cameraScreenHeight);
 	CN(m_pCameraQuad);
 	m_pCameraQuad->RotateXByDeg(90.0f);
 	m_pCameraQuad->SetVisible(false);
