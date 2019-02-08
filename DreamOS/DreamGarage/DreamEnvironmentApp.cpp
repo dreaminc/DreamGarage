@@ -322,8 +322,8 @@ RESULT DreamEnvironmentApp::GetDefaultCameraPlacement(point& ptPosition, quatern
 
 	switch (m_currentType) {
 	case environment::CAVE: {
-		ptPosition = point(-0.75f, 0.2f, 0.0f);
-		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
+		ptPosition = point(-0.97f, 0.214f, 0.0f);
+		qOrientation.SetValues(0.7046f, -0.06f, -.7046f, 0.06f);
 	} break;
 	}
 
