@@ -1327,7 +1327,7 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 		//memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
 		//
 
-		AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
+		AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, sound::type::SIGNED_16_BIT, (uint8_t*)pAudioDataBuffer);
 		CR(m_pDreamSoundSystem->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, channel));
 
 		// hack to make them connect?
@@ -1355,7 +1355,7 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 			//int16_t *pInt16Soundbuffer = new int16_t[frames];
 			//memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
 
-			AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
+			AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, sound::type::SIGNED_16_BIT, (uint8_t*)pAudioDataBuffer);
 			CR(m_pDreamSoundSystem->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, channel));
 
 			// hack to make them connect?
@@ -1364,7 +1364,7 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 
 			// Send audio to Mixdown
 			DreamSoundSystem::MIXDOWN_TARGET mixdownTarget =
-				(DreamSoundSystem::MIXDOWN_TARGET)((int)(DreamSoundSystem::MIXDOWN_TARGET::BROWSER_0) + channel);
+				(DreamSoundSystem::MIXDOWN_TARGET)((int)(DreamSoundSystem::MIXDOWN_TARGET::REMOTE_BROWSER_MONO_0) + channel);
 			CR(PushAudioPacketToMixdown(mixdownTarget, (int)frames, pendingPacket));
 		}
 	}

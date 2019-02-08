@@ -104,10 +104,10 @@ public:
 	virtual RESULT PushData(double *pDataBuffer, int numFrames, int samplingRate) { return R_INVALID_PARAM; }
 
 public:
-	virtual RESULT PushDataToChannel(int channel, uint8_t *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
-	virtual RESULT PushDataToChannel(int channel, int16_t *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
-	virtual RESULT PushDataToChannel(int channel, float *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
-	virtual RESULT PushDataToChannel(int channel, double *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
+	virtual RESULT PushDataToChannel(int channel, uint8_t *pDataBuffer, size_t numFrames, int samplingRate) { return R_INVALID_PARAM; }
+	virtual RESULT PushDataToChannel(int channel, int16_t *pDataBuffer, size_t numFrames, int samplingRate) { return R_INVALID_PARAM; }
+	virtual RESULT PushDataToChannel(int channel, float *pDataBuffer, size_t numFrames, int samplingRate) { return R_INVALID_PARAM; }
+	virtual RESULT PushDataToChannel(int channel, double *pDataBuffer, size_t numFrames, int samplingRate) { return R_INVALID_PARAM; }
 
 public:
 	// These are stubs to be picked up by the appropriate template implementation
@@ -411,7 +411,6 @@ public:
 						sampleCount += 1;
 					}
 				}
-
 			}
 
 		m_bufferLock.unlock();
@@ -421,7 +420,7 @@ public:
 	}
 
 	// Pushes de-interlaced data to a specific channel
-	virtual RESULT PushDataToChannel(int channel, CBType *pDataBuffer, size_t pDataBuffer_n) override {
+	virtual RESULT PushDataToChannel(int channel, CBType *pDataBuffer, size_t numFrames, int samplingRate) override {
 		RESULT r = R_PASS;
 
 		CircularBuffer<CBType> *pChannelCircBuf = nullptr;
@@ -436,9 +435,47 @@ public:
 		pChannelCircBuf = m_ppCircularBuffers[channel];
 		CN(pChannelCircBuf);
 
-		CB((pChannelCircBuf->NumAvailableBufferBytes() >= pDataBuffer_n));
+		CB((pChannelCircBuf->NumAvailableBufferBytes() >= numFrames));
 	
-		pChannelCircBuf->WriteToBuffer(pDataBuffer, pDataBuffer_n);
+		//pChannelCircBuf->WriteToBuffer(pDataBuffer, numFrames);
+
+		///*
+		if (samplingRate == m_samplingRate) {
+			// This will de-interlace the samples
+
+			pChannelCircBuf->WriteToBuffer(pDataBuffer, numFrames);
+		}
+		else {
+			// We need to up/down sample the buffer to our effective sampling rate
+
+			// recalculate effective numFrames
+			int numBufferFrames = (int)(((float)m_samplingRate / (float)samplingRate)*((float)numFrames));
+
+			float frameLocation = 0.0f;
+			int frameFloor = 0;
+			int frameCeiling = 0;
+			int sampleFloor = 0;
+			int sampleCeiling = 0;
+			float ratio = 0.0f;
+			CBType interpolatedValue = 0;
+
+			// This will de-interlace the samples
+			for (int i = 0; i < numBufferFrames; i++) {
+
+				// Calculate the interpolation (linear) value
+				frameLocation = ((float)(i) / (float)(numBufferFrames)) * numFrames;
+
+				// Get the effective frame
+				frameFloor = (int)floor(frameLocation);
+				frameCeiling = (int)ceil(frameLocation);
+				ratio = frameLocation - frameFloor;
+
+				interpolatedValue = (CBType)(((float)pDataBuffer[frameFloor] * (1.0f - ratio)) + ((float)pDataBuffer[frameCeiling] * (ratio)));
+
+				pChannelCircBuf->WriteToBuffer(interpolatedValue);
+			}
+		}
+		//*/
 
 		m_bufferLock.unlock();
 

@@ -203,7 +203,7 @@ public:
 	RESULT WriteToBuffer(CBType value) {
 		RESULT r = R_PASS;
 
-		CBR((NumAvailableBufferBytes() > 0), R_BUFFER_FULL);
+		//CBR((NumAvailableBufferBytes() > 0), R_BUFFER_FULL);
 
 		WriteNextValue(value);
 

@@ -1197,7 +1197,7 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 				//
 				//CRM(m_pParentDOS->PushAudioPacketToMixdown(numFrames, alteredPendingAudioPacket), "Failed to push packet to sound system");
 
-				CRM(m_pParentDOS->PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::BROWSER_0, numFrames, pendingAudioPacket), "Failed to push packet to sound system");
+				CRM(m_pParentDOS->PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_BROWSER_0, numFrames, pendingAudioPacket), "Failed to push packet to sound system");
 			}
 
 		Error:
@@ -1300,7 +1300,7 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 			pTestContext->m_pDreamBrowserSource->SetURI(strURLSource);
 			//*/
 
-			///* Destination (named pipe) Browser
+			/* Destination (named pipe) Browser
 			// Set up Browser to test the mix down code (timing)
 
 			// This presents a timing issue if it works 

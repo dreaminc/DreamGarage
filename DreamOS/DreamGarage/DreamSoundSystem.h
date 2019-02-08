@@ -24,9 +24,6 @@ class SoundFile;
 class HMD;
 //class SoundBuffer;
 
-#define NUM_MONO_MIXDOWN_BUFFERS 6
-#define NUM_STEREO_MIXDOWN_BUFFERS 1
-
 class DreamSoundSystem : 
 	public DreamModule<DreamSoundSystem>, 
 	public SoundClient::observer ,
@@ -41,13 +38,14 @@ public:
 	};
 
 	typedef enum {
-		BROWSER_0,
+		LOCAL_BROWSER_0,
 		LOCAL_MIC,
 		PEER_1,
 		PEER_2,
 		PEER_3,
 		PEER_4,
 		PEER_5,
+		REMOTE_BROWSER_MONO_0,
 		INVALID
 	} MIXDOWN_TARGET;
 
@@ -117,6 +115,7 @@ private:
 	RESULT InitalizeMixdownSendBuffer();
 	RESULT TeardownMixdownSendBuffer();
 	AudioPacket GetPendingMixdownAudioPacket(int numFrames);
+	int64_t GetNumPendingFrames();
 	
 	std::vector<SoundBuffer*> m_pMixdownBuffers;
 

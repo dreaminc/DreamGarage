@@ -32,7 +32,8 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	sandboxconfig.fInitCloud = false;		// TODO: This is currently breaking stuff
 	sandboxconfig.fInitSound = true;
 	sandboxconfig.fInitUserApp = false;		// Turn on for testing User app related functionality 
-	
+	sandboxconfig.fInitNamedPipe = true;
+
 	sandboxconfig.fHMDMirror = true;
 	sandboxconfig.fHideWindow = false;
 	sandboxconfig.f3rdPersonCamera = false;

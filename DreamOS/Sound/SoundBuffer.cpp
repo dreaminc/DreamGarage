@@ -132,19 +132,19 @@ RESULT SoundBuffer::PushMonoAudioPacket(const AudioPacket &audioPacket, bool fCl
 	for (int i = 0; i < m_channels; i++) {
 		switch (audioPacket.GetSoundType()) {
 			case sound::type::UNSIGNED_8_BIT: {
-				CR(PushDataToChannel(i, (uint8_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+				CR(PushDataToChannel(i, (uint8_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
 			} break;
 
 			case sound::type::SIGNED_16_BIT: {
-				CR(PushDataToChannel(i, (int16_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+				CR(PushDataToChannel(i, (int16_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
 			} break;
 
 			case sound::type::FLOATING_POINT_32_BIT: {
-				CR(PushDataToChannel(i, (float*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+				CR(PushDataToChannel(i, (float*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
 			} break;
 
 			case sound::type::FLOATING_POINT_64_BIT: {
-				CR(PushDataToChannel(i, (double*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+				CR(PushDataToChannel(i, (double*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames(), audioPacket.GetSamplingRate()));
 			} break;
 		}
 	}

@@ -44,6 +44,7 @@ public:
 
 	RESULT AddTestWebRTCVideoStream();
 	RESULT AddTestWebRTCAudio();
+	RESULT AddTestWebRTCVCamAudioRelay();
 
 	// Apps
 	RESULT AddTestChromeMultiBrowser();
