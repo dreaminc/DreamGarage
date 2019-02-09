@@ -2050,8 +2050,8 @@ Error:
 bool DreamGarage::IsCameraInUse() {
 	RESULT r = R_PASS;
 	
-	CN(m_pDreamUserControlArea);
-	CN(m_pDreamUserControlArea->GetVCam());
+	CN(m_pDreamUserControlArea, R_SKIPPED);
+	CN(m_pDreamUserControlArea->GetVCam(), R_SKIPPED);
 
 	return m_pDreamUserControlArea->GetVCam()->IsReceivingCameraPlacement();
 Error:
