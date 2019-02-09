@@ -627,7 +627,7 @@ RESULT OGLTexture::LoadFlippedBufferFromTexture(void *pBuffer, size_t pBuffer_n)
 		CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
 		CR(m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
 	}
-
+	/*
 	if (IsOGLPBOPackEnabled()) {
 		// Set the target framebuffer to read
 		CR(m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_glFramebufferIndex));
@@ -663,9 +663,10 @@ RESULT OGLTexture::LoadFlippedBufferFromTexture(void *pBuffer, size_t pBuffer_n)
 		CR(m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
 	}
 	else {
+	*/
 		//CR(m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
-		CR(m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
-	}
+	CR(m_pParentImp->GetTextureImage(m_glFlippedTextureIndex, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
+	//}
 
 	CN(pBuffer);
 
