@@ -324,6 +324,10 @@ public:
 		return nullptr;
 	}
 
+	virtual bool IsCameraInUse() {
+		return false;
+	}
+
 	RESULT UpdateAllPeerLabelOrientations(camera *pCamera);
 
 private:

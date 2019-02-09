@@ -14,6 +14,7 @@
 #include "DreamVideoStreamSubscriber.h"
 
 #include <memory>
+#include <chrono>
 
 class SpatialSoundObject;
 class SoundFile;
@@ -47,6 +48,8 @@ public:
 	enum class SourceType {
 		CAMERA,
 		SHARE_SCREEN,
+		CLOSED,
+		IN_USE,
 		INVALID
 	};
 
@@ -149,6 +152,11 @@ private:
 	bool m_fShouldBeginStream = false;
 	bool m_fReadyForFrame = false;	
 
+private:
+	std::wstring k_wstrMute = L"camera/messages-muted.png";
+	std::wstring k_wstrInUse = L"camera/messages-in-use.png";
+	std::wstring k_wstrClosed = L"camera/messages-closed.png";
+
 protected:
 	static DreamVCam* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -172,6 +180,8 @@ private:
 	texture *m_pCameraQuadBackgroundTexture = nullptr;
 	texture *m_pShareTexture = nullptr;
 	texture *m_pMuteTexture = nullptr;
+	texture *m_pInUseTexture = nullptr;
+	texture *m_pClosedTexture = nullptr;
 
 	// This node is used for the render texture
 	OGLProgram *m_pOGLRenderNode = nullptr;
@@ -201,6 +211,8 @@ private:
 	bool m_fAutoOpened = false;
 
 	bool m_fHasReceivedSettings = false;
+
+	std::chrono::system_clock::time_point m_msTimeClosed;
 };
 
 #endif // ! DREAM_VCAM_SYSTEM_H_
