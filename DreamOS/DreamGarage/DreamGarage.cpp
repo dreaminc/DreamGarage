@@ -1319,7 +1319,7 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 
 	if (strAudioTrackLabel == kUserAudioLabel) {
 		int channel = (int)pPeerConnection->GetPeerSeatPosition();
-		channel += 1;
+		channel += 2;
 
 		//
 		//// TODO: Move this all into DreamSoundSystem or lower
@@ -1370,7 +1370,7 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 	}
 	else if (strAudioTrackLabel == kVCamAudiolabel) {
 		if (m_pCameraVideoStreamPeerConnectionSource != nullptr && m_pCameraVideoStreamPeerConnectionSource->GetPeerUserID() == pPeerConnection->GetPeerUserID()) {
-			int channel = 0;
+			int channel = 1;
 
 			AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
 			CR(m_pDreamSoundSystem->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, channel));
