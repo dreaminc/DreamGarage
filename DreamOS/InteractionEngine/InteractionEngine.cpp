@@ -927,7 +927,7 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 	
 			ControllerState interactionState = pEvent->state;
 			interactionState.ptTouchpad.x() = m_padInteractionEvent.GetControllerState().ptTouchpad.x() - xDiff;
-			interactionState.ptTouchpad.y() = m_padInteractionEvent.GetControllerState().ptTouchpad.y() - xDiff;
+			interactionState.ptTouchpad.y() = m_padInteractionEvent.GetControllerState().ptTouchpad.y() + yDiff;
 
 			m_padInteractionEvent.SetControllerState(interactionState);
 			
