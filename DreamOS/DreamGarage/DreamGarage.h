@@ -175,6 +175,8 @@ public:
 
 	virtual RESULT GetDefaultVCamPlacement(point& ptPosition, quaternion& qOrientation) override;
 
+	virtual bool IsCameraInUse() override;
+
 private:
 	//std::map<long, user*> m_peerUsers;
 	// User Pool

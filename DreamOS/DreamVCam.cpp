@@ -82,7 +82,17 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	CN(m_pCameraQuadBackgroundTexture);
 	m_pCameraQuadBackground->SetDiffuseTexture(m_pCameraQuadBackgroundTexture);
 
-	m_pMuteTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"camera-mute.png");
+	m_pMuteTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &k_wstrMute[0]);
+	m_pInUseTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &k_wstrInUse[0]);
+	m_pClosedTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &k_wstrClosed[0]);
+
+	{
+		auto pOGLTexture = dynamic_cast<OGLTexture*>(m_pClosedTexture);
+		pOGLTexture->EnableOGLPBOPack();
+
+		pOGLTexture = dynamic_cast<OGLTexture*>(m_pInUseTexture);
+		pOGLTexture->EnableOGLPBOPack();
+	}
 
 	GetDOS()->GetDefaultVCamPlacement(ptDefaultCamera, qDefaultCamera);
 
@@ -207,13 +217,31 @@ RESULT DreamVCam::Update(void *pContext) {
 		CR(UpdateFromPendingVideoFrame());
 	}
 
-	CBR(m_fIsRunning, R_SKIPPED);
+	if (m_fReceivingCameraPlacement) {
+		m_pStreamingTexture = m_pInUseTexture;
+
+		size_t bufferSize = m_pStreamingTexture->GetTextureSize();
+		m_loadBufferIndex = (m_loadBufferIndex + 1) % 2;
+		m_pStreamingTexture->LoadFlippedBufferFromTexture(m_pLoadBuffer[m_loadBufferIndex], bufferSize);
+	}
+	/*
+	else if (!m_fIsRunning) {
+		m_pStreamingTexture = m_pClosedTexture;
+
+		size_t bufferSize = m_pStreamingTexture->GetTextureSize();
+		m_loadBufferIndex = (m_loadBufferIndex + 1) % 2;
+		m_pStreamingTexture->LoadFlippedBufferFromTexture(m_pLoadBuffer[m_loadBufferIndex], bufferSize);
+	}
+	//*/
+
+	//CBR(m_fIsRunning, R_SKIPPED);
 
 	CNR(m_pOGLEndNode, R_SKIPPED);
 	CNR(m_pOGLRenderNode, R_SKIPPED);
 	//*
 	// TODO: Some more logic around texture / buffer sizes etc 
 	//if (m_pNamedPipeServer != nullptr && m_pSourceTexture != nullptr) {
+	if (m_fIsRunning)
 	{
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
@@ -273,10 +301,19 @@ RESULT DreamVCam::Update(void *pContext) {
 					m_pStreamingTexture->LoadFlippedBufferFromTexture(m_pLoadBuffer[m_loadBufferIndex], bufferSize);
 				}
 
+
 				if (m_fPendDisconnectPipes) {
-					m_fPendDisconnectPipes = false;
-					CR(m_pNamedPipeServer->ClearConnections());
-					m_fIsRunning = false;
+					auto timeNow = std::chrono::system_clock::now();
+					m_pStreamingTexture = m_pClosedTexture;
+					size_t bufferSize = m_pStreamingTexture->GetTextureSize();
+					m_loadBufferIndex = (m_loadBufferIndex + 1) % 2;
+					m_pStreamingTexture->LoadFlippedBufferFromTexture(m_pLoadBuffer[m_loadBufferIndex], bufferSize);
+
+					if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - m_msTimeClosed).count() > 1000) {
+						m_fPendDisconnectPipes = false;
+						CR(m_pNamedPipeServer->ClearConnections());
+						m_fIsRunning = false;
+					}
 				}
 
 				// This part can at least go in the thread
@@ -387,7 +424,7 @@ RESULT DreamVCam::ModuleProcess(void *pContext) {
 			else {
 				DEBUG_LINEOUT("NamedPipeServer or Streaming Texture were nullptr in VCam Module Process");
 			}
-		
+
 		}
 		
 		//std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -508,9 +545,15 @@ RESULT DreamVCam::CloseSource() {
 	m_fAutoOpened = false;
 
 	m_fPendDisconnectPipes = true;
+	m_msTimeClosed = std::chrono::system_clock::now();
+//	m_fIsRunning = false;
 
 	m_pParentApp->HandleCameraClosed();
 	SetSourceType(SourceType::CAMERA);
+
+	//m_pStreamingTexture = m_pClosedTexture;
+	//m_fIsClosed = true;
+	//SetSourceType(SourceType::CLOSED);
 
 Error:
 	return r;

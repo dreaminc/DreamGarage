@@ -1089,6 +1089,8 @@ Error:
 RESULT DreamUserControlArea::ShutdownAllSources() {
 	RESULT r = R_PASS;
 
+	GetDOS()->OnStopReceivingCameraPlacement();
+
 	m_pDreamUIBar->HandleEvent(UserObserverEventType::DISMISS);
 
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));

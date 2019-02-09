@@ -2046,3 +2046,14 @@ RESULT DreamGarage::GetDefaultVCamPlacement(point& ptPosition, quaternion& qOrie
 Error:
 	return r;
 }
+
+bool DreamGarage::IsCameraInUse() {
+	RESULT r = R_PASS;
+	
+	CN(m_pDreamUserControlArea);
+	CN(m_pDreamUserControlArea->GetVCam());
+
+	return m_pDreamUserControlArea->GetVCam()->IsReceivingCameraPlacement();
+Error:
+	return false;
+}
