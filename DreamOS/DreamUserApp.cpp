@@ -300,18 +300,24 @@ RESULT DreamUserApp::Update(void *pContext) {
 		}
 	}
 	
-	if (m_pLeftHand != nullptr && m_pRightHand != nullptr && 
-		m_pLeftHand->GetPhantomModel() != nullptr && m_pRightHand->GetPhantomModel() != nullptr &&
-		m_pPhantomLeftHand == nullptr && m_pPhantomRightHand == nullptr) {
+	if (m_pLeftHand != nullptr && 
+		m_pLeftHand->GetPhantomModel() != nullptr &&
+		m_pPhantomLeftHand == nullptr) {
 
 		m_pPhantomLeftHand = m_pLeftHand->GetPhantomModel();
 		m_pPhantomLeftHand->SetVisible(true, false);
 		
 		GetDOS()->AddObject(m_pPhantomLeftHand.get(), SandboxApp::PipelineType::AUX);
 
+	}
+
+	if (m_pRightHand != nullptr &&
+		m_pRightHand->GetPhantomModel() != nullptr &&
+		m_pPhantomRightHand == nullptr) {
+
 		m_pPhantomRightHand = m_pRightHand->GetPhantomModel();
 		m_pPhantomRightHand->SetVisible(true, false);
-		
+
 		GetDOS()->AddObject(m_pPhantomRightHand.get(), SandboxApp::PipelineType::AUX);
 	}
 	
