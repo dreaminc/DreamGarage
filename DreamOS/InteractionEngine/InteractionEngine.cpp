@@ -924,11 +924,12 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 
 			xDiff *= scale;
 			yDiff *= scale;
+	
+			ControllerState interactionState = pEvent->state;
+			interactionState.ptTouchpad.x() = m_padInteractionEvent.GetControllerState().ptTouchpad.x() - xDiff;
+			interactionState.ptTouchpad.y() = m_padInteractionEvent.GetControllerState().ptTouchpad.y() - xDiff;
 
-			pEvent->state.ptTouchpad.x() = m_padInteractionEvent.GetControllerState().ptTouchpad.x()-xDiff;
-			pEvent->state.ptTouchpad.y() = m_padInteractionEvent.GetControllerState().ptTouchpad.y()+yDiff;
-
-			m_padInteractionEvent.SetControllerState(pEvent->state);
+			m_padInteractionEvent.SetControllerState(interactionState);
 			
 		} break;
 	}
