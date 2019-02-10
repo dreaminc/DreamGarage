@@ -967,6 +967,10 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 			}
 		}
 	}
+	
+	if (pendingAudioPacket.GetSamplingRate() == 44100) {
+		CR(GetDOS()->GetDreamSoundSystem()->PlayAudioPacket(pendingAudioPacket));
+	}
 
 	//if (m_fStreaming) {
 	//	CR(GetDOS()->GetCloudController()->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));

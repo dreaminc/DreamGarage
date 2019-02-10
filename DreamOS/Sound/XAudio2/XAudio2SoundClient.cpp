@@ -117,6 +117,7 @@ RESULT XAudio2SoundClient::Initialize() {
 	sourceFormat.wBitsPerSample = 16;
 	sourceFormat.nChannels = 2;
 	sourceFormat.nSamplesPerSec = 48000;
+	//sourceFormat.nSamplesPerSec = 44100;
 	sourceFormat.nBlockAlign = (sourceFormat.wBitsPerSample >> 3) * sourceFormat.nChannels;
 	sourceFormat.nAvgBytesPerSec = sourceFormat.nBlockAlign * sourceFormat.nSamplesPerSec;
 	sourceFormat.cbSize = 0;
@@ -288,6 +289,7 @@ RESULT XAudio2SoundClient::PushAudioPacket(const AudioPacket &pendingAudioPacket
 		xAudio2SoundBuffer.AudioBytes = (UINT32)pAudioBuffer_n;  //size of the audio buffer in bytes
 		xAudio2SoundBuffer.pAudioData = pByteAudioBuffer;  //buffer containing audio data
 		xAudio2SoundBuffer.Flags = XAUDIO2_END_OF_STREAM; // tell the source voice not to expect any data after this buffer
+		
 	
 		//XAUDIO2_VOICE_STATE voiceState;
 		//m_pXAudio2SourceVoiceStereoSignedInt16->GetState(&voiceState, NULL);
@@ -295,6 +297,8 @@ RESULT XAudio2SoundClient::PushAudioPacket(const AudioPacket &pendingAudioPacket
 		//m_pXAudio2SourceVoiceStereoSignedInt16->FlushSourceBuffers();
 
 		DEBUG_LINEOUT("%d frames", pendingAudioPacket.GetNumFrames());
+
+		m_pXAudio2SourceVoiceStereoSignedInt16->SetSourceSampleRate(pendingAudioPacket.GetSamplingRate());
 
 		CRM((RESULT)m_pXAudio2SourceVoiceStereoSignedInt16->SubmitSourceBuffer(&xAudio2SoundBuffer), "Failed to submit source buffer");
 
