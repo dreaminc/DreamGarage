@@ -417,10 +417,10 @@ RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, in
 
 		newPendingPacket.SetSoundType(sound::type::SIGNED_16_BIT);
 
-		m_pendingAudioPackets.push(newPendingPacket);
+		//m_pendingAudioPackets.push(newPendingPacket);
 
 		// This will push directly into the pending buffer
-		//CR(m_pWebBrowserControllerObserver->OnAudioPacket(newPendingPacket));
+		CR(m_pWebBrowserControllerObserver->OnAudioPacket(newPendingPacket));
 	}
 
 Error:
