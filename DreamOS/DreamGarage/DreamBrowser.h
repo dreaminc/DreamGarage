@@ -178,6 +178,9 @@ public:
 	virtual std::string GetTitle() override;
 	virtual std::string GetContentType() override;
 
+	virtual std::string GetScheme() override;
+	virtual std::string GetURL() override;
+
 	RESULT PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	virtual RESULT SetURI(std::string strURI);

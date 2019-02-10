@@ -1075,6 +1075,14 @@ std::string DreamBrowser::GetTitle() {
 	return strValidTitle;
 }
 
+std::string DreamBrowser::GetScheme() {
+	return m_strCurrentURL;
+}
+
+std::string DreamBrowser::GetURL() {
+	return "";
+}
+
 std::string DreamBrowser::GetContentType() {
 	return m_strContentType;
 }

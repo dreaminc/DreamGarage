@@ -573,6 +573,14 @@ std::string DreamVCam::GetContentType() {
 	return m_strContentType;
 }
 
+std::string DreamVCam::GetScheme() {
+	return "";
+}
+
+std::string DreamVCam::GetURL() {
+	return "";
+}
+
 RESULT DreamVCam::OnClientConnect() {
 	RESULT r = R_PASS;
 

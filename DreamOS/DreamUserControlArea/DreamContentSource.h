@@ -39,6 +39,9 @@ public:
 
 	virtual std::string GetTitle() = 0;
 	virtual std::string GetContentType() = 0;
+
+	virtual std::string GetScheme() = 0;
+	virtual std::string GetURL() = 0;
 };
 
 #endif // ! DREAM_CONTENT_SOURCE_H_

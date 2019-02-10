@@ -28,11 +28,17 @@
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
 #define SQUARED_DRAG_THRESHOLD 0.001f;
 
+#define LOCK_PX_WIDTH 97.0f
+#define BACKGROUND_PX_WIDTH 1823.0f
+#define ADDRESS_PX_HEIGHT 120.0f
+
 class quad; 
 class sphere;
 class UIView;
 class UIButton;
 class texture;
+class font;
+class text;
 
 class UIControlView : public UISurface, 
 						 public DreamUserObserver {
@@ -48,6 +54,9 @@ public:
 	RESULT Initialize();
 	RESULT Update();
 	
+public:
+	RESULT InitializeAddressBar(float width);
+
 public:
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
 	virtual texture *GetOverlayTexture(HAND_TYPE type);
@@ -80,6 +89,10 @@ public:
 	RESULT SetViewQuadTexture(texture* pBrowserTexture);
 
 public:
+	RESULT SetURLText(std::string strURL);
+	RESULT SetSchemeText(std::string strScheme);
+
+public:
 	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768.png";
 
 	//TODO: potentially move these into user app or dream app
@@ -88,6 +101,11 @@ public:
 	const wchar_t *k_wszViveOverlayLeft = L"vive-controller-overlay-left-active.png";
 	const wchar_t *k_wszViveOverlayRight = L"vive-controller-overlay-right-active.png";
 
+private:
+	std::wstring k_wstrAddressSecure = L"texture/control-view/address-bar-secure.png";
+	std::wstring k_wstrAddressInsecure = L"texture/control-view/address-bar-insecure.png";
+	std::wstring k_wstrAddressBackground = L"texture/control-view/address-bar-url-background.png";
+	
 private:
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
 
@@ -98,6 +116,19 @@ private:
 
 	texture* m_pOverlayLeft;
 	texture* m_pOverlayRight;
+
+	texture *m_pAddressSecureTexture = nullptr;
+	texture *m_pAddressInsecureTexture = nullptr;
+	texture *m_pAddressBackgroundTexture = nullptr;
+
+	std::shared_ptr<UIView> m_pAddressBar = nullptr;
+	std::shared_ptr<quad> m_pAddressSecurityQuad = nullptr;
+	std::shared_ptr<quad> m_pAddressBackgroundQuad = nullptr;
+
+	std::shared_ptr<font> m_pFont = nullptr;
+	std::shared_ptr<text> m_pAddressText = nullptr;
+	std::string m_strCurrentURL;
+	std::string m_strCurrentScheme;
 
 	bool m_fMouseDown[2];
 	bool m_fMouseDrag = false;

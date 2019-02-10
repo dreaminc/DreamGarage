@@ -416,6 +416,9 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 		m_pUserControls->SetTitleText(m_pActiveSource->GetTitle());
 		m_pUserControls->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
 	}
+	if (m_pControlView != nullptr) {
+		m_pControlView->SetURLText(pNewContent->GetURL());
+	}
 
 	//m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 
@@ -477,6 +480,7 @@ RESULT DreamUserControlArea::UpdateControlBarText(std::string& strTitle) {
 	RESULT r = R_PASS;
 
 	CR(m_pUserControls->SetTitleText(strTitle));
+	CR(m_pControlView->SetURLText(strTitle));
 
 Error:
 	return r;

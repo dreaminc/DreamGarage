@@ -99,6 +99,9 @@ public:
 	virtual std::string GetTitle() override;
 	virtual std::string GetContentType() override;
 
+	virtual std::string GetScheme() override;
+	virtual std::string GetURL() override;
+
 	// NamedPipeServerObserver
 	virtual RESULT OnClientConnect() override;
 	virtual RESULT OnClientDisconnect() override;
