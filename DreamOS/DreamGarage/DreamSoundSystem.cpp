@@ -211,9 +211,9 @@ RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptur
 
 	// This pushes the mic input into the chromium mixdown bridge
 	///*
-	//AudioPacket pendingAudioPacket;
-	//pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket, false);
-	//PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_MIC, numFrames, pendingAudioPacket);
+	AudioPacket pendingAudioPacket;
+	pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket, false);
+	PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_MIC, numFrames, pendingAudioPacket);
 	//*/
 
 	/*

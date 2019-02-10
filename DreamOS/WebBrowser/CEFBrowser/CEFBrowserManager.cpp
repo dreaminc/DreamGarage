@@ -62,7 +62,7 @@ RESULT CEFBrowserManager::Update() {
 		int numFramesProcessed = 0;
 		CR(pWebBrowserController->PollNewDirtyFrames(numFramesProcessed));
 
-		CR(pWebBrowserController->PollPendingAudioPackets(numFramesProcessed));
+		//CR(pWebBrowserController->PollPendingAudioPackets(numFramesProcessed));
 	}
 
 	if (m_fUpdateJob) {		// catching child processes
