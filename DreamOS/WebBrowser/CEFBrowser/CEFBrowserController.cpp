@@ -405,12 +405,17 @@ RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, in
 	memcpy(pNewDataBuffer, pDataBuffer, pNewDataBuffer_n);
 	//*/
 	
+	int samplingRate = 48000;
+	if (frames % 441 == 0) {
+		samplingRate = 44100;
+	}
+
 	{
 		AudioPacket newPendingPacket(
 			frames,
 			channels,
 			bitsPerSample,
-			48000,		// TODO: Should bubble down from CEF or something
+			samplingRate,		// TODO: Should bubble down from CEF or something
 			pNewDataBuffer
 			//pDataBuffer
 		);
