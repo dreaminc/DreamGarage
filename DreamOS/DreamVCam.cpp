@@ -217,13 +217,15 @@ RESULT DreamVCam::Update(void *pContext) {
 		CR(UpdateFromPendingVideoFrame());
 	}
 
-	if (m_fReceivingCameraPlacement) {
+	//*
+	if (m_fReceivingCameraPlacement && m_pLoadBuffer[0] != nullptr) {
 		m_pStreamingTexture = m_pInUseTexture;
 
 		size_t bufferSize = m_pStreamingTexture->GetTextureSize();
 		m_loadBufferIndex = (m_loadBufferIndex + 1) % 2;
 		m_pStreamingTexture->LoadBufferFromTexture(m_pLoadBuffer[m_loadBufferIndex], bufferSize);
 	}
+	//*/
 	/*
 	else if (!m_fIsRunning) {
 		m_pStreamingTexture = m_pClosedTexture;

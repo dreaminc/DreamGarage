@@ -29,7 +29,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
-    <LocalDebuggerCommandArguments>-u test1@dreamos.com -p nightmare -env 170</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-rt 2 -env 170 -h n -n n</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
