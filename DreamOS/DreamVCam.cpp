@@ -248,7 +248,7 @@ RESULT DreamVCam::Update(void *pContext) {
 
 		// Approximately 24 FPS
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 41) {
-			
+
 			texture *pTexture = m_pOGLRenderNode->GetOGLFramebufferColorTexture();	
 
 			UnsetSourceTexture();
@@ -282,6 +282,8 @@ RESULT DreamVCam::Update(void *pContext) {
 			//*	
 			size_t bufferSize = m_pStreamingTexture->GetTextureSize();
 			m_loadBufferIndex = (m_loadBufferIndex + 1) % 2;
+
+			std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex[m_loadBufferIndex]);
 
 			if (bufferSize == m_pLoadBuffer_n) {
 				// TODO: We currently don't support multi-sample, so need to make sure
@@ -413,21 +415,21 @@ RESULT DreamVCam::ModuleProcess(void *pContext) {
 
 		// Approximately 24 FPS
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastSentTime).count() > 41) {
+			int loadBufferIndex = (m_loadBufferIndex + 1) % 2;
+			//std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex[m_loadBufferIndex], std::try_to_lock);
 
-			if (m_pNamedPipeServer != nullptr && m_pStreamingTexture != nullptr) {
+			//if (lockBufferMutex.owns_lock()) {
+				if (m_pNamedPipeServer != nullptr && m_pStreamingTexture != nullptr) {
 
-				size_t bufferSize = m_pStreamingTexture->GetTextureSize();
+					m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer[loadBufferIndex]), m_pLoadBuffer_n);
 
-				m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer[m_loadBufferIndex]), m_pLoadBuffer_n);
-
-				lastSentTime = timeNow;
-			}
-			else {
-				DEBUG_LINEOUT("NamedPipeServer or Streaming Texture were nullptr in VCam Module Process");
-			}
-
+					lastSentTime = timeNow;
+				}
+				else {
+					DEBUG_LINEOUT("NamedPipeServer or Streaming Texture were nullptr in VCam Module Process");
+				}
+			//}
 		}
-		
 		//std::this_thread::sleep_for(std::chrono::seconds(1));
 		Sleep(1);
 	}
