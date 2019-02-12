@@ -531,7 +531,7 @@ AudioPacket DreamSoundSystem::GetPendingMixdownAudioPacket(int numFrames) {
 	
 	AudioPacket pendingAudioPacket(numFrames, numChannels, sizeof(int16_t), samplingRate, sound::type::SIGNED_16_BIT, (uint8_t*)(pDataBuffer));
 
-	CBR(!GetDOS()->IsCameraInUse(), R_SKIPPED);
+//	CBR(!GetDOS()->IsCameraInUse(), R_SKIPPED);
 
 	// The Stereo channels
 	for (int i = (int)(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_BROWSER_0); i < (int)(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_MIC); i++) {
@@ -635,7 +635,9 @@ RESULT DreamSoundSystem::MixdownProcess() {
 					void *pDataBuffer = pendingAudioPacket.GetDataBuffer();
 					size_t pDataBuffer_n = pendingAudioPacket.GetDataBufferSize();
 
-					m_pNamedPipeServer->SendMessage((void*)(pDataBuffer), pDataBuffer_n);
+					if (!GetDOS()->IsCameraInUse()) {
+						m_pNamedPipeServer->SendMessage((void*)(pDataBuffer), pDataBuffer_n);
+					}
 				}
 
 				pendingAudioPacket.DeleteBuffer();
