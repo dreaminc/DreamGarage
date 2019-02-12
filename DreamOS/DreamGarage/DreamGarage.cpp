@@ -1135,18 +1135,22 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 
 		avatarID = m_pUserController->GetUser().GetAvatarID();
 
-		if (GetHMD() != nullptr) {
+		//*
+		//if (GetHMD() != nullptr) {
+		if (!m_fClearHands) {
 			auto pLeftHand = GetHMD()->GetHand(HAND_TYPE::HAND_LEFT);
 			pLeftHand->PendCreateHandModel(avatarID);
-			//pLeftHand->SetModelState(hand::ModelState::HAND);
 
 			auto pRightHand = GetHMD()->GetHand(HAND_TYPE::HAND_RIGHT);
 			pRightHand->PendCreateHandModel(avatarID);
-			//pRightHand->SetModelState(hand::ModelState::HAND);
+			m_fClearHands = true;
+		}
 
+		if (GetHMD() != nullptr) {
 			CR(m_pDreamUserApp->SetEventApp(nullptr));
 			CR(m_pDreamUserApp->SetHasOpenApp(false));
 		}
+		//*/
 
 		CR(m_pDreamUserApp->HideMessageQuad());
 	}
@@ -1670,7 +1674,7 @@ RESULT DreamGarage::OnLogout() {
 		CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
 	}
 
-	CR(PendClearHands());
+//	CR(PendClearHands());
 
 	m_fSeated = false;
 

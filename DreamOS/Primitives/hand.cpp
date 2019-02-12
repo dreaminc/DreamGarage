@@ -89,6 +89,10 @@ RESULT hand::LoadHandModel() {
 
 		RemoveChild(m_pPhantomModel);
 		m_pPhantomModel = nullptr;
+
+		if (m_pDreamOS != nullptr) {
+			m_pDreamOS->RemoveObject(m_pPhantomModel.get());
+		}
 	}
 
 #ifndef _DEBUG
@@ -102,6 +106,10 @@ RESULT hand::LoadHandModel() {
 		m_pModel = AddModel(wstrModel);
 		m_pPhantomModel = MakeModel(wstrModel);
 
+		if (m_pDreamOS != nullptr) {
+			m_pDreamOS->AddObject(m_pPhantomModel.get(), SandboxApp::PipelineType::AUX);
+		}
+
 		vector vLeftHandOffset = vector(0.0f, (float)(M_PI), (float)(M_PI_2));
 		m_pModel->SetOrientationOffset(vLeftHandOffset);
 		m_pPhantomModel->SetOrientationOffset(vLeftHandOffset);
@@ -113,6 +121,10 @@ RESULT hand::LoadHandModel() {
 		//m_pModel = m_pHMDComposite->AddModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
 		m_pModel = AddModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
 		m_pPhantomModel = MakeModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
+		
+		if (m_pDreamOS != nullptr) {
+			m_pDreamOS->AddObject(m_pPhantomModel.get(), SandboxApp::PipelineType::AUX);
+		}
 
 		vector vRightHandOffset = vector(0.0f, (float)(M_PI), (float)(-M_PI_2));
 		m_pModel->SetOrientationOffset(vRightHandOffset);
