@@ -759,6 +759,7 @@ RESULT DreamVCam::StopSharing() {
 	RESULT r = R_PASS;
 
 	m_pCurrentCameraShare = nullptr;
+	m_pCameraQuadTexture = nullptr;
 
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CN(pEnvironmentControllerProxy);
