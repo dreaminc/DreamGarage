@@ -87,10 +87,6 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	if (m_pUserModel != nullptr) {
 		m_pUserModel->Update();
 		m_pUserModel->UpdateUserNameLabelPlacement(GetDOS()->GetCamera());
-
-		// 
-		m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT)->GetPhantomModel()->SetVisible(false);
-		m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT)->GetPhantomModel()->SetVisible(false);
 	}
 
 Error:
@@ -253,8 +249,6 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 	//CR(ShowUserNameField());
 
 	GetDOS()->AddObjectToUIGraph(m_pUserModel->GetMouth().get(), SandboxApp::PipelineType::AUX);
-	GetDOS()->AddObject(m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT)->GetPhantomModel().get(), SandboxApp::PipelineType::AUX);
-	GetDOS()->AddObject(m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT)->GetPhantomModel().get(), SandboxApp::PipelineType::AUX);
 
 Error:
 	return r;
