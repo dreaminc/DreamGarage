@@ -507,11 +507,6 @@ RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pD
 	return R_NOT_FOUND;
 }
 
-RESULT DreamGarage::PendClearHands() {
-	m_fClearHands = true;
-	return R_PASS;
-}
-
 user* DreamGarage::FindUserModelInPool(DreamPeerApp *pDreamPeer) {
 	for (const auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == pDreamPeer) {
@@ -969,7 +964,7 @@ RESULT DreamGarage::Update(void) {
 	}
 	//*/
 
-	if (m_fClearHands) {
+	if (m_fInitHands) {
 		//CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
 		//CR(ClearPeers());
 	}
@@ -1135,22 +1130,19 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 
 		avatarID = m_pUserController->GetUser().GetAvatarID();
 
-		//*
-		//if (GetHMD() != nullptr) {
-		if (!m_fClearHands) {
+		if (!m_fInitHands) {
 			auto pLeftHand = GetHMD()->GetHand(HAND_TYPE::HAND_LEFT);
 			pLeftHand->PendCreateHandModel(avatarID);
 
 			auto pRightHand = GetHMD()->GetHand(HAND_TYPE::HAND_RIGHT);
 			pRightHand->PendCreateHandModel(avatarID);
-			m_fClearHands = true;
+			m_fInitHands = true;
 		}
 
 		if (GetHMD() != nullptr) {
 			CR(m_pDreamUserApp->SetEventApp(nullptr));
 			CR(m_pDreamUserApp->SetHasOpenApp(false));
 		}
-		//*/
 
 		CR(m_pDreamUserApp->HideMessageQuad());
 	}
@@ -1673,8 +1665,6 @@ RESULT DreamGarage::OnLogout() {
 	if (m_pDreamUserApp->GetBrowserManager() != nullptr) {
 		CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
 	}
-
-//	CR(PendClearHands());
 
 	m_fSeated = false;
 

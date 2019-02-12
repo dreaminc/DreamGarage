@@ -294,7 +294,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 				m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT)->SetVisible(false);
 			}
 			// Doing this here for now, it's possible we want to just have AddUser add to both pipes though.
-			GetDOS()->AddObject(m_pUserModel->GetHead().get(), SandboxApp::PipelineType::AUX);
+			GetDOS()->AddObject(m_pUserModel.get(), SandboxApp::PipelineType::AUX);
 			GetDOS()->AddObjectToUIGraph(m_pUserModel->GetMouth().get(), SandboxApp::PipelineType::AUX);
 			GetDOS()->AddObjectToUIGraph(m_pUserModel->GetUserObjectComposite().get(), SandboxApp::PipelineType::AUX);
 		}
@@ -306,8 +306,6 @@ RESULT DreamUserApp::Update(void *pContext) {
 
 		m_pPhantomLeftHand = m_pLeftHand->GetPhantomModel();
 		m_pPhantomLeftHand->SetVisible(true, false);
-
-		//GetDOS()->AddObject(m_pPhantomLeftHand.get(), SandboxApp::PipelineType::AUX);
 	}
 
 	if (m_pRightHand != nullptr &&
@@ -316,8 +314,6 @@ RESULT DreamUserApp::Update(void *pContext) {
 
 		m_pPhantomRightHand = m_pRightHand->GetPhantomModel();
 		m_pPhantomRightHand->SetVisible(true, false);
-
-		//GetDOS()->AddObject(m_pPhantomRightHand.get(), SandboxApp::PipelineType::AUX);
 	}
 	
 #endif
