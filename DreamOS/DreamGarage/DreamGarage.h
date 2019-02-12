@@ -185,7 +185,6 @@ private:
 	RESULT AllocateAndAssignUserModelFromPool(DreamPeerApp *pDreamPeer);
 	user* FindUserModelInPool(DreamPeerApp *pDreamPeer);
 	RESULT UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pDreamPeer);
-	RESULT PendClearHands();
 
 	std::array<std::pair<DreamPeerApp*, user*>, MAX_PEERS> m_usersModelPool = { std::pair<DreamPeerApp*, user*>(nullptr, nullptr) };
 
@@ -208,7 +207,7 @@ private:
 	// TODO: should these be here
 	bool m_fFirstLogin = true;
 	bool m_fHasCredentials = false;
-	bool m_fClearHands = false;
+	bool m_fInitHands = false;
 
 	std::string m_strRefreshToken;
 	std::string m_strAccessToken;

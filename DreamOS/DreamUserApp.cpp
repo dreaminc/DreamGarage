@@ -306,9 +306,6 @@ RESULT DreamUserApp::Update(void *pContext) {
 
 		m_pPhantomLeftHand = m_pLeftHand->GetPhantomModel();
 		m_pPhantomLeftHand->SetVisible(true, false);
-		
-		GetDOS()->AddObject(m_pPhantomLeftHand.get(), SandboxApp::PipelineType::AUX);
-
 	}
 
 	if (m_pRightHand != nullptr &&
@@ -317,8 +314,6 @@ RESULT DreamUserApp::Update(void *pContext) {
 
 		m_pPhantomRightHand = m_pRightHand->GetPhantomModel();
 		m_pPhantomRightHand->SetVisible(true, false);
-
-		GetDOS()->AddObject(m_pPhantomRightHand.get(), SandboxApp::PipelineType::AUX);
 	}
 	
 #endif

@@ -165,6 +165,7 @@ private:
 	texture* m_pSourceTexture = nullptr;
 	texture* m_pStreamingTexture = nullptr;
 
+	std::mutex m_BufferMutex[2];
 	unsigned char* m_pLoadBuffer[2] = { 0 };
 	size_t m_pLoadBuffer_n = 0;
 	int m_loadBufferIndex = 0;
