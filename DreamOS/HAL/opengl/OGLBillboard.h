@@ -6,11 +6,13 @@
 #include "OGLObj.h"
 #include "Primitives/billboard.h"
 
+// Pyramid inheritance throws a dominance warning which needs to be suppressed
+// until c++ adds a special keyword to deal with this issue, this is by design
 #pragma warning(push)
 #pragma warning(disable : 4250)
 class OGLBillboard : public billboard, public OGLObj {
 public:
-	OGLBillboard(OpenGLImp *pParentImp, point ptOrigin, float width, float height, texture *pTexture);
+	OGLBillboard(OpenGLImp *pParentImp, point ptOrigin, float width, float height);
 	~OGLBillboard();
 
 	// override to specify GL_POINT

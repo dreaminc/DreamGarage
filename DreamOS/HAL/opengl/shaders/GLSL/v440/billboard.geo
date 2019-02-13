@@ -27,6 +27,8 @@ void GenerateQuad() {
 	vec4 xDiff = vec4(x3Diff, 0.0);
 	vec4 yDiff = vec4(y3Diff, 0.0);
 
+	// TODO: generalize primitive creation into a geoCommon.shader file
+//*
 	// Triangle 1
 	gl_Position = ptOrigin + xDiff + yDiff;
 	gs_out.uvCoord = vec2(1.0,1.0);

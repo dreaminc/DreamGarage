@@ -8,15 +8,12 @@ class texture;
 
 class billboard : public virtual DimObj {
 public:
-	billboard(point ptOrigin, float width, float height, texture *pTexture);
+	billboard(point ptOrigin, float width, float height);
 	~billboard();
 
 	virtual inline unsigned int NumberIndices() override;
 	virtual inline unsigned int NumberVertices() override;
 	virtual RESULT Allocate() override;
-
-	RESULT SetTexture(texture *pTexture);
-	texture *GetTexture();
 
 	float GetWidth();
 	float GetHeight();
@@ -24,8 +21,6 @@ public:
 	RESULT SetVertex(point ptOrigin);
 
 private:
-	texture *m_pTexture = nullptr;
-
 	float m_width;
 	float m_height;
 };

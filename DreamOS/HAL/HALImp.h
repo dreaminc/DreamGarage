@@ -208,7 +208,7 @@ public:
 
 	virtual user *MakeUser() = 0;
 
-	virtual billboard *MakeBillboard(point ptOrigin, float width, float height, texture *pTexture) = 0;
+	virtual billboard *MakeBillboard(point ptOrigin, float width, float height) = 0;
 
 
 	// Composite

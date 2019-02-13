@@ -1,7 +1,7 @@
 #include "OGLBillboard.h"
 
-OGLBillboard::OGLBillboard(OpenGLImp *pParentImp, point ptOrigin, float width, float height, texture *pTexture) :
-	billboard(ptOrigin,width,height,pTexture),
+OGLBillboard::OGLBillboard(OpenGLImp *pParentImp, point ptOrigin, float width, float height) :
+	billboard(ptOrigin,width,height),
 	OGLObj(pParentImp)
 {
 	RESULT r = OGLInitialize();

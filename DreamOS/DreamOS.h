@@ -507,8 +507,8 @@ public:
 	user *AddUser();
 	user *MakeUser();
 
-	billboard *AddBillboard(point ptOrigin, float width, float height, texture *pTexture);
-	billboard *MakeBillboard(point ptOrigin, float width, float height, texture *pTexture);
+	billboard *AddBillboard(point ptOrigin, float width, float height);
+	billboard *MakeBillboard(point ptOrigin, float width, float height);
 
 	Pipeline *GetRenderPipeline();
 

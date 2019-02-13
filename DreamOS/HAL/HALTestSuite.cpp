@@ -1042,17 +1042,20 @@ RESULT HALTestSuite::AddTestBillboardShader() {
 
 			texture *pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 			
-			pTestContext->pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 0.5f, 0.5f, pTexture);
+			pTestContext->pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 0.5f, 0.5f);
+			pTestContext->pBillboard->SetDiffuseTexture(pTexture);
 			CN(pTestContext->pBillboard);
 			pTestContext->pBillboard->SetPosition(1.0f, 0.0f, 1.0f);
 			//pTestContext->pBillboard->SetPosition(1.0f, 0.0f, 10.0f);
 			//pTestContext->pBillboard->SetPosition(-2.0f, 0.0f, 5.0f);
 
-			auto pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 0.5f, 0.5f, pTexture);
-			pBillboard->SetPosition(2.0f, 0.0f, 5.0f);
+			auto pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 0.5f, 0.5f);
+			pBillboard->SetPosition(1.0f, 0.0f, 5.0f);
+			pBillboard->SetDiffuseTexture(pTexture);
 
-			pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 0.5f, 0.5f, pTexture);
-			pBillboard->SetPosition(-2.0f, 0.5f, 5.0f);
+			pBillboard = m_pDreamOS->AddBillboard(point(0.0f, 0.0f, 0.0f), 0.5f, 0.5f);
+			pBillboard->SetPosition(-1.0f, 0.5f, 5.0f);
+			pBillboard->SetDiffuseTexture(pTexture);
 
 			//*
 			pTestContext->pGround = m_pDreamOS->AddSphere();

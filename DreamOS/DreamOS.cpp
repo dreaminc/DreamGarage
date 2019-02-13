@@ -1300,12 +1300,12 @@ user *DreamOS::AddUser() {
 	return m_pSandbox->AddUser();
 }
 
-billboard *DreamOS::AddBillboard(point ptOrigin, float width, float height, texture *pTexture) {
-	return m_pSandbox->AddBillboard(ptOrigin, width, height, pTexture);
+billboard *DreamOS::AddBillboard(point ptOrigin, float width, float height) {
+	return m_pSandbox->AddBillboard(ptOrigin, width, height);
 }
 
-billboard *DreamOS::MakeBillboard(point ptOrigin, float width, float height, texture *pTexture) {
-	return m_pSandbox->MakeBillboard(ptOrigin, width, height, pTexture);
+billboard *DreamOS::MakeBillboard(point ptOrigin, float width, float height) {
+	return m_pSandbox->MakeBillboard(ptOrigin, width, height);
 }
 
 RESULT DreamOS::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {

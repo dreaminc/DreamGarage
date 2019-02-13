@@ -437,10 +437,10 @@ Error:
 	return nullptr;
 }
 
-billboard *OpenGLImp::MakeBillboard(point ptOrigin, float width, float height, texture *pTexture) {
+billboard *OpenGLImp::MakeBillboard(point ptOrigin, float width, float height) {
 	RESULT r = R_PASS;
 
-	billboard *pBillboard = new OGLBillboard(this, ptOrigin, width, height, pTexture);
+	billboard *pBillboard = new OGLBillboard(this, ptOrigin, width, height);
 	CN(pBillboard);
 
 	return pBillboard;
