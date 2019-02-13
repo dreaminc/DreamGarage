@@ -197,6 +197,8 @@ public:
 
 	RESULT OnGetForm(std::shared_ptr<CloudMessage> pCloudMessage);
 
+	RESULT OnEnvironmentSocketPing(std::shared_ptr<CloudMessage> pCloudMessage);
+
 	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override { return R_NOT_IMPLEMENTED; }
 
 	long GetUserID();

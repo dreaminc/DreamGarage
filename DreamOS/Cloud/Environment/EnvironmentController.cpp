@@ -80,6 +80,8 @@ RESULT EnvironmentController::Initialize() {
 	CR(RegisterMethod("get_form", std::bind(&EnvironmentController::OnGetForm, this, std::placeholders::_1)));
 	//TODO: no method currently for a stop_sharing response, but could potentially be used for error handling
 
+	CR(RegisterMethod("environment_socket.ping", std::bind(&EnvironmentController::OnEnvironmentSocketPing, this, std::placeholders::_1)));
+
 Error:
 	return r;
 }
@@ -1059,6 +1061,22 @@ RESULT EnvironmentController::OnGetForm(std::shared_ptr<CloudMessage> pCloudMess
 Error:
 	return r;
 }
+
+RESULT EnvironmentController::OnEnvironmentSocketPing(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("environment_socket.ping"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, m_state));
+
+Error:
+	return r;
+}
+
 
 RESULT EnvironmentController::OnStopSending(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
