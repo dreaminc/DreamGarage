@@ -715,21 +715,32 @@ RESULT UserController::OnGetSettings(std::string&& strResponse) {
 		cameraID = jsonSettings["id"].get<int>();
 		userID = jsonSettings["user"].get<int>();
 
-		CB(!jsonSettings["camera_position_x"].is_null());
+		if (!jsonSettings["camera_position_x"].is_null() &&
+			!jsonSettings["camera_position_y"].is_null() &&
+			!jsonSettings["camera_position_z"].is_null() &&
+			!jsonSettings["camera_orientation_w"].is_null() &&
+			!jsonSettings["camera_orientation_x"].is_null() &&
+			!jsonSettings["camera_orientation_y"].is_null() &&
+			!jsonSettings["camera_orientation_z"].is_null()) {
 
-		ptX = jsonSettings["camera_position_x"].get<float>();
-		ptY = jsonSettings["camera_position_y"].get<float>();
-		ptZ = jsonSettings["camera_position_z"].get<float>();
+			ptX = jsonSettings["camera_position_x"].get<float>();
+			ptY = jsonSettings["camera_position_y"].get<float>();
+			ptZ = jsonSettings["camera_position_z"].get<float>();
 
-		qW = jsonSettings["camera_orientation_w"].get<float>();
-		qX = jsonSettings["camera_orientation_x"].get<float>();
-		qY = jsonSettings["camera_orientation_y"].get<float>();
-		qZ = jsonSettings["camera_orientation_z"].get<float>();
+			qW = jsonSettings["camera_orientation_w"].get<float>();
+			qX = jsonSettings["camera_orientation_x"].get<float>();
+			qY = jsonSettings["camera_orientation_y"].get<float>();
+			qZ = jsonSettings["camera_orientation_z"].get<float>();
 
-		ptCamera = point(ptX, ptY, ptZ);
-		qCamera = quaternion(quaternionXYZW(qW, qX, qY, qZ));
+			ptCamera = point(ptX, ptY, ptZ);
+			qCamera = quaternion(quaternionXYZW(qW, qX, qY, qZ));
 
-		CR(m_pUserControllerObserver->OnGetSettings(ptCamera, qCamera, true));
+			CR(m_pUserControllerObserver->OnGetSettings(ptCamera, qCamera, true));
+		}
+		else {
+			CR(m_pUserControllerObserver->OnGetSettings(point(0.0f, 0.0f, 0.0f), quaternion(), false));
+		}
+
 	}
 
 
