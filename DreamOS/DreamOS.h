@@ -34,6 +34,7 @@
 #include "Primitives/texture.h"
 #include "Primitives/skybox.h"
 #include "Primitives/user.h"
+#include "Primitives/billboard.h"
 
 #include "Primitives/HysteresisObject.h"
 
@@ -506,6 +507,9 @@ public:
 	user *AddUser();
 	user *MakeUser();
 
+	billboard *AddBillboard(point ptOrigin, float width, float height);
+	billboard *MakeBillboard(point ptOrigin, float width, float height);
+
 	Pipeline *GetRenderPipeline();
 
 	stereocamera* GetCamera();
@@ -518,6 +522,7 @@ public:
 	ObjectStoreNode* GetUISceneGraphNode() { return m_pSandbox->GetUISceneGraphNode(); }
 	ObjectStoreNode* GetUIClippingSceneGraphNode() { return m_pSandbox->GetUIClippingSceneGraphNode(); }
 	ObjectStoreNode* GetAuxUISceneGraphNode() { return m_pSandbox->GetAuxUISceneGraphNode(); }
+	ObjectStoreNode* GetBillboardSceneGraphNode() { return m_pSandbox->GetBillboardSceneGraphNode(); }
 
 	// Hands
 	hand *GetHand(HAND_TYPE handType);

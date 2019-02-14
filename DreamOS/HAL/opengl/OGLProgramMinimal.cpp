@@ -140,11 +140,6 @@ RESULT OGLProgramMinimal::SetObjectUniforms(DimObj *pDimObj) {
 		m_pUniformModelMatrix->SetUniform(matModel);
 	}
 
-	if (m_pUniformModelMatrix != nullptr) {
-		auto matModel = pDimObj->GetModelMatrix();
-		m_pUniformModelMatrix->SetUniform(matModel);
-	}
-
 	return R_PASS;
 }
 

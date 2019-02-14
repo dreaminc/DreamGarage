@@ -576,6 +576,9 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	m_pUIClippingSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pUIClippingSceneGraph, "Failed to allocate UI Clipping Scene Graph");
 
+	m_pBillboardSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pBillboardSceneGraph, "Failed to allocate UI Clipping Scene Graph");
+
 	// This will prevent scene graph from being deleted when not connected
 	// TODO: Attach to Sandbox somehow?
 	CB(m_pSceneGraph->incRefCount());
@@ -1654,6 +1657,41 @@ Error:
 	if (pUser != nullptr) {
 		delete pUser;
 		pUser = nullptr;
+	}
+	return nullptr;
+}
+
+billboard *SandboxApp::AddBillboard(point ptOrigin, float width, float height) {
+	RESULT r = R_PASS;
+
+	billboard *pBillboard = MakeBillboard(ptOrigin, width, height);
+	CN(pBillboard);
+
+	// billboards are always rendered by the billboard shader right now (also in aux with same scene graph)
+	m_pBillboardSceneGraph->PushObject(pBillboard);
+
+	return pBillboard;
+
+Error:
+	if (pBillboard != nullptr) {
+		delete pBillboard;
+		pBillboard = nullptr;
+	}
+	return nullptr;
+}
+
+billboard *SandboxApp::MakeBillboard(point ptOrigin, float width, float height) {
+	RESULT r = R_PASS;
+
+	billboard *pBillboard = m_pHALImp->MakeBillboard(ptOrigin, width, height);
+	CN(pBillboard);
+
+	return pBillboard;
+
+Error:
+	if (pBillboard != nullptr) {
+		delete pBillboard;
+		pBillboard = nullptr;
 	}
 	return nullptr;
 }

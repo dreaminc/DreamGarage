@@ -31,6 +31,7 @@
 #include "OGLProgramUIStage.h"
 #include "OGLProgramDebugOverlay.h"
 #include "OGLProgramVisualizeNormals.h"
+#include "OGLProgramBillboard.h"
 
 // Deferred 
 #include "OGLProgramGBuffer.h"
@@ -71,6 +72,7 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "uistage", OGLPROGRAM_UI_STAGE },
 	{ "debug_overlay", OGLPROGRAM_DEBUG_OVERLAY },
 	{ "visualize_normals", OGLPROGRAM_VISUALIZE_NORMALS },
+	{ "billboard", OGLPROGRAM_BILLBOARD },
 	{ "invalid", OGLPROGRAM_INVALID }
 };
 
@@ -321,7 +323,14 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			pOGLProgram = new OGLProgramVisualizeNormals(pParentImp, optFlags);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(versionOGL),
-				"Failed to initialize OGL minimal Program");
+				"Failed to initialize OGL visualize normals Program");
+		} break;
+
+		case OGLPROGRAM_BILLBOARD: {
+			pOGLProgram = new OGLProgramBillboard(pParentImp, optFlags);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL billboard Program");
 		} break;
 
 		case OGLPROGRAM_CUSTOM:

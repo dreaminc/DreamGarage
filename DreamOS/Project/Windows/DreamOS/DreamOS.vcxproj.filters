@@ -1038,6 +1038,15 @@
     <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentShare.cpp">
       <Filter>Cloud\Environment</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\billboard.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBillboard.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLBillboard.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2258,6 +2267,15 @@
     <ClInclude Include="..\..\..\Test\DreamTestSuite.h">
       <Filter>Test</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\billboard.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBillboard.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLBillboard.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2526,6 +2544,15 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\billboard.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\billboard.geo">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\billboard.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>

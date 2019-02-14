@@ -390,6 +390,9 @@ public:
 	user *AddUser();
 	user *MakeUser();
 
+	billboard *AddBillboard(point ptOrigin, float width, float height);
+	billboard *MakeBillboard(point ptOrigin, float width, float height);
+
 	ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	HysteresisObject *MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType);
@@ -432,11 +435,15 @@ public:
 	quaternion GetCameraOrientation();
 
 	CameraNode* GetCameraNode() { return m_pCamera; }
+
 	ObjectStoreNode* GetSceneGraphNode() { return m_pSceneGraph; }
 	ObjectStoreNode* GetAuxSceneGraphNode() { return m_pAuxSceneGraph; }
+
 	ObjectStoreNode* GetUISceneGraphNode() { return m_pUISceneGraph; }
 	ObjectStoreNode* GetUIClippingSceneGraphNode() { return m_pUIClippingSceneGraph; }
 	ObjectStoreNode* GetAuxUISceneGraphNode() { return m_pAuxUISceneGraph; }
+
+	ObjectStoreNode* GetBillboardSceneGraphNode() { return m_pBillboardSceneGraph; }
 
 	hand *GetHand(HAND_TYPE handType);
 
@@ -465,6 +472,7 @@ protected:
 	ObjectStoreNode *m_pUISceneGraph = nullptr;
 	ObjectStoreNode *m_pUIClippingSceneGraph = nullptr;
 	ObjectStoreNode *m_pAuxUISceneGraph = nullptr;
+	ObjectStoreNode *m_pBillboardSceneGraph = nullptr;
 
 	CloudController *m_pCloudController = nullptr;
 	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine = nullptr;
