@@ -517,6 +517,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 
 		virtual RESULT UpdateControlBarText(std::string& strTitle) override { return R_NOT_HANDLED; }
 		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override { return R_NOT_HANDLED; }
+		virtual RESULT UpdateURLBarSecurity(bool fSecure) override { return R_NOT_HANDLED; }
 		virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
@@ -1045,6 +1046,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 		virtual RESULT UpdateControlBarText(std::string& strTitle) override { return R_NOT_HANDLED; }
 		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override { return R_NOT_HANDLED; }
+		virtual RESULT UpdateURLBarSecurity(bool fSecure) override { return R_NOT_HANDLED; }
 		virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) override { return R_NOT_HANDLED; }

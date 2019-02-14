@@ -173,6 +173,12 @@ RESULT CEFBrowserManager::OnLoadingStateChanged(CefRefPtr<CefBrowser> pCEFBrowse
 
 	CR(pCEFBrowserController->OnLoadingStateChanged(fLoading, fCanGoBack, fCanGoForward, strCurrentURL));
 
+	// security check temporarily located here
+	CNR(pCEFBrowser->GetHost(), R_SKIPPED);
+	CNR(pCEFBrowser->GetHost()->GetVisibleNavigationEntry(), R_SKIPPED);
+	CNR(pCEFBrowser->GetHost()->GetVisibleNavigationEntry()->GetSSLStatus(), R_SKIPPED);
+	CR(pCEFBrowserController->SetIsSecureConnection(pCEFBrowser->GetHost()->GetVisibleNavigationEntry()->GetSSLStatus()->IsSecureConnection()));
+
 Error:
 	return r;
 }

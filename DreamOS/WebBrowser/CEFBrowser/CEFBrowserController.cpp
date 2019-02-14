@@ -503,6 +503,16 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::SetIsSecureConnection(bool fSecure) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->SetIsSecureConnection(fSecure));
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::OnLoadStart(CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) {
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadStart");

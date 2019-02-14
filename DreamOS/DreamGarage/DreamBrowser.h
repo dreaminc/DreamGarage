@@ -57,6 +57,7 @@ public:
 
 	virtual RESULT UpdateControlBarText(std::string& strTitle) = 0;
 	virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) = 0;
+	virtual RESULT UpdateURLBarSecurity(bool fSecure) = 0;
 
 	virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) = 0;
 
@@ -134,6 +135,7 @@ public:
 	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType,std::string strURL) override;
 	virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) override;
 	virtual RESULT SetTitle(std::string strTitle) override;
+	virtual RESULT SetIsSecureConnection(bool fSecure) override;
 
 	virtual RESULT HandleDreamFormSuccess() override;
 	virtual RESULT HandleDreamFormCancel() override;
@@ -246,6 +248,7 @@ private:
 	int m_pageDepth = 0; // hack to avoid the loading page on back
 	std::string m_strCurrentTitle;
 	std::string m_strCurrentURL;
+	bool m_fSecure = false;
 
 	TextEntryString m_strEntered;
 	

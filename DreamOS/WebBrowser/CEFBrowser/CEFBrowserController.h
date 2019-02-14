@@ -80,6 +80,8 @@ public:
 	//RESULT OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode);
 	RESULT OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode);
 
+	RESULT SetIsSecureConnection(bool fSecure);
+
 	RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefString strCEFURL);
 	RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL);
 

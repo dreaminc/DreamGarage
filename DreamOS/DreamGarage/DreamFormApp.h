@@ -57,6 +57,7 @@ public:
 
 	RESULT UpdateControlBarText(std::string& strTitle) override;
 	RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override;
+	RESULT UpdateURLBarSecurity(bool fSecure) override;
 
 	RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) override;
 

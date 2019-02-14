@@ -495,6 +495,15 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::UpdateURLBarSecurity(bool fSecure) {
+	RESULT r = R_PASS;
+
+	CR(m_pControlView->SetURLSecurity(fSecure));
+
+Error:
+	return r;
+}
+
 RESULT DreamUserControlArea::HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) {
 	RESULT r = R_PASS;
 

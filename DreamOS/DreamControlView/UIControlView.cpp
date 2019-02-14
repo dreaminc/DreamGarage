@@ -269,6 +269,20 @@ RESULT UIControlView::SetSchemeText(std::string strScheme) {
 	return R_PASS;
 }
 
+RESULT UIControlView::SetURLSecurity(bool fSecure) {
+	RESULT r = R_PASS;
+
+	if (fSecure) {
+		CR(m_pAddressSecurityQuad->SetDiffuseTexture(m_pAddressSecureTexture));
+	}
+	else {
+		CR(m_pAddressSecurityQuad->SetDiffuseTexture(m_pAddressInsecureTexture));
+	}	
+
+Error:
+	return r;
+}
+
 RESULT UIControlView::ShowView() {
 	RESULT r = R_PASS;
 	/* This screws with animations too much, taking it out for now

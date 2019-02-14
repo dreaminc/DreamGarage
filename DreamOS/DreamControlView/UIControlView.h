@@ -91,6 +91,7 @@ public:
 public:
 	RESULT SetURLText(std::string strURL);
 	RESULT SetSchemeText(std::string strScheme);
+	RESULT SetURLSecurity(bool fSecure);
 
 public:
 	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768.png";

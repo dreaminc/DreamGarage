@@ -133,6 +133,7 @@ public:
 	virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) override;
 	virtual RESULT UpdateControlBarText(std::string& strTitle) override;
 	virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override;
+	virtual RESULT UpdateURLBarSecurity(bool fSecure) override;
 	virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override;
 
 	//TODO: present keyboard from browser::OnNodeFocusChanged

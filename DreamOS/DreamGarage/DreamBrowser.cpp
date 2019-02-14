@@ -1064,6 +1064,18 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::SetIsSecureConnection(bool fSecure) {
+	RESULT r = R_PASS;
+
+	m_fSecure = fSecure;
+	CNR(m_pObserver, R_SKIPPED);
+
+	m_pObserver->UpdateURLBarSecurity(fSecure);
+
+Error:
+	return r;
+}
+
 std::string DreamBrowser::GetTitle() {
 	std::string strValidTitle;
 	if (m_strCurrentTitle == "") {
