@@ -1017,6 +1017,11 @@ void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* p
 	}
 
 	m_webRTCICECandidates.push_back(iceCandidate);
+
+	// we can just use the last value instead of creating another copy
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnICECandidateGathered(&m_webRTCICECandidates.back(), m_peerConnectionID);
+	}
 }
 
 // DataChannelObserver Implementation

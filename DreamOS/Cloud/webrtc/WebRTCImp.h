@@ -51,6 +51,7 @@ public:
 		virtual RESULT OnSDPOfferSuccess(long peerConnectionID) = 0;
 		virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) = 0;
 		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
+		virtual RESULT OnICECandidateGathered(WebRTCICECandidate *pICECandidate, long peerConnectionID) = 0;
 		virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
@@ -130,6 +131,7 @@ protected:
 	virtual RESULT OnSDPOfferSuccess(long peerConnectionID) override;
 	virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) override;
 	virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) override;
+	virtual RESULT OnICECandidateGathered(WebRTCICECandidate *pICECandidate, long peerConnectionID) override;
 	virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) override;
 	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;

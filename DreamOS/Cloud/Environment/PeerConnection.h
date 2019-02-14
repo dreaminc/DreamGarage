@@ -291,6 +291,11 @@ public:
 		return R_PASS;
 	}
 
+	RESULT AppendOfferCandidate(WebRTCICECandidate *pICECandidate) {
+		m_offerICECandidates.emplace_back(pICECandidate);	// Should this be push_back()?
+		return R_PASS;
+	}
+
 	const std::list<WebRTCICECandidate>& GetAnswerCandidates() { 
 		return m_answerICECandidates; 
 	}
@@ -298,6 +303,10 @@ public:
 	RESULT SetAnswerCandidates(std::list<WebRTCICECandidate>& iceCandidates) {
 		m_answerICECandidates = iceCandidates;
 		return R_PASS;
+	}
+
+	RESULT AppendAnswerCandidate(WebRTCICECandidate *pICECandidate) {
+		m_answerICECandidates.emplace_back(pICECandidate);
 	}
 
 	bool IsWebRTCConnectionStable() {

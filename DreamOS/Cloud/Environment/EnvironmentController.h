@@ -159,6 +159,8 @@ public:
 	RESULT SetSDPAnswer(User user, PeerConnection *pPeerConnection);
 	RESULT SetOfferCandidates(User user, PeerConnection *pPeerConnection);
 	RESULT SetAnswerCandidates(User user, PeerConnection *pPeerConnection);
+	RESULT AppendOfferCandidate(User user, WebRTCICECandidate* pICECandidate, PeerConnection *pPeerConnection);
+	RESULT AppendAnswerCandidate(User user, WebRTCICECandidate* pICECandidate, PeerConnection *pPeerConnection);
 
 	RESULT UpdateEnvironmentUser();
 	RESULT PrintEnvironmentPeerList();
@@ -237,6 +239,7 @@ private:
 	virtual RESULT OnSDPOfferSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnSDPAnswerSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) override;
+	virtual RESULT OnICECandidateGathered(WebRTCICECandidate *pICECandidate, PeerConnection *pPeerConnection) override;
 
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;

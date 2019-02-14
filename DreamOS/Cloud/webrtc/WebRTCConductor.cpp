@@ -571,6 +571,14 @@ RESULT WebRTCConductor::OnICECandidatesGatheringDone(long peerConnectionID) {
 	return R_NOT_HANDLED;
 }
 
+RESULT WebRTCConductor::OnICECandidateGathered(WebRTCICECandidate* pICECandidate, long peerConnectionID) {
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnICECandidateGathered(pICECandidate, peerConnectionID);
+	}
+
+	return R_NOT_HANDLED;
+}
+
 RESULT WebRTCConductor::OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) {
 	RESULT r = R_PASS;
 

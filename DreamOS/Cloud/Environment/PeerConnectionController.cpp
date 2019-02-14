@@ -506,6 +506,39 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		
 		//RESULT WebRTCConductor::AddIceCandidate(ICECandidate iceCandidate) {
 	}
+	else if (strMethod == "append_offer_candidates") {
+		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
+
+		DOSLOG(INFO, "[PeerConnectionController] append_offer_candidates peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
+
+		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+
+		CN(m_pWebRTCImp);
+		///*
+		if (m_pWebRTCImp->IsOfferer(peerConnectionID) == false) {
+			CBM((pPeerConnection->GetOfferCandidates().size() > 0), "Can't add answer candidates since there are none");
+			CRM(m_pWebRTCImp->AddOfferCandidates(pPeerConnection), "Failed to add Peer Connection answer candidates");
+		}
+		//*/
+	}
+	else if (strMethod == "append_answer_candidates") {
+		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
+
+		// DEADBEEF:
+		//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
+
+		DOSLOG(INFO, "[PeerConnectionController] append_answer_candidates peer connection %v offeror(self): %v answerer: %v", peerConnectionID, offerUserID, answerUserId);
+
+		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+
+		CN(m_pWebRTCImp);
+		///*
+		if (m_pWebRTCImp->IsOfferer(peerConnectionID) == true) {
+			CBM((pPeerConnection->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
+			CRM(m_pWebRTCImp->AddAnswerCandidates(pPeerConnection), "Failed to add Peer Connection answer candidates");
+		}
+		//*/
+	}
 	else {
 		DOSLOG(ERR, "[PeerConnectionController] method unknown");
 	}
@@ -649,6 +682,27 @@ RESULT PeerConnectionController::OnICECandidatesGatheringDone(long peerConnectio
 		m_pPeerConnectionControllerObserver->OnICECandidatesGatheringDone(pPeerConnection);
 	}
 
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::OnICECandidateGathered(WebRTCICECandidate *pICECandidate, long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+
+	if (m_pWebRTCImp->IsOfferer(peerConnectionID)) {
+		CR(pPeerConnection->AppendOfferCandidate(pICECandidate));
+	}
+	else {
+		CR(pPeerConnection->AppendAnswerCandidate(pICECandidate));
+	}
+
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		m_pPeerConnectionControllerObserver->OnICECandidateGathered(pICECandidate, pPeerConnection);
+	}
 
 Error:
 	return r;
