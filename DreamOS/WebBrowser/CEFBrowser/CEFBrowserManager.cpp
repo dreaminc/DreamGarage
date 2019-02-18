@@ -177,7 +177,12 @@ RESULT CEFBrowserManager::OnLoadingStateChanged(CefRefPtr<CefBrowser> pCEFBrowse
 	CNR(pCEFBrowser->GetHost(), R_SKIPPED);
 	CNR(pCEFBrowser->GetHost()->GetVisibleNavigationEntry(), R_SKIPPED);
 	CNR(pCEFBrowser->GetHost()->GetVisibleNavigationEntry()->GetSSLStatus(), R_SKIPPED);
-	CR(pCEFBrowserController->SetIsSecureConnection(pCEFBrowser->GetHost()->GetVisibleNavigationEntry()->GetSSLStatus()->IsSecureConnection()));
+
+	{
+		auto cefSSLStatus = pCEFBrowser->GetHost()->GetVisibleNavigationEntry()->GetSSLStatus();
+		CN(cefSSLStatus);
+		CR(pCEFBrowserController->SetIsSecureConnection(cefSSLStatus->IsSecureConnection() && !CefIsCertStatusError(cefSSLStatus->GetCertStatus())));
+	}
 
 Error:
 	return r;
