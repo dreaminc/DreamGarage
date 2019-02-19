@@ -339,11 +339,8 @@ Error:
 RESULT DreamBrowser::OnLoadError(int errorCode, std::string strError, std::string strFailedURL) {
 	RESULT r = R_PASS;
 
-	if (m_pObserver != nullptr && errorCode == -113) {
-		WebRequest webRequest;
-
-		webRequest.SetURL(util::CStringToWideString(m_pObserver->GetLoadErrorURL().c_str()));
-		//CR(LoadRequest(webRequest));
+	// currently the abort case (-3) is caused by OnCertificateError
+	if (m_pObserver != nullptr && errorCode != -3) {
 		CR(SetURI(m_pObserver->GetLoadErrorURL()));
 	}
 
@@ -371,12 +368,6 @@ Error:
 
 bool DreamBrowser::OnCertificateError(std::string strURL, unsigned int certError) {
 	RESULT r = R_PASS;
-
-	//auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-
-	//std::string strForm = DreamFormApp::StringFromType(FormType::CERTIFICATE_ERROR);
-	//pUserController->RequestFormURL(strForm);
-	//SetURI("https://www.develop.dreamos.com/forms/errors/certificate-invalid");
 
 	CN(m_pObserver);
 	CR(SetURI(m_pObserver->GetCertificateErrorURL()));
@@ -666,6 +657,9 @@ RESULT DreamBrowser::Update(void *pContext) {
 		if (m_pWebBrowserController != nullptr) {
 			CR(UpdateNavigationFlags());
 		}
+		if (m_pObserver != nullptr) {
+			m_pObserver->UpdateAddressBarText(m_strCurrentURL);
+		}
 		m_fUpdateControlBarInfo = false;
 	}
 	
@@ -779,8 +773,7 @@ RESULT DreamBrowser::UpdateNavigationFlags() {
 		bool fCanGoForward = m_pWebBrowserController->CanGoForward();
 
 		if (m_pObserver != nullptr) {
-			//CR(m_pObserver->UpdateControlBarNavigation(fCanGoBack, fCanGoForward));
-			CR(m_pObserver->UpdateControlBarNavigation(true, true));
+			CR(m_pObserver->UpdateControlBarNavigation(fCanGoBack, fCanGoForward));
 		}
 	}
 
@@ -1105,7 +1098,7 @@ RESULT DreamBrowser::SetIsSecureConnection(bool fSecure) {
 	m_fSecure = fSecure;
 	CNR(m_pObserver, R_SKIPPED);
 
-	m_pObserver->UpdateURLBarSecurity(fSecure);
+	m_pObserver->UpdateAddressBarSecurity(fSecure);
 
 Error:
 	return r;

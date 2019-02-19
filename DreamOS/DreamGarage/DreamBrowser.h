@@ -57,7 +57,8 @@ public:
 
 	virtual RESULT UpdateControlBarText(std::string& strTitle) = 0;
 	virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) = 0;
-	virtual RESULT UpdateURLBarSecurity(bool fSecure) = 0;
+	virtual RESULT UpdateAddressBarText(std::string& strURL) = 0;
+	virtual RESULT UpdateAddressBarSecurity(bool fSecure) = 0;
 
 	virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) = 0;
 

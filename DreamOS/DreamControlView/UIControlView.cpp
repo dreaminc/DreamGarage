@@ -127,7 +127,7 @@ RESULT UIControlView::InitializeAddressBar(float width) {
 	m_pFont->SetLineHeight(lineHeight);
 	m_pAddressText = std::shared_ptr<text>(m_pDreamOS->MakeText(
 		m_pFont,
-		"gello world",
+		"",
 		backgroundWidth,
 		lineHeight, 
 		text::flags::RENDER_QUAD));
@@ -144,7 +144,6 @@ RESULT UIControlView::InitializeAddressBar(float width) {
 	CN(m_pAddressBackgroundQuad);
 	m_pAddressBackgroundQuad->SetDiffuseTexture(m_pAddressBackgroundTexture);
 	m_pAddressBackgroundQuad->SetPosition(ptBackground);
-
 
 Error:
 	return r;
@@ -293,6 +292,7 @@ RESULT UIControlView::ShowView() {
 
 	auto fnStartCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(true);
+		m_pViewBackground->SetVisible(true);
 		return R_PASS;
 	};
 
@@ -345,7 +345,7 @@ RESULT UIControlView::Show() {
 	RESULT r = R_PASS;
 
 	//CR(ResetAppComposite());
-	SetVisible(true);
+	SetVisible(true, false);
 //	m_pViewQuad->SetVisible(true);
 	CR(ShowView());
 
@@ -371,6 +371,7 @@ RESULT UIControlView::HideView() {
 
 	auto fnEndCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(false);
+		m_pViewBackground->SetVisible(false);
 		return R_PASS;
 	};
 

@@ -113,7 +113,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		m_pUserControls->Hide();
 		m_pDreamTabView->SetVisible(false);
-		m_pControlView->SetVisible(false);
+		m_pControlView->SetVisible(false, false);
 
 		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
@@ -480,7 +480,6 @@ RESULT DreamUserControlArea::UpdateControlBarText(std::string& strTitle) {
 	RESULT r = R_PASS;
 
 	CR(m_pUserControls->SetTitleText(strTitle));
-	CR(m_pControlView->SetURLText(strTitle));
 
 Error:
 	return r;
@@ -495,10 +494,19 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::UpdateURLBarSecurity(bool fSecure) {
+RESULT DreamUserControlArea::UpdateAddressBarSecurity(bool fSecure) {
 	RESULT r = R_PASS;
 
 	CR(m_pControlView->SetURLSecurity(fSecure));
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::UpdateAddressBarText(std::string& strURL) {
+	RESULT r = R_PASS;
+
+	CR(m_pControlView->SetURLText(strURL));
 
 Error:
 	return r;

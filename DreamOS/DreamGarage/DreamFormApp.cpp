@@ -56,7 +56,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 		m_pFormView->RegisterSubscriber(UI_SCROLL, this);
 
 		//m_pFormView->Hide();
-		m_pFormView->SetVisible(false);
+		m_pFormView->SetVisible(false, false);
 		GetComposite()->SetVisible(false, false);
 		GetDOS()->AddObjectToUIGraph(m_pFormView.get());
 
@@ -237,8 +237,14 @@ RESULT DreamFormApp::UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForw
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamFormApp::UpdateURLBarSecurity(bool fSecure) {
-	return R_NOT_IMPLEMENTED;
+RESULT DreamFormApp::UpdateAddressBarSecurity(bool fSecure) {
+	m_pFormView->SetURLSecurity(fSecure);
+	return R_PASS;
+}
+
+RESULT DreamFormApp::UpdateAddressBarText(std::string& strURL) {
+	m_pFormView->SetURLText(strURL);
+	return R_PASS;
 }
 
 RESULT DreamFormApp::UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) {
