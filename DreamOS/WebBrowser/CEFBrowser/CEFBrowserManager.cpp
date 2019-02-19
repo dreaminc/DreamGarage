@@ -173,6 +173,17 @@ RESULT CEFBrowserManager::OnLoadingStateChanged(CefRefPtr<CefBrowser> pCEFBrowse
 
 	CR(pCEFBrowserController->OnLoadingStateChanged(fLoading, fCanGoBack, fCanGoForward, strCurrentURL));
 
+	// security check temporarily located here
+	CNR(pCEFBrowser->GetHost(), R_SKIPPED);
+	CNR(pCEFBrowser->GetHost()->GetVisibleNavigationEntry(), R_SKIPPED);
+	CNR(pCEFBrowser->GetHost()->GetVisibleNavigationEntry()->GetSSLStatus(), R_SKIPPED);
+
+	{
+		auto cefSSLStatus = pCEFBrowser->GetHost()->GetVisibleNavigationEntry()->GetSSLStatus();
+		CN(cefSSLStatus);
+		CR(pCEFBrowserController->SetIsSecureConnection(cefSSLStatus->IsSecureConnection() && !CefIsCertStatusError(cefSSLStatus->GetCertStatus())));
+	}
+
 Error:
 	return r;
 }
@@ -205,6 +216,21 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserManager::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::ErrorCode errorCode, const CefString& strError, const CefString& strFailedURL) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadError");
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
+	CN(pCEFBrowserController);
+
+	// TODO: add frame
+	CR(pCEFBrowserController->OnLoadError(pCEFBrowser, pCEFFrame, errorCode, strError, strFailedURL));
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserManager::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) {
 	RESULT r = R_PASS;
 
@@ -218,6 +244,17 @@ RESULT CEFBrowserManager::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID,
 
 Error:
 	return r;
+}
+
+bool CEFBrowserManager::OnCertificateError(CefRefPtr<CefBrowser> browser, cef_errorcode_t cert_error, const CefString& request_url, CefRefPtr<CefSSLInfo> ssl_info, CefRefPtr<CefRequestCallback> callback) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(browser->GetIdentifier());
+	CN(pCEFBrowserController);
+
+	return pCEFBrowserController->OnCertificateError(request_url, cert_error);
+Error:
+	return false;
 }
 
 std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(int cefBrowserID) {

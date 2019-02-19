@@ -16,6 +16,8 @@ enum class FormType {
 	ENVIRONMENTS_WELCOME,
 	SETTINGS,
 	TEAMS_MISSING,
+	CERTIFICATE_ERROR,
+	LOAD_RESOURCE_ERROR,
 	DEFAULT,
 	INVALID
 };
@@ -57,6 +59,8 @@ public:
 
 	RESULT UpdateControlBarText(std::string& strTitle) override;
 	RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override;
+	RESULT UpdateAddressBarSecurity(bool fSecure) override;
+	RESULT UpdateAddressBarText(std::string& strText) override;
 
 	RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) override;
 
@@ -71,6 +75,9 @@ public:
 
 	RESULT HandleCanTabNext(bool fCanNext) override;
 	RESULT HandleCanTabPrevious(bool fCanPrevious) override;
+
+	virtual std::string GetCertificateErrorURL() override;
+	virtual std::string GetLoadErrorURL() override;
 
 	RESULT SetAsActive();
 

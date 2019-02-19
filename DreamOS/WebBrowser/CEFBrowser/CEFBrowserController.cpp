@@ -503,6 +503,16 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::SetIsSecureConnection(bool fSecure) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->SetIsSecureConnection(fSecure));
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::OnLoadStart(CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) {
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadStart");
@@ -534,6 +544,17 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::ErrorCode errorCode, const CefString& strError, const CefString& strFailedURL) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadError");
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->OnLoadError((int)(errorCode), strError, strFailedURL));
+
+Error:
+	return r;
+}
+
 CefRefPtr<CefBrowser> CEFBrowserController::GetCEFBrowser() {
 	return m_pCEFBrowser;
 }
@@ -550,6 +571,16 @@ RESULT CEFBrowserController::OnFocusedNodeChanged(int cefBrowserID, int cefFrame
 
 Error:
 	return r;
+}
+
+bool CEFBrowserController::OnCertificateError(std::string strURL, unsigned int certError) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebBrowserControllerObserver);
+	return m_pWebBrowserControllerObserver->OnCertificateError(strURL, certError);
+
+Error:
+	return false;
 }
 
 RESULT CEFBrowserController::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefString strCEFURL) {

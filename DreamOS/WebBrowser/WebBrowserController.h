@@ -62,10 +62,13 @@ public:
 		virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) = 0;
 		virtual RESULT OnLoadStart() = 0;
 		virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) = 0;
+		virtual RESULT OnLoadError(int errorCode, std::string strError, std::string strFailedURL) = 0;
 		virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) = 0;
+		virtual bool OnCertificateError(std::string strURL, unsigned int certError) = 0;
 		virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, std::string strURL) = 0;
 		virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) = 0;
 		virtual RESULT SetTitle(std::string strTitle) = 0;
+		virtual RESULT SetIsSecureConnection(bool fSecure) = 0;
 
 		// Dream Form Extensions
 		virtual RESULT HandleDreamFormSuccess() = 0;

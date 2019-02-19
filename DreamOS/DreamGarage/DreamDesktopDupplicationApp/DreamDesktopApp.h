@@ -66,6 +66,9 @@ public:
 	virtual std::string GetTitle() override;
 	virtual std::string GetContentType() override;
 
+	virtual std::string GetScheme() override;
+	virtual std::string GetURL() override;
+
 	virtual RESULT CloseSource() override;
 	virtual RESULT SendFirstFrame() override;
 

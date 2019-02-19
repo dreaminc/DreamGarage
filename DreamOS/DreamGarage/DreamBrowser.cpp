@@ -2,6 +2,7 @@
 //#include "DreamControlView/UIControlView.h"
 #include "DreamShareView/DreamShareView.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
+#include "DreamFormApp.h"
 #include "DreamOS.h"
 #include "Core/Utilities.h"
 
@@ -335,6 +336,18 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::OnLoadError(int errorCode, std::string strError, std::string strFailedURL) {
+	RESULT r = R_PASS;
+
+	// currently the abort case (-3) is caused by OnCertificateError
+	if (m_pObserver != nullptr && errorCode != -3) {
+		CR(SetURI(m_pObserver->GetLoadErrorURL()));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
@@ -351,6 +364,18 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 
 Error:
 	return r;
+}
+
+bool DreamBrowser::OnCertificateError(std::string strURL, unsigned int certError) {
+	RESULT r = R_PASS;
+
+	CN(m_pObserver);
+	CR(SetURI(m_pObserver->GetCertificateErrorURL()));
+
+	// return true here if the page should load (and execute callback->Continue(true) in CEFHandler::OnCertificateError)
+	return false;
+Error:
+	return false;
 }
 
 RESULT DreamBrowser::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, std::string strURL) {
@@ -631,6 +656,9 @@ RESULT DreamBrowser::Update(void *pContext) {
 	if (m_fUpdateControlBarInfo) {
 		if (m_pWebBrowserController != nullptr) {
 			CR(UpdateNavigationFlags());
+		}
+		if (m_pObserver != nullptr) {
+			m_pObserver->UpdateAddressBarText(m_strCurrentURL);
 		}
 		m_fUpdateControlBarInfo = false;
 	}
@@ -1064,6 +1092,18 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::SetIsSecureConnection(bool fSecure) {
+	RESULT r = R_PASS;
+
+	m_fSecure = fSecure;
+	CNR(m_pObserver, R_SKIPPED);
+
+	m_pObserver->UpdateAddressBarSecurity(fSecure);
+
+Error:
+	return r;
+}
+
 std::string DreamBrowser::GetTitle() {
 	std::string strValidTitle;
 	if (m_strCurrentTitle == "") {
@@ -1073,6 +1113,14 @@ std::string DreamBrowser::GetTitle() {
 		strValidTitle = m_strCurrentTitle;
 	}
 	return strValidTitle;
+}
+
+std::string DreamBrowser::GetScheme() {
+	return m_strCurrentURL;
+}
+
+std::string DreamBrowser::GetURL() {
+	return "";
 }
 
 std::string DreamBrowser::GetContentType() {

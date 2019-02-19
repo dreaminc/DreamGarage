@@ -133,6 +133,8 @@ public:
 	virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) override;
 	virtual RESULT UpdateControlBarText(std::string& strTitle) override;
 	virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override;
+	virtual RESULT UpdateAddressBarSecurity(bool fSecure) override;
+	virtual RESULT UpdateAddressBarText(std::string& strURL) override;
 	virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override;
 
 	//TODO: present keyboard from browser::OnNodeFocusChanged
@@ -148,6 +150,9 @@ public:
 
 	virtual RESULT HandleCanTabNext(bool fCanNext) override;
 	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override;
+
+	virtual std::string GetCertificateErrorURL() override;
+	virtual std::string GetLoadErrorURL() override;
 
 // DreamVCam
 public:
@@ -187,6 +192,9 @@ public:
 
 	RESULT UpdateIsActive(bool fIsActive);
 	RESULT HandleCameraClosed();
+
+	RESULT SetCertificateErrorURL(std::string strURL);
+	RESULT SetLoadErrorURL(std::string strURL);
 
 // Animations
 public:
@@ -249,6 +257,10 @@ private:
 	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
 
 	bool m_fKeyboardUp = false;
+
+	// saved url for certificate error form
+	std::string m_strCertificateErrorURL;
+	std::string m_strLoadErrorURL;
 
 // layout variables
 private:

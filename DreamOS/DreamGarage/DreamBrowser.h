@@ -57,6 +57,8 @@ public:
 
 	virtual RESULT UpdateControlBarText(std::string& strTitle) = 0;
 	virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) = 0;
+	virtual RESULT UpdateAddressBarText(std::string& strURL) = 0;
+	virtual RESULT UpdateAddressBarSecurity(bool fSecure) = 0;
 
 	virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) = 0;
 
@@ -71,6 +73,9 @@ public:
 
 	virtual RESULT HandleCanTabNext(bool fCanNext) = 0;
 	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) = 0;
+
+	virtual std::string GetCertificateErrorURL() = 0;
+	virtual std::string GetLoadErrorURL() = 0;
 };
 
 class DreamBrowser : 
@@ -130,10 +135,13 @@ public:
 	virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) override;
 	virtual RESULT OnLoadStart() override;
 	virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) override;
+	virtual RESULT OnLoadError(int errorCode, std::string strError, std::string strFailedURL) override;
 	virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) override;
+	virtual bool OnCertificateError(std::string strURL, unsigned int certError) override;
 	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType,std::string strURL) override;
 	virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) override;
 	virtual RESULT SetTitle(std::string strTitle) override;
+	virtual RESULT SetIsSecureConnection(bool fSecure) override;
 
 	virtual RESULT HandleDreamFormSuccess() override;
 	virtual RESULT HandleDreamFormCancel() override;
@@ -177,6 +185,9 @@ public:
 
 	virtual std::string GetTitle() override;
 	virtual std::string GetContentType() override;
+
+	virtual std::string GetScheme() override;
+	virtual std::string GetURL() override;
 
 	RESULT PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
@@ -243,6 +254,7 @@ private:
 	int m_pageDepth = 0; // hack to avoid the loading page on back
 	std::string m_strCurrentTitle;
 	std::string m_strCurrentURL;
+	bool m_fSecure = false;
 
 	TextEntryString m_strEntered;
 	

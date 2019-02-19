@@ -56,7 +56,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 		m_pFormView->RegisterSubscriber(UI_SCROLL, this);
 
 		//m_pFormView->Hide();
-		m_pFormView->SetVisible(false);
+		m_pFormView->SetVisible(false, false);
 		GetComposite()->SetVisible(false, false);
 		GetDOS()->AddObjectToUIGraph(m_pFormView.get());
 
@@ -166,6 +166,12 @@ std::string DreamFormApp::StringFromType(FormType type) {
 	else if (type == FormType::TEAMS_MISSING) {
 		strType = "FormKey.TeamsMissing";
 	}
+	else if (type == FormType::CERTIFICATE_ERROR) {
+		strType = "FormKey.ErrorsCertificateInvalid";
+	}
+	else if (type == FormType::LOAD_RESOURCE_ERROR) {
+		strType = "FormKey.ErrorsLoadResource";
+	}
 
 	return strType;
 }
@@ -191,6 +197,12 @@ FormType DreamFormApp::TypeFromString(std::string& strType) {
 	}
 	else if (strType == "FormKey.TeamsMissing") {
 		type = FormType::TEAMS_MISSING;
+	}
+	else if (strType == "FormKey.ErrorsCertificateInvalid") {
+		type = FormType::CERTIFICATE_ERROR;
+	}
+	else if (strType == "FormKey.ErrorsLoadResource") {
+		type = FormType::LOAD_RESOURCE_ERROR;
 	}
 
 	return type;
@@ -223,6 +235,16 @@ RESULT DreamFormApp::UpdateControlBarText(std::string& strTitle) {
 
 RESULT DreamFormApp::UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) {
 	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamFormApp::UpdateAddressBarSecurity(bool fSecure) {
+	m_pFormView->SetURLSecurity(fSecure);
+	return R_PASS;
+}
+
+RESULT DreamFormApp::UpdateAddressBarText(std::string& strURL) {
+	m_pFormView->SetURLText(strURL);
+	return R_PASS;
 }
 
 RESULT DreamFormApp::UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) {
@@ -337,6 +359,14 @@ RESULT DreamFormApp::HandleCanTabPrevious(bool fCanPrevious) {
 
 Error:
 	return r;
+}
+
+std::string DreamFormApp::GetCertificateErrorURL() {
+	return "";
+}
+
+std::string DreamFormApp::GetLoadErrorURL() {
+	return "";
 }
 
 RESULT DreamFormApp::SetAsActive() {

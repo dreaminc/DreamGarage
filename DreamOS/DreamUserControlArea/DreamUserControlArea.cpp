@@ -113,7 +113,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		m_pUserControls->Hide();
 		m_pDreamTabView->SetVisible(false);
-		m_pControlView->SetVisible(false);
+		m_pControlView->SetVisible(false, false);
 
 		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
@@ -416,6 +416,9 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 		m_pUserControls->SetTitleText(m_pActiveSource->GetTitle());
 		m_pUserControls->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
 	}
+	if (m_pControlView != nullptr) {
+		m_pControlView->SetURLText(pNewContent->GetURL());
+	}
 
 	//m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 
@@ -487,6 +490,24 @@ RESULT DreamUserControlArea::UpdateControlBarNavigation(bool fCanGoBack, bool fC
 
 	CR(m_pUserControls->UpdateNavigationButtons(fCanGoBack, fCanGoForward));
 	
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::UpdateAddressBarSecurity(bool fSecure) {
+	RESULT r = R_PASS;
+
+	CR(m_pControlView->SetURLSecurity(fSecure));
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::UpdateAddressBarText(std::string& strURL) {
+	RESULT r = R_PASS;
+
+	CR(m_pControlView->SetURLText(strURL));
+
 Error:
 	return r;
 }
@@ -606,6 +627,14 @@ RESULT DreamUserControlArea::HandleCanTabPrevious(bool fCanPrevious) {
 	CR(pKeyboard->UpdateTabPreviousTexture(fCanPrevious));
 Error:
 	return r;
+}
+
+std::string DreamUserControlArea::GetCertificateErrorURL() {
+	return m_strCertificateErrorURL;
+}
+
+std::string DreamUserControlArea::GetLoadErrorURL() {
+	return m_strLoadErrorURL;
 }
 
 RESULT DreamUserControlArea::OnVirtualCameraCaptured() {
@@ -1056,6 +1085,16 @@ RESULT DreamUserControlArea::HandleCameraClosed() {
 
 Error:
 	return r;
+}
+
+RESULT DreamUserControlArea::SetCertificateErrorURL(std::string strURL) {
+	m_strCertificateErrorURL = strURL;
+	return R_PASS;
+}
+
+RESULT DreamUserControlArea::SetLoadErrorURL(std::string strURL) {
+	m_strLoadErrorURL = strURL;
+	return R_PASS;
 }
 
 RESULT DreamUserControlArea::ShutdownSource() {

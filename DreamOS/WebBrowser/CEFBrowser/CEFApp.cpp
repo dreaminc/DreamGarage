@@ -101,6 +101,16 @@ Error:
 	return r;
 }
 
+RESULT CEFApp::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::ErrorCode errorCode, const CefString& strError, const CefString& strFailedURL) {
+	RESULT r = R_PASS;
+
+	CN(m_pCEFAppObserver);
+	CR(m_pCEFAppObserver->OnLoadError(pCEFBrowser, pCEFFrame, errorCode, strError, strFailedURL));
+
+Error:
+	return r;
+}
+
 
 void CEFApp::OnContextInitialized() {
 	RESULT r = R_PASS;
@@ -234,6 +244,16 @@ RESULT CEFApp::CheckForHeaders(std::multimap<std::string, std::string> &headerma
 
 Error:
 	return r;
+}
+
+bool CEFApp::OnCertificateError(CefRefPtr<CefBrowser> browser, cef_errorcode_t cert_error, const CefString& request_url, CefRefPtr<CefSSLInfo> ssl_info, CefRefPtr<CefRequestCallback> callback) {
+	RESULT r = R_PASS;
+
+	CN(m_pCEFAppObserver);
+
+	return m_pCEFAppObserver->OnCertificateError(browser, cert_error, request_url, ssl_info, callback);
+Error:
+	return false;
 }
 
 // This doesn't do much right now

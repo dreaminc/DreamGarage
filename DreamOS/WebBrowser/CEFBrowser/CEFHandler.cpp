@@ -246,22 +246,20 @@ bool CEFHandler::OnBeforePopup(CefRefPtr<CefBrowser> parentBrowser, CefRefPtr<Ce
 void CEFHandler::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, ErrorCode errorCode,
 	const CefString& strError, const CefString& strFailedURL) 
 {
+	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFHANDLE: OnLoadError %S url: %S", strError.c_str(), strFailedURL.c_str());
 
-	CEF_REQUIRE_UI_THREAD();
+//	pCEFBrowser->GoBack();
+	//pCEFBrowser->GetHost()->
 
-	// Don't display an error for downloaded files.
-	if (errorCode == ERR_ABORTED)
-		return;
+	//pCEFBrowser->StopLoad();
 
-	// Display a load error message.
-	std::stringstream ss;
-	ss << "<html><body bgcolor=\"white\">"
-		"<h2>Failed to load URL " << std::string(strFailedURL) <<
-		" with error " << std::string(strError) << " (" << errorCode <<
-		").</h2></body></html>";
+	CN(m_pCEFHandlerObserver);
+	//CR(m_pCEFHandlerObserver->OnLoadingStateChanged(pCEFBrowser, false, true, false));
+	CR(m_pCEFHandlerObserver->OnLoadError(pCEFBrowser, pCEFFrame, errorCode, strError, strFailedURL));
 
-	pCEFFrame->LoadString(ss.str(), strFailedURL);
+Error:
+	return;
 }
 
 void CEFHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser, bool isLoading, bool canGoBack, bool canGoForward) {
@@ -518,4 +516,15 @@ bool CEFHandler::OnOpenURLFromTab(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFr
 	frame->LoadRequest(pCEFRequest);
 
 	return true;
+}
+
+bool CEFHandler::OnCertificateError(CefRefPtr<CefBrowser> browser, cef_errorcode_t cert_error, const CefString& request_url, CefRefPtr<CefSSLInfo> ssl_info, CefRefPtr<CefRequestCallback> callback) {
+
+//	callback->Continue(true);
+
+	return m_pCEFHandlerObserver->OnCertificateError(browser, cert_error, request_url, ssl_info, callback);
+}
+
+void CEFHandler::OnProtocolExecution(CefRefPtr<CefBrowser> browser, const CefString& url, bool& allow_os_execution) {
+	m_pCEFHandlerObserver->OnCertificateError(browser, (cef_errorcode_t)(0), url, nullptr, nullptr);
 }

@@ -1206,6 +1206,8 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 
 		virtual RESULT UpdateControlBarText(std::string& strTitle) { return R_NOT_IMPLEMENTED; };
 		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) { return R_NOT_IMPLEMENTED; };
+		virtual RESULT UpdateAddressBarSecurity(bool fSecure) override { return R_NOT_IMPLEMENTED; }
+		virtual RESULT UpdateAddressBarText(std::string& strURL) override { return R_NOT_IMPLEMENTED; }
 
 		virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) { return R_NOT_IMPLEMENTED; };
 

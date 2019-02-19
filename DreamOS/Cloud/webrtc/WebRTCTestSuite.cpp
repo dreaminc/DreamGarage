@@ -517,6 +517,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 
 		virtual RESULT UpdateControlBarText(std::string& strTitle) override { return R_NOT_HANDLED; }
 		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override { return R_NOT_HANDLED; }
+		virtual RESULT UpdateAddressBarSecurity(bool fSecure) override { return R_NOT_HANDLED; }
+		virtual RESULT UpdateAddressBarText(std::string& strURL) override { return R_NOT_HANDLED; }
 		virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
@@ -701,6 +703,14 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		Error:
 			return r;
 		};
+
+		virtual std::string GetCertificateErrorURL() override {
+			return "";
+		}
+
+		virtual std::string GetLoadErrorURL() override {
+			return "";
+		}
 
 	} *pTestContext = new TestContext();
 
@@ -1045,6 +1055,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 		virtual RESULT UpdateControlBarText(std::string& strTitle) override { return R_NOT_HANDLED; }
 		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override { return R_NOT_HANDLED; }
+		virtual RESULT UpdateAddressBarSecurity(bool fSecure) override { return R_NOT_HANDLED; }
+		virtual RESULT UpdateAddressBarText(std::string& strURL) override { return R_NOT_HANDLED; }
 		virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
@@ -1245,6 +1257,14 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		Error:
 			return r;
 		};
+
+		virtual std::string GetCertificateErrorURL() override {
+			return "";
+		}
+
+		virtual std::string GetLoadErrorURL() override {
+			return "";
+		}
 
 	} *pTestContext = new TestContext();
 

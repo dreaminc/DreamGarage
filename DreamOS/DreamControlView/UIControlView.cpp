@@ -62,7 +62,8 @@ RESULT UIControlView::Initialize() {
 	float height;
 	height = pDreamUserApp->GetBaseHeight();
 	
-	InitializeSurfaceQuad(width, height);
+	CN(InitializeSurfaceQuad(width, height));
+	CN(InitializeAddressBar(width * m_borderWidth));
 
 //	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
 
@@ -81,6 +82,68 @@ RESULT UIControlView::Initialize() {
 	m_pViewBackground->SetDiffuseTexture(m_pBackgroundTexture);
 
 	m_pViewBackground->SetPosition(point(0.0f, -0.0005f, 0.0f));
+
+Error:
+	return r;
+}
+
+RESULT UIControlView::InitializeAddressBar(float width) {
+	RESULT r = R_PASS;
+
+	float barPXWidth = LOCK_PX_WIDTH + BACKGROUND_PX_WIDTH;
+	float backgroundWidth = (BACKGROUND_PX_WIDTH) / barPXWidth * width;
+	float lockWidth = (LOCK_PX_WIDTH) / barPXWidth * width;
+	float barHeight = (ADDRESS_PX_HEIGHT) / barPXWidth * width;
+	float spacingSize = (30.0f) / barPXWidth * width;
+	float lineHeight = (44.0f) / barPXWidth * width;
+	float textOffset = (-4.0f) / barPXWidth * width;
+
+	float height = -m_pViewQuad->GetWidth() * m_borderHeight / 2.0f - barHeight/2.0f - spacingSize;
+
+	point ptLock = point(-width / 2.0f + lockWidth / 2.0f, 0.0f, 0.0f);
+	point ptBackground = point(-width/2.0f + lockWidth + backgroundWidth/2.0f, 0.0f, 0.0f);
+
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
+
+	// Initialize Address Bar
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+
+	m_pAddressSecureTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wstrAddressSecure)[0]);
+	m_pAddressInsecureTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wstrAddressInsecure)[0]);
+	m_pAddressBackgroundTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wstrAddressBackground)[0]);
+
+	m_pAddressBar = AddUIView();
+	CN(m_pAddressBar);
+	m_pAddressBar->SetPosition(point(0.0, 0.0, height));
+	m_pAddressBar->SetVisible(false, false);
+
+	if (m_pFont == nullptr) {
+		m_pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+		CN(m_pFont);
+		m_pFont->SetLineHeight(0.06f);
+	}
+
+	m_pFont->SetLineHeight(lineHeight);
+	m_pAddressText = std::shared_ptr<text>(m_pDreamOS->MakeText(
+		m_pFont,
+		"",
+		backgroundWidth,
+		lineHeight, 
+		text::flags::RENDER_QUAD));
+	m_pAddressText->SetPosition(ptBackground + point(textOffset, 0.001f, 0.0f));
+
+	m_pAddressBar->AddObject(m_pAddressText);
+
+	m_pAddressSecurityQuad = m_pAddressBar->AddQuad(lockWidth, barHeight);
+	CN(m_pAddressSecurityQuad);
+	m_pAddressSecurityQuad->SetDiffuseTexture(m_pAddressInsecureTexture);
+	m_pAddressSecurityQuad->SetPosition(ptLock);
+
+	m_pAddressBackgroundQuad = m_pAddressBar->AddQuad(backgroundWidth, barHeight);
+	CN(m_pAddressBackgroundQuad);
+	m_pAddressBackgroundQuad->SetDiffuseTexture(m_pAddressBackgroundTexture);
+	m_pAddressBackgroundQuad->SetPosition(ptBackground);
 
 Error:
 	return r;
@@ -132,6 +195,10 @@ RESULT UIControlView::Update() {
 		else {
 			m_fMalletDirty[i].CheckAndCleanDirty();
 		}
+	}
+
+	if (m_pAddressText->CheckAndCleanDirty()) {
+		CR(m_pAddressText->SetText(m_strCurrentURL));
 	}
 
 Error:
@@ -186,6 +253,35 @@ RESULT UIControlView::SetViewQuadTexture(texture* pBrowserTexture) {
 	return R_PASS;
 }
 
+RESULT UIControlView::SetURLText(std::string strURL) {
+	RESULT r = R_PASS;
+
+	m_strCurrentURL = strURL;
+	m_pAddressText->SetDirty();
+
+Error:
+	return r;
+}
+
+RESULT UIControlView::SetSchemeText(std::string strScheme) {
+	m_strCurrentScheme = strScheme;
+	return R_PASS;
+}
+
+RESULT UIControlView::SetURLSecurity(bool fSecure) {
+	RESULT r = R_PASS;
+
+	if (fSecure) {
+		CR(m_pAddressSecurityQuad->SetDiffuseTexture(m_pAddressSecureTexture));
+	}
+	else {
+		CR(m_pAddressSecurityQuad->SetDiffuseTexture(m_pAddressInsecureTexture));
+	}	
+
+Error:
+	return r;
+}
+
 RESULT UIControlView::ShowView() {
 	RESULT r = R_PASS;
 	/* This screws with animations too much, taking it out for now
@@ -196,6 +292,7 @@ RESULT UIControlView::ShowView() {
 
 	auto fnStartCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(true);
+		m_pViewBackground->SetVisible(true);
 		return R_PASS;
 	};
 
@@ -248,7 +345,7 @@ RESULT UIControlView::Show() {
 	RESULT r = R_PASS;
 
 	//CR(ResetAppComposite());
-	SetVisible(true);
+	SetVisible(true, false);
 //	m_pViewQuad->SetVisible(true);
 	CR(ShowView());
 
@@ -274,6 +371,7 @@ RESULT UIControlView::HideView() {
 
 	auto fnEndCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(false);
+		m_pViewBackground->SetVisible(false);
 		return R_PASS;
 	};
 
@@ -373,6 +471,8 @@ Error:
 RESULT UIControlView::FlipViewDown() {
 	RESULT r = R_PASS;
 
+	m_pAddressBar->SetVisible(false, false);
+
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		this,
 		m_ptVisiblePosition,
@@ -401,6 +501,7 @@ RESULT UIControlView::FlipViewUp() {
 	std::shared_ptr<DreamUserApp> pDreamUserApp = m_pDreamOS->GetUserApp();
 	CNR(pDreamUserApp, R_SKIPPED);
 
+	m_pAddressBar->SetVisible(true, false);
 	// currently always fully shown
 
 	// 58 degrees is the old typing angle (straight up), move the y offset down to accommodate

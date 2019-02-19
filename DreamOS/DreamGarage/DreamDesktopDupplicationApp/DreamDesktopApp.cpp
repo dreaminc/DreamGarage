@@ -479,6 +479,14 @@ vector DreamDesktopApp::GetNormal() {
 	return m_vNormal;
 }
 
+std::string DreamDesktopApp::GetScheme() {
+	return "";
+}
+
+std::string DreamDesktopApp::GetURL() {
+	return "";
+}
+
 point DreamDesktopApp::GetOrigin() {
 	return GetComposite()->GetOrigin();
 }
