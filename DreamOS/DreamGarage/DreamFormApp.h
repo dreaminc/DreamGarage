@@ -17,6 +17,7 @@ enum class FormType {
 	SETTINGS,
 	TEAMS_MISSING,
 	CERTIFICATE_ERROR,
+	LOAD_RESOURCE_ERROR,
 	DEFAULT,
 	INVALID
 };
@@ -75,6 +76,7 @@ public:
 	RESULT HandleCanTabPrevious(bool fCanPrevious) override;
 
 	virtual std::string GetCertificateErrorURL() override;
+	virtual std::string GetLoadErrorURL() override;
 
 	RESULT SetAsActive();
 

@@ -336,6 +336,21 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::OnLoadError(int errorCode, std::string strError, std::string strFailedURL) {
+	RESULT r = R_PASS;
+
+	if (m_pObserver != nullptr && errorCode == -113) {
+		WebRequest webRequest;
+
+		webRequest.SetURL(util::CStringToWideString(m_pObserver->GetLoadErrorURL().c_str()));
+		//CR(LoadRequest(webRequest));
+		CR(SetURI(m_pObserver->GetLoadErrorURL()));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
@@ -366,7 +381,7 @@ bool DreamBrowser::OnCertificateError(std::string strURL, unsigned int certError
 	CN(m_pObserver);
 	CR(SetURI(m_pObserver->GetCertificateErrorURL()));
 
-	// return true here if the page should load (and execute callback->Continue(true) in CEFHandle::OnCertificateError)
+	// return true here if the page should load (and execute callback->Continue(true) in CEFHandler::OnCertificateError)
 	return false;
 Error:
 	return false;
@@ -764,7 +779,8 @@ RESULT DreamBrowser::UpdateNavigationFlags() {
 		bool fCanGoForward = m_pWebBrowserController->CanGoForward();
 
 		if (m_pObserver != nullptr) {
-			CR(m_pObserver->UpdateControlBarNavigation(fCanGoBack, fCanGoForward));
+			//CR(m_pObserver->UpdateControlBarNavigation(fCanGoBack, fCanGoForward));
+			CR(m_pObserver->UpdateControlBarNavigation(true, true));
 		}
 	}
 

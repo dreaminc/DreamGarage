@@ -625,6 +625,10 @@ std::string DreamUserControlArea::GetCertificateErrorURL() {
 	return m_strCertificateErrorURL;
 }
 
+std::string DreamUserControlArea::GetLoadErrorURL() {
+	return m_strLoadErrorURL;
+}
+
 RESULT DreamUserControlArea::OnVirtualCameraCaptured() {
 	RESULT r = R_PASS;
 
@@ -1077,6 +1081,11 @@ Error:
 
 RESULT DreamUserControlArea::SetCertificateErrorURL(std::string strURL) {
 	m_strCertificateErrorURL = strURL;
+	return R_PASS;
+}
+
+RESULT DreamUserControlArea::SetLoadErrorURL(std::string strURL) {
+	m_strLoadErrorURL = strURL;
 	return R_PASS;
 }
 

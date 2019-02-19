@@ -544,6 +544,17 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::ErrorCode errorCode, const CefString& strError, const CefString& strFailedURL) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadError");
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->OnLoadError((int)(errorCode), strError, strFailedURL));
+
+Error:
+	return r;
+}
+
 CefRefPtr<CefBrowser> CEFBrowserController::GetCEFBrowser() {
 	return m_pCEFBrowser;
 }

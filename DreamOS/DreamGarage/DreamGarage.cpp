@@ -632,6 +632,9 @@ RESULT DreamGarage::DidFinishLoading() {
 	{
 		std::string strCertificateErrorFormKey = DreamFormApp::StringFromType(FormType::CERTIFICATE_ERROR);
 		m_pUserController->RequestFormURL(strCertificateErrorFormKey);
+		
+		std::string strLoadErrorFormKey = DreamFormApp::StringFromType(FormType::LOAD_RESOURCE_ERROR);
+		m_pUserController->RequestFormURL(strLoadErrorFormKey);
 	}
 
 	// DEBUG:
@@ -1757,6 +1760,9 @@ RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::s
 	}
 	else if (type == FormType::CERTIFICATE_ERROR) {
 		m_pDreamUserControlArea->SetCertificateErrorURL(strURL);
+	}
+	else if (type == FormType::LOAD_RESOURCE_ERROR) {
+		m_pDreamUserControlArea->SetLoadErrorURL(strURL);
 	}
 	// TODO: general form?
 

@@ -169,6 +169,9 @@ std::string DreamFormApp::StringFromType(FormType type) {
 	else if (type == FormType::CERTIFICATE_ERROR) {
 		strType = "FormKey.ErrorsCertificateInvalid";
 	}
+	else if (type == FormType::LOAD_RESOURCE_ERROR) {
+		strType = "FormKey.ErrorsLoadResource";
+	}
 
 	return strType;
 }
@@ -197,6 +200,9 @@ FormType DreamFormApp::TypeFromString(std::string& strType) {
 	}
 	else if (strType == "FormKey.ErrorsCertificateInvalid") {
 		type = FormType::CERTIFICATE_ERROR;
+	}
+	else if (strType == "FormKey.ErrorsLoadResource") {
+		type = FormType::LOAD_RESOURCE_ERROR;
 	}
 
 	return type;
@@ -350,6 +356,10 @@ Error:
 }
 
 std::string DreamFormApp::GetCertificateErrorURL() {
+	return "";
+}
+
+std::string DreamFormApp::GetLoadErrorURL() {
 	return "";
 }
 

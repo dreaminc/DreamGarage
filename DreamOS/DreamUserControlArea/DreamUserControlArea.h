@@ -151,6 +151,7 @@ public:
 	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override;
 
 	virtual std::string GetCertificateErrorURL() override;
+	virtual std::string GetLoadErrorURL() override;
 
 // DreamVCam
 public:
@@ -192,6 +193,7 @@ public:
 	RESULT HandleCameraClosed();
 
 	RESULT SetCertificateErrorURL(std::string strURL);
+	RESULT SetLoadErrorURL(std::string strURL);
 
 // Animations
 public:
@@ -257,6 +259,7 @@ private:
 
 	// saved url for certificate error form
 	std::string m_strCertificateErrorURL;
+	std::string m_strLoadErrorURL;
 
 // layout variables
 private:

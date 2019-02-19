@@ -101,6 +101,16 @@ Error:
 	return r;
 }
 
+RESULT CEFApp::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::ErrorCode errorCode, const CefString& strError, const CefString& strFailedURL) {
+	RESULT r = R_PASS;
+
+	CN(m_pCEFAppObserver);
+	CR(m_pCEFAppObserver->OnLoadError(pCEFBrowser, pCEFFrame, errorCode, strError, strFailedURL));
+
+Error:
+	return r;
+}
+
 
 void CEFApp::OnContextInitialized() {
 	RESULT r = R_PASS;

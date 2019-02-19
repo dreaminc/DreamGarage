@@ -216,6 +216,21 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserManager::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::ErrorCode errorCode, const CefString& strError, const CefString& strFailedURL) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadError");
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
+	CN(pCEFBrowserController);
+
+	// TODO: add frame
+	CR(pCEFBrowserController->OnLoadError(pCEFBrowser, pCEFFrame, errorCode, strError, strFailedURL));
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserManager::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) {
 	RESULT r = R_PASS;
 

@@ -246,22 +246,20 @@ bool CEFHandler::OnBeforePopup(CefRefPtr<CefBrowser> parentBrowser, CefRefPtr<Ce
 void CEFHandler::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, ErrorCode errorCode,
 	const CefString& strError, const CefString& strFailedURL) 
 {
+	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFHANDLE: OnLoadError %S url: %S", strError.c_str(), strFailedURL.c_str());
 
-	CEF_REQUIRE_UI_THREAD();
+//	pCEFBrowser->GoBack();
+	//pCEFBrowser->GetHost()->
 
-	// Don't display an error for downloaded files.
-	if (errorCode == ERR_ABORTED)
-		return;
+	//pCEFBrowser->StopLoad();
 
-	// Display a load error message.
-	std::stringstream ss;
-	ss << "<html><body bgcolor=\"white\">"
-		"<h2>Failed to load URL " << std::string(strFailedURL) <<
-		" with error " << std::string(strError) << " (" << errorCode <<
-		").</h2></body></html>";
+	CN(m_pCEFHandlerObserver);
+	//CR(m_pCEFHandlerObserver->OnLoadingStateChanged(pCEFBrowser, false, true, false));
+	CR(m_pCEFHandlerObserver->OnLoadError(pCEFBrowser, pCEFFrame, errorCode, strError, strFailedURL));
 
-	pCEFFrame->LoadString(ss.str(), strFailedURL);
+Error:
+	return;
 }
 
 void CEFHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser, bool isLoading, bool canGoBack, bool canGoForward) {
