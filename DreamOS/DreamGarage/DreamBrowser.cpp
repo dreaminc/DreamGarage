@@ -2,6 +2,7 @@
 //#include "DreamControlView/UIControlView.h"
 #include "DreamShareView/DreamShareView.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
+#include "DreamFormApp.h"
 #include "DreamOS.h"
 #include "Core/Utilities.h"
 
@@ -351,6 +352,24 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 
 Error:
 	return r;
+}
+
+bool DreamBrowser::OnCertificateError(std::string strURL, unsigned int certError) {
+	RESULT r = R_PASS;
+
+	//auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
+	//std::string strForm = DreamFormApp::StringFromType(FormType::CERTIFICATE_ERROR);
+	//pUserController->RequestFormURL(strForm);
+	//SetURI("https://www.develop.dreamos.com/forms/errors/certificate-invalid");
+
+	CN(m_pObserver);
+	CR(SetURI(m_pObserver->GetCertificateErrorURL()));
+
+	// return true here if the page should load (and execute callback->Continue(true) in CEFHandle::OnCertificateError)
+	return false;
+Error:
+	return false;
 }
 
 RESULT DreamBrowser::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, std::string strURL) {

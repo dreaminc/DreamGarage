@@ -16,6 +16,7 @@ enum class FormType {
 	ENVIRONMENTS_WELCOME,
 	SETTINGS,
 	TEAMS_MISSING,
+	CERTIFICATE_ERROR,
 	DEFAULT,
 	INVALID
 };
@@ -72,6 +73,8 @@ public:
 
 	RESULT HandleCanTabNext(bool fCanNext) override;
 	RESULT HandleCanTabPrevious(bool fCanPrevious) override;
+
+	virtual std::string GetCertificateErrorURL() override;
 
 	RESULT SetAsActive();
 

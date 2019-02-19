@@ -629,6 +629,11 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 	CN(m_pUserController);
 
+	{
+		std::string strCertificateErrorFormKey = DreamFormApp::StringFromType(FormType::CERTIFICATE_ERROR);
+		m_pUserController->RequestFormURL(strCertificateErrorFormKey);
+	}
+
 	// DEBUG:
 #ifdef _DEBUG
 	{
@@ -1749,6 +1754,9 @@ RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::s
 
 		// Login app doesn't show at the start, but it needs to receive the controller events in the lobby
 		m_pDreamLoginApp->SetAsActive();
+	}
+	else if (type == FormType::CERTIFICATE_ERROR) {
+		m_pDreamUserControlArea->SetCertificateErrorURL(strURL);
 	}
 	// TODO: general form?
 

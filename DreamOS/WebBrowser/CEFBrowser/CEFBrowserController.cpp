@@ -562,6 +562,16 @@ Error:
 	return r;
 }
 
+bool CEFBrowserController::OnCertificateError(std::string strURL, unsigned int certError) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebBrowserControllerObserver);
+	return m_pWebBrowserControllerObserver->OnCertificateError(strURL, certError);
+
+Error:
+	return false;
+}
+
 RESULT CEFBrowserController::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefString strCEFURL) {
 	RESULT r = R_PASS;
 

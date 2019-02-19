@@ -72,6 +72,8 @@ public:
 
 	virtual RESULT HandleCanTabNext(bool fCanNext) = 0;
 	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) = 0;
+
+	virtual std::string GetCertificateErrorURL() = 0;
 };
 
 class DreamBrowser : 
@@ -132,6 +134,7 @@ public:
 	virtual RESULT OnLoadStart() override;
 	virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) override;
 	virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) override;
+	virtual bool OnCertificateError(std::string strURL, unsigned int certError) override;
 	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType,std::string strURL) override;
 	virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) override;
 	virtual RESULT SetTitle(std::string strTitle) override;

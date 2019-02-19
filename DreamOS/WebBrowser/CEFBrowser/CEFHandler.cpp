@@ -519,3 +519,14 @@ bool CEFHandler::OnOpenURLFromTab(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFr
 
 	return true;
 }
+
+bool CEFHandler::OnCertificateError(CefRefPtr<CefBrowser> browser, cef_errorcode_t cert_error, const CefString& request_url, CefRefPtr<CefSSLInfo> ssl_info, CefRefPtr<CefRequestCallback> callback) {
+
+//	callback->Continue(true);
+
+	return m_pCEFHandlerObserver->OnCertificateError(browser, cert_error, request_url, ssl_info, callback);
+}
+
+void CEFHandler::OnProtocolExecution(CefRefPtr<CefBrowser> browser, const CefString& url, bool& allow_os_execution) {
+	m_pCEFHandlerObserver->OnCertificateError(browser, (cef_errorcode_t)(0), url, nullptr, nullptr);
+}

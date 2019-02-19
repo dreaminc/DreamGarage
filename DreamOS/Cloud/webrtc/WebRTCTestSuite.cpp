@@ -703,6 +703,10 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 			return r;
 		};
 
+		virtual std::string GetCertificateErrorURL() override {
+			return "";
+		}
+
 	} *pTestContext = new TestContext();
 
 	// Initialize the test
@@ -1247,6 +1251,10 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		Error:
 			return r;
 		};
+
+		virtual std::string GetCertificateErrorURL() override {
+			return "";
+		}
 
 	} *pTestContext = new TestContext();
 

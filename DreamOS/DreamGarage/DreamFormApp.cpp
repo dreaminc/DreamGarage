@@ -166,6 +166,9 @@ std::string DreamFormApp::StringFromType(FormType type) {
 	else if (type == FormType::TEAMS_MISSING) {
 		strType = "FormKey.TeamsMissing";
 	}
+	else if (type == FormType::CERTIFICATE_ERROR) {
+		strType = "FormKey.ErrorsCertificateInvalid";
+	}
 
 	return strType;
 }
@@ -191,6 +194,9 @@ FormType DreamFormApp::TypeFromString(std::string& strType) {
 	}
 	else if (strType == "FormKey.TeamsMissing") {
 		type = FormType::TEAMS_MISSING;
+	}
+	else if (strType == "FormKey.ErrorsCertificateInvalid") {
+		type = FormType::CERTIFICATE_ERROR;
 	}
 
 	return type;
@@ -341,6 +347,10 @@ RESULT DreamFormApp::HandleCanTabPrevious(bool fCanPrevious) {
 
 Error:
 	return r;
+}
+
+std::string DreamFormApp::GetCertificateErrorURL() {
+	return "";
 }
 
 RESULT DreamFormApp::SetAsActive() {

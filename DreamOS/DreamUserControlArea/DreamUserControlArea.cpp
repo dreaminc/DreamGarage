@@ -621,6 +621,10 @@ Error:
 	return r;
 }
 
+std::string DreamUserControlArea::GetCertificateErrorURL() {
+	return m_strCertificateErrorURL;
+}
+
 RESULT DreamUserControlArea::OnVirtualCameraCaptured() {
 	RESULT r = R_PASS;
 
@@ -1069,6 +1073,11 @@ RESULT DreamUserControlArea::HandleCameraClosed() {
 
 Error:
 	return r;
+}
+
+RESULT DreamUserControlArea::SetCertificateErrorURL(std::string strURL) {
+	m_strCertificateErrorURL = strURL;
+	return R_PASS;
 }
 
 RESULT DreamUserControlArea::ShutdownSource() {

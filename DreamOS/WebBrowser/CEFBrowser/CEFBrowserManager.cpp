@@ -231,6 +231,17 @@ Error:
 	return r;
 }
 
+bool CEFBrowserManager::OnCertificateError(CefRefPtr<CefBrowser> browser, cef_errorcode_t cert_error, const CefString& request_url, CefRefPtr<CefSSLInfo> ssl_info, CefRefPtr<CefRequestCallback> callback) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(browser->GetIdentifier());
+	CN(pCEFBrowserController);
+
+	return pCEFBrowserController->OnCertificateError(request_url, cert_error);
+Error:
+	return false;
+}
+
 std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(int cefBrowserID) {
 	for (auto &pWebBrowserController : m_webBrowserControllers) {
 		std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::dynamic_pointer_cast<CEFBrowserController>(pWebBrowserController);

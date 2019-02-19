@@ -236,6 +236,16 @@ Error:
 	return r;
 }
 
+bool CEFApp::OnCertificateError(CefRefPtr<CefBrowser> browser, cef_errorcode_t cert_error, const CefString& request_url, CefRefPtr<CefSSLInfo> ssl_info, CefRefPtr<CefRequestCallback> callback) {
+	RESULT r = R_PASS;
+
+	CN(m_pCEFAppObserver);
+
+	return m_pCEFAppObserver->OnCertificateError(browser, cert_error, request_url, ssl_info, callback);
+Error:
+	return false;
+}
+
 // This doesn't do much right now
 // but this gives us back a different browser than the browser process (render process)
 void CEFApp::OnBrowserCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
