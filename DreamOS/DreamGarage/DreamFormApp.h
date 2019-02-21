@@ -49,6 +49,7 @@ public:
 	static FormType TypeFromString(std::string& strType);
 
 	virtual std::string GetSuccessString();
+	FormType GetFormType();
 
 public:
 	RESULT UpdateWithNewForm(std::string strURL);

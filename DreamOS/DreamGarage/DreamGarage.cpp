@@ -1601,9 +1601,31 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 		CR(pEnvironmentControllerProxy->RequestCurrentScreenShare(SHARE_TYPE_SCREEN));
 	}
 
+	// form-specific behavior
 	else if (strMessage == "UIKeyboard.FormCancel") {
-		CR(m_pDreamLoginApp->HandleDreamFormCancel());
-		CR(m_pDreamGeneralForm->HandleDreamFormCancel());
+
+		FormType formType;
+		if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {
+			formType = m_pDreamGeneralForm->GetFormType();
+		}
+		else {
+			formType = m_pDreamLoginApp->GetFormType();
+		}
+
+		switch (formType) {
+		case FormType::DEFAULT: {
+			CR(m_pDreamUserControlArea->HandleDreamFormCancel());
+		} break;
+		case FormType::SIGN_IN:
+		case FormType::SIGN_UP: {
+			// request original form
+			std::string strFormType = DreamFormApp::StringFromType(formType);
+			m_pUserController->RequestFormURL(strFormType);
+		} break;
+
+		}
+	}
+	else if (strMessage == "test") {
 	}
 
 	else if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {

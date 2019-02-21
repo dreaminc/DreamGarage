@@ -144,7 +144,7 @@ public:
 	bool IsContentVisible();
 
 	virtual RESULT HandleDreamFormSuccess() override;
-	virtual RESULT HandleDreamFormCancel() override { return R_NOT_IMPLEMENTED; };
+	virtual RESULT HandleDreamFormCancel() override;
 	virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) override { return R_NOT_IMPLEMENTED; };
 	virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) override { return R_NOT_IMPLEMENTED; };
 

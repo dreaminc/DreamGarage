@@ -213,6 +213,7 @@ RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 
 #ifndef _DEBUG
 	m_strURL = strURL;
+	//UpdateAddressBarText(strURL);
 	if (m_pDreamBrowserForm == nullptr) {
 		m_fInitBrowser = true;
 		DOSLOG(INFO, "Create browser for form: %s", m_strURL);
@@ -243,7 +244,7 @@ RESULT DreamFormApp::UpdateAddressBarSecurity(bool fSecure) {
 }
 
 RESULT DreamFormApp::UpdateAddressBarText(std::string& strURL) {
-	m_pFormView->SetURLText(strURL);
+	//m_pFormView->SetURLText(strURL);
 	return R_PASS;
 }
 
@@ -332,9 +333,24 @@ Error:
 RESULT DreamFormApp::HandleDreamFormCancel() {
 	RESULT r = R_PASS;
 
-	// TODO: switch on name?
-	CR(GetDOS()->GetUserApp()->SetHasOpenApp(false));
-	CR(Hide());
+	//CR(GetDOS()->GetUserApp()->SetHasOpenApp(false));
+	//CR(Hide());
+	/*
+	switch (m_formType) {
+	case FormType::DEFAULT: {
+		// basically send menu back
+		//GetDOS()->GetUserApp()->HandleUserObserverEvent(UserObserverEventType::BACK);
+		std::string defaultFormCancelMessage = "test";
+		GetDOS()->SendDOSMessage(defaultFormCancelMessage);
+
+	} break;
+	case FormType::SIGN_IN:
+	case FormType::SIGN_UP: {
+		// request original form
+	} break;
+
+	}
+	//*/
 
 Error:
 	return r;
@@ -558,4 +574,8 @@ Error:
 
 std::string DreamFormApp::GetSuccessString() {
 	return m_strSuccess;
+}
+
+FormType DreamFormApp::GetFormType() {
+	return m_formType;
 }
