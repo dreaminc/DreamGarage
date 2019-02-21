@@ -40,6 +40,13 @@ class texture;
 class font;
 class text;
 
+enum class ContentType {
+	FORM,
+	DEFAULT,
+	INVALID
+	// TODO: potentially different layouts for numpad or logins
+};
+
 class UIControlView : public UISurface, 
 						 public DreamUserObserver {
 	friend class DreamUserControlArea;
@@ -66,7 +73,7 @@ public:
 	RESULT Show();
 	RESULT Hide();
 
-	RESULT HandleKeyboardUp();
+	RESULT HandleKeyboardUp(ContentType type = ContentType::DEFAULT);
 	RESULT HandleKeyboardDown();
 
 	RESULT FlipViewUp();

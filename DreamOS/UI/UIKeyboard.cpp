@@ -897,6 +897,10 @@ RESULT UIKeyboard::SetPasswordFlag(bool fIsPassword) {
 	return R_PASS;
 }
 
+std::shared_ptr<UIButton> UIKeyboard::GetCancelButton() {
+	return m_pCancelButton;
+}
+
 RESULT UIKeyboard::UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) {
 	RESULT r = R_PASS;
 
@@ -1038,8 +1042,13 @@ Error:
 RESULT UIKeyboard::HandleCancelPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
+	std::string strKeyboardCancel = "UIKeyboard.FormCancel";
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	// TODO: send form cancel
+	CR(GetDOS()->SendDOSMessage(strKeyboardCancel));
+
+	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 0));
+	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 1));
 
 Error:
 	return r;

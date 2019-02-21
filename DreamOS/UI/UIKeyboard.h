@@ -141,6 +141,8 @@ public:
 
 	RESULT SetPasswordFlag(bool fIsPassword);
 
+	std::shared_ptr<UIButton> GetCancelButton();
+
 private:
 	std::shared_ptr<SoundFile> m_pDefaultPressSound = nullptr;
 	std::shared_ptr<SoundFile> m_pDeletePressSound = nullptr;

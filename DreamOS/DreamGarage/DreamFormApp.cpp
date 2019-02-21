@@ -276,7 +276,7 @@ RESULT DreamFormApp::HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSourc
 		fMaskPasswordEnabled = pDOMNode->IsPassword();
 
 		CR(pKeyboard->ShowBrowserButtons());
-		CR(m_pFormView->HandleKeyboardUp());
+		CR(m_pFormView->HandleKeyboardUp(ContentType::FORM));
 
 		std::string strTextField = pDOMNode->GetValue();
 		pKeyboard->PopulateKeyboardTextBox(strTextField);
@@ -298,7 +298,7 @@ RESULT DreamFormApp::HandleIsInputFocused(bool fIsFocused, DreamContentSource *p
 		CN(pKeyboard);
 
 		CR(pKeyboard->ShowBrowserButtons());
-		CR(m_pFormView->HandleKeyboardUp());
+		CR(m_pFormView->HandleKeyboardUp(ContentType::FORM));
 	}
 	else {
 		CR(m_pDreamBrowserForm->HandleUnfocusEvent());
@@ -332,6 +332,7 @@ Error:
 RESULT DreamFormApp::HandleDreamFormCancel() {
 	RESULT r = R_PASS;
 
+	// TODO: switch on name?
 	CR(GetDOS()->GetUserApp()->SetHasOpenApp(false));
 	CR(Hide());
 

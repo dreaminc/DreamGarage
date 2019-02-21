@@ -1601,6 +1601,11 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 		CR(pEnvironmentControllerProxy->RequestCurrentScreenShare(SHARE_TYPE_SCREEN));
 	}
 
+	else if (strMessage == "UIKeyboard.FormCancel") {
+		CR(m_pDreamLoginApp->HandleDreamFormCancel());
+		CR(m_pDreamGeneralForm->HandleDreamFormCancel());
+	}
+
 	else if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {
 		// Resuming Dream functions if form was accessed out of Menu
 		if (strMessage == "DreamEnvironmentApp.OnFadeIn") {
