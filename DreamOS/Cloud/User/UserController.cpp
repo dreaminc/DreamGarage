@@ -119,7 +119,7 @@ RESULT UserController::LoginWithOTK(std::string& strOTK, long& environmentID) {
 		nlohmann::json jsonResponse = nlohmann::json::parse(strHttpResponse);
 
 		// Check for error/failure
-		if (jsonResponse["/meta/status_code"_json_pointer].get<int>() != 200) {
+		if (jsonResponse["/meta/status_code"_json_pointer].get<int>() != (int)HTTPStatusCode::OK) {
 			std::string strErrorDetail = jsonResponse["/meta/status_code"_json_pointer].get<std::string>();
 			DEBUG_LINEOUT("OTK failed with error: %s", strErrorDetail.c_str());
 		}
@@ -299,7 +299,7 @@ RESULT UserController::OnDreamVersion(std::string&& strResponse) {
 
 	//TODO: these function are void instead of RESULT
 	CR(GetResponseData(jsonData, jsonResponse, statusCode));
-	CB(statusCode == 200);
+	CB(statusCode == (int)HTTPStatusCode::OK);
 
 	CBM(!jsonData["/client_settings/minimum_version"_json_pointer].is_null(), "minimum version was null");
 
@@ -347,7 +347,7 @@ RESULT UserController::OnAPIConnectionCheck(std::string&& strResponse) {
 	//TODO: these function are void instead of RESULT
 	CR(GetResponseData(jsonData, jsonResponse, statusCode));
 	if (m_pUserControllerObserver != nullptr) {
-		if (statusCode == 200) {
+		if (statusCode == (int)HTTPStatusCode::OK) {
 			CR(m_pUserControllerObserver->OnAPIConnectionCheck(true));
 		}
 		else {
@@ -596,7 +596,7 @@ RESULT UserController::OnFormURL(std::string&& strResponse) {
 
 	//TODO: these function are void instead of RESULT
 	CR(GetResponseData(jsonData, jsonResponse, statusCode));
-	CB(statusCode == 200);
+	CB(statusCode == (int)HTTPStatusCode::OK);
 
 	CBM(!jsonData["/form"_json_pointer].is_null(), "form object is malformed");
 
@@ -648,10 +648,10 @@ RESULT UserController::OnAccessToken(std::string&& strResponse) {
 
 	// if the json data is null we know that we got an expected error in GetResponseData
 	// right now, that is only a 401 bad access
-	if (statusCode == 401) {
+	if (statusCode == (int)HTTPStatusCode::UNAUTHORIZED) {
 		CR(m_pUserControllerObserver->OnAccessToken(false, strAccessToken));
 	}
-	else if (statusCode == 200) {
+	else if (statusCode == (int)HTTPStatusCode::OK) {
 		CBM(!jsonData["/access_token"_json_pointer].is_null(), "access token object is malformed");
 		jsonAccessTokenObject = jsonData["/access_token"_json_pointer];
 		CBM(!jsonAccessTokenObject["/token"_json_pointer].is_null(), "access token is malformed");
@@ -703,13 +703,13 @@ RESULT UserController::OnGetSettings(std::string&& strResponse) {
 
 	CR(GetResponseData(jsonData, jsonResponse, statusCode));
 
-	if (statusCode == 404) {
+	if (statusCode == (int)HTTPStatusCode::NOT_FOUND) {
 		// user does not have camera settings
 		// TODO: may want a default camera location from elsewhere
 		CR(m_pUserControllerObserver->OnGetSettings(point(0.0f, 0.0f, 0.0f), quaternion(), false));
 	}
 	//TODO: combine with the json rpc response
-	else if (statusCode == 200) {
+	else if (statusCode == (int)HTTPStatusCode::OK) {
 		nlohmann::json jsonSettings = jsonData["/user_settings"_json_pointer];
 
 		cameraID = jsonSettings["id"].get<int>();
@@ -786,7 +786,7 @@ RESULT UserController::OnSetSettings(std::string&& strResponse) {
 	int statusCode;
 
 	CR(GetResponseData(jsonData, jsonResponse, statusCode));
-	CB(statusCode == 200);
+	CB(statusCode == (int)HTTPStatusCode::OK);
 
 	CR(m_pUserControllerObserver->OnSetSettings());
 
@@ -819,9 +819,9 @@ RESULT UserController::OnGetTeam(std::string&& strResponse) {
 	int statusCode;
 
 	CR(GetResponseData(jsonData, jsonResponse, statusCode));
-	CB(statusCode == 200 || statusCode == 404);
+	CB(statusCode == (int)HTTPStatusCode::OK || (int)HTTPStatusCode::NOT_FOUND);
 
-	if (statusCode == 404) {
+	if (statusCode == (int)HTTPStatusCode::NOT_FOUND) {
 		m_pUserControllerObserver->OnGetTeam(false, -1, -1);
 	}
 	else {
@@ -931,7 +931,7 @@ RESULT UserController::OnTwilioNTSInformation(std::string&& strResponse) {
 	int statusCode;
 
 	CR(GetResponseData(jsonData, jsonResponse, statusCode));
-	CB(statusCode == 200);
+	CB(statusCode == (int)HTTPStatusCode::OK);
 
 	m_twilioNTSInformation = TwilioNTSInformation(
 		jsonData["/date_created"_json_pointer].get<std::string>(),

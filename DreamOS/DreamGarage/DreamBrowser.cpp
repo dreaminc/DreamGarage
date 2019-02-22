@@ -25,6 +25,8 @@
 #include "Sound/SoundBuffer.h"
 #include "HAL\opengl\OGLTexture.h"	// necessary for the dynamic cast to enable PBO
 
+#include "Cloud/HTTP/HTTPCommon.h"
+
 #include <thread>
 
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
@@ -327,7 +329,7 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	
 	//m_strCurrentURL = strCurrentURL;
 
-	if (m_pObserver != nullptr && httpStatusCode == 200) {
+	if (m_pObserver != nullptr && httpStatusCode == (int)HTTPStatusCode::OK) {
 		CR(m_pObserver->HandleLoadEnd());
 	//	m_fUpdateControlBarInfo = true;
 	}
