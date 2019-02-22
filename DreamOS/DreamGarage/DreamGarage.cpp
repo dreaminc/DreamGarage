@@ -1138,7 +1138,7 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 
 		avatarID = m_pUserController->GetUser().GetAvatarID();
 
-		if (!m_fInitHands) {
+		if (!m_fInitHands && GetHMD() != nullptr) {
 			auto pLeftHand = GetHMD()->GetHand(HAND_TYPE::HAND_LEFT);
 			pLeftHand->PendCreateHandModel(avatarID);
 
