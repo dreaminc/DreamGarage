@@ -1601,31 +1601,17 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 		CR(pEnvironmentControllerProxy->RequestCurrentScreenShare(SHARE_TYPE_SCREEN));
 	}
 
-	// form-specific behavior
 	else if (strMessage == "UIKeyboard.FormCancel") {
 
+		// for sign up/sign in forms, reload the original form when the login method is canceled
 		FormType formType;
-		if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {
-			formType = m_pDreamGeneralForm->GetFormType();
-		}
-		else {
-			formType = m_pDreamLoginApp->GetFormType();
-		}
+		formType = m_pDreamLoginApp->GetFormType();
+	//	m_pDreamLoginApp->HandleDreamFormCancel();
 
-		switch (formType) {
-		case FormType::DEFAULT: {
-			CR(m_pDreamUserControlArea->HandleDreamFormCancel());
-		} break;
-		case FormType::SIGN_IN:
-		case FormType::SIGN_UP: {
-			// request original form
-			std::string strFormType = DreamFormApp::StringFromType(formType);
-			m_pUserController->RequestFormURL(strFormType);
-		} break;
+		std::string strFormType = DreamFormApp::StringFromType(formType);
+		//m_pUserController->RequestFormURL(strFormType);
+		m_pDreamLoginApp->ResetForm();
 
-		}
-	}
-	else if (strMessage == "test") {
 	}
 
 	else if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {

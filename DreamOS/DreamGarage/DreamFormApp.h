@@ -53,6 +53,7 @@ public:
 
 public:
 	RESULT UpdateWithNewForm(std::string strURL);
+	RESULT ResetForm();
 
 // Dream Browser observer
 public:

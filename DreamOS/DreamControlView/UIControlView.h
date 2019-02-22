@@ -143,6 +143,7 @@ private:
 	point m_ptClick;
 
 	bool m_fIsMinimized = false;
+	bool m_fUpdateAddressBarText = false;
 
 	//TODO: the physics in the keyboard surface uses dirty with the mallets to determine whether a hit 
 	//		should be registered.  This doesn't work correctly when there are multiple surfaces

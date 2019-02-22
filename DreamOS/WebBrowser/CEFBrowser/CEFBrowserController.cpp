@@ -5,6 +5,7 @@
 #include "include/cef_browser.h"
 #include "include/wrapper/cef_helpers.h"
 #include "include/base/cef_bind.h"
+#include "include/cef_parser.h"
 
 #include "include/cef_browser.h"
 #include "include/cef_app.h"
@@ -21,6 +22,8 @@
 
 #include "CEFDOMNode.h"
 #include "CEFStringVisitor.h"
+
+#include "Core/Utilities.h"
 
 CEFBrowserController::CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
 	m_pCEFBrowser(pCEFBrowser)
@@ -148,7 +151,8 @@ RESULT CEFBrowserController::LoadURL(const std::string& url) {
 
 	CN(m_pCEFBrowser);
 
-	m_pCEFBrowser->GetFocusedFrame()->LoadURL(url);
+	//m_pCEFBrowser->GetFocusedFrame()->LoadURL(url);
+	m_pCEFBrowser->GetMainFrame()->LoadURL(url);
 
 Error:
 	return r;
@@ -745,6 +749,17 @@ RESULT CEFBrowserController::UnfocusInput() {
 	pFrame->ExecuteJavaScript("Dream.Browser.blurFocusedInput();", pFrame->GetURL(), 0);
 
 	return R_PASS;
+}
+
+RESULT CEFBrowserController::ParseURL(std::string strURL, std::string& strParsedURL) {
+	RESULT r = R_PASS;
+
+	CefURLParts parts;
+	CefParseURL(strURL, parts);
+
+	strParsedURL = util::WideStringToString(parts.origin.str);
+Error:
+	return r;
 }
 
 /*

@@ -309,8 +309,8 @@ RESULT UIKeyboard::InitializeKeyboardControls() {
 	float tabOffset = backTabOffset + barButtonWidth + marginError;
 
 	float right = m_surfaceWidth / 2.0f - marginError / 2.0f;
-	float doneOffset = right - barButtonWidth/2.0f;
-	float cancelOffset = doneOffset - barButtonWidth - marginError;
+	float cancelOffset = right - barButtonWidth/2.0f;
+	//float cancelOffset = doneOffset - barButtonWidth - marginError;
 
 	m_pKeyboardControls->RotateXByDeg(-90.0f);
 	m_pKeyboardControls->SetPosition(point(0.0f, 0.0f, -(m_surfaceHeight + buttonWidth) / 2.0f));
@@ -344,9 +344,11 @@ RESULT UIKeyboard::InitializeKeyboardControls() {
 		std::bind(&UIKeyboard::HandleBackTabPressed, this, std::placeholders::_1, std::placeholders::_2),
 		pBackTab, pCantBackTab);
 
+	/*
 	m_pDoneButton = m_pKeyboardControls->AddButton(doneOffset, barButtonWidth, itemSide,
 		std::bind(&UIKeyboard::HandleDonePressed, this, std::placeholders::_1, std::placeholders::_2),
 		pDone);
+		//*/
 
 	m_pCancelButton = m_pKeyboardControls->AddButton(cancelOffset, barButtonWidth, itemSide,
 		std::bind(&UIKeyboard::HandleCancelPressed, this, std::placeholders::_1, std::placeholders::_2),
@@ -354,12 +356,13 @@ RESULT UIKeyboard::InitializeKeyboardControls() {
 
 	CN(m_pNextButton);
 	CN(m_pPreviousButton);
-	CN(m_pDoneButton);
+	//CN(m_pDoneButton);
 	CN(m_pCancelButton);
 
 	m_pNextButton->SetVisible(true);
 	m_pPreviousButton->SetVisible(true);
-	m_pDoneButton->SetVisible(true);
+	//m_pDoneButton->SetVisible(true);
+	m_pCancelButton->SetVisible(true);
 
 Error:
 	return r;
@@ -1047,8 +1050,8 @@ RESULT UIKeyboard::HandleCancelPressed(UIButton* pButtonContext, void* pContext)
 	// TODO: send form cancel
 	CR(GetDOS()->SendDOSMessage(strKeyboardCancel));
 
-	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 0));
-	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 1));
+//	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 0));
+//	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 1));
 
 Error:
 	return r;

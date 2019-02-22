@@ -91,7 +91,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 	}
 	if (m_fUpdateFormURL) {
 		m_fUpdateFormURL = false;
-
+		/*
 		std::multimap<std::string, std::string> headerMap;
 		m_pDreamBrowserForm->CheckForHeaders(headerMap, m_strURL);
 
@@ -108,6 +108,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 			requestHeaders.insert(std::pair<std::wstring, std::wstring>(util::StringToWideString(strKey), util::StringToWideString(strValue)));
 		}
 		webRequest.SetRequestHeaders(requestHeaders);
+		//*/
 
 //		m_pDreamBrowserForm->LoadRequest(webRequest);
 		m_pDreamBrowserForm->SetURI(m_strURL);
@@ -226,6 +227,17 @@ RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 	return r;
 }
 
+RESULT DreamFormApp::ResetForm() {
+
+	m_pDreamBrowserForm->CloseSource();
+	GetDOS()->ShutdownDreamApp<DreamBrowser>(m_pDreamBrowserForm);
+	m_pDreamBrowserForm = nullptr;
+
+	m_fInitBrowser = true;
+
+	return R_PASS;
+}
+
 RESULT DreamFormApp::HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) {
 	return R_NOT_IMPLEMENTED;
 }
@@ -244,7 +256,7 @@ RESULT DreamFormApp::UpdateAddressBarSecurity(bool fSecure) {
 }
 
 RESULT DreamFormApp::UpdateAddressBarText(std::string& strURL) {
-	//m_pFormView->SetURLText(strURL);
+	m_pFormView->SetURLText(strURL);
 	return R_PASS;
 }
 
@@ -277,7 +289,13 @@ RESULT DreamFormApp::HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSourc
 		fMaskPasswordEnabled = pDOMNode->IsPassword();
 
 		CR(pKeyboard->ShowBrowserButtons());
-		CR(m_pFormView->HandleKeyboardUp(ContentType::FORM));
+
+		if (m_formType == FormType::SIGN_IN || m_formType == FormType::SIGN_UP) {
+			CR(m_pFormView->HandleKeyboardUp(ContentType::FORM));
+		}
+		else {
+			CR(m_pFormView->HandleKeyboardUp());
+		}
 
 		std::string strTextField = pDOMNode->GetValue();
 		pKeyboard->PopulateKeyboardTextBox(strTextField);
@@ -299,7 +317,13 @@ RESULT DreamFormApp::HandleIsInputFocused(bool fIsFocused, DreamContentSource *p
 		CN(pKeyboard);
 
 		CR(pKeyboard->ShowBrowserButtons());
-		CR(m_pFormView->HandleKeyboardUp(ContentType::FORM));
+
+		if (m_formType == FormType::SIGN_IN || m_formType == FormType::SIGN_UP) {
+			CR(m_pFormView->HandleKeyboardUp(ContentType::FORM));
+		}
+		else {
+			CR(m_pFormView->HandleKeyboardUp());
+		}
 	}
 	else {
 		CR(m_pDreamBrowserForm->HandleUnfocusEvent());
@@ -333,24 +357,8 @@ Error:
 RESULT DreamFormApp::HandleDreamFormCancel() {
 	RESULT r = R_PASS;
 
-	//CR(GetDOS()->GetUserApp()->SetHasOpenApp(false));
-	//CR(Hide());
-	/*
-	switch (m_formType) {
-	case FormType::DEFAULT: {
-		// basically send menu back
-		//GetDOS()->GetUserApp()->HandleUserObserverEvent(UserObserverEventType::BACK);
-		std::string defaultFormCancelMessage = "test";
-		GetDOS()->SendDOSMessage(defaultFormCancelMessage);
-
-	} break;
-	case FormType::SIGN_IN:
-	case FormType::SIGN_UP: {
-		// request original form
-	} break;
-
-	}
-	//*/
+	m_pFormView->HandleKeyboardDown();
+	m_pDreamBrowserForm->HandleUnfocusEvent();
 
 Error:
 	return r;
@@ -411,19 +419,17 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 
 	case INTERACTION_EVENT_MENU: {
 		auto pCloudController = GetDOS()->GetCloudController();
-		if (pCloudController != nullptr && 
+		if (GetDOS()->GetKeyboardApp()->IsVisible()) {
+			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
+			CR(m_pFormView->HandleKeyboardDown());
+		}
+		else if (pCloudController != nullptr && 
 			pCloudController->IsUserLoggedIn() && 
 			pCloudController->IsEnvironmentConnected() &&
 			m_formType != FormType::ENVIRONMENTS_WELCOME) {
 
-			if (GetDOS()->GetKeyboardApp()->IsVisible()) {
-				CR(m_pDreamBrowserForm->HandleUnfocusEvent());
-				CR(m_pFormView->HandleKeyboardDown());
-			}
-			else {
-				CR(Hide());
-				CR(pDreamUserApp->SetHasOpenApp(false));
-			}
+			CR(Hide());
+			CR(pDreamUserApp->SetHasOpenApp(false));
 		}
 		else {
 			if (m_pFormView != nullptr && !m_pFormView->GetViewQuad()->IsVisible()) {

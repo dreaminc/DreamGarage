@@ -125,6 +125,7 @@ public:
 
 	virtual RESULT IsInputFocused() override;
 	virtual RESULT UnfocusInput() override;
+	virtual RESULT ParseURL(std::string strURL, std::string& strParsedURL) override;
 
 	// Get Focused DOM element
 	//virtual RESULT GetFocusedNode() override;

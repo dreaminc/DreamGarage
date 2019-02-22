@@ -197,8 +197,9 @@ RESULT UIControlView::Update() {
 		}
 	}
 
-	if (m_pAddressText->CheckAndCleanDirty()) {
+	if (m_fUpdateAddressBarText) {
 		CR(m_pAddressText->SetText(m_strCurrentURL));
+		m_fUpdateAddressBarText = false;
 	}
 
 Error:
@@ -257,7 +258,7 @@ RESULT UIControlView::SetURLText(std::string strURL) {
 	RESULT r = R_PASS;
 
 	m_strCurrentURL = strURL;
-	m_pAddressText->SetDirty();
+	m_fUpdateAddressBarText = true;
 
 Error:
 	return r;

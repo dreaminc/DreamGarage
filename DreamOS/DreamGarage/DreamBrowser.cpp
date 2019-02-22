@@ -304,6 +304,7 @@ RESULT DreamBrowser::OnAfterCreated() {
 RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
+	//*
 	if (!fLoading) {
 		m_strCurrentURL = strCurrentURL;
 		
@@ -311,6 +312,7 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 
 		m_fUpdateControlBarInfo = true;
 	}
+	//*/
 
 Error:
 	return r;
@@ -325,11 +327,12 @@ RESULT DreamBrowser::OnLoadStart() {
 RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 	
-	m_strCurrentURL = strCurrentURL;
+	//m_strCurrentURL = strCurrentURL;
 
-	if (m_pObserver != nullptr) {
+	if (m_pObserver != nullptr && httpStatusCode == 200) {
 		CR(m_pObserver->HandleLoadEnd());
-		m_fUpdateControlBarInfo = true;
+	//	CR(m_pWebBrowserController->IsInputFocused());
+	//	m_fUpdateControlBarInfo = true;
 	}
 
 Error:
@@ -658,7 +661,9 @@ RESULT DreamBrowser::Update(void *pContext) {
 			CR(UpdateNavigationFlags());
 		}
 		if (m_pObserver != nullptr) {
-			m_pObserver->UpdateAddressBarText(m_strCurrentURL);
+			std::string strOrigin;
+			m_pWebBrowserController->ParseURL(m_strCurrentURL, strOrigin);
+			m_pObserver->UpdateAddressBarText(strOrigin);
 		}
 		m_fUpdateControlBarInfo = false;
 	}
