@@ -214,7 +214,6 @@ RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 
 #ifndef _DEBUG
 	m_strURL = strURL;
-	//UpdateAddressBarText(strURL);
 	if (m_pDreamBrowserForm == nullptr) {
 		m_fInitBrowser = true;
 		DOSLOG(INFO, "Create browser for form: %s", m_strURL);

@@ -304,7 +304,6 @@ RESULT DreamBrowser::OnAfterCreated() {
 RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
-	//*
 	if (!fLoading) {
 		m_strCurrentURL = strCurrentURL;
 		
@@ -312,7 +311,6 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 
 		m_fUpdateControlBarInfo = true;
 	}
-	//*/
 
 Error:
 	return r;
@@ -331,7 +329,6 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 
 	if (m_pObserver != nullptr && httpStatusCode == 200) {
 		CR(m_pObserver->HandleLoadEnd());
-	//	CR(m_pWebBrowserController->IsInputFocused());
 	//	m_fUpdateControlBarInfo = true;
 	}
 

@@ -612,7 +612,7 @@ RESULT DreamUserControlArea::HandleDreamFormSuccess() {
 }
 
 RESULT DreamUserControlArea::HandleDreamFormCancel() {
-	return R_PASS;
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT DreamUserControlArea::HandleCanTabNext(bool fCanNext) {

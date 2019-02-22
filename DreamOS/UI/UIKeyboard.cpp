@@ -1047,11 +1047,7 @@ RESULT UIKeyboard::HandleCancelPressed(UIButton* pButtonContext, void* pContext)
 
 	std::string strKeyboardCancel = "UIKeyboard.FormCancel";
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	// TODO: send form cancel
 	CR(GetDOS()->SendDOSMessage(strKeyboardCancel));
-
-//	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 0));
-//	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 1));
 
 Error:
 	return r;

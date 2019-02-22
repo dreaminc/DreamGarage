@@ -151,8 +151,7 @@ RESULT CEFBrowserController::LoadURL(const std::string& url) {
 
 	CN(m_pCEFBrowser);
 
-	//m_pCEFBrowser->GetFocusedFrame()->LoadURL(url);
-	m_pCEFBrowser->GetMainFrame()->LoadURL(url);
+	m_pCEFBrowser->GetFocusedFrame()->LoadURL(url);
 
 Error:
 	return r;
