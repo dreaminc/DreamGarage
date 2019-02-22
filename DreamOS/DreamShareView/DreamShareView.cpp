@@ -16,6 +16,8 @@
 #include "DreamGarage/AudioDataMessage.h"
 #include "Sound/SpatialSoundObject.h"
 
+#include "UI/UIView.h"
+
 DreamShareView::DreamShareView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamShareView>(pDreamOS, pContext)
 {
@@ -40,6 +42,9 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	std::shared_ptr<DreamUserApp> pDreamUserApp = pDreamOS->GetUserApp();
 
 	GetDOS()->AddObjectToUIGraph(GetComposite(), (SandboxApp::PipelineType::AUX | SandboxApp::PipelineType::MAIN));
+
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
 
 	int channels = 4;
 	int pxSize = m_castpxWidth * m_castpxHeight * channels;
@@ -94,8 +99,14 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 		CN(m_pSpatialBrowserObject);
 	}
 
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+	m_pPointerLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerLeftTexture)[0]);
+	m_pPointerCenter = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerCenterTexture)[0]);
+	m_pPointerRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerRightTexture)[0]);
+
 	for (int i = 0; i < 12; i++) {
 
+		/*
 		auto pSphere = GetDOS()->AddSphere(0.025f);
 		pSphere->SetVisible(false);
 		if (i % 2 == 0) {
@@ -104,8 +115,26 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 		else {
 			pSphere->SetMaterialDiffuseColor(COLOR_BLUE);
 		}
+		m_pointerViewPool.push(pSphere);
+		//*/
+		float height = 0.05f;
+		float pxHeight = 61.0f;
+		float pxRight = 19.0f;
+		float pxLeft = 33.0f;
+		float leftWidth = height * pxLeft / pxHeight;
+		float rightWidth = height * pxRight / pxHeight;
 
-		m_pointerSpherePool.push(pSphere);
+		auto pComposite = GetDOS()->AddComposite();
+		auto pView = pComposite->AddUIView(GetDOS());
+
+		auto pQuadLeft = pView->AddQuad(leftWidth, height);
+		auto pQuadCenter = pView->AddQuad(height, height);
+		auto pQuadRight = pView->AddQuad(rightWidth, height);
+
+		pQuadLeft->SetPosition(-(height + leftWidth) / 2.0f, 0.0f, 0.0f);
+		pQuadRight->SetPosition((height + rightWidth) / 2.0f, 0.0f, 0.0f);
+
+		m_pointerViewPool.push(pView);
 	}
 
 Error:
@@ -200,7 +229,7 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 
 	if (m_fReceivingStream || IsStreaming()) {
 
-		sphere *pPointer;
+		std::shared_ptr<UIView> pPointer;
 		long userID = pUpdatePointerMessage->GetSenderUserID();
 
 		CR(AllocateSpheres(userID));
@@ -214,7 +243,7 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 
 		pPointer->SetPosition(pUpdatePointerMessage->m_body.ptPointer);
 		pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible);
-		pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
+		//pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
 	}
 
 Error:
@@ -674,15 +703,15 @@ Error:
 RESULT DreamShareView::AllocateSpheres(long userID) {
 	RESULT r = R_PASS;
 
-	std::vector<sphere*> userPointers;
+	std::vector<std::shared_ptr<UIView>> userPointers;
 
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
 
-	userPointers.emplace_back(m_pointerSpherePool.front());
-	m_pointerSpherePool.pop();
-	userPointers.emplace_back(m_pointerSpherePool.front());
-	m_pointerSpherePool.pop();
+	userPointers.emplace_back(m_pointerViewPool.front());
+	m_pointerViewPool.pop();
+	userPointers.emplace_back(m_pointerViewPool.front());
+	m_pointerViewPool.pop();
 
 	m_pointingObjects[userID] = userPointers;
 
@@ -693,15 +722,15 @@ Error:
 RESULT DreamShareView::DeallocateSpheres(long userID) {
 	RESULT r = R_PASS;
 
-	std::vector<sphere*> userPointers;
+	std::vector<std::shared_ptr<UIView>> userPointers;
 
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) != 0, R_SKIPPED);
 
 	userPointers = m_pointingObjects[userID];
 
-	m_pointerSpherePool.push(userPointers[0]);
-	m_pointerSpherePool.push(userPointers[1]);
+	m_pointerViewPool.push(userPointers[0]);
+	m_pointerViewPool.push(userPointers[1]);
 
 	m_pointingObjects.erase(userID);
 

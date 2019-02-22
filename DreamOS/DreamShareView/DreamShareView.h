@@ -19,6 +19,7 @@ class color;
 class AudioPacket;
 class SpatialSoundObject;
 class AudioDataMessage;
+class UIView;
 
 class DreamShareView :
 	public DreamApp<DreamShareView>,
@@ -141,9 +142,19 @@ private:
 	PeerConnection *m_pStreamerPeerConnection = nullptr;
 
 	// Pointing members
-	std::map<long, std::vector<sphere*>> m_pointingObjects; // user id to left/right sphere
+	std::map<long, std::vector<std::shared_ptr<UIView>>> m_pointingObjects; // user id to left/right sphere
 
-	std::queue<sphere*> m_pointerSpherePool;
+	std::queue<std::shared_ptr<UIView>> m_pointerViewPool;
+
+private:
+	const wchar_t *k_wszPointerLeftTexture = L"texture/shared-view/pointer-left";
+	const wchar_t *k_wszPointerCenterTexture = L"texture/shared-view/pointer-center";
+	const wchar_t *k_wszPointerRightTexture = L"texture/shared-view/pointer-right";
+
+private:
+	texture* m_pPointerLeft = nullptr;
+	texture* m_pPointerCenter = nullptr;
+	texture* m_pPointerRight = nullptr;
 
 private:
 //	std::shared_ptr<UIView> 
