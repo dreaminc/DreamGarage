@@ -43,6 +43,9 @@
     <Filter Include="DreamTestApp\Suites\UI">
       <UniqueIdentifier>{cfd35d3c-1642-439e-b581-6708594ddb58}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DreamTestApp\Suites\Dimension">
+      <UniqueIdentifier>{58c01bef-5742-42c3-b61e-adf542c0a50a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
@@ -87,6 +90,9 @@
     <ClCompile Include="..\..\..\UI\UIViewTestSuite.cpp">
       <Filter>DreamTestApp\Suites\UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimensionTestSuite.cpp">
+      <Filter>DreamTestApp\Suites\Dimension</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h">
@@ -130,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UIViewTestSuite.h">
       <Filter>DreamTestApp\Suites\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\DimensionTestSuite.h">
+      <Filter>DreamTestApp\Suites\Dimension</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

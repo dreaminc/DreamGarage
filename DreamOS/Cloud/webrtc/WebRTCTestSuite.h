@@ -55,7 +55,7 @@ private:
 	CloudController *GetCloudController();
 
 private:
-	DreamOS *m_pDreamOS;
+	
 	//CloudController *m_pCloudController = nullptr;
 	//*
 	std::shared_ptr<sphere> m_pTestSphereRelative = nullptr;

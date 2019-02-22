@@ -37,8 +37,7 @@
 #include "UI/UIKeyboardLayout.h"
 
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
-	DreamTestSuite("ui"),
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("ui", pDreamOS)
 {
 	RESULT r = R_PASS;
 

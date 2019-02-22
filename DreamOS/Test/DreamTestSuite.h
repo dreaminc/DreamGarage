@@ -10,18 +10,22 @@
 
 #include "Test/TestSuite.h"
 
+class DreamOS;
+
 class DreamTestSuite : public TestSuite {
 public:
-	DreamTestSuite(std::string strName) :
-		TestSuite(strName)
-	{
-		// empty
-	}
+	DreamTestSuite(std::string strName, DreamOS *pParentDreamOS);
 
 	~DreamTestSuite() = default;
 
+protected:
+	virtual RESULT ResetTest(void *pContext);
+
 public:
-	virtual RESULT SetupPipeline(std::string strRenderProgramName) = 0;
+	virtual RESULT SetupPipeline(std::string strRenderProgramName = "standard");
+
+protected:
+	DreamOS *m_pDreamOS = nullptr;
 };
 
 #endif // DREAM_TEST_SUITE_H_

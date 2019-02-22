@@ -195,6 +195,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
     <ClCompile Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionTestSuite.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp" />
+    <ClCompile Include="..\..\..\Primitives\DimensionTestSuite.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxTestSuite.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundTestSuite.cpp" />
     <ClCompile Include="..\..\..\Test\MatrixTestSuite.cpp" />
@@ -211,6 +212,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
     <ClInclude Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionTestSuite.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h" />
+    <ClInclude Include="..\..\..\Primitives\DimensionTestSuite.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxTestSuite.h" />
     <ClInclude Include="..\..\..\Sound\SoundTestSuite.h" />
     <ClInclude Include="..\..\..\Test\MatrixTestSuite.h" />

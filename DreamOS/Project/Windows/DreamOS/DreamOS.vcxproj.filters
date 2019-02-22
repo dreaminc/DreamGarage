@@ -1047,6 +1047,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLBillboard.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Test\DreamTestSuite.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">

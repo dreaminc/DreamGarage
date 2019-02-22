@@ -24,6 +24,7 @@ public:
 		OS,
 		SOUND,
 		SANDBOX,
+		DIMENSION,
 		INVALID
 	} ;
 
