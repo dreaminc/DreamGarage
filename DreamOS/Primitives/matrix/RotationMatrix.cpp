@@ -53,6 +53,7 @@ RotationMatrix::~RotationMatrix() {
 	// empty stub
 }
 
+//*
 // http://www.cprogramming.com/tutorial/3d/quaternions.html
 RESULT RotationMatrix::SetQuaternionRotationMatrix(quaternion q) {
 	m_type = QUATERNION;
@@ -74,6 +75,33 @@ RESULT RotationMatrix::SetQuaternionRotationMatrix(quaternion q) {
 
 	return R_PASS;
 }
+//*/
+
+/*
+// http://www.mathworks.com/help/aeroblks/quaternionrotation.html
+RESULT RotationMatrix::SetQuaternionRotationMatrix(quaternion q) {
+	m_type = QUATERNION;
+	q.Normalize();
+	//q.Reverse();
+
+	this->identity();
+
+	this->element(0, 0) = 1.0f - 2.0f * (q.y2() + q.z2());
+	this->element(0, 1) = 2.0f * (q.x()*q.y() + q.w()*q.z());
+	this->element(0, 2) = 2.0f * (q.x()*q.z() - q.w()*q.y());
+
+	this->element(1, 0) = 2.0f * (q.x()*q.y() - q.w()*q.z());
+	this->element(1, 1) = 1.0f - 2.0f * (q.x2() + q.z2());
+	this->element(1, 2) = 2.0f * (q.y()*q.z() + q.w()*q.x());
+
+	this->element(2, 0) = 2.0f * (q.x()*q.z() + q.w()*q.y());
+	this->element(2, 1) = 2.0f * (q.y()*q.z() - q.w()*q.x());
+	this->element(2, 2) = 1.0f - 2.0f * (q.x2() + q.y2());
+
+	return R_PASS;
+}
+//*/
+
 
 // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
 quaternion RotationMatrix::GetQuaternion() {

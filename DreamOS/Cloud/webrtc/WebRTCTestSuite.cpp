@@ -29,8 +29,7 @@
 #include "WebBrowser\CEFBrowser/CEFBrowserManager.h"
 
 WebRTCTestSuite::WebRTCTestSuite(DreamOS *pDreamOS) :
-	DreamTestSuite("webrtc"),
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("webrtc", pDreamOS)
 {
 	// empty
 }

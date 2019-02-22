@@ -95,6 +95,7 @@ class DreamOS :
 	friend class DreamAppBase;
 
 	// TODO: this needs to be revisited
+	friend class DreamTestSuite;
 	friend class UIModule;
 	friend class HALTestSuite;
 	friend class UITestSuite;
@@ -108,6 +109,7 @@ class DreamOS :
 	friend class SoundTestSuite;
 	friend class SandboxTestSuite;
 	friend class MultiContentTestSuite;
+	friend class DimensionTestSuite;
 
 public:
 	DreamVideoStreamSubscriber* m_pVideoStreamSubscriber = nullptr;

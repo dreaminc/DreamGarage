@@ -21,7 +21,6 @@ public:
 
 	virtual RESULT AddTests() override;
 
-	virtual RESULT SetupPipeline(std::string strRenderProgramName = "environment") override;
 	virtual RESULT SetupTestSuite() override;
 
 public:

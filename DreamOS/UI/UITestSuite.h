@@ -133,7 +133,7 @@ private:
 	//RESULT SetupUINodePipeline();
 
 private:
-	DreamOS *m_pDreamOS;
+	
 	std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
 	CloudController *m_pCloudController = nullptr;
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;

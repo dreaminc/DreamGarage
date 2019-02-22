@@ -83,7 +83,6 @@ public:
 
 	RESULT TestNestedOBB();
 	RESULT TestNestedCompositesQauds();
-	RESULT AddTestRotation();
 
 	RESULT AddTestMouseDrag();
 	
@@ -107,7 +106,6 @@ private:
 	}
 
 private:
-	DreamOS *m_pDreamOS = nullptr;
 	HALImp *m_pHALImp = nullptr;
 };
 

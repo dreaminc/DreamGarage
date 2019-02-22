@@ -74,8 +74,8 @@ public:
 	virtual RESULT HandleCanTabNext(bool fCanNext) = 0;
 	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) = 0;
 
-	virtual std::string GetCertificateErrorURL() = 0;
-	virtual std::string GetLoadErrorURL() = 0;
+	virtual std::string GetCertificateErrorURL() { return std::string(""); };
+	virtual std::string GetLoadErrorURL() { return std::string(""); };
 };
 
 class DreamBrowser : 

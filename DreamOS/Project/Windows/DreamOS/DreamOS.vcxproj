@@ -534,6 +534,7 @@ __BASE_FILE__="%(Filename)%(Extension)";%(PreprocessorDefinitions)</Preprocessor
     <ClCompile Include="..\..\..\Sound\WASAPI\WASAPISpatialSoundObject.cpp" />
     <ClCompile Include="..\..\..\Sound\XAudio2\X3DSpatialSoundObject.cpp" />
     <ClCompile Include="..\..\..\Sound\XAudio2\XAudio2SoundClient.cpp" />
+    <ClCompile Include="..\..\..\Test\DreamTestSuite.cpp" />
     <ClCompile Include="..\..\..\Test\TestObject.cpp" />
     <ClCompile Include="..\..\..\Test\TestSuite.cpp" />
     <ClCompile Include="..\..\..\Test\TestSuiteFactory.cpp" />

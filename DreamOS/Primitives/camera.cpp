@@ -54,10 +54,16 @@ int camera::GetViewHeight() {
 }
 
 vector camera::GetRightVector() {
-	quaternion temp = GetOrientation();
-	temp.Normalize();
+	quaternion qOrientation = GetOrientation();
+	qOrientation.Normalize();
 
-	vector vectorRight = temp.RotateVector(vector::iVector());
+	//vector vectorRight = qOrientation.RotateVector(vector::iVector(1.0f));
+	//vector vectorRight = (vector::iVector(1.0f)).RotateByQuaternion(qOrientation);
+	vector vectorRight = (vector::iVector(1.0f)).RotateByQuaternion(GetWorldOrientation());
+
+	//RotationMatrix matRotation = RotationMatrix(GetWorldOrientation());
+	//vector vectorRight = (vector)(matRotation * (vector::iVector(1.0f)));
+
 	return vectorRight.Normal();
 }
 
