@@ -365,24 +365,47 @@ vector quaternion::GetVector() {
 	return vector(m_x, m_y, m_z);
 }
 
-// http://www.mathworks.com/help/aeroblks/quaternionrotation.html
+///*
+// http://www.cprogramming.com/tutorial/3d/quaternions.html
 vector quaternion::RotateVector(vector v) {
 	vector retVal;
 
 	retVal.x() =	v.x() * (1.0f - 2.0f * (y2() + z2())) +
-					v.y() * (2.0f * (x()*y() + w()*z())) +
-					v.z() * (2.0f * (x()*z() - w()*y()));
+					v.y() * (2.0f * (x()*y() - w()*z())) +
+					v.z() * (2.0f * (x()*z() + w()*y()));
 
-	retVal.y() =	v.x() * (2.0f * (x()*y() - w()*z())) +
+	retVal.y() =	v.x() * (2.0f * (x()*y() + w()*z())) +
 					v.y() * (1.0f - 2.0f * (x2() + z2())) +
-					v.z() * (2.0f * (y()*z() + w()*x()));
+					v.z() * (2.0f * (y()*z() - w()*x()));
 
-	retVal.z() =	v.x() * (2.0f * (x()*z() + w()*y())) +
-					v.y() * (2.0f * (y()*z() - w()*x())) +
+	retVal.z() =	v.x() * (2.0f * (x()*z() - w()*y())) +
+					v.y() * (2.0f * (y()*z() + w()*x())) +
 					v.z() * (1.0f - 2.0f * (x2() + y2()));
 
 	return retVal;
 }
+//*/
+
+/*
+// http://www.mathworks.com/help/aeroblks/quaternionrotation.html
+vector quaternion::RotateVector(vector v) {
+	vector retVal;
+	
+	retVal.x() =	v.x() * (1.0f - 2.0f * (y2() + z2())) +
+					v.y() * (2.0f * (x()*y() + w()*z())) +
+					v.z() * (2.0f * (x()*z() - w()*y()));
+	
+	retVal.y() =	v.x() * (2.0f * (x()*y() - w()*z())) +
+					v.y() * (1.0f - 2.0f * (x2() + z2())) +
+					v.z() * (2.0f * (y()*z() + w()*x()));
+	
+	retVal.z() =	v.x() * (2.0f * (x()*z() + w()*y())) +
+					v.y() * (2.0f * (y()*z() - w()*x())) +
+					v.z() * (1.0f - 2.0f * (x2() + y2()));
+	
+	return retVal;
+}
+//*/
 
 
 quaternion& quaternion::operator*=(const quaternion_precision& arg) {

@@ -22,7 +22,9 @@ public:
 	virtual RESULT SetupTestSuite() override;
 
 public:
-	RESULT AddTestRotation();
+	RESULT AddTestDimObjRotationFunctions();
+
+	RESULT AddTestVectorRotationFunctions();
 };
 
 #endif // ! DIMENSION_TEST_SUITE_H_
