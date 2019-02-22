@@ -40,6 +40,13 @@ class texture;
 class font;
 class text;
 
+enum class ContentType {
+	FORM,
+	DEFAULT,
+	INVALID
+	// TODO: potentially different layouts for numpad or logins
+};
+
 class UIControlView : public UISurface, 
 						 public DreamUserObserver {
 	friend class DreamUserControlArea;
@@ -66,7 +73,7 @@ public:
 	RESULT Show();
 	RESULT Hide();
 
-	RESULT HandleKeyboardUp();
+	RESULT HandleKeyboardUp(ContentType type = ContentType::DEFAULT);
 	RESULT HandleKeyboardDown();
 
 	RESULT FlipViewUp();
@@ -136,6 +143,7 @@ private:
 	point m_ptClick;
 
 	bool m_fIsMinimized = false;
+	bool m_fUpdateAddressBarText = false;
 
 	//TODO: the physics in the keyboard surface uses dirty with the mallets to determine whether a hit 
 	//		should be registered.  This doesn't work correctly when there are multiple surfaces

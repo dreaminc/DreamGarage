@@ -117,6 +117,7 @@ public:
 	RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext);
 	RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext);
 	RESULT HandleDonePressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleCancelPressed(UIButton* pButtonContext, void* pContext);
 
 	RESULT UpdateTabNextTexture(bool fCanTabNext);
 	RESULT UpdateTabPreviousTexture(bool fCanTabPrevious);
@@ -140,6 +141,8 @@ public:
 
 	RESULT SetPasswordFlag(bool fIsPassword);
 
+	std::shared_ptr<UIButton> GetCancelButton();
+
 private:
 	std::shared_ptr<SoundFile> m_pDefaultPressSound = nullptr;
 	std::shared_ptr<SoundFile> m_pDeletePressSound = nullptr;
@@ -155,11 +158,13 @@ private:
 	const wchar_t *k_wszBackTab = L"key-tab-previous.png";
 	const wchar_t *k_wszCantBackTab = L"key-tab-previous-disabled.png";
 	const wchar_t *k_wszDone = L"key-done.png";
+	std::wstring k_wstrCancel = L"texture/keyboard/cancel.png";
 
 private:
 	std::shared_ptr<UIButton> m_pNextButton = nullptr;
 	std::shared_ptr<UIButton> m_pPreviousButton = nullptr;
 	std::shared_ptr<UIButton> m_pDoneButton = nullptr;
+	std::shared_ptr<UIButton> m_pCancelButton = nullptr;
 
 private:
 	// layout variables

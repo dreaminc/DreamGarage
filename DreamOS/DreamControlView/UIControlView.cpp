@@ -197,8 +197,9 @@ RESULT UIControlView::Update() {
 		}
 	}
 
-	if (m_pAddressText->CheckAndCleanDirty()) {
+	if (m_fUpdateAddressBarText) {
 		CR(m_pAddressText->SetText(m_strCurrentURL));
+		m_fUpdateAddressBarText = false;
 	}
 
 Error:
@@ -257,7 +258,7 @@ RESULT UIControlView::SetURLText(std::string strURL) {
 	RESULT r = R_PASS;
 
 	m_strCurrentURL = strURL;
-	m_pAddressText->SetDirty();
+	m_fUpdateAddressBarText = true;
 
 Error:
 	return r;
@@ -449,9 +450,8 @@ Error:
 	return r;
 }
 
-RESULT UIControlView::HandleKeyboardUp() {
+RESULT UIControlView::HandleKeyboardUp(ContentType type) {
 	RESULT r = R_PASS;
-
 
 	std::shared_ptr<UIKeyboard> pKeyboardApp = m_pDreamOS->GetKeyboardApp();
 	CNR(pKeyboardApp, R_SKIPPED);
@@ -463,6 +463,15 @@ RESULT UIControlView::HandleKeyboardUp() {
 
 	CBR(!pKeyboardApp->IsVisible(), R_SKIPPED);
 	CR(pKeyboardApp->Show());
+
+	switch (type) {
+	case ContentType::FORM: {
+		pKeyboardApp->GetCancelButton()->SetVisible(true);
+	} break;
+	case ContentType::DEFAULT: {
+		pKeyboardApp->GetCancelButton()->SetVisible(false);
+	} break;
+	}
 
 Error:
 	return r;

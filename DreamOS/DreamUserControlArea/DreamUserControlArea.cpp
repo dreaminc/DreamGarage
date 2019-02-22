@@ -611,6 +611,10 @@ RESULT DreamUserControlArea::HandleDreamFormSuccess() {
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT DreamUserControlArea::HandleDreamFormCancel() {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT DreamUserControlArea::HandleCanTabNext(bool fCanNext) {
 	RESULT r = R_PASS;
 	auto pKeyboard = GetDOS()->GetKeyboardApp();

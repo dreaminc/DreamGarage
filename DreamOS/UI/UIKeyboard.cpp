@@ -309,15 +309,23 @@ RESULT UIKeyboard::InitializeKeyboardControls() {
 	float tabOffset = backTabOffset + barButtonWidth + marginError;
 
 	float right = m_surfaceWidth / 2.0f - marginError / 2.0f;
-	float doneOffset = right - barButtonWidth/2.0f;
+	float cancelOffset = right - barButtonWidth/2.0f;
+	//float cancelOffset = doneOffset - barButtonWidth - marginError;
 
 	m_pKeyboardControls->RotateXByDeg(-90.0f);
 	m_pKeyboardControls->SetPosition(point(0.0f, 0.0f, -(m_surfaceHeight + buttonWidth) / 2.0f));
+
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
+
+	// Initialize Address Bar
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
 
 	auto pTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszTab));
 	auto pCantTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszCantTab));
 	auto pBackTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszBackTab));
 	auto pCantBackTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszCantBackTab));
+	auto pCancel = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wstrCancel)[0]));
 
 	//TODO: use when controlbar is deprecated
 	auto pDone = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszDone));
@@ -326,7 +334,7 @@ RESULT UIKeyboard::InitializeKeyboardControls() {
 	CN(pCantTab);
 	CN(pBackTab);
 	CN(pCantBackTab);
-	CN(pDone)
+	CN(pDone);
 
 	m_pNextButton = m_pKeyboardControls->AddButton(tabOffset, barButtonWidth, itemSide,
 		std::bind(&UIKeyboard::HandleTabPressed, this, std::placeholders::_1, std::placeholders::_2),
@@ -336,17 +344,25 @@ RESULT UIKeyboard::InitializeKeyboardControls() {
 		std::bind(&UIKeyboard::HandleBackTabPressed, this, std::placeholders::_1, std::placeholders::_2),
 		pBackTab, pCantBackTab);
 
+	/*
 	m_pDoneButton = m_pKeyboardControls->AddButton(doneOffset, barButtonWidth, itemSide,
 		std::bind(&UIKeyboard::HandleDonePressed, this, std::placeholders::_1, std::placeholders::_2),
 		pDone);
+		//*/
+
+	m_pCancelButton = m_pKeyboardControls->AddButton(cancelOffset, barButtonWidth, itemSide,
+		std::bind(&UIKeyboard::HandleCancelPressed, this, std::placeholders::_1, std::placeholders::_2),
+		pCancel);
 
 	CN(m_pNextButton);
 	CN(m_pPreviousButton);
-	CN(m_pDoneButton);
+	//CN(m_pDoneButton);
+	CN(m_pCancelButton);
 
 	m_pNextButton->SetVisible(true);
 	m_pPreviousButton->SetVisible(true);
-	m_pDoneButton->SetVisible(true);
+	//m_pDoneButton->SetVisible(true);
+	m_pCancelButton->SetVisible(true);
 
 Error:
 	return r;
@@ -884,6 +900,10 @@ RESULT UIKeyboard::SetPasswordFlag(bool fIsPassword) {
 	return R_PASS;
 }
 
+std::shared_ptr<UIButton> UIKeyboard::GetCancelButton() {
+	return m_pCancelButton;
+}
+
 RESULT UIKeyboard::UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) {
 	RESULT r = R_PASS;
 
@@ -1017,6 +1037,17 @@ RESULT UIKeyboard::HandleDonePressed(UIButton* pButtonContext, void* pContext) {
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 0));
 	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 1));
+
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::HandleCancelPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+
+	std::string strKeyboardCancel = "UIKeyboard.FormCancel";
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
+	CR(GetDOS()->SendDOSMessage(strKeyboardCancel));
 
 Error:
 	return r;

@@ -118,6 +118,8 @@ public:
 	virtual RESULT IsInputFocused() = 0;
 	virtual RESULT UnfocusInput() = 0;
 
+	virtual RESULT ParseURL(std::string strURL, std::string& strParsedURL) = 0;
+
 	// Get the new dirty frames since last time they were polled.
 	// returns the number of new dirty frame.
 	// This function can be called by any thread.
