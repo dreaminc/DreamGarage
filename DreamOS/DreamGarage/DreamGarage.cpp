@@ -1603,7 +1603,7 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 
 	else if (strMessage == "UIKeyboard.FormCancel") {
 		// for sign up/sign in forms, reload the original form when the login method is canceled
-		m_pDreamLoginApp->ResetForm();
+		CR(m_pDreamLoginApp->ResetForm());
 	}
 
 	else if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {

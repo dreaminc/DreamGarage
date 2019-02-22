@@ -227,14 +227,16 @@ RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 }
 
 RESULT DreamFormApp::ResetForm() {
+	RESULT r = R_PASS;
 
 	m_pDreamBrowserForm->CloseSource();
-	GetDOS()->ShutdownDreamApp<DreamBrowser>(m_pDreamBrowserForm);
-	m_pDreamBrowserForm = nullptr;
+	CRM(GetDOS()->ShutdownDreamApp<DreamBrowser>(m_pDreamBrowserForm), "Browser shutdown failed");
 
 	m_fInitBrowser = true;
 
-	return R_PASS;
+Error:
+	m_pDreamBrowserForm = nullptr;
+	return r;
 }
 
 RESULT DreamFormApp::HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) {
