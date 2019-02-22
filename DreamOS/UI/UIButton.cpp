@@ -132,12 +132,10 @@ RESULT UIButton::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 
 	//vector for captured object movement
 	qSurface = pButtonContext->GetOrientation() * (pSurface->GetOrientation());
-	qSurface.Reverse();
 	vSurface = qSurface.RotateVector(pSurface->GetNormal() * -1.0f);
 
 	//vector for captured object collisions
 	qRotation = pSurface->GetOrientation(true);
-	qRotation.Reverse();
 	vRotation = qRotation.RotateVector(pSurface->GetNormal() * -1.0f);
 
 	InteractionEngineProxy* pInteractionProxy;

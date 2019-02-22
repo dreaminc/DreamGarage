@@ -131,12 +131,12 @@ RESULT DreamUIBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 
 	//vector for captured object movement
 	qSurface = pSelected->GetOrientation() * (pSurface->GetOrientation());
-	qSurface.Reverse();
 	vSurface = qSurface.RotateVector(pSurface->GetNormal() * -1.0f);
+	
 	//vector for captured object collisions
 	qRotation = pSurface->GetOrientation(true);
-	qRotation.Reverse();
 	vRotation = qRotation.RotateVector(pSurface->GetNormal() * -1.0f);
+
 	CBR(m_pScrollView->IsVisible(), R_SKIPPED);
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
