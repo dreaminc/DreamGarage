@@ -181,7 +181,7 @@ public:
 		}
 
 		if (jsonPeerConnection["/offer_candidates"_json_pointer] != nullptr) {
-			m_offerICECandidates.clear();
+			//m_offerICECandidates.clear();
 
 			for (auto &jsonICECandidate : jsonPeerConnection["/offer_candidates"_json_pointer]) {
 				std::string strSDPCandidate = jsonICECandidate[kCandidateSdpName].get<std::string>();
@@ -205,7 +205,7 @@ public:
 		}
 
 		if (jsonPeerConnection["/answer_candidates"_json_pointer] != nullptr) {
-			m_answerICECandidates.clear();
+			//m_answerICECandidates.clear();
 
 			for (auto &jsonICECandidate : jsonPeerConnection["/answer_candidates"_json_pointer]) {
 				std::string strSDPCandidate = jsonICECandidate[kCandidateSdpName].get<std::string>();
@@ -292,7 +292,7 @@ public:
 	}
 
 	RESULT AppendOfferCandidate(WebRTCICECandidate *pICECandidate) {
-		m_offerICECandidates.emplace_back(pICECandidate);	// Should this be push_back()?
+		m_offerICECandidates.emplace_back(*pICECandidate);	// Should this be push_back()?
 		return R_PASS;
 	}
 
@@ -306,7 +306,8 @@ public:
 	}
 
 	RESULT AppendAnswerCandidate(WebRTCICECandidate *pICECandidate) {
-		m_answerICECandidates.emplace_back(pICECandidate);
+		m_answerICECandidates.emplace_back(*pICECandidate);
+		return R_PASS;
 	}
 
 	bool IsWebRTCConnectionStable() {
