@@ -258,6 +258,8 @@ RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
 		virtual RESULT HandleCanTabNext(bool fCanNext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleLoadEnd() override { return R_NOT_HANDLED; }
+		virtual std::string GetCertificateErrorURL() { return std::string(""); };
+		virtual std::string GetLoadErrorURL() { return std::string(""); };
 
 	} *pTestContext = new TestContext();
 

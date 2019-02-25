@@ -28,7 +28,7 @@ namespace DreamUnitTesting {
 			//CRM(dreamTestApp.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
 
 		Error:
-			Assert::AreEqual(r, R_PASS);
+			Assert::IsTrue(r == R_PASS);
 		}
 
 	};

@@ -1222,6 +1222,9 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 		virtual RESULT HandleCanTabNext(bool fCanNext) { return R_NOT_IMPLEMENTED; };
 		virtual RESULT HandleCanTabPrevious(bool fCanPrevious) { return R_NOT_IMPLEMENTED; };
 
+		virtual std::string GetCertificateErrorURL() { return std::string(""); };
+		virtual std::string GetLoadErrorURL() { return std::string(""); };
+
 		// Browser
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
 		
