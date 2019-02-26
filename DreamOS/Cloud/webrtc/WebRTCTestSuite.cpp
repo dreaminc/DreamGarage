@@ -429,7 +429,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Testing multi-peer connection of WebRTC");
+	pNewTest->SetTestName("multipeer");
 	pNewTest->SetTestDescription("Test multi-peer connections of WebRTc");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -970,7 +970,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("WebRTC Audio");
+	pNewTest->SetTestName("vcamaudio");
 	pNewTest->SetTestDescription("Tests the multi-peer audio capabilities of WebRTC using the Dream Sound Client");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1544,7 +1544,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("WebRTC Audio");
+	pNewTest->SetTestName("audio");
 	pNewTest->SetTestDescription("Tests the multi-peer audio capabilities of WebRTC using the Dream Sound Client");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2102,7 +2102,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Test Connect and Login");
+	pNewTest->SetTestName("videostream");
 	pNewTest->SetTestDescription("Test connect and log into service - this will hang for a while");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2268,7 +2268,7 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi-browser");
+	pNewTest->SetTestName("multibrowser");
 	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);

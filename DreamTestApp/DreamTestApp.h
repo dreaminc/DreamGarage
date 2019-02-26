@@ -53,7 +53,7 @@ private:
 private:
 	RESULT RegisterTestSuite(std::shared_ptr<TestSuite> pTestSuite);
 	RESULT RegisterTestSuites();
-	RESULT SelectTestSuite(std::string strName);
+	RESULT SelectTest(std::string strTestSuiteName, std::string strTestName);
 
 	std::shared_ptr<TestSuite> m_pCurrentTestSuite = nullptr;
 	std::map<std::string, std::shared_ptr<TestSuite>> m_registeredTestSuites;

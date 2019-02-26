@@ -76,6 +76,8 @@ public:
 
 public:
 	RESULT SetTestName(std::string strName);
+	std::string GetTestName();
+
 	RESULT SetTestDescription(std::string strDescription);
 	RESULT SetTestDuration(double sDuration);
 	RESULT SetTestRepeats(int nRepeats);

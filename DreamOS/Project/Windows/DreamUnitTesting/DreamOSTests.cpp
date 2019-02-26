@@ -2,7 +2,6 @@
 #include "CppUnitTest.h"
 
 #include "RESULT/EHM.h"
-
 #include "./../DreamTestApp/DreamTestApp.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -21,11 +20,13 @@ namespace DreamUnitTesting {
 
 			DEBUG_LINEOUT("DUT:DOS: Vanilla Test");
 
-			CRM(r, "Vanialla check RESULT code test");
-
-			//DreamTestApp dreamTestApp;
-			//CRM(dreamTestApp.Initialize(argc, argv), "Failed to initialize Dream Test App");
-			//CRM(dreamTestApp.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
+			CRM(r, "Vanilla check RESULT code test");
+			
+			{
+				DreamTestApp dreamTestApp;
+				CRM(dreamTestApp.Initialize(argc, argv), "Failed to initialize Dream Test App");
+				CRM(dreamTestApp.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
+			}
 
 		Error:
 			Assert::IsTrue(r == R_PASS);

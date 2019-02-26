@@ -227,8 +227,21 @@ bool TestObject::DidTestPass() {
 }
 
 RESULT TestObject::SetTestName(std::string strName) {
+	RESULT r = R_PASS;
+
+	CBM((strName.find_first_of(" \t\n\v\f\r") == std::string::npos), "%s test name cannot have whitespace", strName.c_str());
+
 	m_strTestName = strName;
-	return R_PASS;
+
+	// Force lower case
+	std::transform(m_strTestName.begin(), m_strTestName.end(), m_strTestName.begin(), ::tolower);
+
+Error:
+	return r;
+}
+
+std::string TestObject::GetTestName() {
+	return m_strTestName;
 }
 
 RESULT TestObject::SetTestDescription(std::string strDescription) {

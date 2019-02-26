@@ -2428,6 +2428,9 @@ Error:
 RESULT HALTestSuite::TestNestedCompositesQauds() {
 	RESULT r = R_PASS;
 
+	std::string strTestName = "quads";
+	std::string strTestDescription = "Composite quad test";
+
 	double sTestTime = 70.0f;
 	int nRepeats = 1;
 
@@ -2530,8 +2533,8 @@ RESULT HALTestSuite::TestNestedCompositesQauds() {
 	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("HAL Model Test");
-	pNewTest->SetTestDescription("HAL Model test");
+	pNewTest->SetTestName(strTestName);
+	pNewTest->SetTestDescription(strTestDescription);
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

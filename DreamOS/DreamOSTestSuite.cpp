@@ -89,8 +89,6 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestMeta());	
 
-	CR(AddTestDreamOS());
-
 	// Casting tests
 
 	CR(AddTestBasicBrowserCast());
@@ -1157,7 +1155,10 @@ Error:
 RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 6000.0f;
+	std::string strTestName = "sound";
+	std::string strTestDescription = "Testing playing a sound by way of the sound system module";
+
+	double sTestTime = 20.0f;
 	int nRepeats = 1;
 	float radius = 2.0f;
 
@@ -1377,8 +1378,8 @@ RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Sound System Play Sound");
-	pUITest->SetTestDescription("Testing playing a sound by way of the sound system module");
+	pUITest->SetTestName(strTestName);
+	pUITest->SetTestDescription(strTestDescription);
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 

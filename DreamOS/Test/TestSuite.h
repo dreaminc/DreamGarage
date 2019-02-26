@@ -28,6 +28,8 @@ public:
 
 	RESULT UpdateAndRunTests(void *pContext);
 
+	RESULT SelectTest(std::string strTestName);
+
 	std::shared_ptr<TestObject> AddTest(std::function<RESULT()> fnTestFunction, void *pContext = nullptr);
 	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnTest, void *pContext = nullptr);
 
@@ -60,6 +62,8 @@ public:
 private:
 	std::vector<std::shared_ptr<TestObject>> m_tests;
 	std::vector<std::shared_ptr<TestObject>>::iterator m_currentTest;
+
+	std::shared_ptr<TestObject> m_pSingleTestToRun = nullptr;
 
 	std::string m_strName;
 

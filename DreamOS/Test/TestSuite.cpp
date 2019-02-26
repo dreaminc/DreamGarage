@@ -22,6 +22,23 @@ Error:
 	return r;
 }
 
+
+RESULT TestSuite::SelectTest(std::string strTestName) {
+	RESULT r = R_PASS;
+
+	for (auto &pTest : m_tests) {
+		if (pTest->GetTestName() == strTestName) {
+			m_pSingleTestToRun = pTest;
+			break;
+		}
+	}
+
+	CNM(m_pSingleTestToRun, "Test %s not found", strTestName.c_str());
+
+Error:
+	return r;
+}
+
 // This will run tests per the update loop, for the given duration
 // zero duration indicates no duration
 
@@ -36,10 +53,17 @@ RESULT TestSuite::UpdateAndRunTests(void *pContext) {
 		m_fTestSuiteSetup = true;
 	}
 
-	CBR((m_currentTest != m_tests.end()), R_COMPLETE);
+	if (m_pSingleTestToRun == nullptr) {
+		CBR((m_currentTest != m_tests.end()), R_COMPLETE);
+	}
 
 	{
-		auto pTest = (*m_currentTest);
+		std::shared_ptr<TestObject> pTest = nullptr;
+		
+		if (m_pSingleTestToRun != nullptr)
+			pTest = m_pSingleTestToRun;
+		else 
+			pTest = (*m_currentTest);
 
 		switch (pTest->GetTestState()) {
 			case TestObject::state::NOT_INITIALIZED: {
@@ -76,7 +100,13 @@ RESULT TestSuite::UpdateAndRunTests(void *pContext) {
 					CR(pTest->InitializeTest(pContext));
 				}
 				else {
-					m_currentTest++;
+					if (m_pSingleTestToRun == nullptr) {
+						m_currentTest++;
+					}
+					else {
+						// We're done!
+						r = R_COMPLETE;
+					}
 				}
 			} break;
 		}

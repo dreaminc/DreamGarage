@@ -41,6 +41,7 @@ public:
 	RESULT RegisterParameter(std::string strParamName, std::string strParamTag, std::string strDefaultValue);
 	RESULT SetParameterValue(std::string strParamName, std::string strParamValue);
 	std::string GetParameterValue(std::string strParamName);
+	std::vector<std::string> GetParameterValues(std::string strParamName, char cDelim = '.');
 
 	void ForEach(std::function<void(const std::string&)> func);
 
