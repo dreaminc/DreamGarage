@@ -4,8 +4,8 @@ DreamShareViewPointerMessage::DreamShareViewPointerMessage(long senderUserID, lo
 	DreamShareViewMessage(senderUserID, receiverUserID, sizeof(DreamShareViewPointerMessage), uidSenderDreamApp, DreamShareViewMessage::type::POINTER)
 {
 	m_body.ptPointer = ptPointer;
-	m_body.strInitials[0] = strInitials[0];
-	m_body.strInitials[1] = strInitials[1];
+	m_body.szInitials[0] = strInitials[0];
+	m_body.szInitials[1] = strInitials[1];
 	m_body.fVisible = fVisible;
 	m_body.fLeftHand = fLeftHand;
 }

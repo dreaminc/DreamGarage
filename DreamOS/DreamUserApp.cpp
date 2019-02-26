@@ -331,7 +331,7 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 	auto pCloudController = GetDOS()->GetCloudController();
 	long userID;
 	std::string strInitials;
-	char initials[2];
+	char szInitials[2];
 
 	CN(pCloudController);
 	CNR(m_pUserModel, R_SKIPPED);
@@ -340,10 +340,10 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 	strInitials = m_pUserModel->GetInitials();
 
 	if (strInitials.size() >= 1) {
-		initials[0] = strInitials[0];
+		szInitials[0] = strInitials[0];
 	}
 	if (strInitials.size() >= 2) {
-		initials[1] = strInitials[1];
+		szInitials[1] = strInitials[1];
 	}
 
 	DreamShareViewPointerMessage *pPointerMessageLeft = new DreamShareViewPointerMessage(
@@ -351,7 +351,7 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 		0,
 		GetAppUID(),
 		m_ptLeftPointer,
-		initials,
+		szInitials,
 		m_fLeftSphereOn && m_fLeftSphereInteracting,
 		true);
 
@@ -360,7 +360,7 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 		0,
 		GetAppUID(),
 		m_ptRightPointer,
-		initials,
+		szInitials,
 		m_fRightSphereOn && m_fRightSphereInteracting,
 		false);
 

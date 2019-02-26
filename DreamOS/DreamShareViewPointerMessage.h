@@ -15,7 +15,7 @@ class DreamShareViewPointerMessage : public DreamShareViewMessage {
 public:
 	__declspec(align(8)) struct MessageBody {
 		point ptPointer;
-		char strInitials[2]; // always 2 characters
+		char szInitials[2]; // always 2 characters
 
 		bool fVisible;
 		bool fLeftHand;
