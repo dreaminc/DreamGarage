@@ -473,6 +473,9 @@ Error:
 	return r;
 }
 
+
+// TODO: Do we need this anymore? 
+// TODO: Should we create a VR/AR HMD test suite
 RESULT DreamOSTestSuite::AddTestMeta() {
 	RESULT r = R_PASS;
 
@@ -582,8 +585,8 @@ RESULT DreamOSTestSuite::AddTestMeta() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local Shared Content View Test");
-	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestName("metahmd");
+	pUITest->SetTestDescription("Set up of the meta HMD");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -641,8 +644,8 @@ RESULT DreamOSTestSuite::AddTestDreamUIBar() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local Shared Content View Test");
-	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestName("dreamuibar");
+	pUITest->SetTestDescription("Testing the DreamUIBar app");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -749,8 +752,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local Shared Content View Test");
-	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestName("dreambrowser");
+	pUITest->SetTestDescription("Testing of Dream Browser App");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -821,8 +824,8 @@ RESULT DreamOSTestSuite::AddTestCaptureApp() {
 
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
-	pUITest->SetTestName("Local Shared Content View Test");
-	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestName("captureapp");
+	pUITest->SetTestDescription("Test capture app functionality");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -896,8 +899,8 @@ RESULT DreamOSTestSuite::AddTestUIKeyboard() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local Shared Content View Test");
-	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestName("uikeyboard");
+	pUITest->SetTestDescription("Test the UI keyboard");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(1);
 
@@ -977,7 +980,7 @@ RESULT DreamOSTestSuite::AddTestDreamLogger() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Logging Test");
+	pUITest->SetTestName("logger");
 	pUITest->SetTestDescription("Basic logging test which will spin up a few SPD logs and test out the system");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -1143,8 +1146,8 @@ RESULT DreamOSTestSuite::AddTestNamedPipes() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Dream VCam Test");
-	pUITest->SetTestDescription("Testing the dream virtual camera module");
+	pUITest->SetTestName("namedpipes");
+	pUITest->SetTestDescription("Test the named pipe server capabilities");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -1155,7 +1158,7 @@ Error:
 RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
 	RESULT r = R_PASS;
 
-	std::string strTestName = "sound";
+	std::string strTestName = "dreamsoundsystem";
 	std::string strTestDescription = "Testing playing a sound by way of the sound system module";
 
 	double sTestTime = 20.0f;
@@ -1649,7 +1652,7 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Dream VCam Test");
+	pUITest->SetTestName("vcam");
 	pUITest->SetTestDescription("Testing the dream virtual camera module");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -1790,7 +1793,7 @@ RESULT DreamOSTestSuite::AddTestModuleManager() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Module Manager Test");
+	pUITest->SetTestName("modulemanager");
 	pUITest->SetTestDescription("Testing module manager functionality");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -1863,8 +1866,8 @@ RESULT DreamOSTestSuite::AddTestDreamApps() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local Shared Content View Test");
-	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestName("appmanager");
+	pUITest->SetTestDescription("Testing the app management capabilities");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -2007,8 +2010,8 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local Shared Content View Test");
-	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestName("dreamuserapp");
+	pUITest->SetTestDescription("Test the Dream user app");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -2117,8 +2120,8 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local UIView Test");
-	pUITest->SetTestDescription("Full test of uiview working locally");
+	pUITest->SetTestName("dreamos");
+	pUITest->SetTestDescription("General DOS test");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(1);
 
@@ -2207,8 +2210,8 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local Shared Content View Test");
-	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestName("dreamshareview");
+	pUITest->SetTestDescription("Test the Dream Share View app");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -2216,6 +2219,7 @@ Error:
 	return r;
 }
 
+// TODO: What does this test do?
 RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
 	RESULT r = R_PASS;
 
@@ -2322,8 +2326,8 @@ RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local Shared Content View Test");
-	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestName("basicbrowsercast");
+	pUITest->SetTestDescription("Browser casting test");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -2434,7 +2438,7 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
-	pUITest->SetTestName("Local Dream Desktop Test");
+	pUITest->SetTestName("dreamdesktop");
 	pUITest->SetTestDescription("Dream Desktop working locally");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(1);
@@ -2551,7 +2555,7 @@ RESULT DreamOSTestSuite::AddTestGamepadCamera() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("2D camera test");
+	pUITest->SetTestName("gamepadcamera");
 	pUITest->SetTestDescription("Basic test moving camera with gamepad");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -2779,8 +2783,8 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSwitching() {
 	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Environment Fade Shader");
-	pNewTest->SetTestDescription("Environment fade shader test");
+	pNewTest->SetTestName("environmentswitching");
+	pNewTest->SetTestDescription("Environment fade shader and switching test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -3069,8 +3073,8 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Environment Fade Shader");
-	pNewTest->SetTestDescription("Environment fade shader test");
+	pNewTest->SetTestName("environmentseating");
+	pNewTest->SetTestDescription("Test for the environment seating functions");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -3078,6 +3082,7 @@ Error:
 	return r;
 }
 
+// TODO: Should move this to the sandbox test suite
 RESULT DreamOSTestSuite::AddTestCredentialStorage() {
 	RESULT r = R_PASS;
 
@@ -3149,7 +3154,7 @@ RESULT DreamOSTestSuite::AddTestCredentialStorage() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset);
 	CN(pUITest);
 
-	pUITest->SetTestName("Credential Manager Test");
+	pUITest->SetTestName("credentialstorage");
 	pUITest->SetTestDescription("Basic test of using password vault");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
