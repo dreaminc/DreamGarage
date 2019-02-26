@@ -1,10 +1,11 @@
 #include "DreamShareViewPointerMessage.h"
 
-DreamShareViewPointerMessage::DreamShareViewPointerMessage(long senderUserID, long receiverUserID, UID uidSenderDreamApp, point ptPointer, color cColor, bool fVisible, bool fLeftHand) :
+DreamShareViewPointerMessage::DreamShareViewPointerMessage(long senderUserID, long receiverUserID, UID uidSenderDreamApp, point ptPointer, char strInitials[2], bool fVisible, bool fLeftHand) :
 	DreamShareViewMessage(senderUserID, receiverUserID, sizeof(DreamShareViewPointerMessage), uidSenderDreamApp, DreamShareViewMessage::type::POINTER)
 {
 	m_body.ptPointer = ptPointer;
-	m_body.cColor = cColor;
+	m_body.strInitials[0] = strInitials[0];
+	m_body.strInitials[1] = strInitials[1];
 	m_body.fVisible = fVisible;
 	m_body.fLeftHand = fLeftHand;
 }

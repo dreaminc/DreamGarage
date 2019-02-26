@@ -36,6 +36,7 @@ class UserControllerProxy : public ControllerProxy {
 public:
 	virtual std::string GetUserToken() = 0;
 	virtual std::string GetPeerScreenName(long peerUserID) = 0;
+	virtual std::string GetPeerInitials(long peerUserID) = 0;
 
 	virtual RESULT RequestFormURL(std::string& strFormKey) = 0;
 
@@ -99,6 +100,7 @@ public:
 	virtual std::string GetUserToken() override;
 
 	virtual std::string GetPeerScreenName(long peerUserID) override;
+	virtual std::string GetPeerInitials(long peerUserID) override;
 	int GetPeerAvatarModelID(long peerUserID);
 	std::string GetPeerProfilePhotoURL(long peerUserID);
 
@@ -207,6 +209,7 @@ private:
 
 	std::string	m_strToken;
 	std::string m_strPeerScreenName;
+	std::string m_strInitials;
 	long m_avatarModelId = -1;
 	std::string m_strProfilePhotoURL;
 

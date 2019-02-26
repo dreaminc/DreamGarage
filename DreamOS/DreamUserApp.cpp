@@ -269,6 +269,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 
 		std::string strScreenName = pUserController->GetUser().GetScreenName();
 		std::string strPhotoURL = pUserController->GetUser().GetProfilePhotoURL();
+		std::string strInitials = pUserController->GetUser().GetInitials();
 
 		if (avatarID != -1) {	// don't do this step until the user profile info is loaded
 			m_pUserModel = std::shared_ptr<user>(GetDOS()->MakeUser());
@@ -280,6 +281,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 
 			CR(m_pUserModel->SetScreenName(strScreenName));
 			CR(m_pUserModel->SetProfilePhoto(strPhotoURL));
+			CR(m_pUserModel->SetInitials(strInitials));
 
 			CR(m_pUserModel->InitializeObject());
 			//m_pUserModel->SetUserLabelOrientation(quaternion::MakeQuaternionWithEuler(0.0, (float)M_PI, 0.0f));
@@ -328,16 +330,28 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 
 	auto pCloudController = GetDOS()->GetCloudController();
 	long userID;
+	std::string strInitials;
+	char initials[2];
+
 	CN(pCloudController);
+	CNR(m_pUserModel, R_SKIPPED);
 
 	userID = pCloudController->GetUserID();
+	strInitials = m_pUserModel->GetInitials();
+
+	if (strInitials.size() >= 1) {
+		initials[0] = strInitials[0];
+	}
+	if (strInitials.size() >= 2) {
+		initials[1] = strInitials[1];
+	}
 
 	DreamShareViewPointerMessage *pPointerMessageLeft = new DreamShareViewPointerMessage(
 		userID,
 		0,
 		GetAppUID(),
 		m_ptLeftPointer,
-		COLOR_RED,
+		initials,
 		m_fLeftSphereOn && m_fLeftSphereInteracting,
 		true);
 
@@ -346,7 +360,7 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 		0,
 		GetAppUID(),
 		m_ptRightPointer,
-		COLOR_BLUE,
+		initials,
 		m_fRightSphereOn && m_fRightSphereInteracting,
 		false);
 
