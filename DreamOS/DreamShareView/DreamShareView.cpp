@@ -104,24 +104,11 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	m_pPointerCenter = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerCenterTexture)[0]);
 	m_pPointerRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerRightTexture)[0]);
 
-	//if (m_pFont == nullptr) {
 	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 	CN(m_pFont);
-	//}
 
 	for (int i = 0; i < 12; i++) {
 
-		/*
-		auto pSphere = GetDOS()->AddSphere(0.025f);
-		pSphere->SetVisible(false);
-		if (i % 2 == 0) {
-			pSphere->SetMaterialDiffuseColor(COLOR_RED);
-		}
-		else {
-			pSphere->SetMaterialDiffuseColor(COLOR_BLUE);
-		}
-		m_pointerViewPool.push(pSphere);
-		//*/
 		auto pComposite = GetDOS()->MakeComposite();
 
 		auto pView = pComposite->AddUIView(GetDOS());
@@ -205,8 +192,11 @@ RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<UIView> pView, std
 		textHeight,
 		text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
 	pText->SetPosition(point(0.0f, 0.02f, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
+
+	//pText->SetText(strInitials);
 	//pText->RenderToQuad();
 
+	// TODO: the text object should have access to the functionality of the update function
 	auto oglText = dynamic_cast<OGLText*>(pText.get());
 	oglText->Update();
 
