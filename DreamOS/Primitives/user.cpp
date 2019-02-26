@@ -508,6 +508,15 @@ RESULT user::SetScreenName(std::string strScreenName) {
 	return R_PASS;
 }
 
+RESULT user::SetInitials(std::string strInitials) {
+	m_strInitials = strInitials;
+	return R_PASS;
+}
+
+std::string user::GetInitials() {
+	return m_strInitials;
+}
+
 RESULT user::PendProfilePhotoDownload() {
 	RESULT r = R_PASS;
 

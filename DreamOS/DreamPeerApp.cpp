@@ -214,6 +214,7 @@ RESULT DreamPeerApp::SetPeerConnection(PeerConnection *pPeerConnection) {
 	pUserController->GetPeerProfile(m_peerUserID);
 
 	m_strScreenName = pUserController->GetPeerScreenName(m_peerUserID);
+	m_strInitials = pUserController->GetPeerInitials(m_peerUserID);
 	m_avatarModelId = pUserController->GetPeerAvatarModelID(m_peerUserID);
 	m_strProfilePhotoURL = pUserController->GetPeerProfilePhotoURL(m_peerUserID);
 

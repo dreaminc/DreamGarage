@@ -13,9 +13,9 @@
 class DreamShareViewPointerMessage : public DreamShareViewMessage {
 
 public:
-	__declspec(align(4)) struct MessageBody {
+	__declspec(align(8)) struct MessageBody {
 		point ptPointer;
-		color cColor;
+		char szInitials[2]; // always 2 characters
 
 		bool fVisible;
 		bool fLeftHand;
@@ -25,7 +25,7 @@ public:
 	} m_body;
 
 public:
-	DreamShareViewPointerMessage(long senderUserID, long receiverUserID, UID uidSenderDreamApp, point ptPointer, color cColor, bool fVisible, bool fLeftHand);
+	DreamShareViewPointerMessage(long senderUserID, long receiverUserID, UID uidSenderDreamApp, point ptPointer, char strInitials[2], bool fVisible, bool fLeftHand);
 	~DreamShareViewPointerMessage();
 
 	RESULT PrintMessage() override;

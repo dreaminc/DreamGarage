@@ -86,6 +86,8 @@ public:
 	bool HasProfilePhoto();
 	RESULT SetProfilePhoto(std::string strProfilePhoto);
 	RESULT SetScreenName(std::string strScreenName);
+	RESULT SetInitials(std::string strInitials);
+	std::string GetInitials();
 
 	RESULT PendProfilePhotoDownload();
 	RESULT OnProfilePhotoDownload(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext);
@@ -130,6 +132,7 @@ private:
 
 	std::string m_strScreenName;
 	std::string m_strProfilePhotoURL;
+	std::string m_strInitials;
 
 	std::shared_ptr<sphere> m_pSphere = nullptr;
 

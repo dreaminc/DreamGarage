@@ -25,6 +25,7 @@ public:
 		m_strFirstName(""),
 		m_strLastName(""),
 		m_strScreenName(""),
+		m_strInitials(""),
 		m_strProfilePhotoURL(""),
 		m_version(0.0f)
 	{
@@ -47,7 +48,7 @@ public:
 
 	User(long userID, long defaultEnvironmentID, long defaultAvatarID,
 		std::string strEmail, std::string strScreename,
-		std::string strFirstName, std::string strLastName, std::string strProfilePhotoURL,
+		std::string strFirstName, std::string strLastName, std::string strInitials, std::string strProfilePhotoURL,
 		version userVersion
 	) :
 		m_userID(userID),
@@ -57,6 +58,7 @@ public:
 		m_strScreenName(strScreename),
 		m_strFirstName(strFirstName),
 		m_strLastName(strLastName),
+		m_strInitials(strInitials),
 		m_strProfilePhotoURL(strProfilePhotoURL),
 		m_version(userVersion)
 	{
@@ -85,6 +87,7 @@ public:
 	const std::string&	GetFirstName() const  { return m_strFirstName; }
 	const std::string&	GetLastName() const  { return m_strLastName; }
 	const std::string&	GetScreenName() const  { return m_strScreenName; }
+	const std::string&	GetInitials() const  { return m_strInitials; }
 	const std::string&	GetProfilePhotoURL() const  { return m_strProfilePhotoURL; }
 	
 	const std::string&	GetToken() const { return m_strToken; }
@@ -111,6 +114,7 @@ private:
 	std::string	m_strLastName;
 	std::string	m_strScreenName;
 	std::string	m_strProfilePhotoURL;
+	std::string m_strInitials;
 
 	std::string m_strToken;
 

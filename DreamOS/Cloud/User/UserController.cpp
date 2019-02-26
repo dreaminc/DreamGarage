@@ -493,6 +493,7 @@ RESULT UserController::LoadProfile() {
 			jsonResponse["/data/public_name"_json_pointer].get<std::string>(),
 			jsonResponse["/data/first_name"_json_pointer].get<std::string>(),
 			jsonResponse["/data/last_name"_json_pointer].get<std::string>(),
+			jsonResponse["/data/initials"_json_pointer].get<std::string>(),
 			strProfilePhoto,
 			version(1.0f)	// version
 		);
@@ -542,6 +543,7 @@ RESULT UserController::GetPeerProfile(long peerUserID) {
 
 		if (peerUserID == jsonResponse["/data/id"_json_pointer].get<long>()) {
 			m_strPeerScreenName = jsonResponse["/data/public_name_short"_json_pointer].get<std::string>();
+			m_strInitials = jsonResponse["/data/initials"_json_pointer].get<std::string>();
 			m_avatarModelId = jsonResponse["/data/avatar_model_id"_json_pointer].get<int>();
 			if (!jsonResponse["/data/user_label_photo_url"_json_pointer].is_null()) {
 				m_strProfilePhotoURL = jsonResponse["/data/user_label_photo_url"_json_pointer].get<std::string>();
@@ -894,6 +896,7 @@ RESULT UserController::OnUserProfile(std::string&& strResponse) {
 		jsonData["/public_name_short"_json_pointer].get<std::string>(),
 		jsonData["/first_name"_json_pointer].get<std::string>(),
 		jsonData["/last_name"_json_pointer].get<std::string>(),
+		jsonData["/initials"_json_pointer].get<std::string>(),
 		strProfilePhoto,
 		version(1.0f)	// version
 	);
@@ -1080,6 +1083,10 @@ std::string UserController::GetUserToken() {
 std::string UserController::GetPeerScreenName(long peerUserID) {
 	//GetPeerProfile(peerUserID);
 	return m_strPeerScreenName;
+}
+
+std::string UserController::GetPeerInitials(long peerUserID) {
+	return m_strInitials;
 }
 
 int UserController::GetPeerAvatarModelID(long peerUserID) {

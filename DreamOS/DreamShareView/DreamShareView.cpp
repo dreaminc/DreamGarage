@@ -4,9 +4,11 @@
 #include "Primitives/quad.h"
 #include "Primitives/texture.h"
 #include "Primitives/color.h"
+#include "Primitives/font.h"
 
 // TODO: make enabling PBO (un)pack more portable
 #include "HAL/opengl/OGLTexture.h"
+#include "HAL/opengl/OGLText.h"
 
 #include "DreamShareViewShareMessage.h"
 #include "DreamControlView/UIControlView.h"
@@ -15,6 +17,8 @@
 #include "Sound/AudioPacket.h"
 #include "DreamGarage/AudioDataMessage.h"
 #include "Sound/SpatialSoundObject.h"
+
+#include "UI/UIView.h"
 
 DreamShareView::DreamShareView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamShareView>(pDreamOS, pContext)
@@ -39,7 +43,8 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	DreamOS *pDreamOS = GetDOS();
 	std::shared_ptr<DreamUserApp> pDreamUserApp = pDreamOS->GetUserApp();
 
-	GetDOS()->AddObjectToUIGraph(GetComposite(), (SandboxApp::PipelineType::AUX | SandboxApp::PipelineType::MAIN));
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
 
 	int channels = 4;
 	int pxSize = m_castpxWidth * m_castpxHeight * channels;
@@ -94,19 +99,29 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 		CN(m_pSpatialBrowserObject);
 	}
 
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+	m_pPointerLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerLeftTexture)[0]);
+	m_pPointerCenter = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerCenterTexture)[0]);
+	m_pPointerRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerRightTexture)[0]);
+
+	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+	CN(m_pFont);
+
 	for (int i = 0; i < 12; i++) {
 
-		auto pSphere = GetDOS()->AddSphere(0.025f);
-		pSphere->SetVisible(false);
-		if (i % 2 == 0) {
-			pSphere->SetMaterialDiffuseColor(COLOR_RED);
-		}
-		else {
-			pSphere->SetMaterialDiffuseColor(COLOR_BLUE);
-		}
+		auto pComposite = GetDOS()->MakeComposite();
 
-		m_pointerSpherePool.push(pSphere);
+		auto pView = pComposite->AddUIView(GetDOS());
+		pView->RotateXByDeg(90.0f);
+		pView->RotateYByDeg(-90.0f);
+		pView->SetVisible(false, false);
+
+		m_pointerViewPool.push(pView);
+		GetDOS()->AddObjectToUIGraph(pView.get(), (SandboxApp::PipelineType::AUX | SandboxApp::PipelineType::MAIN));
+
 	}
+
+	GetDOS()->AddObjectToUIGraph(GetComposite(), (SandboxApp::PipelineType::AUX | SandboxApp::PipelineType::MAIN));
 
 Error:
 	return r;
@@ -157,6 +172,55 @@ Error:
 	return r;
 }
 
+RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<UIView> pView, std::string strInitials) {
+	RESULT r = R_PASS;
+
+	float height = 0.1f;
+	float textHeight = 0.075f;
+	float pxHeight = 61.0f;
+	float pxRight = 19.0f;
+	float pxLeft = 33.0f;
+	float leftWidth = height * pxLeft / pxHeight;
+	float rightWidth = height * pxRight / pxHeight;
+
+	m_pFont->SetLineHeight(textHeight);
+
+	auto pText = std::shared_ptr<text>(GetDOS()->MakeText(
+		m_pFont,
+		strInitials,
+		0.4,
+		textHeight,
+		text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
+	pText->SetPosition(point(0.0f, 0.02f, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
+
+	//pText->SetText(strInitials);
+	//pText->RenderToQuad();
+
+	// TODO: the text object should have access to the functionality of the update function
+	auto oglText = dynamic_cast<OGLText*>(pText.get());
+	oglText->Update();
+
+	float width = pText->GetWidth();
+
+	auto pQuadLeft = pView->AddQuad(leftWidth, height);
+	auto pQuadCenter = pView->AddQuad(width, height);
+	auto pQuadRight = pView->AddQuad(rightWidth, height);
+
+	pQuadLeft->SetDiffuseTexture(m_pPointerLeft);
+	pQuadCenter->SetDiffuseTexture(m_pPointerCenter);
+	pQuadRight->SetDiffuseTexture(m_pPointerRight);
+
+	float screenOffset = 0.01f;
+	pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, screenOffset, 0.0f);
+	pQuadCenter->SetPosition(0.0f, screenOffset, 0.0f);
+	pQuadRight->SetPosition((width + rightWidth) / 2.0f, screenOffset, 0.0f);
+
+	pView->AddObject(pText);
+
+Error:
+	return r;
+}
+
 RESULT DreamShareView::HandleShareMessage(PeerConnection* pPeerConnection, DreamShareViewShareMessage *pShareMessage) {
 	RESULT r = R_PASS;
 
@@ -200,10 +264,10 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 
 	if (m_fReceivingStream || IsStreaming()) {
 
-		sphere *pPointer;
+		std::shared_ptr<UIView> pPointer;
 		long userID = pUpdatePointerMessage->GetSenderUserID();
 
-		CR(AllocateSpheres(userID));
+		CR(AllocateSpheres(userID, pUpdatePointerMessage->m_body.szInitials));
 
 		if (pUpdatePointerMessage->m_body.fLeftHand) {
 			pPointer = m_pointingObjects[userID][0];
@@ -213,8 +277,8 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 		}
 
 		pPointer->SetPosition(pUpdatePointerMessage->m_body.ptPointer);
-		pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible);
-		pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
+		pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible, false);
+		//pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
 	}
 
 Error:
@@ -671,18 +735,44 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::AllocateSpheres(long userID) {
+RESULT DreamShareView::AllocateSpheres(long userID, std::string strInitials) {
 	RESULT r = R_PASS;
+	std::vector<std::shared_ptr<UIView>> userPointers;
 
-	std::vector<sphere*> userPointers;
+	std::shared_ptr<text> pText = nullptr;
+	std::shared_ptr<UIView> pView = nullptr;
 
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
 
-	userPointers.emplace_back(m_pointerSpherePool.front());
-	m_pointerSpherePool.pop();
-	userPointers.emplace_back(m_pointerSpherePool.front());
-	m_pointerSpherePool.pop();
+
+	for (int i = 0; i < 2; i++) {
+		pView = m_pointerViewPool.front();
+
+		CR(InitializePointerLabel(pView, strInitials));
+
+		userPointers.emplace_back(pView);
+		m_pointerViewPool.pop();
+	}
+
+	m_pointingObjects[userID] = userPointers;
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::AllocateSpheres(long userID) {
+	RESULT r = R_PASS;
+
+	std::vector<std::shared_ptr<UIView>> userPointers;
+
+	CBR(userID != -1, R_SKIPPED);
+	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
+
+	userPointers.emplace_back(m_pointerViewPool.front());
+	m_pointerViewPool.pop();
+	userPointers.emplace_back(m_pointerViewPool.front());
+	m_pointerViewPool.pop();
 
 	m_pointingObjects[userID] = userPointers;
 
@@ -693,15 +783,15 @@ Error:
 RESULT DreamShareView::DeallocateSpheres(long userID) {
 	RESULT r = R_PASS;
 
-	std::vector<sphere*> userPointers;
+	std::vector<std::shared_ptr<UIView>> userPointers;
 
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) != 0, R_SKIPPED);
 
 	userPointers = m_pointingObjects[userID];
 
-	m_pointerSpherePool.push(userPointers[0]);
-	m_pointerSpherePool.push(userPointers[1]);
+	m_pointerViewPool.push(userPointers[0]);
+	m_pointerViewPool.push(userPointers[1]);
 
 	m_pointingObjects.erase(userID);
 

@@ -153,6 +153,7 @@ private:
 private:
 	long m_peerUserID = -1;
 	std::string m_strScreenName;
+	std::string m_strInitials;
 	long m_avatarModelId = -1;
 	std::string m_strProfilePhotoURL;
 
