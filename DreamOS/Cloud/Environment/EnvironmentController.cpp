@@ -370,7 +370,7 @@ RESULT EnvironmentController::SetOfferCandidates(User user, PeerConnection *pPee
 
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Set Offer Candidates JSON: %s", strData.c_str());
-
+	DOSLOG(INFO, "Set Offer Candidates JSON: %s", strData.c_str());
 	/*
 	m_fPendingMessage = true;
 	m_state = state::SET_OFFER_CANDIDATES;
@@ -434,6 +434,7 @@ RESULT EnvironmentController::SetAnswerCandidates(User user, PeerConnection *pPe
 
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Set Answer Candidates JSON: %s", strData.c_str());
+	DOSLOG(INFO, "Set Answer Candidates JSON: %s", strData.c_str());
 
 	/*
 	m_fPendingMessage = true;

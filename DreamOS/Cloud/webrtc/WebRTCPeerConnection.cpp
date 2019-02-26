@@ -1003,7 +1003,7 @@ void WebRTCPeerConnection::OnIceConnectionReceivingChange(bool fReceiving) {
 void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* pICECandidate) {
 	DOSLOG(INFO, "OnIceCandidate: %s %d", pICECandidate->sdp_mid().c_str(), pICECandidate->sdp_mline_index());
 	DOSLOG(INFO, "[WebRTCPeerConnection] OnIceCandidate: %v %v", pICECandidate->sdp_mid(), pICECandidate->sdp_mline_index());
-
+	DOSLOG(INFO, "Using: %s %s %s", pICECandidate->candidate().protocol(), pICECandidate->candidate().type(), pICECandidate->candidate().url());
 	//Json::StyledWriter writer;
 	//Json::Value jmessage;
 
@@ -1199,9 +1199,14 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 
 	for (int i = 0; i < twilioNTSInformation.m_ICEServerURIs.size(); i++) {
 		
-		iceServer.uri = twilioNTSInformation.m_ICEServerURIs[i];
+		iceServer.urls.emplace_back(twilioNTSInformation.m_ICEServerURIs[i]);
+		DOSLOG(INFO, "Adding ice server: %s", twilioNTSInformation.m_ICEServerURIs[i]);
+
 		iceServer.username = twilioNTSInformation.m_ICEServerUsernames[i];
+		DOSLOG(INFO, "Username: %s", twilioNTSInformation.m_ICEServerUsernames[i]);
+
 		iceServer.password = twilioNTSInformation.m_ICEServerPasswords[i];
+		DOSLOG(INFO, "Password: %s", twilioNTSInformation.m_ICEServerPasswords[i]);
 
 		//iceServer.tls_cert_policy = webrtc::PeerConnectionInterface::kTlsCertPolicyInsecureNoCheck;
 
@@ -1399,7 +1404,7 @@ RESULT WebRTCPeerConnection::SendDataChannelMessage(uint8_t *pDataChannelBuffer,
 		int a = 5;
 	}
 
-	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(pDataChannelBuffer, pDataChannelBuffer_n), true)));
+	CBR(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(pDataChannelBuffer, pDataChannelBuffer_n), true)), R_SKIPPED);
 	
 Error:
 	return r;

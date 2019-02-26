@@ -952,7 +952,7 @@ RESULT UserController::OnTwilioNTSInformation(std::string&& strResponse) {
 
 		std::string strICEServerPassword;
 		if (jsonData["/password"_json_pointer].is_null() != true)
-			strICEServerPassword = jsonData["/username"_json_pointer].get<std::string>();
+			strICEServerPassword = jsonData["/password"_json_pointer].get<std::string>();
 
 		m_twilioNTSInformation.AddICEServerURI(strICEServerURI, strICEServerUsername, strICEServerPassword);
 	}
