@@ -123,6 +123,8 @@ Error:
 RESULT DreamTestApp::RegisterTestSuite(std::shared_ptr<TestSuite> pTestSuite) {
 	RESULT r = R_PASS;
 
+	CNM(pTestSuite, "Test suite is null");
+
 	CBM((m_registeredTestSuites.find(pTestSuite->GetName()) == m_registeredTestSuites.end()), 
 		"%s test suite already registered", pTestSuite->GetName().c_str());
 

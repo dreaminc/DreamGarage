@@ -15,7 +15,7 @@ namespace DreamUnitTesting {
 
 			// Mock argc/argv 
 			
-			const char *argv[] = { "DreamTestApp.exe", "-ts", "webrtc", "-t", "0" };
+			const char *argv[] = { "DreamTestApp.exe", "-ts", "hal.quads", "-t", "0" };
 			int argc = sizeof(argv) / sizeof(argv[0]);
 
 			DEBUG_LINEOUT("DUT:DOS: Vanilla Test");

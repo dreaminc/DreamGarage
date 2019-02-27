@@ -407,17 +407,15 @@ RESULT UIViewTestSuite::AddTestUIView() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize,
+	auto pUITest = AddTest("uiview", fnInitialize,
 		std::bind(&UIViewTestSuite::UpdateHandRay, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
 		nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Basic test of uiview working locally");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
@@ -474,22 +472,21 @@ RESULT UIViewTestSuite::AddTestUIButton() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize,
+	auto pUITest = AddTest("uibutton", fnInitialize,
 		std::bind(&UIViewTestSuite::UpdateHandRay, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
 		nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Basic test of uiview working locally");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
 }
 
+// TODO: How is this different than the above
 RESULT UIViewTestSuite::AddTestUIButtons() {
 	RESULT r = R_PASS;
 
@@ -526,17 +523,15 @@ RESULT UIViewTestSuite::AddTestUIButtons() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize,
+	auto pUITest = AddTest("uibuttons", fnInitialize,
 		std::bind(&UIViewTestSuite::UpdateHandRay, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
 		nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Basic test of uiview working locally");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
@@ -623,22 +618,21 @@ RESULT UIViewTestSuite::AddTestUISpatialScrollView() {
 			return r;
 		};
 
-	auto pUITest = AddTest(fnInitialize,
+	auto pUITest = AddTest("spatialscrollview", fnInitialize,
 		fnUpdate,
 		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
 		pContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Basic test of uiview working locally");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
 }
 
+// TODO: Does this belong in this test suite?
 RESULT UIViewTestSuite::AddTestDreamUIBar() {
 	RESULT r = R_PASS;
 
@@ -726,13 +720,11 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest("dreamuibar", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Basic test of uiview working locally");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
@@ -904,13 +896,11 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 	};
 
 	auto fnTest = [&](void *pContext) {return R_PASS; };
-	auto pUIViewTest = AddTest(fnInitialize, fnUpdate, fnTest, pTestContext);
+	auto pUIViewTest = AddTest("keyboardangle", fnInitialize, fnUpdate, fnTest, pTestContext);
 	CN(pUIViewTest);
 
-	pUIViewTest->SetTestName("Local UIView Test");
 	pUIViewTest->SetTestDescription("Test to adjust Keyboard and Mallet angles");
 	pUIViewTest->SetTestDuration(sTestTime);
-	pUIViewTest->SetTestRepeats(1);
 Error:
 	return r;
 }
@@ -1031,19 +1021,18 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {	// can adjust scroll view depth w
 		return R_PASS;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, pTestContext);
+	auto pUITest = AddTest("curvedtitle", fnInitialize, fnUpdate, fnTest, pTestContext);
 	CN(pUITest);
 	CN(pTestContext);
 
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Test to show curved Title");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
 }
 
+// TODO: Should this go into the DOS test suite?
 RESULT UIViewTestSuite::AddTestDreamControlView() {	
 	RESULT r = R_PASS;
 	
@@ -1107,12 +1096,10 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 		return R_PASS;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, nullptr);
+	auto pUITest = AddTest("dreamcontrolview", fnInitialize, fnUpdate, fnTest, nullptr);
 	CN(pUITest);
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Full Test of DreamControlView");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;

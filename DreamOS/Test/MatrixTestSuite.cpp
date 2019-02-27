@@ -16,17 +16,17 @@ MatrixTestSuite::~MatrixTestSuite() {
 RESULT MatrixTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	auto pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixCreate, this));
-	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixMultiply, this));
-	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixDeterminant, this));
-	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixMinor, this));
-	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixInverse, this));
+	auto pNewTest = AddTest("creatematrix", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixCreate, this));
+	pNewTest = AddTest("matrixmultiply", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixMultiply, this));
+	pNewTest = AddTest("matrixdeterminant", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixDeterminant, this));
+	pNewTest = AddTest("matrixminor", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixMinor, this));
+	pNewTest = AddTest("matrixinverse", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixInverse, this));
 
-	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestTranslateMatrix, this));
-	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestRotateMatrix, this));
-	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestViewMatrix, this));
-	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestProjectionMatrix, this));
-	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestScaleMatrix, this));
+	pNewTest = AddTest("translatematrix", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestTranslateMatrix, this));
+	pNewTest = AddTest("rotatematrix", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestRotateMatrix, this));
+	pNewTest = AddTest("viewmatrix", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestViewMatrix, this));
+	pNewTest = AddTest("projectionmatrix", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestProjectionMatrix, this));
+	pNewTest = AddTest("scalematrix", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestScaleMatrix, this));
 
 Error:
 	return r;

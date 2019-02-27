@@ -191,10 +191,9 @@ RESULT PhysicsEngineTestSuite::AddTestBoundingScale() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("boundingscale", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("boundingscale");
 	pNewTest->SetTestDescription("Bounding scale test to see that all bounding volume reference geometry is scaled correctly");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -254,10 +253,9 @@ RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSphereVolume() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("scaledspherevolume", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("scaledspherevolume");
 	pNewTest->SetTestDescription("Collision of scaled sphere and volume");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -376,10 +374,9 @@ RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSpheres() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("scaledspherevssphere", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("scaledspherevssphere");
 	pNewTest->SetTestDescription("Scaled spheres colliding with one another in a chain");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -453,10 +450,9 @@ RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSphereQuad() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("scaledquadvssphere", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("scaledquadvssphere");
 	pNewTest->SetTestDescription("Scaled Sphere colliding with quads");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -556,10 +552,9 @@ RESULT PhysicsEngineTestSuite::AddTestBoundingScaleVolumes() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("scaledvolumevsvolumepttoface", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("scaledvolumevsvolumepttoface");
 	pNewTest->SetTestDescription("Scaled Volume colliding with volume pt to face");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -706,10 +701,9 @@ RESULT PhysicsEngineTestSuite::AddTestRayScaledQuads() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvsscaledquads", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("rayvsscaledquads");
 	pNewTest->SetTestDescription("Ray intersection of scaled quads oriented in various fashion");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -880,10 +874,9 @@ RESULT PhysicsEngineTestSuite::AddTestMultiCompositeRayScaledQuad() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvsnestedcompositescaledquads", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("rayvsnestedcompositescaledquads");
 	pNewTest->SetTestDescription("Ray intersection of multiple layers of nested scaled quads in a composite and resolving those points, also returning the object");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -940,10 +933,9 @@ RESULT PhysicsEngineTestSuite::AddTestBallVolume() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("spherevsobb", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("spherevsobb");
 	pNewTest->SetTestDescription("Sphere colliding with an OBB with various orientations");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1099,10 +1091,9 @@ RESULT PhysicsEngineTestSuite::AddTestRayQuadsComposite() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvsquadsincomposite", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("rayvsquadsincomposite");
 	pNewTest->SetTestDescription("Ray intersection of quads oriented in various fashion in a composite");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1245,10 +1236,9 @@ RESULT PhysicsEngineTestSuite::AddTestRayQuads() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvsquads", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("rayvsquads");
 	pNewTest->SetTestDescription("Ray intersection of quads oriented in various fashion");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1392,10 +1382,9 @@ RESULT PhysicsEngineTestSuite::AddTestRay() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvsobjects", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("rayvsobjects");
 	pNewTest->SetTestDescription("Ray intersection of various objects and resolving those points");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1493,10 +1482,9 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("volumevsvolumeptoface", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("volumevsvolumeptoface");
 	pNewTest->SetTestDescription("Volume colliding with volume pt to face");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1676,10 +1664,9 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolumeDominos() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("volumevsvolumeplanedominos", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("volumevsvolumeplanedominos");
 	pNewTest->SetTestDescription("Volume colliding with immovable volume");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1768,10 +1755,9 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolume() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("volumevsvomlumeplane", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("volumevsvomlumeplane");
 	pNewTest->SetTestDescription("Volume colliding with immovable volume");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1838,10 +1824,9 @@ RESULT PhysicsEngineTestSuite::AddTestSphereVsSphereArray() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("spherevsspherearray", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("spherevsspherearray");
 	pNewTest->SetTestDescription("Larger sphere colliding with an array of spheres of lesser mass");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1948,10 +1933,9 @@ RESULT PhysicsEngineTestSuite::AddTestSphereVsSphere() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("spherevssphere", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("spherevssphere");
 	pNewTest->SetTestDescription("Spheres colliding with one another in a chain");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2069,10 +2053,9 @@ RESULT PhysicsEngineTestSuite::AddTestSphereGenerator() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("spheregenerator", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("spheregenerator");
 	pNewTest->SetTestDescription("Spheres colliding with one another in a chain");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2143,10 +2126,9 @@ RESULT PhysicsEngineTestSuite::AddTestQuadVsSphere() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("quadvssphere", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("quadvssphere");
 	pNewTest->SetTestDescription("Sphere colliding with quads");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2373,10 +2355,9 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumeEdge() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("volumevsvolumeedges", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("volumevsvolumeedges");
 	pNewTest->SetTestDescription("Testing edge - edge for volume collisions");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2467,10 +2448,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCompositionQuads() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositecompositionquads", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("compositecompositionquads");
 	pNewTest->SetTestDescription("Testing composite composition along with internal rotations and active external transformations");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2641,10 +2621,9 @@ RESULT PhysicsEngineTestSuite::AddTestMultiCompositeRayQuad() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvsnestedcompositequads", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("rayvsnestedcompositequads");
 	pNewTest->SetTestDescription("Ray intersection of multiple layers of nested quads in a composite and resolving those points, also returning the object");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2798,10 +2777,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeRay() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvscompositeobjects", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("rayvscompositeobjects");
 	pNewTest->SetTestDescription("Ray intersection of various objects in a composite and resolving those points");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2898,10 +2876,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeComposition() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositecomposition", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("compositecomposition");
 	pNewTest->SetTestDescription("Testing composite composition along with internal rotations and active external transformations");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2996,10 +2973,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionSpheres() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositespherecollision", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("compositespherecollision");
 	pNewTest->SetTestDescription("Testing composite collisions with spheres");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -3092,10 +3068,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionSphereVolume() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositespherevolume", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("compositespherevolume");
 	pNewTest->SetTestDescription("Testing composite collisions with spheres and volumes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -3188,10 +3163,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionVolumeSphere() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositevolumesphere", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("compositevolumesphere");
 	pNewTest->SetTestDescription("Testing composite collisions with spheres and volumes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -3285,10 +3259,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionVolumes() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositevolumes", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("compositevolumes");
 	pNewTest->SetTestDescription("Testing composite collisions with spheres and volumes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -3381,10 +3354,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionSphereQuads() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositespherequads", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("compositespherequads");
 	pNewTest->SetTestDescription("Testing composite collisions with spheres and volumes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);

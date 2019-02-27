@@ -183,10 +183,9 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("spatialsound", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("spatialsound");
 	pUITest->SetTestDescription("Basic test of playing a spatial sound");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -401,10 +400,9 @@ RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("browsersoundrouting", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("browsersoundrouting");
 	pUITest->SetTestDescription("Testing the routing of the browser audio");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -573,10 +571,9 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("capture", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("capture");
 	pUITest->SetTestDescription("Test the mic capture capabilities of sound");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -658,10 +655,9 @@ RESULT SoundTestSuite::AddTestSoundClient() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("soundclient", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("soundclient");
 	pUITest->SetTestDescription("Testing the general sound client arch");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -777,10 +773,9 @@ RESULT SoundTestSuite::AddTestPlaySound() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("playsound", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("playsound");
 	pUITest->SetTestDescription("Basic test of playing a sound");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -863,10 +858,9 @@ RESULT SoundTestSuite::AddTestEnumerateDevices() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("enumerateaudiodevices", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("enumerateaudiodevices");
 	pUITest->SetTestDescription("Basic test of enumerating audio devices");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);

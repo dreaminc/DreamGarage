@@ -10,7 +10,7 @@
 #include "DreamTestingApp.h"
 
 SandboxTestSuite::SandboxTestSuite(DreamOS *pDreamOS) :
-	TestSuite("sandbox"),
+	DreamTestSuite("sandbox"),
 	m_pDreamOS(pDreamOS)
 {
 	// empty
@@ -26,6 +26,15 @@ RESULT SandboxTestSuite::AddTests() {
 	CR(AddTestCompositeObject());
 
 	CR(AddTestObjectPipeline());
+
+Error:
+	return r;
+}
+
+RESULT SandboxTestSuite::SetupTestSuite() {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamOS, "DreamOS handle is not set");
 
 Error:
 	return r;
@@ -205,10 +214,9 @@ RESULT SandboxTestSuite::AddTestObjectPipeline() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest("objectpipeline", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Object Pipeline Test");
 	pUITest->SetTestDescription("This is a test for the basic object pipeline arch");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -273,10 +281,9 @@ RESULT SandboxTestSuite::AddTestCompositeObject() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest("compositeobject", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Object Pipeline Test");
 	pUITest->SetTestDescription("This is a test for the basic object pipeline arch");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
