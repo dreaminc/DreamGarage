@@ -30,7 +30,6 @@ public:
 	RESULT Initialize();
 
 public:
-
 	std::shared_ptr<UIView> MakeUIView();
 	std::shared_ptr<UIView> AddUIView();
 

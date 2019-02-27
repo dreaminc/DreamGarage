@@ -17,6 +17,7 @@ class texture;
 class color;
 class font;
 class text;
+class FlatContext;
 
 class AudioPacket;
 class SpatialSoundObject;
@@ -163,6 +164,7 @@ private:
 	texture* m_pPointerRight = nullptr;
 
 	std::shared_ptr<font> m_pFont = nullptr;
+	std::vector<std::shared_ptr<FlatContext>> m_pContexts;
 
 private:
 //	std::shared_ptr<UIView> 

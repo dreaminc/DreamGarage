@@ -185,37 +185,48 @@ RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<UIView> pView, std
 
 	m_pFont->SetLineHeight(textHeight);
 
-	auto pText = std::shared_ptr<text>(GetDOS()->MakeText(
-		m_pFont,
-		strInitials,
-		0.4,
-		textHeight,
-		text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
-	pText->SetPosition(point(0.0f, 0.02f, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
+	auto pFlatContext = GetComposite()->MakeFlatContext();
+	CN(pFlatContext);
+	{
+		m_pContexts.push_back(pFlatContext);
 
-	//pText->SetText(strInitials);
-	//pText->RenderToQuad();
+		auto pText = std::shared_ptr<text>(GetDOS()->MakeText(
+			m_pFont,
+			strInitials,
+			0.4,
+			textHeight,
+			text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
+		pText->SetPosition(point(0.0f, 0.02f, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
 
-	// TODO: the text object should have access to the functionality of the update function
-	auto oglText = dynamic_cast<OGLText*>(pText.get());
-	oglText->Update();
+		// TODO: the text object should have access to the functionality of the update function
+		auto oglText = dynamic_cast<OGLText*>(pText.get());
+		oglText->Update();
 
-	float width = pText->GetWidth();
+		float width = pText->GetWidth();
 
-	auto pQuadLeft = pView->AddQuad(leftWidth, height);
-	auto pQuadCenter = pView->AddQuad(width, height);
-	auto pQuadRight = pView->AddQuad(rightWidth, height);
+		float screenOffset = 0.01f;
 
-	pQuadLeft->SetDiffuseTexture(m_pPointerLeft);
-	pQuadCenter->SetDiffuseTexture(m_pPointerCenter);
-	pQuadRight->SetDiffuseTexture(m_pPointerRight);
+		//*
+		auto pQuadLeft = pFlatContext->AddQuad(leftWidth, height);
+		auto pQuadCenter = pFlatContext->AddQuad(width, height);
+		auto pQuadRight = pFlatContext->AddQuad(rightWidth, height);
 
-	float screenOffset = 0.01f;
-	pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, screenOffset, 0.0f);
-	pQuadCenter->SetPosition(0.0f, screenOffset, 0.0f);
-	pQuadRight->SetPosition((width + rightWidth) / 2.0f, screenOffset, 0.0f);
+		pQuadLeft->SetDiffuseTexture(m_pPointerLeft);
+		pQuadCenter->SetDiffuseTexture(m_pPointerCenter);
+		pQuadRight->SetDiffuseTexture(m_pPointerRight);
 
-	pView->AddObject(pText);
+		pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, 0.0f, 0.0f);
+		pQuadCenter->SetPosition(0.0f, 0.0f, 0.0f);
+		pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, 0.0f);
+
+		pFlatContext->AddObject(pText);
+		//*/
+
+		auto pQuad = pView->AddQuad(leftWidth + width + rightWidth, height);
+		pQuad->SetPosition(0.0f, screenOffset, 0.0f);
+
+		pFlatContext->RenderToQuad(pQuad.get(), 0, 0);
+	}
 
 Error:
 	return r;
