@@ -355,7 +355,7 @@ class PeerConnectionInterface : public rtc::RefCountInterface {
     IceServers servers;
     // TODO(pthatcher): Rename this ice_transport_type, but update
     // Chromium at the same time.
-    IceTransportsType type = kRelay;
+    IceTransportsType type = kAll;
     BundlePolicy bundle_policy = kBundlePolicyBalanced;
     RtcpMuxPolicy rtcp_mux_policy = kRtcpMuxPolicyRequire;
     std::vector<rtc::scoped_refptr<rtc::RTCCertificate>> certificates;

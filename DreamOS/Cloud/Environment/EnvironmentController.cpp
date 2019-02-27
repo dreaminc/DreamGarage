@@ -396,7 +396,6 @@ RESULT EnvironmentController::SetOfferCandidates(User user, PeerConnection *pPee
 
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Set Offer Candidates JSON: %s", strData.c_str());
-	DOSLOG(INFO, "Set Offer Candidates JSON: %s", strData.c_str());
 	/*
 	m_fPendingMessage = true;
 	m_state = state::SET_OFFER_CANDIDATES;
@@ -460,7 +459,6 @@ RESULT EnvironmentController::SetAnswerCandidates(User user, PeerConnection *pPe
 
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Set Answer Candidates JSON: %s", strData.c_str());
-	DOSLOG(INFO, "Set Answer Candidates JSON: %s", strData.c_str());
 
 	/*
 	m_fPendingMessage = true;
@@ -1223,7 +1221,6 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 
 	// Determine who to handle this
 	// TODO: Move this over to CloudMessage instead
-	DOSLOG(INFO, "EnvironmentController Websocket Message: %s", strMessage);
 
 	if (strTokens[0] == "peer_connection" || strTokens[0] == "peer_connection_candidate") {
 		nlohmann::json jsonPayload = jsonCloudMessage["/payload"_json_pointer];

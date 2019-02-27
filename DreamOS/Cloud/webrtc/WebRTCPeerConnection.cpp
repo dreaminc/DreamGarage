@@ -1200,13 +1200,13 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	for (int i = 0; i < twilioNTSInformation.m_ICEServerURIs.size(); i++) {
 		
 		iceServer.urls.emplace_back(twilioNTSInformation.m_ICEServerURIs[i]);
-		DOSLOG(INFO, "Adding ice server: %s", twilioNTSInformation.m_ICEServerURIs[i]);
+		//DOSLOG(INFO, "Adding ice server: %s", twilioNTSInformation.m_ICEServerURIs[i]);
 
 		iceServer.username = twilioNTSInformation.m_ICEServerUsernames[i];
-		DOSLOG(INFO, "Username: %s", twilioNTSInformation.m_ICEServerUsernames[i]);
+		//DOSLOG(INFO, "Username: %s", twilioNTSInformation.m_ICEServerUsernames[i]);
 
 		iceServer.password = twilioNTSInformation.m_ICEServerPasswords[i];
-		DOSLOG(INFO, "Password: %s", twilioNTSInformation.m_ICEServerPasswords[i]);
+		//DOSLOG(INFO, "Password: %s", twilioNTSInformation.m_ICEServerPasswords[i]);
 
 		//iceServer.tls_cert_policy = webrtc::PeerConnectionInterface::kTlsCertPolicyInsecureNoCheck;
 
@@ -1404,6 +1404,7 @@ RESULT WebRTCPeerConnection::SendDataChannelMessage(uint8_t *pDataChannelBuffer,
 		int a = 5;
 	}
 
+	// Since UpdateHead and Hands from DreamGarage is unprotected - it should check if peers exist before trying to broadcast the message
 	CBR(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(pDataChannelBuffer, pDataChannelBuffer_n), true)), R_SKIPPED);
 	
 Error:
