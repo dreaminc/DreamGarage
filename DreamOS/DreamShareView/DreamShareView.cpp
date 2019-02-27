@@ -111,7 +111,7 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 
 		auto pComposite = GetDOS()->MakeComposite();
 
-		auto pView = pComposite->AddUIView(GetDOS());
+		auto pView = pComposite->AddFlatContext();
 		pView->RotateXByDeg(90.0f);
 		pView->RotateYByDeg(-90.0f);
 		pView->SetVisible(false, false);
@@ -172,7 +172,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<UIView> pView, std::string strInitials) {
+RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<FlatContext> pView, std::string strInitials) {
 	RESULT r = R_PASS;
 
 	float height = 0.1f;
@@ -185,10 +185,10 @@ RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<UIView> pView, std
 
 	m_pFont->SetLineHeight(textHeight);
 
-	auto pFlatContext = GetComposite()->MakeFlatContext();
-	CN(pFlatContext);
+	//auto pFlatContext = GetComposite()->MakeFlatContext();
+	//CN(pFlatContext);
 	{
-		m_pContexts.push_back(pFlatContext);
+		//m_pContexts.push_back(pFlatContext);
 
 		auto pText = std::shared_ptr<text>(GetDOS()->MakeText(
 			m_pFont,
@@ -207,9 +207,9 @@ RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<UIView> pView, std
 		float screenOffset = 0.01f;
 
 		//*
-		auto pQuadLeft = pFlatContext->AddQuad(leftWidth, height);
-		auto pQuadCenter = pFlatContext->AddQuad(width, height);
-		auto pQuadRight = pFlatContext->AddQuad(rightWidth, height);
+		auto pQuadLeft = pView->AddQuad(leftWidth, height);
+		auto pQuadCenter = pView->AddQuad(width, height);
+		auto pQuadRight = pView->AddQuad(rightWidth, height);
 
 		pQuadLeft->SetDiffuseTexture(m_pPointerLeft);
 		pQuadCenter->SetDiffuseTexture(m_pPointerCenter);
@@ -219,13 +219,15 @@ RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<UIView> pView, std
 		pQuadCenter->SetPosition(0.0f, 0.0f, 0.0f);
 		pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, 0.0f);
 
-		pFlatContext->AddObject(pText);
+		pView->AddObject(pText);
 		//*/
 
-		auto pQuad = pView->AddQuad(leftWidth + width + rightWidth, height);
-		pQuad->SetPosition(0.0f, screenOffset, 0.0f);
+		//auto pQuad = pView->AddQuad(leftWidth + width + rightWidth, height);
+		//pQuad->SetPosition(0.0f, screenOffset, 0.0f);
 
-		pFlatContext->RenderToQuad(pQuad.get(), 0, 0);
+		pView->RenderToQuad(leftWidth + width + rightWidth, height, 0, 0);
+		//pView->SetPosition(-screenOffset*10, 0.0f, 0.0f);
+		//pFlatContext->RenderToQuad(pQuad.get(), 0, 0);
 	}
 
 Error:
@@ -275,7 +277,7 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 
 	if (m_fReceivingStream || IsStreaming()) {
 
-		std::shared_ptr<UIView> pPointer;
+		std::shared_ptr<FlatContext> pPointer;
 		long userID = pUpdatePointerMessage->GetSenderUserID();
 
 		CR(AllocateSpheres(userID, pUpdatePointerMessage->m_body.szInitials));
@@ -287,7 +289,7 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 			pPointer = m_pointingObjects[userID][1];
 		}
 
-		pPointer->SetPosition(pUpdatePointerMessage->m_body.ptPointer);
+		pPointer->SetPosition(pUpdatePointerMessage->m_body.ptPointer + point(-0.01f, 0.0f, 0.0f));
 		pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible, false);
 		//pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
 	}
@@ -748,10 +750,10 @@ Error:
 
 RESULT DreamShareView::AllocateSpheres(long userID, std::string strInitials) {
 	RESULT r = R_PASS;
-	std::vector<std::shared_ptr<UIView>> userPointers;
+	std::vector<std::shared_ptr<FlatContext>> userPointers;
 
 	std::shared_ptr<text> pText = nullptr;
-	std::shared_ptr<UIView> pView = nullptr;
+	std::shared_ptr<FlatContext> pView = nullptr;
 
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
@@ -775,7 +777,7 @@ Error:
 RESULT DreamShareView::AllocateSpheres(long userID) {
 	RESULT r = R_PASS;
 
-	std::vector<std::shared_ptr<UIView>> userPointers;
+	std::vector<std::shared_ptr<FlatContext>> userPointers;
 
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
@@ -794,7 +796,7 @@ Error:
 RESULT DreamShareView::DeallocateSpheres(long userID) {
 	RESULT r = R_PASS;
 
-	std::vector<std::shared_ptr<UIView>> userPointers;
+	std::vector<std::shared_ptr<FlatContext>> userPointers;
 
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) != 0, R_SKIPPED);

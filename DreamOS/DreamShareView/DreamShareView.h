@@ -43,7 +43,7 @@ public:
 	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) override;
 
 private:
-	RESULT InitializePointerLabel(std::shared_ptr<UIView> pView, std::string strInitials);
+	RESULT InitializePointerLabel(std::shared_ptr<FlatContext> pView, std::string strInitials);
 
 private:
 	RESULT HandleShareMessage(PeerConnection* pPeerConnection, DreamShareViewShareMessage *pShareMessage);
@@ -149,9 +149,9 @@ private:
 	PeerConnection *m_pStreamerPeerConnection = nullptr;
 
 	// Pointing members
-	std::map<long, std::vector<std::shared_ptr<UIView>>> m_pointingObjects; // user id to left/right sphere
+	std::map<long, std::vector<std::shared_ptr<FlatContext>>> m_pointingObjects; // user id to left/right sphere
 
-	std::queue<std::shared_ptr<UIView>> m_pointerViewPool;
+	std::queue<std::shared_ptr<FlatContext>> m_pointerViewPool;
 
 private:
 	const wchar_t *k_wszPointerLeftTexture = L"texture/shared-view/pointer-left.png";
