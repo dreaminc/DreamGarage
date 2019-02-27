@@ -303,7 +303,7 @@ nlohmann::json EnvironmentController::CreateICECandidateEnvironmentMessage(PeerC
 
 	jsonData["payload"] = nlohmann::json::object();
 	if (pICECandidate != nullptr) {
-		jsonData["payload"]["peer_connection"] = pPeerConnection->GetPeerConnectionICECandidateJSON(pICECandidate, fOfferer);
+		jsonData["payload"]["peer_connection_candidate"] = pPeerConnection->GetPeerConnectionICECandidateJSON(pICECandidate, fOfferer);
 	}
 
 	//jsonData["version"] = user.GetVersion().GetString(false);
