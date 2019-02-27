@@ -426,10 +426,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 
 	// Add the test
 	//auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multipeer", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("multipeer");
 	pNewTest->SetTestDescription("Test multi-peer connections of WebRTc");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -967,10 +966,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("vcamaudio", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("vcamaudio");
 	pNewTest->SetTestDescription("Tests the multi-peer audio capabilities of WebRTC using the Dream Sound Client");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1541,10 +1539,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("audio", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("audio");
 	pNewTest->SetTestDescription("Tests the multi-peer audio capabilities of WebRTC using the Dream Sound Client");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2099,10 +2096,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 
 	// Add the test
 	//auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("videostream", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("videostream");
 	pNewTest->SetTestDescription("Test connect and log into service - this will hang for a while");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2265,10 +2261,9 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 
 	// Add the test
 	//auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multibrowser", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("multibrowser");
 	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);

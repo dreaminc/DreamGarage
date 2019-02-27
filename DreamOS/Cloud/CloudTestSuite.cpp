@@ -29,7 +29,42 @@ std::map<int, std::string> k_refreshTokens = {
 	{ 9, "HPfaNfjFrAhlbqS9DuZD5dCrAzI215ETDTRzFMVXrtoYrI2A9XBS3VEKOjGlDSVE" }
 };
 
-RESULT CloudTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
+CloudTestSuite::CloudTestSuite(DreamOS *pDreamOS) :
+	DreamTestSuite("cloud"),
+	m_pDreamOS(pDreamOS)
+{
+	// empty
+}
+
+CloudTestSuite::~CloudTestSuite() {
+	// empty
+}
+
+RESULT CloudTestSuite::AddTests() {
+	RESULT r = R_PASS;
+
+	CR(AddTestSwitchingEnvironmentSockets());
+
+	// TODO: Closed box testing (multi user/environment instances or cloud controllers if need be)
+	CR(AddTestMultiConnectTest());
+
+	// Requires login
+
+	CR(AddTestDownloadFile());	 
+
+	CR(AddTestConnectLogin());
+	
+	CR(AddTestMenuAPI());
+
+	// TODO: Add Websocket tests
+	// TODO: Add HTTP / CURL tests
+
+
+Error:
+	return r;
+}
+
+RESULT CloudTestSuite::SetupPipeline(std::string strRenderShaderName) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -79,41 +114,14 @@ Error:
 	return r;
 }
 
-CloudTestSuite::CloudTestSuite(DreamOS *pDreamOS) :
-	TestSuite("cloud"),
-	m_pDreamOS(pDreamOS)
-{
-	// empty
-}
-
-CloudTestSuite::~CloudTestSuite() {
-	// empty
-}
-
-RESULT CloudTestSuite::AddTests() {
+RESULT CloudTestSuite::SetupTestSuite() {
 	RESULT r = R_PASS;
 
-	CR(AddTestSwitchingEnvironmentSockets());
-
-	// TODO: Closed box testing (multi user/environment instances or cloud controllers if need be)
-	CR(AddTestMultiConnectTest());
-
-	// Requires login
-
-	CR(AddTestDownloadFile());	 
-
-	CR(AddTestConnectLogin());
-	
-	CR(AddTestMenuAPI());
-
-	// TODO: Add Websocket tests
-	// TODO: Add HTTP / CURL tests
-
+	CNM(m_pDreamOS, "DreamOS handle is not set");
 
 Error:
 	return r;
 }
-
 
 RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 	RESULT r = R_PASS;
@@ -279,7 +287,7 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		CR(SetupSkyboxPipeline("blinnphong"));
+		CR(SetupPipeline("blinnphong"));
 
 		{
 
@@ -395,10 +403,9 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("switchenvsockets", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Test Switching Environment Sockets");
 	pNewTest->SetTestDescription("Test switching between environment sockets");
 	pNewTest->SetTestDuration(sTestTime);
 
@@ -575,10 +582,9 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnTest, pTestContext);
+	auto pNewTest = AddTest("multiconnect", fnInitialize, fnTest, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Test Connect and Login");
 	pNewTest->SetTestDescription("Test connect and log into service - this will hang for a while");
 	pNewTest->SetTestDuration(sTestTime);
 
@@ -646,10 +652,9 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
+	auto pNewTest = AddTest("downloadfile", fnInitialize, fnTest, GetCloudController());
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Test Download File");
 	pNewTest->SetTestDescription("Test downloading a file from arbitrary URL");
 	pNewTest->SetTestDuration(sTestTime);
 
@@ -709,10 +714,9 @@ RESULT CloudTestSuite::AddTestConnectLogin() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
+	auto pNewTest = AddTest("connectlogin", fnInitialize, fnTest, GetCloudController());
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Test Connect and Login");
 	pNewTest->SetTestDescription("Test connect and log into service");
 	pNewTest->SetTestDuration(sTestTime);
 
@@ -728,43 +732,6 @@ RESULT CloudTestSuite::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnv
 		//CR(m_pDreamContentView->SetEnvironmentAsset(pEnvironmentAsset));
 		m_pDreamContentView->SetEnvironmentAsset(pEnvironmentAsset);
 	}
-
-//Error:
-	return r;
-}
-
-RESULT CloudTestSuite::SetupPipeline() {
-	RESULT r = R_PASS;
-
-	// Set up the pipeline
-	HALImp *pHAL = m_pDreamOS->GetHALImp();
-	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
-
-	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
-	CNM(pDestSinkNode, "Destination sink node isn't set");
-
-	CR(pHAL->MakeCurrentContext());
-
-	ProgramNode* pRenderProgramNode;
-	pRenderProgramNode = pHAL->MakeProgramNode("minimal");
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-	// Screen Quad Shader (opt - we could replace this if we need to)
-	ProgramNode *pRenderScreenQuad;
-	pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
-	
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-	// Connect Program to Display
-
-	// Connected in parallel (order matters)
-	// NOTE: Right now this won't work with mixing for example
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-
-	CR(pHAL->ReleaseCurrentContext());
 
 Error:
 	return r;
@@ -868,10 +835,9 @@ RESULT CloudTestSuite::AddTestMenuAPI() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
+	auto pNewTest = AddTest("menuapi", fnInitialize, fnTest, GetCloudController());
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Test Menu API");
 	pNewTest->SetTestDescription("Test Menu API");
 	pNewTest->SetTestDuration(sTestTime);
 

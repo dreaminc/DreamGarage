@@ -153,10 +153,9 @@ RESULT AnimationTestSuite::AddTestCurves() {
 		return ResetTest(pContext);
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pNewTest = AddTest("curves", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Animation Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(5.0);
 	pNewTest->SetTestRepeats(1);
@@ -210,10 +209,9 @@ RESULT AnimationTestSuite::AddTestRotate() {
 		return ResetTest(pContext);
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pNewTest = AddTest("rotate", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Animation Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(5.0);
 	pNewTest->SetTestRepeats(1);
@@ -273,10 +271,9 @@ RESULT AnimationTestSuite::AddTestUIColor() {
 		return ResetTest(pContext);
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pNewTest = AddTest("uicolor", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Animation Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(10.0);
 	pNewTest->SetTestRepeats(1);
@@ -332,10 +329,9 @@ RESULT AnimationTestSuite::AddTestAnimationBasic() {
 		return ResetTest(pContext);
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("basic", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Animation Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(10.0);
 	pNewTest->SetTestRepeats(1);
@@ -401,10 +397,9 @@ RESULT AnimationTestSuite::AddTestCancel() {
 		return ResetTest(pContext);
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("cancel", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Animation Cancel Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(5.0);
 	pNewTest->SetTestRepeats(1);

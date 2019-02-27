@@ -8,7 +8,7 @@
 
 #include "Primitives/valid.h"
 #include "Primitives/Subscriber.h"
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 #include <functional>
 #include <memory>
@@ -29,14 +29,16 @@ struct RayCompositeTestContext : public Subscriber<InteractionObjectEvent> {
 };
 
 // TODO: Consider moving valid up to TestSuite
-class InteractionEngineTestSuite : public valid, public TestSuite  {
+class InteractionEngineTestSuite : public valid, public DreamTestSuite  {
 public:
 	InteractionEngineTestSuite(DreamOS *pDreamOS);
 	~InteractionEngineTestSuite();
 
 	virtual RESULT AddTests() override;
 
-	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
+	virtual RESULT SetupPipeline(std::string strRenderProgramName = "standard") override;
+	virtual RESULT SetupTestSuite() override;
+
 	RESULT Initialize();
 
 	RESULT AddTestFlatCollisions();

@@ -1,7 +1,7 @@
 #ifndef MULTI_CONTENT_TEST_SUITE_H_
 #define MULTI_CONTENT_TEST_SUITE_H_
 
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 #include "InteractionEngine/InteractionEngine.h"
 #include "Primitives/Subscriber.h"
 
@@ -18,7 +18,7 @@ class composite;
 class texture;
 class UIStageProgram;
 
-class MultiContentTestSuite : public TestSuite, public Subscriber<InteractionObjectEvent>, public valid
+class MultiContentTestSuite : public DreamTestSuite, public Subscriber<InteractionObjectEvent>, public valid
 {
 public:
 	MultiContentTestSuite(DreamOS *pDreamOS);
@@ -28,7 +28,8 @@ public:
 
 	virtual RESULT AddTests() override;
 
-	RESULT SetupPipeline();
+	virtual RESULT SetupPipeline(std::string strRenderProgramName = "standard") override;
+	virtual RESULT SetupTestSuite() override;
 
 public:
 

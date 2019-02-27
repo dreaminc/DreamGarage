@@ -159,22 +159,34 @@ std::shared_ptr<TestObject> TestSuite::GetCurrentTest() {
 		return nullptr;
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(const TestObject::Functions &fnStruct, void *pContext) {
+std::shared_ptr<TestObject> TestSuite::AddTest(std::string strTestName, const TestObject::Functions &fnStruct, void *pContext) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnStruct, pContext);
+	std::shared_ptr<TestObject> pNewTest = nullptr;
 
+	// Ensure no tests of same name exists
+	for (auto &pTest : m_tests) {
+		CBM((pTest->GetTestName() != strTestName), "%s test already exists, test names must be unique to suites", strTestName.c_str());
+	}
+
+	pNewTest = std::make_shared<TestObject>(fnStruct, pContext);
 	CNM(pNewTest, "Failed to allocate new test");
+
+	pNewTest->SetTestName(strTestName);
 
 	m_tests.push_back(pNewTest);
 
 	return pNewTest;
 
 Error:
+	if (pNewTest != nullptr) {
+		pNewTest = nullptr;
+	}
+
 	return nullptr;
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize,
+std::shared_ptr<TestObject> TestSuite::AddTest(std::string strTestName, std::function<RESULT(void*)> fnInitialize,
 	std::function<RESULT(void*)> fnUpdate,
 	std::function<RESULT(void*)> fnTest,
 	std::function<RESULT(void*)> fnReset,
@@ -188,10 +200,10 @@ std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnIn
 	fnStruct.fnReset = fnReset;
 	fnStruct.fnTestNoContext = nullptr;
 
-	return AddTest(fnStruct, pContext);
+	return AddTest(strTestName, fnStruct, pContext);
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize,
+std::shared_ptr<TestObject> TestSuite::AddTest(std::string strTestName, std::function<RESULT(void*)> fnInitialize,
 	std::function<RESULT(void*)> fnUpdate,
 	std::function<RESULT(void*)> fnTest,
 	void *pContext)
@@ -204,10 +216,10 @@ std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnIn
 	fnStruct.fnReset = nullptr;
 	fnStruct.fnTestNoContext = nullptr;
 
-	return AddTest(fnStruct, pContext);
+	return AddTest(strTestName, fnStruct, pContext);
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize, std::function<RESULT(void*)> fnTest, void *pContext) {
+std::shared_ptr<TestObject> TestSuite::AddTest(std::string strTestName, std::function<RESULT(void*)> fnInitialize, std::function<RESULT(void*)> fnTest, void *pContext) {
 	TestObject::Functions fnStruct = { nullptr };
 
 	fnStruct.fnInitialize = fnInitialize;
@@ -216,10 +228,10 @@ std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnIn
 	fnStruct.fnReset = nullptr;
 	fnStruct.fnTestNoContext = nullptr;
 
-	return AddTest(fnStruct, pContext);
+	return AddTest(strTestName, fnStruct, pContext);
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnTest, void *pContext) {
+std::shared_ptr<TestObject> TestSuite::AddTest(std::string strTestName, std::function<RESULT(void*)> fnTest, void *pContext) {
 	TestObject::Functions fnStruct = { nullptr };
 
 	fnStruct.fnInitialize = nullptr;
@@ -228,10 +240,10 @@ std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnTe
 	fnStruct.fnReset = nullptr;
 	fnStruct.fnTestNoContext = nullptr;
 
-	return AddTest(fnStruct, pContext);
+	return AddTest(strTestName, fnStruct, pContext);
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT()> fnTestFunction, void *pContext) {
+std::shared_ptr<TestObject> TestSuite::AddTest(std::string strTestName, std::function<RESULT()> fnTestFunction, void *pContext) {
 	TestObject::Functions fnStruct = { nullptr };
 
 	fnStruct.fnInitialize = nullptr;
@@ -240,7 +252,7 @@ std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT()> fnTestFun
 	fnStruct.fnReset = nullptr;
 	fnStruct.fnTestNoContext = fnTestFunction;
 
-	return AddTest(fnStruct, pContext);
+	return AddTest(strTestName, fnStruct, pContext);
 }
 
 RESULT TestSuite::ClearTests() {

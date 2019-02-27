@@ -105,7 +105,7 @@ struct TestContext : public Subscriber<InteractionObjectEvent> {
 };
 
 InteractionEngineTestSuite::InteractionEngineTestSuite(DreamOS *pDreamOS) :
-	TestSuite("interaction"),
+	DreamTestSuite("interaction"),
 	m_pDreamOS(pDreamOS)
 {
 	RESULT r = R_PASS;
@@ -400,10 +400,9 @@ RESULT InteractionEngineTestSuite::AddTestFlatCollisions() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pCaptureContext);
+	auto pNewTest = AddTest("flatcollisions", fnInitialize, fnUpdate, fnTest, fnReset, pCaptureContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Capture Test");
 	pNewTest->SetTestDescription("Capture handling test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -620,10 +619,9 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pCaptureContext);
+	auto pNewTest = AddTest("captureobject", fnInitialize, fnUpdate, fnTest, fnReset, pCaptureContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Capture Test");
 	pNewTest->SetTestDescription("Capture handling test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -783,10 +781,9 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("nestedcompositeobb", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray Events Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -927,10 +924,9 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveComposite() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multiprimitivecomposite", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Primitive Interaction Composite Test");
 	pNewTest->SetTestDescription("Test covering multi interaction objects interacting with composite objects");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -939,6 +935,7 @@ Error:
 	return r;
 }
 
+// TODO: Lots of remove object tests 
 RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveCompositeRemove() {
 	RESULT r = R_PASS;
 
@@ -1047,10 +1044,9 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveCompositeRemove() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multiprimitivecompositeremove", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Primitive Interaction Composite Test");
 	pNewTest->SetTestDescription("Test covering multi interaction objects interacting with composite objects");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1182,10 +1178,9 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveRemove() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multiprimitiveremove", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Primitive Interaction Test");
 	pNewTest->SetTestDescription("Test covering multi interaction objects interacting with non composite objects");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1413,10 +1408,9 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multiprimitive", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Primitive Interaction Test");
 	pNewTest->SetTestDescription("Test covering multi interaction objects interacting with non composite objects");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1561,10 +1555,9 @@ RESULT InteractionEngineTestSuite::AddTestObjectBasedEvents() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("objectbasedevents", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray Events Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1696,6 +1689,15 @@ RESULT InteractionEngineTestSuite::SetupPipeline(std::string strRenderProgramNam
 	}
 
 	CR(pHAL->ReleaseCurrentContext());
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngineTestSuite::SetupTestSuite() {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamOS, "DreamOS handle is not set");
 
 Error:
 	return r;
@@ -1866,10 +1868,9 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRayController() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("compositeraycontroller", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray Events Controller Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(10000.0);
 	pNewTest->SetTestRepeats(1);
@@ -1960,10 +1961,9 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("compositeray", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray Events Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2125,10 +2125,9 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRayNested() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("raynested", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray Events Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
