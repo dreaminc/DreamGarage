@@ -1225,7 +1225,7 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 	// TODO: Move this over to CloudMessage instead
 	DOSLOG(INFO, "EnvironmentController Websocket Message: %s", strMessage);
 
-	if (strTokens[0] == "peer_connection") {
+	if (strTokens[0] == "peer_connection" || strTokens[0] == "peer_connection_candidate") {
 		nlohmann::json jsonPayload = jsonCloudMessage["/payload"_json_pointer];
 		strMethod = strTokens[1];
 
