@@ -164,7 +164,7 @@ private:
 	texture* m_pPointerRight = nullptr;
 
 	std::shared_ptr<font> m_pFont = nullptr;
-	std::vector<std::shared_ptr<FlatContext>> m_pStupid;
+	std::vector<std::shared_ptr<FlatContext>> m_pContexts;
 
 private:
 //	std::shared_ptr<UIView> 

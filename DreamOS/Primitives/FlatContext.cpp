@@ -336,7 +336,3 @@ RESULT FlatContext::RenderToQuad(float width, float height, float xOffset, float
 Error:
 	return r;
 }
-
-std::shared_ptr<quad> FlatContext::GetCurrentRenderQuad() {
-	return m_pQuad;
-}
