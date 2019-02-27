@@ -306,7 +306,7 @@ nlohmann::json EnvironmentController::CreateICECandidateEnvironmentMessage(PeerC
 		jsonData["payload"]["peer_connection_candidate"] = pPeerConnection->GetPeerConnectionICECandidateJSON(pICECandidate, fOfferer);
 	}
 
-	//jsonData["version"] = user.GetVersion().GetString(false);
+	jsonData["version"] = "1.0";
 
 	return jsonData;
 }
@@ -1223,6 +1223,7 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 
 	// Determine who to handle this
 	// TODO: Move this over to CloudMessage instead
+	DOSLOG(INFO, "EnvironmentController Websocket Message: %s", strMessage);
 
 	if (strTokens[0] == "peer_connection") {
 		nlohmann::json jsonPayload = jsonCloudMessage["/payload"_json_pointer];

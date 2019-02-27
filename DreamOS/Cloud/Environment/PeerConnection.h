@@ -282,7 +282,7 @@ public:
 	nlohmann::json GetPeerConnectionICECandidateJSON(WebRTCICECandidate *pICECandidate, bool fOfferer) {
 		nlohmann::json jsonData;
 
-		jsonData["peer_connection"] = std::to_string(m_peerConnectionID);
+		jsonData["peer_connection"] = (int)(m_peerConnectionID);
 
 		if (fOfferer) {
 			// TODO: Add RESULT handling

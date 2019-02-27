@@ -508,7 +508,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 	}
 	else if (strMethod == "peer_connection_candidate.create") {
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
-
+		DOSLOG(INFO, "Creating peer connection candidate");
 		DOSLOG(INFO, "[PeerConnectionController] append_offer_candidates peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
 
 		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
