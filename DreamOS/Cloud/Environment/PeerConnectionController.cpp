@@ -513,7 +513,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 	}
 	else if (jsonPayload["/peer_connection_candidate"_json_pointer] != nullptr) {
 		nlohmann::json jsonPeerConnection = jsonPayload["/peer_connection_candidate"_json_pointer];
-		long peerConnectionID = jsonPeerConnection["/id"_json_pointer].get<long>();
+		long peerConnectionID = jsonPeerConnection["/peer_connection"_json_pointer].get<long>();
 
 		PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
 		long userID = GetUserID();
@@ -523,7 +523,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 			DOSLOG(INFO, "Creating peer connection candidate");
 			//DOSLOG(INFO, "[PeerConnectionController] append_offer_candidates peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
 
-			pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+			pPeerConnection->UpdatePeerConnectionCandidateFromJSON(jsonPeerConnection);
 
 			CN(m_pWebRTCImp);
 			///*

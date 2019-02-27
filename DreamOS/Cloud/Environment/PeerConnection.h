@@ -221,9 +221,16 @@ public:
 			CRM(SetAnswerSocketConnectionID(jsonPeerConnection["/answer_socket_connection"_json_pointer].get<long>()), "Failed to set answer socket conncetion ID");
 		}
 
+	Error:
+		return r;
+	}
+
+	RESULT UpdatePeerConnectionCandidateFromJSON(nlohmann::json jsonPeerConnection) {
+		RESULT r = R_PASS;
+
 		if (jsonPeerConnection["/candidate"_json_pointer] != nullptr) {
 			std::string strCandidateType = jsonPeerConnection["/candidate_type"_json_pointer].get<std::string>();
-			
+
 			auto &jsonICECandidate = jsonPeerConnection["/candidate"_json_pointer];
 			std::string strSDPCandidate = jsonICECandidate[kCandidateSdpName].get<std::string>();
 			std::string strSDPMediaID = jsonICECandidate[kCandidateSdpMidName].get<std::string>();
@@ -237,8 +244,7 @@ public:
 				m_answerICECandidates.push_back(iceCandidate);
 			}
 		}
-
-
+		
 	Error:
 		return r;
 	}
