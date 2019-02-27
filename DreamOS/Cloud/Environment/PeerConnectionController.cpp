@@ -313,220 +313,233 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 	RESULT r = R_PASS;
 
 	// Either create a new peer connection or pull the one that we have
-	nlohmann::json jsonPeerConnection = jsonPayload["/peer_connection"_json_pointer];
-	long peerConnectionID = jsonPeerConnection["/id"_json_pointer].get<long>();
+	if (jsonPayload["/peer_connection"_json_pointer] != nullptr) {
+		nlohmann::json jsonPeerConnection = jsonPayload["/peer_connection"_json_pointer];
+		long peerConnectionID = jsonPeerConnection["/id"_json_pointer].get<long>();
 
-	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
-	long userID = GetUserID();
+		PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+		long userID = GetUserID();
 
-	/*
-	// DEADBEEF: No longer true
-	if (m_pPeerConnectionCurrentHandshake != nullptr) {
-		CBM((m_pPeerConnectionCurrentHandshake->GetPeerConnectionID() == peerConnectionID), "Can't negotiate multiple peers at same time");
-	}
-	*/
-	
-	// The below will create it if it doesn't exist
-
-	nlohmann::json jsonOfferSocketConnection = jsonPayload["/offer_socket_connection"_json_pointer];
-	long offerUserID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
-
-	nlohmann::json jsonAnswerSocketConnection = jsonPayload["/answer_socket_connection"_json_pointer];
-	long answerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
-
-	//long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-	//long answerEnvironmentID = jsonAnswerSocketConnection["/environment"_json_pointer].get<long>();
-
-	// TODO: Add Session ID
-	
-	// TODO: Make sure they match
-
-	CBM((userID != -1), "User does not seem to be signed in");
-
-	if (strMethod == "disconnect") {
-		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
-
-		DOSLOG(INFO, "[PeerConnectionController] disconnect peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
-
-		CRM(ClosePeerConnection(pPeerConnection), "Failed to close peer connection");
-
-	}
-	else if (strMethod == "create_offer") {
-		if (userID != offerUserID) {
-			DOSLOG(ERR, "[PeerConnectionController] requested offer for wrong user. payload=%v", jsonPayload);
-			return R_FAIL;
-		}
-
-		DOSLOG(INFO, "[PeerConnectionController] create_offer peer connection %v users offeror(self): %v and answerer: %v", peerConnectionID, userID, answerUserId);
-
-		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
-		pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
+		/*
 		// DEADBEEF: No longer true
-		//m_pPeerConnectionCurrentHandshake = pPeerConnection;
-
-		long peerUserID = pPeerConnection->GetPeerUserID();
-
-		// New peer connection (from server)
-		CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), true, pPeerConnection));
-
-		// Initialize SDP Peer Connection and Offer
-		CN(m_pWebRTCImp);
-		//m_pWebRTCImp->InitializePeerConnection(true);
-		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, userID, peerUserID, true);
-
-	}
-	else if (strMethod == "set_offer") {
-		DOSLOG(ERR, "[PeerConnectionController] set offer should not be a request");
-		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
-
-		// DEADBEEF: No longer true
-		//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
-
-		//pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
-	}
-	else if (strMethod == "create_answer") {
-		if (userID != answerUserId) {
-			DOSLOG(ERR, "[PeerConnectionController] requested answer for wrong user. payload=%v", jsonPayload);
-			return R_FAIL;
+		if (m_pPeerConnectionCurrentHandshake != nullptr) {
+			CBM((m_pPeerConnectionCurrentHandshake->GetPeerConnectionID() == peerConnectionID), "Can't negotiate multiple peers at same time");
 		}
+		*/
 
-		DOSLOG(INFO, "[PeerConnectionController] create_answer peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
+		// The below will create it if it doesn't exist
 
-		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
-		pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
-		// DEADBEEF: No longer true
-		//m_pPeerConnectionCurrentHandshake = pPeerConnection;	
-		
-		long peerUserID = pPeerConnection->GetPeerUserID();
+		nlohmann::json jsonOfferSocketConnection = jsonPayload["/offer_socket_connection"_json_pointer];
+		long offerUserID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
 
-		// New peer connection (from server)
-		CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), false, pPeerConnection));
+		nlohmann::json jsonAnswerSocketConnection = jsonPayload["/answer_socket_connection"_json_pointer];
+		long answerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
 
-		std::string strSDPOffer = pPeerConnection->GetSDPOffer();
+		//long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+		//long answerEnvironmentID = jsonAnswerSocketConnection["/environment"_json_pointer].get<long>();
 
-		// Initialize SDP Peer Connection Offer and Create Answer
-		CN(m_pWebRTCImp);
-		//CR(m_pWebRTCImp->InitializePeerConnection(false));
-		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, userID, peerUserID, false);
-		CR(m_pWebRTCImp->CreateSDPOfferAnswer(peerConnectionID, strSDPOffer));
+		// TODO: Add Session ID
 
-	}
-	else if (strMethod == "set_offer_candidates") {
-		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
-		
-		DOSLOG(INFO, "[PeerConnectionController] set_offer_candidates peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
+		// TODO: Make sure they match
 
-		// DEADBEEF: No longer true
-		//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
-		
-		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+		CBM((userID != -1), "User does not seem to be signed in");
 
-		// Initialize SDP Peer Connection Offer and Create Answer
-		CN(m_pWebRTCImp);
-		//CR(m_pWebRTCImp->CreateSDPOfferAnswer(strSDPOffer));
+		if (strMethod == "disconnect") {
+			CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
 
-		//CR(m_pWebRTCImp->AddOfferCandidates(pPeerConnection));
+			DOSLOG(INFO, "[PeerConnectionController] disconnect peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
 
-		// TODO: Add Candidates
-		///*
-		if ((m_pWebRTCImp->IsOfferer(peerConnectionID) == false) /*&& m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()*/) {
-			CBM((pPeerConnection->GetOfferCandidates().size() > 0), "Can't add answer candidates since there are none");
-			CRM(m_pWebRTCImp->AddOfferCandidates(pPeerConnection), "Failed to add Peer Connection answer candidates");
+			CRM(ClosePeerConnection(pPeerConnection), "Failed to close peer connection");
+
 		}
-		//*/
-	}
-	else if (strMethod == "set_answer") {
-		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
+		else if (strMethod == "create_offer") {
+			if (userID != offerUserID) {
+				DOSLOG(ERR, "[PeerConnectionController] requested offer for wrong user. payload=%v", jsonPayload);
+				return R_FAIL;
+			}
 
+			DOSLOG(INFO, "[PeerConnectionController] create_offer peer connection %v users offeror(self): %v and answerer: %v", peerConnectionID, userID, answerUserId);
 
-		DOSLOG(INFO, "[PeerConnectionController] set_answer peer connection %v offeror(self): %v answerer: %v", peerConnectionID, offerUserID, answerUserId);
-		// DEADBEEF:
-		//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
+			CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
+			pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
+			// DEADBEEF: No longer true
+			//m_pPeerConnectionCurrentHandshake = pPeerConnection;
 
-		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+			long peerUserID = pPeerConnection->GetPeerUserID();
 
-		// TODO: This is a bit of a hack - but setting the answer description here from the Answer SDP 
-		// will ultimately signal the WebRTC connection to be complete	
-		CN(m_pWebRTCImp);
-		CR(m_pWebRTCImp->SetSDPAnswer(peerConnectionID, pPeerConnection->GetSDPAnswer()));
-		//CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
-	
+			// New peer connection (from server)
+			CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), true, pPeerConnection));
 
-		// We don't have a guarantee that the WebRTC connection is stable at this point
+			// Initialize SDP Peer Connection and Offer
+			CN(m_pWebRTCImp);
+			//m_pWebRTCImp->InitializePeerConnection(true);
+			m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, userID, peerUserID, true);
 
-		// Initialize SDP Peer Connection Offer and Create Answer
-		//CN(m_pWebRTCImp);
-
-		// We can do this now - since we are guaranteed to already have our local SDP 
-		//CR(m_pWebRTCImp->AddAnswerCandidates(pPeerConnection));
-
-		//CR(m_pWebRTCImp->CreateSDPOfferAnswer(strSDPOffer));
-
-		// TODO: Add Candidates
-		// At this point the whole thing is complete
-		//pPeerConnection->Print();
-
-		//RESULT WebRTCConductor::AddIceCandidate(ICECandidate iceCandidate) {
-	}
-	else if (strMethod == "set_answer_candidates") {
-		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
-
-		// DEADBEEF:
-		//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
-
-		DOSLOG(INFO, "[PeerConnectionController] set_answer_candidates peer connection %v offeror(self): %v answerer: %v", peerConnectionID, offerUserID, answerUserId);
-
-		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
-
-		// TODO: This is a bit of a hack - but setting the answer description here from the Answer SDP 
-		// will ultimately signal the WebRTC connection to be complete
-		CN(m_pWebRTCImp);
-		//CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
-
-		///*
-		if ((m_pWebRTCImp->IsOfferer(peerConnectionID) == true) /*&& m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()*/) {
-			CBM((pPeerConnection->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
-			CRM(m_pWebRTCImp->AddAnswerCandidates(pPeerConnection), "Failed to add Peer Connection answer candidates");
 		}
-		//*/
+		else if (strMethod == "set_offer") {
+			DOSLOG(ERR, "[PeerConnectionController] set offer should not be a request");
+			CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
 
-		// We don't have a guarantee that the WebRTC connection is stable at this point
+			// DEADBEEF: No longer true
+			//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
 
-		// Initialize SDP Peer Connection Offer and Create Answer
-		//CN(m_pWebRTCImp);
+			//pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+		}
+		else if (strMethod == "create_answer") {
+			if (userID != answerUserId) {
+				DOSLOG(ERR, "[PeerConnectionController] requested answer for wrong user. payload=%v", jsonPayload);
+				return R_FAIL;
+			}
 
-		// We can do this now - since we are guaranteed to already have our local SDP 
-		//CR(m_pWebRTCImp->AddAnswerCandidates(pPeerConnection));
+			DOSLOG(INFO, "[PeerConnectionController] create_answer peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
 
-		//CR(m_pWebRTCImp->CreateSDPOfferAnswer(strSDPOffer));
+			CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
+			pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
+			// DEADBEEF: No longer true
+			//m_pPeerConnectionCurrentHandshake = pPeerConnection;	
 
-		// TODO: Add Candidates
-		// At this point the whole thing is complete
-		//pPeerConnection->Print();
-		
-		//RESULT WebRTCConductor::AddIceCandidate(ICECandidate iceCandidate) {
-	}
-	else if (strMethod == "create") {
-		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
-		DOSLOG(INFO, "Creating peer connection candidate");
-		DOSLOG(INFO, "[PeerConnectionController] append_offer_candidates peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
+			long peerUserID = pPeerConnection->GetPeerUserID();
 
-		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+			// New peer connection (from server)
+			CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), false, pPeerConnection));
 
-		CN(m_pWebRTCImp);
-		///*
-		if (m_pWebRTCImp->IsOfferer(peerConnectionID) == false) {
-			CBM((pPeerConnection->GetOfferCandidates().size() > 0), "Can't add offer candidates since there are none");
-			CRM(m_pWebRTCImp->AddOfferCandidates(pPeerConnection), "Failed to add Peer Connection answer candidates");
+			std::string strSDPOffer = pPeerConnection->GetSDPOffer();
+
+			// Initialize SDP Peer Connection Offer and Create Answer
+			CN(m_pWebRTCImp);
+			//CR(m_pWebRTCImp->InitializePeerConnection(false));
+			m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, userID, peerUserID, false);
+			CR(m_pWebRTCImp->CreateSDPOfferAnswer(peerConnectionID, strSDPOffer));
+
+		}
+		else if (strMethod == "set_offer_candidates") {
+			CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
+
+			DOSLOG(INFO, "[PeerConnectionController] set_offer_candidates peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
+
+			// DEADBEEF: No longer true
+			//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
+
+			pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+
+			// Initialize SDP Peer Connection Offer and Create Answer
+			CN(m_pWebRTCImp);
+			//CR(m_pWebRTCImp->CreateSDPOfferAnswer(strSDPOffer));
+
+			//CR(m_pWebRTCImp->AddOfferCandidates(pPeerConnection));
+
+			// TODO: Add Candidates
+			///*
+			if ((m_pWebRTCImp->IsOfferer(peerConnectionID) == false) /*&& m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()*/) {
+				CBM((pPeerConnection->GetOfferCandidates().size() > 0), "Can't add answer candidates since there are none");
+				CRM(m_pWebRTCImp->AddOfferCandidates(pPeerConnection), "Failed to add Peer Connection answer candidates");
+			}
+			//*/
+		}
+		else if (strMethod == "set_answer") {
+			CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
+
+
+			DOSLOG(INFO, "[PeerConnectionController] set_answer peer connection %v offeror(self): %v answerer: %v", peerConnectionID, offerUserID, answerUserId);
+			// DEADBEEF:
+			//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
+
+			pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+
+			// TODO: This is a bit of a hack - but setting the answer description here from the Answer SDP 
+			// will ultimately signal the WebRTC connection to be complete	
+			CN(m_pWebRTCImp);
+			CR(m_pWebRTCImp->SetSDPAnswer(peerConnectionID, pPeerConnection->GetSDPAnswer()));
+			//CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
+
+
+			// We don't have a guarantee that the WebRTC connection is stable at this point
+
+			// Initialize SDP Peer Connection Offer and Create Answer
+			//CN(m_pWebRTCImp);
+
+			// We can do this now - since we are guaranteed to already have our local SDP 
+			//CR(m_pWebRTCImp->AddAnswerCandidates(pPeerConnection));
+
+			//CR(m_pWebRTCImp->CreateSDPOfferAnswer(strSDPOffer));
+
+			// TODO: Add Candidates
+			// At this point the whole thing is complete
+			//pPeerConnection->Print();
+
+			//RESULT WebRTCConductor::AddIceCandidate(ICECandidate iceCandidate) {
+		}
+		else if (strMethod == "set_answer_candidates") {
+			CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
+
+			// DEADBEEF:
+			//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
+
+			DOSLOG(INFO, "[PeerConnectionController] set_answer_candidates peer connection %v offeror(self): %v answerer: %v", peerConnectionID, offerUserID, answerUserId);
+
+			pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+
+			// TODO: This is a bit of a hack - but setting the answer description here from the Answer SDP 
+			// will ultimately signal the WebRTC connection to be complete
+			CN(m_pWebRTCImp);
+			//CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
+
+			///*
+			if ((m_pWebRTCImp->IsOfferer(peerConnectionID) == true) /*&& m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()*/) {
+				CBM((pPeerConnection->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
+				CRM(m_pWebRTCImp->AddAnswerCandidates(pPeerConnection), "Failed to add Peer Connection answer candidates");
+			}
+			//*/
+
+			// We don't have a guarantee that the WebRTC connection is stable at this point
+
+			// Initialize SDP Peer Connection Offer and Create Answer
+			//CN(m_pWebRTCImp);
+
+			// We can do this now - since we are guaranteed to already have our local SDP 
+			//CR(m_pWebRTCImp->AddAnswerCandidates(pPeerConnection));
+
+			//CR(m_pWebRTCImp->CreateSDPOfferAnswer(strSDPOffer));
+
+			// TODO: Add Candidates
+			// At this point the whole thing is complete
+			//pPeerConnection->Print();
+
+			//RESULT WebRTCConductor::AddIceCandidate(ICECandidate iceCandidate) {
 		}
 		else {
-			CBM((pPeerConnection->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
-			CRM(m_pWebRTCImp->AddAnswerCandidates(pPeerConnection), "Failed to add Peer Connection answer candidates");
+			DOSLOG(ERR, "[PeerConnectionController] method unknown");
 		}
-		//*/
 	}
-	else {
-		DOSLOG(ERR, "[PeerConnectionController] method unknown");
+	else if (jsonPayload["/peer_connection_candidate"_json_pointer] != nullptr) {
+		nlohmann::json jsonPeerConnection = jsonPayload["/peer_connection_candidate"_json_pointer];
+		long peerConnectionID = jsonPeerConnection["/id"_json_pointer].get<long>();
+
+		PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+		long userID = GetUserID();
+
+		if (strMethod == "create") {
+			CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
+			DOSLOG(INFO, "Creating peer connection candidate");
+			//DOSLOG(INFO, "[PeerConnectionController] append_offer_candidates peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
+
+			pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+
+			CN(m_pWebRTCImp);
+			///*
+			if (m_pWebRTCImp->IsOfferer(peerConnectionID) == false) {
+				CBM((pPeerConnection->GetOfferCandidates().size() > 0), "Can't add offer candidates since there are none");
+				CRM(m_pWebRTCImp->AddOfferCandidates(pPeerConnection), "Failed to add Peer Connection answer candidates");
+			}
+			else {
+				CBM((pPeerConnection->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
+				CRM(m_pWebRTCImp->AddAnswerCandidates(pPeerConnection), "Failed to add Peer Connection answer candidates");
+			}
+			//*/
+		}
+		else {
+			DOSLOG(ERR, "[PeerConnectionController] method unknown");
+		}
 	}
 
 Error:
