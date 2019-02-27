@@ -221,6 +221,24 @@ public:
 			CRM(SetAnswerSocketConnectionID(jsonPeerConnection["/answer_socket_connection"_json_pointer].get<long>()), "Failed to set answer socket conncetion ID");
 		}
 
+		if (jsonPeerConnection["/candidate"_json_pointer] != nullptr) {
+			std::string strCandidateType = jsonPeerConnection["/candidate_type"_json_pointer].get<std::string>();
+			
+			auto &jsonICECandidate = jsonPeerConnection["/candidate"_json_pointer];
+			std::string strSDPCandidate = jsonICECandidate[kCandidateSdpName].get<std::string>();
+			std::string strSDPMediaID = jsonICECandidate[kCandidateSdpMidName].get<std::string>();
+			int SDPMediateLineIndex = jsonICECandidate[kCandidateSdpMlineIndexName].get<int>();
+
+			WebRTCICECandidate iceCandidate(strSDPCandidate, strSDPMediaID, SDPMediateLineIndex);
+			if (strCandidateType == "PeerCandidateType.Offer") {
+				m_offerICECandidates.push_back(iceCandidate);
+			}
+			else {
+				m_answerICECandidates.push_back(iceCandidate);
+			}
+		}
+
+
 	Error:
 		return r;
 	}

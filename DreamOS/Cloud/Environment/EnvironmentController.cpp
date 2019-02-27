@@ -288,7 +288,6 @@ nlohmann::json EnvironmentController::CreateEnvironmentMessage(User user, PeerCo
 // TODO: Move to PeerConnection for PeerConnection related calls?
 nlohmann::json EnvironmentController::CreateICECandidateEnvironmentMessage(PeerConnection *pPeerConnection, WebRTCICECandidate* pICECandidate, bool fOfferer) {
 	nlohmann::json jsonData;
-	bool fOfferer = false;
 
 	// Set up the JSON data
 	guid guidMessage = guid();

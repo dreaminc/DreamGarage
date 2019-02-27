@@ -261,9 +261,7 @@ RESULT WebRTCConductor::AddOfferCandidates(PeerConnection *pPeerConnection) {
 	auto pWebRTCPeerConnection = GetPeerConnection(pPeerConnection->GetPeerConnectionID());
 
 	if (pWebRTCPeerConnection != nullptr) {
-		for (auto &iceCandidate : pPeerConnection->GetOfferCandidates()) {
-			CR(pWebRTCPeerConnection->AddIceCandidate(iceCandidate));
-		}
+		CR(pWebRTCPeerConnection->AddIceCandidate(pPeerConnection->GetOfferCandidates().back()));
 	}
 
 Error:
@@ -277,9 +275,7 @@ RESULT WebRTCConductor::AddAnswerCandidates(PeerConnection *pPeerConnection) {
 	auto pWebRTCPeerConnection = GetPeerConnection(pPeerConnection->GetPeerConnectionID());
 
 	if (pWebRTCPeerConnection != nullptr) {
-		for (auto &iceCandidate : pPeerConnection->GetAnswerCandidates()) {
-			CR(pWebRTCPeerConnection->AddIceCandidate(iceCandidate));
-		}
+		CR(pWebRTCPeerConnection->AddIceCandidate(pPeerConnection->GetAnswerCandidates().back()));
 	}
 
 Error:
