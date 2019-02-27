@@ -32,6 +32,8 @@ HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+
+	CR(AddTestFlatContextNesting());
 	CR(TestNestedCompositesQauds());
 
 	CR(TestNestedOBB());
@@ -93,8 +95,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestEnvironments());
 
 	CR(AddTestRemoveObjects());
-
-	CR(AddTestFlatContextNesting());
 
 	CR(AddTestText());
 

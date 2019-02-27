@@ -34,7 +34,9 @@ public:
 	RESULT RenderToQuad(quad::CurveType curveType = quad::CurveType::FLAT);
 	RESULT RenderToQuad(quad* pRenderQuad, float xOffset, float yOffset);
 
-	RESULT RenderToQuad(float width, float height, float xOffset, float yOffset, quad::CurveType curveType);
+	RESULT RenderToQuad(float width, float height, float xOffset, float yOffset, quad::CurveType curveType = quad::CurveType::FLAT);
+
+	std::shared_ptr<quad> GetCurrentRenderQuad();
 
 	float GetWidth();
 	float GetHeight();

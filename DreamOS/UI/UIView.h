@@ -30,7 +30,13 @@ public:
 	RESULT Initialize();
 
 public:
+	// Use for UIViews where the children are static so that they are rendered together as a single object/texture
+	// A flattened UIView would exist outside of the scene graph and call flatten to update the texture for a quad
+	RESULT Flatten();
 
+	virtual RESULT Notify(InteractionObjectEvent *pEvent);
+
+public:
 	std::shared_ptr<UIView> MakeUIView();
 	std::shared_ptr<UIView> AddUIView();
 
@@ -68,8 +74,6 @@ public:
 
 	std::shared_ptr<UISurface> MakeUISurface();
 	std::shared_ptr<UISurface> AddUISurface();
-
-	virtual RESULT Notify(InteractionObjectEvent *pEvent);
 
 protected:
 	DreamOS *m_pDreamOS = nullptr;

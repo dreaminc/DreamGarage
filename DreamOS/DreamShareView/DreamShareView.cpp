@@ -185,6 +185,9 @@ RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<UIView> pView, std
 
 	m_pFont->SetLineHeight(textHeight);
 
+	auto pFlatContext = GetComposite()->MakeFlatContext();
+	m_pContexts.emplace_back(pFlatContext);
+
 	auto pText = std::shared_ptr<text>(GetDOS()->MakeText(
 		m_pFont,
 		strInitials,
@@ -193,29 +196,34 @@ RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<UIView> pView, std
 		text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
 	pText->SetPosition(point(0.0f, 0.02f, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
 
-	//pText->SetText(strInitials);
-	//pText->RenderToQuad();
-
 	// TODO: the text object should have access to the functionality of the update function
 	auto oglText = dynamic_cast<OGLText*>(pText.get());
 	oglText->Update();
 
 	float width = pText->GetWidth();
 
-	auto pQuadLeft = pView->AddQuad(leftWidth, height);
-	auto pQuadCenter = pView->AddQuad(width, height);
-	auto pQuadRight = pView->AddQuad(rightWidth, height);
+	float screenOffset = 0.01f;
+
+	//*
+	auto pQuadLeft = pFlatContext->AddQuad(leftWidth, height);
+	auto pQuadCenter = pFlatContext->AddQuad(width, height);
+	auto pQuadRight = pFlatContext->AddQuad(rightWidth, height);
 
 	pQuadLeft->SetDiffuseTexture(m_pPointerLeft);
 	pQuadCenter->SetDiffuseTexture(m_pPointerCenter);
 	pQuadRight->SetDiffuseTexture(m_pPointerRight);
 
-	float screenOffset = 0.01f;
-	pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, screenOffset, 0.0f);
-	pQuadCenter->SetPosition(0.0f, screenOffset, 0.0f);
-	pQuadRight->SetPosition((width + rightWidth) / 2.0f, screenOffset, 0.0f);
+	pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, 0.0f, 0.0f);
+	pQuadCenter->SetPosition(0.0f, 0.0f, 0.0f);
+	pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, 0.0f);
 
-	pView->AddObject(pText);
+	pFlatContext->AddObject(pText);
+	//*/
+
+	auto pQuad = pView->AddQuad(leftWidth + width + rightWidth, height);
+	pQuad->SetPosition(0.0f, screenOffset, 0.0f);
+
+	pFlatContext->RenderToQuad(pQuad.get(), 0, 0);
 
 Error:
 	return r;
