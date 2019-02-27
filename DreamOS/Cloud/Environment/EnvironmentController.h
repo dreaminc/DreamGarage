@@ -155,6 +155,7 @@ public:
 
 	// TODO: New Server Integration
 	nlohmann::json CreateEnvironmentMessage(User user, PeerConnection *pPeerConnection, std::string strMethod);
+	nlohmann::json CreateICECandidateEnvironmentMessage(PeerConnection *pPeerConnection, WebRTCICECandidate *pICECandidate, bool fOfferer);
 	RESULT SetSDPOffer(User user, PeerConnection *pPeerConnection);
 	RESULT SetSDPAnswer(User user, PeerConnection *pPeerConnection);
 	RESULT SetOfferCandidates(User user, PeerConnection *pPeerConnection);

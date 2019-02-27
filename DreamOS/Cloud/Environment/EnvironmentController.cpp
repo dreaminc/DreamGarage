@@ -285,6 +285,33 @@ nlohmann::json EnvironmentController::CreateEnvironmentMessage(User user, PeerCo
 	return jsonData;
 }
 
+// TODO: Move to PeerConnection for PeerConnection related calls?
+nlohmann::json EnvironmentController::CreateICECandidateEnvironmentMessage(PeerConnection *pPeerConnection, WebRTCICECandidate* pICECandidate, bool fOfferer) {
+	nlohmann::json jsonData;
+	bool fOfferer = false;
+
+	// Set up the JSON data
+	guid guidMessage = guid();
+	std::string strGUID = guidMessage.GetGUIDString();
+
+	jsonData["id"] = guidMessage.GetGUIDString();
+	//jsonData["token"] = user.GetToken();
+	//jsonData["type"] = "response";
+	jsonData["type"] = "request";
+
+	//jsonData["method"] = std::string("environmentuser") + strMethod;
+	jsonData["method"] = "peer_connection_candidate.create";
+
+	jsonData["payload"] = nlohmann::json::object();
+	if (pICECandidate != nullptr) {
+		jsonData["payload"]["peer_connection"] = pPeerConnection->GetPeerConnectionICECandidateJSON(pICECandidate, fOfferer);
+	}
+
+	//jsonData["version"] = user.GetVersion().GetString(false);
+
+	return jsonData;
+}
+
 RESULT EnvironmentController::SetSDPOffer(User user, PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
@@ -397,7 +424,7 @@ RESULT EnvironmentController::AppendOfferCandidate(User user, WebRTCICECandidate
 	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
 
 	// Set up the JSON data
-	jsonData = CreateEnvironmentMessage(user, pPeerConnection, "peer_connection.append_offer_candidates");
+	jsonData = CreateICECandidateEnvironmentMessage(pPeerConnection, pICECandidate, true);
 
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Append Offer Candidates JSON: %s", strData.c_str());
@@ -462,7 +489,7 @@ RESULT EnvironmentController::AppendAnswerCandidate(User user, WebRTCICECandidat
 	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
 
 	// Set up the JSON data
-	jsonData = CreateEnvironmentMessage(user, pPeerConnection, "peer_connection.append_answer_candidates");
+	jsonData = CreateICECandidateEnvironmentMessage(pPeerConnection, pICECandidate, false);
 
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Append Offer Candidates JSON: %s", strData.c_str());

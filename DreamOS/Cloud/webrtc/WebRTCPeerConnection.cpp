@@ -986,7 +986,7 @@ void WebRTCPeerConnection::OnIceGatheringChange(webrtc::PeerConnectionInterface:
 		DOSLOG(INFO, "%v ICE Gathering Complete", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
-			m_pParentObserver->OnICECandidatesGatheringDone(m_peerConnectionID);
+			//m_pParentObserver->OnICECandidatesGatheringDone(m_peerConnectionID);
 		}
 		else {
 			DOSLOG(INFO, "No WebRTC Peer Connection Observer registered");
@@ -1003,7 +1003,7 @@ void WebRTCPeerConnection::OnIceConnectionReceivingChange(bool fReceiving) {
 void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* pICECandidate) {
 	DOSLOG(INFO, "OnIceCandidate: %s %d", pICECandidate->sdp_mid().c_str(), pICECandidate->sdp_mline_index());
 	DOSLOG(INFO, "[WebRTCPeerConnection] OnIceCandidate: %v %v", pICECandidate->sdp_mid(), pICECandidate->sdp_mline_index());
-	DOSLOG(INFO, "Using: %s %s %s", pICECandidate->candidate().protocol(), pICECandidate->candidate().type(), pICECandidate->candidate().url());
+	DOSLOG(INFO, "Using: %s %s %s %s", pICECandidate->candidate().protocol(), pICECandidate->candidate().priority(), pICECandidate->candidate().type(), pICECandidate->candidate().url());
 	//Json::StyledWriter writer;
 	//Json::Value jmessage;
 

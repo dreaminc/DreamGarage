@@ -261,6 +261,36 @@ public:
 		return jsonData;
 	}
 
+	nlohmann::json GetPeerConnectionICECandidateJSON(WebRTCICECandidate *pICECandidate, bool fOfferer) {
+		nlohmann::json jsonData;
+
+		jsonData["peer_connection"] = std::to_string(m_peerConnectionID);
+
+		if (fOfferer) {
+			// TODO: Add RESULT handling
+			nlohmann::json jsonICECandidate;
+
+			jsonICECandidate[kCandidateSdpName] = pICECandidate->m_strSDPCandidate;
+			jsonICECandidate[kCandidateSdpMidName] = pICECandidate->m_strSDPMediaID;
+			jsonICECandidate[kCandidateSdpMlineIndexName] = pICECandidate->m_SDPMediateLineIndex;
+
+			jsonData["candidate"] = jsonICECandidate;
+			jsonData["candidate_type"] = "PeerCandidateType.Offer";
+		}
+		else {
+			nlohmann::json jsonICECandidate;
+
+			jsonICECandidate[kCandidateSdpName] = pICECandidate->m_strSDPCandidate;
+			jsonICECandidate[kCandidateSdpMidName] = pICECandidate->m_strSDPMediaID;
+			jsonICECandidate[kCandidateSdpMlineIndexName] = pICECandidate->m_SDPMediateLineIndex;
+
+			jsonData["candidate"] = jsonICECandidate;
+			jsonData["candidate_type"] = "PeerCandidateType.Answer";
+		}
+
+		return jsonData;
+	}
+
 	//nlohmann::json GetCandidatesJSON(std::list<WebRTCICECandidate> iceCandidates, nlohmann::json &jsonCandidates) {
 	RESULT GetCandidatesJSON(std::list<WebRTCICECandidate> iceCandidates, nlohmann::json &jsonCandidates) {
 		RESULT r = R_PASS;
