@@ -32,8 +32,8 @@ HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-
 	CR(AddTestFlatContextNesting());
+
 	CR(TestNestedCompositesQauds());
 
 	CR(TestNestedOBB());
@@ -206,6 +206,7 @@ Error:
 	return r;
 }
 
+// TODO: This should be split up into a scene graph test (new suite) and DOS TS
 RESULT HALTestSuite::AddTestRemoveObjects() {
 	RESULT r = R_PASS;
 	
@@ -259,12 +260,10 @@ RESULT HALTestSuite::AddTestRemoveObjects() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
-	//auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("removeobjects", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Remove Test");
-	pNewTest->SetTestDescription("remove");
+	pNewTest->SetTestDescription("Testing the removal of objects from DOS");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -423,11 +422,10 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("depthpeeling", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Alpha Volumes");
-	pNewTest->SetTestDescription("Test alpha with volumes");
+	pNewTest->SetTestDescription("Testing the depth peeling program");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -458,11 +456,10 @@ RESULT HALTestSuite::AddTestSkybox() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnPass, fnPass, fnPass, nullptr);
+	auto pNewTest = AddTest("skybox", fnInitialize, fnPass, fnPass, fnPass, nullptr);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Sky Test");
-	pNewTest->SetTestDescription("sky");
+	pNewTest->SetTestDescription("Testing the skybox");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -470,6 +467,7 @@ Error:
 	return r;
 }
 
+// TODO: Should be moved to DOS or another test suite since this is not really testing HAL capabilities 
 RESULT HALTestSuite::AddTestEnvironments() {
 	RESULT r = R_PASS;
 
@@ -546,11 +544,10 @@ RESULT HALTestSuite::AddTestEnvironments() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnPass, fnPass, fnPass, nullptr);
+	auto pNewTest = AddTest("envmodel", fnInitialize, fnPass, fnPass, fnPass, nullptr);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Environment Test");
-	pNewTest->SetTestDescription("New Environment test");
+	pNewTest->SetTestDescription("Testing the environment model");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -635,10 +632,9 @@ RESULT HALTestSuite::AddTestIncludeShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("includeshader", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Include Shader");
 	pNewTest->SetTestDescription("Testing shaders including other shader files test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -740,11 +736,10 @@ RESULT HALTestSuite::AddTestToonShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("toonshader", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Include Shader");
-	pNewTest->SetTestDescription("Testing shaders including other shader files test");
+	pNewTest->SetTestDescription("Testing the toon cell shader");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -963,11 +958,10 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("geoshader", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Environment Shader");
-	pNewTest->SetTestDescription("Environment shader test");
+	pNewTest->SetTestDescription("Testing the geometery shader stage capability");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -1078,11 +1072,10 @@ RESULT HALTestSuite::AddTestBillboardShader() {
 		return ResetTest(pContext);
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("billboardshader", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Environment Shader");
-	pNewTest->SetTestDescription("Environment shader test");
+	pNewTest->SetTestDescription("Testing the billboard shader");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 	
@@ -1304,11 +1297,10 @@ RESULT HALTestSuite::AddTestFadeShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("fadeshader", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Environment Fade Shader");
-	pNewTest->SetTestDescription("Environment fade shader test");
+	pNewTest->SetTestDescription("Testing the screen quad based fade shader");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -1597,11 +1589,10 @@ RESULT HALTestSuite::AddTestWaterShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("watershader", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Environment Shader");
-	pNewTest->SetTestDescription("Environment shader test");
+	pNewTest->SetTestDescription("Testing the plane water shader program");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -1780,11 +1771,10 @@ RESULT HALTestSuite::AddTestEnvironmentMapping() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("envmapping", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Environment Shader");
-	pNewTest->SetTestDescription("Environment shader test");
+	pNewTest->SetTestDescription("Test the environment mapping capabilities");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -2072,11 +2062,10 @@ RESULT HALTestSuite::AddTestWaterShaderCube() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("watershadercube", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Environment Shader");
-	pNewTest->SetTestDescription("Environment shader test");
+	pNewTest->SetTestDescription("Water shader with a cube map");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -2258,11 +2247,10 @@ RESULT HALTestSuite::AddTestStandardShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("standardshader", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Environment Shader");
-	pNewTest->SetTestDescription("Environment shader test");
+	pNewTest->SetTestDescription("Testing the core standard shader");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -2413,11 +2401,10 @@ RESULT HALTestSuite::AddTestFlatContextNesting() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("nestedflatcontext", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("HAL Model Test");
-	pNewTest->SetTestDescription("HAL Model test");
+	pNewTest->SetTestDescription("Testing nested flat contexts");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -2428,7 +2415,10 @@ Error:
 RESULT HALTestSuite::TestNestedCompositesQauds() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 70.0f;
+	std::string strTestName = "quads";
+	std::string strTestDescription = "Composite quad test";
+
+	double sTestTime = 10.0f;
 	int nRepeats = 1;
 
 	struct TestContext {
@@ -2527,11 +2517,10 @@ RESULT HALTestSuite::TestNestedCompositesQauds() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest(strTestName, fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("HAL Model Test");
-	pNewTest->SetTestDescription("HAL Model test");
+	pNewTest->SetTestDescription(strTestDescription);
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -2539,6 +2528,7 @@ Error:
 	return r;
 }
 
+// TODO: Does this move to a different test suite (collision, physics?)
 RESULT HALTestSuite::TestNestedOBB() {
 	RESULT r = R_PASS;
 
@@ -2632,11 +2622,10 @@ RESULT HALTestSuite::TestNestedOBB() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("nestedobb", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("HAL Model Test");
-	pNewTest->SetTestDescription("HAL Model test");
+	pNewTest->SetTestDescription("Testing nested OBB capabilities");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -2644,6 +2633,98 @@ Error:
 	return r;
 }
 
+RESULT HALTestSuite::AddTestRotation() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 40.0f;
+	int nRepeats = 1;
+
+	float width = 1.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupPipeline("minimal"));
+
+		// Objects 
+
+		DimRay *pRay;
+		pRay = nullptr;
+
+		for (int i = 0; i < 9; i++) {
+			pRay = m_pDreamOS->AddRay(point(0.0f), vector::iVector(1.0f), 0.5f);
+			CN(pRay);
+			pRay->translateX(-4.5f + (i * 1.0f));
+			pRay->translateY(-1.0f);
+
+			pRay->RotateZByDeg(45.0f * i);
+		}
+
+		for (int i = 0; i < 9; i++) {
+			pRay = m_pDreamOS->AddRay(point(0.0f), vector::iVector(1.0f), 0.5f);
+			CN(pRay);
+			pRay->translateX(-4.5f + (i * 1.0f));
+			pRay->translateY(0.0f);
+
+			pRay->RotateZBy(M_PI_4 * i);
+		}
+
+		for (int i = 0; i < 9; i++) {
+			pRay = m_pDreamOS->AddRay(point(0.0f), vector::iVector(1.0f), 0.5f);
+			CN(pRay);
+			pRay->translateX(-4.5f + (i * 1.0f));
+			pRay->translateY(1.0f);
+
+			pRay->SetRotate(0.0f, 0.0f, (M_PI_4 * i));
+		}
+
+		for (int i = 0; i < 9; i++) {
+			pRay = m_pDreamOS->AddRay(point(0.0f), vector::iVector(1.0f), 0.5f);
+			CN(pRay);
+			pRay->translateX(-4.5f + (i * 1.0f));
+			pRay->translateY(2.0f);
+
+			pRay->SetRotateDeg(0.0f, 0.0f, (45.0f * i));
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest("rotation", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestDescription("Testing DimObj rotation functions");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+// TODO: Revisit user arch - correct test suite?
 RESULT HALTestSuite::AddTestUserModel() {
 	RESULT r = R_PASS;
 
@@ -2742,11 +2823,10 @@ RESULT HALTestSuite::AddTestUserModel() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("usermodel", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("HAL Model Test");
-	pNewTest->SetTestDescription("HAL Model test");
+	pNewTest->SetTestDescription("Testing the user model object");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -2755,6 +2835,7 @@ Error:
 }
 
 // TODO: This is a deeper project
+// TODO: Another particle system capability / test rig?
 RESULT HALTestSuite::AddTestModelInstancing() {
 	RESULT r = R_PASS;
 
@@ -2843,11 +2924,10 @@ RESULT HALTestSuite::AddTestModelInstancing() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("instancing", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("HAL Model Test");
-	pNewTest->SetTestDescription("HAL Model test");
+	pNewTest->SetTestDescription("Test out instancing capabilities of Dream");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -2977,11 +3057,10 @@ RESULT HALTestSuite::AddTestModel() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("model", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("HAL Model Test");
-	pNewTest->SetTestDescription("HAL Model test");
+	pNewTest->SetTestDescription("Testing the HAL model loading capabilities and general model loading test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -3148,11 +3227,10 @@ RESULT HALTestSuite::AddTestModelOrientation() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("modelorientation", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("HAL Model Test");
-	pNewTest->SetTestDescription("HAL Model test");
+	pNewTest->SetTestDescription("Testing the model orientation capabilities of the model object");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -3270,12 +3348,10 @@ RESULT HALTestSuite::AddTestHeightQuadObject() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("heightmapquad", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("UI Shader Stage Test");
-	pNewTest->SetTestDescription("UI Shader Stage shader test");
-
+	pNewTest->SetTestDescription("Testing the setting of a tesselated quad from a height map");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 Error:
@@ -3424,12 +3500,10 @@ RESULT HALTestSuite::AddTestQuadObject() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("quadobject", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("UI Shader Stage Test");
-	pNewTest->SetTestDescription("UI Shader Stage shader test");
-
+	pNewTest->SetTestDescription("Basic quad object test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 Error:
@@ -3580,11 +3654,10 @@ RESULT HALTestSuite::AddTestUIShaderStage() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("uishader", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("HAL Quad Test");
-	pNewTest->SetTestDescription("HAL Quad Geometry test");
+	pNewTest->SetTestDescription("Testing the UI shader stage");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -3758,11 +3831,10 @@ RESULT HALTestSuite::AddTestText() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("text", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Blinn Phong Text Test");
-	pNewTest->SetTestDescription("Blinn phong text shader test");
+	pNewTest->SetTestDescription("General HAL text test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -3927,11 +3999,10 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureBumpDisplacement() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("blinnphongtexturenormaldisplacementshader", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Blinn Phong Texture Normal Displacement Shader");
-	pNewTest->SetTestDescription("Blinn phong texture bump maapping and displacement parallax shader test");
+	pNewTest->SetTestDescription("Blinn Phong texture bump maapping and displacement parallax shader test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -4094,11 +4165,10 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureBump() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("blinnphongtexturebumpshader", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Blinn Phong Texture Copy Shader");
-	pNewTest->SetTestDescription("Blinn phong texture shader test with a textured copied over");
+	pNewTest->SetTestDescription("Blinn phong texture shader test with a bump map test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -4218,11 +4288,10 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("blinnphongtexture", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Blinn Phong Texture Copy Shader");
-	pNewTest->SetTestDescription("Blinn phong texture shader test with a textured copied over");
+	pNewTest->SetTestDescription("Blinn Phong texture shader test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -4230,6 +4299,7 @@ Error:
 	return r;
 }
 
+// TODO: This definitely should go to a new Sense test suite
 RESULT HALTestSuite::AddTestSenseHaptics() {
 	RESULT r = R_PASS;
 
@@ -4330,11 +4400,10 @@ RESULT HALTestSuite::AddTestSenseHaptics() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("sensehaptics", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Blinn Phong Texture Shader");
-	pNewTest->SetTestDescription("Blinn phong texture shader test");
+	pNewTest->SetTestDescription("Testing Sense haptics capabilities");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -4439,10 +4508,9 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderBlur() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("blinnphongblurshader", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Blinn Phong Shader Blur");
 	pNewTest->SetTestDescription("Blinn phong shader with blur test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -4542,10 +4610,9 @@ RESULT HALTestSuite::AddTestObjectMaterialsColors() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("materialcolors", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Material Color Test");
 	pNewTest->SetTestDescription("Testing the changing of material color properties");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -4554,6 +4621,7 @@ Error:
 	return r;
 }
 
+// TODO: Do more with this test (FOV, near/far field, camera movement etc)
 RESULT HALTestSuite::AddTestCamera() {
 	RESULT r = R_PASS;
 
@@ -4606,11 +4674,10 @@ RESULT HALTestSuite::AddTestCamera() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("camera", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Blinn Phong Shader HMD");
-	pNewTest->SetTestDescription("Blinn phong shader HMD test");
+	pNewTest->SetTestDescription("General camera capabilities HAL test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -4712,11 +4779,10 @@ RESULT HALTestSuite::AddTestObjectMaterialsBump() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("materialsbump", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Blinn Phong Shader HMD");
-	pNewTest->SetTestDescription("Blinn phong shader HMD test");
+	pNewTest->SetTestDescription("Testing the materials bump capabilities");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -4821,11 +4887,10 @@ RESULT HALTestSuite::AddTestBlinnPhongShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("blinnphongshader", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Blinn Phong Shader HMD");
-	pNewTest->SetTestDescription("Blinn phong shader HMD test");
+	pNewTest->SetTestDescription("Blinn phong shader test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -4833,6 +4898,7 @@ Error:
 	return r;
 }
 
+// TODO: This should be moved to a sense test suite
 RESULT HALTestSuite::AddTestMouseDrag() {
 	RESULT r = R_PASS;
 
@@ -4925,11 +4991,10 @@ RESULT HALTestSuite::AddTestMouseDrag() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("mousedrag", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Mouse Drag");
-	pNewTest->SetTestDescription("Testing mouse dragging with minimal shader");
+	pNewTest->SetTestDescription("Testing mouse dragging");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -5031,11 +5096,10 @@ RESULT HALTestSuite::AddTestMinimalShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("minimalshader", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Render To Texture");
-	pNewTest->SetTestDescription("Testing rendering to texture using a quad");
+	pNewTest->SetTestDescription("Testing of the minimal shader");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -5177,11 +5241,10 @@ RESULT HALTestSuite::AddTestTextureUpdate() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("updatetexture", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Render To Texture");
-	pNewTest->SetTestDescription("Testing rendering to texture using a quad");
+	pNewTest->SetTestDescription("Testing the ability to update a texture");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -5300,11 +5363,10 @@ RESULT HALTestSuite::AddTestPBOTextureUpload() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("texturepboupload", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Render To Texture");
-	pNewTest->SetTestDescription("Testing rendering to texture using a quad");
+	pNewTest->SetTestDescription("Testing the PBO upload capability to update a texture from a buffer");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -5426,11 +5488,10 @@ RESULT HALTestSuite::AddTestPBOTextureReadback() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("pbotexturereadback", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Render To Texture");
-	pNewTest->SetTestDescription("Testing rendering to texture using a quad");
+	pNewTest->SetTestDescription("Testing reading back a texture using the PBO capability");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -5522,11 +5583,10 @@ RESULT HALTestSuite::AddTestMinimalTextureShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pNewTest = AddTest("minimaltextureshader", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Render To Texture");
-	pNewTest->SetTestDescription("Testing rendering to texture using a quad");
+	pNewTest->SetTestDescription("Testing the minimal texture shader program");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -5634,11 +5694,10 @@ RESULT HALTestSuite::AddTestRenderToTextureQuad() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("rendertexturetoquad", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Render To Texture");
-	pNewTest->SetTestDescription("Testing rendering to texture using a quad");
+	pNewTest->SetTestDescription("Testing rendering to a quad texture");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
@@ -5714,10 +5773,9 @@ RESULT HALTestSuite::AddTestAlphaVolumes() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("alphavolumes", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Alpha Volumes");
 	pNewTest->SetTestDescription("Test alpha with volumes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -5778,10 +5836,9 @@ RESULT HALTestSuite::AddTestFramerateVolumes() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("volumeframerate", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Framerate Volumes");
 	pNewTest->SetTestDescription("Test frame rate vs many volumes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -5929,10 +5986,9 @@ RESULT HALTestSuite::AddTest3rdPersonCamera() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pNewTest = AddTest("thirdpersoncam", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("3rd person camera test");
 	pNewTest->SetTestDescription("Test 3rd person camera auxiliary sink node target");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -6100,10 +6156,9 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pNewTest = AddTest("irradiancemap", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Irradiance Map Test");
 	pNewTest->SetTestDescription("Test cube map based irradiance map shader");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -6215,10 +6270,9 @@ RESULT HALTestSuite::AddTestCubeMap() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pNewTest = AddTest("cubemap", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Cube Map Test");
 	pNewTest->SetTestDescription("Test cube map shaders and cube map pipeline nodes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -6377,11 +6431,10 @@ RESULT HALTestSuite::AddTestTextureSubRegionUpdate() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("updatetexturesubregion", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Render To Texture");
-	pNewTest->SetTestDescription("Testing rendering to texture using a quad");
+	pNewTest->SetTestDescription("Testing the updating of a subregion of a texture");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

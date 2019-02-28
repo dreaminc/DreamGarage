@@ -531,7 +531,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	CR(m_pCommandLineManager->RegisterParameter("hmd", "h", ""));
 	CR(m_pCommandLineManager->RegisterParameter("environment", "env", "default"));
-	CR(m_pCommandLineManager->RegisterParameter("testval", "t", "1"));
+	
 	CR(m_pCommandLineManager->RegisterParameter("leap", "lp", ""));
 	CR(m_pCommandLineManager->RegisterParameter("namedpipe", "n", ""));
 

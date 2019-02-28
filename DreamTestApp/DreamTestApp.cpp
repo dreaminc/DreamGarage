@@ -48,7 +48,8 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	CN(pCommandLineManager);
 
 	// Test CLI selector
-	CR(pCommandLineManager->RegisterParameter("testsuite", "ts", "dreamos"));
+	CR(pCommandLineManager->RegisterParameter("teststring", "ts", "dreamos."));
+	CR(pCommandLineManager->RegisterParameter("testval", "t", "1"));
 
 	// previous AWS server
 	// CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "http://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
@@ -83,7 +84,7 @@ Error:
 RESULT DreamTestApp::LoadScene() {
 	RESULT r = R_PASS;
 
-	std::string strTestName;
+	std::vector<std::string> testStringValues;
 
 	// IO
 	RegisterSubscriber((SenseVirtualKey)('N'), this);
@@ -99,12 +100,20 @@ RESULT DreamTestApp::LoadScene() {
 	auto pCommandLineManager = CommandLineManager::instance();
 	CN(pCommandLineManager);
 
-	strTestName = pCommandLineManager->GetParameterValue("testsuite");
+	testStringValues = pCommandLineManager->GetParameterValues("teststring");
+	CBM((testStringValues.size() == 2), "Test string malformed");
 
-	// Register Test Suites
-	CRM(RegisterTestSuites(), "Failed to register test suites");
+	{
+		std::string strTestSuiteName = testStringValues[0];
+		std::string strTestName = testStringValues[1];
 
-	CRM(SelectTestSuite(strTestName), "Failed to select %s test suite", strTestName.c_str());
+		// Register Test Suites
+		CRM(RegisterTestSuites(), "Failed to register test suites");
+
+		CRM(SelectTest(strTestSuiteName, strTestName), "Failed to select %s test from %s test suite", strTestName.c_str(), strTestSuiteName.c_str());
+	}
+
+	// TODO: Kill this yo
 	AddSkybox();
 
 Error:
@@ -113,6 +122,8 @@ Error:
 
 RESULT DreamTestApp::RegisterTestSuite(std::shared_ptr<TestSuite> pTestSuite) {
 	RESULT r = R_PASS;
+
+	CNM(pTestSuite, "Test suite is null");
 
 	CBM((m_registeredTestSuites.find(pTestSuite->GetName()) == m_registeredTestSuites.end()), 
 		"%s test suite already registered", pTestSuite->GetName().c_str());
@@ -134,7 +145,7 @@ RESULT DreamTestApp::RegisterTestSuites() {
 	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::OS, this));
 	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::SOUND, this));
 	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::DIMENSION, this));
-	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::COLLISION, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::MULTICONTENT, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UIVIEW, this));
@@ -148,13 +159,15 @@ Error:
 	return r;
 }
 
-RESULT DreamTestApp::SelectTestSuite(std::string strName) {
+RESULT DreamTestApp::SelectTest(std::string strTestSuiteName, std::string strTestName) {
 	RESULT r = R_PASS;
 
-	CBM((m_registeredTestSuites.find(strName) != m_registeredTestSuites.end()),
-		"%s test suite not registered", strName.c_str());
+	CBM((m_registeredTestSuites.find(strTestSuiteName) != m_registeredTestSuites.end()),
+		"%s test suite not registered", strTestSuiteName.c_str());
 
-	m_pCurrentTestSuite = m_registeredTestSuites[strName];
+	m_pCurrentTestSuite = m_registeredTestSuites[strTestSuiteName];
+
+	CRM(m_pCurrentTestSuite->SelectTest(strTestName), "Failed to select %s test", strTestName.c_str());
 
 Error:
 	return r;

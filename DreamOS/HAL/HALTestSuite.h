@@ -93,6 +93,7 @@ public:
 	RESULT AddTestAlphaVolumes();
 
 	RESULT AddTestRemoveObjects();
+	RESULT AddTestRotation();
 
 	RESULT AddTestCamera();
 	RESULT AddTest3rdPersonCamera();

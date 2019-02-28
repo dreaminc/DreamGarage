@@ -42,8 +42,7 @@
 #include <memory>
 
 MultiContentTestSuite::MultiContentTestSuite(DreamOS *pDreamOS) :
-	TestSuite("multicontent"),
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("multicontent", pDreamOS)
 {
 	RESULT r = R_PASS;
 
@@ -116,7 +115,7 @@ Error:
 	return r;
 }
 
-RESULT MultiContentTestSuite::SetupPipeline() {
+RESULT MultiContentTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -129,7 +128,7 @@ RESULT MultiContentTestSuite::SetupPipeline() {
 	CR(pHAL->MakeCurrentContext());
 
 	ProgramNode* pRenderProgramNode;
-	pRenderProgramNode = pHAL->MakeProgramNode("standard");
+	pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -183,6 +182,15 @@ RESULT MultiContentTestSuite::SetupPipeline() {
 	//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
 
 	CR(pHAL->ReleaseCurrentContext());
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::SetupTestSuite() {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamOS, "DreamOS handle is not set");
 
 Error:
 	return r;
@@ -336,10 +344,9 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("dreamtabview", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi-browser");
 	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -348,6 +355,7 @@ Error:
 	return r;
 }
 
+// TODO: Remove objects is replicated here
 RESULT MultiContentTestSuite::AddTestRemoveObjects() {
 	RESULT r = R_PASS;
 	
@@ -388,7 +396,7 @@ RESULT MultiContentTestSuite::AddTestRemoveObjects() {
 		pTestContext->TestAddObject();
 		//CN(pTestContext);
 
-	//Error:
+	Error:
 		return r;
 	};
 	
@@ -426,11 +434,9 @@ RESULT MultiContentTestSuite::AddTestRemoveObjects() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
-	//auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("removeobjects", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
-
-	pNewTest->SetTestName("Remove Test");
+	
 	pNewTest->SetTestDescription("remove");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -529,11 +535,9 @@ RESULT MultiContentTestSuite::AddTestRemoveText() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
-	//auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("removetext", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Remove Test");
 	pNewTest->SetTestDescription("remove");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -542,6 +546,7 @@ Error:
 	return r;
 }
 
+// TODO: com'on ...
 RESULT MultiContentTestSuite::AddTestRemoveObjects2() {
 	RESULT r = R_PASS;
 	
@@ -666,11 +671,9 @@ RESULT MultiContentTestSuite::AddTestRemoveObjects2() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
-	//auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("removeobjects2", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Remove Test");
 	pNewTest->SetTestDescription("remove");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -915,10 +918,9 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("loginforms", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Content Active Source");
 	pNewTest->SetTestDescription("Multi Content, swapping active source");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1006,10 +1008,9 @@ RESULT MultiContentTestSuite::AddTestMenuShader() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("menushader", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Content Active Source");
 	pNewTest->SetTestDescription("Multi Content, swapping active source");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1103,10 +1104,9 @@ RESULT MultiContentTestSuite::AddTestDreamSettingsApp() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("settingsapp", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Content Active Source");
 	pNewTest->SetTestDescription("Multi Content, swapping active source");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1248,10 +1248,9 @@ RESULT MultiContentTestSuite::AddTestCameraSettings() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("camerasettings", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Content Active Source");
 	pNewTest->SetTestDescription("Multi Content, swapping active source");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1483,10 +1482,9 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("changeuiwidth", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Content Active Source");
 	pNewTest->SetTestDescription("Multi Content, swapping active source");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1630,10 +1628,9 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("alluiobjects", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Content Active Source");
 	pNewTest->SetTestDescription("Multi Content, swapping active source");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1742,10 +1739,9 @@ RESULT MultiContentTestSuite::AddTestMenuMemory() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("menumemory", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Content Active Source");
 	pNewTest->SetTestDescription("Multi Content, swapping active source");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1920,10 +1916,9 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("activesource", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Content Active Source");
 	pNewTest->SetTestDescription("Multi Content, swapping active source");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1983,10 +1978,9 @@ RESULT MultiContentTestSuite::AddTestUserControlArea() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("usercontrolarea", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi-browser");
 	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2177,10 +2171,9 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("usercontrolarealayout", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi-browser");
 	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2290,10 +2283,9 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("manybrowsers", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi-browser");
 	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2478,10 +2470,9 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBasic() {
 
 	// Add the test
 	//auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multipeerbasic", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi-browser");
 	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2668,10 +2659,9 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBrowser() {
 
 	// Add the test
 	//auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multipeerbrowser", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi-browser");
 	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);

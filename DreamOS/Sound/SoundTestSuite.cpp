@@ -183,10 +183,9 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("spatialsound", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Audio Play Spatial Sound");
 	pUITest->SetTestDescription("Basic test of playing a spatial sound");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -258,6 +257,8 @@ RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
 		virtual RESULT HandleCanTabNext(bool fCanNext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleLoadEnd() override { return R_NOT_HANDLED; }
+		virtual std::string GetCertificateErrorURL() { return std::string(""); };
+		virtual std::string GetLoadErrorURL() { return std::string(""); };
 
 	} *pTestContext = new TestContext();
 
@@ -399,11 +400,10 @@ RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("browsersoundrouting", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Audio Play Sound WASAPI");
-	pUITest->SetTestDescription("Basic test of playing a sound utilizing WASAPI");
+	pUITest->SetTestDescription("Testing the routing of the browser audio");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -571,11 +571,10 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("capture", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Audio Play Sound WASAPI");
-	pUITest->SetTestDescription("Basic test of playing a sound utilizing WASAPI");
+	pUITest->SetTestDescription("Test the mic capture capabilities of sound");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -656,11 +655,10 @@ RESULT SoundTestSuite::AddTestSoundClient() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("soundclient", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Audio Play Sound WASAPI");
-	pUITest->SetTestDescription("Basic test of playing a sound utilizing WASAPI");
+	pUITest->SetTestDescription("Testing the general sound client arch");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -775,10 +773,9 @@ RESULT SoundTestSuite::AddTestPlaySound() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("playsound", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Audio Play Sound");
 	pUITest->SetTestDescription("Basic test of playing a sound");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -861,11 +858,10 @@ RESULT SoundTestSuite::AddTestEnumerateDevices() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("enumerateaudiodevices", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Audio Device Enumeration Test");
-	pUITest->SetTestDescription("Basic test of enumerating devices");
+	pUITest->SetTestDescription("Basic test of enumerating audio devices");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 

@@ -8,8 +8,7 @@
 #include "PhysicsEngine/CollisionManifold.h"
 
 PhysicsEngineTestSuite::PhysicsEngineTestSuite(DreamOS *pDreamOS) :
-	TestSuite("physics"),
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("physics", pDreamOS)
 {
 	// empty
 }
@@ -20,8 +19,6 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
-
-	CR(SetupSkyboxPipeline("blinnphong"));
 
 	CR(AddTestVolumeToPlaneVolumeDominos());
 
@@ -57,6 +54,76 @@ RESULT PhysicsEngineTestSuite::AddTests() {
 	CR(AddTestSphereGenerator());
 	CR(AddTestSphereVsSphere());
 	CR(AddTestBallVolume());
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::SetupPipeline(std::string strRenderShaderName) {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	{
+		m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+		CNM(m_pSceneGraph, "Failed to allocate Debug Scene Graph");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderShaderName);
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Skybox
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		// Debug Overlay
+		ProgramNode* pDebugOverlay = pHAL->MakeProgramNode("debug_overlay");
+		CN(pDebugOverlay);
+		CR(pDebugOverlay->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+		CR(pDebugOverlay->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pDebugOverlay->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDebugOverlay->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_SPOT, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+	}
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::SetupTestSuite() {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamOS, "DreamOS handle is not set");
+
+	CRM(SetupPipeline("blinnphong"), "Failed to set up pipeline");
 
 Error:
 	return r;
@@ -123,10 +190,9 @@ RESULT PhysicsEngineTestSuite::AddTestBoundingScale() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("boundingscale", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Bounding scale test");
 	pNewTest->SetTestDescription("Bounding scale test to see that all bounding volume reference geometry is scaled correctly");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -186,10 +252,9 @@ RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSphereVolume() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("scaledspherevolume", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Scaled Sphere Volume");
 	pNewTest->SetTestDescription("Collision of scaled sphere and volume");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -308,10 +373,9 @@ RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSpheres() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("scaledspherevssphere", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Scaled Sphere vs Sphere");
 	pNewTest->SetTestDescription("Scaled spheres colliding with one another in a chain");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -385,10 +449,9 @@ RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSphereQuad() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("scaledquadvssphere", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Scaled Quad vs Sphere");
 	pNewTest->SetTestDescription("Scaled Sphere colliding with quads");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -488,10 +551,9 @@ RESULT PhysicsEngineTestSuite::AddTestBoundingScaleVolumes() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("scaledvolumevsvolumepttoface", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Scaled Volume vs Volume Pt Face");
 	pNewTest->SetTestDescription("Scaled Volume colliding with volume pt to face");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -638,10 +700,9 @@ RESULT PhysicsEngineTestSuite::AddTestRayScaledQuads() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvsscaledquads", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray vs Scaled Quads");
 	pNewTest->SetTestDescription("Ray intersection of scaled quads oriented in various fashion");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -812,10 +873,9 @@ RESULT PhysicsEngineTestSuite::AddTestMultiCompositeRayScaledQuad() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvsnestedcompositescaledquads", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray vs Nested Composite Scaled Quads");
 	pNewTest->SetTestDescription("Ray intersection of multiple layers of nested scaled quads in a composite and resolving those points, also returning the object");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -872,10 +932,9 @@ RESULT PhysicsEngineTestSuite::AddTestBallVolume() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("spherevsobb", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Sphere vs OBB");
 	pNewTest->SetTestDescription("Sphere colliding with an OBB with various orientations");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -913,7 +972,7 @@ RESULT PhysicsEngineTestSuite::AddTestRayQuadsComposite() {
 		// Ray to quads 
 		int quadCount = 0;
 
-		CR(SetupSkyboxPipeline("blinnphong"));
+		CR(SetupPipeline("blinnphong"));
 
 		RayTestContext *pTestContext;
 		pTestContext = reinterpret_cast<RayTestContext*>(pContext);
@@ -1031,10 +1090,9 @@ RESULT PhysicsEngineTestSuite::AddTestRayQuadsComposite() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvsquadsincomposite", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray vs Quads in Composite");
 	pNewTest->SetTestDescription("Ray intersection of quads oriented in various fashion in a composite");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1177,10 +1235,9 @@ RESULT PhysicsEngineTestSuite::AddTestRayQuads() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvsquads", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray vs Quads");
 	pNewTest->SetTestDescription("Ray intersection of quads oriented in various fashion");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1324,10 +1381,9 @@ RESULT PhysicsEngineTestSuite::AddTestRay() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvsobjects", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray vs Objects");
 	pNewTest->SetTestDescription("Ray intersection of various objects and resolving those points");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1425,10 +1481,9 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("volumevsvolumeptoface", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Volume vs Volume Pt Face");
 	pNewTest->SetTestDescription("Volume colliding with volume pt to face");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1608,10 +1663,9 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolumeDominos() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("volumevsvolumeplanedominos", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Volume vs Volume Plane");
 	pNewTest->SetTestDescription("Volume colliding with immovable volume");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1700,10 +1754,9 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolume() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("volumevsvomlumeplane", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Volume vs Volume Plane");
 	pNewTest->SetTestDescription("Volume colliding with immovable volume");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1770,10 +1823,9 @@ RESULT PhysicsEngineTestSuite::AddTestSphereVsSphereArray() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("spherevsspherearray", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Sphere vs Sphere Array");
 	pNewTest->SetTestDescription("Larger sphere colliding with an array of spheres of lesser mass");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1880,10 +1932,9 @@ RESULT PhysicsEngineTestSuite::AddTestSphereVsSphere() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("spherevssphere", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Sphere vs Sphere");
 	pNewTest->SetTestDescription("Spheres colliding with one another in a chain");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2001,10 +2052,9 @@ RESULT PhysicsEngineTestSuite::AddTestSphereGenerator() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("spheregenerator", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Sphere vs Sphere");
 	pNewTest->SetTestDescription("Spheres colliding with one another in a chain");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2075,10 +2125,9 @@ RESULT PhysicsEngineTestSuite::AddTestQuadVsSphere() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("quadvssphere", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Quad vs Sphere");
 	pNewTest->SetTestDescription("Sphere colliding with quads");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2103,7 +2152,7 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumeEdge() {
 
 		// Volume vs Volume edge edge
 
-		CR(SetupSkyboxPipeline("blinnphong"));
+		CR(SetupPipeline("blinnphong"));
 
 		volume *pVolume;
 		pVolume = nullptr;
@@ -2305,10 +2354,9 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumeEdge() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("volumevsvolumeedges", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Volume vs Volume - Edges");
 	pNewTest->SetTestDescription("Testing edge - edge for volume collisions");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2399,10 +2447,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCompositionQuads() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositecompositionquads", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Composite Composition");
 	pNewTest->SetTestDescription("Testing composite composition along with internal rotations and active external transformations");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2573,10 +2620,9 @@ RESULT PhysicsEngineTestSuite::AddTestMultiCompositeRayQuad() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvsnestedcompositequads", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray vs Nested Composite Quads");
 	pNewTest->SetTestDescription("Ray intersection of multiple layers of nested quads in a composite and resolving those points, also returning the object");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2730,10 +2776,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeRay() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvscompositeobjects", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray vs Composite Objects");
 	pNewTest->SetTestDescription("Ray intersection of various objects in a composite and resolving those points");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2830,10 +2875,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeComposition() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositecomposition", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Composite Composition");
 	pNewTest->SetTestDescription("Testing composite composition along with internal rotations and active external transformations");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2928,10 +2972,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionSpheres() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositespherecollision", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Composite Sphere Collision");
 	pNewTest->SetTestDescription("Testing composite collisions with spheres");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -3024,10 +3067,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionSphereVolume() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositespherevolume", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Composite Sphere Volume");
 	pNewTest->SetTestDescription("Testing composite collisions with spheres and volumes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -3120,10 +3162,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionVolumeSphere() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositevolumesphere", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Composite Sphere Volume");
 	pNewTest->SetTestDescription("Testing composite collisions with spheres and volumes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -3217,10 +3258,9 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionVolumes() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositevolumes", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Composite Sphere Volume");
 	pNewTest->SetTestDescription("Testing composite collisions with spheres and volumes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -3313,73 +3353,12 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionSphereQuads() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("compositespherequads", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Composite Sphere Volume");
 	pNewTest->SetTestDescription("Testing composite collisions with spheres and volumes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
-
-Error:
-	return r;
-}
-
-
-RESULT PhysicsEngineTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
-	RESULT r = R_PASS;
-
-	// Set up the pipeline
-	HALImp *pHAL = m_pDreamOS->GetHALImp();
-	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
-
-	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
-	CNM(pDestSinkNode, "Destination sink node isn't set");
-
-	{
-		m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
-		CNM(m_pSceneGraph, "Failed to allocate Debug Scene Graph");
-
-		CR(pHAL->MakeCurrentContext());
-
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderShaderName);
-		CN(pRenderProgramNode);
-		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Reference Geometry Shader Program
-		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-		CN(pReferenceGeometryProgram);
-		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-		// Skybox
-		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-		CN(pSkyboxProgram);
-		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-		// Debug Overlay
-		ProgramNode* pDebugOverlay = pHAL->MakeProgramNode("debug_overlay");
-		CN(pDebugOverlay);
-		CR(pDebugOverlay->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
-		CR(pDebugOverlay->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		CR(pDebugOverlay->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-
-		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-		CN(pRenderScreenQuad);
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDebugOverlay->Output("output_framebuffer")));
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-
-		CR(pHAL->ReleaseCurrentContext());
-
-		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
-		light *pLight = m_pDreamOS->AddLight(LIGHT_SPOT, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
-	}
 
 Error:
 	return r;

@@ -6,7 +6,7 @@
 // DREAM OS
 // DreamOS/Cloud/CloudTestSuite.h
 
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 #include <functional>
 #include <memory>
@@ -23,7 +23,7 @@ class DreamContentView;
 // Test Users login (refresh) tokens for users test<key>@dreamos.com
 extern std::map<int, std::string> k_refreshTokens;
 
-class CloudTestSuite : public TestSuite, 
+class CloudTestSuite : public DreamTestSuite, 
 					   public MenuController::observer,
 					   public CloudController::EnvironmentObserver
 {
@@ -44,7 +44,8 @@ public:
 	RESULT AddTestSwitchingEnvironmentSockets();
 
 	//TODO: remove when tests don't need pipelines
-	RESULT SetupPipeline();
+	virtual RESULT SetupPipeline(std::string strRenderShaderName = "standard") override;
+	virtual RESULT SetupTestSuite() override;
 
 	// Functionality
 	RESULT LaunchDreamView();
@@ -110,7 +111,6 @@ public:
 
 private:
 	CloudController *GetCloudController();
-	RESULT SetupSkyboxPipeline(std::string strRenderShaderName);
 
 private:
 	DreamOS *m_pDreamOS = nullptr;

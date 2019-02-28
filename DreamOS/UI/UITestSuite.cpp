@@ -475,10 +475,9 @@ RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("flatcontextcomposition", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Flat Context Composition Test");
 	pUITest->SetTestDescription("Flat context composition test");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -552,11 +551,10 @@ RESULT UITestSuite::AddTestUIMenuItem() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS->GetCloudController());
+	auto pUITest = AddTest("uimenuitem", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS->GetCloudController());
 	CN(pUITest);
 
-	pUITest->SetTestName("Browser Request Test");
-	pUITest->SetTestDescription("Basic test of browser working with a web request");
+	pUITest->SetTestDescription("Test for UI menu item");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -564,6 +562,7 @@ Error:
 	return r;
 }
 
+// TODO: Move this test somewhere else.  Should text have it's own test suite?
 RESULT UITestSuite::AddTestFont() {
 	RESULT r = R_PASS;
 
@@ -785,11 +784,10 @@ RESULT UITestSuite::AddTestFont() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS->GetCloudController());
+	auto pUITest = AddTest("font", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS->GetCloudController());
 	CN(pUITest);
 
-	pUITest->SetTestName("Browser Request Test");
-	pUITest->SetTestDescription("Basic test of browser working with a web request");
+	pUITest->SetTestDescription("Font creation test");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -797,6 +795,7 @@ Error:
 	return r;
 }
 
+// TODO: This should be moved into it's own test suite for browser / API or both
 RESULT UITestSuite::AddTestBrowserRequestWithMenuAPI() {
 	RESULT r = R_PASS;
 
@@ -889,10 +888,9 @@ RESULT UITestSuite::AddTestBrowserRequestWithMenuAPI() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pUITest = AddTest("browserrequest", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pUITest);
 
-	pUITest->SetTestName("Browser Request Test");
 	pUITest->SetTestDescription("Basic test of browser working with a web request");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -901,6 +899,7 @@ Error:
 	return r;
 }
 
+// TODO: Browser probably needs it's own test suite
 RESULT UITestSuite::AddTestBrowserURL() {
 	RESULT r = R_PASS;
 
@@ -959,10 +958,9 @@ RESULT UITestSuite::AddTestBrowserURL() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest("browserurl", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Browser URL Test");
 	pUITest->SetTestDescription("Basic test of browser working with a URL");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -1046,10 +1044,9 @@ RESULT UITestSuite::AddTestBrowserRequest() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest("browserwebrequest", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Browser Request Test");
 	pUITest->SetTestDescription("Basic test of browser working with a web request");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -1141,10 +1138,9 @@ RESULT UITestSuite::AddTestUIView() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest("uiview", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Basic test of uiview working locally");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(1);
@@ -1205,10 +1201,9 @@ RESULT UITestSuite::AddTestSharedContentView() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest("sharedcontentview", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local Shared Content View Test");
 	pUITest->SetTestDescription("Basic test of shared content view working locally");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
@@ -1217,6 +1212,7 @@ Error:
 	return r;
 }
 
+// TODO: What is this test exactly?
 RESULT UITestSuite::AddTestInteractionFauxUI() {
 	RESULT r = R_PASS;
 
@@ -1358,10 +1354,9 @@ RESULT UITestSuite::AddTestInteractionFauxUI() {
 		return R_PASS;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest("fauxui", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("UI Faux Interaction Engine Test");
 	pUITest->SetTestDescription("UI Basic Testing Environment");
 	pUITest->SetTestDuration(10000.0);
 	pUITest->SetTestRepeats(1);

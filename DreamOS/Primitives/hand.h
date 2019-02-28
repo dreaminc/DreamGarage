@@ -10,7 +10,7 @@
 // this is really a convenience object that should be used to derive others rather than off of DimObj directly
 
 #include "composite.h"
-#include "Leap.h"
+//#include "Leap.h"
 #include "HandType.h"
 
 #include <memory>

@@ -4,9 +4,9 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/Primitices/matrix/MatrixTestSuite.h
+// DreamOS/PhysicsEngine/PhysicsEngineTestSutie.h
 
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 #include <functional>
 #include <memory>
@@ -15,14 +15,15 @@
 
 class DreamOS;
 
-class PhysicsEngineTestSuite : public TestSuite {
+class PhysicsEngineTestSuite : public DreamTestSuite {
 public:
 	PhysicsEngineTestSuite(DreamOS *pDreamOS);
 	~PhysicsEngineTestSuite();
 
 	virtual RESULT AddTests() override;
 
-	RESULT SetupSkyboxPipeline(std::string strRenderShaderName);
+	virtual RESULT SetupPipeline(std::string strRenderShaderName = "standard") override;
+	virtual RESULT SetupTestSuite() override;
 
 	RESULT AddTestCompositeRay();
 	RESULT AddTestMultiCompositeRayQuad();

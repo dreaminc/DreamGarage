@@ -119,6 +119,25 @@ std::string CommandLineManager::GetParameterValue(std::string strParamName) {
 	}
 }
 
+std::vector<std::string> CommandLineManager::GetParameterValues(std::string strParamName, char cDelim) {
+	std::vector<std::string> retVec = std::vector<std::string>();
+	
+	std::string strParamVal = GetParameterValue(strParamName);
+	
+	size_t dPosition = 0;
+	std::string strTok;
+
+	while ((dPosition = strParamVal.find(cDelim)) != std::string::npos) {
+		strTok = strParamVal.substr(0, dPosition);
+		retVec.push_back(strTok);
+		strParamVal.erase(0, dPosition + 1);
+	}
+
+	retVec.push_back(strParamVal);
+
+	return retVec;
+}
+
 RESULT CommandLineManager::DisableParameter(std::string strParamName) {
 	RESULT r = R_PASS;
 

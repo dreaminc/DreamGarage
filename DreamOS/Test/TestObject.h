@@ -17,6 +17,9 @@
 
 class TestObject {
 public:
+	friend class TestSuite;
+
+public:
 	enum class state {
 		NOT_INITIALIZED,
 		INITIALIZED,
@@ -74,8 +77,12 @@ public:
 
 	bool DidTestPass();
 
-public:
+protected:
 	RESULT SetTestName(std::string strName);
+
+public:
+	std::string GetTestName();
+
 	RESULT SetTestDescription(std::string strDescription);
 	RESULT SetTestDuration(double sDuration);
 	RESULT SetTestRepeats(int nRepeats);

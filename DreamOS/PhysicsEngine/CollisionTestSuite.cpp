@@ -11,8 +11,7 @@
 #include "Primitives/HysteresisCylinder.h"
 
 CollisionTestSuite::CollisionTestSuite(DreamOS *pDreamOS) :
-	TestSuite("collision"),
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("collision", pDreamOS)
 {
 	// empty
 }
@@ -52,13 +51,13 @@ RESULT CollisionTestSuite::AddTests() {
 
 	CR(AddTestRayModel());
 
-	CR(SetupSkyboxPipeline("minimal"));
+	CR(SetupPipeline("minimal"));
 
 Error:
 	return r;
 }
 
-RESULT CollisionTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
+RESULT CollisionTestSuite::SetupPipeline(std::string strRenderShaderName) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -117,6 +116,15 @@ Error:
 	return r;
 }
 
+RESULT CollisionTestSuite::SetupTestSuite() {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamOS, "DreamOS handle is not set");
+
+Error:
+	return r;
+}
+
 RESULT CollisionTestSuite::ResetTest(void *pContext) {
 	RESULT r = R_PASS;
 
@@ -146,7 +154,7 @@ RESULT CollisionTestSuite::AddTestPlaneOBB() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupPipeline("minimal"));
 
 		// Test Context
 		TestContext *pTestContext;
@@ -236,13 +244,11 @@ RESULT CollisionTestSuite::AddTestPlaneOBB() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("planevsobb", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Plane vs OBB Test");
 	pNewTest->SetTestDescription("Test Plane vs OBB");
 	pNewTest->SetTestDuration(sTestTime);
-	//pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
@@ -265,7 +271,7 @@ RESULT CollisionTestSuite::AddTestPlaneQuad() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupPipeline("minimal"));
 
 		// Test Context
 		TestContext *pTestContext;
@@ -354,13 +360,11 @@ RESULT CollisionTestSuite::AddTestPlaneQuad() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("planevsquad", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Plane vs Quad Test");
 	pNewTest->SetTestDescription("Test Plane vs Quad");
 	pNewTest->SetTestDuration(sTestTime);
-	//pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
@@ -382,7 +386,7 @@ RESULT CollisionTestSuite::AddTestPlaneSphere() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupPipeline("minimal"));
 
 		// Test Context
 		TestContext *pTestContext;
@@ -469,13 +473,11 @@ RESULT CollisionTestSuite::AddTestPlaneSphere() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("spherevsplane", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Sphere vs Plane Test");
 	pNewTest->SetTestDescription("Test Sphere vs Plane");
 	pNewTest->SetTestDuration(sTestTime);
-	//pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
@@ -497,7 +499,7 @@ RESULT CollisionTestSuite::AddTestPlaneRay() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupPipeline("minimal"));
 
 		// Test Context
 		TestContext *pTestContext;
@@ -579,13 +581,11 @@ RESULT CollisionTestSuite::AddTestPlaneRay() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("planevsray", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Plane vs Ray Test");
 	pNewTest->SetTestDescription("Plane vs Ray Test");
 	pNewTest->SetTestDuration(sTestTime);
-	//pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
@@ -866,12 +866,9 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("planevsplane", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	//CR(SetupSkyboxPipeline("minimal"));
-
-	pNewTest->SetTestName("Plane vs Plane Test");
 	pNewTest->SetTestDescription("Plane vs Plane Test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -896,7 +893,7 @@ RESULT CollisionTestSuite::AddTestQuadQuad() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupPipeline("minimal"));
 
 		// Test Context
 		TestContext *pTestContext;
@@ -981,13 +978,11 @@ RESULT CollisionTestSuite::AddTestQuadQuad() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("planevsplane", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Plane vs Plane Test");
 	pNewTest->SetTestDescription("Plane vs Plane Test");
 	pNewTest->SetTestDuration(sTestTime);
-	//pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
@@ -1009,7 +1004,7 @@ RESULT CollisionTestSuite::AddTestPlanePlane() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupPipeline("minimal"));
 
 		// Test Context
 		TestContext *pTestContext;
@@ -1095,13 +1090,11 @@ RESULT CollisionTestSuite::AddTestPlanePlane() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("planevsplane", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Plane vs Plane Test");
 	pNewTest->SetTestDescription("Plane vs Plane Test");
 	pNewTest->SetTestDuration(sTestTime);
-	//pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
@@ -1124,7 +1117,7 @@ RESULT CollisionTestSuite::AddTestSphereSphere() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupPipeline("minimal"));
 
 		// Test Context
 		TestContext *pTestContext;
@@ -1221,10 +1214,9 @@ RESULT CollisionTestSuite::AddTestSphereSphere() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("spherevssphere", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Sphere vs Sphere Test");
 	pNewTest->SetTestDescription("Sphere vs Sphere Test");
 	pNewTest->SetTestDuration(sTestTime);
 
@@ -1248,7 +1240,7 @@ RESULT CollisionTestSuite::AddTestSphereQuad() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupPipeline("minimal"));
 
 		// Test Context
 		TestContext *pTestContext;
@@ -1335,10 +1327,9 @@ RESULT CollisionTestSuite::AddTestSphereQuad() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("spherevsquad", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Sphere vs Quad Test");
 	pNewTest->SetTestDescription("Sphere vs Quad Test");
 	pNewTest->SetTestDuration(sTestTime);
 
@@ -1362,7 +1353,7 @@ RESULT CollisionTestSuite::AddTestSphereOBB() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupPipeline("minimal"));
 
 		// Test Context
 		TestContext *pTestContext;
@@ -1450,10 +1441,9 @@ RESULT CollisionTestSuite::AddTestSphereOBB() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("spherevsobb", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Sphere vs OBB Test");
 	pNewTest->SetTestDescription("Sphere vs OBB Test");
 	pNewTest->SetTestDuration(sTestTime);
 
@@ -1521,7 +1511,7 @@ RESULT CollisionTestSuite::AddTestRayInComposite() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupPipeline("minimal"));
 
 		RayTestContext *pTestContext;
 		pTestContext = reinterpret_cast<RayTestContext*>(pContext);
@@ -1646,13 +1636,11 @@ RESULT CollisionTestSuite::AddTestRayInComposite() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvscompositeobjs", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray vs Composite Objects");
 	pNewTest->SetTestDescription("Ray intersection of various objects in a composite and resolving those points");
 	pNewTest->SetTestDuration(sTestTime);
-	pNewTest->SetTestRepeats(1);
 
 Error:
 	return r;
@@ -1681,7 +1669,7 @@ RESULT CollisionTestSuite::AddTestScaledCompositeRay() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupPipeline("minimal"));
 
 		RayTestContext *pTestContext;
 		pTestContext = reinterpret_cast<RayTestContext*>(pContext);
@@ -1807,10 +1795,9 @@ RESULT CollisionTestSuite::AddTestScaledCompositeRay() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("scaledcompositevsray", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray vs Composite Objects");
 	pNewTest->SetTestDescription("Ray intersection of various objects in a composite and resolving those points");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1848,7 +1835,7 @@ RESULT CollisionTestSuite::AddTestRayModel() {
 
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupPipeline("minimal"));
 
 		RayTestContext *pTestContext;
 		pTestContext = reinterpret_cast<RayTestContext*>(pContext);
@@ -1950,10 +1937,9 @@ RESULT CollisionTestSuite::AddTestRayModel() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("rayvsmodel", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray vs Quads in Composite");
 	pNewTest->SetTestDescription("Ray intersection of quads oriented in various fashion in a composite");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2100,7 +2086,7 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		CR(SetupSkyboxPipeline("minimal_texture"));
+		CR(SetupPipeline("minimal_texture"));
 
 		CN(m_pDreamOS);
 		pTestContext->pDreamOS = m_pDreamOS;
@@ -2216,10 +2202,9 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("hysteresis", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Hysteresis Test");
 	pNewTest->SetTestDescription("hysteresis test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);

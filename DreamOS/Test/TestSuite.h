@@ -28,25 +28,30 @@ public:
 
 	RESULT UpdateAndRunTests(void *pContext);
 
-	std::shared_ptr<TestObject> AddTest(std::function<RESULT()> fnTestFunction, void *pContext = nullptr);
-	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnTest, void *pContext = nullptr);
+	RESULT SelectTest(std::string strTestName);
 
-	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize,
+	std::shared_ptr<TestObject> AddTest(std::string strTestName, std::function<RESULT()> fnTestFunction, void *pContext = nullptr);
+	std::shared_ptr<TestObject> AddTest(std::string strTestName, std::function<RESULT(void*)> fnTest, void *pContext = nullptr);
+
+	std::shared_ptr<TestObject> AddTest(std::string strTestName, 
+										std::function<RESULT(void*)> fnInitialize,
 									    std::function<RESULT(void*)> fnTest,
 										void *pContext = nullptr);
 
-	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize,
+	std::shared_ptr<TestObject> AddTest(std::string strTestName, 
+										std::function<RESULT(void*)> fnInitialize,
 										std::function<RESULT(void*)> fnUpdate,
 										std::function<RESULT(void*)> fnTest,
 										void *pContext = nullptr);
 
-	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize,
+	std::shared_ptr<TestObject> AddTest(std::string strTestName, 
+										std::function<RESULT(void*)> fnInitialize,
 										std::function<RESULT(void*)> fnUpdate,
 										std::function<RESULT(void*)> fnTest,
 										std::function<RESULT(void*)> fnReset,
 										void *pContext = nullptr);
 
-	std::shared_ptr<TestObject> AddTest(const TestObject::Functions &fnStruct, void *pContext = nullptr);
+	std::shared_ptr<TestObject> AddTest(std::string strTestName, const TestObject::Functions &fnStruct, void *pContext = nullptr);
 
 	virtual RESULT SetupTestSuite() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT AddTests() = 0;
@@ -60,6 +65,8 @@ public:
 private:
 	std::vector<std::shared_ptr<TestObject>> m_tests;
 	std::vector<std::shared_ptr<TestObject>>::iterator m_currentTest;
+
+	std::shared_ptr<TestObject> m_pSingleTestToRun = nullptr;
 
 	std::string m_strName;
 

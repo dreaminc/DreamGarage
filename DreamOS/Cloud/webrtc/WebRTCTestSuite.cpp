@@ -293,28 +293,35 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 		RESULT r = R_PASS;
 
 		std::string strTestValue;
+		int testUserNumber = -1;
+		CommandLineManager *pCommandLineManager = nullptr;
+		
 
 		DOSLOG(INFO, "[WebRTCTestingSuite] Multipeer Test Initializing ... ");
 
 		CR(SetupPipeline("blinnphong"));
 
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		// Objects 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		CN(pLight);
 
-		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		sphere *pSphere;
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
 		CN(pSphere);
 
 		//*/
 
 		// Command Line Manager
-		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
 
 		strTestValue = pCommandLineManager->GetParameterValue("testval");
-		int testUserNumber = atoi(strTestValue.c_str());
+		testUserNumber = atoi(strTestValue.c_str());
 
 		// Cloud Controller
 		DEBUG_LINEOUT("Initializing Cloud Controller");
@@ -351,7 +358,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 		CN(pTestContext);
 
 		// Cloud Controller
-		CloudController *pCloudController = pTestContext->pCloudController;
+		CloudController *pCloudController;
+		pCloudController = pTestContext->pCloudController;
 		CN(pCloudController);
 
 		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
@@ -368,7 +376,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		CloudController *pCloudController = pTestContext->pCloudController;
+		CloudController *pCloudController;
+		pCloudController = pTestContext->pCloudController;
 		CN(pCloudController);
 
 		// Every 20 ms
@@ -417,10 +426,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 
 	// Add the test
 	//auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multipeer", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Testing multi-peer connection of WebRTC");
 	pNewTest->SetTestDescription("Test multi-peer connections of WebRTc");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -724,10 +732,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		//std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
 		std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
 		std::string strTestValue;
+		int testUserNumber = -1;
 
 		CR(SetupPipeline("standard"));
 
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		CN(m_pDreamOS);
@@ -735,17 +745,20 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		pTestContext->pDreamOS = m_pDreamOS;
 
 		// Objects 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		CN(pLight);
 
 		// TODO: Why does shit explode with no objects in scene
 		//auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
 
 		// Command Line Manager
-		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CommandLineManager *pCommandLineManager;
+		pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
 
 		strTestValue = pCommandLineManager->GetParameterValue("testval");
-		int testUserNumber = atoi(strTestValue.c_str());
+		testUserNumber = atoi(strTestValue.c_str());
 
 		// quad
 		// This presents a timing issue if it works 
@@ -871,7 +884,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		CloudController *pCloudController = pTestContext->pCloudController;
+		CloudController *pCloudController;
+		pCloudController = pTestContext->pCloudController;
 		CN(pCloudController);
 
 		if (pTestContext->m_pBrowserQuad != nullptr) {
@@ -952,10 +966,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("vcamaudio", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("WebRTC Audio");
 	pNewTest->SetTestDescription("Tests the multi-peer audio capabilities of WebRTC using the Dream Sound Client");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1278,10 +1291,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		//std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
 		std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
 		std::string strTestValue;
+		int testUserNumber = -1;
 
 		CR(SetupPipeline("standard"));
 
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		CN(m_pDreamOS);
@@ -1289,17 +1304,20 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		pTestContext->pDreamOS = m_pDreamOS;
 
 		// Objects 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		CN(pLight);
 
 		// TODO: Why does shit explode with no objects in scene
 		//auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
 
 		// Command Line Manager
-		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CommandLineManager *pCommandLineManager;
+		pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
 
 		strTestValue = pCommandLineManager->GetParameterValue("testval");
-		int testUserNumber = atoi(strTestValue.c_str());
+		testUserNumber = atoi(strTestValue.c_str());
 
 		// quad
 		// This presents a timing issue if it works 
@@ -1439,7 +1457,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		CloudController *pCloudController = pTestContext->pCloudController;
+		CloudController *pCloudController;
+		pCloudController = pTestContext->pCloudController;
 		CN(pCloudController);
 
 		if (pTestContext->m_pBrowserQuad != nullptr) {
@@ -1520,10 +1539,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("audio", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("WebRTC Audio");
 	pNewTest->SetTestDescription("Tests the multi-peer audio capabilities of WebRTC using the Dream Sound Client");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1737,6 +1755,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		int pxWidth = 500;
 		int pxHeight = 500;
 		int channels = 4;
+		int testUserNumber = -1;
 
 		std::string strTestValue;
 
@@ -1744,12 +1763,16 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 
 		CR(SetupPipeline("environment"));
 
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		// Objects 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		CN(pLight);
 		
+
 		pTestContext->pChromeDestQuad = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1);
 		CN(pTestContext->pChromeDestQuad);
 		pTestContext->pChromeDestQuad->RotateXByDeg(45.0f);
@@ -1774,128 +1797,130 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		pTestContext->pVCamSourceQuad->translateX(1.0f);
 		pTestContext->pVCamSourceQuad->translateY(-1.0f);
 
-		// Temporary
-		///*
-		// Chrome
-		pTestContext->pChromeDestQuadTexture = m_pDreamOS->MakeTexture(
-			texture::type::TEXTURE_2D, 
-			pxWidth, 
-			pxHeight, 
-			PIXEL_FORMAT::RGBA,
-			4, 
-			&vectorByteBuffer[0], 
-			pxWidth * pxHeight * 4
-		);
+		{
+			// Temporary
+			///*
+			// Chrome
+			pTestContext->pChromeDestQuadTexture = m_pDreamOS->MakeTexture(
+				texture::type::TEXTURE_2D,
+				pxWidth,
+				pxHeight,
+				PIXEL_FORMAT::RGBA,
+				4,
+				&vectorByteBuffer[0],
+				pxWidth * pxHeight * 4
+			);
 
-		CN(pTestContext->pChromeDestQuadTexture);
-		pTestContext->pChromeDestQuad->SetDiffuseTexture(pTestContext->pChromeDestQuadTexture);
+			CN(pTestContext->pChromeDestQuadTexture);
+			pTestContext->pChromeDestQuad->SetDiffuseTexture(pTestContext->pChromeDestQuadTexture);
 
-		pTestContext->pChromeSourceTexture = m_pDreamOS->MakeTexture(
-			texture::type::TEXTURE_2D,
-			pxWidth,
-			pxHeight,
-			PIXEL_FORMAT::RGBA,
-			4,
-			&vectorByteBuffer[0],
-			pxWidth * pxHeight * 4
-		);
+			pTestContext->pChromeSourceTexture = m_pDreamOS->MakeTexture(
+				texture::type::TEXTURE_2D,
+				pxWidth,
+				pxHeight,
+				PIXEL_FORMAT::RGBA,
+				4,
+				&vectorByteBuffer[0],
+				pxWidth * pxHeight * 4
+			);
 
-		CN(pTestContext->pChromeSourceTexture);
-		pTestContext->pChromeSourceQuad->SetDiffuseTexture(pTestContext->pChromeSourceTexture);
+			CN(pTestContext->pChromeSourceTexture);
+			pTestContext->pChromeSourceQuad->SetDiffuseTexture(pTestContext->pChromeSourceTexture);
 
-		// VCam
-		pTestContext->pVCamDestQuadTexture = m_pDreamOS->MakeTexture(
-			texture::type::TEXTURE_2D,
-			pxWidth,
-			pxHeight,
-			PIXEL_FORMAT::RGBA,
-			4,
-			&vectorByteBuffer[0],
-			pxWidth * pxHeight * 4
-		);
+			// VCam
+			pTestContext->pVCamDestQuadTexture = m_pDreamOS->MakeTexture(
+				texture::type::TEXTURE_2D,
+				pxWidth,
+				pxHeight,
+				PIXEL_FORMAT::RGBA,
+				4,
+				&vectorByteBuffer[0],
+				pxWidth * pxHeight * 4
+			);
 
-		CN(pTestContext->pVCamDestQuadTexture);
-		pTestContext->pVCamDestQuad->SetDiffuseTexture(pTestContext->pVCamDestQuadTexture);
+			CN(pTestContext->pVCamDestQuadTexture);
+			pTestContext->pVCamDestQuad->SetDiffuseTexture(pTestContext->pVCamDestQuadTexture);
 
-		pTestContext->pVCamSourceTexture = m_pDreamOS->MakeTexture(
-			texture::type::TEXTURE_2D,
-			pxWidth,
-			pxHeight,
-			PIXEL_FORMAT::RGBA,
-			4,
-			&vectorByteBuffer[0],
-			pxWidth * pxHeight * 4
-		);
+			pTestContext->pVCamSourceTexture = m_pDreamOS->MakeTexture(
+				texture::type::TEXTURE_2D,
+				pxWidth,
+				pxHeight,
+				PIXEL_FORMAT::RGBA,
+				4,
+				&vectorByteBuffer[0],
+				pxWidth * pxHeight * 4
+			);
 
-		CN(pTestContext->pVCamSourceTexture);
-		pTestContext->pVCamSourceQuad->SetDiffuseTexture(pTestContext->pVCamSourceTexture);
+			CN(pTestContext->pVCamSourceTexture);
+			pTestContext->pVCamSourceQuad->SetDiffuseTexture(pTestContext->pVCamSourceTexture);
 
-		size_t bufSize = sizeof(uint8_t) * pxWidth * pxHeight * channels;
+			size_t bufSize = sizeof(uint8_t) * pxWidth * pxHeight * channels;
 
-		pTestContext->pTestChromeVideoFrameBuffer = (uint8_t*)malloc(bufSize);
-		CN(pTestContext->pTestChromeVideoFrameBuffer);
+			pTestContext->pTestChromeVideoFrameBuffer = (uint8_t*)malloc(bufSize);
+			CN(pTestContext->pTestChromeVideoFrameBuffer);
 
-		pTestContext->pTestVCamVideoFrameBuffer = (uint8_t*)malloc(bufSize);
-		CN(pTestContext->pTestVCamVideoFrameBuffer);
+			pTestContext->pTestVCamVideoFrameBuffer = (uint8_t*)malloc(bufSize);
+			CN(pTestContext->pTestVCamVideoFrameBuffer);
 
-		int chromeStyleCounter = 0;
-		int vcamStyleCounter = 0;
+			int chromeStyleCounter = 0;
+			int vcamStyleCounter = 0;
 
-		for (int i = 0; i < pxHeight; i++) {
-			for (int j = 0; j < pxWidth; j++) {
-				uint8_t cChromePixel[4] = { 0x00, 0x00, 0x00, 0xFF };
-				cChromePixel[chromeStyleCounter] = 0xFF;
+			for (int i = 0; i < pxHeight; i++) {
+				for (int j = 0; j < pxWidth; j++) {
+					uint8_t cChromePixel[4] = { 0x00, 0x00, 0x00, 0xFF };
+					cChromePixel[chromeStyleCounter] = 0xFF;
 
-				uint8_t cVCamPixel[4] = { 0x00, 0x00, 0x00, 0xFF };
-				cVCamPixel[vcamStyleCounter] = 0xFF;
+					uint8_t cVCamPixel[4] = { 0x00, 0x00, 0x00, 0xFF };
+					cVCamPixel[vcamStyleCounter] = 0xFF;
 
-				size_t offset = (i * ((pxWidth - 1)) + (j));
-				offset *= 4;
+					size_t offset = (i * ((pxWidth - 1)) + (j));
+					offset *= 4;
 
-				CB((offset < bufSize));
+					CB((offset < bufSize));
 
-				uint8_t *pPixelMemLocation = pTestContext->pTestChromeVideoFrameBuffer + offset;
-				memcpy(pPixelMemLocation, cChromePixel, sizeof(cChromePixel));
+					uint8_t *pPixelMemLocation = pTestContext->pTestChromeVideoFrameBuffer + offset;
+					memcpy(pPixelMemLocation, cChromePixel, sizeof(cChromePixel));
 
-				pPixelMemLocation = pTestContext->pTestVCamVideoFrameBuffer + offset;
-				memcpy(pPixelMemLocation, cVCamPixel, sizeof(cVCamPixel));
-			}
-
-			if (i % 50 == 0) {
-				if (++chromeStyleCounter > 3) {
-					chromeStyleCounter = 0;
+					pPixelMemLocation = pTestContext->pTestVCamVideoFrameBuffer + offset;
+					memcpy(pPixelMemLocation, cVCamPixel, sizeof(cVCamPixel));
 				}
 
-				if (--vcamStyleCounter < 0) {
-					vcamStyleCounter = 3;
+				if (i % 50 == 0) {
+					if (++chromeStyleCounter > 3) {
+						chromeStyleCounter = 0;
+					}
+
+					if (--vcamStyleCounter < 0) {
+						vcamStyleCounter = 3;
+					}
 				}
 			}
+
+			CR(pTestContext->pChromeSourceTexture->Update(
+				(unsigned char*)(pTestContext->pTestChromeVideoFrameBuffer),
+				pxWidth,
+				pxHeight,
+				PIXEL_FORMAT::RGBA)
+			);
+			CR(pTestContext->pChromeSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
+
+			CR(pTestContext->pVCamSourceTexture->Update(
+				(unsigned char*)(pTestContext->pTestVCamVideoFrameBuffer),
+				pxWidth,
+				pxHeight,
+				PIXEL_FORMAT::RGBA)
+			);
+			CR(pTestContext->pVCamSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
 		}
-
-		CR(pTestContext->pChromeSourceTexture->Update(
-			(unsigned char*)(pTestContext->pTestChromeVideoFrameBuffer),
-			pxWidth,
-			pxHeight,
-			PIXEL_FORMAT::RGBA)
-		);
-		CR(pTestContext->pChromeSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
-
-		CR(pTestContext->pVCamSourceTexture->Update(
-			(unsigned char*)(pTestContext->pTestVCamVideoFrameBuffer),
-			pxWidth,
-			pxHeight,
-			PIXEL_FORMAT::RGBA)
-		);
-		CR(pTestContext->pVCamSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
-
 		//*/
 
 		// Command Line Manager
-		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CommandLineManager *pCommandLineManager;
+		pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
 
 		strTestValue = pCommandLineManager->GetParameterValue("testval");
-		int testUserNumber = atoi(strTestValue.c_str());
+		testUserNumber = atoi(strTestValue.c_str());
 
 		// Cloud Controller
 		DEBUG_LINEOUT("Initializing Cloud Controller");
@@ -1946,75 +1971,77 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		if (pTestContext->m_pendingChromeVideoBuffer.fPendingBufferReady && pTestContext->m_pendingChromeVideoBuffer.pPendingBuffer != nullptr) {
-			// Update the video buffer to texture
-			CR(pTestContext->pChromeDestQuadTexture->Update(
-				(unsigned char*)(pTestContext->m_pendingChromeVideoBuffer.pPendingBuffer),
-				pTestContext->m_pendingChromeVideoBuffer.pxWidth,
-				pTestContext->m_pendingChromeVideoBuffer.pxHeight,
+		{
+
+			if (pTestContext->m_pendingChromeVideoBuffer.fPendingBufferReady && pTestContext->m_pendingChromeVideoBuffer.pPendingBuffer != nullptr) {
+				// Update the video buffer to texture
+				CR(pTestContext->pChromeDestQuadTexture->Update(
+					(unsigned char*)(pTestContext->m_pendingChromeVideoBuffer.pPendingBuffer),
+					pTestContext->m_pendingChromeVideoBuffer.pxWidth,
+					pTestContext->m_pendingChromeVideoBuffer.pxHeight,
+					PIXEL_FORMAT::RGBA)
+				);
+			}
+
+			if (pTestContext->m_pendingVCamVideoBuffer.fPendingBufferReady && pTestContext->m_pendingVCamVideoBuffer.pPendingBuffer != nullptr) {
+				// Update the video buffer to texture
+				CR(pTestContext->pVCamDestQuadTexture->Update(
+					(unsigned char*)(pTestContext->m_pendingVCamVideoBuffer.pPendingBuffer),
+					pTestContext->m_pendingVCamVideoBuffer.pxWidth,
+					pTestContext->m_pendingVCamVideoBuffer.pxHeight,
+					PIXEL_FORMAT::RGBA)
+				);
+			}
+
+			// Scroll/Update the buffers
+			int pxWidth = pTestContext->pChromeSourceTexture->GetWidth();
+			int pxHeight = pTestContext->pChromeSourceTexture->GetHeight();
+			int channels = pTestContext->pChromeSourceTexture->GetChannels();
+
+			size_t bufSize = sizeof(uint8_t) * pxWidth * pxHeight * channels;
+			size_t bufRowSize = sizeof(uint8_t) * pxWidth * channels;
+
+			uint8_t *tempRow = (uint8_t*)malloc(bufRowSize);
+			CN(tempRow);
+
+			// Chrome Buffer
+			// Save the row
+			memcpy(tempRow, pTestContext->pTestChromeVideoFrameBuffer, bufRowSize);
+			memcpy(pTestContext->pTestChromeVideoFrameBuffer,
+				pTestContext->pTestChromeVideoFrameBuffer + bufRowSize,
+				(bufSize - bufRowSize));
+			memcpy(pTestContext->pTestChromeVideoFrameBuffer + (bufSize - bufRowSize),
+				tempRow,
+				bufRowSize);
+
+			memcpy(tempRow, pTestContext->pTestVCamVideoFrameBuffer + (bufSize - bufRowSize), bufRowSize);
+			memcpy(pTestContext->pTestVCamVideoFrameBuffer + bufRowSize,
+				pTestContext->pTestVCamVideoFrameBuffer,
+				(bufSize - bufRowSize));
+			memcpy(pTestContext->pTestVCamVideoFrameBuffer,
+				tempRow,
+				bufRowSize);
+
+			CR(pTestContext->pChromeSourceTexture->Update(
+				(unsigned char*)(pTestContext->pTestChromeVideoFrameBuffer),
+				pxWidth,
+				pxHeight,
 				PIXEL_FORMAT::RGBA)
 			);
-		}
+			CR(pTestContext->pChromeSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
 
-		if (pTestContext->m_pendingVCamVideoBuffer.fPendingBufferReady && pTestContext->m_pendingVCamVideoBuffer.pPendingBuffer != nullptr) {
-			// Update the video buffer to texture
-			CR(pTestContext->pVCamDestQuadTexture->Update(
-				(unsigned char*)(pTestContext->m_pendingVCamVideoBuffer.pPendingBuffer),
-				pTestContext->m_pendingVCamVideoBuffer.pxWidth,
-				pTestContext->m_pendingVCamVideoBuffer.pxHeight,
+			CR(pTestContext->pVCamSourceTexture->Update(
+				(unsigned char*)(pTestContext->pTestVCamVideoFrameBuffer),
+				pxWidth,
+				pxHeight,
 				PIXEL_FORMAT::RGBA)
 			);
-		}
+			CR(pTestContext->pVCamSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
 
-		// Scroll/Update the buffers
-		int pxWidth = pTestContext->pChromeSourceTexture->GetWidth();
-		int pxHeight = pTestContext->pChromeSourceTexture->GetHeight();
-		int channels = pTestContext->pChromeSourceTexture->GetChannels();
-
-		size_t bufSize = sizeof(uint8_t) * pxWidth * pxHeight * channels;
-		size_t bufRowSize = sizeof(uint8_t) * pxWidth * channels;
-
-		uint8_t *tempRow = (uint8_t*)malloc(bufRowSize);
-		CN(tempRow);
-
-		// Chrome Buffer
-		// Save the row
-		memcpy(tempRow, pTestContext->pTestChromeVideoFrameBuffer, bufRowSize);
-		memcpy(pTestContext->pTestChromeVideoFrameBuffer,
-			pTestContext->pTestChromeVideoFrameBuffer + bufRowSize,
-			(bufSize - bufRowSize));
-		memcpy(pTestContext->pTestChromeVideoFrameBuffer + (bufSize - bufRowSize),
-			tempRow,
-			bufRowSize);
-
-		memcpy(tempRow, pTestContext->pTestVCamVideoFrameBuffer + (bufSize - bufRowSize), bufRowSize);
-		memcpy(pTestContext->pTestVCamVideoFrameBuffer + bufRowSize,
-			pTestContext->pTestVCamVideoFrameBuffer,
-			(bufSize - bufRowSize));
-		memcpy(pTestContext->pTestVCamVideoFrameBuffer,
-			tempRow,
-			bufRowSize);
-
-		CR(pTestContext->pChromeSourceTexture->Update(
-			(unsigned char*)(pTestContext->pTestChromeVideoFrameBuffer),
-			pxWidth,
-			pxHeight,
-			PIXEL_FORMAT::RGBA)
-		);
-		CR(pTestContext->pChromeSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
-
-		CR(pTestContext->pVCamSourceTexture->Update(
-			(unsigned char*)(pTestContext->pTestVCamVideoFrameBuffer),
-			pxWidth,
-			pxHeight,
-			PIXEL_FORMAT::RGBA)
-		);
-		CR(pTestContext->pVCamSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
-
-
-		if (tempRow != nullptr) {
-			free(tempRow);
-			tempRow = nullptr;
+			if (tempRow != nullptr) {
+				free(tempRow);
+				tempRow = nullptr;
+			}
 		}
 
 		// Replace with BroadcastTexture
@@ -2069,10 +2096,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 
 	// Add the test
 	//auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("videostream", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Test Connect and Login");
 	pNewTest->SetTestDescription("Test connect and log into service - this will hang for a while");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -2104,8 +2130,10 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 
 		CR(SetupPipeline("standard"));
 
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
+
 		CN(m_pDreamOS);
 
 		// Initialize Cloud controller if not already initialized 
@@ -2119,10 +2147,13 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 		
 
 		// Objects 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		CN(pLight);
 
 		// Command Line Manager
-		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CommandLineManager *pCommandLineManager;
+		pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
 
 		// Cloud Controller
@@ -2173,7 +2204,10 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 
 		pDreamShareView->Show();
 
-		auto pComposite = m_pDreamOS->AddComposite();
+		composite *pComposite;		
+		pComposite = m_pDreamOS->AddComposite();
+		CN(pComposite);
+
 		pComposite->SetPosition(pDreamBrowser->GetOrigin());
 		m_pTestQuad = pComposite->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f));
 		CN(m_pTestQuad);
@@ -2227,10 +2261,9 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 
 	// Add the test
 	//auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multibrowser", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi-browser");
 	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
