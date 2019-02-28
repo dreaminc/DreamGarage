@@ -11,8 +11,7 @@
 #include "Primitives/HysteresisCylinder.h"
 
 CollisionTestSuite::CollisionTestSuite(DreamOS *pDreamOS) :
-	DreamTestSuite("collision"),
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("collision", pDreamOS)
 {
 	// empty
 }

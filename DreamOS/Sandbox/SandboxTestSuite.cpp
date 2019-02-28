@@ -10,8 +10,7 @@
 #include "DreamTestingApp.h"
 
 SandboxTestSuite::SandboxTestSuite(DreamOS *pDreamOS) :
-	DreamTestSuite("sandbox"),
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("sandbox", pDreamOS)
 {
 	// empty
 }

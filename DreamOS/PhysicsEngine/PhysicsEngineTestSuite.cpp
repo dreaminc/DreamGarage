@@ -8,8 +8,7 @@
 #include "PhysicsEngine/CollisionManifold.h"
 
 PhysicsEngineTestSuite::PhysicsEngineTestSuite(DreamOS *pDreamOS) :
-	DreamTestSuite("physics"),
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("physics", pDreamOS)
 {
 	// empty
 }

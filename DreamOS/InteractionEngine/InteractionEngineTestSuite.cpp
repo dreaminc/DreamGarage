@@ -105,8 +105,7 @@ struct TestContext : public Subscriber<InteractionObjectEvent> {
 };
 
 InteractionEngineTestSuite::InteractionEngineTestSuite(DreamOS *pDreamOS) :
-	DreamTestSuite("interaction"),
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("interaction", pDreamOS)
 {
 	RESULT r = R_PASS;
 

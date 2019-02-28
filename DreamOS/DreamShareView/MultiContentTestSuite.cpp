@@ -42,8 +42,7 @@
 #include <memory>
 
 MultiContentTestSuite::MultiContentTestSuite(DreamOS *pDreamOS) :
-	DreamTestSuite("multicontent"),
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("multicontent", pDreamOS)
 {
 	RESULT r = R_PASS;
 

@@ -122,10 +122,9 @@ RESULT DimensionTestSuite::AddTestDimObjRotationFunctions() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("dimobjrotation", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("DimObj Rotation Functions");
 	pNewTest->SetTestDescription("Confirm consistency of DimObj rotation functions");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -206,10 +205,9 @@ RESULT DimensionTestSuite::AddTestVectorRotationFunctions() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest("vectorrotationfunctions", fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("DimObj Rotation Functions");
 	pNewTest->SetTestDescription("Confirm consistency of DimObj rotation functions");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);

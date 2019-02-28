@@ -30,8 +30,7 @@ std::map<int, std::string> k_refreshTokens = {
 };
 
 CloudTestSuite::CloudTestSuite(DreamOS *pDreamOS) :
-	DreamTestSuite("cloud"),
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("cloud", pDreamOS)
 {
 	// empty
 }
