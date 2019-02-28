@@ -69,6 +69,7 @@ public:
 		SET_SDP_ANSWER,
 		SET_OFFER_CANDIDATES,
 		SET_ANSWER_CANDIDATES,
+		CREATE_ICE_CANDIDATES,
 
 		// Menu
 		MENU_API_REQUEST,
@@ -155,10 +156,12 @@ public:
 
 	// TODO: New Server Integration
 	nlohmann::json CreateEnvironmentMessage(User user, PeerConnection *pPeerConnection, std::string strMethod);
+	nlohmann::json CreateICECandidateEnvironmentMessage(User user, PeerConnection *pPeerConnection, WebRTCICECandidate *pICECandidate, bool fOfferer);
 	RESULT SetSDPOffer(User user, PeerConnection *pPeerConnection);
 	RESULT SetSDPAnswer(User user, PeerConnection *pPeerConnection);
 	RESULT SetOfferCandidates(User user, PeerConnection *pPeerConnection);
 	RESULT SetAnswerCandidates(User user, PeerConnection *pPeerConnection);
+	RESULT CreateICECandidate(User user, WebRTCICECandidate* pICECandidate, PeerConnection *pPeerConnection, bool fOfferer);
 
 	RESULT UpdateEnvironmentUser();
 	RESULT PrintEnvironmentPeerList();
@@ -237,6 +240,7 @@ private:
 	virtual RESULT OnSDPOfferSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnSDPAnswerSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) override;
+	virtual RESULT OnICECandidateGathered(WebRTCICECandidate *pICECandidate, PeerConnection *pPeerConnection) override;
 
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;

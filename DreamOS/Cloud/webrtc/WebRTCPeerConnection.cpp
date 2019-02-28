@@ -986,7 +986,7 @@ void WebRTCPeerConnection::OnIceGatheringChange(webrtc::PeerConnectionInterface:
 		DOSLOG(INFO, "%v ICE Gathering Complete", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
-			m_pParentObserver->OnICECandidatesGatheringDone(m_peerConnectionID);
+			//m_pParentObserver->OnICECandidatesGatheringDone(m_peerConnectionID);
 		}
 		else {
 			DOSLOG(INFO, "No WebRTC Peer Connection Observer registered");
@@ -1003,7 +1003,7 @@ void WebRTCPeerConnection::OnIceConnectionReceivingChange(bool fReceiving) {
 void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* pICECandidate) {
 	DOSLOG(INFO, "OnIceCandidate: %s %d", pICECandidate->sdp_mid().c_str(), pICECandidate->sdp_mline_index());
 	DOSLOG(INFO, "[WebRTCPeerConnection] OnIceCandidate: %v %v", pICECandidate->sdp_mid(), pICECandidate->sdp_mline_index());
-
+	DOSLOG(INFO, "Using: %s %s %s %s", pICECandidate->candidate().protocol(), pICECandidate->candidate().priority(), pICECandidate->candidate().type(), pICECandidate->candidate().url());
 	//Json::StyledWriter writer;
 	//Json::Value jmessage;
 
@@ -1017,6 +1017,11 @@ void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* p
 	}
 
 	m_webRTCICECandidates.push_back(iceCandidate);
+
+	// we can just use the last value instead of creating another copy
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnICECandidateGathered(&m_webRTCICECandidates.back(), m_peerConnectionID);
+	}
 }
 
 // DataChannelObserver Implementation
@@ -1194,9 +1199,14 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 
 	for (int i = 0; i < twilioNTSInformation.m_ICEServerURIs.size(); i++) {
 		
-		iceServer.uri = twilioNTSInformation.m_ICEServerURIs[i];
+		iceServer.urls.emplace_back(twilioNTSInformation.m_ICEServerURIs[i]);
+		//DOSLOG(INFO, "Adding ice server: %s", twilioNTSInformation.m_ICEServerURIs[i]);
+
 		iceServer.username = twilioNTSInformation.m_ICEServerUsernames[i];
+		//DOSLOG(INFO, "Username: %s", twilioNTSInformation.m_ICEServerUsernames[i]);
+
 		iceServer.password = twilioNTSInformation.m_ICEServerPasswords[i];
+		//DOSLOG(INFO, "Password: %s", twilioNTSInformation.m_ICEServerPasswords[i]);
 
 		//iceServer.tls_cert_policy = webrtc::PeerConnectionInterface::kTlsCertPolicyInsecureNoCheck;
 
@@ -1394,7 +1404,8 @@ RESULT WebRTCPeerConnection::SendDataChannelMessage(uint8_t *pDataChannelBuffer,
 		int a = 5;
 	}
 
-	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(pDataChannelBuffer, pDataChannelBuffer_n), true)));
+	// Since UpdateHead and Hands from DreamGarage is unprotected - it should check if peers exist before trying to broadcast the message
+	CBR(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(pDataChannelBuffer, pDataChannelBuffer_n), true)), R_SKIPPED);
 	
 Error:
 	return r;

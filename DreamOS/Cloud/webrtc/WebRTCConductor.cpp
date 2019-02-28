@@ -261,9 +261,7 @@ RESULT WebRTCConductor::AddOfferCandidates(PeerConnection *pPeerConnection) {
 	auto pWebRTCPeerConnection = GetPeerConnection(pPeerConnection->GetPeerConnectionID());
 
 	if (pWebRTCPeerConnection != nullptr) {
-		for (auto &iceCandidate : pPeerConnection->GetOfferCandidates()) {
-			CR(pWebRTCPeerConnection->AddIceCandidate(iceCandidate));
-		}
+		CR(pWebRTCPeerConnection->AddIceCandidate(pPeerConnection->GetOfferCandidates().back()));
 	}
 
 Error:
@@ -277,9 +275,7 @@ RESULT WebRTCConductor::AddAnswerCandidates(PeerConnection *pPeerConnection) {
 	auto pWebRTCPeerConnection = GetPeerConnection(pPeerConnection->GetPeerConnectionID());
 
 	if (pWebRTCPeerConnection != nullptr) {
-		for (auto &iceCandidate : pPeerConnection->GetAnswerCandidates()) {
-			CR(pWebRTCPeerConnection->AddIceCandidate(iceCandidate));
-		}
+		CR(pWebRTCPeerConnection->AddIceCandidate(pPeerConnection->GetAnswerCandidates().back()));
 	}
 
 Error:
@@ -566,6 +562,14 @@ RESULT WebRTCConductor::OnSDPFailure(long peerConnectionID, bool fOffer) {
 RESULT WebRTCConductor::OnICECandidatesGatheringDone(long peerConnectionID) {
 	if (m_pParentObserver != nullptr) {
 		return m_pParentObserver->OnICECandidatesGatheringDone(peerConnectionID);
+	}
+
+	return R_NOT_HANDLED;
+}
+
+RESULT WebRTCConductor::OnICECandidateGathered(WebRTCICECandidate* pICECandidate, long peerConnectionID) {
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnICECandidateGathered(pICECandidate, peerConnectionID);
 	}
 
 	return R_NOT_HANDLED;

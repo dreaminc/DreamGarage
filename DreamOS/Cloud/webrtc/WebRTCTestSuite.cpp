@@ -41,11 +41,11 @@ WebRTCTestSuite::~WebRTCTestSuite() {
 RESULT WebRTCTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestWebRTCMultiPeer());
+
 	CR(AddTestWebRTCVCamAudioRelay());
 
 	CR(AddTestWebRTCAudio());
-
-	CR(AddTestWebRTCMultiPeer());
 
 	CR(AddTestWebRTCVideoStream());
 
@@ -171,7 +171,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 		}
 
 		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
-			DEBUG_LINEOUT("OnAudioData: %s", strAudioTrackLabel.c_str());
+			//DEBUG_LINEOUT("OnAudioData: %s", strAudioTrackLabel.c_str());
 
 			return R_NOT_HANDLED;
 		}

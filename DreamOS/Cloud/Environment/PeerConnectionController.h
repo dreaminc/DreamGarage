@@ -33,6 +33,7 @@ public:
 		virtual RESULT OnSDPOfferSuccess(PeerConnection *pPeerConnection) = 0;
 		virtual RESULT OnSDPAnswerSuccess(PeerConnection *pPeerConnection) = 0;
 		virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) = 0;
+		virtual RESULT OnICECandidateGathered(WebRTCICECandidate *pICECandidate, PeerConnection *pPeerConnection) = 0;
 
 		// TODO: Switch to Peer User ID
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
@@ -108,6 +109,7 @@ public:
 	virtual RESULT OnSDPOfferSuccess(long peerConnectionID) override;
 	virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) override;
 	virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) override;
+	virtual RESULT OnICECandidateGathered(WebRTCICECandidate *pICECandidate, long peerConnectionID) override;
 	virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) override;
 	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;

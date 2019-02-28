@@ -285,6 +285,32 @@ nlohmann::json EnvironmentController::CreateEnvironmentMessage(User user, PeerCo
 	return jsonData;
 }
 
+// TODO: Move to PeerConnection for PeerConnection related calls?
+nlohmann::json EnvironmentController::CreateICECandidateEnvironmentMessage(User user, PeerConnection *pPeerConnection, WebRTCICECandidate* pICECandidate, bool fOfferer) {
+	nlohmann::json jsonData;
+
+	// Set up the JSON data
+	guid guidMessage = guid();
+	std::string strGUID = guidMessage.GetGUIDString();
+
+	jsonData["id"] = guidMessage.GetGUIDString();
+	//jsonData["token"] = user.GetToken();
+	//jsonData["type"] = "response";
+	jsonData["type"] = "request";
+
+	//jsonData["method"] = std::string("environmentuser") + strMethod;
+	jsonData["method"] = "peer_connection_candidate.create";
+
+	jsonData["payload"] = nlohmann::json::object();
+	if (pICECandidate != nullptr) {
+		jsonData["payload"]["peer_connection_candidate"] = pPeerConnection->GetPeerConnectionICECandidateJSON(pICECandidate, fOfferer);
+	}
+
+	jsonData["version"] = user.GetVersion().GetString(false);
+
+	return jsonData;
+}
+
 RESULT EnvironmentController::SetSDPOffer(User user, PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
@@ -370,7 +396,6 @@ RESULT EnvironmentController::SetOfferCandidates(User user, PeerConnection *pPee
 
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Set Offer Candidates JSON: %s", strData.c_str());
-
 	/*
 	m_fPendingMessage = true;
 	m_state = state::SET_OFFER_CANDIDATES;
@@ -411,6 +436,31 @@ RESULT EnvironmentController::SetAnswerCandidates(User user, PeerConnection *pPe
 	*/
 
 	CR(SendEnvironmentSocketData(strData, state::SET_ANSWER_CANDIDATES));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::CreateICECandidate(User user, WebRTCICECandidate *pICECandidate, PeerConnection *pPeerConnection, bool fOfferer) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonData;
+	std::string strData;
+
+	CloudController *pParentCloudController = dynamic_cast<CloudController*>(GetParentController());
+
+	CNM(pParentCloudController, "Parent CloudController not found or null");
+	CN(m_pEnvironmentWebsocket);
+	CBM((m_fConnected), "Environment socket not connected");
+	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
+
+	// Set up the JSON data
+	jsonData = CreateICECandidateEnvironmentMessage(user, pPeerConnection, pICECandidate, fOfferer);
+
+	strData = jsonData.dump();
+	DEBUG_LINEOUT("Create ICE Candidates JSON: %s", strData.c_str());
+
+	CR(SendEnvironmentSocketData(strData, state::CREATE_ICE_CANDIDATES));
 
 Error:
 	return r;
@@ -784,6 +834,20 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::OnICECandidateGathered(WebRTCICECandidate *pICECandidate, PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	if (pPeerConnection->GetOfferUserID() == s_user.GetUserID()) {
+		CR(CreateICECandidate(s_user, pICECandidate, pPeerConnection, true));
+	}
+	else if (pPeerConnection->GetAnswerUserID() == s_user.GetUserID()) {
+		CR(CreateICECandidate(s_user, pICECandidate, pPeerConnection, false));
+	}
+
+Error:
+	return r;
+}
+
 RESULT EnvironmentController::OnOpenAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
@@ -1121,7 +1185,7 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 	// Determine who to handle this
 	// TODO: Move this over to CloudMessage instead
 
-	if (strTokens[0] == "peer_connection") {
+	if (strTokens[0] == "peer_connection" || strTokens[0] == "peer_connection_candidate") {
 		nlohmann::json jsonPayload = jsonCloudMessage["/payload"_json_pointer];
 		strMethod = strTokens[1];
 

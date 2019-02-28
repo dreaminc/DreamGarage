@@ -380,6 +380,17 @@ Error:
 	return r;
 }
 
+RESULT WebRTCImp::OnICECandidateGathered(WebRTCICECandidate *pICECandidate, long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnICECandidateGathered(pICECandidate, peerConnectionID));
+	}
+
+Error:
+	return r;
+}
+
 RESULT WebRTCImp::OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) {
 	RESULT r = R_PASS;
 
