@@ -286,7 +286,7 @@ nlohmann::json EnvironmentController::CreateEnvironmentMessage(User user, PeerCo
 }
 
 // TODO: Move to PeerConnection for PeerConnection related calls?
-nlohmann::json EnvironmentController::CreateICECandidateEnvironmentMessage(PeerConnection *pPeerConnection, WebRTCICECandidate* pICECandidate, bool fOfferer) {
+nlohmann::json EnvironmentController::CreateICECandidateEnvironmentMessage(User user, PeerConnection *pPeerConnection, WebRTCICECandidate* pICECandidate, bool fOfferer) {
 	nlohmann::json jsonData;
 
 	// Set up the JSON data
@@ -306,7 +306,7 @@ nlohmann::json EnvironmentController::CreateICECandidateEnvironmentMessage(PeerC
 		jsonData["payload"]["peer_connection_candidate"] = pPeerConnection->GetPeerConnectionICECandidateJSON(pICECandidate, fOfferer);
 	}
 
-	jsonData["version"] = "1.0";
+	jsonData["version"] = user.GetVersion().GetString(false);
 
 	return jsonData;
 }
@@ -408,37 +408,6 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::AppendOfferCandidate(User user, WebRTCICECandidate *pICECandidate, PeerConnection *pPeerConnection) {
-	RESULT r = R_PASS;
-
-	nlohmann::json jsonData;
-	std::string strData;
-
-	CloudController *pParentCloudController = dynamic_cast<CloudController*>(GetParentController());
-
-	CNM(pParentCloudController, "Parent CloudController not found or null");
-	CN(m_pEnvironmentWebsocket);
-	CBM((m_fConnected), "Environment socket not connected");
-	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
-
-	// Set up the JSON data
-	jsonData = CreateICECandidateEnvironmentMessage(pPeerConnection, pICECandidate, true);
-
-	strData = jsonData.dump();
-	DEBUG_LINEOUT("Append Offer Candidates JSON: %s", strData.c_str());
-
-	/*
-	m_fPendingMessage = true;
-	m_state = state::SET_OFFER_CANDIDATES;
-	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
-	*/
-
-	CR(SendEnvironmentSocketData(strData, state::SET_OFFER_CANDIDATES));	// May need another state
-
-Error:
-	return r;
-}
-
 // TODO: Lots of duplicated code 
 RESULT EnvironmentController::SetAnswerCandidates(User user, PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
@@ -472,7 +441,7 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::AppendAnswerCandidate(User user, WebRTCICECandidate *pICECandidate, PeerConnection *pPeerConnection) {
+RESULT EnvironmentController::CreateICECandidate(User user, WebRTCICECandidate *pICECandidate, PeerConnection *pPeerConnection, bool fOfferer) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonData;
@@ -486,18 +455,12 @@ RESULT EnvironmentController::AppendAnswerCandidate(User user, WebRTCICECandidat
 	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
 
 	// Set up the JSON data
-	jsonData = CreateICECandidateEnvironmentMessage(pPeerConnection, pICECandidate, false);
+	jsonData = CreateICECandidateEnvironmentMessage(user, pPeerConnection, pICECandidate, fOfferer);
 
 	strData = jsonData.dump();
-	DEBUG_LINEOUT("Append Offer Candidates JSON: %s", strData.c_str());
+	DEBUG_LINEOUT("Create ICE Candidates JSON: %s", strData.c_str());
 
-	/*
-	m_fPendingMessage = true;
-	m_state = state::SET_OFFER_CANDIDATES;
-	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
-	*/
-
-	CR(SendEnvironmentSocketData(strData, state::SET_ANSWER_CANDIDATES));	// May need another state
+	CR(SendEnvironmentSocketData(strData, state::CREATE_ICE_CANDIDATES));
 
 Error:
 	return r;
@@ -875,10 +838,10 @@ RESULT EnvironmentController::OnICECandidateGathered(WebRTCICECandidate *pICECan
 	RESULT r = R_PASS;
 
 	if (pPeerConnection->GetOfferUserID() == s_user.GetUserID()) {
-		CR(AppendOfferCandidate(s_user, pICECandidate, pPeerConnection));
+		CR(CreateICECandidate(s_user, pICECandidate, pPeerConnection, true));
 	}
 	else if (pPeerConnection->GetAnswerUserID() == s_user.GetUserID()) {
-		CR(AppendAnswerCandidate(s_user, pICECandidate, pPeerConnection));
+		CR(CreateICECandidate(s_user, pICECandidate, pPeerConnection, false));
 	}
 
 Error:

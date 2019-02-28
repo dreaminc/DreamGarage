@@ -69,6 +69,7 @@ public:
 		SET_SDP_ANSWER,
 		SET_OFFER_CANDIDATES,
 		SET_ANSWER_CANDIDATES,
+		CREATE_ICE_CANDIDATES,
 
 		// Menu
 		MENU_API_REQUEST,
@@ -155,13 +156,12 @@ public:
 
 	// TODO: New Server Integration
 	nlohmann::json CreateEnvironmentMessage(User user, PeerConnection *pPeerConnection, std::string strMethod);
-	nlohmann::json CreateICECandidateEnvironmentMessage(PeerConnection *pPeerConnection, WebRTCICECandidate *pICECandidate, bool fOfferer);
+	nlohmann::json CreateICECandidateEnvironmentMessage(User user, PeerConnection *pPeerConnection, WebRTCICECandidate *pICECandidate, bool fOfferer);
 	RESULT SetSDPOffer(User user, PeerConnection *pPeerConnection);
 	RESULT SetSDPAnswer(User user, PeerConnection *pPeerConnection);
 	RESULT SetOfferCandidates(User user, PeerConnection *pPeerConnection);
 	RESULT SetAnswerCandidates(User user, PeerConnection *pPeerConnection);
-	RESULT AppendOfferCandidate(User user, WebRTCICECandidate* pICECandidate, PeerConnection *pPeerConnection);
-	RESULT AppendAnswerCandidate(User user, WebRTCICECandidate* pICECandidate, PeerConnection *pPeerConnection);
+	RESULT CreateICECandidate(User user, WebRTCICECandidate* pICECandidate, PeerConnection *pPeerConnection, bool fOfferer);
 
 	RESULT UpdateEnvironmentUser();
 	RESULT PrintEnvironmentPeerList();
