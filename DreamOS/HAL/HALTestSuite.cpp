@@ -2418,7 +2418,7 @@ RESULT HALTestSuite::TestNestedCompositesQauds() {
 	std::string strTestName = "quads";
 	std::string strTestDescription = "Composite quad test";
 
-	double sTestTime = 70.0f;
+	double sTestTime = 10.0f;
 	int nRepeats = 1;
 
 	struct TestContext {

@@ -10,6 +10,22 @@ namespace DreamUnitTesting {
 	TEST_CLASS(DreamOSTests) {
 	public:
 		
+		TEST_METHOD(VaniallaEHMTest) {
+			RESULT r = R_PASS;
+
+			// Mock argc/argv 
+
+			const char *argv[] = { "DreamTestApp.exe", "-ts", "hal.quads", "-t", "0" };
+			int argc = sizeof(argv) / sizeof(argv[0]);
+
+			DEBUG_LINEOUT("DUT:DOS: Vanilla EHM Test");
+
+			CRM(r, "Vanilla check RESULT code test");
+
+		Error:
+			Assert::IsTrue(r == R_PASS);
+		}
+
 		TEST_METHOD(VaniallaDOSTest) {
 			RESULT r = R_PASS;
 
@@ -19,8 +35,6 @@ namespace DreamUnitTesting {
 			int argc = sizeof(argv) / sizeof(argv[0]);
 
 			DEBUG_LINEOUT("DUT:DOS: Vanilla Test");
-
-			CRM(r, "Vanilla check RESULT code test");
 			
 			{
 				DreamTestApp dreamTestApp;
