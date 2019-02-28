@@ -181,7 +181,7 @@ public:
 		}
 
 		if (jsonPeerConnection["/offer_candidates"_json_pointer] != nullptr) {
-			//m_offerICECandidates.clear();
+			m_offerICECandidates.clear();
 
 			for (auto &jsonICECandidate : jsonPeerConnection["/offer_candidates"_json_pointer]) {
 				std::string strSDPCandidate = jsonICECandidate[kCandidateSdpName].get<std::string>();
@@ -205,7 +205,7 @@ public:
 		}
 
 		if (jsonPeerConnection["/answer_candidates"_json_pointer] != nullptr) {
-			//m_answerICECandidates.clear();
+			m_answerICECandidates.clear();
 
 			for (auto &jsonICECandidate : jsonPeerConnection["/answer_candidates"_json_pointer]) {
 				std::string strSDPCandidate = jsonICECandidate[kCandidateSdpName].get<std::string>();

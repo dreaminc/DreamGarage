@@ -681,7 +681,6 @@ RESULT PeerConnectionController::OnICECandidatesGatheringDone(long peerConnectio
 		m_pPeerConnectionControllerObserver->OnICECandidatesGatheringDone(pPeerConnection);
 	}
 
-
 Error:
 	return r;
 }
