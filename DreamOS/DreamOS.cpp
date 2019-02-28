@@ -1575,6 +1575,13 @@ texture* DreamOS::GetSharedContentTexture() {
 	return nullptr;
 }
 
+texture* DreamOS::GetSharedContentPointerTexture() {
+	if (m_pDreamShareView != nullptr) {
+		return m_pDreamShareView->GetPointingTexture();
+	}
+	return nullptr;
+}
+
 texture* DreamOS::GetSharedCameraTexture() {
 	return nullptr;
 }

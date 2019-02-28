@@ -270,8 +270,8 @@ RESULT DreamVCam::Update(void *pContext) {
 				} break;
 
 				case(DreamVCam::SourceType::SHARE_SCREEN): {
-					if (GetDOS()->GetSharedContentTexture() != nullptr) {
-						m_pStreamingTexture = GetDOS()->GetSharedContentTexture();
+					if (GetDOS()->GetSharedContentPointerTexture() != nullptr) {
+						m_pStreamingTexture = GetDOS()->GetSharedContentPointerTexture();
 					}
 					else {	// could also just cascade close event from ControlArea?
 						m_sourceType = SourceType::CAMERA;
