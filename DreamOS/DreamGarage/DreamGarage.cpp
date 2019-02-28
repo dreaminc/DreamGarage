@@ -1962,8 +1962,6 @@ RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::s
 			CR(m_pDreamGeneralForm->Show());
 		//}
 
-		CR(GetUserApp()->ResetAppComposite());
-
 		// Used for special case with disabling button presses on welcome form
 		CR(m_pDreamGeneralForm->SetFormType(DreamFormApp::TypeFromString(strKey)));
 
