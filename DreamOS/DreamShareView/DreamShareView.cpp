@@ -104,7 +104,7 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	m_pPointerCenter = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerCenterTexture)[0]);
 	m_pPointerRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerRightTexture)[0]);
 
-	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Black.fnt", true);
 	CN(m_pFont);
 
 	for (int i = 0; i < 12; i++) {
