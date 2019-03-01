@@ -5,6 +5,7 @@
 #include "Primitives/texture.h"
 #include "Primitives/color.h"
 #include "Primitives/font.h"
+#include "Primitives/Framebuffer.h"
 
 // TODO: make enabling PBO (un)pack more portable
 #include "HAL/opengl/OGLTexture.h"
@@ -58,7 +59,10 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 
 	point ptPosition = point(0.0f, castWidth * m_borderHeight / 2.0f -castWidth * m_bottomBarHeight / 2.0f, 0.0f);
 
-	m_pCastQuad = GetComposite()->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal);
+	m_pPointerContext = GetComposite()->MakeFlatContext(1280, 720, 4);
+	//m_pCastQuadComposite = m_pPointerContext->AddComposite();
+	m_pCastQuadComposite = GetComposite()->AddComposite();
+	m_pCastQuad = m_pCastQuadComposite->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal);
 	CN(m_pCastQuad);
 
 	m_pCastQuad->SetPosition(ptPosition);
@@ -66,7 +70,8 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	m_pCastQuad->FlipUVVertical();
 	CR(m_pCastQuad->SetVisible(false));
 
-	m_pCastBackgroundQuad = GetComposite()->AddQuad(castWidth * m_borderWidth, castWidth * m_borderHeight, 1, 1, nullptr, vNormal);
+	m_pCastBackgroundQuadComposite = GetComposite()->AddComposite();
+	m_pCastBackgroundQuad = m_pCastBackgroundQuadComposite->AddQuad(castWidth * m_borderWidth, castWidth * m_borderHeight, 1, 1, nullptr, vNormal);
 	m_pCastBackgroundQuad->SetDiffuseTexture(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"control-view-main-background.png"));
 	m_pCastBackgroundQuad->SetPosition(ptPosition + point(0.0f, 0.0f, -0.001f));
 	m_pCastBackgroundQuad->SetVisible(false);
@@ -107,11 +112,13 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Black.fnt", true);
 	CN(m_pFont);
 
+	m_pMirrorQuad = GetComposite()->AddQuad(castWidth,castHeight);
+	m_pMirrorQuad->RotateXByDeg(90.0f);
+	m_pMirrorQuad->SetVisible(false);
+
 	for (int i = 0; i < 12; i++) {
 
-		auto pComposite = GetDOS()->MakeComposite();
-
-		auto pView = pComposite->AddUIView(GetDOS());
+		auto pView = GetComposite()->AddFlatContext();
 		pView->RotateXByDeg(90.0f);
 		pView->RotateYByDeg(-90.0f);
 		pView->SetVisible(false, false);
@@ -136,6 +143,36 @@ RESULT DreamShareView::Update(void *pContext) {
 
 	if (m_fReceivingStream && m_pendingFrame.fPending) {
 		CRM(UpdateFromPendingVideoFrame(), "Failed to update pending frame");
+	}
+
+	if (m_pointingObjects.size() > 0) {
+		
+		auto qRotation = m_pCastQuad->GetOrientation(true);
+
+		m_pMirrorQuad = m_pPointerContext->AddQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight());
+		m_pMirrorQuad->SetDiffuseTexture(m_pCastQuad->GetTextureDiffuse());
+		float scale = m_pCastQuad->GetScale(true).x();
+
+		for (auto pair : m_pointingObjects) {
+			std::vector<std::shared_ptr<FlatContext>> userPointers = pair.second;
+			for (std::shared_ptr<FlatContext> labelFlatContext : userPointers) {
+
+				point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (labelFlatContext->GetPosition(true) - m_pCastQuad->GetOrigin(true)));
+
+				auto pLabelQuad = labelFlatContext->GetCurrentQuad();
+				auto pFlatQuad = m_pPointerContext->AddQuad(pLabelQuad->GetWidth()/scale, pLabelQuad->GetHeight()/scale);
+				pFlatQuad->SetDiffuseTexture(labelFlatContext->GetFramebuffer()->GetColorTexture());
+				pFlatQuad->FlipUVVertical();
+				pFlatQuad->SetVisible(labelFlatContext->IsVisible());
+
+				// TODO: depending on final design of labels, cap positioning of the label quads so that
+				// the flat context is not resized
+				pFlatQuad->SetPosition(point(ptPosition.x()/scale, 0.0f, ptPosition.y()/scale));
+			}
+		}
+
+		m_pPointerContext->RenderToQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight(), 0, 0);
+
 	}
 
 Error:
@@ -172,7 +209,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<UIView> pView, std::string strInitials) {
+RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<FlatContext> pView, std::string strInitials) {
 	RESULT r = R_PASS;
 
 	float height = 0.1f;
@@ -185,48 +222,37 @@ RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<UIView> pView, std
 
 	m_pFont->SetLineHeight(textHeight);
 
-	auto pFlatContext = GetComposite()->MakeFlatContext();
-	CN(pFlatContext);
-	{
-		m_pContexts.push_back(pFlatContext);
+	auto pText = std::shared_ptr<text>(GetDOS()->MakeText(
+		m_pFont,
+		strInitials,
+		0.4,
+		textHeight,
+		text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
+	pText->SetPosition(point(0.0f, 0.02f, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
 
-		auto pText = std::shared_ptr<text>(GetDOS()->MakeText(
-			m_pFont,
-			strInitials,
-			0.4,
-			textHeight,
-			text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
-		pText->SetPosition(point(0.0f, 0.02f, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
+	// TODO: the text object should have access to the functionality of the update function
+	auto oglText = dynamic_cast<OGLText*>(pText.get());
+	oglText->Update();
 
-		// TODO: the text object should have access to the functionality of the update function
-		auto oglText = dynamic_cast<OGLText*>(pText.get());
-		oglText->Update();
+	float width = pText->GetWidth();
 
-		float width = pText->GetWidth();
+	float screenOffset = 0.01f;
 
-		float screenOffset = 0.01f;
+	auto pQuadLeft = pView->AddQuad(leftWidth, height);
+	auto pQuadCenter = pView->AddQuad(width, height);
+	auto pQuadRight = pView->AddQuad(rightWidth, height);
 
-		//*
-		auto pQuadLeft = pFlatContext->AddQuad(leftWidth, height);
-		auto pQuadCenter = pFlatContext->AddQuad(width, height);
-		auto pQuadRight = pFlatContext->AddQuad(rightWidth, height);
+	pQuadLeft->SetDiffuseTexture(m_pPointerLeft);
+	pQuadCenter->SetDiffuseTexture(m_pPointerCenter);
+	pQuadRight->SetDiffuseTexture(m_pPointerRight);
 
-		pQuadLeft->SetDiffuseTexture(m_pPointerLeft);
-		pQuadCenter->SetDiffuseTexture(m_pPointerCenter);
-		pQuadRight->SetDiffuseTexture(m_pPointerRight);
+	pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, 0.0f, 0.0f);
+	pQuadCenter->SetPosition(0.0f, 0.0f, 0.0f);
+	pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, 0.0f);
 
-		pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, 0.0f, 0.0f);
-		pQuadCenter->SetPosition(0.0f, 0.0f, 0.0f);
-		pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, 0.0f);
+	pView->AddObject(pText);
 
-		pFlatContext->AddObject(pText);
-		//*/
-
-		auto pQuad = pView->AddQuad(leftWidth + width + rightWidth, height);
-		pQuad->SetPosition(0.0f, screenOffset, 0.0f);
-
-		pFlatContext->RenderToQuad(pQuad.get(), 0, 0);
-	}
+	pView->RenderToQuad(leftWidth + width + rightWidth, height, 0, 0);
 
 Error:
 	return r;
@@ -275,7 +301,7 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 
 	if (m_fReceivingStream || IsStreaming()) {
 
-		std::shared_ptr<UIView> pPointer;
+		std::shared_ptr<FlatContext> pPointer;
 		long userID = pUpdatePointerMessage->GetSenderUserID();
 
 		CR(AllocateSpheres(userID, pUpdatePointerMessage->m_body.szInitials));
@@ -287,7 +313,7 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 			pPointer = m_pointingObjects[userID][1];
 		}
 
-		pPointer->SetPosition(pUpdatePointerMessage->m_body.ptPointer);
+		pPointer->SetPosition(pUpdatePointerMessage->m_body.ptPointer + point(-0.01f, 0.0f, 0.0f));
 		pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible, false);
 		//pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
 	}
@@ -323,6 +349,10 @@ RESULT DreamShareView::SetCastingTexture(texture* pNewCastTexture) {
 texture* DreamShareView::GetCastingTexture() {
 //	return m_pCastTexture;
 	return m_pCastQuad->GetTextureDiffuse();
+}
+
+texture* DreamShareView::GetPointingTexture() {
+	return m_pPointerContext->GetFramebuffer()->GetColorTexture();
 }
 
 RESULT DreamShareView::Show() {
@@ -734,9 +764,17 @@ Error:
 RESULT DreamShareView::UpdateScreenPosition(point ptPosition, quaternion qOrientation, float scale) {
 	RESULT r = R_PASS;
 
-	GetComposite()->SetPosition(ptPosition);
-	GetComposite()->SetOrientation(qOrientation);
-	GetComposite()->SetScale(scale);
+	m_pCastQuadComposite->SetPosition(ptPosition);
+	m_pCastQuadComposite->SetOrientation(qOrientation);
+	m_pCastQuadComposite->SetScale(scale);
+
+	m_pCastBackgroundQuadComposite->SetPosition(ptPosition);
+	m_pCastBackgroundQuadComposite->SetOrientation(qOrientation);
+	m_pCastBackgroundQuadComposite->SetScale(scale);
+
+	m_pMirrorQuad->SetPosition(ptPosition);
+	m_pMirrorQuad->SetOrientation(qOrientation);
+	m_pMirrorQuad->SetScale(scale);
 
 	if (m_pSpatialBrowserObject != nullptr) {
 		m_pSpatialBrowserObject->SetPosition(ptPosition);
@@ -748,10 +786,10 @@ Error:
 
 RESULT DreamShareView::AllocateSpheres(long userID, std::string strInitials) {
 	RESULT r = R_PASS;
-	std::vector<std::shared_ptr<UIView>> userPointers;
+	std::vector<std::shared_ptr<FlatContext>> userPointers;
 
 	std::shared_ptr<text> pText = nullptr;
-	std::shared_ptr<UIView> pView = nullptr;
+	std::shared_ptr<FlatContext> pView = nullptr;
 
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
@@ -775,7 +813,7 @@ Error:
 RESULT DreamShareView::AllocateSpheres(long userID) {
 	RESULT r = R_PASS;
 
-	std::vector<std::shared_ptr<UIView>> userPointers;
+	std::vector<std::shared_ptr<FlatContext>> userPointers;
 
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
@@ -794,7 +832,7 @@ Error:
 RESULT DreamShareView::DeallocateSpheres(long userID) {
 	RESULT r = R_PASS;
 
-	std::vector<std::shared_ptr<UIView>> userPointers;
+	std::vector<std::shared_ptr<FlatContext>> userPointers;
 
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) != 0, R_SKIPPED);

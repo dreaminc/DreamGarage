@@ -43,7 +43,7 @@ public:
 	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) override;
 
 private:
-	RESULT InitializePointerLabel(std::shared_ptr<UIView> pView, std::string strInitials);
+	RESULT InitializePointerLabel(std::shared_ptr<FlatContext> pView, std::string strInitials);
 
 private:
 	RESULT HandleShareMessage(PeerConnection* pPeerConnection, DreamShareViewShareMessage *pShareMessage);
@@ -55,6 +55,7 @@ public:
 	RESULT ShowCastingTexture();
 	RESULT SetCastingTexture(texture* pNewCastTexture);
 	texture* GetCastingTexture();
+	texture* GetPointingTexture();
 	RESULT Show();
 	RESULT Hide();
 
@@ -116,11 +117,17 @@ private:
 	// Quad related members
 	std::shared_ptr<quad> m_pCastQuad = nullptr;
 	std::shared_ptr<quad> m_pCastBackgroundQuad = nullptr;
+	std::shared_ptr<quad> m_pMirrorQuad = nullptr;
+
+	std::shared_ptr<composite> m_pCastQuadComposite = nullptr;
+	std::shared_ptr<composite> m_pCastBackgroundQuadComposite = nullptr;
 
 	texture* m_pCastTexture = nullptr;
 	std::shared_ptr<texture> m_pCastBackgroundTexture = nullptr;
 	std::shared_ptr<texture> m_pVideoCastTexture = nullptr;
 	std::shared_ptr<texture> m_pLoadingTexture = nullptr;
+
+	texture* m_pPointingTexture = nullptr;
 
 	int m_castpxWidth = BROWSER_WIDTH;
 	int m_castpxHeight = BROWSER_HEIGHT;
@@ -149,9 +156,12 @@ private:
 	PeerConnection *m_pStreamerPeerConnection = nullptr;
 
 	// Pointing members
-	std::map<long, std::vector<std::shared_ptr<UIView>>> m_pointingObjects; // user id to left/right sphere
+	std::map<long, std::vector<std::shared_ptr<FlatContext>>> m_pointingObjects; // user id to left/right sphere
 
-	std::queue<std::shared_ptr<UIView>> m_pointerViewPool;
+	std::queue<std::shared_ptr<FlatContext>> m_pointerViewPool;
+
+	composite *m_pPointerComposite = nullptr;
+	std::shared_ptr<FlatContext> m_pPointerContext = nullptr;
 
 private:
 	const wchar_t *k_wszPointerLeftTexture = L"texture/shared-view/pointer-left.png";
