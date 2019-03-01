@@ -59,8 +59,9 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 
 	point ptPosition = point(0.0f, castWidth * m_borderHeight / 2.0f -castWidth * m_bottomBarHeight / 2.0f, 0.0f);
 
-	m_pPointerContext = GetComposite()->AddFlatContext(1280, 720, 4);
-	m_pCastQuadComposite = m_pPointerContext->AddComposite();
+	m_pPointerContext = GetComposite()->MakeFlatContext(1280, 720, 4);
+	//m_pCastQuadComposite = m_pPointerContext->AddComposite();
+	m_pCastQuadComposite = GetComposite()->AddComposite();
 	m_pCastQuad = m_pCastQuadComposite->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal);
 	CN(m_pCastQuad);
 
@@ -113,13 +114,14 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 
 	//m_pPointerComposite = GetDOS()->MakeComposite();
 	//m_pPointerContext->SetWid
-	m_pMirrorQuad = m_pPointerContext->AddQuad(castWidth,castHeight);
+	m_pMirrorQuad = GetComposite()->AddQuad(castWidth,castHeight);
 	m_pMirrorQuad->RotateXByDeg(90.0f);
 	m_pMirrorQuad->SetVisible(false);
 
 	for (int i = 0; i < 12; i++) {
 
-		auto pView = m_pPointerContext->AddFlatContext();
+//		auto pView = m_pPointerContext->AddFlatContext();
+		auto pView = GetComposite()->AddFlatContext();
 		pView->RotateXByDeg(90.0f);
 		pView->RotateYByDeg(-90.0f);
 		pView->SetVisible(false, false);
@@ -148,8 +150,32 @@ RESULT DreamShareView::Update(void *pContext) {
 
 	if (m_pointingObjects.size() > 0) {
 		
-	//	m_pPointerContext->RenderToQuad(m_pMirrorQuad.get(), 0, 0);
-		m_pPointerContext->RenderToTexture();
+		auto qRotation = m_pCastQuad->GetOrientation(true);
+
+		m_pMirrorQuad = m_pPointerContext->AddQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight());
+		m_pMirrorQuad->SetDiffuseTexture(m_pCastQuad->GetTextureDiffuse());
+		float scale = m_pCastQuad->GetScale(true).x();
+
+		for (auto pair : m_pointingObjects) {
+			auto first = pair.first;
+			auto second = pair.second;
+			for (auto label : second) {
+
+				point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (label->GetPosition(true) - m_pCastQuad->GetOrigin(true)));
+
+				auto pLabelQuad = label->GetCurrentQuad();
+				auto pFlatQuad = m_pPointerContext->AddQuad(pLabelQuad->GetWidth()/scale, pLabelQuad->GetHeight()/scale);
+				pFlatQuad->SetDiffuseTexture(label->GetFramebuffer()->GetColorTexture());
+				pFlatQuad->FlipUVVertical();
+				pFlatQuad->SetVisible(label->IsVisible());
+
+				// TODO: depending on final design of labels, cap positioning of the label quads so that
+				// the flat context is not resized
+				pFlatQuad->SetPosition(point(ptPosition.x()/scale, 0.0f, ptPosition.y()/scale));
+			}
+		}
+
+		m_pPointerContext->RenderToQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight(), 0, 0);
 
 	}
 
@@ -755,21 +781,9 @@ Error:
 RESULT DreamShareView::UpdateScreenPosition(point ptPosition, quaternion qOrientation, float scale) {
 	RESULT r = R_PASS;
 
-	/*
-	GetComposite()->SetPosition(ptPosition);
-	GetComposite()->SetOrientation(qOrientation);
-	GetComposite()->SetScale(scale);
-	//*/
-
 	m_pCastQuadComposite->SetPosition(ptPosition);
 	m_pCastQuadComposite->SetOrientation(qOrientation);
 	m_pCastQuadComposite->SetScale(scale);
-
-	/*
-	m_pPointerContext->SetPosition(ptPosition);
-	m_pPointerContext->SetOrientation(qOrientation);
-	m_pPointerContext->SetScale(scale);
-	//*/
 
 	m_pCastBackgroundQuadComposite->SetPosition(ptPosition);
 	m_pCastBackgroundQuadComposite->SetOrientation(qOrientation);
@@ -778,8 +792,6 @@ RESULT DreamShareView::UpdateScreenPosition(point ptPosition, quaternion qOrient
 	m_pMirrorQuad->SetPosition(ptPosition);
 	m_pMirrorQuad->SetOrientation(qOrientation);
 	m_pMirrorQuad->SetScale(scale);
-
-	//m_pMirrorQuad->SetScale(scale);
 
 	if (m_pSpatialBrowserObject != nullptr) {
 		m_pSpatialBrowserObject->SetPosition(ptPosition);

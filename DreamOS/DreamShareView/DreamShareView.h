@@ -162,7 +162,6 @@ private:
 
 	composite *m_pPointerComposite = nullptr;
 	std::shared_ptr<FlatContext> m_pPointerContext = nullptr;
-	std::shared_ptr<FlatContext> m_pTestContext = nullptr;
 
 private:
 	const wchar_t *k_wszPointerLeftTexture = L"texture/shared-view/pointer-left.png";

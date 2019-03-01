@@ -36,6 +36,8 @@ public:
 
 	RESULT RenderToQuad(float width, float height, float xOffset, float yOffset, quad::CurveType curveType = quad::CurveType::FLAT);
 
+	std::shared_ptr<quad> GetCurrentQuad();
+
 	float GetWidth();
 	float GetHeight();
 	float GetLeft(bool fAbsolute = true);
