@@ -154,17 +154,16 @@ RESULT DreamShareView::Update(void *pContext) {
 		float scale = m_pCastQuad->GetScale(true).x();
 
 		for (auto pair : m_pointingObjects) {
-			auto first = pair.first;
-			auto second = pair.second;
-			for (auto label : second) {
+			std::vector<std::shared_ptr<FlatContext>> userPointers = pair.second;
+			for (std::shared_ptr<FlatContext> labelFlatContext : userPointers) {
 
-				point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (label->GetPosition(true) - m_pCastQuad->GetOrigin(true)));
+				point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (labelFlatContext->GetPosition(true) - m_pCastQuad->GetOrigin(true)));
 
-				auto pLabelQuad = label->GetCurrentQuad();
+				auto pLabelQuad = labelFlatContext->GetCurrentQuad();
 				auto pFlatQuad = m_pPointerContext->AddQuad(pLabelQuad->GetWidth()/scale, pLabelQuad->GetHeight()/scale);
-				pFlatQuad->SetDiffuseTexture(label->GetFramebuffer()->GetColorTexture());
+				pFlatQuad->SetDiffuseTexture(labelFlatContext->GetFramebuffer()->GetColorTexture());
 				pFlatQuad->FlipUVVertical();
-				pFlatQuad->SetVisible(label->IsVisible());
+				pFlatQuad->SetVisible(labelFlatContext->IsVisible());
 
 				// TODO: depending on final design of labels, cap positioning of the label quads so that
 				// the flat context is not resized
