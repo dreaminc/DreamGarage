@@ -109,6 +109,7 @@ protected:
 	bool m_fUpdateFormURL = false;
 	bool m_fBrowserFinishedLoading = false;
 
+	bool m_fTyping = false;
 	bool m_fFormVisible = false;
 	bool m_fPendShowFormView = false;
 	bool m_fSetAsActive = false;
