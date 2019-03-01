@@ -311,7 +311,9 @@ Error:
 RESULT DreamFormApp::HandleIsInputFocused(bool fIsFocused, DreamContentSource *pContext) {
 	RESULT r = R_PASS;
 
-	if (fIsFocused) {
+	if (fIsFocused && !m_fTyping) {
+		m_fTyping = true;
+
 		GetDOS()->GetUserApp()->SetEventApp(m_pFormView.get());
 
 		auto pKeyboard = GetDOS()->GetKeyboardApp();
@@ -326,7 +328,9 @@ RESULT DreamFormApp::HandleIsInputFocused(bool fIsFocused, DreamContentSource *p
 			CR(m_pFormView->HandleKeyboardUp());
 		}
 	}
-	else {
+	else if (!fIsFocused && m_fTyping) {
+		m_fTyping = false;
+
 		CR(m_pDreamBrowserForm->HandleUnfocusEvent());
 		CR(m_pFormView->HandleKeyboardDown());
 	}
