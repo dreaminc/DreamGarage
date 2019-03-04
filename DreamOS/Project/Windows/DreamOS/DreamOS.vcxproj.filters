@@ -1047,6 +1047,9 @@
     <ClCompile Include="..\..\..\Test\DreamTestSuite.cpp">
       <Filter>Test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIPointerLabel.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2272,6 +2275,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLBillboard.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIPointerLabel.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

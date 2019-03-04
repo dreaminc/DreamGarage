@@ -19,6 +19,7 @@ class UserAreaControls;
 class UISurface;
 class UITabView;
 class UIControlView;
+class UIPointerLabel;
 class DreamOS;
 
 class UIView : public composite, public Publisher<UIEventType, UIEvent>, public Subscriber<InteractionObjectEvent> {
@@ -67,6 +68,9 @@ public:
 
 	std::shared_ptr<UISurface> MakeUISurface();
 	std::shared_ptr<UISurface> AddUISurface();
+
+	std::shared_ptr<UIPointerLabel> MakeUIPointerLabel();
+	std::shared_ptr<UIPointerLabel> AddUIPointerLabel();
 
 	virtual RESULT Notify(InteractionObjectEvent *pEvent);
 

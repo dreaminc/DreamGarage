@@ -20,6 +20,7 @@
 #include "Sound/SpatialSoundObject.h"
 
 #include "UI/UIView.h"
+#include "UI/UIPointerLabel.h"
 
 DreamShareView::DreamShareView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamShareView>(pDreamOS, pContext)
@@ -43,9 +44,6 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 
 	DreamOS *pDreamOS = GetDOS();
 	std::shared_ptr<DreamUserApp> pDreamUserApp = pDreamOS->GetUserApp();
-
-	PathManager *pPathManager = PathManager::instance();
-	std::wstring wstrAssetPath;
 
 	int channels = 4;
 	int pxSize = m_castpxWidth * m_castpxHeight * channels;
@@ -104,31 +102,22 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 		CN(m_pSpatialBrowserObject);
 	}
 
-	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
-	m_pPointerLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerLeftTexture)[0]);
-	m_pPointerCenter = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerCenterTexture)[0]);
-	m_pPointerRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerRightTexture)[0]);
-
-	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Black.fnt", true);
-	CN(m_pFont);
-
 	m_pMirrorQuad = GetComposite()->AddQuad(castWidth,castHeight);
 	m_pMirrorQuad->RotateXByDeg(90.0f);
 	m_pMirrorQuad->SetVisible(false);
 
-	for (int i = 0; i < 12; i++) {
-
-		auto pView = GetComposite()->AddFlatContext();
-		pView->RotateXByDeg(90.0f);
-		pView->RotateYByDeg(-90.0f);
-		pView->SetVisible(false, false);
-
-		m_pointerViewPool.push(pView);
-		GetDOS()->AddObjectToUIGraph(pView.get(), (SandboxApp::PipelineType::AUX | SandboxApp::PipelineType::MAIN));
-
-	}
-
 	GetDOS()->AddObjectToUIGraph(GetComposite(), (SandboxApp::PipelineType::AUX | SandboxApp::PipelineType::MAIN));
+
+	{
+		auto pView = GetComposite()->AddUIView(pDreamOS);
+		for (int i = 0; i < 12; i++) {
+
+			auto pLabel = pView->AddUIPointerLabel();
+			m_pointerViewPool.push(pLabel);
+			GetDOS()->AddObjectToUIGraph(pLabel.get(), (SandboxApp::PipelineType::AUX | SandboxApp::PipelineType::MAIN));
+
+		}
+	}
 
 Error:
 	return r;
@@ -154,16 +143,17 @@ RESULT DreamShareView::Update(void *pContext) {
 		float scale = m_pCastQuad->GetScale(true).x();
 
 		for (auto pair : m_pointingObjects) {
-			std::vector<std::shared_ptr<FlatContext>> userPointers = pair.second;
-			for (std::shared_ptr<FlatContext> labelFlatContext : userPointers) {
+			std::vector<std::shared_ptr<UIPointerLabel>> userPointers = pair.second;
+			for (std::shared_ptr<UIPointerLabel> pPointerLabel : userPointers) {
 
-				point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (labelFlatContext->GetPosition(true) - m_pCastQuad->GetOrigin(true)));
+				auto pLabelFlatContext = pPointerLabel->GetContext();
+				point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (pLabelFlatContext->GetPosition(true) - m_pCastQuad->GetOrigin(true)));
 
-				auto pLabelQuad = labelFlatContext->GetCurrentQuad();
+				auto pLabelQuad = pLabelFlatContext->GetCurrentQuad();
 				auto pFlatQuad = m_pPointerContext->AddQuad(pLabelQuad->GetWidth()/scale, pLabelQuad->GetHeight()/scale);
-				pFlatQuad->SetDiffuseTexture(labelFlatContext->GetFramebuffer()->GetColorTexture());
+				pFlatQuad->SetDiffuseTexture(pLabelFlatContext->GetFramebuffer()->GetColorTexture());
 				pFlatQuad->FlipUVVertical();
-				pFlatQuad->SetVisible(labelFlatContext->IsVisible());
+				pFlatQuad->SetVisible(pLabelFlatContext->IsVisible());
 
 				// TODO: depending on final design of labels, cap positioning of the label quads so that
 				// the flat context is not resized
@@ -204,64 +194,6 @@ RESULT DreamShareView::HandleDreamAppMessage(PeerConnection* pPeerConnection, Dr
 	} break;
 
 	}
-
-Error:
-	return r;
-}
-
-RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<FlatContext> pView, std::string strInitials) {
-	RESULT r = R_PASS;
-
-	//float height = 0.1f;
-	float height = m_pCastQuad->GetHeight()/2 * 0.0803;
-	float textHeight = 0.75f*height;
-	float pxHeight = 61.0f;
-	float pxRight = 19.0f;
-	float pxLeft = 33.0f;
-	float leftWidth = height * pxLeft / pxHeight;
-	float rightWidth = height * pxRight / pxHeight;
-
-	m_pFont->SetLineHeight(textHeight);
-
-	auto pText = std::shared_ptr<text>(GetDOS()->MakeText(
-		m_pFont,
-		strInitials,
-		0.4,
-		textHeight,
-		text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
-
-	// assuming only capital letters (A-Z) and centering based on those
-	CharacterGlyph periodGlyph; 
-	m_pFont->GetGlyphFromChar('A', periodGlyph);
-	float glyphHeight = pText->GetMSizeFromDots(periodGlyph.height);
-	float offset = (textHeight - glyphHeight) / 8.0f;
-
-
-	// TODO: the text object should have access to the functionality of the update function
-	auto oglText = dynamic_cast<OGLText*>(pText.get());
-	oglText->Update();
-
-	float width = pText->GetWidth();
-
-	float screenOffset = 0.01f;
-
-	auto pQuadLeft = pView->AddQuad(leftWidth, height);
-	auto pQuadCenter = pView->AddQuad(width, height);
-	auto pQuadRight = pView->AddQuad(rightWidth, height);
-
-	pQuadLeft->SetDiffuseTexture(m_pPointerLeft);
-	pQuadCenter->SetDiffuseTexture(m_pPointerCenter);
-	pQuadRight->SetDiffuseTexture(m_pPointerRight);
-
-	pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, 0.0f, -offset);
-	pQuadCenter->SetPosition(0.0f, 0.0f, -offset);
-	pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, -offset);
-
-	pText->SetPosition(point(0.0f, 0.0f, 0.0f));
-
-	pView->AddObject(pText);
-
-	pView->RenderToQuad(leftWidth + width + rightWidth, height, 0, 0);
 
 Error:
 	return r;
@@ -310,7 +242,7 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 
 	if (m_fReceivingStream || IsStreaming()) {
 
-		std::shared_ptr<FlatContext> pPointer;
+		std::shared_ptr<UIPointerLabel> pPointer;
 		long userID = pUpdatePointerMessage->GetSenderUserID();
 
 		CR(AllocateSpheres(userID, pUpdatePointerMessage->m_body.szInitials));
@@ -322,8 +254,8 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 			pPointer = m_pointingObjects[userID][1];
 		}
 
-		pPointer->SetPosition(pUpdatePointerMessage->m_body.ptPointer + point(-0.01f, 0.0f, 0.0f));
-		pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible, false);
+		pPointer->GetContext()->SetPosition(pUpdatePointerMessage->m_body.ptPointer + point(-0.01f, 0.0f, 0.0f));
+		pPointer->GetContext()->SetVisible(pUpdatePointerMessage->m_body.fVisible, false);
 		//pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
 	}
 
@@ -795,10 +727,10 @@ Error:
 
 RESULT DreamShareView::AllocateSpheres(long userID, std::string strInitials) {
 	RESULT r = R_PASS;
-	std::vector<std::shared_ptr<FlatContext>> userPointers;
+	std::vector<std::shared_ptr<UIPointerLabel>> userPointers;
 
 	std::shared_ptr<text> pText = nullptr;
-	std::shared_ptr<FlatContext> pView = nullptr;
+	std::shared_ptr<UIPointerLabel> pView = nullptr;
 
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
@@ -807,7 +739,7 @@ RESULT DreamShareView::AllocateSpheres(long userID, std::string strInitials) {
 	for (int i = 0; i < 2; i++) {
 		pView = m_pointerViewPool.front();
 
-		CR(InitializePointerLabel(pView, strInitials));
+		pView->Initialize(m_pCastQuad->GetHeight(), strInitials);
 
 		userPointers.emplace_back(pView);
 		m_pointerViewPool.pop();
@@ -822,7 +754,7 @@ Error:
 RESULT DreamShareView::AllocateSpheres(long userID) {
 	RESULT r = R_PASS;
 
-	std::vector<std::shared_ptr<FlatContext>> userPointers;
+	std::vector<std::shared_ptr<UIPointerLabel>> userPointers;
 
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
@@ -841,7 +773,7 @@ Error:
 RESULT DreamShareView::DeallocateSpheres(long userID) {
 	RESULT r = R_PASS;
 
-	std::vector<std::shared_ptr<FlatContext>> userPointers;
+	std::vector<std::shared_ptr<UIPointerLabel>> userPointers;
 
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) != 0, R_SKIPPED);
