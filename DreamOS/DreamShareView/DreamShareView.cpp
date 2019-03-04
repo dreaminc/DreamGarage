@@ -212,8 +212,9 @@ Error:
 RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<FlatContext> pView, std::string strInitials) {
 	RESULT r = R_PASS;
 
-	float height = 0.1f;
-	float textHeight = 0.075f;
+	//float height = 0.1f;
+	float height = m_pCastQuad->GetHeight()/2 * 0.0803;
+	float textHeight = 0.75f*height;
 	float pxHeight = 61.0f;
 	float pxRight = 19.0f;
 	float pxLeft = 33.0f;
@@ -228,7 +229,13 @@ RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<FlatContext> pView
 		0.4,
 		textHeight,
 		text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
-	pText->SetPosition(point(0.0f, 0.02f, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
+
+	// assuming only capital letters (A-Z) and centering based on those
+	CharacterGlyph periodGlyph; 
+	m_pFont->GetGlyphFromChar('A', periodGlyph);
+	float glyphHeight = pText->GetMSizeFromDots(periodGlyph.height);
+	float offset = (textHeight - glyphHeight) / 8.0f;
+
 
 	// TODO: the text object should have access to the functionality of the update function
 	auto oglText = dynamic_cast<OGLText*>(pText.get());
@@ -246,9 +253,11 @@ RESULT DreamShareView::InitializePointerLabel(std::shared_ptr<FlatContext> pView
 	pQuadCenter->SetDiffuseTexture(m_pPointerCenter);
 	pQuadRight->SetDiffuseTexture(m_pPointerRight);
 
-	pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, 0.0f, 0.0f);
-	pQuadCenter->SetPosition(0.0f, 0.0f, 0.0f);
-	pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, 0.0f);
+	pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, 0.0f, -offset);
+	pQuadCenter->SetPosition(0.0f, 0.0f, -offset);
+	pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, -offset);
+
+	pText->SetPosition(point(0.0f, 0.0f, 0.0f));
 
 	pView->AddObject(pText);
 
