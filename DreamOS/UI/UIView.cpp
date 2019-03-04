@@ -282,6 +282,9 @@ std::shared_ptr<UIPointerLabel> UIView::MakeUIPointerLabel() {
 
 	return pPointerLabel;
 Error:
+	if (pPointerLabel != nullptr) {
+		pPointerLabel = nullptr;
+	}
 	return nullptr;
 }
 
