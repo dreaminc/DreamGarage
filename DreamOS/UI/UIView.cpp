@@ -5,6 +5,7 @@
 #include "UISpatialScrollView.h"
 #include "UIFlatScrollView.h"
 #include "UISurface.h"
+#include "UIPointerLabel.h"
 
 // TODO: move these files to DreamOS(?)
 #include "DreamGarage/UserAreaControls.h"
@@ -268,6 +269,30 @@ std::shared_ptr<UISurface> UIView::AddUISurface() {
 	std::shared_ptr<UISurface> pSurface = MakeUISurface();
 	CR(AddObject(pSurface));
 	return pSurface;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIPointerLabel> UIView::MakeUIPointerLabel() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIPointerLabel> pPointerLabel(new UIPointerLabel(m_pHALImp, m_pDreamOS));
+	CN(pPointerLabel);
+	CR(pPointerLabel->Initialize());
+
+	return pPointerLabel;
+Error:
+	if (pPointerLabel != nullptr) {
+		pPointerLabel = nullptr;
+	}
+	return nullptr;
+}
+
+std::shared_ptr<UIPointerLabel> UIView::AddUIPointerLabel() {
+	RESULT r = R_PASS;
+	std::shared_ptr<UIPointerLabel> pLabel = MakeUIPointerLabel();
+	CR(AddObject(pLabel));
+	return pLabel;
 Error:
 	return nullptr;
 }

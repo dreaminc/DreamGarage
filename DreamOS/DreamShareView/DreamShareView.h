@@ -23,6 +23,7 @@ class AudioPacket;
 class SpatialSoundObject;
 class AudioDataMessage;
 class UIView;
+class UIPointerLabel;
 
 class DreamShareView :
 	public DreamApp<DreamShareView>,
@@ -41,9 +42,6 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) override;
-
-private:
-	RESULT InitializePointerLabel(std::shared_ptr<FlatContext> pView, std::string strInitials);
 
 private:
 	RESULT HandleShareMessage(PeerConnection* pPeerConnection, DreamShareViewShareMessage *pShareMessage);
@@ -156,29 +154,12 @@ private:
 	PeerConnection *m_pStreamerPeerConnection = nullptr;
 
 	// Pointing members
-	std::map<long, std::vector<std::shared_ptr<FlatContext>>> m_pointingObjects; // user id to left/right sphere
+	std::map<long, std::vector<std::shared_ptr<UIPointerLabel>>> m_pointingObjects; // user id to left/right sphere
 
-	std::queue<std::shared_ptr<FlatContext>> m_pointerViewPool;
+	std::queue<std::shared_ptr<UIPointerLabel>> m_pointerViewPool;
 
 	composite *m_pPointerComposite = nullptr;
 	std::shared_ptr<FlatContext> m_pPointerContext = nullptr;
-
-private:
-	const wchar_t *k_wszPointerLeftTexture = L"texture/shared-view/pointer-left.png";
-	const wchar_t *k_wszPointerCenterTexture = L"texture/shared-view/pointer-center.png";
-	const wchar_t *k_wszPointerRightTexture = L"texture/shared-view/pointer-right.png";
-
-private:
-	texture* m_pPointerLeft = nullptr;
-	texture* m_pPointerCenter = nullptr;
-	texture* m_pPointerRight = nullptr;
-
-	std::shared_ptr<font> m_pFont = nullptr;
-	std::vector<std::shared_ptr<FlatContext>> m_pContexts;
-
-private:
-//	std::shared_ptr<UIView> 
-
 };
 
 #endif // ! DREAM_SHARE_VIEW_H_ 
