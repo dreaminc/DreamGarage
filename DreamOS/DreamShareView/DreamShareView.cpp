@@ -256,7 +256,6 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 
 		pPointer->GetContext()->SetPosition(pUpdatePointerMessage->m_body.ptPointer + point(-0.01f, 0.0f, 0.0f));
 		pPointer->GetContext()->SetVisible(pUpdatePointerMessage->m_body.fVisible, false);
-		//pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
 	}
 
 Error:
