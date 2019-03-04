@@ -277,8 +277,12 @@ std::shared_ptr<UIPointerLabel> UIView::MakeUIPointerLabel() {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<UIPointerLabel> pPointerLabel(new UIPointerLabel(m_pHALImp, m_pDreamOS));
+	CN(pPointerLabel);
+	CR(pPointerLabel->Initialize());
 
 	return pPointerLabel;
+Error:
+	return nullptr;
 }
 
 std::shared_ptr<UIPointerLabel> UIView::AddUIPointerLabel() {

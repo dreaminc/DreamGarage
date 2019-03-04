@@ -12,7 +12,8 @@ public:
 	~UIPointerLabel();
 
 public:
-	RESULT Initialize(float parentHeight, std::string strInitials);
+	RESULT Initialize();
+	RESULT RenderLabelWithInitials(float parentHeight, std::string strInitials);
 
 public:
 	std::shared_ptr<FlatContext> GetContext();
