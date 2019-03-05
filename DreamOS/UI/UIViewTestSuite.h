@@ -1,12 +1,10 @@
 #ifndef UI_VIEW_TEST_SUITE_H_
 
-
-
 #include "RESULT/EHM.h"
 
 #include "Primitives/valid.h"
 #include "Primitives/Subscriber.h"
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 
 class DreamOS;
@@ -15,11 +13,11 @@ class UIButton;
 class UIStageProgram;
 struct UIEvent;
 
-class UIViewTestSuite : public valid, public TestSuite, public Subscriber<UIEvent>
+class UIViewTestSuite : public valid, public DreamTestSuite, public Subscriber<UIEvent>
 {
 public:
 	UIViewTestSuite(DreamOS *pDreamOS);
-	~UIViewTestSuite();
+	~UIViewTestSuite() = default;
 
 	RESULT Initialize();
 

@@ -59,6 +59,8 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestDreamObjectModule());
+	
 	CR(AddTestDreamSoundSystem());
 
 	CR(AddTestDreamBrowser());
@@ -76,8 +78,6 @@ RESULT DreamOSTestSuite::AddTests() {
 	CR(AddTestDreamLogger());
 
 	CR(AddTestEnvironmentSeating());
-
-	CR(AddTestCredentialStorage());
 
 	CR(AddTestEnvironmentSwitching());
 	
@@ -1144,6 +1144,67 @@ RESULT DreamOSTestSuite::AddTestNamedPipes() {
 	pUITest->SetTestDescription("Test the named pipe server capabilities");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
+	RESULT r = R_PASS;
+
+	TestObject::TestDescriptor testDescriptor;
+	testDescriptor.strTestName = "dreamobjectmodule";
+	testDescriptor.strTestDescription = "Test object creation / destruction using the object module";
+	testDescriptor.sDuration = 100.0f;
+	
+	float radius = 2.0f;
+
+	struct TestContext {
+		sphere *pSphere = nullptr;
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline("standard"));
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		{
+			light *pLight;
+			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
+
+			//pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+			//CN(pTestContext->pSphere);
+			//pTestContext->pSphere->SetPosition(ptPosition);
+
+			
+		}
+
+	Error:
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+	Error:
+		return r;
+	};
+
+	testDescriptor.fnInitialize = fnInitialize;
+	testDescriptor.fnUpdate = fnUpdate;
+
+	auto pUITest = AddTest(testDescriptor, pTestContext);
+	CN(pUITest);
 
 Error:
 	return r;

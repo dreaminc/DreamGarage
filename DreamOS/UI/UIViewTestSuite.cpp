@@ -25,22 +25,15 @@
 #include "Sense/SenseController.h"
 
 UIViewTestSuite::UIViewTestSuite(DreamOS *pDreamOS) :
-	TestSuite("uiview"),
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("uiview", pDreamOS)
 {
 	RESULT r = R_PASS;
-
-	CR(Initialize());
 
 	Validate();
 	return;
 Error:
 	Invalidate();
 	return;
-}
-
-UIViewTestSuite::~UIViewTestSuite() {
-
 }
 
 RESULT UIViewTestSuite::Initialize() {

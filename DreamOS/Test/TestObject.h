@@ -29,13 +29,18 @@ public:
 		COMPLETE
 	};
 
-	struct Functions {
+	struct TestDescriptor {
 		std::function<RESULT(void*)> fnInitialize = nullptr;
 		std::function<RESULT(void*)> fnUpdate = nullptr;
 		std::function<RESULT(void*)> fnTest = nullptr;
 		std::function<RESULT(void*)> fnReset = nullptr;
 
 		std::function<RESULT()> fnTestNoContext = nullptr;
+
+		std::string strTestName = "default";
+		std::string strTestDescription = "default";
+		double sDuration = 10.0f;
+		int nRepeats = 1;
 	};
 
 public:
@@ -57,7 +62,7 @@ public:
 			   std::function<RESULT(void*)> fnReset,
 			   void *pContext = nullptr);
 
-	TestObject(const TestObject::Functions &fnStruct, void *pContext = nullptr);
+	TestObject(const TestObject::TestDescriptor &testDescriptor, void *pContext = nullptr);
 
 	~TestObject();
 
@@ -79,6 +84,7 @@ public:
 
 protected:
 	RESULT SetTestName(std::string strName);
+	RESULT SetParentTestSuite(TestSuite *pParentTestSuite);
 
 public:
 	std::string GetTestName();
@@ -108,18 +114,19 @@ private:
 	std::chrono::high_resolution_clock::duration m_timeDurationTotal;
 
 	std::function<RESULT(void*)> m_fnInitialize = nullptr;
-	RESULT m_initializeResult;
+	RESULT m_initializeResult = R_NOT_HANDLED;
 
 	std::function<RESULT(void*)> m_fnUpdate = nullptr;
-	RESULT m_updateResult;
+	RESULT m_updateResult = R_NOT_HANDLED;
 
 	std::function<RESULT(void*)> m_fnTest = nullptr;
-	RESULT m_testResult;
+	RESULT m_testResult = R_NOT_HANDLED;
 
 	std::function<RESULT(void*)> m_fnReset = nullptr;
-	RESULT m_resetResult;
+	RESULT m_resetResult = R_NOT_HANDLED;
 
-	void* m_pContext;
+	TestSuite *m_pParentTestSuite = nullptr;
+	void* m_pContext = nullptr;
 };
 
 #endif // ! TEST_OBJECT_H_

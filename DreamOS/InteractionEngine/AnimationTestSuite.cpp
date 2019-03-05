@@ -10,13 +10,8 @@
 #include "HAL/Pipeline/SourceNode.h"
 
 AnimationTestSuite::AnimationTestSuite(DreamOS *pDreamOS) :
-	TestSuite("animation")
+	DreamTestSuite("animation", pDreamOS)
 {
-	// empty
-	m_pDreamOS = pDreamOS;
-}
-
-AnimationTestSuite::~AnimationTestSuite() {
 	// empty
 }
 

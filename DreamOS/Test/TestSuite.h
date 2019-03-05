@@ -51,11 +51,19 @@ public:
 										std::function<RESULT(void*)> fnReset,
 										void *pContext = nullptr);
 
-	std::shared_ptr<TestObject> AddTest(std::string strTestName, const TestObject::Functions &fnStruct, void *pContext = nullptr);
+	std::shared_ptr<TestObject> AddTest(std::string strTestName, TestObject::TestDescriptor testDescriptor, void *pContext = nullptr);
+
+	std::shared_ptr<TestObject> AddTest(const TestObject::TestDescriptor &testDescriptor, void *pContext = nullptr);
 
 	virtual RESULT SetupTestSuite() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT AddTests() = 0;
 	
+public:
+	virtual RESULT DefaultInitializeProcess(void* pContext) = 0;
+	virtual RESULT DefaultUpdateProcess(void* pContext) = 0;
+	virtual RESULT DefaultEvaluateProcess(void* pContext) = 0;
+	virtual RESULT DefaultResetProcess(void* pContext) = 0;
+
 	std::shared_ptr<TestObject> GetCurrentTest();
 
 	std::string GetName() {
