@@ -5,6 +5,7 @@
 
 class FlatContext;
 class font;
+class DreamShareViewPointerMessage;
 
 class UIPointerLabel : public UIView {
 public:
@@ -15,7 +16,12 @@ public:
 	RESULT Initialize();
 	RESULT RenderLabelWithInitials(float parentHeight, std::string strInitials);
 
+private:
+	RESULT RenderLabel();
+
 public:
+	RESULT HandlePointerMessage(DreamShareViewPointerMessage *pUpdatePointerMessage);
+
 	std::shared_ptr<FlatContext> GetContext();
 
 private:

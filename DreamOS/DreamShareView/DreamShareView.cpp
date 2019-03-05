@@ -254,8 +254,8 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 			pPointer = m_pointingObjects[userID][1];
 		}
 
-		pPointer->GetContext()->SetPosition(pUpdatePointerMessage->m_body.ptPointer + point(-0.01f, 0.0f, 0.0f));
-		pPointer->GetContext()->SetVisible(pUpdatePointerMessage->m_body.fVisible, false);
+		CN(pPointer);
+		CR(pPointer->HandlePointerMessage(pUpdatePointerMessage));
 	}
 
 Error:

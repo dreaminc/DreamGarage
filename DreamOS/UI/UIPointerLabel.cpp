@@ -1,6 +1,8 @@
 #include "UIPointerLabel.h"
 #include "DreamOS.h"
 
+#include "DreamShareView/DreamShareView.h"
+
 #include "Primitives/font.h"
 #include "Primitives/text.h"
 #include "Primitives/FlatContext.h"
@@ -10,7 +12,7 @@
 UIPointerLabel::UIPointerLabel(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIView(pHALImp,pDreamOS)
 {
-
+	// empty
 }
 
 RESULT UIPointerLabel::Initialize() {
@@ -66,7 +68,7 @@ RESULT UIPointerLabel::RenderLabelWithInitials(float parentHeight, std::string s
 		CharacterGlyph periodGlyph;
 		m_pFont->GetGlyphFromChar('A', periodGlyph);
 		float glyphHeight = pText->GetMSizeFromDots(periodGlyph.height);
-		float offset = (textHeight - glyphHeight) / 8.0f;
+		float textOffset = (textHeight - glyphHeight) / 8.0f;
 
 
 		// TODO: the text object should have access to the functionality of the update function
@@ -74,6 +76,8 @@ RESULT UIPointerLabel::RenderLabelWithInitials(float parentHeight, std::string s
 		oglText->Update();
 
 		float width = pText->GetWidth();
+		float totalWidth = leftWidth + width + rightWidth;
+		float directionOffset = width/2.0f + leftWidth;
 
 		float screenOffset = 0.01f;
 
@@ -89,16 +93,37 @@ RESULT UIPointerLabel::RenderLabelWithInitials(float parentHeight, std::string s
 		pQuadCenter->SetDiffuseTexture(m_pPointerCenter);
 		pQuadRight->SetDiffuseTexture(m_pPointerRight);
 
-		pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, 0.0f, -offset);
-		pQuadCenter->SetPosition(0.0f, 0.0f, -offset);
-		pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, -offset);
+		pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, 0.0f, -textOffset);
+		pQuadCenter->SetPosition(0.0f, 0.0f, -textOffset);
+		pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, -textOffset);
 
 		pText->SetPosition(point(0.0f, 0.0f, 0.0f));
 
 		m_pRenderContext->AddObject(pText);
 
-		m_pRenderContext->RenderToQuad(leftWidth + width + rightWidth, height, 0, 0);
+		m_pRenderContext->RenderToQuad(totalWidth, height, 0, 0);
+
+		{
+			m_pRenderContext->SetPosition(point(-screenOffset, 0.0f, -m_pRenderContext->GetCurrentQuad()->GetWidth()/2.0f));
+		}
 	}
+
+Error:
+	return r;
+}
+
+RESULT UIPointerLabel::RenderLabel() {
+	return R_PASS;
+}
+
+RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdatePointerMessage) {
+	RESULT r = R_PASS;
+
+	CN(pUpdatePointerMessage);
+
+	//SetPosition(pUpdatePointerMessage->m_body.ptPointer + point(-0.01f, 0.0f, 0.0f));
+	SetPosition(pUpdatePointerMessage->m_body.ptPointer);
+	m_pRenderContext->SetVisible(pUpdatePointerMessage->m_body.fVisible, false);
 
 Error:
 	return r;
