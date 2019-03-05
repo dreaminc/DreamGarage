@@ -42,10 +42,12 @@ UIPointerLabel::~UIPointerLabel() {
 	// empty
 }
 
-RESULT UIPointerLabel::RenderLabelWithInitials(float parentHeight, std::string strInitials) {
+RESULT UIPointerLabel::RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad, std::string strInitials) {
 	RESULT r = R_PASS;
 
-	float height = parentHeight/2 * 0.0803;
+	m_pParentQuad = pParentQuad;
+
+	float height = pParentQuad->GetHeight()/2 * 0.06;
 	float textHeight = 0.75f*height;
 	float pxHeight = 84.0f;
 	float pxRight = 21.0f;
@@ -104,7 +106,7 @@ RESULT UIPointerLabel::RenderLabelWithInitials(float parentHeight, std::string s
 		m_pRenderContext->RenderToQuad(totalWidth, height, 0, 0);
 
 		{
-			m_pRenderContext->SetPosition(point(-screenOffset, 0.0f, -m_pRenderContext->GetCurrentQuad()->GetWidth()/2.0f));
+			m_pRenderContext->SetPosition(point(-screenOffset, 0.0f, m_pRenderContext->GetCurrentQuad()->GetWidth() / 2.0f));
 		}
 	}
 
@@ -122,8 +124,15 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 	CN(pUpdatePointerMessage);
 
 	//SetPosition(pUpdatePointerMessage->m_body.ptPointer + point(-0.01f, 0.0f, 0.0f));
+	{
+		point ptPosition = (point)(inverse(RotationMatrix(m_pParentQuad->GetOrientation(true))) * (pUpdatePointerMessage->m_body.ptPointer - m_pParentQuad->GetOrigin(true)));
+		float width = m_pParentQuad->GetWidth() * m_pParentQuad->GetScale(true).x();
+		bool fCenter = ptPosition.x() > -width / 4.0f && ptPosition.x() < width / 4.0f;
+		m_pRenderContext->SetVisible(fCenter && pUpdatePointerMessage->m_body.fVisible, false);
+	}
+
 	SetPosition(pUpdatePointerMessage->m_body.ptPointer);
-	m_pRenderContext->SetVisible(pUpdatePointerMessage->m_body.fVisible, false);
+
 
 Error:
 	return r;

@@ -738,7 +738,7 @@ RESULT DreamShareView::AllocateSpheres(long userID, std::string strInitials) {
 	for (int i = 0; i < 2; i++) {
 		pView = m_pointerViewPool.front();
 
-		pView->RenderLabelWithInitials(m_pCastQuad->GetHeight(), strInitials);
+		pView->RenderLabelWithInitials(m_pCastQuad, strInitials);
 
 		userPointers.emplace_back(pView);
 		m_pointerViewPool.pop();
