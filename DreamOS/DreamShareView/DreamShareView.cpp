@@ -247,14 +247,6 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 		long userID = pUpdatePointerMessage->GetSenderUserID();
 		std::string strInitials(pUpdatePointerMessage->m_body.szInitials, 2);
 
-		/*
-		std::string strInitials;
-		auto charInitials = pUpdatePointerMessage->m_body.szInitials;
-		if (charInitials != nullptr) {
-			strInitials = charInitials[0] + charInitials[1];
-		}
-		//*/
-
 		CR(AllocateSpheres(userID, strInitials));
 
 		if (pUpdatePointerMessage->m_body.fLeftHand) {
