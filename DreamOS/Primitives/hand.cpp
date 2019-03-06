@@ -265,13 +265,13 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 	m_pHead = AddSphere(m_radius, 20.0f, 20.0f);
 	m_pHead->SetVisible(false);
 	m_pHead->SetPosition(m_headOffset);
-
+	m_pHead->RotateXBy(m_angle);
 
 	// the mallet head is used for the collision interactions with buttons
 	pDreamOS->AddInteractionObject(m_pHead.get());
 
-	// the hand is used to the intersection interactions like pointing
-	pDreamOS->AddInteractionObject(this);
+	// the hand is used for the intersection interactions like pointing
+	//pDreamOS->AddInteractionObject(this);
 
 
 Error:

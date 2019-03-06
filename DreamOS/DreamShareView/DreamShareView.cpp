@@ -245,8 +245,7 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 
 		std::shared_ptr<UIPointerLabel> pPointer;
 		long userID = pUpdatePointerMessage->GetSenderUserID();
-		std::string strInitials(pUpdatePointerMessage->m_body.szInitials);
-		//strInitials = pUpdatePointerMessage->m_body.szInitials[0] + pUpdatePointerMessage->m_body.szInitials[1];
+		std::string strInitials(pUpdatePointerMessage->m_body.szInitials, 2);
 
 		CR(AllocateSpheres(userID, strInitials));
 

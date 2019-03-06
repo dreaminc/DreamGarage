@@ -163,7 +163,7 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		float width = m_pParentQuad->GetWidth() * m_pParentQuad->GetScale(true).x();
 		float height = m_pParentQuad->GetHeight() * m_pParentQuad->GetScale(true).y();
 
-		std::string strInitials(pUpdatePointerMessage->m_body.szInitials);
+		std::string strInitials(pUpdatePointerMessage->m_body.szInitials, 2);
 
 		if (ptPosition.x() > width / 4.0f && m_fPointingLeft) {
 			m_fPointingLeft = false;
