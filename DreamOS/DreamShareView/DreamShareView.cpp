@@ -147,17 +147,18 @@ RESULT DreamShareView::Update(void *pContext) {
 			for (std::shared_ptr<UIPointerLabel> pPointerLabel : userPointers) {
 
 				auto pLabelFlatContext = pPointerLabel->GetContext();
-				point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (pLabelFlatContext->GetPosition(true) - m_pCastQuad->GetOrigin(true)));
+				if (pLabelFlatContext->IsVisible()) {
+					point ptLabelQuad = pLabelFlatContext->GetCurrentQuad()->GetPosition(true);
+					point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (ptLabelQuad - m_pCastQuad->GetOrigin(true)));
 
-				auto pLabelQuad = pLabelFlatContext->GetCurrentQuad();
-				auto pFlatQuad = m_pPointerContext->AddQuad(pLabelQuad->GetWidth()/scale, pLabelQuad->GetHeight()/scale);
-				pFlatQuad->SetDiffuseTexture(pLabelFlatContext->GetFramebuffer()->GetColorTexture());
-				pFlatQuad->FlipUVVertical();
-				pFlatQuad->SetVisible(pLabelFlatContext->IsVisible());
+					auto pLabelQuad = pLabelFlatContext->GetCurrentQuad();
+					auto pFlatQuad = m_pPointerContext->AddQuad(pLabelQuad->GetWidth() / scale, pLabelQuad->GetHeight() / scale);
+					pFlatQuad->SetDiffuseTexture(pLabelFlatContext->GetFramebuffer()->GetColorTexture());
+					pFlatQuad->FlipUVVertical();
+					pFlatQuad->SetVisible(pLabelFlatContext->IsVisible());
 
-				// TODO: depending on final design of labels, cap positioning of the label quads so that
-				// the flat context is not resized
-				pFlatQuad->SetPosition(point(ptPosition.x()/scale, 0.0f, ptPosition.y()/scale));
+					pFlatQuad->SetPosition(point(ptPosition.x() / scale, 0.0f, ptPosition.y() / scale));
+				}
 			}
 		}
 

@@ -153,7 +153,13 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 
 	//SetPosition(pUpdatePointerMessage->m_body.ptPointer + point(-0.01f, 0.0f, 0.0f));
 	{
-		point ptPosition = (point)(inverse(RotationMatrix(m_pParentQuad->GetOrientation(true))) * (pUpdatePointerMessage->m_body.ptPointer - m_pParentQuad->GetOrigin(true)));
+		point ptMessage = pUpdatePointerMessage->m_body.ptPointer;
+
+		// smoothing
+		float newAmount = 0.3f;
+		ptMessage = (1.0f - newAmount) * GetPosition() + (newAmount)* ptMessage;
+
+		point ptPosition = (point)(inverse(RotationMatrix(m_pParentQuad->GetOrientation(true))) * (ptMessage - m_pParentQuad->GetOrigin(true)));
 		float width = m_pParentQuad->GetWidth() * m_pParentQuad->GetScale(true).x();
 		float height = m_pParentQuad->GetHeight() * m_pParentQuad->GetScale(true).y();
 
@@ -168,6 +174,7 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 			CR(RenderLabelWithInitials(m_pParentQuad, strInitials));
 		}
 
+
 		bool fInBounds = true;
 
 		// left/right bounds check
@@ -181,9 +188,9 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 			fInBounds = false;
 		}
 		m_pRenderContext->SetVisible(fInBounds && pUpdatePointerMessage->m_body.fVisible, false);
-	}
 
-	SetPosition(pUpdatePointerMessage->m_body.ptPointer);
+		SetPosition(ptMessage);
+	}
 
 
 Error:
@@ -192,5 +199,9 @@ Error:
 
 std::shared_ptr<FlatContext> UIPointerLabel::GetContext() {
 	return m_pRenderContext;
+}
+
+bool UIPointerLabel::IsPointingLeft() {
+	return m_fPointingLeft;
 }
 

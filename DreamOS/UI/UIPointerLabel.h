@@ -23,6 +23,7 @@ public:
 	RESULT HandlePointerMessage(DreamShareViewPointerMessage *pUpdatePointerMessage);
 
 	std::shared_ptr<FlatContext> GetContext();
+	bool IsPointingLeft();
 
 private:
 	std::shared_ptr<FlatContext> m_pRenderContext = nullptr;
