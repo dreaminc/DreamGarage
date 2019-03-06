@@ -88,7 +88,7 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	m_pMessageQuadBackground->SetVisible(true);
 	m_pMessageQuadBackground->RotateXByDeg(90);
 
-	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.45f, 0.3f, CYLINDER);
+	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.4f, 0.3f, CYLINDER);
 
 	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::ON, this));
 	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::OFF, this));
@@ -509,10 +509,10 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 	auto pRightHand = pUserApp->GetHand(HAND_TYPE::HAND_RIGHT);
 	auto handType = HAND_TYPE::HAND_INVALID;
 
-	if (mEvent->m_pInteractionObject == pLeftHand) {
+	if (mEvent->m_pInteractionObject == pLeftHand->GetMalletHead()) {
 		handType = HAND_TYPE::HAND_LEFT;
 	}
-	else if (mEvent->m_pInteractionObject == pRightHand) {
+	else if (mEvent->m_pInteractionObject == pRightHand->GetMalletHead()) {
 		handType = HAND_TYPE::HAND_RIGHT;
 	}
 
@@ -543,10 +543,10 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 			}
 		}
 
-		if (m_pLeftHand == mEvent->m_pInteractionObject) {
+		if (m_pLeftHand->GetMalletHead() == mEvent->m_pInteractionObject) {
 			m_fLeftSphereInteracting = true;
 		}
-		else if (m_pRightHand == mEvent->m_pInteractionObject) {
+		else if (m_pRightHand->GetMalletHead() == mEvent->m_pInteractionObject) {
 			m_fRightSphereInteracting = true;
 		}
 
@@ -572,10 +572,10 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 	case (ELEMENT_INTERSECT_ENDED): {
 
-		if (m_pLeftHand == mEvent->m_pInteractionObject) {
+		if (m_pLeftHand->GetMalletHead() == mEvent->m_pInteractionObject) {
 			m_fLeftSphereInteracting = false;
 		}
-		else if (m_pRightHand == mEvent->m_pInteractionObject) {
+		else if (m_pRightHand->GetMalletHead() == mEvent->m_pInteractionObject) {
 			m_fRightSphereInteracting = false;
 		}
 
@@ -634,10 +634,10 @@ RESULT DreamUserApp::Notify(HysteresisEvent *mEvent) {
 
 	case HysteresisEventType::ON: {
 
-		if (m_pLeftHand == mEvent->m_pEventObject) {
+		if (m_pLeftHand->GetMalletHead() == mEvent->m_pEventObject) {
 			m_fLeftSphereOn = true;
 		}
-		else if (m_pRightHand == mEvent->m_pEventObject) {
+		else if (m_pRightHand->GetMalletHead() == mEvent->m_pEventObject) {
 			m_fRightSphereOn = true;
 		}
 
@@ -645,10 +645,10 @@ RESULT DreamUserApp::Notify(HysteresisEvent *mEvent) {
 
 	case HysteresisEventType::OFF: {
 
-		if (m_pLeftHand == mEvent->m_pEventObject) {
+		if (m_pLeftHand->GetMalletHead() == mEvent->m_pEventObject) {
 			m_fLeftSphereOn = false;
 		}
-		else if (m_pRightHand == mEvent->m_pEventObject) {
+		else if (m_pRightHand->GetMalletHead() == mEvent->m_pEventObject) {
 			m_fRightSphereOn = false;
 		}
 
@@ -696,7 +696,8 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 
 	CR(pHand->InitializeWithContext(pDreamOS));
 
-	CR(m_pPointingArea->RegisterObject(pHand));
+	CR(m_pPointingArea->RegisterObject(pHand->GetMalletHead()));
+	//CR(m_pPointingArea->RegisterObject(pHand));
 
 	if (type == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;
