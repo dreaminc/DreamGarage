@@ -30,7 +30,7 @@ private:
 	// used to help determine where the pointer is on the quad, 
 	// and from that the direction of the pointer;
 	std::shared_ptr<quad> m_pParentQuad = nullptr;
-	bool fPointingLeft = true;
+	bool m_fPointingLeft = true;
 
 // Resource strings
 private:
