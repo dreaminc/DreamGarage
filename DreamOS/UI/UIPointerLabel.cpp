@@ -155,9 +155,9 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 	{
 		point ptPosition = (point)(inverse(RotationMatrix(m_pParentQuad->GetOrientation(true))) * (pUpdatePointerMessage->m_body.ptPointer - m_pParentQuad->GetOrigin(true)));
 		float width = m_pParentQuad->GetWidth() * m_pParentQuad->GetScale(true).x();
-		//bool fCenter = ptPosition.x() > -width / 4.0f && ptPosition.x() < width / 4.0f;
+		float height = m_pParentQuad->GetHeight() * m_pParentQuad->GetScale(true).y();
+
 		std::string strInitials(pUpdatePointerMessage->m_body.szInitials);
-		//strInitials = pUpdatePointerMessage->m_body.szInitials[0] + pUpdatePointerMessage->m_body.szInitials[1];
 
 		if (ptPosition.x() > width / 4.0f && m_fPointingLeft) {
 			m_fPointingLeft = false;
@@ -169,8 +169,18 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		}
 
 		bool fInBounds = true;
-		//if (width / 2.0f - ptPosition.x() < )
-		m_pRenderContext->SetVisible(pUpdatePointerMessage->m_body.fVisible, false);
+
+		// left/right bounds check
+		if (width / 2.0f - ptPosition.x() < 0 ||
+			width / 2.0f + ptPosition.x() < 0) {
+			fInBounds = false;
+		}
+		// bottom/top bounds check
+		if (height / 2.0f - ptPosition.y() < m_pRenderContext->GetHeight()/2.0f ||
+			height / 2.0f + ptPosition.y() < m_pRenderContext->GetHeight()/2.0f) {
+			fInBounds = false;
+		}
+		m_pRenderContext->SetVisible(fInBounds && pUpdatePointerMessage->m_body.fVisible, false);
 	}
 
 	SetPosition(pUpdatePointerMessage->m_body.ptPointer);
