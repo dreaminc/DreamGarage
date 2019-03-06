@@ -158,12 +158,16 @@ Error:
 RESULT HALImp::Render() {
 	RESULT r = R_PASS;
 
+	MakeCurrentContext();
+
 	// Pipeline stuff
 	m_pRenderPipeline->RunPipeline();
 
 	FlushHALBuffers();
 
-//Error:
+	ReleaseCurrentContext();
+
+Error:
 	return r;
 }
 

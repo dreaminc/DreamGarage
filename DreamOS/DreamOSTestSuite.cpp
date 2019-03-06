@@ -52,10 +52,6 @@ DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	// empty
 }
 
-DreamOSTestSuite::~DreamOSTestSuite() {
-	// empty
-}
-
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
@@ -1178,11 +1174,8 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			light *pLight;
 			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 
-			//pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
-			//CN(pTestContext->pSphere);
-			//pTestContext->pSphere->SetPosition(ptPosition);
-
-			
+			pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+			CN(pTestContext->pSphere);
 		}
 
 	Error:

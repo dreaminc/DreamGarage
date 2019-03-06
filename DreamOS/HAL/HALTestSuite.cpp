@@ -32,6 +32,8 @@ HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestEmptyPipeline());
+
 	CR(AddTestFlatContextNesting());
 
 	CR(TestNestedCompositesQauds());
@@ -137,7 +139,7 @@ Error:
 	return r;
 }
 
-RESULT HALTestSuite::ResetTest(void *pContext) {
+RESULT HALTestSuite::DefaultResetProcess(void *pContext) {
 	RESULT r = R_PASS;
 
 	// Will reset the sandbox as needed between tests
@@ -418,7 +420,7 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -628,7 +630,7 @@ RESULT HALTestSuite::AddTestIncludeShader() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -732,7 +734,7 @@ RESULT HALTestSuite::AddTestToonShader() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -954,7 +956,7 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -1069,7 +1071,7 @@ RESULT HALTestSuite::AddTestBillboardShader() {
 	};
 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	auto pNewTest = AddTest("billboardshader", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
@@ -1293,7 +1295,7 @@ RESULT HALTestSuite::AddTestFadeShader() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -1585,7 +1587,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -1767,7 +1769,7 @@ RESULT HALTestSuite::AddTestEnvironmentMapping() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -2058,7 +2060,7 @@ RESULT HALTestSuite::AddTestWaterShaderCube() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -2243,7 +2245,7 @@ RESULT HALTestSuite::AddTestStandardShader() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -2397,7 +2399,7 @@ RESULT HALTestSuite::AddTestFlatContextNesting() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -2513,7 +2515,7 @@ RESULT HALTestSuite::TestNestedCompositesQauds() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -2618,7 +2620,7 @@ RESULT HALTestSuite::TestNestedOBB() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -2709,7 +2711,7 @@ RESULT HALTestSuite::AddTestRotation() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -2819,7 +2821,7 @@ RESULT HALTestSuite::AddTestUserModel() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -2920,7 +2922,7 @@ RESULT HALTestSuite::AddTestModelInstancing() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -3053,7 +3055,7 @@ RESULT HALTestSuite::AddTestModel() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -3223,7 +3225,7 @@ RESULT HALTestSuite::AddTestModelOrientation() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -3344,7 +3346,7 @@ RESULT HALTestSuite::AddTestHeightQuadObject() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -3496,7 +3498,7 @@ RESULT HALTestSuite::AddTestQuadObject() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -3650,7 +3652,7 @@ RESULT HALTestSuite::AddTestUIShaderStage() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -3827,7 +3829,7 @@ RESULT HALTestSuite::AddTestText() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -3995,7 +3997,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureBumpDisplacement() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -4161,7 +4163,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureBump() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -4284,7 +4286,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -4396,7 +4398,7 @@ RESULT HALTestSuite::AddTestSenseHaptics() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -4504,7 +4506,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderBlur() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -4606,7 +4608,7 @@ RESULT HALTestSuite::AddTestObjectMaterialsColors() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -4670,7 +4672,7 @@ RESULT HALTestSuite::AddTestCamera() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -4775,7 +4777,7 @@ RESULT HALTestSuite::AddTestObjectMaterialsBump() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -4883,7 +4885,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShader() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -4987,7 +4989,7 @@ RESULT HALTestSuite::AddTestMouseDrag() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -4997,6 +4999,70 @@ RESULT HALTestSuite::AddTestMouseDrag() {
 	pNewTest->SetTestDescription("Testing mouse dragging");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTestEmptyPipeline() {
+	RESULT r = R_PASS;
+
+	TestObject::TestDescriptor testDestriptor;
+	testDestriptor.strTestName = "emptypipeline";
+	testDestriptor.strTestDescription = "Testing the pipeline with limited shader stages and an empty scene graph";
+	testDestriptor.sDuration = 20.0f;
+	testDestriptor.nRepeats = 1;
+
+	float width = 1.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode*pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderProgramNode->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		// Objects (should be empty for test to work correctly)
+
+		{
+			// Making a sphere seems to flip the right bits for some reason
+			//auto pSphere = m_pDreamOS->MakeSphere(1.0f);
+			//CN(pSphere);
+		}
+
+	Error:
+		return r;
+	};
+
+	testDestriptor.fnInitialize = fnInitialize;
+
+	// Add the test
+	auto pNewTest = AddTest(testDestriptor, m_pDreamOS);
+	CN(pNewTest);
 
 Error:
 	return r;
@@ -5092,7 +5158,7 @@ RESULT HALTestSuite::AddTestMinimalShader() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -5237,7 +5303,7 @@ RESULT HALTestSuite::AddTestTextureUpdate() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -5359,7 +5425,7 @@ RESULT HALTestSuite::AddTestPBOTextureUpload() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -5484,7 +5550,7 @@ RESULT HALTestSuite::AddTestPBOTextureReadback() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -5579,7 +5645,7 @@ RESULT HALTestSuite::AddTestMinimalTextureShader() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -5690,7 +5756,7 @@ RESULT HALTestSuite::AddTestRenderToTextureQuad() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -5769,7 +5835,7 @@ RESULT HALTestSuite::AddTestAlphaVolumes() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -5832,7 +5898,7 @@ RESULT HALTestSuite::AddTestFramerateVolumes() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -5982,7 +6048,7 @@ RESULT HALTestSuite::AddTest3rdPersonCamera() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -6152,7 +6218,7 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -6266,7 +6332,7 @@ RESULT HALTestSuite::AddTestCubeMap() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -6427,7 +6493,7 @@ RESULT HALTestSuite::AddTestTextureSubRegionUpdate() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test

@@ -118,7 +118,7 @@ RESULT DimensionTestSuite::AddTestDimObjRotationFunctions() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
@@ -201,7 +201,7 @@ RESULT DimensionTestSuite::AddTestVectorRotationFunctions() {
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
+		return DefaultResetProcess(pContext);
 	};
 
 	// Add the test
