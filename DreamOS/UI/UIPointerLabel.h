@@ -5,6 +5,7 @@
 
 class FlatContext;
 class font;
+class DreamShareViewPointerMessage;
 
 class UIPointerLabel : public UIView {
 public:
@@ -13,13 +14,24 @@ public:
 
 public:
 	RESULT Initialize();
-	RESULT RenderLabelWithInitials(float parentHeight, std::string strInitials);
+	RESULT RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad, std::string strInitials);
+
+private:
+	RESULT RenderLabel();
 
 public:
+	RESULT HandlePointerMessage(DreamShareViewPointerMessage *pUpdatePointerMessage);
+
 	std::shared_ptr<FlatContext> GetContext();
+	bool IsPointingLeft();
 
 private:
 	std::shared_ptr<FlatContext> m_pRenderContext = nullptr;
+
+	// used to help determine where the pointer is on the quad, 
+	// and from that the direction of the pointer;
+	std::shared_ptr<quad> m_pParentQuad = nullptr;
+	bool m_fPointingLeft = true;
 
 // Resource strings
 private:

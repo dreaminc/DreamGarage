@@ -147,17 +147,18 @@ RESULT DreamShareView::Update(void *pContext) {
 			for (std::shared_ptr<UIPointerLabel> pPointerLabel : userPointers) {
 
 				auto pLabelFlatContext = pPointerLabel->GetContext();
-				point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (pLabelFlatContext->GetPosition(true) - m_pCastQuad->GetOrigin(true)));
+				if (pLabelFlatContext->IsVisible()) {
+					point ptLabelQuad = pLabelFlatContext->GetCurrentQuad()->GetPosition(true);
+					point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (ptLabelQuad - m_pCastQuad->GetOrigin(true)));
 
-				auto pLabelQuad = pLabelFlatContext->GetCurrentQuad();
-				auto pFlatQuad = m_pPointerContext->AddQuad(pLabelQuad->GetWidth()/scale, pLabelQuad->GetHeight()/scale);
-				pFlatQuad->SetDiffuseTexture(pLabelFlatContext->GetFramebuffer()->GetColorTexture());
-				pFlatQuad->FlipUVVertical();
-				pFlatQuad->SetVisible(pLabelFlatContext->IsVisible());
+					auto pLabelQuad = pLabelFlatContext->GetCurrentQuad();
+					auto pFlatQuad = m_pPointerContext->AddQuad(pLabelQuad->GetWidth() / scale, pLabelQuad->GetHeight() / scale);
+					pFlatQuad->SetDiffuseTexture(pLabelFlatContext->GetFramebuffer()->GetColorTexture());
+					pFlatQuad->FlipUVVertical();
+					pFlatQuad->SetVisible(pLabelFlatContext->IsVisible());
 
-				// TODO: depending on final design of labels, cap positioning of the label quads so that
-				// the flat context is not resized
-				pFlatQuad->SetPosition(point(ptPosition.x()/scale, 0.0f, ptPosition.y()/scale));
+					pFlatQuad->SetPosition(point(ptPosition.x() / scale, 0.0f, ptPosition.y() / scale));
+				}
 			}
 		}
 
@@ -244,8 +245,10 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 
 		std::shared_ptr<UIPointerLabel> pPointer;
 		long userID = pUpdatePointerMessage->GetSenderUserID();
+		std::string strInitials(pUpdatePointerMessage->m_body.szInitials);
+		//strInitials = pUpdatePointerMessage->m_body.szInitials[0] + pUpdatePointerMessage->m_body.szInitials[1];
 
-		CR(AllocateSpheres(userID, pUpdatePointerMessage->m_body.szInitials));
+		CR(AllocateSpheres(userID, strInitials));
 
 		if (pUpdatePointerMessage->m_body.fLeftHand) {
 			pPointer = m_pointingObjects[userID][0];
@@ -254,8 +257,8 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 			pPointer = m_pointingObjects[userID][1];
 		}
 
-		pPointer->GetContext()->SetPosition(pUpdatePointerMessage->m_body.ptPointer + point(-0.01f, 0.0f, 0.0f));
-		pPointer->GetContext()->SetVisible(pUpdatePointerMessage->m_body.fVisible, false);
+		CN(pPointer);
+		CR(pPointer->HandlePointerMessage(pUpdatePointerMessage));
 	}
 
 Error:
@@ -734,11 +737,10 @@ RESULT DreamShareView::AllocateSpheres(long userID, std::string strInitials) {
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
 
-
 	for (int i = 0; i < 2; i++) {
 		pView = m_pointerViewPool.front();
 
-		pView->RenderLabelWithInitials(m_pCastQuad->GetHeight(), strInitials);
+		pView->RenderLabelWithInitials(m_pCastQuad, strInitials);
 
 		userPointers.emplace_back(pView);
 		m_pointerViewPool.pop();
