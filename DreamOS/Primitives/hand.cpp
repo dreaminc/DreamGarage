@@ -271,7 +271,7 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 	pDreamOS->AddInteractionObject(m_pHead.get());
 
 	// the hand is used for the intersection interactions like pointing
-	//pDreamOS->AddInteractionObject(this);
+	pDreamOS->AddInteractionObject(this);
 
 
 Error:
