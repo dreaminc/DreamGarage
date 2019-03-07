@@ -1157,6 +1157,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 
 	struct TestContext {
 		sphere *pSphere = nullptr;
+		model *pModel = nullptr;
 	} *pTestContext = new TestContext();
 
 	auto fnInitialize = [=](void *pContext) {
@@ -1174,12 +1175,16 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			light *pLight;
 			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 
-			pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
-			CN(pTestContext->pSphere);
+			// 
+			model *pModel = m_pDreamOS->AddModel(L"\\4\\head.fbx");
+			CN(pModel);
+			pModel->SetPosition(point(2.0f, 0.0f, 0.0f));
+			pModel->SetScale(0.05f);
+
 		}
 
 	Error:
-		return R_PASS;
+		return r;
 	};
 
 	// Update Code
