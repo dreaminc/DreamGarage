@@ -166,7 +166,10 @@ RESULT InteractionEngine::UpdateAnimationQueue() {
 
 	m_pObjectQueue->Update(msNow);
 
-	//*
+	// TODO: accumulator is commented out for now because:
+	// it was combining events for left and right controllers
+	// it was always sending events even if nothing was accumulated
+	/*
 	auto tCurrent = std::chrono::high_resolution_clock::now();
 	m_msLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(tCurrent - m_tLastUpdate).count();
 
@@ -907,6 +910,9 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 			double touchY = m_interactionPadAccumulator;
 			m_interactionPadAccumulator = std::modf(m_interactionPadAccumulator, &touchY);
 
+			m_padInteractionEvent = InteractionObjectEvent(INTERACTION_EVENT_PAD_MOVE);
+			m_padInteractionEvent.m_state = ControllerState();
+
 			for (auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
 				VirtualObj *pObject = pActiveObject->GetObject();
 
@@ -917,6 +923,7 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 				CR(NotifySubscribers(type, &interactionEvent));
 			}
 
+			/*
 			float xDiff = -pEvent->state.ptTouchpad.x();
 			float yDiff = pEvent->state.ptTouchpad.y();
 
@@ -928,8 +935,14 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 			ControllerState interactionState = pEvent->state;
 			interactionState.ptTouchpad.x() = m_padInteractionEvent.GetControllerState().ptTouchpad.x() - xDiff;
 			interactionState.ptTouchpad.y() = m_padInteractionEvent.GetControllerState().ptTouchpad.y() + yDiff;
+			//*/
 
-			m_padInteractionEvent.SetControllerState(interactionState);
+			InteractionObjectEvent padInteractionEvent(INTERACTION_EVENT_PAD_MOVE);
+			padInteractionEvent.SetControllerState(pEvent->state);
+
+			//m_padInteractionEvent.SetControllerState(interactionState);
+			CR(NotifySubscribers(INTERACTION_EVENT_PAD_MOVE, &padInteractionEvent));
+
 			
 		} break;
 	}

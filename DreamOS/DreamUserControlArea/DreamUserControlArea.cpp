@@ -196,9 +196,9 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		bool fHeight = (ptSphereOrigin.z() > ptDreamTabView.z() - tabViewHeight / 2.0f &&
 						ptSphereOrigin.z() < ptDreamTabView.z() + tabViewHeight / 2.0f);
 
-		bool fMalletInTabView = fWidth && fHeight;
+		m_fMalletInTabView[i] = fWidth && fHeight;
 
-		m_pDreamTabView->SetScrollFlag(fMalletInTabView, i);
+		m_pDreamTabView->SetScrollFlag(m_fMalletInTabView[i], i);
 		
 	}
 
@@ -1397,7 +1397,22 @@ RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
 		CR(OnMouseMove(ptContact));
 	} break;
 	case UI_SCROLL: {
-		CR(OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
+
+		bool fScrollingTabView = false;
+
+		auto pHand = dynamic_cast<hand*>(pUIEvent->m_pInteractionObject);
+		CNR(pHand, R_SKIPPED);
+
+		if (m_fMalletInTabView[0] && pHand->GetHandState().handType == HAND_TYPE::HAND_LEFT) {
+			fScrollingTabView = true;
+		}
+		if (m_fMalletInTabView[1] && pHand->GetHandState().handType == HAND_TYPE::HAND_RIGHT) {
+			fScrollingTabView = true;
+		}
+
+		if (!fScrollingTabView) {
+			CR(OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
+		}
 	}
 	};
 

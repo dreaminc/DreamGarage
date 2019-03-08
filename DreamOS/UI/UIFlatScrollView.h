@@ -27,6 +27,7 @@ public:
 	texture *GetCurrentTexture();
 
 	RESULT SetScrollFlag(bool fCanScroll, int index);
+	bool CanScroll();
 
 	RESULT SetBounds(float width, float height);
 

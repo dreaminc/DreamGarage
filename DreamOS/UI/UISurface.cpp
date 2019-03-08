@@ -140,22 +140,30 @@ RESULT UISurface::Notify(InteractionObjectEvent *pEvent) {
 	switch (pEvent->m_eventType) {
 	case InteractionEventType::INTERACTION_EVENT_PAD_MOVE: {
 		point ptScroll;
+		VirtualObj *pObj = nullptr;
 		if (state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
 			ptScroll = m_ptLeftHover;
+			pObj = m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
 		}
 		else if (state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
 			ptScroll = m_ptRightHover;
+			pObj = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
+			//pObj = nullptr;
 		}
 
+		point ptDiff = point(-state.ptTouchpad.x()*SCROLL_CONSTANT, state.ptTouchpad.y()*SCROLL_CONSTANT, 0.0f);
 		if (ptScroll.x() < m_pViewQuad->GetWidth()/2.0f && ptScroll.x() > -m_pViewQuad->GetWidth()/2.0f &&
-			ptScroll.y() < m_pViewQuad->GetHeight()/2.0f && ptScroll.y() > -m_pViewQuad->GetHeight()/2.0f) {
-//			CR(m_pParentApp->OnScroll(pxXDiff, pxYDiff, point(ptScroll.x, ptScroll.y, 0.0f)));
-			
-			point ptDiff = point(-state.ptTouchpad.x()*SCROLL_CONSTANT, state.ptTouchpad.y()*SCROLL_CONSTANT, 0.0f);
-			UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SCROLL, m_pViewQuad.get(), nullptr, ptScroll, ptDiff);
+			ptScroll.z() < m_pViewQuad->GetHeight()/2.0f && ptScroll.z() > -m_pViewQuad->GetHeight()/2.0f) {
+			UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SCROLL, m_pViewQuad.get(), pObj, ptScroll, ptDiff);
 			NotifySubscribers(UI_SCROLL, pUIEvent);
-
 		}
+		//*
+		else {
+			UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SCROLL, m_pViewQuad.get(), pObj, point(0.0f, 0.0f, 0.0f), ptDiff);
+			NotifySubscribers(UI_SCROLL, pUIEvent);
+		}
+		//*/
+
 	} break;
 	}
 Error:

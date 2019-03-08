@@ -277,6 +277,7 @@ private:
 
 	// certainly temporary
 	bool m_fIsAnimating = false;
+	bool m_fMalletInTabView[2] = { false, false };
 
 	std::string m_strDesktopScope = SCOPE_DESKTOP;
 	std::string m_strWebsiteScope = SCOPE_WEBSITE;
