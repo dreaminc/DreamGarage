@@ -76,6 +76,10 @@ RESULT UIFlatScrollView::SetScrollFlag(bool fCanScroll, int index) {
 	return R_PASS;
 }
 
+bool UIFlatScrollView::CanScroll() {
+	return m_fCanScrollFlag[0] || m_fCanScrollFlag[1];
+}
+
 RESULT UIFlatScrollView::SetBounds(float width, float height) {
 	RESULT r = R_PASS;
 
