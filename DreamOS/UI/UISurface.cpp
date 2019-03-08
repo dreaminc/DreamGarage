@@ -147,15 +147,17 @@ RESULT UISurface::Notify(InteractionObjectEvent *pEvent) {
 			ptScroll = m_ptRightHover;
 		}
 
+		point ptDiff = point(-state.ptTouchpad.x()*SCROLL_CONSTANT, state.ptTouchpad.y()*SCROLL_CONSTANT, 0.0f);
 		if (ptScroll.x() < m_pViewQuad->GetWidth()/2.0f && ptScroll.x() > -m_pViewQuad->GetWidth()/2.0f &&
-			ptScroll.y() < m_pViewQuad->GetHeight()/2.0f && ptScroll.y() > -m_pViewQuad->GetHeight()/2.0f) {
-//			CR(m_pParentApp->OnScroll(pxXDiff, pxYDiff, point(ptScroll.x, ptScroll.y, 0.0f)));
-			
-			point ptDiff = point(-state.ptTouchpad.x()*SCROLL_CONSTANT, state.ptTouchpad.y()*SCROLL_CONSTANT, 0.0f);
+			ptScroll.z() < m_pViewQuad->GetHeight()/2.0f && ptScroll.z() > -m_pViewQuad->GetHeight()/2.0f) {
 			UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SCROLL, m_pViewQuad.get(), nullptr, ptScroll, ptDiff);
 			NotifySubscribers(UI_SCROLL, pUIEvent);
-
 		}
+		else {
+			UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SCROLL, m_pViewQuad.get(), nullptr, point(0.0f, 0.0f, 0.0f), ptDiff);
+			NotifySubscribers(UI_SCROLL, pUIEvent);
+		}
+
 	} break;
 	}
 Error:
