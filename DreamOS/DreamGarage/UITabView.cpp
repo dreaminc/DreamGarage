@@ -253,8 +253,8 @@ RESULT UITabView::PendSelectTab(UIButton *pButtonContext, void *pContext) {
 	RESULT r = R_PASS;
 
 	if (!m_fForceContentFocus) {
-		CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 		CBR(m_pScrollView->CanScroll(), R_SKIPPED);
+		CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	}
 	m_fForceContentFocus = false;
 	CR(m_pParentApp->HideWebsiteTyping());
