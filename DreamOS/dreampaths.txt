@@ -8,11 +8,10 @@ HAL 			./HAL/
 SHADERS 		./HAL/opengl/shaders/GLSL/
 SANDBOX			./Sandbox/
 RESULT 			./RESULT/
-TEXTURE			./Texture/
-TEXTURE_CUBE	./Texture/Cube/
+TEXTURE			./Resources/Texture/
+CUBEMAP			./Resources/Cubemap/
 FONT			./Resources/Fonts/
-MODEL			./Models/
+MODEL			./Resources/Models/
 ASSET			./Assets/
-DATA			./Data/
 SOUND			./Resources/Sounds/
 SCRIPTS			./Scripts/

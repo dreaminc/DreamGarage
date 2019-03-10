@@ -607,7 +607,7 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 		// Destination Path
 		std::wstring strImageDest;
 		PathManager* pPathManager = PathManager::instance();
-		strImageDest = pPathManager->GetFilePath(PATH_VALUE_TYPE::PATH_DATA, L"testimg.png");
+		strImageDest = pPathManager->GetFilePath(PATH_VALUE_TYPE::PATH_TEXTURE, L"testimg.png");
 
 		// Cloud Controller
 		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);

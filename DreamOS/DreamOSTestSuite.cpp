@@ -1165,7 +1165,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline("standard"));
+		CR(SetupPipeline("environment"));
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -1176,9 +1176,9 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 
 			// 
-			model *pModel = m_pDreamOS->AddModel(L"\\4\\head.fbx");
+			model *pModel = m_pDreamOS->AddModel(L"\\Cave\\Cave.fbx");
 			CN(pModel);
-			pModel->SetPosition(point(2.0f, 0.0f, 0.0f));
+			pModel->SetPosition(point(2.0f, -2.5f, 0.0f));
 			pModel->SetScale(0.05f);
 
 		}
