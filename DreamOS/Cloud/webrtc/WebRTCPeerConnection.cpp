@@ -131,45 +131,16 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
 
-	//rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface = nullptr;
-
-	///*
-	// User Stream (Voice)
-	// TODO: 
-	//CB((m_WebRTCLocalActiveStreams.find(kUserStreamLabel) == m_WebRTCLocalActiveStreams.end()));
-
-	//pMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kUserStreamLabel);
-	//CNM(pMediaStreamInterface, "Failed to create user media stream");
-
-	// User audio stream
+	// User Stream
 	CR(AddLocalAudioSource(kUserAudioLabel, kUserStreamLabel));
 	
-	//// Chrome Audio Source
+	// Chrome Stream
 	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
-	
-	// Virtual Camera Audio Source
-	CR(AddLocalAudioSource(kVCamAudiolabel, kChromeStreamLabel));
-
-	// Chrome Video
 	CR(AddVideoStream(kChromeCaptureDevice, kChromeVideoLabel, kChromeStreamLabel));
 
-	// Virtual Camera Video
-	CR(AddVideoStream(kVCamCaptureDevice, kVCamVideoLabel, kUserStreamLabel));
-	
-	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
-
-	// Add user stream to peer connection interface
-	//if (!m_pWebRTCPeerConnectionInterface->AddStream(pMediaStreamInterface)) {
-	//	DOSLOG(INFO, "Adding user media stream to PeerConnection failed");
-	//}
-
-	// Insert it into our local active streams (referenced in OnAddStream
-	//m_WebRTCLocalActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->id(), pMediaStreamInterface));
-
-	// Chrome Media Stream
-	// TODO:
-	//CB((m_WebRTCLocalActiveStreams.find(kChromeStreamLabel) == m_WebRTCLocalActiveStreams.end()));
-	//*/
+	// Virtual Camera Stream
+	CR(AddVideoStream(kVCamCaptureDevice, kVCamVideoLabel, kVCamStreamLabel));
+	CR(AddLocalAudioSource(kVCamAudiolabel, kVCamStreamLabel));
 
 	// Data Channel
 	// This is not in the media streaming interface
@@ -255,11 +226,6 @@ RESULT WebRTCPeerConnection::AddVideoStream(const std::string &strVideoCaptureDe
 	// Set up constraints
 	webrtc::FakeConstraints videoSourceConstraints;
 
-	// TODO: Add video constraints if needed
-	//pVideoCapturer = OpenVideoCaptureDevice();
-	//CN(pVideoCapturer);
-
-	//CR(InitializeVideoCaptureDevice("default_capture"));
 	CR(InitializeVideoCaptureDevice(strVideoCaptureDevice, strVideoTrackLabel));
 
 	pVideoCapturer = GetVideoCaptureDeviceByTrackName(strVideoTrackLabel);
@@ -269,7 +235,6 @@ RESULT WebRTCPeerConnection::AddVideoStream(const std::string &strVideoCaptureDe
 	CN(pVideoTrackSource);
 
 	pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(
-		//m_pWebRTCPeerConnectionFactory->CreateVideoTrack(kChromeVideoLabel, pVideoTrackSource)
 		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(strVideoTrackLabel, pVideoTrackSource)
 	);
 	CN(pVideoTrack);
@@ -330,9 +295,6 @@ RESULT WebRTCPeerConnection::AddLocalAudioSource(const std::string &strAudioTrac
 		fakeAudioOptions.highpass_filter = rtc::Optional<bool>(false);
 		fakeAudioOptions.typing_detection = rtc::Optional<bool>(false);
 
-		//auto pWebRTCLocalAudioSource = new rtc::RefCountedObject<WebRTCLocalAudioSource>();
-		//auto pWebRTCLocalAudioSource = WebRTCLocalAudioSource::Create(strAudioTrackLabel, audioSourceConstraints);
-
 		auto pWebRTCLocalAudioSource = WebRTCLocalAudioSource::Create(strAudioTrackLabel, fakeAudioOptions);
 		CN(pWebRTCLocalAudioSource);
 
@@ -351,9 +313,7 @@ RESULT WebRTCPeerConnection::AddLocalAudioSource(const std::string &strAudioTrac
 
 		pLocalAudioTrack->AddRef();
 
-		//pMediaStreamInterface->AddTrack(pAudioTrack);
 		auto pRTPSender = m_pWebRTCPeerConnectionInterface->AddTrack(pLocalAudioTrack, {strMediaStreamLabel});
-		
 		//std::string strTrackID = pRTPSender.value()->id();
 
 	}
@@ -392,11 +352,8 @@ RESULT WebRTCPeerConnection::AddAudioStream(const std::string &strAudioTrackLabe
 	pAudioTrack->AddRef();
 
 	m_pWebRTCPeerConnectionInterface->AddTrack(pAudioTrack, {kUserStreamLabel});
-	//pMediaStreamInterface->AddTrack(pAudioTrack);
 
-	//pAudioTrack->GetSource()
-
-	//Error:
+Error:
 	return r;
 }
 
@@ -505,13 +462,6 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 	// TODO: do we add to a map like out going? Or check existing ?
 
 	DOSLOG(INFO, "OnAddStream: %s", pMediaStreamInterface->id().c_str());
-
-	// Add to remote streams
-	// TODO: This is done with local_stream/remote_stream now
-	//if (m_WebRTCRemoteActiveStreams.find(pMediaStreamInterface->id()) == m_WebRTCRemoteActiveStreams.end()) {
-	//	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
-	//	m_WebRTCRemoteActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->id(), pMediaStreamInterface));
-	//}
 	
 	if (!pMediaStreamInterface) {
 		DOSLOG(INFO, "Cannot add stream");
@@ -519,6 +469,8 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 	}
 	
 	auto audioTracks = pMediaStreamInterface->GetAudioTracks();
+
+	// TODO: Turn this shit into a function bruh
 
 	// User Audio track	
 	auto pUserAudioTrack = pMediaStreamInterface->FindAudioTrack(kUserAudioLabel);
@@ -542,35 +494,9 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 				
 			}
 		}
-
-		// TODO: Volume stuff
-		/*
-		auto pUserAudioTrackSource = pUserAudioTrack->GetSource();
-	
-		if (pUserAudioTrackSource != nullptr) {
-			DOSLOG(INFO, "Found AudioTrackSourceInterface");
-	
-			// Not currently using this as previous for mouth size
-			// We'll want to put this back in when we go to localaudiosource though
-			//pUserAudioTrackSource->AddSink(this);
-	
-#ifndef _USE_TEST_APP
-			// Turn off audio for non-testing
-			SetAudioVolume(0.0f);
-#endif
-	
-			DOSLOG(INFO, "Added user audio sink");
-		}
-		else {
-			DOSLOG(INFO, "Cannot AudioTrackInterface::GetSource");
-		}
-		*/
 	}
-	
-	// TODO: Turn this shit into a function bruh
 
 	// Chrome Audio Track
-	//auto pChromeAudioTrack = pMediaStreamInterface->FindAudioTrack(kChromeAudioLabel);
 	auto pChromeAudioTrack = pMediaStreamInterface->FindAudioTrack(kChromeAudioLabel);
 	if (pChromeAudioTrack != nullptr && pChromeAudioTrack->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
 

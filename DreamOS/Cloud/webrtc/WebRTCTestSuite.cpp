@@ -459,23 +459,28 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		SoundClient *pXAudio2AudioClient = nullptr;
 
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
-		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+		std::shared_ptr<DreamBrowser> m_pDreamBrowserChrome = nullptr;
+		std::shared_ptr<DreamBrowser> m_pDreamBrowserVCam = nullptr;
 
 		int testUserNum = 0;
 
 		sphere *pSphere = nullptr;
 
+		quad *m_pBrowserQuadChrome = nullptr;
+		texture *pQuadTextureChrome = nullptr;
 
-		quad *m_pBrowserQuad = nullptr;
-		texture *pQuadTexture = nullptr;
-
+		quad *m_pBrowserQuadVCam = nullptr;
+		texture *pQuadTextureVCam = nullptr;
 
 		struct PendingVideoBuffer {
 			uint8_t *pPendingBuffer = nullptr;
 			int pxWidth = 0;
 			int pxHeight = 0;
 			bool fPendingBufferReady = false;
-		} m_pendingVideoBuffer;
+		};
+
+		PendingVideoBuffer m_pendingVideoBufferChrome;
+		PendingVideoBuffer m_pendingVideoBufferVCam;
 
 		uint8_t *pTestVideoFrameBuffer = nullptr;
 
@@ -514,6 +519,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 			if (pCloudController != nullptr && testUserNum == 2) {
 				CR(pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
 
+				//// Pretend we have an audio source on VCam as well
+				//CR(pCloudController->BroadcastAudioPacket(kVCamAudiolabel, pendingAudioPacket));
+
 				int numFrames = pendingAudioPacket.GetNumFrames();
 				CRM(pDreamOS->PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_BROWSER_0, numFrames, pendingAudioPacket), "Failed to push packet to sound system");
 			}
@@ -536,6 +544,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		virtual RESULT HandleCanTabNext(bool fCanNext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleLoadEnd() override { return R_NOT_HANDLED; }
+
 		// CloudController::PeerConnectionObserver
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
 			DEVENV_LINEOUT("OnNewPeerConnection");
@@ -577,7 +586,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 			if (strAudioTrackLabel == kUserAudioLabel) {
 
 				AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, sound::type::SIGNED_16_BIT, (uint8_t*)pAudioDataBuffer);
-				CR(pDreamOS->GetDreamSoundSystem()->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, 1));
+				CR(pDreamOS->GetDreamSoundSystem()->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, 2));
 
 				CRM(pDreamOS->PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::PEER_1, (int)frames, pendingPacket), "Failed to push packet to sound system");
 			}
@@ -587,6 +596,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 				CR(pDreamOS->GetDreamSoundSystem()->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, 0));
 
 				CRM(pDreamOS->PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::REMOTE_BROWSER_MONO_0, (int)frames, pendingPacket), "Failed to push packet to sound system");
+			}
+			else if (strAudioTrackLabel == kVCamAudiolabel) {
+				AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, sound::type::SIGNED_16_BIT, (uint8_t*)pAudioDataBuffer);
+				CR(pDreamOS->GetDreamSoundSystem()->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, 1));
+
+				//CRM(pDreamOS->PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::REMOTE_BROWSER_MONO_0, (int)frames, pendingPacket), "Failed to push packet to sound system");
 			}
 
 		Error:
@@ -608,14 +623,22 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
 			RESULT r = R_PASS;
 
-			CBM((m_pendingVideoBuffer.fPendingBufferReady == false), "Buffer already pending");
+			if (strVideoTrackLabel == kChromeVideoLabel) {
+				CBM((m_pendingVideoBufferChrome.fPendingBufferReady == false), "Chrome Buffer already pending");
 
-			//DEBUG_LINEOUT("on video frame %s", strVideoTrackLabel.c_str());
+				m_pendingVideoBufferChrome.pPendingBuffer = pVideoFrameDataBuffer;
+				m_pendingVideoBufferChrome.pxWidth = pxWidth;
+				m_pendingVideoBufferChrome.pxHeight = pxHeight;
+				m_pendingVideoBufferChrome.fPendingBufferReady = true;
+			}
+			else if (strVideoTrackLabel == kVCamVideoLabel) {
+				CBM((m_pendingVideoBufferVCam.fPendingBufferReady == false), "VCam Buffer already pending");
 
-			m_pendingVideoBuffer.pPendingBuffer = pVideoFrameDataBuffer;
-			m_pendingVideoBuffer.pxWidth = pxWidth;
-			m_pendingVideoBuffer.pxHeight = pxHeight;
-			m_pendingVideoBuffer.fPendingBufferReady = true;
+				m_pendingVideoBufferVCam.pPendingBuffer = pVideoFrameDataBuffer;
+				m_pendingVideoBufferVCam.pxWidth = pxWidth;
+				m_pendingVideoBufferVCam.pxHeight = pxHeight;
+				m_pendingVideoBufferVCam.fPendingBufferReady = true;
+			}
 
 		Error:
 			return r;
@@ -730,7 +753,10 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 
 		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
 		//std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
-		std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
+		
+		std::string strURLChrome = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
+		std::string strURLVCam = "https://www.youtube.com/watch?v=Ic4xAuIkoFE";
+
 		std::string strTestValue;
 		int testUserNumber = -1;
 
@@ -760,13 +786,21 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		strTestValue = pCommandLineManager->GetParameterValue("testval");
 		testUserNumber = atoi(strTestValue.c_str());
 
-		// quad
-		// This presents a timing issue if it works 
-		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
-		CN(pTestContext->m_pBrowserQuad);
-		pTestContext->m_pBrowserQuad->FlipUVHorizontal();
-		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
-		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
+		// Chrome Browser Quad
+		pTestContext->m_pBrowserQuadChrome = m_pDreamOS->AddQuad(3.0f, 3.0f);
+		CN(pTestContext->m_pBrowserQuadChrome);
+		pTestContext->m_pBrowserQuadChrome->FlipUVHorizontal();
+		pTestContext->m_pBrowserQuadChrome->RotateXByDeg(90.0f);
+		pTestContext->m_pBrowserQuadChrome->RotateZByDeg(180.0f);
+		pTestContext->m_pBrowserQuadChrome->translateX(-1.75f);
+		
+		// VCam Browser Quad
+		pTestContext->m_pBrowserQuadVCam = m_pDreamOS->AddQuad(3.0f, 3.0f);
+		CN(pTestContext->m_pBrowserQuadVCam);
+		pTestContext->m_pBrowserQuadVCam->FlipUVHorizontal();
+		pTestContext->m_pBrowserQuadVCam->RotateXByDeg(90.0f);
+		pTestContext->m_pBrowserQuadVCam->RotateZByDeg(180.0f);
+		pTestContext->m_pBrowserQuadVCam->translateX(-1.75f);
 
 		// Browser
 		if (testUserNumber == 2) {
@@ -775,19 +809,24 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 			CN(pTestContext->m_pWebBrowserManager);
 			CR(pTestContext->m_pWebBrowserManager->Initialize());
 
-			// Create the Shared View App
-			pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-			pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
-			CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
-			CRM(pTestContext->m_pDreamBrowser->RegisterObserver(pTestContext), "Failed to register browser observer");
-			pTestContext->m_pDreamBrowser->SetForceObserverAudio(true);
+			// Create the Dream Browser Chrome
+			pTestContext->m_pDreamBrowserChrome = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+			pTestContext->m_pDreamBrowserChrome->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURLChrome);
+			CNM(pTestContext->m_pDreamBrowserChrome, "Failed to create dream browser chrome");
+			CRM(pTestContext->m_pDreamBrowserChrome->RegisterObserver(pTestContext), "Failed to register browser observer chrome");
+			pTestContext->m_pDreamBrowserChrome->SetForceObserverAudio(true);
 
-			// Set up the view
-			//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-			//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-			//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
+			pTestContext->m_pDreamBrowserChrome->SetURI(strURLChrome);
 
-			pTestContext->m_pDreamBrowser->SetURI(strURL);
+
+			pTestContext->m_pDreamBrowserVCam = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+			pTestContext->m_pDreamBrowserVCam->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURLVCam);
+			CNM(pTestContext->m_pDreamBrowserVCam, "Failed to create dream browser vcam");
+			CRM(pTestContext->m_pDreamBrowserVCam->RegisterObserver(pTestContext), "Failed to register browser observer vcam");
+			pTestContext->m_pDreamBrowserVCam->SetForceObserverAudio(true);
+
+			pTestContext->m_pDreamBrowserVCam->SetURI(strURLVCam);
+
 			//*/
 		}
 		else {
@@ -798,7 +837,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 
 			std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
-			pTestContext->pQuadTexture = m_pDreamOS->MakeTexture(
+			pTestContext->pQuadTextureChrome = m_pDreamOS->MakeTexture(
 				texture::type::TEXTURE_2D,
 				pxWidth,
 				pxHeight,
@@ -808,8 +847,21 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 				pxWidth * pxHeight * 4
 			);
 
-			CN(pTestContext->pQuadTexture);
-			pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->pQuadTexture);
+			CN(pTestContext->pQuadTextureChrome);
+			pTestContext->m_pBrowserQuadChrome->SetDiffuseTexture(pTestContext->pQuadTextureChrome);
+
+			pTestContext->pQuadTextureVCam = m_pDreamOS->MakeTexture(
+				texture::type::TEXTURE_2D,
+				pxWidth,
+				pxHeight,
+				PIXEL_FORMAT::RGBA,
+				4,
+				&vectorByteBuffer[0],
+				pxWidth * pxHeight * 4
+			);
+
+			CN(pTestContext->pQuadTextureVCam);
+			pTestContext->m_pBrowserQuadVCam->SetDiffuseTexture(pTestContext->pQuadTextureVCam);
 		}
 
 		// Cloud Controller
@@ -888,32 +940,61 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		pCloudController = pTestContext->pCloudController;
 		CN(pCloudController);
 
-		if (pTestContext->m_pBrowserQuad != nullptr) {
+		if (pTestContext->m_pBrowserQuadChrome != nullptr) {
 
-			if (pTestContext->m_pDreamBrowser != nullptr) {
-				auto pSourceTexture = pTestContext->m_pDreamBrowser->GetSourceTexture();
+			// Chrome Browser
+			if (pTestContext->m_pDreamBrowserChrome != nullptr) {
+				auto pSourceTexture = pTestContext->m_pDreamBrowserChrome->GetSourceTexture();
 
-				pTestContext->m_pBrowserQuad->SetDiffuseTexture(pSourceTexture);
+				pTestContext->m_pBrowserQuadChrome->SetDiffuseTexture(pSourceTexture);
 
 				//GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
 
 				// Testing: Memory Leak
 				pCloudController->BroadcastTextureFrame(kChromeVideoLabel, pSourceTexture, 0, PIXEL_FORMAT::RGBA);
 			}
-			else if (pTestContext->m_pendingVideoBuffer.fPendingBufferReady && pTestContext->m_pendingVideoBuffer.pPendingBuffer != nullptr) {
+			else if (pTestContext->m_pendingVideoBufferChrome.fPendingBufferReady && pTestContext->m_pendingVideoBufferChrome.pPendingBuffer != nullptr) {
 
-				reinterpret_cast<OGLTexture*>(pTestContext->pQuadTexture)->Resize(pTestContext->m_pendingVideoBuffer.pxWidth, pTestContext->m_pendingVideoBuffer.pxHeight);
+				reinterpret_cast<OGLTexture*>(pTestContext->pQuadTextureChrome)->Resize(pTestContext->m_pendingVideoBufferChrome.pxWidth, pTestContext->m_pendingVideoBufferChrome.pxHeight);
 
 				// Update the video buffer to texture
 
 				// NOTE: Looks like this bad boy is leaking some mems
-				CR(pTestContext->pQuadTexture->Update(
-					(unsigned char*)(pTestContext->m_pendingVideoBuffer.pPendingBuffer),
-					pTestContext->m_pendingVideoBuffer.pxWidth,
-					pTestContext->m_pendingVideoBuffer.pxHeight,
+				CR(pTestContext->pQuadTextureChrome->Update(
+					(unsigned char*)(pTestContext->m_pendingVideoBufferChrome.pPendingBuffer),
+					pTestContext->m_pendingVideoBufferChrome.pxWidth,
+					pTestContext->m_pendingVideoBufferChrome.pxHeight,
 					PIXEL_FORMAT::RGBA)
 				);
 			}
+
+
+			// VCam Browser
+			if (pTestContext->m_pDreamBrowserVCam != nullptr) {
+				auto pSourceTexture = pTestContext->m_pDreamBrowserVCam->GetSourceTexture();
+
+				pTestContext->m_pBrowserQuadVCam->SetDiffuseTexture(pSourceTexture);
+
+				//GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
+
+				// Testing: Memory Leak
+				pCloudController->BroadcastTextureFrame(kVCamVideoLabel, pSourceTexture, 0, PIXEL_FORMAT::RGBA);
+			}
+			else if (pTestContext->m_pendingVideoBufferVCam.fPendingBufferReady && pTestContext->m_pendingVideoBufferVCam.pPendingBuffer != nullptr) {
+			
+				reinterpret_cast<OGLTexture*>(pTestContext->pQuadTextureVCam)->Resize(pTestContext->m_pendingVideoBufferVCam.pxWidth, pTestContext->m_pendingVideoBufferVCam.pxHeight);
+			
+				// Update the video buffer to texture
+			
+				// NOTE: Looks like this bad boy is leaking some mems
+				CR(pTestContext->pQuadTextureVCam->Update(
+					(unsigned char*)(pTestContext->m_pendingVideoBufferVCam.pPendingBuffer),
+					pTestContext->m_pendingVideoBufferVCam.pxWidth,
+					pTestContext->m_pendingVideoBufferVCam.pxHeight,
+					PIXEL_FORMAT::RGBA)
+				);
+			}
+
 		}
 
 		// Every 20 ms
@@ -950,11 +1031,11 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		//*/
 
 	Error:
-		pTestContext->m_pendingVideoBuffer.fPendingBufferReady = false;
+		pTestContext->m_pendingVideoBufferChrome.fPendingBufferReady = false;
 
-		if (pTestContext->m_pendingVideoBuffer.pPendingBuffer != nullptr) {
-			delete pTestContext->m_pendingVideoBuffer.pPendingBuffer;
-			pTestContext->m_pendingVideoBuffer.pPendingBuffer = nullptr;
+		if (pTestContext->m_pendingVideoBufferChrome.pPendingBuffer != nullptr) {
+			delete pTestContext->m_pendingVideoBufferChrome.pPendingBuffer;
+			pTestContext->m_pendingVideoBufferChrome.pPendingBuffer = nullptr;
 		}
 
 		return r;
