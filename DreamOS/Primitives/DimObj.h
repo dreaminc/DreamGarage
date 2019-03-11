@@ -20,7 +20,6 @@
 #include "QuadIndexGroup.h"
 #include "Vertex.h"
 
-#include "TimeManager/TimeManager.h"
 #include "material.h"
 #include "texture.h"
 
@@ -31,7 +30,6 @@ class BoundingVolume;
 class CollisionManifold;
 
 class DimObj : public VirtualObj, 
-			   public Subscriber<TimeEvent>, 
 			   public dirty 
 {
 	friend class OGLObj;
@@ -231,9 +229,6 @@ public:
 	
 	// TODO: Should this moved up into vertex?
 	RESULT RotateVerticesByEulerVector(vector vEuler);
-	
-	// TODO: This shouldn't be baked in here ultimately
-	RESULT Notify(TimeEvent *event);
 
 	material* GetMaterial();
 	RESULT SetMaterial(material mMaterial);

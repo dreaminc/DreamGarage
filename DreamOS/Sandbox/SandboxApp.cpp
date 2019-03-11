@@ -18,9 +18,6 @@
 #include "DreamAppManager.h"
 #include "DreamAppMessage.h"
 
-// TODO: This shouldn't be needed here
-#include "DreamOS.h"
-
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/ProgramNode.h"
 
@@ -433,10 +430,6 @@ RESULT SandboxApp::RunAppLoop() {
 		// Module Manager
 		CR(m_pDreamModuleManager->Update());
 
-		// TODO: MODULE
-		// Time Manager
-		CR(m_pTimeManager->Update());
-
 		// App Manager
 		CR(m_pDreamAppManager->Update());
 
@@ -613,7 +606,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializeDreamModuleManager(), "Failed to initialize Dream Module Manager");
 
 	// TODO: Time manager should be converted to a module
-	CRM(InitializeTimeManager(), "Failed to initialize time manager");
+	CRM(InitializeTimeManagerModule(), "Failed to initialize time manager");
 
 	if ((m_pCommandLineManager->GetParameterValue("namedpipe").compare("") == 0) == false) {
 		m_SandboxConfiguration.fInitNamedPipe = false;
@@ -648,6 +641,7 @@ Error:
 	return r;
 }
 
+// TODO: Module
 RESULT SandboxApp::InitializePhysicsEngine() {
 	RESULT r = R_PASS;
 
@@ -667,6 +661,7 @@ Error:
 	return r;
 }
 
+// TODO: Module
 RESULT SandboxApp::InitializeInteractionEngine() {
 	RESULT r = R_PASS;
 
@@ -690,14 +685,20 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::InitializeTimeManager() {
+RESULT SandboxApp::InitializeTimeManagerModule() {
 	RESULT r = R_PASS;
 
-	// Initialize Time Manager
-	m_pTimeManager = std::make_unique<TimeManager>();
+	CNM(m_pDreamModuleManager, "Module manager is not running");
 
-	CNM(m_pTimeManager, "Failed to allocate Time Manager");
-	CVM(m_pTimeManager, "Failed to validate Time Manager");
+	DOSLOG(INFO, "Launching Time Manager Module");
+
+	m_pTimeManagerModule = m_pDreamModuleManager->CreateRegisterAndStartModule<TimeManagerModule>(this);	
+	CNM(m_pTimeManagerModule, "Failed to launch Time Manager Module");
+	CVM(m_pTimeManagerModule, "Failed to validate Time Manager Module");
+
+Error:
+	return r;
+
 
 Error:
 	return r;
@@ -1942,7 +1943,7 @@ Error:
 RESULT SandboxApp::RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber) {
 	RESULT r = R_PASS;
 
-	CR(m_pTimeManager->RegisterSubscriber(timeEvent, pTimeSubscriber));
+	CR(m_pTimeManagerModule->RegisterSubscriber(timeEvent, pTimeSubscriber));
 
 Error:
 	return r;

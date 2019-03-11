@@ -145,12 +145,18 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	}
 	//*/
 
+	// Sandbox Modules and Apps
+
 	// Audio System
 	if (m_pSandbox->m_SandboxConfiguration.fInitSound) {
 		CRM(InitializeDreamSoundSystem(), "Failed to initialize the Dream Sound System");
 		CRM(RegisterSoundSystemObserver(this), "Failed to register this as sound system observer");
 	}
 
+	// Object Loader Module
+	CRM(InitializeDreamObjectModule(), "Failed to initialize the Dream Object Module");
+
+	// Dream User App
 	if (m_pSandbox->m_SandboxConfiguration.fInitUserApp) {
 		CRM(InitializeDreamUserApp(), "Failed to initalize user app");
 	}
@@ -888,6 +894,18 @@ RESULT DreamOS::InitializeCloudController() {
 	RESULT r = R_PASS;
 
 	CR(m_pSandbox->InitializeCloudController());
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::InitializeDreamObjectModule() {
+	RESULT r = R_PASS;
+
+	DOSLOG(INFO, "Initializing Dream Object Module");
+
+	//m_pDreamObjectModule = LaunchDreamModule<DreamObjectModule>(this);
+	//CNM(m_pDreamObjectModule, "Failed to launch Dream Object Module");
 
 Error:
 	return r;

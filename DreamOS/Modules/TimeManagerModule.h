@@ -1,12 +1,12 @@
-#ifndef TIME_MANAGER_H_
-#define TIME_MANAGER_H_
+#ifndef TIME_MANAGER_MODULE_H_
+#define TIME_MANAGER_MODULE_H_
 
 // DREAM OS
-// DreamOS/Dimension/Primitives/TimeManager.h
+// DreamOS/Modules/TimeManagerModule.h
 // Time Manager 
 
-#include "Primitives/valid.h"
-#include "Primitives/Types/UID.h"
+#include "DreamModule.h"
+
 #include "Primitives/Publisher.h"
 
 #include <vector>
@@ -39,13 +39,26 @@ typedef struct TimeEvent {
 } TIME_EVENT;
 
 
-class TimeManager : public Publisher<TimeEventType, TimeEvent>, public valid {
-public:
-	TimeManager(double	processingTimeQuantum = 0.0167);
-	~TimeManager();
+class TimeManagerModule : 
+	public DreamModule<TimeManagerModule>,
+	public Publisher<TimeEventType, TimeEvent>
+{
+	friend class DreamModuleManager;
 
+public:
+	TimeManagerModule(DreamOS *pDreamOS, void *pContext, double processingTimeQuantum = 0.0167f);
+	~TimeManagerModule();
+
+	virtual RESULT InitializeModule(void *pContext = nullptr) override;
+	virtual RESULT OnDidFinishInitializing(void *pContext = nullptr) override;
+	virtual RESULT Update(void *pContext = nullptr) override;
+	virtual RESULT Shutdown(void *pContext = nullptr) override;
+
+protected:
+	static TimeManagerModule* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+
+public:
 	RESULT Reset();		// Resets time
-	RESULT Update();	// Updates the time from previous call to update.
 
 	RESULT ResetMinMaxFPS();
 	RESULT PrintFPS();
@@ -58,21 +71,15 @@ private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_currentTime;
 
 	double m_processingTimeQuantum;
-	double m_totalElapsedTime;
+	double m_totalElapsedTime = 0.0f;
 	double m_totalTimeToProcess;
 
-	double m_runTimeFPS = 0;
+	double m_runTimeFPS = 0.0f;
 	
-	double m_maxFPS = 0;
-	double m_minFPS = 0;
+	double m_maxFPS = 0.0f;
+	double m_minFPS = 0.0f;
 
 	long long m_numFrames = 0;
-
-public:
-	UID getID() { return m_uid; }
-
-private:
-	UID m_uid;
 };
 
-#endif // !TIME_MANAGER_H_
+#endif // !TIME_MANAGER_MODULE_H_
