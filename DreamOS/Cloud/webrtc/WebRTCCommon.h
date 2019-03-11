@@ -25,6 +25,7 @@ const char kUserAudioLabel[] = "user_audio_label";
 const char kUserDataLabel[] = "user_data_label";
 
 // User Video Camera
+const char kVCamStreamLabel[] = "vcam_stream_label";
 const char kVCamVideoLabel[] = "vcam_video_label";
 const char kVCamAudiolabel[] = "vcam_audio_label";
 
