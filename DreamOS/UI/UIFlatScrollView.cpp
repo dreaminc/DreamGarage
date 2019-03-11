@@ -165,6 +165,10 @@ RESULT UIFlatScrollView::Notify(SenseControllerEvent *pEvent) {
 			{
 				CR(Snap());
 			}
+			else
+			{
+				m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(this);
+			}
 		}
 
 	} break;
