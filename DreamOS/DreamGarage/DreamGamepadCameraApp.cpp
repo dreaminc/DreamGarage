@@ -98,6 +98,22 @@ Error:
 	return r;
 }
 
+RESULT DreamGamepadCameraApp::ClearUpdateFlags(HAND_TYPE handType) {
+	RESULT r = R_PASS;
+
+	if (handType == HAND_TYPE::HAND_LEFT) {
+		m_fUpdateLeftStick = false;
+		m_fUpdateLeftTrigger = false;
+	}
+	else if (handType == HAND_TYPE::HAND_RIGHT) {
+		m_fUpdateRightStick = false;
+		m_fUpdateRightTrigger = false;
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamGamepadCameraApp::RegisterGamepadCameraObserver(DreamGamepadCameraApp::observer *pObserver) {
 	RESULT r = R_PASS;
 

@@ -336,7 +336,15 @@ RESULT DreamVCam::Update(void *pContext) {
 		
 		// Check if Active Source
 		if (m_pParentApp->GetActiveSource() != nullptr) {
-			if (m_pParentApp->GetActiveSource().get() == this && m_pParentApp->IsContentVisible() && !m_pParentApp->IsScrollingTabs()) {
+			if (m_pParentApp->GetActiveSource().get() == this && m_pParentApp->IsContentVisible()) {
+
+				if (m_pParentApp->IsScrollingTabs(HAND_TYPE::HAND_LEFT)) {
+					m_pDreamGamepadCamera->ClearUpdateFlags(HAND_TYPE::HAND_LEFT);
+				}
+				if (m_pParentApp->IsScrollingTabs(HAND_TYPE::HAND_RIGHT)) {
+					m_pDreamGamepadCamera->ClearUpdateFlags(HAND_TYPE::HAND_RIGHT);
+				}
+
 				if (m_pDreamGamepadCamera->GetCameraControlType() != DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER) {
 					CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
 				}

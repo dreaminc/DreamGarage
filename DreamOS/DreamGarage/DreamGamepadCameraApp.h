@@ -24,6 +24,8 @@
 #include "Sense/SenseGamepadController.h"
 #include "Sense/SenseController.h"
 
+#include "Primitives/HandType.h"
+
 class camera;
 class AirResistanceGenerator;
 
@@ -74,6 +76,7 @@ public:
 	CameraControlType GetCameraControlType();
 
 	RESULT UnregisterFromEvents();
+	RESULT ClearUpdateFlags(HAND_TYPE handType);
 
 	RESULT RegisterGamepadCameraObserver(DreamGamepadCameraApp::observer *pObserver);
 

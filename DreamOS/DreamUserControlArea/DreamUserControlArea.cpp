@@ -1073,8 +1073,17 @@ bool DreamUserControlArea::IsSharingScreen() {
 	return (m_pCurrentScreenShare != nullptr);
 }
 
-bool DreamUserControlArea::IsScrollingTabs() {
-	return (m_fMalletInTabView[0] || m_fMalletInTabView[1]);
+bool DreamUserControlArea::IsScrollingTabs(HAND_TYPE handType) {
+
+	if (handType == HAND_TYPE::HAND_LEFT) {
+		return m_fMalletInTabView[0];
+	}
+	else if (handType == HAND_TYPE::HAND_RIGHT) {
+		return m_fMalletInTabView[1];
+	}
+
+	return false;
+	//return (m_fMalletInTabView[0] || m_fMalletInTabView[1]);
 }
 
 RESULT DreamUserControlArea::UpdateIsActive(bool fIsActive) {
