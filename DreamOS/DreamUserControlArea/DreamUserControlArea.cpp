@@ -1073,6 +1073,10 @@ bool DreamUserControlArea::IsSharingScreen() {
 	return (m_pCurrentScreenShare != nullptr);
 }
 
+bool DreamUserControlArea::IsScrollingTabs() {
+	return (m_fMalletInTabView[0] || m_fMalletInTabView[1]);
+}
+
 RESULT DreamUserControlArea::UpdateIsActive(bool fIsActive) {
 	RESULT r = R_PASS;
 

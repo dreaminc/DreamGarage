@@ -190,6 +190,8 @@ public:
 	std::shared_ptr<EnvironmentShare> GetCurrentScreenShare();
 	bool IsSharingScreen();
 
+	bool IsScrollingTabs();
+
 	RESULT UpdateIsActive(bool fIsActive);
 	RESULT HandleCameraClosed();
 
