@@ -864,6 +864,7 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrow
 
 	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
+	// This check never fails, as long as ShareView has been initialized
 	CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);
 
 	if ((GetSourceTexture() == GetDOS()->GetSharedCameraTexture()) || (GetSourceTexture() == GetDOS()->GetSharedContentTexture())) {
@@ -992,7 +993,7 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 		if (m_fForceObserverAudio || GetDOS()->GetSharedContentTexture() == m_pBrowserTexture.get() || GetDOS()->GetSharedCameraTexture() == m_pBrowserTexture.get()) {
 			//DOSLOG(INFO, "AudioPacket: Frames: %d, Channels: %d, SamplingRate: %d", pendingAudioPacket.GetNumFrames(), pendingAudioPacket.GetNumChannels(), pendingAudioPacket.GetSamplingRate());
 			if (m_strCurrentURL == "https://web.skype.com/") {
-				if (pendingAudioPacket.GetNumChannels() == 2) { //&& pendingAudioPacket.GetNumFrames() == 480) {
+				if (pendingAudioPacket.GetNumChannels() == 2 && pendingAudioPacket.GetNumFrames() == 480) {
 					//DOSLOG(INFO, "Pushing Packet!!!");
 
 					if (m_pRenderSoundBuffer != nullptr) {

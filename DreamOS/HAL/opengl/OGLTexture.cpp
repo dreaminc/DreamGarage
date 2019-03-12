@@ -558,13 +558,10 @@ RESULT OGLTexture::LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
 		CR(BindPixelPackBuffer(m_packBufferIndex));
 
 		//m_pParentImp->glReadPixels(0, 0, m_width, m_height, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, 0);
-		CR(m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), NULL));
-
-		// increment index
-		m_packBufferIndex = (m_packBufferIndex + 1) % NUM_PACK_BUFFERS;
+		CR(m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), NULL));	
 
 		// Map the PBO to process its data by CPU (other PBO as to avoid waiting)
-		CR(BindPixelPackBuffer(m_packBufferIndex));
+		//CR(BindPixelPackBuffer(m_packBufferIndex));
 		void *pPackPBO = m_pParentImp->glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
 
 		CN(pPackPBO);
@@ -577,6 +574,8 @@ RESULT OGLTexture::LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
 		// back to conventional pixel operation
 		m_pParentImp->glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
+		// increment index
+		m_packBufferIndex = (m_packBufferIndex + 1) % NUM_PACK_BUFFERS;
 		
 	}
 	else {

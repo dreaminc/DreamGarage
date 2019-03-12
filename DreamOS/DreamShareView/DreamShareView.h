@@ -105,6 +105,8 @@ public:
 		size_t pDataBuffer_n = 0;
 	} m_pendingFrame;
 
+	PendingFrame m_overflowFrame;
+
 protected:
 	static DreamShareView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -126,6 +128,8 @@ private:
 	std::shared_ptr<texture> m_pLoadingTexture = nullptr;
 
 	texture* m_pPointingTexture = nullptr;
+
+	std::mutex m_overflowBufferMutex;
 
 	int m_castpxWidth = BROWSER_WIDTH;
 	int m_castpxHeight = BROWSER_HEIGHT;

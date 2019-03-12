@@ -571,6 +571,21 @@ RESULT DreamShareView::OnVideoFrame(const std::string &strVideoTrackLabel, PeerC
 
 		if (r == R_OVERFLOW) {
 			DEBUG_LINEOUT("Overflow frame!");
+			std::unique_lock<std::mutex> lockBufferMutex(m_overflowBufferMutex);
+
+			m_overflowFrame.fPending = true;
+			m_overflowFrame.pxWidth = pxWidth;
+			m_overflowFrame.pxHeight = pxHeight;
+
+			// Allocate
+			// TODO: Might be able to avoid this if the video buffer is not changing size
+			// and just keep the memory allocated instead
+			m_overflowFrame.pDataBuffer_n = sizeof(uint8_t) * pxWidth * pxHeight * 4;
+			//m_pendingFrame.pDataBuffer = (uint8_t*)malloc(m_pendingFrame.pDataBuffer_n);
+
+			m_overflowFrame.pDataBuffer = pVideoFrameDataBuffer;
+
+			CNM(m_overflowFrame.pDataBuffer, "Failed to allocate video buffer mem");
 			return R_PASS;
 		}
 
@@ -691,7 +706,15 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 	}
 
 Error:
-	if (m_pendingFrame.pDataBuffer != nullptr) {
+	if (m_overflowFrame.fPending == true) {
+		std::unique_lock<std::mutex> lockBufferMutex(m_overflowBufferMutex);
+		m_pendingFrame = m_overflowFrame;
+		memcpy(m_pendingFrame.pDataBuffer, m_overflowFrame.pDataBuffer, m_overflowFrame.pDataBuffer_n);
+
+		m_overflowFrame.fPending = false;
+	}
+	
+	else if (m_pendingFrame.pDataBuffer != nullptr) {
 		delete [] m_pendingFrame.pDataBuffer;
 		m_pendingFrame.pDataBuffer = nullptr;
 
