@@ -706,13 +706,12 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 	}
 
 Error:
-	if (m_overflowFrame.pDataBuffer != nullptr) {
+	if (m_overflowFrame.fPending == true) {
 		std::unique_lock<std::mutex> lockBufferMutex(m_overflowBufferMutex);
 		m_pendingFrame = m_overflowFrame;
-		delete[] m_overflowFrame.pDataBuffer;
-		m_overflowFrame.pDataBuffer = nullptr;
+		memcpy(m_pendingFrame.pDataBuffer, m_overflowFrame.pDataBuffer, m_overflowFrame.pDataBuffer_n);
 
-		memset(&m_overflowFrame, 0, sizeof(PendingFrame));
+		m_overflowFrame.fPending = false;
 	}
 	
 	else if (m_pendingFrame.pDataBuffer != nullptr) {
