@@ -988,7 +988,7 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 		if (m_fForceObserverAudio || GetDOS()->GetSharedContentTexture() == m_pBrowserTexture.get() || GetDOS()->GetSharedCameraTexture() == m_pBrowserTexture.get()) {
 			//DOSLOG(INFO, "AudioPacket: Frames: %d, Channels: %d, SamplingRate: %d", pendingAudioPacket.GetNumFrames(), pendingAudioPacket.GetNumChannels(), pendingAudioPacket.GetSamplingRate());
 			if (m_strCurrentURL == "https://web.skype.com/") {
-				if (pendingAudioPacket.GetNumChannels() == 2) { //&& pendingAudioPacket.GetNumFrames() == 480) {
+				if (pendingAudioPacket.GetNumChannels() == 2 && pendingAudioPacket.GetNumFrames() == 480) {
 					//DOSLOG(INFO, "Pushing Packet!!!");
 
 					if (m_pRenderSoundBuffer != nullptr) {
