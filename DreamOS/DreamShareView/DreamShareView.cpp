@@ -134,12 +134,13 @@ RESULT DreamShareView::Update(void *pContext) {
 		CRM(UpdateFromPendingVideoFrame(), "Failed to update pending frame");
 	}
 
-	if (m_pointingObjects.size() > 0) {
-		
-		auto qRotation = m_pCastQuad->GetOrientation(true);
-
+	if (m_pCastQuad != nullptr) {
 		m_pMirrorQuad = m_pPointerContext->AddQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight());
 		m_pMirrorQuad->SetDiffuseTexture(m_pCastQuad->GetTextureDiffuse());
+		m_pPointerContext->RenderToQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight(), 0, 0);
+	}
+
+	if (m_pointingObjects.size() > 0) {
 		float scale = m_pCastQuad->GetScale(true).x();
 
 		for (auto pair : m_pointingObjects) {
@@ -161,9 +162,6 @@ RESULT DreamShareView::Update(void *pContext) {
 				}
 			}
 		}
-
-		m_pPointerContext->RenderToQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight(), 0, 0);
-
 	}
 
 Error:
