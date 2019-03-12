@@ -157,6 +157,20 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::ReplaceURL(const std::string& strURL) {
+	RESULT r = R_PASS;
+	std::string strCode;
+
+	CN(m_pCEFBrowser);
+
+	strCode = "location.replace('" + strURL + "');";
+
+	m_pCEFBrowser->GetFocusedFrame()->ExecuteJavaScript(strCode, m_pCEFBrowser->GetFocusedFrame()->GetURL(), 0);
+
+Error:
+	return r;
+}
+
 CefRefPtr<CefPostData> CEFBrowserController::MakeCEFRequestPostData(std::shared_ptr<WebRequestPostData> pWebRequestPostData) {
 	RESULT r = R_PASS;
 
@@ -246,6 +260,15 @@ RESULT CEFBrowserController::LoadRequest(const WebRequest &webRequest) {
 
 Error:
 	return r;
+}
+
+bool CEFBrowserController::CheckIsError(int errorCode) {
+	for (int i = 0; i < m_cefErrorCodes.size(); i++) {
+		if (errorCode == m_cefErrorCodes[i]) {
+			return true;
+		}
+	}
+	return false;
 }
 
 RESULT CEFBrowserController::SendKeyEventChar(char chKey, bool fKeyDown) {

@@ -341,9 +341,13 @@ Error:
 RESULT DreamBrowser::OnLoadError(int errorCode, std::string strError, std::string strFailedURL) {
 	RESULT r = R_PASS;
 
-	// currently the abort case (-3) is caused by OnCertificateError
-	if (m_pObserver != nullptr && errorCode != -3) {
-		CR(SetURI(m_pObserver->GetLoadErrorURL()));
+	// currently our handling of OnCertificateError causes an abort(-3)
+	// that error isn't handled here so the privacy message isn't overriden
+	if (m_pObserver != nullptr) {
+		CN(m_pWebBrowserController);
+		if (errorCode != -3 && m_pWebBrowserController->CheckIsError(errorCode)) {
+			CR(m_pWebBrowserController->ReplaceURL(m_pObserver->GetLoadErrorURL()));
+		}
 	}
 
 Error:
