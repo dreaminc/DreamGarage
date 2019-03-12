@@ -168,7 +168,7 @@ public:
 	size_t PendingAudioPacketQueueLength();
 
 	//IMPLEMENT_REFCOUNTING(CEFBrowserController);
-	int m_cefErrorCodes[54] = {
+	std::vector<int> m_cefErrorCodes = {
 	  ERR_NONE,
 	  ERR_FAILED,
 	  ERR_ABORTED,

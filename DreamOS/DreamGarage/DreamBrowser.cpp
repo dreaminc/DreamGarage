@@ -342,7 +342,7 @@ RESULT DreamBrowser::OnLoadError(int errorCode, std::string strError, std::strin
 	RESULT r = R_PASS;
 
 	// currently our handling of OnCertificateError causes an abort(-3)
-	// that error isn't handled here so the privacy messages isn't overriden
+	// that error isn't handled here so the privacy message isn't overriden
 	if (m_pObserver != nullptr) {
 		CN(m_pWebBrowserController);
 		if (errorCode != -3 && m_pWebBrowserController->CheckIsError(errorCode)) {

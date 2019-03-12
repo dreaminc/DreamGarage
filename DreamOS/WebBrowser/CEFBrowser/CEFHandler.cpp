@@ -249,12 +249,7 @@ void CEFHandler::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFra
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFHANDLE: OnLoadError %S url: %S", strError.c_str(), strFailedURL.c_str());
 
-//	pCEFBrowser->GoBack();
-	//pCEFBrowser->GetHost()->
-
-	//pCEFBrowser->StopLoad();
-
-	//CR(m_pCEFHandlerObserver->OnLoadingStateChanged(pCEFBrowser, false, true, false));
+	CN(m_pCEFHandlerObserver);
 	CR(m_pCEFHandlerObserver->OnLoadError(pCEFBrowser, pCEFFrame, errorCode, strError, strFailedURL));
 
 Error:

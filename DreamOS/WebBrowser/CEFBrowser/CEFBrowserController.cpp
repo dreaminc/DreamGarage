@@ -163,9 +163,7 @@ RESULT CEFBrowserController::ReplaceURL(const std::string& strURL) {
 
 	CN(m_pCEFBrowser);
 
-//	m_pCEFBrowser->GetFocusedFrame()->LoadURL(url);
 	strCode = "location.replace('" + strURL + "');";
-	//strCode = strCode + strURL;
 
 	m_pCEFBrowser->GetFocusedFrame()->ExecuteJavaScript(strCode, m_pCEFBrowser->GetFocusedFrame()->GetURL(), 0);
 
@@ -265,7 +263,7 @@ Error:
 }
 
 bool CEFBrowserController::CheckIsError(int errorCode) {
-	for (int i = 0; i < 54; i++) {
+	for (int i = 0; i < m_cefErrorCodes.size(); i++) {
 		if (errorCode == m_cefErrorCodes[i]) {
 			return true;
 		}
