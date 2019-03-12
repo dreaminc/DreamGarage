@@ -133,6 +133,9 @@ public:
 
 	// Loads a URL
 	virtual RESULT LoadURL(const std::string& strURL) = 0;
+	virtual RESULT ReplaceURL(const std::string& strURL) = 0;
+
+	virtual bool CheckIsError(int errorCode) = 0;
 
 	// Loads a Web Request
 	virtual RESULT LoadRequest(const WebRequest &webRequest) = 0;

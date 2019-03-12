@@ -50,7 +50,7 @@ class WebRequestPostData;
 
 class CEFDOMNode;
 
-class CEFBrowserController :  public WebBrowserController {
+class CEFBrowserController : public WebBrowserController {
 
 	RESULT RegisterCEFAppObserver(CEFBrowserController::observer* pCEFBrowserControllerObserver);
 public:
@@ -63,7 +63,10 @@ public:
 	virtual RESULT PollPendingAudioPackets(int &numAudioPacketsProcessed) override;
 	virtual RESULT Resize(unsigned int width, unsigned int height) override;
 	virtual RESULT LoadURL(const std::string& strURL) override;
+	virtual RESULT ReplaceURL(const std::string& strURL) override;
 	virtual RESULT LoadRequest(const WebRequest &webRequest) override;
+
+	virtual bool CheckIsError(int errorCode) override;
 
 	CefRefPtr<CefRequest> MakeCEFRequest(const WebRequest &webRequest);
 	CefRefPtr<CefPostData> MakeCEFRequestPostData(std::shared_ptr<WebRequestPostData> pWebRequestPostData);
@@ -98,14 +101,14 @@ public:
 	RESULT HandleCanTabPrevious(bool fTabPrevious);
 
 	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseDown, int clickCount = 1) override;
-	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) override; 
-	virtual RESULT SendMouseWheel(const WebBrowserMouseEvent& webBrowserMouseEvent, int deltaX, int deltaY) override;	
+	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) override;
+	virtual RESULT SendMouseWheel(const WebBrowserMouseEvent& webBrowserMouseEvent, int deltaX, int deltaY) override;
 	virtual RESULT CloseBrowser() override;
 
 	virtual RESULT SendKeyEventChar(char chKey, bool fKeyDown) override;
 	virtual RESULT SendKeySequence(const std::string& strKeySequence) override;
 
-	virtual RESULT Shutdown() override; 
+	virtual RESULT Shutdown() override;
 
 	CefRefPtr<CefBrowser> GetCEFBrowser();
 
@@ -139,9 +142,9 @@ private:
 	std::vector<unsigned char> m_vectorFrameBuffer;
 	std::vector<unsigned char> m_vectorPopupBuffer;
 	WebBrowserController::PAINT_ELEMENT_TYPE m_paintType;
-	
+
 	CefRect m_popupRect;
-	
+
 	// browser physical size (buffer size)
 	int m_bufferWidth = 0;
 	int m_bufferHeight = 0;
@@ -165,6 +168,63 @@ public:
 	size_t PendingAudioPacketQueueLength();
 
 	//IMPLEMENT_REFCOUNTING(CEFBrowserController);
+	int m_cefErrorCodes[54] = {
+	  ERR_NONE,
+	  ERR_FAILED,
+	  ERR_ABORTED,
+	  ERR_INVALID_ARGUMENT,
+	  ERR_INVALID_HANDLE,
+	  ERR_FILE_NOT_FOUND,
+	  ERR_TIMED_OUT,
+	  ERR_FILE_TOO_BIG,
+	  ERR_UNEXPECTED,
+	  ERR_ACCESS_DENIED,
+	  ERR_NOT_IMPLEMENTED,
+	  ERR_CONNECTION_CLOSED,
+	  ERR_CONNECTION_RESET,
+	  ERR_CONNECTION_REFUSED,
+	  ERR_CONNECTION_ABORTED,
+	  ERR_CONNECTION_FAILED,
+	  ERR_NAME_NOT_RESOLVED,
+	  ERR_INTERNET_DISCONNECTED,
+	  ERR_SSL_PROTOCOL_ERROR,
+	  ERR_ADDRESS_INVALID,
+	  ERR_ADDRESS_UNREACHABLE,
+	  ERR_SSL_CLIENT_AUTH_CERT_NEEDED,
+	  ERR_TUNNEL_CONNECTION_FAILED,
+	  ERR_NO_SSL_VERSIONS_ENABLED,
+	  ERR_SSL_VERSION_OR_CIPHER_MISMATCH,
+	  ERR_SSL_RENEGOTIATION_REQUESTED,
+	  ERR_CERT_COMMON_NAME_INVALID,
+	  ERR_CERT_DATE_INVALID,
+	  ERR_CERT_AUTHORITY_INVALID,
+	  ERR_CERT_CONTAINS_ERRORS,
+	  ERR_CERT_NO_REVOCATION_MECHANISM,
+	  ERR_CERT_UNABLE_TO_CHECK_REVOCATION,
+	  ERR_CERT_REVOKED,
+	  ERR_CERT_INVALID,
+	  ERR_CERT_WEAK_SIGNATURE_ALGORITHM,
+	  ERR_CERT_NON_UNIQUE_NAME,
+	  ERR_CERT_WEAK_KEY,
+	  ERR_CERT_NAME_CONSTRAINT_VIOLATION,
+	  ERR_CERT_VALIDITY_TOO_LONG,
+	  ERR_CERT_END,
+	  ERR_INVALID_URL,
+	  ERR_DISALLOWED_URL_SCHEME,
+	  ERR_UNKNOWN_URL_SCHEME,
+	  ERR_TOO_MANY_REDIRECTS,
+	  ERR_UNSAFE_REDIRECT,
+	  ERR_UNSAFE_PORT,
+	  ERR_INVALID_RESPONSE,
+	  ERR_INVALID_CHUNKED_ENCODING,
+	  ERR_METHOD_NOT_SUPPORTED,
+	  ERR_UNEXPECTED_PROXY_AUTH,
+	  ERR_EMPTY_RESPONSE,
+	  ERR_RESPONSE_HEADERS_TOO_BIG,
+	  ERR_CACHE_MISS,
+	  ERR_INSECURE_RESPONSE 
+	};
+
 };
 
 #endif // ! CEF_BROWSER_CONTROLLER_H_

@@ -254,7 +254,6 @@ void CEFHandler::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFra
 
 	//pCEFBrowser->StopLoad();
 
-	CN(m_pCEFHandlerObserver);
 	//CR(m_pCEFHandlerObserver->OnLoadingStateChanged(pCEFBrowser, false, true, false));
 	CR(m_pCEFHandlerObserver->OnLoadError(pCEFBrowser, pCEFFrame, errorCode, strError, strFailedURL));
 
