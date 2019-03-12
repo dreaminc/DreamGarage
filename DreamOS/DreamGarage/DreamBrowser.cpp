@@ -986,16 +986,34 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	if (m_pObserver != nullptr) {
 
 		if (m_fForceObserverAudio || GetDOS()->GetSharedContentTexture() == m_pBrowserTexture.get() || GetDOS()->GetSharedCameraTexture() == m_pBrowserTexture.get()) {
+			//DOSLOG(INFO, "AudioPacket: Frames: %d, Channels: %d, SamplingRate: %d", pendingAudioPacket.GetNumFrames(), pendingAudioPacket.GetNumChannels(), pendingAudioPacket.GetSamplingRate());
+			if (m_strCurrentURL == "https://web.skype.com/") {
+				if (pendingAudioPacket.GetNumChannels() == 2) { //&& pendingAudioPacket.GetNumFrames() == 480) {
+					DOSLOG(INFO, "Pushing Packet!!!");
 
-			if (m_pRenderSoundBuffer != nullptr) {
+					if (m_pRenderSoundBuffer != nullptr) {
 
-				m_pRenderSoundBuffer->LockBuffer();
+						m_pRenderSoundBuffer->LockBuffer();
 
-				{
-					CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
+						{
+							CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
+						}
+
+						m_pRenderSoundBuffer->UnlockBuffer();
+					}
 				}
+			}
+			else {
+				if (m_pRenderSoundBuffer != nullptr) {
 
-				m_pRenderSoundBuffer->UnlockBuffer();
+					m_pRenderSoundBuffer->LockBuffer();
+
+					{
+						CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
+					}
+
+					m_pRenderSoundBuffer->UnlockBuffer();
+				}
 			}
 		}
 	}
