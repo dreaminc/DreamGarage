@@ -129,6 +129,8 @@ private:
 
 	texture* m_pPointingTexture = nullptr;
 
+	std::mutex m_overflowBufferMutex;
+
 	int m_castpxWidth = BROWSER_WIDTH;
 	int m_castpxHeight = BROWSER_HEIGHT;
 	float m_aspectRatio;

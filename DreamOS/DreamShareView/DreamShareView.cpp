@@ -571,6 +571,8 @@ RESULT DreamShareView::OnVideoFrame(const std::string &strVideoTrackLabel, PeerC
 
 		if (r == R_OVERFLOW) {
 			DEBUG_LINEOUT("Overflow frame!");
+			std::unique_lock<std::mutex> lockBufferMutex(m_overflowBufferMutex);
+
 			m_overflowFrame.fPending = true;
 			m_overflowFrame.pxWidth = pxWidth;
 			m_overflowFrame.pxHeight = pxHeight;
@@ -705,6 +707,7 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 
 Error:
 	if (m_overflowFrame.pDataBuffer != nullptr) {
+		std::unique_lock<std::mutex> lockBufferMutex(m_overflowBufferMutex);
 		m_pendingFrame = m_overflowFrame;
 		delete[] m_overflowFrame.pDataBuffer;
 		m_overflowFrame.pDataBuffer = nullptr;

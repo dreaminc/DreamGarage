@@ -860,6 +860,7 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrow
 
 	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
+	// This check never fails, as long as ShareView has been initialized
 	CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);
 
 	if ((GetSourceTexture() == GetDOS()->GetSharedCameraTexture()) || (GetSourceTexture() == GetDOS()->GetSharedContentTexture())) {
