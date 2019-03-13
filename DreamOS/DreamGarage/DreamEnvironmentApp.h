@@ -29,7 +29,9 @@ namespace environment {
 	typedef enum type {
 		LOBBY = 0,
 		CAVE = 1,
-		ISLAND = 2,
+		//CANYON = 2,
+		//HOUSE = 3,
+		ISLAND,
 		INVALID
 	} ENVIRONMENT_TYPE;
 };
@@ -100,7 +102,9 @@ private:
 		// legacy environment, potentially could be removed completely
 		// do not load during release startup
 	//	{environment::ISLAND, L"\\FloatingIsland\\env.obj"},
-		{environment::CAVE, L"\\Cave\\cave.FBX"}
+		{environment::CAVE, L"\\model\\environment\\1\\environment.fbx"},
+		//{environment::CANYON, L"\\model\\environment\\2\\environment.fbx"},
+		//{environment::HOUSE, L"\\model\\environment\\3\\environment.fbx"}
 	};
 
 	//populated in LoadAllEnvironments
