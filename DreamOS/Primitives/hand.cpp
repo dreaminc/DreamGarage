@@ -79,6 +79,9 @@ RESULT hand::LoadHandModel() {
 	float scaleModel = 0.01f;
 	color modelColor;
 
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
+
 	// replace hands
 	if (m_pModel != nullptr) {
 		RemoveChild(m_pModel);
@@ -94,9 +97,11 @@ RESULT hand::LoadHandModel() {
 
 #ifndef _DEBUG
 
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+
 	if (m_handType == HAND_TYPE::HAND_LEFT) {
 
-		std::wstring wstrModel = k_wstrFolder + std::to_wstring(m_avatarModelId) + L"/" + k_wstrLeft + k_wstrFileType;
+		std::wstring wstrModel = wstrAssetPath + k_wstrFolder + std::to_wstring(m_avatarModelId) + L"/" + k_wstrLeft + k_wstrFileType;
 		//m_pModel = m_pHMDComposite->AddModel(wstrModel);
 		m_pModel = AddModel(wstrModel);
 		m_pPhantomModel = MakeModel(wstrModel);
@@ -112,7 +117,7 @@ RESULT hand::LoadHandModel() {
 	
 	if (m_handType == HAND_TYPE::HAND_RIGHT) {
 
-		std::wstring wstrModel = k_wstrFolder + std::to_wstring(m_avatarModelId) + L"/" + k_wstrRight + k_wstrFileType;
+		std::wstring wstrModel = wstrAssetPath + k_wstrFolder + std::to_wstring(m_avatarModelId) + L"/" + k_wstrRight + k_wstrFileType;
 		//m_pModel = m_pHMDComposite->AddModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
 		m_pModel = AddModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
 		m_pPhantomModel = MakeModel(wstrModel, ModelFactory::flags::FLIP_WINDING);

@@ -133,10 +133,16 @@ RESULT DreamEnvironmentApp::PositionEnvironment(environment::type type, std::sha
 RESULT DreamEnvironmentApp::LoadAllEnvironments() {
 	RESULT r = R_PASS;
 
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+
 	for (auto& filenamePair : m_environmentFilenames) {
 
-		//TODO: with unique environment shader, change this to MakeModel
-		std::shared_ptr<model> pModel = GetComposite()->AddModel(filenamePair.second);
+		//TODO: with unique environment shader, change this to MakeModel	
+		std::wstring wstrModelPath = wstrAssetPath + filenamePair.second;
+
+		std::shared_ptr<model> pModel = GetComposite()->AddModel(wstrModelPath);
 		CN(pModel);
 
 		m_environmentModels[filenamePair.first] = pModel;
