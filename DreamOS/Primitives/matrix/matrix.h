@@ -981,8 +981,8 @@ matrix<TMat4x4, M, N> transpose(matrix<TMat4x4, N, M> mat) {
 	matrix<TMat4x4, M, N> retMatrix;
 	retMatrix.clear();
 
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < M; j++) {
+	for (int i = 0; i < M; i++) {
+		for (int j = 0; j < N; j++) {
 			retMatrix.element(i, j) = mat.element(j, i);
 		}
 	}

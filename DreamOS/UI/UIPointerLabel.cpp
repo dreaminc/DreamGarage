@@ -192,14 +192,16 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		SetPosition(ptMessage);
 
 		// update saved points queue
-		m_recentPoints.push_back(ptPosition);
+		if (m_recentPoints.size() == 0 || ptPosition != m_recentPoints.back()) {
+			m_recentPoints.push_back(ptPosition);
+		}
 		if (m_recentPoints.size() > NUM_POINTS) {
 			m_recentPoints.pop_front();
 		}
 
 		// calculate orientation
 		if (m_recentPoints.size() == NUM_POINTS) {
-			CR(UpdateOrientationFromPoints());
+			UpdateOrientationFromPoints();
 		}
 	}
 
@@ -209,6 +211,13 @@ Error:
 }
 
 RESULT UIPointerLabel::UpdateOrientationFromPoints() {
+	RESULT r = R_PASS;
+
+	return r;
+}
+
+quaternion UIPointerLabel::OrientationFromRegression() {
+
 	RESULT r = R_PASS;
 
 	const unsigned int pts = NUM_POINTS;
@@ -251,6 +260,7 @@ RESULT UIPointerLabel::UpdateOrientationFromPoints() {
 
 	//*
 	// mA * [x] = mb
+
 	matrix<float, dims, pts> mAT = transpose(mA);
 
 	// (mA^T * mA) * [x] = mA^T * mb
@@ -273,13 +283,15 @@ RESULT UIPointerLabel::UpdateOrientationFromPoints() {
 	// y = x[0][0] + x[0][1]*t
 	float slope = x.element(1, 0);
 
+	if (m_recentPoints[0].x() < m_recentPoints[m_recentPoints.size() - 1].x()) {
+		slope = -slope;
+	}
 	// calculate label orientation through 2-dimensional slope
-	float theta = tan(slope);
+	float theta = sin(slope);
 
-	SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, theta));
-	//*/
+	return quaternion::MakeQuaternionWithEuler(theta, 0.0f, 0.0f);
 Error:
-	return r;
+	return quaternion();
 }
 
 std::shared_ptr<FlatContext> UIPointerLabel::GetContext() {

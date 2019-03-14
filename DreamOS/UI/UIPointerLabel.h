@@ -3,7 +3,7 @@
 
 #include "UIView.h"
 
-#define NUM_POINTS 5
+#define NUM_POINTS 20
 
 class FlatContext;
 class font;
@@ -35,9 +35,10 @@ private:
 	std::shared_ptr<quad> m_pParentQuad = nullptr;
 	bool m_fPointingLeft = true;
 
-// Path saving
+// Path saving methods
 private:
 	RESULT UpdateOrientationFromPoints();
+	quaternion OrientationFromRegression();
 
 private:
 	std::deque<point> m_recentPoints;
