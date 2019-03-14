@@ -223,16 +223,17 @@ RESULT UIPointerLabel::UpdateOrientationFromPoints() {
 
 	// populate matrices
 	// linear
+	//*
 	int i = 0;
 	for (auto ptPosition : m_recentPoints) {
 		
-		mA[i][0] = 1;
-		mA[i][1] = ptPosition.x();
-
-		mb[i][0] = ptPosition.y();
+		mA.element(i, 0) = 1;
+		mA.element(i, 1) = ptPosition.x();
+		mb.element(i, 0) = ptPosition.y();
 
 		i++;
 	}
+	//*/
 	// quadratic
 	/*
 	int i = 0;
@@ -248,6 +249,7 @@ RESULT UIPointerLabel::UpdateOrientationFromPoints() {
 	}
 	//*/
 
+	//*
 	// mA * [x] = mb
 	matrix<float, dims, pts> mAT = transpose(mA);
 
@@ -269,13 +271,13 @@ RESULT UIPointerLabel::UpdateOrientationFromPoints() {
 
 	// linear
 	// y = x[0][0] + x[0][1]*t
-	float slope = x[0][1];
+	float slope = x.element(1, 0);
 
 	// calculate label orientation through 2-dimensional slope
 	float theta = tan(slope);
 
 	SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, theta));
-
+	//*/
 Error:
 	return r;
 }
