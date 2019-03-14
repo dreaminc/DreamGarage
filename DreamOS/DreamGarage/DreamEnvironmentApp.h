@@ -29,8 +29,8 @@ namespace environment {
 	typedef enum type {
 		LOBBY = 0,
 		CAVE = 1,
-		//CANYON = 2,
-		//HOUSE = 3,
+		CANYON = 2,
+		HOUSE = 3,
 		ISLAND,
 		INVALID
 	} ENVIRONMENT_TYPE;

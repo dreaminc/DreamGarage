@@ -339,26 +339,28 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 		//m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pReflectionSkyboxProgram));
 		//m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pSkyboxProgram));
 
-		quad *pWaterQuad = MakeQuad(1000.0f, 1000.0f);
-		point ptQuadOffset = point(90.0f, -1.3f, -25.0f);
-		pWaterQuad->SetPosition(ptQuadOffset);
-		pWaterQuad->SetMaterialColors(color(57.0f / 255.0f, 112.0f / 255.0f, 151.0f / 255.0f, 1.0f));
-		CN(pWaterQuad);
+		if (m_pWaterQuad == nullptr) {
+			m_pWaterQuad = MakeQuad(1000.0f, 1000.0f);
+			point ptQuadOffset = point(90.0f, -2.38f, -25.0f);
+			m_pWaterQuad->SetPosition(ptQuadOffset);
+			m_pWaterQuad->SetMaterialColors(color(57.0f / 255.0f, 112.0f / 255.0f, 151.0f / 255.0f, 1.0f));
+		}
+		CN(m_pWaterQuad);
 
 		if (pWaterProgramNode != nullptr) {
-			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(pWaterQuad));
+			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(m_pWaterQuad));
 		}
 
 		if (pReflectionProgramNode != nullptr) {
-			CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionObject(pWaterQuad));
+			CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionObject(m_pWaterQuad));
 		}
 
 		if (pRefractionProgramNode != nullptr) {
-			CR(dynamic_cast<OGLProgramRefraction*>(pRefractionProgramNode)->SetRefractionObject(pWaterQuad));
+			CR(dynamic_cast<OGLProgramRefraction*>(pRefractionProgramNode)->SetRefractionObject(m_pWaterQuad));
 		}
 
 		if (pReflectionSkyboxProgram != nullptr) {
-			CR(dynamic_cast<OGLProgramSkybox*>(pReflectionSkyboxProgram)->SetReflectionObject(pWaterQuad));
+			CR(dynamic_cast<OGLProgramSkybox*>(pReflectionSkyboxProgram)->SetReflectionObject(m_pWaterQuad));
 		}
 
 		if(m_pDreamEnvironmentApp == nullptr) {			// Pipelines made before Environment app will need to get the scenegraph node from it in LoadScene() apparently
@@ -1842,6 +1844,15 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 	else {
 		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
 		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environment::type(environmentModelId)));
+		if (environment::type(environmentModelId) == environment::type::CAVE) {
+			m_pWaterQuad->SetPosition(point(90.0f, -2.38f, -25.0f));
+		}
+		else if (environment::type(environmentModelId) == environment::type::CANYON) {
+			m_pWaterQuad->SetPosition(point(90.0f, -19.42f, -25.0f));
+		}
+		else if (environment::type(environmentModelId) == environment::type::HOUSE) {
+			m_pWaterQuad->SetPosition(point(90.0f, -100.0f, -25.0f));
+		}
 	}
 
 Error:

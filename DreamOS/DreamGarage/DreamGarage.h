@@ -229,6 +229,7 @@ private:
 	ProgramNode* m_pRefractionProgramNodeMirror = nullptr;
 	ProgramNode* m_pReflectionProgramNodeMirror = nullptr;
 
+	quad* m_pWaterQuad = nullptr;
 	DreamEnvironmentApp* m_pDreamEnvironmentApp = nullptr;
 	DreamUserControlArea* m_pDreamUserControlArea = nullptr;
 	DreamUIBar* m_pDreamUIBar = nullptr;
