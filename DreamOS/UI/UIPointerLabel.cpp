@@ -151,7 +151,6 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 
 	CN(pUpdatePointerMessage);
 
-	//SetPosition(pUpdatePointerMessage->m_body.ptPointer + point(-0.01f, 0.0f, 0.0f));
 	{
 		point ptMessage = pUpdatePointerMessage->m_body.ptPointer;
 
@@ -159,12 +158,13 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		float newAmount = 0.3f;
 		ptMessage = (1.0f - newAmount) * GetPosition() + (newAmount)* ptMessage;
 
+		// calculate position on the screen quad
 		point ptPosition = (point)(inverse(RotationMatrix(m_pParentQuad->GetOrientation(true))) * (ptMessage - m_pParentQuad->GetOrigin(true)));
 		float width = m_pParentQuad->GetWidth() * m_pParentQuad->GetScale(true).x();
 		float height = m_pParentQuad->GetHeight() * m_pParentQuad->GetScale(true).y();
-
 		std::string strInitials(pUpdatePointerMessage->m_body.szInitials, 2);
 
+		// Update orientation
 		if (ptPosition.x() > width / 4.0f && m_fPointingLeft) {
 			m_fPointingLeft = false;
 			CR(RenderLabelWithInitials(m_pParentQuad, strInitials));
@@ -190,8 +190,91 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		m_pRenderContext->SetVisible(fInBounds && pUpdatePointerMessage->m_body.fVisible, false);
 
 		SetPosition(ptMessage);
+
+		// update saved points queue
+		m_recentPoints.push_back(ptPosition);
+		if (m_recentPoints.size() > NUM_POINTS) {
+			m_recentPoints.pop_front();
+		}
+
+		// calculate orientation
+		if (m_recentPoints.size() == NUM_POINTS) {
+			CR(UpdateOrientationFromPoints());
+		}
 	}
 
+
+Error:
+	return r;
+}
+
+RESULT UIPointerLabel::UpdateOrientationFromPoints() {
+	RESULT r = R_PASS;
+
+	const unsigned int pts = NUM_POINTS;
+	const unsigned int dims = 2;
+
+	// quadratic
+	//const unsigned int dims = 3;
+
+	// linear normal equation matrices
+	matrix<float, pts, dims> mA;
+	matrix<float, pts, 1> mb;
+
+	// populate matrices
+	// linear
+	int i = 0;
+	for (auto ptPosition : m_recentPoints) {
+		
+		mA[i][0] = 1;
+		mA[i][1] = ptPosition.x();
+
+		mb[i][0] = ptPosition.y();
+
+		i++;
+	}
+	// quadratic
+	/*
+	int i = 0;
+	for (auto ptPosition : m_recentPoints) {
+		
+		mA[i][0] = 1;
+		mA[i][1] = ptPosition.x();
+		mA[i][2] = ptPosition.x() * ptPosition.x();
+
+		mb[i][0] = ptPosition.y();
+
+		i++;
+	}
+	//*/
+
+	// mA * [x] = mb
+	matrix<float, dims, pts> mAT = transpose(mA);
+
+	// (mA^T * mA) * [x] = mA^T * mb
+	matrix<float, dims, dims> mATA = mAT * mA;
+	matrix<float, dims, 1> mATb = mAT * mb;
+
+	// mA transpose * mA may be invertible since it is square
+	matrix<float, dims, dims> mI;
+	matrix<float, dims, 1> x;
+
+	// if determinant = 0, the matrix is not invertible
+	CB(determinant(mATA) != 0);
+
+	mI = inverse(mATA);
+
+	// [x] = (mA^T * mA)^-1 * mA^T * mb
+	x = mI * mATb;
+
+	// linear
+	// y = x[0][0] + x[0][1]*t
+	float slope = x[0][1];
+
+	// calculate label orientation through 2-dimensional slope
+	float theta = tan(slope);
+
+	SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, theta));
 
 Error:
 	return r;
