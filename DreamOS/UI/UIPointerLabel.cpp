@@ -165,6 +165,7 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		std::string strInitials(pUpdatePointerMessage->m_body.szInitials, 2);
 
 		// Update orientation
+		/*
 		if (ptPosition.x() > width / 4.0f && m_fPointingLeft) {
 			m_fPointingLeft = false;
 			CR(RenderLabelWithInitials(m_pParentQuad, strInitials));
@@ -173,6 +174,7 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 			m_fPointingLeft = true;
 			CR(RenderLabelWithInitials(m_pParentQuad, strInitials));
 		}
+		//*/
 
 
 		bool fInBounds = true;
@@ -213,10 +215,55 @@ Error:
 RESULT UIPointerLabel::UpdateOrientationFromPoints() {
 	RESULT r = R_PASS;
 
+	quaternion qRotation;
+
+	CBR(OrientationFromAverage(qRotation), R_SKIPPED);
+
+//	CBR(OrientationFromNormalEquation(qRotation), R_SKIPPED);
+
+	SetOrientation(qRotation);
+
+Error:
 	return r;
 }
 
-quaternion UIPointerLabel::OrientationFromRegression() {
+bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation) {
+	RESULT r = R_PASS;
+
+	// average velocity, xdiff, ydiff
+	float totalX = 0.0f;
+	float totalY = 0.0f;
+
+	float velocity = 0.0f;
+
+	for (int i = (int)(m_recentPoints.size()) - 1; i > 0; i--) {
+		m_recentPoints[i];
+			
+		float currentX = m_recentPoints[i].x() - m_recentPoints[i-1].x();
+		float currentY = m_recentPoints[i].y() - m_recentPoints[i-1].y();
+
+		totalX += currentX;
+		totalY += currentY;
+
+		velocity += sqrt(currentX * currentX + currentY * currentY);
+	}
+
+	totalX /= m_recentPoints.size();
+	totalY /= m_recentPoints.size();
+	velocity /= m_recentPoints.size();
+
+	float theta = atan2(totalY, -totalX);
+
+	CB(velocity > 0.0075f);
+
+	qRotation = quaternion::MakeQuaternionWithEuler(theta, 0.0f, 0.0f);
+
+	return true;
+Error:
+	return false;
+}
+
+bool UIPointerLabel::OrientationFromNormalEquation(quaternion& qRotation) {
 
 	RESULT r = R_PASS;
 
@@ -283,15 +330,14 @@ quaternion UIPointerLabel::OrientationFromRegression() {
 	// y = x[0][0] + x[0][1]*t
 	float slope = x.element(1, 0);
 
-	if (m_recentPoints[0].x() < m_recentPoints[m_recentPoints.size() - 1].x()) {
-		slope = -slope;
-	}
 	// calculate label orientation through 2-dimensional slope
-	float theta = sin(slope);
+	float theta = atan2(slope,1);
 
-	return quaternion::MakeQuaternionWithEuler(theta, 0.0f, 0.0f);
+	qRotation = quaternion::MakeQuaternionWithEuler(theta, 0.0f, 0.0f);
+
+	return true;
 Error:
-	return quaternion();
+	return false;
 }
 
 std::shared_ptr<FlatContext> UIPointerLabel::GetContext() {

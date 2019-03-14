@@ -38,7 +38,8 @@ private:
 // Path saving methods
 private:
 	RESULT UpdateOrientationFromPoints();
-	quaternion OrientationFromRegression();
+	bool OrientationFromAverage(quaternion& qRotation);
+	bool OrientationFromNormalEquation(quaternion& qRotation);
 
 private:
 	std::deque<point> m_recentPoints;
