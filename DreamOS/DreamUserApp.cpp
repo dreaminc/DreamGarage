@@ -323,7 +323,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 	}
 	
 #endif
-//	CR(UpdateHysteresisObject());
+	CR(UpdateHysteresisObject());
 
 Error:
 	return r;

@@ -3,6 +3,8 @@
 
 #include "UIView.h"
 
+#define NUM_POINTS 20
+
 class FlatContext;
 class font;
 class DreamShareViewPointerMessage;
@@ -32,6 +34,15 @@ private:
 	// and from that the direction of the pointer;
 	std::shared_ptr<quad> m_pParentQuad = nullptr;
 	bool m_fPointingLeft = true;
+
+// Path saving methods
+private:
+	RESULT UpdateOrientationFromPoints();
+	bool OrientationFromAverage(quaternion& qRotation);
+	bool OrientationFromNormalEquation(quaternion& qRotation);
+
+private:
+	std::deque<point> m_recentPoints;
 
 // Resource strings
 private:
