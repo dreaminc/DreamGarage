@@ -974,11 +974,11 @@ matrix<TMat4x4, N, N> transpose(matrix<TMat4x4, N, N> mat) {
 	return retMatrix;
 }
 
-template <typename TMat4x4, int N, int M>
-matrix<TMat4x4, M, N> transpose(matrix<TMat4x4, N, M> mat) {
+template <typename TMat, int N, int M>
+matrix<TMat, M, N> transpose(matrix<TMat, N, M> mat) {
 	RESULT r = R_PASS;
 
-	matrix<TMat4x4, M, N> retMatrix;
+	matrix<TMat, M, N> retMatrix;
 	retMatrix.clear();
 
 	for (int i = 0; i < M; i++) {

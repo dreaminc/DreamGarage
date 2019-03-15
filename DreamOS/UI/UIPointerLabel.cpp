@@ -270,16 +270,12 @@ bool UIPointerLabel::OrientationFromNormalEquation(quaternion& qRotation) {
 	const unsigned int pts = NUM_POINTS;
 	const unsigned int dims = 2;
 
-	// quadratic
-	//const unsigned int dims = 3;
-
 	// linear normal equation matrices
 	matrix<float, pts, dims> mA;
 	matrix<float, pts, 1> mb;
 
 	// populate matrices
 	// linear
-	//*
 	int i = 0;
 	for (auto ptPosition : m_recentPoints) {
 		
@@ -289,32 +285,17 @@ bool UIPointerLabel::OrientationFromNormalEquation(quaternion& qRotation) {
 
 		i++;
 	}
-	//*/
-	// quadratic
-	/*
-	int i = 0;
-	for (auto ptPosition : m_recentPoints) {
-		
-		mA[i][0] = 1;
-		mA[i][1] = ptPosition.x();
-		mA[i][2] = ptPosition.x() * ptPosition.x();
 
-		mb[i][0] = ptPosition.y();
-
-		i++;
-	}
-	//*/
-
-	//*
+	// solving for x, the coefficients of a linear function
 	// mA * [x] = mb
-
 	matrix<float, dims, pts> mAT = transpose(mA);
 
+	// multiply both sides by the transpose of matrix A
 	// (mA^T * mA) * [x] = mA^T * mb
 	matrix<float, dims, dims> mATA = mAT * mA;
 	matrix<float, dims, 1> mATb = mAT * mb;
 
-	// mA transpose * mA may be invertible since it is square
+	// check invertibility of matrix A times A-transpose
 	matrix<float, dims, dims> mI;
 	matrix<float, dims, 1> x;
 
@@ -323,6 +304,7 @@ bool UIPointerLabel::OrientationFromNormalEquation(quaternion& qRotation) {
 
 	mI = inverse(mATA);
 
+	// multiplying both sides by the inverse solves for x
 	// [x] = (mA^T * mA)^-1 * mA^T * mb
 	x = mI * mATb;
 
