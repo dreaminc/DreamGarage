@@ -59,6 +59,7 @@ RESULT OGLProgramReflection::OGLInitialize() {
 	// Uniform Blocks
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
+	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pFogBlock), std::string("ub_fogConfig")));
 
 	// Frame buffer Output
 	int pxWidth = m_pParentImp->GetViewport().Width();
@@ -202,6 +203,8 @@ RESULT OGLProgramReflection::ProcessNode(long frameID) {
 
 	SetLights(pLights);
 
+	SetFogConfig(50.0f, 300.0f, 0.05f, color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 0.0f));
+
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// 3D Object / skybox
@@ -271,6 +274,18 @@ RESULT OGLProgramReflection::SetMaterial(material *pMaterial) {
 	if (m_pMaterialsBlock != nullptr) {
 		CR(m_pMaterialsBlock->SetMaterial(pMaterial));
 		CR(m_pMaterialsBlock->UpdateOGLUniformBlockBuffers());
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgramReflection::SetFogConfig(float startDistance, float endDistance, float density, vector fogColor) {
+	RESULT r = R_PASS;
+
+	if (m_pFogBlock != nullptr) {
+		CR(m_pFogBlock->SetFogConfig(startDistance, endDistance, density, fogColor));
+		CR(m_pFogBlock->UpdateOGLUniformBlockBuffers());
 	}
 
 Error:

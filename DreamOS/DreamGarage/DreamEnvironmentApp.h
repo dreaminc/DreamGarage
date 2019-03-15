@@ -102,7 +102,7 @@ private:
 		// legacy environment, potentially could be removed completely
 		// do not load during release startup
 	//	{environment::ISLAND, L"\\FloatingIsland\\env.obj"},
-		{environment::CAVE, L"\\model\\environment\\1\\environment.fbx"},
+		{environment::CAVE, L"\\model\\environment\\2\\environment.fbx"},
 		//{environment::CANYON, L"\\model\\environment\\2\\environment.fbx"},
 		//{environment::HOUSE, L"\\model\\environment\\3\\environment.fbx"}
 	};

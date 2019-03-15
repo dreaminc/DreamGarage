@@ -12,33 +12,37 @@ struct FogConfiguration {
 	float startDistance;
 	float endDistance;
 	float density;
-	vec3 color;
+	vec4 color;
 };
 
-vec4 MixWithFog(in uint fogType, in vec4 shaderColor, in float fragmentDepth, in FogConfiguration fogConfig) {
+layout(std140) uniform ub_fogConfig{
+	FogConfiguration fogConfig;
+};
+
+vec4 MixWithFog(in uint fogType, in vec4 shaderColor, in float fragmentDepth, in FogConfiguration fogConfiguration) {
 
 	float fogFactor;
 
 	switch (fogType) {
 		case(FOG_TYPE_LINEAR): {
-			float fogEndDistance = fogConfig.endDistance;
-			float fogStartDistance = fogConfig.startDistance;
+			float fogEndDistance = fogConfiguration.endDistance;
+			float fogStartDistance = fogConfiguration.startDistance;
 			fogFactor = 1.0f - ((fogEndDistance - fragmentDepth) / (fogEndDistance - fogStartDistance));
 		} break;
 
 		case(FOG_TYPE_EXPONENTIAL): {
-			float fogDensity = fogConfig.density;
+			float fogDensity = fogConfiguration.density;
 			fogFactor = 1.0f - exp(-(abs((fragmentDepth * fogDensity))));
 		} break;
 
 		case(FOG_TYPE_EXPONENTIAL_SQUARED): {
-			float fogDensity = fogConfig.density;
+			float fogDensity = fogConfiguration.density;
 			fogFactor = 1.0f - exp(-(pow((fragmentDepth * fogDensity), 2.0)));
 		} break;
 	}
 
 	fogFactor = clamp(fogFactor, 0.0f, 1.0f);
-	vec3 mixWithFogColor = mix(shaderColor.rgb, fogConfig.color, fogFactor);
-	return vec4(mixWithFogColor, 1.0f);
+	vec4 mixWithFogColor = mix(shaderColor.rgba, fogConfiguration.color, fogFactor);
+	return mixWithFogColor;
 
 }

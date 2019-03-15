@@ -26,6 +26,7 @@ public:
 	RESULT SetObjectTextures(OGLObj *pOGLObj);
 	RESULT SetLights(std::vector<light*> *pLights);
 	RESULT SetMaterial(material *pMaterial);
+	RESULT SetFogConfig(float startDistance, float endDistance, float density, vector fogColor);
 	RESULT SetObjectUniforms(DimObj *pDimObj);
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
@@ -79,6 +80,7 @@ private:
 	// Uniform Blocks
 	OGLLightsBlock *m_pLightsBlock = nullptr;
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
+	OGLFogBlock *m_pFogBlock = nullptr;
 };
 
 #endif // ! OGLPROGRAM_REFLECTION_H_

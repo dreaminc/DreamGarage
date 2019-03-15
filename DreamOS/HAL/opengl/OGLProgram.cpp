@@ -89,6 +89,7 @@ RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const w
 
 	// TODO:  Currently using a global material 
 	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+	SetFogConfig(50.0f, 300.0f, 0.05f, color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 0.0f));
 
 Error:
 	return r;
@@ -113,6 +114,10 @@ RESULT OGLProgram::SetLights(std::vector<light*> *pLights) {
 }
 
 RESULT OGLProgram::SetMaterial(material *pMaterial) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT OGLProgram::SetFogConfig(float startDistance, float endDistance, float density, vector fogColor) {
 	return R_NOT_IMPLEMENTED;
 }
 
