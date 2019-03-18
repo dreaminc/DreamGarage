@@ -62,17 +62,19 @@ RESULT UIPointerLabel::RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad
 
 	auto pText = std::shared_ptr<text>(m_pDreamOS->MakeText(
 		m_pFont,
-		//strInitials,
-		"WW",
+		strInitials,
 		0.4,
 		textHeight,
 		text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
 
 	CN(pText);
 
-	m_pDotQuad = AddQuad(dotHeight, dotHeight);
+	m_pDotComposite = AddComposite();
+	m_pDotComposite->SetVisible(false, false);
+
+	m_pDotQuad = m_pDotComposite->AddQuad(dotHeight, dotHeight);
 	m_pDotQuad->SetDiffuseTexture(m_pPointerDot);
-	m_pDotQuad->SetVisible(true);
+	m_pDotQuad->RotateZByDeg(90.0f);
 	{
 		// assuming only capital letters (A-Z) and centering based on those
 		CharacterGlyph periodGlyph;
@@ -134,7 +136,7 @@ RESULT UIPointerLabel::RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad
 		}
 
 		{
-			m_pDotQuad->SetPosition(point(-screenOffset * 2.0f, 0.0f, 0.0f));
+			m_pDotComposite->SetPosition(point(-screenOffset * 2.0f, 0.0f, 0.0f));
 			m_pRenderContext->SetPosition(point(-screenOffset, 0.0f, 0.0f));
 			auto pQuad = m_pRenderContext->GetCurrentQuad();
 			/*
@@ -201,6 +203,7 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 			fInBounds = false;
 		}
 		m_pRenderContext->SetVisible(fInBounds && pUpdatePointerMessage->m_body.fVisible, false);
+		m_pDotComposite->SetVisible(fInBounds && pUpdatePointerMessage->m_body.fVisible, false);
 
 		SetPosition(ptMessage);
 
@@ -232,7 +235,7 @@ RESULT UIPointerLabel::UpdateOrientationFromPoints() {
 
 //	CBR(OrientationFromNormalEquation(qRotation), R_SKIPPED);
 
-	m_pDotQuad->SetOrientation(qRotation);
+	m_pDotComposite->SetOrientation(qRotation);
 
 Error:
 	return r;
@@ -265,10 +268,10 @@ bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation) {
 
 	float theta = atan2(totalY, -totalX);
 
-	m_pDotQuad->SetVisible(true);
-
 	CB(velocity > 0.0075f);
 
+	//qRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, theta);
+	//qRotation = quaternion::MakeQuaternionWithEuler(theta, 0.0f, (float)(M_PI_2));
 	qRotation = quaternion::MakeQuaternionWithEuler(theta, 0.0f, 0.0f);
 
 	return true;
