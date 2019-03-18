@@ -25,6 +25,7 @@ RESULT UIPointerLabel::Initialize() {
 	m_pPointerLeft = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerLeftTexture)[0]);
 	m_pPointerCenter = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerCenterTexture)[0]);
 	m_pPointerRight = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerRightTexture)[0]);
+	m_pPointerDot = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerDotTexture)[0]);
 
 	m_pRenderContext = AddFlatContext();
 	m_pRenderContext->RotateXByDeg(90.0f);
@@ -49,22 +50,29 @@ RESULT UIPointerLabel::RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad
 
 	float height = pParentQuad->GetHeight()/2 * 0.06;
 	float textHeight = 0.75f*height;
-	float pxHeight = 84.0f;
-	float pxRight = 21.0f;
-	float pxLeft = 39.0f;
+	float pxHeight = 65.0f;
+	float pxRight = 10.0f;
+	float pxLeft = 10.0f;
 	float leftWidth = height * pxLeft / pxHeight;
 	float rightWidth = height * pxRight / pxHeight;
+	float pxDot = 178.0f;
+	float dotHeight = height * pxDot / pxHeight;
 
 	m_pFont->SetLineHeight(textHeight);
 
 	auto pText = std::shared_ptr<text>(m_pDreamOS->MakeText(
 		m_pFont,
-		strInitials,
+		//strInitials,
+		"WW",
 		0.4,
 		textHeight,
 		text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
 
 	CN(pText);
+
+	m_pDotQuad = AddQuad(dotHeight, dotHeight);
+	m_pDotQuad->SetDiffuseTexture(m_pPointerDot);
+	m_pDotQuad->SetVisible(true);
 	{
 		// assuming only capital letters (A-Z) and centering based on those
 		CharacterGlyph periodGlyph;
@@ -126,14 +134,17 @@ RESULT UIPointerLabel::RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad
 		}
 
 		{
+			m_pDotQuad->SetPosition(point(-screenOffset * 2.0f, 0.0f, 0.0f));
 			m_pRenderContext->SetPosition(point(-screenOffset, 0.0f, 0.0f));
 			auto pQuad = m_pRenderContext->GetCurrentQuad();
+			/*
 			if (m_fPointingLeft) {
 				pQuad->SetPosition(point(pQuad->GetWidth() / 2.0f, 0.0f, 0.0f));
 			}
 			else {
 				pQuad->SetPosition(point(-pQuad->GetWidth() / 2.0f, 0.0f, 0.0f));
 			}
+			//*/
 		//	m_pRenderContext->SetPosition(point(-screenOffset, 0.0f, m_pRenderContext->GetCurrentQuad()->GetWidth() / 2.0f));
 		}
 	}
@@ -221,7 +232,7 @@ RESULT UIPointerLabel::UpdateOrientationFromPoints() {
 
 //	CBR(OrientationFromNormalEquation(qRotation), R_SKIPPED);
 
-	SetOrientation(qRotation);
+	m_pDotQuad->SetOrientation(qRotation);
 
 Error:
 	return r;
@@ -253,6 +264,8 @@ bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation) {
 	velocity /= m_recentPoints.size();
 
 	float theta = atan2(totalY, -totalX);
+
+	m_pDotQuad->SetVisible(true);
 
 	CB(velocity > 0.0075f);
 
