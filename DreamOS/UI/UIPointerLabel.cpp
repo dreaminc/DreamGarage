@@ -230,18 +230,29 @@ RESULT UIPointerLabel::UpdateOrientationFromPoints() {
 	RESULT r = R_PASS;
 
 	quaternion qRotation;
+	vector vDirection;
 
-	CBR(OrientationFromAverage(qRotation), R_SKIPPED);
+	CBR(OrientationFromAverage(qRotation, vDirection), R_SKIPPED);
 
 //	CBR(OrientationFromNormalEquation(qRotation), R_SKIPPED);
 
+	vDirection.Normalize();
+	vDirection = m_pDotQuad->GetWidth()/2.0f * vDirection;
+	vDirection = vector(-0.02f, -vDirection.y(), vDirection.x());
+
 	m_pDotComposite->SetOrientation(qRotation);
+	m_pDotComposite->SetPosition(vDirection);
+
+	m_pRenderContext->SetPosition(vDirection);
+
+	// TODO: Slerp(?), lerp does not work well
+//	m_pDotComposite->SetOrientation(m_pDotComposite->GetOrientation().RotateToQuaternionLerp(qRotation, 0.2f));
 
 Error:
 	return r;
 }
 
-bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation) {
+bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation, vector &vDirection) {
 	RESULT r = R_PASS;
 
 	// average velocity, xdiff, ydiff
@@ -270,8 +281,7 @@ bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation) {
 
 	CB(velocity > 0.0075f);
 
-	//qRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, theta);
-	//qRotation = quaternion::MakeQuaternionWithEuler(theta, 0.0f, (float)(M_PI_2));
+	vDirection = vector(-totalX, totalY, 0.0f);
 	qRotation = quaternion::MakeQuaternionWithEuler(theta, 0.0f, 0.0f);
 
 	return true;
@@ -279,7 +289,7 @@ Error:
 	return false;
 }
 
-bool UIPointerLabel::OrientationFromNormalEquation(quaternion& qRotation) {
+bool UIPointerLabel::OrientationFromNormalEquation(quaternion& qRotation, vector& vDirection) {
 
 	RESULT r = R_PASS;
 
@@ -331,6 +341,7 @@ bool UIPointerLabel::OrientationFromNormalEquation(quaternion& qRotation) {
 	// calculate label orientation through 2-dimensional slope
 	float theta = atan2(slope,1);
 
+	vDirection = vector(1, slope, 0);
 	qRotation = quaternion::MakeQuaternionWithEuler(theta, 0.0f, 0.0f);
 
 	return true;
