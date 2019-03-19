@@ -162,7 +162,7 @@ RESULT DreamEnvironmentApp::SetCurrentEnvironment(environment::type type) {
 	m_currentType = type;
 
 	for (auto *pProgram : m_fogPrograms) {
-		fogparams fogParams = m_environmentFogParams[m_currentType];
+		FogParams fogParams = m_environmentFogParams[m_currentType];
 		CR(pProgram->SetFogParams(fogParams));
 	}
 

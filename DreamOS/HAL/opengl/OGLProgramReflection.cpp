@@ -10,7 +10,7 @@
 #include "OGLAttachment.h"
 
 #include "Primitives/matrix/ReflectionMatrix.h"
-#include "OGLFogBlock.h"
+#include "OGLFogParamsBlock.h"
 
 OGLProgramReflection::OGLProgramReflection(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglreflection", optFlags),
@@ -60,7 +60,7 @@ RESULT OGLProgramReflection::OGLInitialize() {
 	// Uniform Blocks
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
-	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pFogBlock), std::string("ub_fogParams")));
+	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pFogParamsBlock), std::string("ub_fogParams")));
 
 	// Frame buffer Output
 	int pxWidth = m_pParentImp->GetViewport().Width();
@@ -204,9 +204,9 @@ RESULT OGLProgramReflection::ProcessNode(long frameID) {
 
 	SetLights(pLights);
 
-	if (m_pFogBlock != nullptr) {
-		m_pFogBlock->SetFogParams(&m_fogParams);
-		m_pFogBlock->UpdateOGLUniformBlockBuffers();
+	if (m_pFogParamsBlock != nullptr) {
+		m_pFogParamsBlock->SetFogParams(m_fogParams);
+		m_pFogParamsBlock->UpdateOGLUniformBlockBuffers();
 	}
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());

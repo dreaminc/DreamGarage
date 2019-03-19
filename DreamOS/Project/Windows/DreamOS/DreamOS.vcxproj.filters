@@ -1050,10 +1050,10 @@
     <ClCompile Include="..\..\..\UI\UIPointerLabel.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLFogBlock.cpp">
+    <ClCompile Include="..\..\..\HAL\opengl\OGLFogParamsBlock.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\fogparams.cpp">
+    <ClCompile Include="..\..\..\Primitives\FogParams.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2285,13 +2285,13 @@
     <ClInclude Include="..\..\..\UI\UIPointerLabel.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLFogBlock.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\HAL\FogProgram.h">
       <Filter>HAL</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\fogparams.h">
+    <ClInclude Include="..\..\..\HAL\opengl\OGLFogParamsBlock.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\FogParams.h">
       <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>

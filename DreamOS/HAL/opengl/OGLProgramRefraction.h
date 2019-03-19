@@ -13,7 +13,7 @@
 
 class ObjectStore;
 class stereocamera;
-class OGLFogBlock;
+class OGLFogParamsBlock;
 
 class OGLProgramRefraction : public OGLProgram, public FogProgram {
 public:
@@ -79,7 +79,7 @@ private:
 	// Uniform Blocks
 	OGLLightsBlock *m_pLightsBlock = nullptr;
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
-	OGLFogBlock *m_pFogBlock = nullptr;
+	OGLFogParamsBlock *m_pFogParamsBlock = nullptr;
 };
 
 #endif // ! OGLPROGRAM_REFRACTION_H_

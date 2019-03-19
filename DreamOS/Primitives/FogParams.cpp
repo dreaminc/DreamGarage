@@ -1,6 +1,6 @@
-#include "fogparams.h"
+#include "FogParams.h"
 
-fogparams::fogparams() :
+FogParams::FogParams() :
 	m_startDistance(50.0f),
 	m_endDistance(300.0f),
 	m_density(0.05f),
@@ -10,13 +10,13 @@ fogparams::fogparams() :
 	// empty
 }
 
-fogparams::fogparams(float startDistance, float endDistance, float density, color fogColor) {
+FogParams::FogParams(float startDistance, float endDistance, float density, color fogColor) {
 	m_startDistance = startDistance;
 	m_endDistance = endDistance;
 	m_density = density;
 	m_fogColor = fogColor;
 }
 
-fogparams::~fogparams() {
+FogParams::~FogParams() {
 	// empty
 }

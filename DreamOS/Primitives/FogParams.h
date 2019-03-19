@@ -1,5 +1,5 @@
-#ifndef FOGPARAMS_H_
-#define FOGPARAMS_H_
+#ifndef FOG_PARAMS_H_
+#define FOG_PARAMS_H_
 
 #include "RESULT/EHM.h"
 
@@ -9,11 +9,11 @@
 
 #include "color.h"
 
-class fogparams {
+class FogParams {
 public:
-	fogparams();
-	fogparams(float startDistance, float endDistance, float density, color fogColor);
-	~fogparams();
+	FogParams();
+	FogParams(float startDistance, float endDistance, float density, color fogColor);
+	~FogParams();
 
 private:
 	// default lobby params
@@ -24,4 +24,4 @@ private:
 	color m_fogColor = color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 1.0f);
 };
 
-#endif // ! MATERIAL_H_
+#endif // ! FOG_PARAMS_H_

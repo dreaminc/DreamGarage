@@ -13,7 +13,7 @@
 #include "OGLTexture.h"
 #include "../FogProgram.h"
 
-class OGLFogBlock;
+class OGLFogParamsBlock;
 
 class OGLProgramEnvironment: public OGLProgram, public FogProgram {
 public:
@@ -47,7 +47,7 @@ private:
 	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
 
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
-	OGLFogBlock *m_pFogBlock = nullptr;
+	OGLFogParamsBlock *m_pFogParamsBlock = nullptr;
 };
 
 #endif // ! OGLPROGRAM_ENVIRONMENT_H_

@@ -2,18 +2,18 @@
 #define FOG_PROGRAM_H
 
 #include "./RESULT/EHM.h"
-#include "Primitives/fogparams.h"
+#include "Primitives/FogParams.h"
 
 class color;
 
 class FogProgram {
 public:
-	RESULT SetFogParams(fogparams fogParams) {
+	RESULT SetFogParams(FogParams fogParams) {
 		m_fogParams = fogParams;
 		return R_PASS;
 	}
 
-	fogparams m_fogParams;
+	FogParams m_fogParams;
 };
 
 #endif // ! FOG_PROGRAM_H_
