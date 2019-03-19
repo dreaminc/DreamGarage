@@ -218,7 +218,7 @@ RESULT OGLProgramSkyboxScatterCube::ProcessNode(long frameID) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// uniforms for all passes
-	m_pUniformSunDirection->SetUniform(m_sunDirection);
+	m_pUniformSunDirection->SetUniform(vector(-0.4f, 0.5f, 1.0f));
 	m_pUniformViewWidth->SetUniformInteger(pxWidth);
 	m_pUniformViewHeight->SetUniformInteger(pxHeight);
 

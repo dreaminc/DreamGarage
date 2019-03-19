@@ -1855,6 +1855,7 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environment::type(environmentModelId)));
 		if (environment::type(environmentModelId) == environment::type::CAVE) {
 			m_pWaterQuad->SetPosition(point(90.0f, -2.38f, 0.0f));
+			//m_pWaterQuad->SetPosition(point(90.0f, -19.42f, 0.0f));
 		}
 		else if (environment::type(environmentModelId) == environment::type::CANYON) {
 			m_pWaterQuad->SetPosition(point(90.0f, -19.42f, 0.0f));

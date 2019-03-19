@@ -6,7 +6,7 @@
 #define GAMEPAD_CAMERA_ROTATE_SCALE	0.7f		// 1.41178f;
 #define CAMERA_AT_REST_MOMENTUM 0.000001		// because double precision
 
-#define PRECISION_CAMERA_SPEED_CONSTANT 20.0f;
+#define PRECISION_CAMERA_SPEED_CONSTANT 200.0f;
 #define PRECISION_CAMERA_SENSE_CONTROLLER_UP_SPEED_CONSTANT 0.00000255f;	// this is 255 / GamepadUpSpeedScale, probably because sense controller is normalizing trigger values
 #define PRECISION_CAMERA_LOOK_SENSITIVITY 0.375f;
 

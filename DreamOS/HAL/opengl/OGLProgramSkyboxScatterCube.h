@@ -49,7 +49,7 @@ private:
 	OGLFramebuffer* m_pOGLFramebufferCubemap = nullptr;
 	cubemap* m_pOutputCubemap = nullptr;
 
-	vector m_sunDirection = vector(1.0f, 0.25f, -0.1f);
+	vector m_sunDirection = vector(1.0f, 0.25f, 0.1f);
 	//vector m_sunDirection = vector(-1.0f, 0.25f, 0.0f);
 
 private:

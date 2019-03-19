@@ -88,7 +88,7 @@ private:
 	float m_lightIntensity;
 	float m_directionalIntensity;
 
-	vector m_vSunDirection = vector(1.0f, 0.25f, -0.1f);
+	vector m_vSunDirection = vector(1.0f, 0.75f, 0.1f);
 	light *m_pDirectionalSunLight = nullptr;
 	light *m_pDirectionalAmbientLight = nullptr;
 
@@ -108,14 +108,15 @@ private:
 		// legacy environment, potentially could be removed completely
 		// do not load during release startup
 	//	{environment::ISLAND, L"\\FloatingIsland\\env.obj"},
-		{environment::CAVE, L"\\model\\environment\\1\\environment.fbx"},
+		{environment::CAVE, L"\\model\\environment\\2\\environment.fbx"},
 		//{environment::CANYON, L"\\model\\environment\\2\\environment.fbx"},
 		//{environment::HOUSE, L"\\model\\environment\\3\\environment.fbx"}
 	};
 	
 	std::map<environment::type, FogParams> m_environmentFogParams = {
-		{ environment::CAVE, FogParams(50.0f, 300.0f, 0.05f, color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 1.0f))},
-		{ environment::CANYON, FogParams(900.0f, 1150.0f, 0.05f, color(202.0f / 255.0f, 190.0f / 255.0f, 161.0f / 255.0f, 1.0f))},	// 450 is ~the last leg of the bend, but probably need a better distance solution
+		//{ environment::CAVE, FogParams(50.0f, 300.0f, 0.05f, color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 1.0f))},
+		{ environment::CAVE, FogParams(900.0f, 1150.0f, 0.05f, color(202.0f / 255.0f, 190.0f / 255.0f, 161.0f / 255.0f, 1.0f))},	// for testing
+		//{ environment::CANYON, FogParams(900.0f, 1150.0f, 0.05f, color(202.0f / 255.0f, 190.0f / 255.0f, 161.0f / 255.0f, 1.0f))},	// 450 is ~the last leg of the bend, but probably need a better distance solution
 		{ environment::HOUSE, FogParams(50.0f, 300.0f, 0.05f, color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 1.0f))}
 	};
 
