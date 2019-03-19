@@ -46,6 +46,7 @@ private:
 
 private:
 	std::deque<point> m_recentPoints;
+	float m_currentAngle;
 
 // Resource strings
 private:

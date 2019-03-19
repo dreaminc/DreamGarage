@@ -237,7 +237,7 @@ RESULT UIPointerLabel::UpdateOrientationFromPoints() {
 //	CBR(OrientationFromNormalEquation(qRotation), R_SKIPPED);
 
 	vDirection.Normalize();
-	vDirection = m_pDotQuad->GetWidth()/2.0f * vDirection;
+	vDirection = (m_pDotQuad->GetWidth()/2.0f-m_pDotQuad->GetWidth()/12.0f) * vDirection;
 	vDirection = vector(-0.02f, -vDirection.y(), vDirection.x());
 
 	m_pDotComposite->SetOrientation(qRotation);
@@ -281,8 +281,22 @@ bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation, vector &vDire
 
 	CB(velocity > 0.0075f);
 
-	vDirection = vector(-totalX, totalY, 0.0f);
-	qRotation = quaternion::MakeQuaternionWithEuler(theta, 0.0f, 0.0f);
+	if (theta - m_currentAngle > (float)(M_PI)) {
+		theta -= (float)(2 * M_PI);
+	}
+	else if (theta - m_currentAngle < -(float)(M_PI)) {
+		m_currentAngle -= (float)(2 * M_PI);
+	//	theta += (float)(2 * M_PI);
+	}
+	m_currentAngle = 0.2f * theta + 0.8f * m_currentAngle;
+	//m_currentAngle = theta;
+
+	{
+		vDirection = vector(-totalX, totalY, 0.0f);
+		float mag = vDirection.magnitude();
+		vDirection = vector(mag*cos(m_currentAngle), mag*sin(m_currentAngle), 0.0f);
+	}
+	qRotation = quaternion::MakeQuaternionWithEuler(m_currentAngle, 0.0f, 0.0f);
 
 	return true;
 Error:
