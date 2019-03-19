@@ -98,6 +98,7 @@ public:
 	///
 	/*--cef()--*/
 	virtual void OnAudioData(CefRefPtr<CefBrowser> browser, 
+							 int audio_stream_id,
                              int frames, int channels, int bits_per_sample,
 							 const void* data_buffer) { }
 

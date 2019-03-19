@@ -122,7 +122,7 @@ Error:
 	return r;
 }
 
-RESULT CEFBrowserManager::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
+RESULT CEFBrowserManager::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int audioSteamID, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
 	RESULT r = R_PASS;
 	
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
@@ -130,7 +130,7 @@ RESULT CEFBrowserManager::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int fra
 
 	//DEBUG_LINEOUT("CEFBrowserManager: OnAudioData %S", pCEFBrowser->GetFocusedFrame()->GetURL().c_str());
 
-	CR(pCEFBrowserController->OnAudioData(pCEFBrowser, frames, channels, bitsPerSample, pDataBuffer));
+	CR(pCEFBrowserController->OnAudioData(pCEFBrowser, audioSteamID, frames, channels, bitsPerSample, pDataBuffer));
 
 Error:
 	return r;

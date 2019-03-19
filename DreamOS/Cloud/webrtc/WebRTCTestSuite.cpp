@@ -447,11 +447,11 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 	struct TestContext :
 		public DreamSoundSystem::observer,
 		public CloudController::PeerConnectionObserver,
-		public CloudController::UserObserver,
-		public DreamBrowserObserver
+		public CloudController::UserObserver
 	{
 		DreamOS *pDreamOS = nullptr;
 
+		int testUserNum = 0;
 		CloudController *pCloudController = nullptr;
 		UserController *pUserController = nullptr;
 
@@ -462,7 +462,6 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		std::shared_ptr<DreamBrowser> m_pDreamBrowserChrome = nullptr;
 		std::shared_ptr<DreamBrowser> m_pDreamBrowserVCam = nullptr;
 
-		int testUserNum = 0;
 
 		sphere *pSphere = nullptr;
 
@@ -512,38 +511,87 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 			return r;
 		}
 
-		// DreamBrowserObserver
-		virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override {
-			RESULT r = R_PASS;
+		// DreamBrowserObserver Chrome
+		struct DreamBrowserObserverChrome  : public DreamBrowserObserver {
+			virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override {
+				RESULT r = R_PASS;
 
-			if (pCloudController != nullptr && testUserNum == 2) {
-				CR(pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
+				if (pCloudController != nullptr) {
+					CR(pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
 
-				//// Pretend we have an audio source on VCam as well
-				//CR(pCloudController->BroadcastAudioPacket(kVCamAudiolabel, pendingAudioPacket));
+					//// Pretend we have an audio source on VCam as well
+					//CR(pCloudController->BroadcastAudioPacket(kVCamAudiolabel, pendingAudioPacket));
 
-				int numFrames = pendingAudioPacket.GetNumFrames();
-				CRM(pDreamOS->PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_BROWSER_0, numFrames, pendingAudioPacket), "Failed to push packet to sound system");
+					int numFrames = pendingAudioPacket.GetNumFrames();
+					CRM(pDreamOS->PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_BROWSER_0, numFrames, pendingAudioPacket), "Failed to push packet to sound system");
+				}
+
+			Error:
+				return r;
 			}
 
-		Error:
-			return r;
-		}
+			virtual RESULT UpdateControlBarText(std::string& strTitle) override { return R_NOT_HANDLED; }
+			virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override { return R_NOT_HANDLED; }
+			virtual RESULT UpdateAddressBarSecurity(bool fSecure) override { return R_NOT_HANDLED; }
+			virtual RESULT UpdateAddressBarText(std::string& strURL) override { return R_NOT_HANDLED; }
+			virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleDreamFormSuccess() override { return R_NOT_HANDLED; }
+			virtual RESULT HandleDreamFormCancel() override { return R_NOT_HANDLED; }
+			virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleCanTabNext(bool fCanNext) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleLoadEnd() override { return R_NOT_HANDLED; }
+			virtual std::string GetCertificateErrorURL() override { return ""; }
+			virtual std::string GetLoadErrorURL() override { return ""; }
 
-		virtual RESULT UpdateControlBarText(std::string& strTitle) override { return R_NOT_HANDLED; }
-		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override { return R_NOT_HANDLED; }
-		virtual RESULT UpdateAddressBarSecurity(bool fSecure) override { return R_NOT_HANDLED; }
-		virtual RESULT UpdateAddressBarText(std::string& strURL) override { return R_NOT_HANDLED; }
-		virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) override { return R_NOT_HANDLED; }
-		virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
-		virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
-		virtual RESULT HandleDreamFormSuccess() override { return R_NOT_HANDLED; }
-		virtual RESULT HandleDreamFormCancel() override { return R_NOT_HANDLED; }
-		virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) override { return R_NOT_HANDLED; }
-		virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) override { return R_NOT_HANDLED; }
-		virtual RESULT HandleCanTabNext(bool fCanNext) override { return R_NOT_HANDLED; }
-		virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override { return R_NOT_HANDLED; }
-		virtual RESULT HandleLoadEnd() override { return R_NOT_HANDLED; }
+			CloudController *pCloudController = nullptr;
+			DreamOS *pDreamOS = nullptr;
+
+		} *pDreamBrowserObserverChrome = nullptr;
+
+		// DreamBrowserObserver VCam
+		struct DreamBrowserObserverVCam : public DreamBrowserObserver {
+			virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override {
+				RESULT r = R_PASS;
+
+				if (pCloudController != nullptr) {
+					CR(pCloudController->BroadcastAudioPacket(kVCamAudiolabel, pendingAudioPacket));
+
+					//// Pretend we have an audio source on VCam as well
+					//CR(pCloudController->BroadcastAudioPacket(kVCamAudiolabel, pendingAudioPacket));
+
+					//int numFrames = pendingAudioPacket.GetNumFrames();
+					//CRM(pDreamOS->PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET::LOCAL_BROWSER_0, numFrames, pendingAudioPacket), "Failed to push packet to sound system");
+				}
+
+			Error:
+				return r;
+			}
+
+			virtual RESULT UpdateControlBarText(std::string& strTitle) override { return R_NOT_HANDLED; }
+			virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override { return R_NOT_HANDLED; }
+			virtual RESULT UpdateAddressBarSecurity(bool fSecure) override { return R_NOT_HANDLED; }
+			virtual RESULT UpdateAddressBarText(std::string& strURL) override { return R_NOT_HANDLED; }
+			virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleDreamFormSuccess() override { return R_NOT_HANDLED; }
+			virtual RESULT HandleDreamFormCancel() override { return R_NOT_HANDLED; }
+			virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleCanTabNext(bool fCanNext) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override { return R_NOT_HANDLED; }
+			virtual RESULT HandleLoadEnd() override { return R_NOT_HANDLED; }
+			virtual std::string GetCertificateErrorURL() override { return ""; }
+			virtual std::string GetLoadErrorURL() override { return ""; }
+
+			CloudController *pCloudController = nullptr;
+			DreamOS *pDreamOS = nullptr;
+
+		} *pDreamBrowserObserverVCam = nullptr;
 
 		// CloudController::PeerConnectionObserver
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
@@ -734,14 +782,6 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 			return r;
 		};
 
-		virtual std::string GetCertificateErrorURL() override {
-			return "";
-		}
-
-		virtual std::string GetLoadErrorURL() override {
-			return "";
-		}
-
 	} *pTestContext = new TestContext();
 
 	// Initialize the test
@@ -755,7 +795,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		//std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
 		
 		std::string strURLChrome = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
-		std::string strURLVCam = "https://www.youtube.com/watch?v=Ic4xAuIkoFE";
+		//std::string strURLVCam = "https://www.youtube.com/watch?v=Ic4xAuIkoFE";
+		std::string strURLVCam = "https://web.skype.com";
 
 		std::string strTestValue;
 		int testUserNumber = -1;
@@ -800,7 +841,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		pTestContext->m_pBrowserQuadVCam->FlipUVHorizontal();
 		pTestContext->m_pBrowserQuadVCam->RotateXByDeg(90.0f);
 		pTestContext->m_pBrowserQuadVCam->RotateZByDeg(180.0f);
-		pTestContext->m_pBrowserQuadVCam->translateX(-1.75f);
+		pTestContext->m_pBrowserQuadVCam->translateX(1.75f);
 
 		// Browser
 		if (testUserNumber == 2) {
@@ -813,7 +854,13 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 			pTestContext->m_pDreamBrowserChrome = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
 			pTestContext->m_pDreamBrowserChrome->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURLChrome);
 			CNM(pTestContext->m_pDreamBrowserChrome, "Failed to create dream browser chrome");
-			CRM(pTestContext->m_pDreamBrowserChrome->RegisterObserver(pTestContext), "Failed to register browser observer chrome");
+
+			pTestContext->pDreamBrowserObserverChrome = new TestContext::DreamBrowserObserverChrome();
+			CN(pTestContext->pDreamBrowserObserverChrome);
+			pTestContext->pDreamBrowserObserverChrome->pDreamOS = pTestContext->pDreamOS;
+
+			CRM(pTestContext->m_pDreamBrowserChrome->RegisterObserver(pTestContext->pDreamBrowserObserverChrome), 
+				"Failed to register browser observer chrome");
 			pTestContext->m_pDreamBrowserChrome->SetForceObserverAudio(true);
 
 			pTestContext->m_pDreamBrowserChrome->SetURI(strURLChrome);
@@ -822,7 +869,13 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 			pTestContext->m_pDreamBrowserVCam = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
 			pTestContext->m_pDreamBrowserVCam->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURLVCam);
 			CNM(pTestContext->m_pDreamBrowserVCam, "Failed to create dream browser vcam");
-			CRM(pTestContext->m_pDreamBrowserVCam->RegisterObserver(pTestContext), "Failed to register browser observer vcam");
+
+			pTestContext->pDreamBrowserObserverVCam = new TestContext::DreamBrowserObserverVCam();
+			CN(pTestContext->pDreamBrowserObserverVCam);
+			pTestContext->pDreamBrowserObserverVCam->pDreamOS = pTestContext->pDreamOS;
+
+			CRM(pTestContext->m_pDreamBrowserVCam->RegisterObserver(pTestContext->pDreamBrowserObserverVCam), 
+				"Failed to register browser observer vcam");
 			pTestContext->m_pDreamBrowserVCam->SetForceObserverAudio(true);
 
 			pTestContext->m_pDreamBrowserVCam->SetURI(strURLVCam);
@@ -878,6 +931,13 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		CRM(pTestContext->pCloudController->Start(false), "Failed to start cloud controller");
 
 		DEBUG_LINEOUT("Initializing Cloud Controller");
+
+		if (pTestContext->pDreamBrowserObserverChrome != nullptr) 
+			pTestContext->pDreamBrowserObserverChrome->pCloudController = pTestContext->pCloudController;
+
+		if (pTestContext->pDreamBrowserObserverVCam != nullptr) 
+			pTestContext->pDreamBrowserObserverVCam->pCloudController = pTestContext->pCloudController;
+		
 
 		CR(m_pDreamOS->UnregisterSoundSystemObserver());
 		CR(m_pDreamOS->RegisterSoundSystemObserver(pTestContext));
@@ -1036,6 +1096,13 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		if (pTestContext->m_pendingVideoBufferChrome.pPendingBuffer != nullptr) {
 			delete pTestContext->m_pendingVideoBufferChrome.pPendingBuffer;
 			pTestContext->m_pendingVideoBufferChrome.pPendingBuffer = nullptr;
+		}
+
+		pTestContext->m_pendingVideoBufferVCam.fPendingBufferReady = false;
+
+		if (pTestContext->m_pendingVideoBufferVCam.pPendingBuffer != nullptr) {
+			delete pTestContext->m_pendingVideoBufferVCam.pPendingBuffer;
+			pTestContext->m_pendingVideoBufferVCam.pPendingBuffer = nullptr;
 		}
 
 		return r;

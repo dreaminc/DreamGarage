@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2019 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -39,7 +39,7 @@
 #define CEF_VERSION_MAJOR 3
 #define CEF_COMMIT_NUMBER 1853
 #define CEF_COMMIT_HASH "7c71bd3feeca52fda98f1f696d39cc8609fa210c"
-#define COPYRIGHT_YEAR 2018
+#define COPYRIGHT_YEAR 2019
 
 #define CHROME_VERSION_MAJOR 70
 #define CHROME_VERSION_MINOR 0

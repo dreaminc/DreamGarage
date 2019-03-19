@@ -308,12 +308,21 @@ private:
 	// Sound stuff
 private:
 	RESULT InitializeDreamBrowserSoundSystem();
-	RESULT InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
+	
+	//RESULT InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
+	
+	RESULT InitializeNewRenderBusSoundBuffer(const AudioPacket& pendingAudioPacket);
+	int GetPendingAudioFrames();
+	AudioPacket GetPendingRenderAudioPacket(int numFrames);
+
 	RESULT AudioProcess();
 
 	sound::state m_soundState = sound::state::UNINITIALIZED;
-	SoundBuffer *m_pRenderSoundBuffer = nullptr;
-	std::thread	m_browserAudioProcessingThread;
+	std::map<int, SoundBuffer*> m_renderAudioBuses;
+	//SoundBuffer *m_pRenderSoundBuffer = nullptr;
+	
+	std::thread	m_browserAudioProcessingThread;		
+	int m_defaultBrowserSamplingRate = 48000;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_
