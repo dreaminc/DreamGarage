@@ -311,6 +311,7 @@ private:
 	
 	//RESULT InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
 	
+	RESULT TeardownAudioBusSoundBuffers();
 	RESULT InitializeNewRenderBusSoundBuffer(const AudioPacket& pendingAudioPacket);
 	int GetPendingAudioFrames();
 	AudioPacket GetPendingRenderAudioPacket(int numFrames);
