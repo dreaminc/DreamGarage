@@ -76,7 +76,7 @@ public:
 	RESULT OnAfterCreated();
 	RESULT OnPaint(CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height);
 	RESULT OnPopupSize(const CefRect& rect);
-	RESULT OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer);
+	RESULT OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int audioSteamID, int frames, int channels, int bitsPerSample, const void* pDataBuffer);
 	RESULT OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL);
 	RESULT OnLoadStart(CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type);
 	RESULT OnLoadEnd(CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode);
@@ -162,7 +162,7 @@ private:
 
 public:
 	AudioPacket PopPendingAudioPacket();
-	RESULT PushPendingAudioPacket(int frames, int channels, int bitsPerSample, uint8_t *pDataBfufer);
+	RESULT PushPendingAudioPacket(int audioSteamID, int frames, int channels, int bitsPerSample, uint8_t *pDataBfufer);
 	bool IsAudioPacketPending();
 	RESULT ClearPendingAudioPacketQueue();
 	size_t PendingAudioPacketQueueLength();

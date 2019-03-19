@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2019 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -33,7 +33,7 @@
 // by hand. See the translator.README.txt file in the tools directory for
 // more information.
 //
-// $hash=3a79551f76f89f68ba3071bc0bc94c80eb481ff5$
+// $hash=ca0a279956a0ffd18038adee875f4eed0b5d2a07$
 //
 
 #ifndef CEF_INCLUDE_CAPI_CEF_AUDIO_HANDLER_CAPI_H_
@@ -103,6 +103,7 @@ typedef struct _cef_audio_handler_t {
   ///
   void(CEF_CALLBACK* on_audio_data)(struct _cef_audio_handler_t* self,
                                     struct _cef_browser_t* browser,
+                                    int audio_stream_id,
                                     int frames,
                                     int channels,
                                     int bits_per_sample,

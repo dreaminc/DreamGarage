@@ -86,6 +86,15 @@ public:
 		return r;
 	}
 
+	RESULT SetAudioStreamID(int id) {
+		m_audioStreamID = id;
+		return R_PASS;
+	}
+
+	int GetAudioStreamID() const {
+		return m_audioStreamID;
+	}
+
 	sound::type GetSoundType() const {
 		return m_soundType;
 	}
@@ -108,6 +117,7 @@ private:
 	uint8_t *m_pDataBuffer;
 	size_t m_pDataBuffer_n;
 	sound::type m_soundType = sound::type::INVALID;
+	int m_audioStreamID = -1;
 
 	int m_samplingRate = DEFAULT_SAMPLING_RATE;
 };

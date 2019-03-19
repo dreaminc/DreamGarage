@@ -85,8 +85,6 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestDreamUIBar());
 
-	CR(AddTestCredentialStorage());
-
 	CR(AddTestMeta());	
 
 	// Casting tests

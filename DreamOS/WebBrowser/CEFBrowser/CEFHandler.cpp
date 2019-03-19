@@ -365,13 +365,13 @@ Error:
 
 #ifdef CEF_AUDIO_MIRROR
 // Audio Handler
-void CEFHandler::OnAudioData(CefRefPtr<CefBrowser> browser, int frames, int channels, int bits_per_sample, const void* data_buffer) {
+void CEFHandler::OnAudioData(CefRefPtr<CefBrowser> browser, int audio_stream_id, int frames, int channels, int bits_per_sample, const void* data_buffer) {
 	RESULT r = R_PASS;
 
 	//DEBUG_LINEOUT("CEFHandle: OnAudioData");
 
 	CN(m_pCEFHandlerObserver);
-	CR(m_pCEFHandlerObserver->OnAudioData(browser, frames, channels, bits_per_sample, data_buffer));
+	CR(m_pCEFHandlerObserver->OnAudioData(browser, audio_stream_id, frames, channels, bits_per_sample, data_buffer));
 
 Error:
 	return;

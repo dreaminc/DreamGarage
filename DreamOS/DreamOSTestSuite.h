@@ -81,8 +81,7 @@ public:
 	WebBrowserPoint GetRelativeBrowserPointFromContact(point ptIntersectionContact);
 
 private:
-	DreamOS *m_pDreamOS = nullptr;
-	UIStageProgram *m_pUIProgramNode;
+	UIStageProgram *m_pUIProgramNode = nullptr;
 
 //browser testing
 private:
