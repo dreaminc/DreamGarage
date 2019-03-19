@@ -5,6 +5,7 @@
 #include "HAL/opengl/OGLProgramStandard.h"
 #include "HAL/opengl/OGLProgramScreenFade.h"
 #include "HAL/SkyboxScatterProgram.h"
+#include "HAL/FogProgram.h"
 
 #include "Primitives/user.h"
 
@@ -155,8 +156,17 @@ Error:
 }
 
 RESULT DreamEnvironmentApp::SetCurrentEnvironment(environment::type type) {
+	RESULT r = R_PASS;
+
 	m_pCurrentEnvironmentModel = m_environmentModels[type];
 	m_currentType = type;
+
+	for (auto *pProgram : m_fogPrograms) {
+		FogParams *pParams = m_environmentFogParams[m_currentType];
+		CR(pProgram->SetFogParams(pParams->startDistance, pParams->endDistance, pParams->density, pParams->fogColor));
+	}
+
+Error:
 	return R_PASS;
 }
 
@@ -167,6 +177,11 @@ RESULT DreamEnvironmentApp::SetSkyboxPrograms(std::vector<SkyboxScatterProgram*>
 
 RESULT DreamEnvironmentApp::SetScreenFadeProgram(OGLProgramScreenFade* pFadeProgram) {
 	m_pFadeProgram = pFadeProgram;
+	return R_PASS;
+}
+
+RESULT DreamEnvironmentApp::SetFogPrograms(std::vector<FogProgram*> pFogPrograms) {
+	m_fogPrograms = pFogPrograms;
 	return R_PASS;
 }
 

@@ -152,7 +152,7 @@ RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
 
 	SetLights(pLights);
 
-	SetFogConfig(50.0f, 300.0f, 0.05f, color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 0.0f));
+	SetFogConfig(m_fogStartDistance, m_fogEndDistance, m_fogDensity, m_fogColor);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
@@ -206,7 +206,16 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramMinimalTexture::SetFogConfig(float startDistance, float endDistance, float density, vector fogColor) {
+RESULT OGLProgramMinimalTexture::SetFogParams(float startDistance, float endDistance, float density, color fogColor) {
+	m_fogStartDistance = startDistance;
+	m_fogEndDistance = endDistance;
+	m_fogDensity = density;
+	m_fogColor = fogColor;
+	
+	return R_PASS;
+}
+
+RESULT OGLProgramMinimalTexture::SetFogConfig(float startDistance, float endDistance, float density, color fogColor) {
 	RESULT r = R_PASS;
 
 	if (m_pFogBlock != nullptr) {

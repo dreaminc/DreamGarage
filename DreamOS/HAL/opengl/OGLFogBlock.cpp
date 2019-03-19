@@ -24,7 +24,7 @@ Error:
 	return r;
 }
 
-RESULT OGLFogBlock::SetFogConfig(float startDistance, float endDistance, float density, vector color) {
+RESULT OGLFogBlock::SetFogConfig(float startDistance, float endDistance, float density, color fogColor) {
 	RESULT r = R_PASS;
 
 	FogBlock *pNewConfig = new FogBlock();
@@ -33,7 +33,8 @@ RESULT OGLFogBlock::SetFogConfig(float startDistance, float endDistance, float d
 	pNewConfig->startDistance = startDistance;
 	pNewConfig->endDistance = endDistance;
 	pNewConfig->density = density;
-	pNewConfig->color = color;
+	pNewConfig->reserved0 = 1.0f;
+	pNewConfig->fogColor = fogColor;//color(1.0f, 0.0f, 1.0f, 0.0f);
 
 	FogBlock *pFogBlock = reinterpret_cast<FogBlock*>(m_pUniformBufferData);
 	CN(pFogBlock);

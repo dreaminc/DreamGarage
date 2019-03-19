@@ -12,6 +12,7 @@ struct FogConfiguration {
 	float startDistance;
 	float endDistance;
 	float density;
+	float whatTheFuck;
 	vec4 color;
 };
 
@@ -20,6 +21,11 @@ layout(std140) uniform ub_fogConfig{
 };
 
 vec4 MixWithFog(in uint fogType, in vec4 shaderColor, in float fragmentDepth, in FogConfiguration fogConfiguration) {
+
+	//fogConfiguration.startDistance = 50.0f;
+	//fogConfiguration.endDistance = 300.0f;
+	//fogConfiguration.density = 0.05;
+	//fogConfiguration.color = vec4(222.0f / 255.0f, 222.0f / 255.0f, 222.0f / 255.0f, 1.0f);
 
 	float fogFactor;
 
@@ -42,7 +48,7 @@ vec4 MixWithFog(in uint fogType, in vec4 shaderColor, in float fragmentDepth, in
 	}
 
 	fogFactor = clamp(fogFactor, 0.0f, 1.0f);
-	vec4 mixWithFogColor = mix(shaderColor.rgba, fogConfiguration.color, fogFactor);
+	vec4 mixWithFogColor = vec4(mix(shaderColor.rgb, fogConfiguration.color.rgb, fogFactor), 1.0f);
 	return mixWithFogColor;
 
 }

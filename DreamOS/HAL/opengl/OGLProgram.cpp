@@ -89,7 +89,7 @@ RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const w
 
 	// TODO:  Currently using a global material 
 	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
-	SetFogConfig(50.0f, 300.0f, 0.05f, color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 0.0f));
+	SetFogConfig(50.0f, 300.0f, 0.05f, color(222.0f / 255.0f, 222.0f / 255.0f, 222.0f / 255.0f, 1.0f));
 
 Error:
 	return r;

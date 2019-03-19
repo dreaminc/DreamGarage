@@ -339,6 +339,11 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 		//m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pReflectionSkyboxProgram));
 		//m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pSkyboxProgram));
 
+		// save interfaces to fog nodes
+		m_fogProgramNodes.emplace_back(dynamic_cast<FogProgram*>(pRenderEnvironmentProgramNode));
+		m_fogProgramNodes.emplace_back(dynamic_cast<FogProgram*>(pRefractionProgramNode));
+		m_fogProgramNodes.emplace_back(dynamic_cast<FogProgram*>(pReflectionProgramNode));
+
 		if (m_pWaterQuad == nullptr) {
 			m_pWaterQuad = MakeQuad(1000.0f, 1000.0f);
 			point ptQuadOffset = point(90.0f, -2.38f, -25.0f);
@@ -384,6 +389,8 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 
 			CN(pRefractionProgramNode);
 			CR(pRefractionProgramNode->ConnectToInput("scenegraph", m_pDreamEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
+
+			CR(m_pDreamEnvironmentApp->SetFogPrograms(m_fogProgramNodes));
 		}
 	}
 
@@ -591,6 +598,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	if (m_pDreamEnvironmentApp != nullptr) {
 		m_pDreamEnvironmentApp->SetSkyboxPrograms(m_skyboxProgramNodes);
 		m_pDreamEnvironmentApp->SetScreenFadeProgram(m_pScreenFadeProgramNode);
+		m_pDreamEnvironmentApp->SetFogPrograms(m_fogProgramNodes);
 	}
 
 	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this, false);
@@ -1845,13 +1853,13 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
 		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environment::type(environmentModelId)));
 		if (environment::type(environmentModelId) == environment::type::CAVE) {
-			m_pWaterQuad->SetPosition(point(90.0f, -2.38f, -25.0f));
+			m_pWaterQuad->SetPosition(point(90.0f, -2.38f, 0.0f));
 		}
 		else if (environment::type(environmentModelId) == environment::type::CANYON) {
-			m_pWaterQuad->SetPosition(point(90.0f, -19.42f, -25.0f));
+			m_pWaterQuad->SetPosition(point(90.0f, -19.42f, 0.0f));
 		}
 		else if (environment::type(environmentModelId) == environment::type::HOUSE) {
-			m_pWaterQuad->SetPosition(point(90.0f, -100.0f, -25.0f));
+			m_pWaterQuad->SetPosition(point(90.0f, -2.65f, 0.0f));
 		}
 	}
 

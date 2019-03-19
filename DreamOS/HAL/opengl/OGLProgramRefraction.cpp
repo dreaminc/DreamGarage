@@ -151,7 +151,7 @@ RESULT OGLProgramRefraction::OGLInitialize(version versionOGL) {
 
 	// TODO:  Currently using a global material 
 	SetMaterial(&material(1.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
-	SetFogConfig(50.0f, 300.0f, 0.05f, color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 0.0f));
+	SetFogConfig(50.0f, 300.0f, 0.05f, color(222.0f / 255.0f, 222.0f / 255.0f, 222.0f / 255.0f, 1.0f));
 
 Error:
 	return r;
@@ -218,6 +218,7 @@ RESULT OGLProgramRefraction::ProcessNode(long frameID) {
 		m_pUniformClippingOffset->SetUniform(0.0f);
 
 	SetLights(pLights);
+	SetFogConfig(m_fogStartDistance, m_fogEndDistance, m_fogDensity, m_fogColor);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
@@ -311,7 +312,16 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramRefraction::SetFogConfig(float startDistance, float endDistance, float density, vector fogColor) {
+RESULT OGLProgramRefraction::SetFogParams(float startDistance, float endDistance, float density, color fogColor) {
+	m_fogStartDistance = startDistance;
+	m_fogEndDistance = endDistance;
+	m_fogDensity = density;
+	m_fogColor = fogColor;
+
+	return R_PASS;
+}
+
+RESULT OGLProgramRefraction::SetFogConfig(float startDistance, float endDistance, float density, color fogColor) {
 	RESULT r = R_PASS;
 
 	if (m_pFogBlock != nullptr) {

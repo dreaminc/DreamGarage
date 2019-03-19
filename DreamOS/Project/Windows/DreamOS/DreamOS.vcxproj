@@ -674,6 +674,7 @@ __BASE_FILE__="%(Filename)%(Extension)";%(PreprocessorDefinitions)</Preprocessor
     <ClInclude Include="..\..\..\External\Matrices\Vectors.h" />
     <ClInclude Include="..\..\..\HAL\EnvironmentProgram.h" />
     <ClInclude Include="..\..\..\HAL\FlatProgram.h" />
+    <ClInclude Include="..\..\..\HAL\FogProgram.h" />
     <ClInclude Include="..\..\..\HAL\HAL.h" />
     <ClInclude Include="..\..\..\HAL\HALImp.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GLSLObject.h" />
