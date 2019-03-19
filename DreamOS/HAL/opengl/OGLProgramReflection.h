@@ -9,11 +9,13 @@
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
+#include "../FogProgram.h"
 
 class ObjectStore;
 class stereocamera;
+class OGLFogParamsBlock;
 
-class OGLProgramReflection : public OGLProgram {
+class OGLProgramReflection : public OGLProgram, public FogProgram {
 public:
 	OGLProgramReflection(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
@@ -79,6 +81,7 @@ private:
 	// Uniform Blocks
 	OGLLightsBlock *m_pLightsBlock = nullptr;
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
+	OGLFogParamsBlock *m_pFogParamsBlock = nullptr;
 };
 
 #endif // ! OGLPROGRAM_REFLECTION_H_

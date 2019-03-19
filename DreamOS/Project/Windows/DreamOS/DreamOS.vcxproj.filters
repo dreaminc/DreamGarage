@@ -1050,6 +1050,12 @@
     <ClCompile Include="..\..\..\UI\UIPointerLabel.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLFogParamsBlock.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\FogParams.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2278,6 +2284,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UIPointerLabel.h">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\FogProgram.h">
+      <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLFogParamsBlock.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\FogParams.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

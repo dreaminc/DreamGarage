@@ -38,16 +38,8 @@ void main(void) {
 	else {
 		textureColor = DataIn.color;
 	}
-
-	// Might want to pop this up to client
-	FogConfiguration fogConfig = {
-		50.0f,
-		300.0f,
-		0.05f,
-		vec3(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f)
-	};
 	
 	vec4 shaderColor = 1.5f * material.m_colorDiffuse * textureColor + g_ambient;
 
-	out_vec4Color = MixWithFog(FOG_TYPE_LINEAR, shaderColor, DataIn.vertDepth, fogConfig);
+	out_vec4Color = MixWithFog(FOG_TYPE_LINEAR, shaderColor, DataIn.vertDepth);
 }
