@@ -13,6 +13,7 @@
 
 class ObjectStore;
 class stereocamera;
+class OGLFogBlock;
 
 class OGLProgramReflection : public OGLProgram, public FogProgram {
 public:
@@ -27,13 +28,9 @@ public:
 	RESULT SetObjectTextures(OGLObj *pOGLObj);
 	RESULT SetLights(std::vector<light*> *pLights);
 	RESULT SetMaterial(material *pMaterial);
-	RESULT SetFogConfig(float startDistance, float endDistance, float density, color fogColor);
 	RESULT SetObjectUniforms(DimObj *pDimObj);
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
-
-	// FogProgram
-	virtual RESULT SetFogParams(float startDistance, float endDistance, float density, color fogColor) override;
 
 public:
 	//RESULT SetReflectionPlane(plane reflectionPlane);
@@ -85,12 +82,6 @@ private:
 	OGLLightsBlock *m_pLightsBlock = nullptr;
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
 	OGLFogBlock *m_pFogBlock = nullptr;
-
-	// Default fog values for Lobby(?)
-	float m_fogStartDistance = 50.0f;
-	float m_fogEndDistance = 300.0f;
-	float m_fogDensity = 0.05f;
-	color m_fogColor = color(222.0f / 255.0f, 222.0f / 255.0f, 222.0f / 255.0f, 1.0f);
 };
 
 #endif // ! OGLPROGRAM_REFLECTION_H_

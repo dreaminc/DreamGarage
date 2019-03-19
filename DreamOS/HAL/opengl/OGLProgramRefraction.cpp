@@ -10,6 +10,7 @@
 #include "OGLAttachment.h"
 
 #include "Primitives/matrix/ReflectionMatrix.h"
+#include "OGLFogBlock.h"
 
 OGLProgramRefraction::OGLProgramRefraction(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglrefraction", optFlags),
@@ -59,7 +60,7 @@ RESULT OGLProgramRefraction::OGLInitialize() {
 	// Uniform Blocks
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
-	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pFogBlock), std::string("ub_fogConfig")));
+	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pFogBlock), std::string("ub_fogParams")));
 
 	// Frame buffer Output
 	//int pxWidth = m_pParentImp->GetViewport().Width();
@@ -151,7 +152,6 @@ RESULT OGLProgramRefraction::OGLInitialize(version versionOGL) {
 
 	// TODO:  Currently using a global material 
 	SetMaterial(&material(1.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
-	SetFogConfig(50.0f, 300.0f, 0.05f, color(222.0f / 255.0f, 222.0f / 255.0f, 222.0f / 255.0f, 1.0f));
 
 Error:
 	return r;
@@ -218,7 +218,11 @@ RESULT OGLProgramRefraction::ProcessNode(long frameID) {
 		m_pUniformClippingOffset->SetUniform(0.0f);
 
 	SetLights(pLights);
-	SetFogConfig(m_fogStartDistance, m_fogEndDistance, m_fogDensity, m_fogColor);
+	
+	if (m_pFogBlock != nullptr) {
+		m_pFogBlock->SetFogParams(&m_fogParams);
+		m_pFogBlock->UpdateOGLUniformBlockBuffers();
+	}
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
@@ -306,27 +310,6 @@ RESULT OGLProgramRefraction::SetMaterial(material *pMaterial) {
 	if (m_pMaterialsBlock != nullptr) {
 		CR(m_pMaterialsBlock->SetMaterial(pMaterial));
 		CR(m_pMaterialsBlock->UpdateOGLUniformBlockBuffers());
-	}
-
-Error:
-	return r;
-}
-
-RESULT OGLProgramRefraction::SetFogParams(float startDistance, float endDistance, float density, color fogColor) {
-	m_fogStartDistance = startDistance;
-	m_fogEndDistance = endDistance;
-	m_fogDensity = density;
-	m_fogColor = fogColor;
-
-	return R_PASS;
-}
-
-RESULT OGLProgramRefraction::SetFogConfig(float startDistance, float endDistance, float density, color fogColor) {
-	RESULT r = R_PASS;
-
-	if (m_pFogBlock != nullptr) {
-		CR(m_pFogBlock->SetFogConfig(startDistance, endDistance, density, fogColor));
-		CR(m_pFogBlock->UpdateOGLUniformBlockBuffers());
 	}
 
 Error:

@@ -1053,6 +1053,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLFogBlock.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\fogparams.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2287,6 +2290,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\FogProgram.h">
       <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\fogparams.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

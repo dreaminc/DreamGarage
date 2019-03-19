@@ -8,7 +8,7 @@
 // OpenGL Fog Block - This is a block representing the current fog configuration
 
 #include "shaders/OGLUniformBlock.h"
-#include "Primitives/color.h"
+#include "Primitives/fogparams.h"
 
 #define FOG_UNIFORM_BLOCK_BINDING_POINT 2	// Oh boy, see OGLLightsBlock
 
@@ -19,19 +19,15 @@ public:
 
 	//RESULT GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferData_n);
 
-	RESULT ClearFogConfig();
-	RESULT SetFogConfig(float startDistance, float endDistance, float density, color fogColor);
+	RESULT ClearFogParams();
+	RESULT SetFogParams(fogparams *fogParams);
 
 private:
 
 #pragma pack(push)  /* push current alignment to stack */
 #pragma pack(1)     /* set alignment to 1 byte boundary */
 	struct FogBlock {
-		float startDistance;
-		float endDistance;
-		float density;
-		float reserved0;
-		color fogColor;
+		fogparams m_fogParams;
 	};
 #pragma pack(pop)
 };

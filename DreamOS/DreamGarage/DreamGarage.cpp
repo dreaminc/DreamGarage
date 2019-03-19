@@ -340,9 +340,9 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 		//m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pSkyboxProgram));
 
 		// save interfaces to fog nodes
-		m_fogProgramNodes.emplace_back(dynamic_cast<FogProgram*>(pRenderEnvironmentProgramNode));
-		m_fogProgramNodes.emplace_back(dynamic_cast<FogProgram*>(pRefractionProgramNode));
-		m_fogProgramNodes.emplace_back(dynamic_cast<FogProgram*>(pReflectionProgramNode));
+		m_fogProgramNodes.push_back(dynamic_cast<FogProgram*>(pRenderEnvironmentProgramNode));
+		m_fogProgramNodes.push_back(dynamic_cast<FogProgram*>(pRefractionProgramNode));
+		m_fogProgramNodes.push_back(dynamic_cast<FogProgram*>(pReflectionProgramNode));
 
 		if (m_pWaterQuad == nullptr) {
 			m_pWaterQuad = MakeQuad(1000.0f, 1000.0f);

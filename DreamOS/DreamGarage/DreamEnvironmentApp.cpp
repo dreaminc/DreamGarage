@@ -162,16 +162,16 @@ RESULT DreamEnvironmentApp::SetCurrentEnvironment(environment::type type) {
 	m_currentType = type;
 
 	for (auto *pProgram : m_fogPrograms) {
-		FogParams *pParams = m_environmentFogParams[m_currentType];
-		CR(pProgram->SetFogParams(pParams->startDistance, pParams->endDistance, pParams->density, pParams->fogColor));
+		fogparams fogParams = m_environmentFogParams[m_currentType];
+		CR(pProgram->SetFogParams(fogParams));
 	}
 
 Error:
 	return R_PASS;
 }
 
-RESULT DreamEnvironmentApp::SetSkyboxPrograms(std::vector<SkyboxScatterProgram*> pPrograms) {
-	m_skyboxPrograms = pPrograms;
+RESULT DreamEnvironmentApp::SetSkyboxPrograms(std::vector<SkyboxScatterProgram*> skyboxPrograms) {
+	m_skyboxPrograms = skyboxPrograms;
 	return R_PASS;
 }
 
@@ -180,8 +180,8 @@ RESULT DreamEnvironmentApp::SetScreenFadeProgram(OGLProgramScreenFade* pFadeProg
 	return R_PASS;
 }
 
-RESULT DreamEnvironmentApp::SetFogPrograms(std::vector<FogProgram*> pFogPrograms) {
-	m_fogPrograms = pFogPrograms;
+RESULT DreamEnvironmentApp::SetFogPrograms(std::vector<FogProgram*> fogPrograms) {
+	m_fogPrograms = fogPrograms;
 	return R_PASS;
 }
 

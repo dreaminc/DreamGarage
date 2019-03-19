@@ -39,5 +39,5 @@ void main(void) {
 	
 	vec4 shaderColor = material.m_colorDiffuse * textureColor + g_ambient;
 
-	out_vec4Color = MixWithFog(FOG_TYPE_LINEAR, shaderColor, DataIn.vertDepth, fogConfig);
+	out_vec4Color = MixWithFog(FOG_TYPE_LINEAR, shaderColor, DataIn.vertDepth);
 }

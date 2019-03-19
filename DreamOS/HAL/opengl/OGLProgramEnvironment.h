@@ -13,6 +13,8 @@
 #include "OGLTexture.h"
 #include "../FogProgram.h"
 
+class OGLFogBlock;
+
 class OGLProgramEnvironment: public OGLProgram, public FogProgram {
 public:
 	OGLProgramEnvironment(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
@@ -25,13 +27,9 @@ public:
 
 	RESULT SetObjectTextures(OGLObj *pOGLObj);
 	RESULT SetMaterial(material *pMaterial);
-	RESULT SetFogConfig(float startDistance, float endDistance, float density, color fogColor);
 	RESULT SetObjectUniforms(DimObj *pDimObj);
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
-
-	// FogProgram
-	virtual RESULT SetFogParams(float startDistance, float endDistance, float density, color fogColor) override;
 
 protected:
 	stereocamera *m_pCamera = nullptr;
@@ -50,12 +48,6 @@ private:
 
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
 	OGLFogBlock *m_pFogBlock = nullptr;
-
-	// Default fog values for Lobby(?)
-	float m_fogStartDistance = 50.0f;
-	float m_fogEndDistance = 300.0f;
-	float m_fogDensity = 0.05f;
-	color m_fogColor = color(222.0f / 255.0f, 222.0f / 255.0f, 222.0f / 255.0f, 1.0f);
 };
 
 #endif // ! OGLPROGRAM_ENVIRONMENT_H_

@@ -28,7 +28,6 @@
 // TODO: This will go into a specific OGLProgram
 #include "OGLLightsBlock.h"
 #include "OGLMaterialBlock.h"
-#include "OGLFogBlock.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
 
@@ -94,7 +93,6 @@ public:
 	RESULT SetLights(ObjectStore *pSceneGraph);
 	virtual RESULT SetLights(std::vector<light*> *pLights);
 	virtual RESULT SetMaterial(material *pMaterial);
-	virtual RESULT SetFogConfig(float startDistance, float endDistance, float density, vector fogColor);
 	
 	RESULT SetCamera(camera *pCamera);
 	RESULT SetStereoCamera(stereocamera* pStereoCamera, EYE_TYPE eye);

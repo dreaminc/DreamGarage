@@ -5,6 +5,7 @@
 #include "DreamApp.h"
 #include "Primitives/point.h"
 #include "Primitives/color.h"
+#include "Primitives/fogparams.h"
 
 #include <map>
 
@@ -43,20 +44,6 @@ class DreamEnvironmentApp : public DreamApp<DreamEnvironmentApp> {
 
 	// DreamApp
 public:
-	
-	struct FogParams {
-		float startDistance;
-		float endDistance;
-		float density;
-		color fogColor;
-
-		FogParams(float fogStartDistance, float fogEndDistance, float fogDensity, color newfogColor) {
-			startDistance = fogStartDistance;
-			endDistance = fogEndDistance;
-			density = fogDensity;
-			fogColor = newfogColor;
-		}
-	};
 
 	DreamEnvironmentApp(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -73,10 +60,10 @@ public:
 	RESULT LoadAllEnvironments();
 	RESULT SetCurrentEnvironment(environment::type type);
 
-	RESULT SetSkyboxPrograms(std::vector<SkyboxScatterProgram*> pPrograms);
+	RESULT SetSkyboxPrograms(std::vector<SkyboxScatterProgram*> skyboxPrograms);
 	RESULT SetScreenFadeProgram(OGLProgramScreenFade* pFadeProgram);
 
-	RESULT SetFogPrograms(std::vector<FogProgram*> pFogPrograms);
+	RESULT SetFogPrograms(std::vector<FogProgram*> fogPrograms);
 
 	// Environment transition functions
 public:
@@ -126,10 +113,10 @@ private:
 		//{environment::HOUSE, L"\\model\\environment\\3\\environment.fbx"}
 	};
 	
-	std::map<environment::type, FogParams*> m_environmentFogParams = {
-		{ environment::CAVE, new FogParams(50.0f, 300.0f, 0.05f, color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 1.0f))},
-		{ environment::CANYON, new FogParams(900.0f, 1150.0f, 0.05f, color(202.0f / 255.0f, 190.0f / 255.0f, 161.0f / 255.0f, 1.0f))},	// 450 is ~the last leg of the bend, but probably need a better distance solution
-		{ environment::HOUSE, new FogParams(50.0f, 300.0f, 0.05f, color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 1.0f))}
+	std::map<environment::type, fogparams> m_environmentFogParams = {
+		{ environment::CAVE, fogparams(50.0f, 300.0f, 0.05f, color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 1.0f))},
+		{ environment::CANYON, fogparams(900.0f, 1150.0f, 0.05f, color(202.0f / 255.0f, 190.0f / 255.0f, 161.0f / 255.0f, 1.0f))},	// 450 is ~the last leg of the bend, but probably need a better distance solution
+		{ environment::HOUSE, fogparams(50.0f, 300.0f, 0.05f, color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 1.0f))}
 	};
 
 	//populated in LoadAllEnvironments
