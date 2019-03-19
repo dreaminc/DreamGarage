@@ -63,7 +63,9 @@ RESULT DreamBrowser::Shutdown(void *pContext) {
 	}
 	//*/
 
-//Error:
+	CRM(TeardownAudioBusSoundBuffers(), "Failed to tear down browser audio bus sound buffers");
+
+Error:
 	return r;
 }
 
@@ -916,6 +918,22 @@ Error:
 	return r;
 }
 */
+
+RESULT DreamBrowser::TeardownAudioBusSoundBuffers() {
+	RESULT r = R_PASS;
+
+	for (auto &pRenderBus : m_renderAudioBuses) {
+		if (pRenderBus.second != nullptr) {
+			delete pRenderBus.second;
+			pRenderBus.second = nullptr;
+		}
+	}
+
+	m_renderAudioBuses.clear();
+
+Error:
+	return r;
+}
 
 RESULT DreamBrowser::InitializeNewRenderBusSoundBuffer(const AudioPacket& pendingAudioPacket) {
 	RESULT r = R_PASS;
