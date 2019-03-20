@@ -279,17 +279,23 @@ bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation, vector &vDire
 
 	float theta = atan2(totalY, -totalX);
 
-	CB(velocity > 0.0075f);
+	CB(velocity > 0.01f);
 
-	if (theta - m_currentAngle > (float)(M_PI)) {
-		theta -= (float)(2 * M_PI);
+	//*
+	if (theta - m_currentAngle >= (float)(M_PI)) {
+		//theta -= (float)(2 * M_PI);
+		m_currentAngle += (float)(2 * M_PI);
 	}
-	else if (theta - m_currentAngle < -(float)(M_PI)) {
+	//*/
+
+	//*
+	if (theta - m_currentAngle <= -(float)(M_PI)) {
+		//theta += (float)(2 * M_PI);
 		m_currentAngle -= (float)(2 * M_PI);
-	//	theta += (float)(2 * M_PI);
 	}
-	m_currentAngle = 0.2f * theta + 0.8f * m_currentAngle;
-	//m_currentAngle = theta;
+	//*/
+
+	m_currentAngle = 0.1f * theta + 0.9f * m_currentAngle;
 
 	{
 		vDirection = vector(-totalX, totalY, 0.0f);
