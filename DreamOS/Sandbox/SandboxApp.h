@@ -14,6 +14,7 @@
 
 #include "HAL/HALImp.h"
 
+#include "Modules/TimeManagerModule.h"
 #include "Sandbox/PathManager.h"
 #include "Sandbox/CredentialManager.h"
 #include "Sandbox/CommandLineManager.h"
@@ -129,7 +130,7 @@ public:
 private:
 	RESULT InitializePhysicsEngine();
 	RESULT InitializeInteractionEngine();
-	RESULT InitializeTimeManager();
+	RESULT InitializeTimeManagerModule();
 	RESULT InitializeDreamAppManager();
 	RESULT InitializeDreamModuleManager();
 	RESULT InitializeCamera();
@@ -474,10 +475,6 @@ protected:
 	ObjectStoreNode *m_pAuxUISceneGraph = nullptr;
 	ObjectStoreNode *m_pBillboardSceneGraph = nullptr;
 
-	CloudController *m_pCloudController = nullptr;
-	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine = nullptr;
-	std::unique_ptr<InteractionEngine> m_pInteractionEngine = nullptr;
-
 	// TODO: Generalize to hands controller or something like that (should cover all of the various sensors)
 	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion = nullptr;
 	SenseKeyboard *m_pSenseKeyboard = nullptr;
@@ -487,10 +484,17 @@ protected:
 
 	// TODO: Create a "manager manager" or a more generalized way to add these
 	// All "managers" should be unique pointers 
-	std::unique_ptr<TimeManager> m_pTimeManager = nullptr;
 	std::unique_ptr<DreamAppManager> m_pDreamAppManager = nullptr;
 	std::unique_ptr<DreamModuleManager> m_pDreamModuleManager = nullptr;
 	std::unique_ptr<CredentialManager> m_pCredentialManager = nullptr;
+
+	// Sandbox (Core System) Modules
+	std::shared_ptr<TimeManagerModule> m_pTimeManagerModule = nullptr;
+
+	// TODO: These should be converted to module
+	CloudController *m_pCloudController = nullptr;
+	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine = nullptr;
+	std::unique_ptr<InteractionEngine> m_pInteractionEngine = nullptr;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;

@@ -571,6 +571,9 @@ protected:
 	RESULT RegisterSoundSystemObserver(DreamSoundSystem::observer *pObserver);
 	RESULT UnregisterSoundSystemObserver();
 
+	// Object Module
+	RESULT InitializeDreamObjectModule();
+
 	// DreamSoundSystem::observer
 	virtual RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) override;
 
@@ -657,6 +660,7 @@ protected:
 	// Modules
 protected:
 	std::shared_ptr<DreamSoundSystem> m_pDreamSoundSystem = nullptr;
+	//std::shared_ptr<DreamObjectModule> m_pDreamObjectModule = nullptr;
 
 public:
 	std::shared_ptr<UIKeyboard> GetKeyboardApp();

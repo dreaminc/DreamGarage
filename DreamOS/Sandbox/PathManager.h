@@ -30,11 +30,10 @@ typedef enum {
 	PATH_SANDBOX,
 	PATH_RESULT,
 	PATH_TEXTURE,
-	PATH_TEXTURE_CUBE,
+	PATH_CUBEMAP,
 	PATH_FONT,
 	PATH_MODEL,
 	PATH_ASSET,
-	PATH_DATA,
 	PATH_SOUND,
 	PATH_SCRIPTS,
 	PATH_INVALID	// Also acts as a found
@@ -67,11 +66,10 @@ class PathManager : public valid {
 		L"SANDBOX",
 		L"RESULT",
 		L"TEXTURE",
-		L"TEXTURE_CUBE",
+		L"CUBEMAP",
 		L"FONT",
 		L"MODEL",
 		L"ASSET",
-		L"DATA",
 		L"SOUND",
 		L"SCRIPTS"
 	};

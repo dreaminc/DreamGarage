@@ -1,6 +1,7 @@
-#include "TimeManager.h"
+#include "TimeManagerModule.h"
 
-TimeManager::TimeManager(double	processingTimeQuantum) : 
+TimeManagerModule::TimeManagerModule(DreamOS *pDreamOS, void *pContext, double processingTimeQuantum) :
+	DreamModule<TimeManagerModule>(pDreamOS, pContext),
 	m_processingTimeQuantum(processingTimeQuantum),
 	m_totalElapsedTime(0.0f),
 	m_totalTimeToProcess(0.0f),
@@ -20,11 +21,30 @@ Error:
 	return;
 }
 
-TimeManager::~TimeManager() {
-	// empty
+TimeManagerModule::~TimeManagerModule() {
+	Shutdown();
 }
 
-RESULT TimeManager::Reset() {
+// The Self Construct
+TimeManagerModule* TimeManagerModule::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
+	TimeManagerModule *pDreamModule = new TimeManagerModule(pDreamOS, pContext);
+	return pDreamModule;
+}
+
+RESULT TimeManagerModule::InitializeModule(void *pContext) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT TimeManagerModule::OnDidFinishInitializing(void *pContext = nullptr) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT TimeManagerModule::Shutdown(void *pContext = nullptr) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT TimeManagerModule::Reset() {
+	
 	m_startTime = std::chrono::high_resolution_clock::now();
 
 	m_currentTime = m_startTime;
@@ -34,7 +54,7 @@ RESULT TimeManager::Reset() {
 	return R_PASS;
 }
 
-RESULT TimeManager::Update() {
+RESULT TimeManagerModule::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	auto now = std::chrono::high_resolution_clock::now();
@@ -69,7 +89,7 @@ Error:
 	return R_PASS;
 }
 
-RESULT TimeManager::PrintFPS() {
+RESULT TimeManagerModule::PrintFPS() {
 	//DEBUG_LINEOUT_RETURN("Runtime FPS: %f numframes:%zd", m_runTimeFPS, m_numFrames);
 	
 	DEBUG_LINEOUT_RETURN("Runtime FPS: %04f min:%04f max:%04f", m_runTimeFPS, m_minFPS, m_maxFPS);
@@ -77,15 +97,15 @@ RESULT TimeManager::PrintFPS() {
 	return R_PASS;
 }
 
-double TimeManager::GetRunTimeFrameRate() {
+double TimeManagerModule::GetRunTimeFrameRate() {
 	return m_runTimeFPS;
 }
 
-long long TimeManager::GetTotalNumberOfFrames() {
+long long TimeManagerModule::GetTotalNumberOfFrames() {
 	return m_numFrames;
 }
 
-RESULT TimeManager::ResetMinMaxFPS() {
+RESULT TimeManagerModule::ResetMinMaxFPS() {
 	m_maxFPS = 0.0f;
 	m_minFPS = 0.0f;
 	return R_PASS;

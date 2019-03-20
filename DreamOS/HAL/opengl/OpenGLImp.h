@@ -13,8 +13,6 @@
 
 #include "OpenGLRenderingContext.h"
 
-#include "TimeManager/TimeManager.h"
-
 //#include "Primitives/camera.h"
 #include "Primitives/version.h"
 
