@@ -1844,7 +1844,7 @@ Error:
 	return r;
 }
 
-// TODO: Make waterquad positionings programmatic?
+// TODO: Make waterquad and light positionings programmatic?
 RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) {
 	RESULT r = R_PASS;
 
