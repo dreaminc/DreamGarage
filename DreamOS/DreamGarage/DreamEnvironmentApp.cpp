@@ -45,7 +45,6 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	// One strong "SUN" directional light, and a second dimmer "ambient" light from the opposite direction
 	float downwardAngle = 45.0f * ((float) M_PI / 180.0f);
 
-	//vector vSunDirection = vector(1.0f, -0.5f, 1.0f);
 	vector vSunDirection = vector(-1.0f, -0.25f, 0.1f);
 	vector vAmbientDirection = vector(1.0f, 0.25f, -0.1f);
 
@@ -162,8 +161,11 @@ RESULT DreamEnvironmentApp::SetCurrentEnvironment(environment::type type) {
 	m_currentType = type;
 
 	for (auto *pProgram : m_fogPrograms) {
-		FogParams fogParams = m_environmentFogParams[m_currentType];
-		CR(pProgram->SetFogParams(fogParams));
+		CR(pProgram->SetFogParams(m_environmentFogParams[m_currentType]));
+	}
+
+	for (auto pProgram : m_skyboxPrograms) {
+		pProgram->SetSunDirection(m_environmentSunDirection[m_currentType]);
 	}
 
 Error:

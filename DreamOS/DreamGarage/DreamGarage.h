@@ -226,6 +226,7 @@ private:
 	ProgramNode* m_pReflectionProgramNode = nullptr;
 
 	std::vector<FogProgram*> m_fogProgramNodes;
+	std::vector<ProgramNode*> m_waterProgramNodes;
 
 	// For mirror
 	ProgramNode* m_pRenderEnvironmentProgramNodeMirror = nullptr;

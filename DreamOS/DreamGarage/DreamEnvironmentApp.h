@@ -119,6 +119,12 @@ private:
 		{ environment::HOUSE, FogParams(50.0f, 300.0f, 0.05f, color(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f, 1.0f))}
 	};
 
+	std::map<environment::type, vector> m_environmentSunDirection = {
+		{ environment::CAVE, vector(1.0f, 0.25f, -0.1f) },	// cave
+		{ environment::CANYON, vector(-0.4f, 0.5f, 1.0f) },	// canyon
+		{ environment::HOUSE, vector(0.5f, 0.13f, 0.1f) }	// House front right
+	};
+
 	//populated in LoadAllEnvironments
 	std::map<environment::type, std::shared_ptr<model>> m_environmentModels;
 
