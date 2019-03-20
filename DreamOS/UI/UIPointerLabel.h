@@ -37,6 +37,7 @@ private:
 
 	std::shared_ptr<composite> m_pDotComposite = nullptr;
 	std::shared_ptr<quad> m_pDotQuad = nullptr;
+	float m_dotCenterOffset;
 
 // Path saving methods
 private:

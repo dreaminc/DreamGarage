@@ -57,6 +57,7 @@ RESULT UIPointerLabel::RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad
 	float rightWidth = height * pxRight / pxHeight;
 	float pxDot = 178.0f;
 	float dotHeight = height * pxDot / pxHeight;
+	m_dotCenterOffset = height * 14.0f / pxHeight;
 
 	m_pFont->SetLineHeight(textHeight);
 
@@ -105,21 +106,10 @@ RESULT UIPointerLabel::RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad
 		pQuadLeft->SetDiffuseTexture(m_pPointerLeft);
 		pQuadCenter->SetDiffuseTexture(m_pPointerCenter);
 		pQuadRight->SetDiffuseTexture(m_pPointerRight);
-		if (!m_fPointingLeft) {
-			pQuadLeft->FlipUVHorizontal();
-			pQuadRight->FlipUVHorizontal();
-		}
 
-		if (m_fPointingLeft) {
-			pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, 0.0f, -textOffset);
-			pQuadCenter->SetPosition(0.0f, 0.0f, -textOffset);
-			pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, -textOffset);
-		}
-		else {
-			pQuadLeft->SetPosition((width + leftWidth) / 2.0f, 0.0f, -textOffset);
-			pQuadCenter->SetPosition(0.0f, 0.0f, -textOffset);
-			pQuadRight->SetPosition(-(width + rightWidth) / 2.0f, 0.0f, -textOffset);
-		}
+		pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, 0.0f, -textOffset);
+		pQuadCenter->SetPosition(0.0f, 0.0f, -textOffset);
+		pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, -textOffset);
 
 		pText->SetPosition(point(0.0f, 0.0f, 0.0f));
 
@@ -135,20 +125,8 @@ RESULT UIPointerLabel::RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad
 			m_pRenderContext->RenderToQuad(totalWidth, height, (leftWidth - rightWidth) / 2.0f, 0);
 		}
 
-		{
-			m_pDotComposite->SetPosition(point(-screenOffset * 2.0f, 0.0f, 0.0f));
-			m_pRenderContext->SetPosition(point(-screenOffset, 0.0f, 0.0f));
-			auto pQuad = m_pRenderContext->GetCurrentQuad();
-			/*
-			if (m_fPointingLeft) {
-				pQuad->SetPosition(point(pQuad->GetWidth() / 2.0f, 0.0f, 0.0f));
-			}
-			else {
-				pQuad->SetPosition(point(-pQuad->GetWidth() / 2.0f, 0.0f, 0.0f));
-			}
-			//*/
-		//	m_pRenderContext->SetPosition(point(-screenOffset, 0.0f, m_pRenderContext->GetCurrentQuad()->GetWidth() / 2.0f));
-		}
+		m_pDotComposite->SetPosition(point(-screenOffset * 2.0f, 0.0f, 0.0f));
+		m_pRenderContext->SetPosition(point(-screenOffset, 0.0f, 0.0f));
 	}
 
 Error:
@@ -177,19 +155,7 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		float height = m_pParentQuad->GetHeight() * m_pParentQuad->GetScale(true).y();
 		std::string strInitials(pUpdatePointerMessage->m_body.szInitials, 2);
 
-		// Update orientation
-		/*
-		if (ptPosition.x() > width / 4.0f && m_fPointingLeft) {
-			m_fPointingLeft = false;
-			CR(RenderLabelWithInitials(m_pParentQuad, strInitials));
-		}
-		else if (ptPosition.x() < -width / 4.0f && !m_fPointingLeft) {
-			m_fPointingLeft = true;
-			CR(RenderLabelWithInitials(m_pParentQuad, strInitials));
-		}
-		//*/
-
-
+		// TODO: update for round implementation
 		bool fInBounds = true;
 
 		// left/right bounds check
@@ -237,16 +203,13 @@ RESULT UIPointerLabel::UpdateOrientationFromPoints() {
 //	CBR(OrientationFromNormalEquation(qRotation), R_SKIPPED);
 
 	vDirection.Normalize();
-	vDirection = (m_pDotQuad->GetWidth()/2.0f-m_pDotQuad->GetWidth()/12.0f) * vDirection;
+	vDirection = (m_pDotQuad->GetWidth()/2.0f-m_dotCenterOffset) * vDirection;
 	vDirection = vector(-0.02f, -vDirection.y(), vDirection.x());
 
 	m_pDotComposite->SetOrientation(qRotation);
 	m_pDotComposite->SetPosition(vDirection);
 
 	m_pRenderContext->SetPosition(vDirection);
-
-	// TODO: Slerp(?), lerp does not work well
-//	m_pDotComposite->SetOrientation(m_pDotComposite->GetOrientation().RotateToQuaternionLerp(qRotation, 0.2f));
 
 Error:
 	return r;
@@ -279,21 +242,15 @@ bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation, vector &vDire
 
 	float theta = atan2(totalY, -totalX);
 
-	CB(velocity > 0.01f);
+	CB(velocity > 0.025f);
 
-	//*
 	if (theta - m_currentAngle >= (float)(M_PI)) {
-		//theta -= (float)(2 * M_PI);
 		m_currentAngle += (float)(2 * M_PI);
 	}
-	//*/
 
-	//*
 	if (theta - m_currentAngle <= -(float)(M_PI)) {
-		//theta += (float)(2 * M_PI);
 		m_currentAngle -= (float)(2 * M_PI);
 	}
-	//*/
 
 	m_currentAngle = 0.1f * theta + 0.9f * m_currentAngle;
 
