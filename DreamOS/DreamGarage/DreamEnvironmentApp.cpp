@@ -46,8 +46,10 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	float downwardAngle = 45.0f * ((float) M_PI / 180.0f);
 
 	//vector vSunDirection = vector(1.0f, -0.5f, 1.0f);
-	vector vSunDirection = vector(-0.4f, 0.5f, 1.0f);
-	vector vAmbientDirection = vector(-0.4f, 0.5f, 1.0f);
+	vector vSunDirection = vector(-1.0f, -0.25f, 0.1f);
+	vector vAmbientDirection = vector(1.0f, 0.25f, -0.1f);
+	//vector vSunDirection = vector(-0.4f, 0.5f, 1.0f);
+	//vector vAmbientDirection = vector(-0.4f, 0.5f, 1.0f);
 
 	m_pDirectionalSunLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vSunDirection);
 	m_pDirectionalAmbientLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.1f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vAmbientDirection);
@@ -162,12 +164,12 @@ RESULT DreamEnvironmentApp::SetCurrentEnvironment(environment::type type) {
 	m_currentType = type;
 
 	for (auto *pProgram : m_fogPrograms) {
-		FogParams fogParams = m_environmentFogParams[m_currentType];
-		CR(pProgram->SetFogParams(fogParams));
+		//FogParams fogParams = m_environmentFogParams[m_currentType];
+		CR(pProgram->SetFogParams(m_environmentFogParams[m_currentType]));
 	}
 
 	for (auto pProgram : m_skyboxPrograms) {
-		pProgram->SetSunDirection(m_vSunDirection);
+		pProgram->SetSunDirection(m_environmentSunDirection[m_currentType]);
 	}
 
 Error:

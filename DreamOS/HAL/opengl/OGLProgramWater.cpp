@@ -170,6 +170,15 @@ Error:
 	return r;
 }
 
+RESULT OGLProgramWater::SetWaterReflectionLight(light* pLight) {
+	// This kind of assumes water doesn't add any other lights, but this is probably safe?
+	if (!m_lights.empty()) {	// pop the most recently added light
+		m_lights.pop_back();
+	}
+	m_lights.push_back(pLight);
+	return R_PASS;
+}
+
 RESULT OGLProgramWater::SetPlaneObject(VirtualObj* pReflectionObject) {
 	RESULT r = R_PASS;
 

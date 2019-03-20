@@ -34,7 +34,7 @@ public:
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 
-	
+	RESULT SetWaterReflectionLight(light* pLight);
 
 public:
 	RESULT SetPlaneObject(VirtualObj* pReflectionObject);
