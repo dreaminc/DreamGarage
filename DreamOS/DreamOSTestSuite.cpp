@@ -1153,33 +1153,80 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 	testDescriptor.strTestDescription = "Test object creation / destruction using the object module";
 	testDescriptor.sDuration = 100.0f;
 	
-	float radius = 2.0f;
+	float radius = 0.1f;
+	int factor = 10;
 
 	struct TestContext {
 		sphere *pSphere = nullptr;
 		model *pModel = nullptr;
+
+		RESULT OnSphereReady(DimObj *pDimObj, void *pContext) {
+			RESULT r = R_PASS;
+
+			point ptSphere;
+			sphere *pSphere = dynamic_cast<sphere*>(pDimObj);
+			CN(pSphere);
+
+			CN(pDreamOS);
+
+			if (pContext != nullptr) {
+				memcpy(&ptSphere, (point*)(pContext), sizeof(point));
+
+				delete pContext;
+				pContext = nullptr;
+			}
+
+			pSphere->SetPosition(ptSphere);
+
+			CRM(pDreamOS->AddObject(pSphere), "Failed to add async sphere");
+
+		Error:
+			return r;
+		}
+
+		DreamOS *pDreamOS = nullptr;
+
 	} *pTestContext = new TestContext();
 
-	auto fnInitialize = [=](void *pContext) {
+	testDescriptor.fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline("environment"));
+		CR(SetupPipeline("standard"));
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
+
+		pTestContext->pDreamOS = m_pDreamOS;
 
 		{
 			light *pLight;
 			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 
 			// 
-			model *pModel = m_pDreamOS->AddModel(L"\\Cave\\Cave.fbx");
-			CN(pModel);
-			pModel->SetPosition(point(2.0f, -2.5f, 0.0f));
-			pModel->SetScale(0.05f);
+			//model *pModel = m_pDreamOS->AddModel(L"\\Cave\\cave.FBX");
+			//CN(pModel);
+			//pModel->SetPosition(point(2.0f, -2.5f, 0.0f));
+			//pModel->SetScale(0.05f);
+
+			// Test the creation of an arbitrarily large number of spheres
+			for (int i = 0; i < factor; i++) {
+				for (int j = 0; j < factor; j++) {
+					for (int k = 0; k < factor; k++) {
+						float xPos = ((float)i - ((float)(factor - 1) / 2.0f)) * 1.1f * (radius * 2.0f);
+						float yPos = ((float)j - ((float)(factor - 1) / 2.0f)) * 1.1f * (radius * 2.0f);
+						float zPos = ((float)k - ((float)(factor - 1) / 2.0f)) * 1.1f * (radius * 2.0f);
+
+						point *pPtSphere = new point(xPos, yPos, zPos);
+						CN(pPtSphere);
+
+						CR(m_pDreamOS->MakeSphere(std::bind(&TestContext::OnSphereReady, pTestContext, std::placeholders::_1, std::placeholders::_2), 
+							(void*)(pPtSphere), radius, 10, 10));
+					}
+				}
+			}
 
 		}
 
@@ -1188,7 +1235,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 	};
 
 	// Update Code
-	auto fnUpdate = [=](void *pContext) {
+	testDescriptor.fnUpdate = [=](void *pContext) {
 		RESULT r = R_PASS;
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -1197,9 +1244,6 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 	Error:
 		return r;
 	};
-
-	testDescriptor.fnInitialize = fnInitialize;
-	testDescriptor.fnUpdate = fnUpdate;
 
 	auto pUITest = AddTest(testDescriptor, pTestContext);
 	CN(pUITest);

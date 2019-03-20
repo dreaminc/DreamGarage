@@ -698,10 +698,6 @@ RESULT SandboxApp::InitializeTimeManagerModule() {
 
 Error:
 	return r;
-
-
-Error:
-	return r;
 }
 
 RESULT SandboxApp::InitializeDreamModuleManager() {

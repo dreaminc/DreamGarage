@@ -49,8 +49,8 @@ RESULT OGLSphere::Render() {
 	// Strips
 	// TODO: quad strip?
 	int indexCount = 0;
-	int numTriangleStripVerts = 2 * (m_numAngularDivisions + 1);
-	int numStrips = m_numVerticalDivisions - 1;
+	int numTriangleStripVerts = 2 * (m_params.numAngularDivisions + 1);
+	int numStrips = m_params.numVerticalDivisions - 1;
 
 	for (int i = 0; i < numStrips; i++) {
 		void *pOffset = (void*)(sizeof(dimindex) * indexCount);

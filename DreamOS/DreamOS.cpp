@@ -675,14 +675,28 @@ hand *DreamOS::GetHand(HAND_TYPE handType) {
 	return m_pSandbox->GetHand(handType);
 }
 
-model *DreamOS::MakeModel(const std::wstring& wstrModelFilename, std::function<RESULT(model*)> fnOnObjectReady, ModelFactory::flags modelFactoryFlags) {
+// TODO: 
+RESULT DreamOS::MakeModel(const std::wstring& wstrModelFilename, std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, ModelFactory::flags modelFactoryFlags) {
 	RESULT r = R_PASS;
-	model *pModel = nullptr;
 
-	CNM()
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
 
 Error:
-	return pModel;
+	return r;
+}
+
+RESULT DreamOS::MakeSphere(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	sphere::params *pSphereParams = new sphere::params(radius, numAngularDivisions, numVerticalDivisions);
+	CN(pSphereParams);
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pSphereParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
+
+Error:
+	return r;
 }
 
 ProgramNode* DreamOS::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
@@ -914,8 +928,8 @@ RESULT DreamOS::InitializeDreamObjectModule() {
 
 	DOSLOG(INFO, "Initializing Dream Object Module");
 
-	//m_pDreamObjectModule = LaunchDreamModule<DreamObjectModule>(this);
-	//CNM(m_pDreamObjectModule, "Failed to launch Dream Object Module");
+	m_pDreamObjectModule = LaunchDreamModule<DreamObjectModule>(this);
+	CNM(m_pDreamObjectModule, "Failed to launch Dream Object Module");
 
 Error:
 	return r;

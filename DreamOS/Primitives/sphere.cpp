@@ -11,22 +11,20 @@ Error:
 }
 
 unsigned int sphere::NumberVertices() {
-	int numVertsPerStrip = m_numAngularDivisions + 1;
-	int numStrips = m_numVerticalDivisions;
+	int numVertsPerStrip = m_params.numAngularDivisions + 1;
+	int numStrips = m_params.numVerticalDivisions;
 	return (numStrips) * (numVertsPerStrip);
 }
 
 unsigned int sphere::NumberIndices() {
-	int numTriangleStripVerts = 2 * (m_numAngularDivisions + 1);
-	int numStrips = m_numVerticalDivisions;
+	int numTriangleStripVerts = 2 * (m_params.numAngularDivisions + 1);
+	int numStrips = m_params.numVerticalDivisions;
 
 	return (numTriangleStripVerts * numStrips);
 }
 
 sphere::sphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) :
-	m_radius(radius),
-	m_numAngularDivisions(numAngularDivisions),
-	m_numVerticalDivisions(numVerticalDivisions)
+	m_params(radius, numAngularDivisions, numVerticalDivisions)
 {
 	RESULT r = R_PASS;
 
@@ -45,9 +43,7 @@ Error:
 }
 
 sphere::sphere(BoundingSphere *pBoundingSphere, bool fTriangleBased) :
-	m_radius(1.0f),
-	m_numAngularDivisions(MIN_SPHERE_DIVISIONS * 3),
-	m_numVerticalDivisions(MIN_SPHERE_DIVISIONS * 3)
+	m_params(1.0f, MIN_SPHERE_DIVISIONS * 3, MIN_SPHERE_DIVISIONS * 3)
 {
 	RESULT r = R_PASS;
 
@@ -68,7 +64,7 @@ Error:
 RESULT sphere::UpdateFromBoundingSphere(BoundingSphere* pBoundingSphere, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	if (pBoundingSphere->GetRadius() != m_radius) {
+	if (pBoundingSphere->GetRadius() != m_params.radius) {
 		CR(SetSphereVertices(pBoundingSphere, fTriangleBased));
 	}
 
@@ -87,11 +83,11 @@ Error:
 RESULT sphere::SetSphereVertices(BoundingSphere* pBoundingSphere, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	m_radius = pBoundingSphere->GetRadius(false) * 1.05f;	// Add a buffer so we can see the reference geometry 
+	m_params.radius = pBoundingSphere->GetRadius(false) * 1.05f;	// Add a buffer so we can see the reference geometry 
 	SetOrigin(pBoundingSphere->GetOrigin());
 
 	//CR(SetSphereVertices(m_radius, m_numAngularDivisions, m_numVerticalDivisions, pBoundingSphere->GetOrigin()));
-	CR(SetSphereVertices(m_radius, m_numAngularDivisions, m_numVerticalDivisions));
+	CR(SetSphereVertices(m_params.radius, m_params.numAngularDivisions, m_params.numVerticalDivisions));
 
 Error:
 	return r;
@@ -100,17 +96,17 @@ Error:
 RESULT sphere::SetSphereVertices(float radius, int numAngularDivisions, int numVerticalDivisions, point ptOrigin, color c) {
 	RESULT r = R_PASS;
 
-	if (m_numAngularDivisions < MIN_SPHERE_DIVISIONS) m_numAngularDivisions = MIN_SPHERE_DIVISIONS;
-	if (m_numVerticalDivisions < MIN_SPHERE_DIVISIONS) m_numVerticalDivisions = MIN_SPHERE_DIVISIONS;
+	if (m_params.numAngularDivisions < MIN_SPHERE_DIVISIONS) m_params.numAngularDivisions = MIN_SPHERE_DIVISIONS;
+	if (m_params.numVerticalDivisions < MIN_SPHERE_DIVISIONS) m_params.numVerticalDivisions = MIN_SPHERE_DIVISIONS;
 
 	CR(Allocate());
 
 	// Vertices 
-	int numStrips = m_numVerticalDivisions;
-	int numStripDivs = (m_numAngularDivisions + 1);
+	int numStrips = m_params.numVerticalDivisions;
+	int numStripDivs = (m_params.numAngularDivisions + 1);
 	int vertCount = 0;
-	float thetaDiv = static_cast<float>((2.0f * M_PI) / (m_numAngularDivisions));
-	float psiDiv = static_cast<float>((1.0f * M_PI) / (m_numVerticalDivisions - 1));
+	float thetaDiv = static_cast<float>((2.0f * M_PI) / (m_params.numAngularDivisions));
+	float psiDiv = static_cast<float>((1.0f * M_PI) / (m_params.numVerticalDivisions - 1));
 
 	for (int i = 0; i < numStrips; i++) {
 		float effPsi = psiDiv * static_cast<float>(i);

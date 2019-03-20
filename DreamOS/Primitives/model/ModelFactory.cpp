@@ -344,7 +344,7 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 
 	//pModel->UpdateBoundingVolume();
 
-// Success:
+Success:
 	return pModel;
 
 Error:

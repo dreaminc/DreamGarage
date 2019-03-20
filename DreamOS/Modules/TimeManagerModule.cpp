@@ -35,11 +35,11 @@ RESULT TimeManagerModule::InitializeModule(void *pContext) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT TimeManagerModule::OnDidFinishInitializing(void *pContext = nullptr) {
+RESULT TimeManagerModule::OnDidFinishInitializing(void *pContext) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT TimeManagerModule::Shutdown(void *pContext = nullptr) {
+RESULT TimeManagerModule::Shutdown(void *pContext) {
 	return R_NOT_IMPLEMENTED;
 }
 

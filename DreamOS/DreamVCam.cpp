@@ -409,7 +409,7 @@ RESULT DreamVCam::ModuleProcess(void *pContext) {
 	// TODO: Cross thread OGL calls don't seem to work - need to investigate
 
 	while (true) {
-		DEBUG_LINEOUT("vcam: stayalive - %d", (1 * stayAliveCount++));
+		//DEBUG_LINEOUT("vcam: stayalive - %d", (1 * stayAliveCount++));
 
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 

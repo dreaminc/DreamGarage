@@ -50,7 +50,9 @@
 
 //#include "DreamLogger/DreamLogger.h"
 
+// Dream Modules
 #include "DreamGarage/DreamSoundSystem.h"
+#include "Modules/DreamObjectModule.h"
 
 #include "Primitives/model/ModelFactory.h"
 
@@ -530,7 +532,8 @@ public:
 	hand *GetHand(HAND_TYPE handType);
 
 	// Async Object 
-	model *MakeModel(const std::wstring& wstrModelFilename, std::function<RESULT(model*)> fnOnObjectReady, ModelFactory::flags modelFactoryFlags = ModelFactory::flags::NONE);
+	RESULT MakeModel(const std::wstring& wstrModelFilename, std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext = nullptr, ModelFactory::flags modelFactoryFlags = ModelFactory::flags::NONE);
+	RESULT MakeSphere(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext = nullptr, float radius = 1.0f, int numAngularDivisions = 10, int numVerticalDivisions = 10, color c = color(COLOR_WHITE));
 
 	// Shaders / Programs
 	ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
@@ -660,7 +663,7 @@ protected:
 	// Modules
 protected:
 	std::shared_ptr<DreamSoundSystem> m_pDreamSoundSystem = nullptr;
-	//std::shared_ptr<DreamObjectModule> m_pDreamObjectModule = nullptr;
+	std::shared_ptr<DreamObjectModule> m_pDreamObjectModule = nullptr;
 
 public:
 	std::shared_ptr<UIKeyboard> GetKeyboardApp();

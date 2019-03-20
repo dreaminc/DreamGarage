@@ -1050,6 +1050,9 @@
     <ClCompile Include="..\..\..\Modules\TimeManagerModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Modules\DreamObjectModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2278,6 +2281,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Modules\TimeManagerModule.h">
       <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Modules\DreamObjectModule.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\PrimParams.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
