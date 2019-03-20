@@ -25,6 +25,7 @@ RESULT UIPointerLabel::Initialize() {
 	m_pPointerLeft = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerLeftTexture)[0]);
 	m_pPointerCenter = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerCenterTexture)[0]);
 	m_pPointerRight = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerRightTexture)[0]);
+	m_pPointerDot = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerDotTexture)[0]);
 
 	m_pRenderContext = AddFlatContext();
 	m_pRenderContext->RotateXByDeg(90.0f);
@@ -49,11 +50,14 @@ RESULT UIPointerLabel::RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad
 
 	float height = pParentQuad->GetHeight()/2 * 0.06;
 	float textHeight = 0.75f*height;
-	float pxHeight = 84.0f;
-	float pxRight = 21.0f;
-	float pxLeft = 39.0f;
+	float pxHeight = 65.0f;
+	float pxRight = 10.0f;
+	float pxLeft = 10.0f;
 	float leftWidth = height * pxLeft / pxHeight;
 	float rightWidth = height * pxRight / pxHeight;
+	float pxDot = 178.0f;
+	float dotHeight = height * pxDot / pxHeight;
+	m_dotCenterOffset = height * 14.0f / pxHeight;
 
 	m_pFont->SetLineHeight(textHeight);
 
@@ -65,6 +69,13 @@ RESULT UIPointerLabel::RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad
 		text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
 
 	CN(pText);
+
+	m_pDotComposite = AddComposite();
+	m_pDotComposite->SetVisible(false, false);
+
+	m_pDotQuad = m_pDotComposite->AddQuad(dotHeight, dotHeight);
+	m_pDotQuad->SetDiffuseTexture(m_pPointerDot);
+	m_pDotQuad->RotateZByDeg(90.0f);
 	{
 		// assuming only capital letters (A-Z) and centering based on those
 		CharacterGlyph periodGlyph;
@@ -95,21 +106,10 @@ RESULT UIPointerLabel::RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad
 		pQuadLeft->SetDiffuseTexture(m_pPointerLeft);
 		pQuadCenter->SetDiffuseTexture(m_pPointerCenter);
 		pQuadRight->SetDiffuseTexture(m_pPointerRight);
-		if (!m_fPointingLeft) {
-			pQuadLeft->FlipUVHorizontal();
-			pQuadRight->FlipUVHorizontal();
-		}
 
-		if (m_fPointingLeft) {
-			pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, 0.0f, -textOffset);
-			pQuadCenter->SetPosition(0.0f, 0.0f, -textOffset);
-			pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, -textOffset);
-		}
-		else {
-			pQuadLeft->SetPosition((width + leftWidth) / 2.0f, 0.0f, -textOffset);
-			pQuadCenter->SetPosition(0.0f, 0.0f, -textOffset);
-			pQuadRight->SetPosition(-(width + rightWidth) / 2.0f, 0.0f, -textOffset);
-		}
+		pQuadLeft->SetPosition(-(width + leftWidth) / 2.0f, 0.0f, -textOffset);
+		pQuadCenter->SetPosition(0.0f, 0.0f, -textOffset);
+		pQuadRight->SetPosition((width + rightWidth) / 2.0f, 0.0f, -textOffset);
 
 		pText->SetPosition(point(0.0f, 0.0f, 0.0f));
 
@@ -125,17 +125,8 @@ RESULT UIPointerLabel::RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad
 			m_pRenderContext->RenderToQuad(totalWidth, height, (leftWidth - rightWidth) / 2.0f, 0);
 		}
 
-		{
-			m_pRenderContext->SetPosition(point(-screenOffset, 0.0f, 0.0f));
-			auto pQuad = m_pRenderContext->GetCurrentQuad();
-			if (m_fPointingLeft) {
-				pQuad->SetPosition(point(pQuad->GetWidth() / 2.0f, 0.0f, 0.0f));
-			}
-			else {
-				pQuad->SetPosition(point(-pQuad->GetWidth() / 2.0f, 0.0f, 0.0f));
-			}
-		//	m_pRenderContext->SetPosition(point(-screenOffset, 0.0f, m_pRenderContext->GetCurrentQuad()->GetWidth() / 2.0f));
-		}
+		m_pDotComposite->SetPosition(point(-screenOffset * 2.0f, 0.0f, 0.0f));
+		m_pRenderContext->SetPosition(point(-screenOffset, 0.0f, 0.0f));
 	}
 
 Error:
@@ -164,19 +155,7 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		float height = m_pParentQuad->GetHeight() * m_pParentQuad->GetScale(true).y();
 		std::string strInitials(pUpdatePointerMessage->m_body.szInitials, 2);
 
-		// Update orientation
-		/*
-		if (ptPosition.x() > width / 4.0f && m_fPointingLeft) {
-			m_fPointingLeft = false;
-			CR(RenderLabelWithInitials(m_pParentQuad, strInitials));
-		}
-		else if (ptPosition.x() < -width / 4.0f && !m_fPointingLeft) {
-			m_fPointingLeft = true;
-			CR(RenderLabelWithInitials(m_pParentQuad, strInitials));
-		}
-		//*/
-
-
+		// TODO: update for round implementation
 		bool fInBounds = true;
 
 		// left/right bounds check
@@ -190,6 +169,7 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 			fInBounds = false;
 		}
 		m_pRenderContext->SetVisible(fInBounds && pUpdatePointerMessage->m_body.fVisible, false);
+		m_pDotComposite->SetVisible(fInBounds && pUpdatePointerMessage->m_body.fVisible, false);
 
 		SetPosition(ptMessage);
 
@@ -216,18 +196,26 @@ RESULT UIPointerLabel::UpdateOrientationFromPoints() {
 	RESULT r = R_PASS;
 
 	quaternion qRotation;
+	vector vDirection;
 
-	CBR(OrientationFromAverage(qRotation), R_SKIPPED);
+	CBR(OrientationFromAverage(qRotation, vDirection), R_SKIPPED);
 
 //	CBR(OrientationFromNormalEquation(qRotation), R_SKIPPED);
 
-	SetOrientation(qRotation);
+	vDirection.Normalize();
+	vDirection = (m_pDotQuad->GetWidth()/2.0f-m_dotCenterOffset) * vDirection;
+	vDirection = vector(-0.02f, -vDirection.y(), vDirection.x());
+
+	m_pDotComposite->SetOrientation(qRotation);
+	m_pDotComposite->SetPosition(vDirection);
+
+	m_pRenderContext->SetPosition(vDirection);
 
 Error:
 	return r;
 }
 
-bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation) {
+bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation, vector &vDirection) {
 	RESULT r = R_PASS;
 
 	// average velocity, xdiff, ydiff
@@ -254,16 +242,31 @@ bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation) {
 
 	float theta = atan2(totalY, -totalX);
 
-	CB(velocity > 0.0075f);
+	CB(velocity > 0.025f);
 
-	qRotation = quaternion::MakeQuaternionWithEuler(theta, 0.0f, 0.0f);
+	if (theta - m_currentAngle >= (float)(M_PI)) {
+		m_currentAngle += (float)(2 * M_PI);
+	}
+
+	if (theta - m_currentAngle <= -(float)(M_PI)) {
+		m_currentAngle -= (float)(2 * M_PI);
+	}
+
+	m_currentAngle = 0.1f * theta + 0.9f * m_currentAngle;
+
+	{
+		vDirection = vector(-totalX, totalY, 0.0f);
+		float mag = vDirection.magnitude();
+		vDirection = vector(mag*cos(m_currentAngle), mag*sin(m_currentAngle), 0.0f);
+	}
+	qRotation = quaternion::MakeQuaternionWithEuler(m_currentAngle, 0.0f, 0.0f);
 
 	return true;
 Error:
 	return false;
 }
 
-bool UIPointerLabel::OrientationFromNormalEquation(quaternion& qRotation) {
+bool UIPointerLabel::OrientationFromNormalEquation(quaternion& qRotation, vector& vDirection) {
 
 	RESULT r = R_PASS;
 
@@ -315,6 +318,7 @@ bool UIPointerLabel::OrientationFromNormalEquation(quaternion& qRotation) {
 	// calculate label orientation through 2-dimensional slope
 	float theta = atan2(slope,1);
 
+	vDirection = vector(1, slope, 0);
 	qRotation = quaternion::MakeQuaternionWithEuler(theta, 0.0f, 0.0f);
 
 	return true;
