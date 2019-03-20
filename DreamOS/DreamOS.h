@@ -529,6 +529,9 @@ public:
 	// Hands
 	hand *GetHand(HAND_TYPE handType);
 
+	// Async Object 
+	model *MakeModel(const std::wstring& wstrModelFilename, std::function<RESULT(model*)> fnOnObjectReady, ModelFactory::flags modelFactoryFlags = ModelFactory::flags::NONE);
+
 	// Shaders / Programs
 	ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 

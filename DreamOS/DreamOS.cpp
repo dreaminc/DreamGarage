@@ -669,6 +669,16 @@ hand *DreamOS::GetHand(HAND_TYPE handType) {
 	return m_pSandbox->GetHand(handType);
 }
 
+model *DreamOS::MakeModel(const std::wstring& wstrModelFilename, std::function<RESULT(model*)> fnOnObjectReady, ModelFactory::flags modelFactoryFlags) {
+	RESULT r = R_PASS;
+	model *pModel = nullptr;
+
+	CNM()
+
+Error:
+	return pModel;
+}
+
 ProgramNode* DreamOS::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
 	RESULT r = R_PASS;
 
