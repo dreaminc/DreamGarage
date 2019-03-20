@@ -1113,45 +1113,34 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 
 		if (m_fForceObserverAudio || GetDOS()->GetSharedContentTexture() == m_pBrowserTexture.get() || GetDOS()->GetSharedCameraTexture() == m_pBrowserTexture.get()) {
 			//DOSLOG(INFO, "AudioPacket: Frames: %d, Channels: %d, SamplingRate: %d", pendingAudioPacket.GetNumFrames(), pendingAudioPacket.GetNumChannels(), pendingAudioPacket.GetSamplingRate());
+			
+			bool fPushPacket = false;
+
+			// Some basic filtering rules
 			if (m_strCurrentURL == "https://web.skype.com/") {
 				if (pendingAudioPacket.GetNumChannels() == 2 && pendingAudioPacket.GetNumFrames() == 480) {
 					//DOSLOG(INFO, "Pushing Packet!!!");
-
-					if (m_pRenderSoundBuffer != nullptr) {
-
-						m_pRenderSoundBuffer->LockBuffer();
-
-						{
-							CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
-						}
-
-						m_pRenderSoundBuffer->UnlockBuffer();
-					}
-					
-			auto pBufferTarget = m_renderAudioBuses[pendingAudioPacket.GetAudioStreamID()];
-
-			if (pBufferTarget != nullptr) {
-
-				pBufferTarget->LockBuffer();
-
-				{
-					CR(pBufferTarget->PushAudioPacket(pendingAudioPacket, true));
+					fPushPacket = true;
 				}
 			}
 			else {
-				if (m_pRenderSoundBuffer != nullptr) {
+				fPushPacket = true;
+			}
 
-					m_pRenderSoundBuffer->LockBuffer();
+			// Push the packet to the target audio bus buffer
+			if(fPushPacket) {
+				auto pBufferTarget = m_renderAudioBuses[pendingAudioPacket.GetAudioStreamID()];
+
+				if (pBufferTarget != nullptr) {
+
+					pBufferTarget->LockBuffer();
 
 					{
-						CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
+						CR(pBufferTarget->PushAudioPacket(pendingAudioPacket, true));
 					}
 
-					m_pRenderSoundBuffer->UnlockBuffer();
+					pBufferTarget->UnlockBuffer();
 				}
-
-				pBufferTarget->UnlockBuffer();
-
 			}
 		}
 	}
