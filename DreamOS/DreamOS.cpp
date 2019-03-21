@@ -681,6 +681,10 @@ DimObj *DreamOS::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 	return m_pSandbox->MakeObject(pPrimParams, fInitialize);
 }
 
+RESULT DreamOS::InitializeObject(DimObj *pDimObj) {
+	return m_pSandbox->InitializeObject(pDimObj);
+}
+
 // TODO: 
 RESULT DreamOS::MakeModel(const std::wstring& wstrModelFilename, std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, ModelFactory::flags modelFactoryFlags) {
 	RESULT r = R_PASS;

@@ -322,6 +322,7 @@ Error:
 */
 
 // This allows for separate HAL initialization of objects
+// Note, this will clobber the dim object on failure
 RESULT OpenGLImp::InitializeObject(DimObj *pDimObj) {
 	RESULT r = R_PASS;
 
@@ -330,7 +331,15 @@ RESULT OpenGLImp::InitializeObject(DimObj *pDimObj) {
 
 	CR(pOGLObj->OGLInitialize());
 
+Success:
+	return r;
+
 Error:
+	if (pDimObj != nullptr) {
+		delete pDimObj;
+		pDimObj = nullptr;
+	}
+
 	return r;
 }
 

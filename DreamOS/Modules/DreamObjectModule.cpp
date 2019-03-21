@@ -85,6 +85,24 @@ RESULT DreamObjectModule::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	// This is GPU protected 
+	if (m_pendingInitializationDimbjects.empty() == false) {
+		PendingDimObject pendingObject = m_pendingInitializationDimbjects.front();
+		m_pendingInitializationDimbjects.pop();
+
+		CN(pendingObject.pDimObj);
+
+		CR(GetDOS()->InitializeObject(pendingObject.pDimObj));
+		CN(pendingObject.pDimObj);
+
+		// Execute the call back
+		CR(pendingObject.fnOnObjectReady(pendingObject.pDimObj, pendingObject.pContext));
+
+		// Clean out the params
+		if (pendingObject.pPrimParams != nullptr) {
+			delete pendingObject.pPrimParams;
+			pendingObject.pPrimParams = nullptr;
+		}
+	}
 
 Error:
 	return R_PASS;
@@ -103,7 +121,8 @@ RESULT DreamObjectModule::ModuleProcess(void *pContext) {
 			pendingObject.pDimObj = GetDOS()->MakeObject(pendingObject.pPrimParams, false);
 			CN(pendingObject.pDimObj);
 
-			
+			// Push to the GPU pending queue
+			m_pendingInitializationDimbjects.push(pendingObject);
 		}
 
 		Sleep(1);

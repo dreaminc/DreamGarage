@@ -252,6 +252,7 @@ public:
 	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal);
 	quad *MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 
+	RESULT InitializeObject(DimObj *pDimObj);
 	DimObj *MakeObject(PrimParams *pPrimParams, bool fInitialize = true);
 
 	// TODO: Remove all of these (going with factory solution)

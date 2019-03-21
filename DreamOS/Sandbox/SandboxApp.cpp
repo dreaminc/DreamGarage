@@ -1065,6 +1065,10 @@ Error:
 }
 
 
+RESULT SandboxApp::InitializeObject(DimObj *pDimObj) {
+	return m_pHALImp->InitializeObject(pDimObj);
+}
+
 DimObj *SandboxApp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 	DimObj *pDimObj = nullptr;
