@@ -1,5 +1,7 @@
 #include "DreamOS.h"
 
+#include "Primitives/PrimParams.h"
+
 //#include "DreamLogger/DreamLogger.h"
 #include "DreamAppManager.h"
 
@@ -673,6 +675,10 @@ point DreamOS::GetCameraPosition() {
 
 hand *DreamOS::GetHand(HAND_TYPE handType) {
 	return m_pSandbox->GetHand(handType);
+}
+
+DimObj *DreamOS::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
+	return m_pSandbox->MakeObject(pPrimParams, fInitialize);
 }
 
 // TODO: 

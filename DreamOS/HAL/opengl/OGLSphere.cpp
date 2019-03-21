@@ -4,20 +4,27 @@
 // until c++ adds a special keyword to deal with this issue, this is by design
 #pragma warning(push)
 #pragma warning(disable : 4250)
+
+OGLSphere::OGLSphere(OpenGLImp *pParentImp, sphere::params *pSphereParams) :
+	sphere(pSphereParams),
+	OGLObj(pParentImp)
+{
+	//
+}
+
+
 OGLSphere::OGLSphere(OpenGLImp *pParentImp, float radius, int numAngularDivisions, int numVerticalDivisions, color c) :
 	sphere(radius, numAngularDivisions, numVerticalDivisions, c),
 	OGLObj(pParentImp)
 {
-	// TODO: Implement valid and CV EHM
-	RESULT r = OGLInitialize();
+	// 
 }
 
 OGLSphere::OGLSphere(OpenGLImp *pParentImp, BoundingSphere* pBoundingSphere, bool fTriangleBased) :
 	sphere(pBoundingSphere, fTriangleBased),
 	OGLObj(pParentImp)
 {
-	// TODO: Implement valid and CV EHM
-	RESULT r = OGLInitialize();
+	// 
 }
 
 RESULT OGLSphere::UpdateFromBoundingSphere(BoundingSphere* pBoundingSphere) {

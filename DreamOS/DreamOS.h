@@ -72,6 +72,8 @@ class PeerStayAliveMessage;
 class PeerAckMessage;
 class PeerHandshakeMessage;
 
+struct PrimParams;
+
 #include "DreamVideoStreamSubscriber.h"
 
 class DOSObserver {
@@ -532,6 +534,7 @@ public:
 	hand *GetHand(HAND_TYPE handType);
 
 	// Async Object 
+	DimObj *MakeObject(PrimParams *pPrimParams, bool fInitialize = true);
 	RESULT MakeModel(const std::wstring& wstrModelFilename, std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext = nullptr, ModelFactory::flags modelFactoryFlags = ModelFactory::flags::NONE);
 	RESULT MakeSphere(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext = nullptr, float radius = 1.0f, int numAngularDivisions = 10, int numVerticalDivisions = 10, color c = color(COLOR_WHITE));
 

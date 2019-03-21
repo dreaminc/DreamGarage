@@ -39,6 +39,7 @@ public:
 	};
 
 public:
+	sphere(sphere::params *pSphereParams, color c = color(COLOR_WHITE));
 	sphere(float radius = 1.0f, int numAngularDivisions = MIN_SPHERE_DIVISIONS, int numVerticalDivisions = MIN_SPHERE_DIVISIONS, color c = color(COLOR_WHITE));
 	sphere(BoundingSphere *pBoundingSphere, bool fTriangleBased = true);
 

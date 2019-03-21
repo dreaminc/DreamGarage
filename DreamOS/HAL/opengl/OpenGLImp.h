@@ -32,6 +32,8 @@ class OGLDreamConsole;
 class font;
 class mesh;
 
+class OGLSphere;
+
 class OpenGLImp : public HALImp {
 private:
 	// TODO: Fix this architecture 
@@ -49,6 +51,9 @@ public:
 	version GetOGLVersion() { return m_versionOGL; }
 	version GetGLSLVersion() { return m_versionGLSL; }
 
+	virtual RESULT InitializeObject(DimObj *pDimObj) override;
+	virtual DimObj* MakeObject(PrimParams *pPrimParams, bool fInitialize = true) override;
+
 	// TODO: Remove and use param pack function
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) override;
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) override;
@@ -56,6 +61,7 @@ public:
 	virtual quad* MakeQuad(double width, double height, point ptOrigin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector()) override;
 	virtual quad* MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector()) override;
 
+	OGLSphere* MakeSphere(PrimParams *pSphereParams, bool fInitialize = false);
 	virtual sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) override;
 
 	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) override;

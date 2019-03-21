@@ -2,6 +2,26 @@
 
 #include "Primitives/PrimParams.h"
 
+#include "Primitives/sphere.h"
+#include "DreamOS.h"
+
+RESULT DreamObjectModule::PendingDimObject::ClearObject() {
+	RESULT r = R_PASS;
+
+	if (pPrimParams != nullptr) {
+		delete pPrimParams;
+		pPrimParams = nullptr;
+	}
+
+	if (pDimObj != nullptr) {
+		delete pDimObj;
+		pDimObj = nullptr;
+	}
+
+Error:
+	return r;
+}
+
 DreamObjectModule::DreamObjectModule(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamObjectModule>(pDreamOS, pContext)
 {
@@ -43,7 +63,22 @@ RESULT DreamObjectModule::OnDidFinishInitializing(void *pContext) {
 }
 
 RESULT DreamObjectModule::Shutdown(void *pContext) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	while (m_queuedDimObjects.empty() != true) {
+		PendingDimObject pendingObject = m_queuedDimObjects.front();
+		m_queuedDimObjects.pop();
+		pendingObject.ClearObject();
+	}
+
+	while (m_pendingInitializationDimbjects.empty() != true) {
+		PendingDimObject pendingObject = m_pendingInitializationDimbjects.front();
+		m_pendingInitializationDimbjects.pop();
+		pendingObject.ClearObject();
+	}
+
+Error:
+	return r;
 }
 
 RESULT DreamObjectModule::Update(void *pContext) {
@@ -61,8 +96,15 @@ RESULT DreamObjectModule::ModuleProcess(void *pContext) {
 	bool fRunning = true;
 
 	while (fRunning) {
+		if (m_queuedDimObjects.empty() == false) {
+			PendingDimObject pendingObject = m_queuedDimObjects.front();
+			m_queuedDimObjects.pop();
 
+			pendingObject.pDimObj = GetDOS()->MakeObject(pendingObject.pPrimParams, false);
+			CN(pendingObject.pDimObj);
 
+			
+		}
 
 		Sleep(1);
 	}
@@ -80,7 +122,7 @@ RESULT DreamObjectModule::QueueNewObject(PrimParams *pPrimParams, std::function<
 	newPendingObject.fnOnObjectReady = fnOnObjectReady;
 	newPendingObject.pContext = pContext;
 
-	m_queuedObjects.push(newPendingObject);
+	m_queuedDimObjects.push(newPendingObject);
 
 Error:
 	return r;

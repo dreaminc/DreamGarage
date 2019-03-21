@@ -24,6 +24,9 @@ private:
 		PrimParams *pPrimParams = nullptr;
 		std::function<RESULT(DimObj*, void*)> fnOnObjectReady = nullptr;
 		void *pContext = nullptr;
+		DimObj *pDimObj = nullptr;
+
+		RESULT ClearObject();
 	};
 
 public:
@@ -43,7 +46,8 @@ protected:
 	static DreamObjectModule* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	std::queue<PendingDimObject> m_queuedObjects;
+	std::queue<PendingDimObject> m_queuedDimObjects;
+	std::queue<PendingDimObject> m_pendingInitializationDimbjects;
 };
 
 #endif // !DREAM_OBJECT_MODULE_H_

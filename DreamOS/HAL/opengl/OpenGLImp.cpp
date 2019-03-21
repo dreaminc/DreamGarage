@@ -321,6 +321,41 @@ Error:
 }
 */
 
+// This allows for separate HAL initialization of objects
+RESULT OpenGLImp::InitializeObject(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+	CN(pOGLObj);
+
+	CR(pOGLObj->OGLInitialize());
+
+Error:
+	return r;
+}
+
+DimObj* OpenGLImp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+	OGLObj *pOGLObj = nullptr;
+
+	switch (pPrimParams->GetPrimitiveType()) {
+		case PRIMITIVE_TYPE::SPHERE: {
+			pOGLObj = MakeSphere(pPrimParams, fInitialize);
+			CN(pOGLObj);
+		} break;
+	}
+
+Success:
+	return pOGLObj;
+
+Error:
+	if (pOGLObj != nullptr) {
+		delete pOGLObj;
+		pOGLObj = nullptr;
+	}
+
+	return nullptr;
+}
 
 mesh *OpenGLImp::MakeMesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
@@ -589,7 +624,7 @@ DimPlane* OpenGLImp::MakePlane(point ptOrigin, vector vNormal) {
 	DimPlane *pPlane = new OGLPlane(this, ptOrigin, vNormal);
 	CN(pPlane);
 
-	//Success:
+Success:
 	return pPlane;
 
 Error:
@@ -600,20 +635,50 @@ Error:
 	return nullptr;
 }
 
+OGLSphere* OpenGLImp::MakeSphere(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLSphere *pOGLSphere = nullptr;
+
+	sphere::params *pSphereParams = dynamic_cast<sphere::params*>(pPrimParams);
+	CN(pSphereParams);
+
+	pOGLSphere = new OGLSphere(this, pSphereParams);
+	CN(pOGLSphere);
+
+	if (fInitialize) {
+		CR(pOGLSphere->OGLInitialize());
+	}
+
+Success:
+	return pOGLSphere;
+
+Error:
+	if (pOGLSphere != nullptr) {
+		delete pOGLSphere;
+		pOGLSphere = nullptr;
+	}
+
+	return nullptr;
+}
+
 sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 10, int numVerticalDivisions = 10, color c = color(COLOR_WHITE)) {
 	RESULT r = R_PASS;
 
-	sphere *pSphere = new OGLSphere(this, radius, numAngularDivisions, numVerticalDivisions, c);
-	CN(pSphere);
+	OGLSphere *pOGLSphere = new OGLSphere(this, radius, numAngularDivisions, numVerticalDivisions, c);
+	CN(pOGLSphere);
 
-//Success:
-	return pSphere;
+	CR(pOGLSphere->OGLInitialize());
+
+Success:
+	return pOGLSphere;
 
 Error:
-	if (pSphere != nullptr) {
-		delete pSphere;
-		pSphere = nullptr;
+	if (pOGLSphere != nullptr) {
+		delete pOGLSphere;
+		pOGLSphere = nullptr;
 	}
+
 	return nullptr;
 }
 

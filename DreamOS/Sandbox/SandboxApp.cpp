@@ -1,4 +1,7 @@
 #include "SandboxApp.h"
+
+#include "Primitives/PrimParams.h"
+
 #include "Cloud/CloudController.h"
 
 #include "Cloud/Message/Message.h"
@@ -1059,6 +1062,25 @@ RESULT SandboxApp::SetGravityState(bool fEnabled) {
 
 Error:
 	return r;
+}
+
+
+DimObj *SandboxApp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+	DimObj *pDimObj = nullptr;
+
+	pDimObj = m_pHALImp->MakeObject(pPrimParams, fInitialize);
+
+Success:
+	return pDimObj;
+
+Error:
+	if (pDimObj != nullptr) {
+		delete pDimObj;
+		pDimObj = nullptr;
+	}
+
+	return nullptr;
 }
 
 FlatContext* SandboxApp::AddFlatContext(int width, int height, int channels) {

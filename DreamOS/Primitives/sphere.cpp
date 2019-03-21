@@ -23,18 +23,38 @@ unsigned int sphere::NumberIndices() {
 	return (numTriangleStripVerts * numStrips);
 }
 
-sphere::sphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) :
-	m_params(radius, numAngularDivisions, numVerticalDivisions)
+sphere::sphere(sphere::params *pSphereParams, color c) :
+	m_params(*pSphereParams)
 {
 	RESULT r = R_PASS;
 
-	CR(SetSphereVertices(radius, numAngularDivisions, numVerticalDivisions, point(), c));
+	CR(SetSphereVertices(m_params.radius, m_params.numAngularDivisions, m_params.numVerticalDivisions, point(), c));
 
 	// TODO: Allow for changing this - put it into a factory
 	//CR(InitializeAABB());
 	CR(InitializeBoundingSphere());
 
-// Success:
+Success:
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
+}
+
+sphere::sphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) :
+	m_params(radius, numAngularDivisions, numVerticalDivisions)
+{
+	RESULT r = R_PASS;
+
+	CR(SetSphereVertices(m_params.radius, m_params.numAngularDivisions, m_params.numVerticalDivisions, point(), c));
+
+	// TODO: Allow for changing this - put it into a factory
+	//CR(InitializeAABB());
+	CR(InitializeBoundingSphere());
+
+Success:
 	Validate();
 	return;
 Error:

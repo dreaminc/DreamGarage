@@ -252,6 +252,10 @@ public:
 	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal);
 	quad *MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 
+	DimObj *MakeObject(PrimParams *pPrimParams, bool fInitialize = true);
+
+	// TODO: Remove all of these (going with factory solution)
+	// Do this after async objects are in and work with models
 	template<typename objType, typename... Targs>
 	objType *TAddObject(Targs... Fargs) {
 		RESULT r = R_PASS;
