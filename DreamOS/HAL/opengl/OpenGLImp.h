@@ -33,6 +33,7 @@ class font;
 class mesh;
 
 class OGLSphere;
+class OGLVolume;
 
 class OpenGLImp : public HALImp {
 private:
@@ -68,6 +69,7 @@ public:
 	virtual DimRay* MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) override;
 	virtual DimPlane* MakePlane(point ptOrigin = point(), vector vNormal = vector::jVector(1.0f)) override;
 	
+	OGLVolume *MakeVolume(PrimParams *pPrimParams, bool fInitialize = false);
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) override;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) override;
 	

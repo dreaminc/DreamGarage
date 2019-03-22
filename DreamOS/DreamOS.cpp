@@ -709,6 +709,20 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::MakeVolume(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, double width, double length, double height, bool fTriangleBased) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	volume::params *pVolumeParams = new volume::params(volume::VOLUME_TYPE::RECTANGULAR_CUBOID, width, length, height, fTriangleBased);
+	CN(pVolumeParams);
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pVolumeParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
+
+Error:
+	return r;
+}
+
 ProgramNode* DreamOS::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
 	RESULT r = R_PASS;
 

@@ -1154,7 +1154,8 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 	testDescriptor.sDuration = 100.0f;
 	
 	float radius = 0.1f;
-	int factor = 10;
+	int factor = 32;
+	float paddingRatio = 0.10f;
 
 	struct TestContext {
 		sphere *pSphere = nullptr;
@@ -1184,6 +1185,30 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			return r;
 		}
 
+		RESULT OnVolumeReady(DimObj *pDimObj, void *pContext) {
+			RESULT r = R_PASS;
+
+			point ptVolume;
+			volume *pVolume = dynamic_cast<volume*>(pDimObj);
+			CN(pVolume);
+
+			CN(pDreamOS);
+
+			if (pContext != nullptr) {
+				memcpy(&ptVolume, (point*)(pContext), sizeof(point));
+
+				delete pContext;
+				pContext = nullptr;
+			}
+
+			pVolume->SetPosition(ptVolume);
+
+			CRM(pDreamOS->AddObject(pVolume), "Failed to add async sphere");
+
+		Error:
+			return r;
+		}
+
 		DreamOS *pDreamOS = nullptr;
 
 	} *pTestContext = new TestContext();
@@ -1193,7 +1218,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline("standard"));
+		CR(SetupPipeline("blinnphong"));
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -1215,15 +1240,25 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			for (int i = 0; i < factor; i++) {
 				for (int j = 0; j < factor; j++) {
 					for (int k = 0; k < factor; k++) {
-						float xPos = ((float)i - ((float)(factor - 1) / 2.0f)) * 1.1f * (radius * 2.0f);
-						float yPos = ((float)j - ((float)(factor - 1) / 2.0f)) * 1.1f * (radius * 2.0f);
-						float zPos = ((float)k - ((float)(factor - 1) / 2.0f)) * 1.1f * (radius * 2.0f);
+						float xPos = ((float)i - ((float)(factor - 1) / 2.0f)) * (1.0 + paddingRatio) * (radius * 2.0f);
+						float yPos = ((float)j - ((float)(factor - 1) / 2.0f)) * (1.0 + paddingRatio) * (radius * 2.0f);
+						float zPos = ((float)k - ((float)(factor - 1) / 2.0f)) * (1.0 + paddingRatio) * (radius * 2.0f);
 
+						/* 
+						// sphere
 						point *pPtSphere = new point(xPos, yPos, zPos);
 						CN(pPtSphere);
-
 						CR(m_pDreamOS->MakeSphere(std::bind(&TestContext::OnSphereReady, pTestContext, std::placeholders::_1, std::placeholders::_2), 
 							(void*)(pPtSphere), radius, 10, 10));
+						*/
+
+						///*
+						// volume
+						point *pPtVolume = new point(xPos, yPos, zPos);
+						CN(pPtVolume);
+						CR(m_pDreamOS->MakeVolume(std::bind(&TestContext::OnVolumeReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
+							(void*)(pPtVolume), radius * 2.0f, radius * 2.0f, radius * 2.0f));
+						//*/
 					}
 				}
 			}

@@ -352,6 +352,11 @@ DimObj* OpenGLImp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 			pOGLObj = MakeSphere(pPrimParams, fInitialize);
 			CN(pOGLObj);
 		} break;
+
+		case PRIMITIVE_TYPE::VOLUME: {
+			pOGLObj = MakeVolume(pPrimParams, fInitialize);
+			CN(pOGLObj);
+		} break;
 	}
 
 Success:
@@ -748,18 +753,48 @@ Error:
 volume* OpenGLImp::MakeVolume(double width, double length, double height, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = new OGLVolume(this, width, length, height, fTriangleBased);
-	CN(pVolume);
+	OGLVolume *pOGLVolume = new OGLVolume(this, width, length, height, fTriangleBased);
+	CN(pOGLVolume);
 
-//Success:
-	return pVolume;
+	CR(pOGLVolume->OGLInitialize());
+
+Success:
+	return pOGLVolume;
 
 Error:
-	if (pVolume != nullptr) {
-		delete pVolume;
-		pVolume = nullptr;
+	if (pOGLVolume != nullptr) {
+		delete pOGLVolume;
+		pOGLVolume = nullptr;
 	}
 	return nullptr;
+}
+
+OGLVolume* OpenGLImp::MakeVolume(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLVolume *pOGLVolume = nullptr;
+
+	volume::params *pVolumeParams = dynamic_cast<volume::params*>(pPrimParams);
+	CN(pVolumeParams);
+
+	pOGLVolume = new OGLVolume(this, pVolumeParams);
+	CN(pOGLVolume);
+
+	if (fInitialize) {
+		CR(pOGLVolume->OGLInitialize());
+	}
+
+Success:
+	return pOGLVolume;
+
+Error:
+	if (pOGLVolume != nullptr) {
+		delete pOGLVolume;
+		pOGLVolume = nullptr;
+	}
+
+	return nullptr;
+	
 }
 
 volume* OpenGLImp::MakeVolume(double side, bool fTriangleBased) {

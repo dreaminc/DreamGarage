@@ -18,6 +18,8 @@
 
 #include "DimObj.h"
 
+#include "PrimParams.h"
+
 #include "Vertex.h"
 #include "point.h"
 #include "color.h"
@@ -33,7 +35,28 @@ public:
 		INVALID
 	} VOLUME_TYPE;
 
+	struct params :
+		public PrimParams
+	{
+		virtual PRIMITIVE_TYPE GetPrimitiveType() override { return PRIMITIVE_TYPE::VOLUME; }
+
+		params(VOLUME_TYPE volumeType, double width, double length, double height, bool fTriangleBased) :
+			volumeType(volumeType),
+			width(width),
+			length(length),
+			height(height),
+			fTriangleBased(fTriangleBased)
+		{ }
+
+		VOLUME_TYPE volumeType;
+		double width;
+		double length;
+		double height;
+		bool fTriangleBased;
+	};
+
 public:
+	volume(volume::params *pVolumeParams);
 	volume(double width, double length, double height, bool fTriangleBased = true);
 	volume(double side, bool fTriangleBased = true);
 	volume(BoundingBox* pBoundingBox, bool fTriangleBased = true);
@@ -49,8 +72,7 @@ public:
 	bool IsTriangleBased();
 
 private:
-	VOLUME_TYPE m_volumeType;
-	bool m_fTriangleBased;
+	volume::params m_params;
 };
 
 #endif // !VOLUME_H_
