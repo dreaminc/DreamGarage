@@ -90,6 +90,7 @@ public:
 		unsigned fHideWindow : 1;
 		unsigned fInitUserApp : 1;
 		unsigned fInitNamedPipe : 1;
+		unsigned fInitKeyboard : 1;
 		HMD_TYPE hmdType = HMD_ANY_AVAILABLE;
 	};
 

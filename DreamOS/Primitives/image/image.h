@@ -26,6 +26,7 @@ public:
 	virtual RESULT LoadFromPath() = 0;
 	virtual RESULT LoadFromMemory() = 0;
 	virtual RESULT Release() { return R_NOT_IMPLEMENTED; };
+	virtual RESULT LoadImage() { return R_NOT_IMPLEMENTED; };
 
 	RESULT FlipVertical();
 	
@@ -51,6 +52,8 @@ protected:
 	int m_height = 0;
 	int m_scanWidth = 0;
 	int m_channels = 0;
+	int m_bitsPerPixel = 0;
+	// TODO: IMAGE FORMAT
 
 	unsigned char *m_pImageBuffer = nullptr;
 	size_t m_pImageBuffer_n = 0;

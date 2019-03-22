@@ -163,7 +163,9 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 		CRM(InitializeDreamUserApp(), "Failed to initalize user app");
 	}
 
-	CR(InitializeKeyboard());
+	if (m_pSandbox->m_SandboxConfiguration.fInitKeyboard) {
+		CR(InitializeKeyboard());
+	}
 
 	CRM(DidFinishLoading(), "Failed to run DidFinishLoading");
 

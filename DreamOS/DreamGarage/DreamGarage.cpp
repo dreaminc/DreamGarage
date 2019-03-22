@@ -90,6 +90,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fInitSound = true;
 	sandboxconfig.fInitUserApp = true;
 	sandboxconfig.fInitNamedPipe = true;
+	sandboxconfig.fInitKeyboard = true;
 
 	sandboxconfig.fHideWindow = true;
 	sandboxconfig.fHMDMirror = false;

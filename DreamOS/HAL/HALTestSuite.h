@@ -52,6 +52,7 @@ public:
 	RESULT AddTestBlinnPhongShaderTextureBumpDisplacement();
 	RESULT AddTestMinimalShader();
 	RESULT AddTestMinimalTextureShader();
+	RESULT AddTestTextureFormats();
 	RESULT AddTestBlinnPhongShaderBlur();
 	RESULT AddTestDepthPeelingShader();
 	RESULT AddTestObjectMaterialsBump();
