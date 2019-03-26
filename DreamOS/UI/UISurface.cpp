@@ -33,6 +33,11 @@ RESULT UISurface::UpdateWithHand(hand *pHand, bool &fMalletDirty, bool &fMouseDo
 	point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
 	point ptSphereOrigin = pHand->GetMalletHead()->GetOrigin(true);
 	ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
+	
+	{
+		//only allow button presses when visible
+		CBR(IsVisible(), R_SKIPPED);
+	}
 
 	if (ptSphereOrigin.y() >= pHand->GetMalletRadius()) {
 

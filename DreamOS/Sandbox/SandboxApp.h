@@ -419,6 +419,7 @@ public:
 	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
 	RESULT RegisterSubscriber(SenseControllerEventType mouseEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
 	RESULT RegisterSubscriber(SenseGamepadEventType mouseEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber);
+	RESULT RegisterSubscriber(HMDEventType hmdEvent, Subscriber<HMDEvent>* pHMDEventSubscriber);
 
 	RESULT UnregisterSubscriber(SenseControllerEventType mouseEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
 	RESULT UnregisterSubscriber(SenseGamepadEventType mouseEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber);

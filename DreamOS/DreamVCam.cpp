@@ -417,7 +417,7 @@ RESULT DreamVCam::ModuleProcess(void *pContext) {
 	// TODO: Cross thread OGL calls don't seem to work - need to investigate
 
 	while (true) {
-		DEBUG_LINEOUT("vcam: stayalive - %d", (1 * stayAliveCount++));
+		//DEBUG_LINEOUT("vcam: stayalive - %d", (1 * stayAliveCount++));
 
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
@@ -434,7 +434,7 @@ RESULT DreamVCam::ModuleProcess(void *pContext) {
 					lastSentTime = timeNow;
 				}
 				else {
-					DEBUG_LINEOUT("NamedPipeServer or Streaming Texture were nullptr in VCam Module Process");
+					//DEBUG_LINEOUT("NamedPipeServer or Streaming Texture were nullptr in VCam Module Process");
 				}
 			//}
 		}
