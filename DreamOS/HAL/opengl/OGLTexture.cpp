@@ -97,10 +97,8 @@ Error:
 RESULT OGLTexture::AllocateGLTexture(size_t optOffset) {
 	RESULT r = R_PASS;
 
-	GLenum glFormat = GetOGLPixelFormat();
-
-	//GLint internalGLFormat = static_cast<GLint>(glFormat);
-	GLint internalGLFormat = GetOpenGLPixelFormat(PIXEL_FORMAT::Unspecified, m_channels);
+	GLenum glFormat = GetOpenGLPixelFormat(m_pixelFormat, m_channels);
+	GLint internalGLFormat = GetInternalOpenGLPixelFormat(m_pixelFormat, m_bitsPerPixel, m_channels);
 
 	unsigned char *pImageBuffer = nullptr;
 
@@ -108,7 +106,7 @@ RESULT OGLTexture::AllocateGLTexture(size_t optOffset) {
 		pImageBuffer = m_pImage->GetImageBuffer() + (optOffset);
 	}
 
-	CR(AllocateGLTexture(pImageBuffer, GL_RGBA8, glFormat, GL_UNSIGNED_BYTE));
+	CR(AllocateGLTexture(pImageBuffer, internalGLFormat, glFormat, GL_UNSIGNED_BYTE));
 
 Error:
 	return r;
@@ -281,6 +279,8 @@ OGLTexture* OGLTexture::MakeTexture(OpenGLImp *pParentImp, texture::type type, i
 		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
 		CN(pTexture);
 	}
+	
+	CR(pTexture->SetFormat(PIXEL_FORMAT::BGRA));
 
 	CR(pTexture->OGLInitialize(NULL));
 	CR(pTexture->SetParams(width, height, channels, samples, levels));
@@ -351,13 +351,10 @@ OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::ty
 	CR(pTexture->SetParams(width, height, channels));
 	CR(pTexture->SetFormat(pixelFormat));
 
-	GLenum glFormat = pTexture->GetOGLPixelFormat();
-	GLint internalGLFormat = GetOpenGLPixelFormat(PIXEL_FORMAT::Unspecified, channels);
+	GLenum glFormat = GetOpenGLPixelFormat(pixelFormat, channels);
+	GLint internalGLFormat = GetOpenGLPixelFormat(pixelFormat, channels);
 
-	//CR(pTexture->CopyTextureImageBuffer(width, height, channels, pBuffer, (int)(pBuffer_n)));
-	//CR(pTexture->AllocateGLTexture());
 	CR(pTexture->AllocateGLTexture((unsigned char*)(pBuffer), internalGLFormat, glFormat, GL_UNSIGNED_BYTE));
-
 	
 	CR(pTexture->SetDefaultTextureParams());
 
@@ -785,10 +782,6 @@ RESULT OGLTexture::Update(unsigned char* pBuffer, int width, int height, PIXEL_F
 
 Error:
 	return r;
-}
-
-GLenum OGLTexture::GetOGLPixelFormat() {
-	return GetOpenGLPixelFormat(m_pixelFormat, m_channels);
 }
 
 RESULT OGLTexture::EnableOGLPBOUnpack() {

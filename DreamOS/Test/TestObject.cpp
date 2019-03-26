@@ -2,7 +2,7 @@
 
 #include "TestSuite.h"
 
-TestObject::TestObject(const TestObject::TestDescriptor &testDescriptor, void *pContext) :
+TestObject::TestObject(const TestObject::TestDescriptor &testDescriptor) :
 	m_fnInitialize(testDescriptor.fnInitialize),
 	m_fnUpdate(testDescriptor.fnUpdate),
 	m_fnTest(testDescriptor.fnTest),
@@ -11,7 +11,7 @@ TestObject::TestObject(const TestObject::TestDescriptor &testDescriptor, void *p
 	m_strDescription(testDescriptor.strTestDescription),
 	m_nRepeats(testDescriptor.nRepeats),
 	m_sDuration(testDescriptor.sDuration),
-	m_pContext(pContext)
+	m_pContext(testDescriptor.pContext)
 {
 	if (testDescriptor.fnTestNoContext != nullptr) {
 		// Wrap it up

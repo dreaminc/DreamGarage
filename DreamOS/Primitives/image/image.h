@@ -9,6 +9,7 @@
 // of pixels 
 
 #include "Primitives/DObject.h"
+#include "Primitives/color.h"
 
 #include <string>
 
@@ -40,6 +41,8 @@ public:
 	int GetWidth();
 	int GetHeight();
 	int GetChannels();
+
+	virtual PIXEL_FORMAT GetPixelFormat();
 
 protected:
 	std::wstring m_wstrFilename;

@@ -41,6 +41,7 @@ public:
 		std::string strTestDescription = "default";
 		double sDuration = 10.0f;
 		int nRepeats = 1;
+		void *pContext = nullptr;
 	};
 
 public:
@@ -62,7 +63,7 @@ public:
 			   std::function<RESULT(void*)> fnReset,
 			   void *pContext = nullptr);
 
-	TestObject(const TestObject::TestDescriptor &testDescriptor, void *pContext = nullptr);
+	TestObject(const TestObject::TestDescriptor &testDescriptor);
 
 	~TestObject();
 

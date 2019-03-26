@@ -1211,7 +1211,8 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 
 		DreamOS *pDreamOS = nullptr;
 
-	} *pTestContext = new TestContext();
+	};
+	testDescriptor.pContext = new TestContext();
 
 	testDescriptor.fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
@@ -1280,7 +1281,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 		return r;
 	};
 
-	auto pUITest = AddTest(testDescriptor, pTestContext);
+	auto pUITest = AddTest(testDescriptor);
 	CN(pUITest);
 
 Error:

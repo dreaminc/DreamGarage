@@ -22,6 +22,7 @@
 #include "Primitives/color.h"
 
 GLenum GetOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int channels = 3);
+GLenum GetInternalOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int bitsPerPixel = 8, int channels = 4);
 
 
 #endif // ! OPEN_GL_COMMON_H_

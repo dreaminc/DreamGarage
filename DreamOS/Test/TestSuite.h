@@ -51,9 +51,9 @@ public:
 										std::function<RESULT(void*)> fnReset,
 										void *pContext = nullptr);
 
-	std::shared_ptr<TestObject> AddTest(std::string strTestName, TestObject::TestDescriptor testDescriptor, void *pContext = nullptr);
+	std::shared_ptr<TestObject> AddTest(std::string strTestName, TestObject::TestDescriptor testDescriptor);
 
-	std::shared_ptr<TestObject> AddTest(const TestObject::TestDescriptor &testDescriptor, void *pContext = nullptr);
+	std::shared_ptr<TestObject> AddTest(const TestObject::TestDescriptor &testDescriptor);
 
 	virtual RESULT SetupTestSuite() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT AddTests() = 0;

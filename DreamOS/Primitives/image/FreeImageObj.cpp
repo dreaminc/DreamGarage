@@ -51,14 +51,9 @@ RESULT FreeImageObj::Release() {
 	RESULT r = R_PASS;
 
 	// Unload the 32-bit color bitmap
-	if (m_pfiBitmap32 != nullptr) {
-		if (m_pfiBitmap != m_pfiBitmap32 && m_pfiBitmap != nullptr) {
-			FreeImage_Unload(m_pfiBitmap);
-			m_pfiBitmap = nullptr;
-		}
-
-		FreeImage_Unload(m_pfiBitmap32);
-		m_pfiBitmap32 = nullptr;
+	if (m_pfiBitmap != nullptr) {
+		FreeImage_Unload(m_pfiBitmap);
+		m_pfiBitmap = nullptr;
 	}
 
 	m_pImageBuffer = nullptr;
@@ -78,22 +73,42 @@ RESULT FreeImageObj::LoadImage() {
 	memcpy(&m_fiHeaderInfo, pFIHeaderInfo, sizeof(BITMAPINFO));
 
 	m_fiBitsPerPixel = FreeImage_GetBPP(m_pfiBitmap);
+	
+	switch (m_fiColorType) {
+		case FIC_MINISWHITE:
+		case FIC_MINISBLACK: {
+			m_channels = 1;
+		} break;
 
-	// Set to 32 bits per pixel (not sure if we want this)
-	if (m_fiBitsPerPixel == 32) {
-		m_pfiBitmap32 = m_pfiBitmap;
+		case FIC_RGB: {
+			m_channels = 3;
+		} break;
+
+		case FIC_RGBALPHA: {
+			m_channels = 4;
+		} break;
+
+			
+		case FIC_PALETTE:
+		case FIC_CMYK:
+		default: {
+			if (m_fiBitsPerPixel != 32) {
+				m_pfiBitmap = FreeImage_ConvertTo32Bits(m_pfiBitmap);
+				CNM(m_pfiBitmap, "Failed to convert to 32 bits");
+				m_fiBitsPerPixel = 32;
+			}
+
+			m_channels = 4;
+		} break;			
 	}
-	else {
-		m_pfiBitmap32 = FreeImage_ConvertTo32Bits(m_pfiBitmap);
-	}
 
-	m_width = FreeImage_GetWidth(m_pfiBitmap32);
-	m_height = FreeImage_GetHeight(m_pfiBitmap32);
-	m_scanWidth = FreeImage_GetPitch(m_pfiBitmap32);
-	m_channels = 4;	// TODO: This is guaranteed by the conversion to 32 bits above
-
-					// Get a handle to the data buffer
-	m_pImageBuffer = FreeImage_GetBits(m_pfiBitmap32);
+	m_width = FreeImage_GetWidth(m_pfiBitmap);
+	m_height = FreeImage_GetHeight(m_pfiBitmap);
+	m_scanWidth = FreeImage_GetPitch(m_pfiBitmap);
+	
+	// Get a handle to the data buffer
+	//m_pImageBuffer = FreeImage_GetBits(m_pfiBitmap32);
+	m_pImageBuffer = FreeImage_GetBits(m_pfiBitmap);
 	CN(m_pImageBuffer);
 
 Error:
@@ -149,4 +164,32 @@ RESULT FreeImageObj::LoadFromMemory() {
 
 Error:
 	return r;
+}
+
+// FreeImage uses a BGR[A] pixel layout under a Little Endian processor (Windows, Linux) 
+// and uses a RGB[A] pixel layout under a Big Endian processor (Mac OS X or any Big Endian Linux / Unix)
+PIXEL_FORMAT FreeImageObj::GetPixelFormat() {
+	//
+	switch (m_fiColorType) {
+	case FIC_MINISWHITE:
+	case FIC_MINISBLACK: {
+		return PIXEL_FORMAT::GREYSCALE;
+	} break;
+
+	case FIC_RGB: {
+		return PIXEL_FORMAT::BGR;
+	} break;
+
+	case FIC_RGBALPHA: {
+		return PIXEL_FORMAT::BGRA;
+	} break;
+
+	case FIC_PALETTE:
+	case FIC_CMYK:
+	default: {
+		return PIXEL_FORMAT::BGRA;	
+	} break;
+	}
+
+	return PIXEL_FORMAT::BGRA;
 }

@@ -5022,7 +5022,7 @@ RESULT HALTestSuite::AddTestEmptyPipeline() {
 	float padding = 0.5f;
 
 	// Initialize Code 
-	auto fnInitialize = [=](void *pContext) {
+	testDestriptor.fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 
 		m_pDreamOS->SetGravityState(false);
@@ -5060,10 +5060,10 @@ RESULT HALTestSuite::AddTestEmptyPipeline() {
 		return r;
 	};
 
-	testDestriptor.fnInitialize = fnInitialize;
+	testDestriptor.pContext = m_pDreamOS;
 
 	// Add the test
-	auto pNewTest = AddTest(testDestriptor, m_pDreamOS);
+	auto pNewTest = AddTest(testDestriptor);
 	CN(pNewTest);
 
 Error:
@@ -5654,7 +5654,7 @@ RESULT HALTestSuite::AddTestTextureFormats() {
 	};
 
 	// Add the test
-	auto pUITest = AddTest(testDescriptor, /*pTestContext*/ nullptr);
+	auto pUITest = AddTest(testDescriptor);
 	CN(pUITest);
 
 Error:

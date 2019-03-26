@@ -96,3 +96,22 @@ int image::GetHeight() {
 int image::GetChannels() {
 	return m_channels;
 }
+
+PIXEL_FORMAT image::GetPixelFormat() {
+	switch (m_channels) {
+		case 1: {
+			return PIXEL_FORMAT::GREYSCALE;
+		} break;
+
+		case 3: {
+			return PIXEL_FORMAT::BGR;
+		} break;
+
+		case 4: {
+			return PIXEL_FORMAT::BGRA;
+		} break;
+
+	}
+
+	return PIXEL_FORMAT::INVALID;
+}

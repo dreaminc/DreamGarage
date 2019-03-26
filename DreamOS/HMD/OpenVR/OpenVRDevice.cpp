@@ -252,7 +252,7 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	void *pBuffer = (void*)(pRenderModelTexture->rubTextureMapData);
 	int pBuffer_n = sizeof(uint8_t) * width * height * channels;
 
-	texture *pTexture = m_pParentSandbox->MakeTexture(texture::type::TEXTURE_2D, width, height, PIXEL_FORMAT::Unspecified, channels, pBuffer, pBuffer_n);
+	texture *pTexture = m_pParentSandbox->MakeTexture(texture::type::TEXTURE_2D, width, height, PIXEL_FORMAT::BGRA, channels, pBuffer, pBuffer_n);
 	pControllerMesh->SetDiffuseTexture(pTexture);
 
 	CR(SetControllerMeshTexture(pControllerMesh, pTexture, controllerRole))
