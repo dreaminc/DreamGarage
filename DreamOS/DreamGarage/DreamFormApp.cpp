@@ -55,6 +55,10 @@ RESULT DreamFormApp::Update(void *pContext) {
 		m_pFormView->RegisterSubscriber(UI_SELECT_ENDED, this);
 		m_pFormView->RegisterSubscriber(UI_SCROLL, this);
 
+		for (int i = 0; i < HMDEventType::HMD_EVENT_INVALID; i++) {
+			CR(GetDOS()->RegisterSubscriber((HMDEventType)(i), this));
+		}
+
 		//m_pFormView->Hide();
 		m_pFormView->SetVisible(false, false);
 		GetComposite()->SetVisible(false, false);
@@ -543,6 +547,61 @@ RESULT DreamFormApp::Notify(UIEvent *pUIEvent) {
 Error:
 	return r;
 }
+
+RESULT DreamFormApp::Notify(HMDEvent *pHMDEvent) {
+	RESULT r = R_PASS;
+
+	DreamUserObserver *pEventApp = nullptr;
+
+	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	CN(pDreamUserApp);
+
+	pEventApp = pDreamUserApp->m_pEventApp;
+	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
+	CNR(m_pFormView, R_SKIPPED);
+	CNR(m_pDreamBrowserForm, R_SKIPPED);
+
+	switch (pHMDEvent->m_eventType) {
+	
+	case HMDEventType::HMD_EVENT_FOCUS: {
+		if (m_fPendHMDRecenter) {
+			CR(pDreamUserApp->ResetAppComposite());
+			m_fPendHMDRecenter = false;
+		}
+		
+		if (m_fTyping) {
+			GetDOS()->GetKeyboardApp()->SetVisible(true);
+			GetDOS()->GetKeyboardApp()->ShowBrowserButtons();
+		}
+
+		if (m_fFormVisible) {
+			m_pFormView->GetViewQuad()->SetVisible(true);	// because the quad is in UIScenegraph
+			GetComposite()->SetVisible(true, false);
+		}
+	} break;
+
+	case HMD_EVENT_UNFOCUS: {
+		
+		if (m_fTyping) {
+			GetDOS()->GetKeyboardApp()->SetVisible(false);
+			GetDOS()->GetKeyboardApp()->HideBrowserButtons();
+		}
+		
+		if (m_fFormVisible) {
+			m_pFormView->GetViewQuad()->SetVisible(false);  // because the quad is in UIScenegraph
+			GetComposite()->SetVisible(false, false);
+		}
+	} break;
+
+	case HMD_EVENT_RESET_VIEW: {
+		m_fPendHMDRecenter = true;
+	} break;
+	}
+
+Error:
+	return r;
+}
+
 
 RESULT DreamFormApp::Show() {
 	RESULT r = R_PASS;

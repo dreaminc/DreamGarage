@@ -1458,6 +1458,10 @@ RESULT DreamOS::RegisterSubscriber(SenseGamepadEventType gamePadEvent, Subscribe
 	return m_pSandbox->RegisterSubscriber(gamePadEvent, pGamepadSubscriber);
 }
 
+RESULT DreamOS::RegisterSubscriber(HMDEventType hmdEvent, Subscriber<HMDEvent>* pHMDEventSubscriber) {
+	return m_pSandbox->RegisterSubscriber(hmdEvent, pHMDEventSubscriber);
+}
+
 RESULT DreamOS::UnregisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
 	return m_pSandbox->UnregisterSubscriber(controllerEvent, pControllerSubscriber);
 }

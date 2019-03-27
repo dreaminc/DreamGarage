@@ -647,8 +647,10 @@ Error:
 RESULT UISpatialScrollView::Show() {
 	RESULT r = R_PASS;
 
+	m_fScrollButtonVisible = true;
+
 	m_pTitleView->SetVisible(true, false);
-	m_pMenuButtonsContainer->SetVisible(true, false);
+	m_pMenuButtonsContainer->SetVisible(true, true);
 
 	return r;
 }
@@ -657,11 +659,17 @@ RESULT UISpatialScrollView::Show() {
 RESULT UISpatialScrollView::Hide() {
 	RESULT r = R_PASS;
 
+	m_fScrollButtonVisible = false;
+
 	m_pTitleView->SetVisible(false, false);
+	for (auto& pButton : { m_pLeftScrollButton, m_pRightScrollButton }) {
+		CR(HideObject(pButton.get()));
+	}
 	m_pLeftScrollButton->SetVisible(false);
 	m_pRightScrollButton->SetVisible(false);
 	m_pMenuButtonsContainer->SetVisible(false, true);
 
+Error:
 	return r;
 }
 

@@ -120,7 +120,6 @@ public:
 	// Pointing
 public:
 	virtual RESULT Notify(HysteresisEvent *mEvent);
-
 private:
 
 	// Current Hysteresis Event (ON/OFF)

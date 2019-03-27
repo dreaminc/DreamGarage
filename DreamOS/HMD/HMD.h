@@ -33,10 +33,11 @@ class SandboxApp;
 class HMDSinkNode;
 class HMDSourceNode;
 
+// TODO: move shutdown event here?
 typedef enum HMDEventType {
-	HMD_EVENT_ORIENTATION,
-	HMD_EVENT_POSITION,
-	HMD_EVENT_BOTH,
+	HMD_EVENT_UNFOCUS,
+	HMD_EVENT_FOCUS,
+	HMD_EVENT_RESET_VIEW,
 	HMD_EVENT_INVALID
 } HMD_EVENT_TYPE;
 
@@ -50,39 +51,16 @@ enum class HMDDeviceType {
 enum EYE_TYPE;
 
 typedef struct HMDEvent {
-	HMDEventType EventType;
-	clock_t HMDEventTickCount;
-	point ptOrigin;
-	quaternion qOrientation;
+	HMDEventType m_eventType;
+	HMDDeviceType m_deviceType;
 
-	inline void SetEventClockTick() {
-		HMDEventTickCount = clock();
-	}
-
-	HMDEvent(point pt, quaternion q) :
-		EventType(HMD_EVENT_BOTH)
-	{		
-		SetEventClockTick();
-		ptOrigin = pt;
-		qOrientation = q;
-	}
-
-	HMDEvent(point pt) :
-		EventType(HMD_EVENT_POSITION)
+	HMDEvent(HMDEventType hmdEventType, HMDDeviceType hmdDeviceType) :
+		m_eventType(hmdEventType),
+		m_deviceType(hmdDeviceType)
 	{
-		SetEventClockTick();
-		ptOrigin = pt;
-	}
-
-	HMDEvent(quaternion q) :
-		EventType(HMD_EVENT_ORIENTATION)
-	{
-		SetEventClockTick();
-		qOrientation = q;
+		// empty
 	}
 } HMD_EVENT;
-
-
 
 class HMD : public Publisher<HMDEventType, HMDEvent> {
 public:
@@ -92,6 +70,9 @@ public:
 		m_eyeWidth(0),
 		m_eyeHeight(0)
 	{
+		for (int i = 0; i < HMD_EVENT_INVALID; i++) {
+			RegisterEvent((HMDEventType)(i));
+		}
 		// empty stub
 	}
 
