@@ -1408,12 +1408,13 @@ RESULT DreamUserControlArea::Notify(HMDEvent *pEvent) {
 		}
 
 		if (m_fKeyboardUp) {
-			GetDOS()->GetKeyboardApp()->Show();
+			GetDOS()->GetKeyboardApp()->SetVisible(true);
+			GetDOS()->GetKeyboardApp()->ShowBrowserButtons();
 		}
 
 		if (pEventApp == m_pControlView.get()) {
 			GetComposite()->SetVisible(true, false);
-			m_pControlView->GetViewQuad()->SetVisible(true);
+			m_pControlView->GetViewQuad()->SetVisible(true);	// because the quad is in UIScenegraph
 			if (m_fWasTabViewOpen) {
 				m_pDreamTabView->Show();
 				m_fWasTabViewOpen = false;
@@ -1430,7 +1431,8 @@ RESULT DreamUserControlArea::Notify(HMDEvent *pEvent) {
 		CNR(m_pDreamUIBar, R_SKIPPED);
 
 		if (m_fKeyboardUp) {
-			GetDOS()->GetKeyboardApp()->Hide();
+			GetDOS()->GetKeyboardApp()->SetVisible(false);
+			GetDOS()->GetKeyboardApp()->HideBrowserButtons();
 		}
 
 		if (pEventApp == m_pControlView.get()) {

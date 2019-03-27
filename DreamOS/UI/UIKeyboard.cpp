@@ -857,6 +857,15 @@ Error:
 	return r;
 }
 
+RESULT UIKeyboard::HideBrowserButtons() {
+	RESULT r = R_PASS;
+
+	CR(m_pKeyboardControls->SetVisible(false, false));
+
+Error:
+	return r;
+}
+
 RESULT UIKeyboard::UpdateComposite(float depth) {
 	RESULT r = R_PASS;
 
@@ -1034,6 +1043,7 @@ RESULT UIKeyboard::SetKeyReleaseThreshold(float threshold) {
 RESULT UIKeyboard::HandleDonePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
+	CBR(m_pKeyboardControls->IsVisible(), R_SKIPPED);
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 0));
 	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 1));
@@ -1046,6 +1056,7 @@ RESULT UIKeyboard::HandleCancelPressed(UIButton* pButtonContext, void* pContext)
 	RESULT r = R_PASS;
 
 	std::string strKeyboardCancel = "UIKeyboard.FormCancel";
+	CBR(m_pKeyboardControls->IsVisible(), R_SKIPPED);
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	CR(GetDOS()->SendDOSMessage(strKeyboardCancel));
 
@@ -1056,6 +1067,7 @@ Error:
 RESULT UIKeyboard::HandleTabPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
+	CBR(m_pKeyboardControls->IsVisible(), R_SKIPPED);
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	CR(UpdateKeyState((SenseVirtualKey)(SVK_TAB), 0));
 	CR(UpdateKeyState((SenseVirtualKey)(SVK_TAB), 1));
@@ -1067,6 +1079,7 @@ Error:
 RESULT UIKeyboard::HandleBackTabPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
+	CBR(m_pKeyboardControls->IsVisible(), R_SKIPPED);
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	CR(UpdateKeyState((SenseVirtualKey)(SVK_SHIFTTAB), 0));
 	CR(UpdateKeyState((SenseVirtualKey)(SVK_SHIFTTAB), 1));

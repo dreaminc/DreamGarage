@@ -136,6 +136,8 @@ public:
 	RESULT UpdateTitleView(texture *pIconTexture, std::string strTitle);
 	RESULT ShowTitleView();
 	RESULT ShowBrowserButtons();
+	RESULT HideBrowserButtons();
+
 	RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin);
 	RESULT UpdateComposite(float depth); // update position/orientation
 
