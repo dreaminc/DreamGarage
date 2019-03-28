@@ -1857,7 +1857,7 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
 		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environment::type(environmentModelId)));
 		if (environment::type(environmentModelId) == environment::type::CAVE) {
-			m_pWaterQuad->SetPosition(point(90.0f, -2.38f, 0.0f));
+			m_pWaterQuad->SetPosition(point(90.0f, -1.28f, 0.0f));
 			
 			vector vWaterLightDirection = vector(-1.0f, -0.35f, 0.1f);
 			float lightIntensity = 2.0f;
@@ -1871,7 +1871,7 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 			}
 		}
 		else if (environment::type(environmentModelId) == environment::type::CANYON) {
-			m_pWaterQuad->SetPosition(point(90.0f, -19.42f, 0.0f));
+			m_pWaterQuad->SetPosition(point(90.0f, -18.32f, 0.0f));
 			
 			vector vWaterLightDirection = vector(0.4f, -0.35f, -1.0f);
 			float lightIntensity = 2.0f;
@@ -1885,7 +1885,7 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 			}
 		}
 		else if (environment::type(environmentModelId) == environment::type::HOUSE) {
-			m_pWaterQuad->SetPosition(point(90.0f, -3.7f, 0.0f));
+			m_pWaterQuad->SetPosition(point(90.0f, -2.6f, 0.0f));
 
 			// surprisingly close enough, though the sun position is just barely different from cave
 			vector vWaterLightDirection = vector(-1.0f, -0.35f, 0.1f);
