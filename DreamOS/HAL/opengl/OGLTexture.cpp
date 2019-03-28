@@ -83,12 +83,19 @@ RESULT OGLTexture::AllocateGLTexture(unsigned char *pImageBuffer, GLint internal
 	
 	CR(Bind());
 
-	// TODO: Pull deeper settings from texture object
-	CR(m_pParentImp->TexImage2D(m_glTextureTarget, 0, internalGLFormat, m_width, m_height, 0, glFormat, pixelDataType, pImageBuffer));
-
 	m_glInternalFormat = internalGLFormat;
 	m_glFormat = glFormat;
 	m_glPixelDataType = pixelDataType;
+
+	CR(m_pParentImp->TexImage2D(m_glTextureTarget,		// Texture Target
+								0,						// Level
+								m_glInternalFormat,		// Internal format
+								m_width,				// width
+								m_height,				// height
+								0,						// border 
+								m_glFormat,				// format
+								m_glPixelDataType,		// pixel data type
+								pImageBuffer));			// buffer data
 
 Error:
 	return r;

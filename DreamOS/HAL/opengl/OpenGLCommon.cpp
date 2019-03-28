@@ -3,7 +3,7 @@
 GLenum GetOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int channels) {
 	switch (pixelFormat) {
 		case PIXEL_FORMAT::GREYSCALE: {
-			return GL_LUMINANCE;
+			return GL_RED;
 		} break;
 
 		case PIXEL_FORMAT::RGB: {
@@ -26,10 +26,10 @@ GLenum GetOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int channels) {
 	return 0; // no format for unknown
 }
 
-GLenum GetInternalOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int bitsPerPixel, int channels) {
+GLint GetInternalOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int bitsPerPixel, int channels) {
 	switch (pixelFormat) {
 		case PIXEL_FORMAT::GREYSCALE: {
-			return GL_LUMINANCE;
+			return GL_R8;
 		} break;
 
 		case PIXEL_FORMAT::BGR: 
