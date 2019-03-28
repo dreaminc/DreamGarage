@@ -115,7 +115,8 @@ RESULT DreamEnvironmentApp::PositionEnvironment(environment::type type, std::sha
 
 	}
 	else {
-		m_ptSceneOffset = point(0.0f, -1.20f, 0.0f);
+		//m_ptSceneOffset = point(0.0f, -1.20f, 0.0f);
+		m_ptSceneOffset = point(0.0f, -0.1f, 0.0f);
 		m_sceneScale = m_environmentSceneScale;
 		GetComposite()->RotateYByDeg(90.0f);
 	}
@@ -345,7 +346,7 @@ RESULT DreamEnvironmentApp::GetDefaultCameraPlacement(point& ptPosition, quatern
 
 	switch (m_currentType) {
 	case environment::CAVE: {
-		ptPosition = point(-0.97f, 0.214f, 0.0f);
+		ptPosition = point(-0.97f, 0.239f, 0.0f);
 		qOrientation.SetValues(0.7046f, -0.06f, -.7046f, 0.06f);
 	} break;
 	}
@@ -371,12 +372,22 @@ RESULT DreamEnvironmentApp::GetEnvironmentSeatingPositionAndOrientation(point& p
 	} break;
 
 	case 2: {
-		ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, -(m_tableWidth) / 2.0f);
+		if (m_currentType == environment::CAVE) {
+			ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, -(m_tableWidth) / 2.0f);
+		}
+		else {
+			ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, -(m_tableWidth + 0.5f) / 2.0f);
+		}
 		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_middleAngle, 0.0f); break;
 	} break;
 
 	case 3: {
-		ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, (m_tableWidth) / 2.0f);
+		if (m_currentType == environment::CAVE) {
+			ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, (m_tableWidth) / 2.0f);
+		}
+		else {
+			ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, (m_tableWidth + 0.5f) / 2.0f);
+		}
 		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_middleAngle, 0.0f); break;
 	} break;
 

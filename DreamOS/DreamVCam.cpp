@@ -546,7 +546,7 @@ RESULT DreamVCam::SendFirstFrame() {
 RESULT DreamVCam::CloseSource() {
 	RESULT r = R_PASS;
 
-	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
+	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition(true).x(), m_pCamera->GetPosition(true).y(), m_pCamera->GetPosition(true).z());
 
 	CR(GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(true), m_pCamera->GetOrientation()));
 
@@ -640,7 +640,7 @@ RESULT DreamVCam::OnCameraAtRest() {
 
 	CBR(m_fHasReceivedSettings, R_SKIPPED);
 	
-	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
+	//DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
 	GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(true), m_pCamera->GetOrientation());
 
 	CNR(m_pParentApp, R_SKIPPED);
