@@ -330,7 +330,7 @@ RESULT DreamEnvironmentApp::GetSharedScreenPlacement(point& ptPosition, quaterni
 		qOrientation = quaternion();
 		scale = 1.0f;
 	} break;
-	case environment::CAVE: {
+	default: {
 		ptPosition = m_ptSharedScreen;
 		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
 		scale = m_sharedScreenScale;
@@ -345,7 +345,11 @@ RESULT DreamEnvironmentApp::GetDefaultCameraPlacement(point& ptPosition, quatern
 	RESULT r = R_PASS;
 
 	switch (m_currentType) {
-	case environment::CAVE: {
+	case environment::ISLAND: {	// idk
+		ptPosition = point(-0.97f, 0.239f, 0.0f);
+		qOrientation.SetValues(0.7046f, -0.06f, -.7046f, 0.06f);
+	}
+	default: {
 		ptPosition = point(-0.97f, 0.239f, 0.0f);
 		qOrientation.SetValues(0.7046f, -0.06f, -.7046f, 0.06f);
 	} break;

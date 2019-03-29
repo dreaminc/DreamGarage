@@ -335,7 +335,7 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 		CN(pEndNode);
 
 		// save interfaces to skybox nodes
-		m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pScatteringSkyboxProgram));
+		m_skyboxProgramNodes.push_back(dynamic_cast<SkyboxScatterProgram*>(pScatteringSkyboxProgram));
 		//m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pReflectionSkyboxProgram));
 		//m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pSkyboxProgram));
 
@@ -394,6 +394,7 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 			CR(pRefractionProgramNode->ConnectToInput("scenegraph", m_pDreamEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
 
 			CR(m_pDreamEnvironmentApp->SetFogPrograms(m_fogProgramNodes));
+			CR(m_pDreamEnvironmentApp->SetSkyboxPrograms(m_skyboxProgramNodes));
 		}
 	}
 
@@ -1847,7 +1848,7 @@ Error:
 // TODO: Make waterquad and light positionings programmatic?
 RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) {
 	RESULT r = R_PASS;
-
+	environmentModelId = 2;
 	if (!fSuccess) {
 		// need to create a team, since the user has no teams
 		std::string strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
