@@ -118,7 +118,7 @@ RESULT DreamEnvironmentApp::PositionEnvironment(environment::type type, std::sha
 		//m_ptSceneOffset = point(0.0f, -1.20f, 0.0f);
 		m_ptSceneOffset = point(0.0f, -0.1f, 0.0f);
 		m_sceneScale = m_environmentSceneScale;
-		GetComposite()->RotateYByDeg(90.0f);
+		pModel->RotateYByDeg(90.0f);
 	}
 	//*/
 
