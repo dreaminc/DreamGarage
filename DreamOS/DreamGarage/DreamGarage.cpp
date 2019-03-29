@@ -1848,7 +1848,7 @@ Error:
 // TODO: Make waterquad and light positionings programmatic?
 RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) {
 	RESULT r = R_PASS;
-	environmentModelId = 2;
+
 	if (!fSuccess) {
 		// need to create a team, since the user has no teams
 		std::string strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
