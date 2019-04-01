@@ -109,26 +109,14 @@ RESULT DreamEnvironmentApp::PositionEnvironment(environment::type type, std::sha
 	m_ptSceneOffset = point(0.0f, 0.0f, 0.0f);
 	m_sceneScale = 0.1f;
 
-	if (type == environment::ISLAND) {
-		m_ptSceneOffset = point(90.0f, -5.0f, -25.0f);
-		m_sceneScale = 0.1f;
+	m_ptSceneOffset = point(0.0f, -0.1f, 0.0f);
+	m_sceneScale = m_environmentSceneScale;
+	pModel->RotateYByDeg(90.0f);
 
-	}
-	else {
-		//m_ptSceneOffset = point(0.0f, -1.20f, 0.0f);
-		m_ptSceneOffset = point(0.0f, -0.1f, 0.0f);
-		m_sceneScale = m_environmentSceneScale;
-		pModel->RotateYByDeg(90.0f);
-	}
-	//*/
-
-	//GetComposite()->SetPosition(m_ptSceneOffset);
-	//GetComposite()->SetScale(m_sceneScale);
 	pModel->SetPosition(m_ptSceneOffset);
 	pModel->SetScale(m_sceneScale);
 
 	return r;
-
 }
 
 RESULT DreamEnvironmentApp::LoadAllEnvironments() {
@@ -323,19 +311,9 @@ Error:
 RESULT DreamEnvironmentApp::GetSharedScreenPlacement(point& ptPosition, quaternion& qOrientation, float& scale) {
 	RESULT r = R_PASS;
 
-	switch (m_currentType) {
-	case environment::ISLAND: {
-		// legacy
-		ptPosition = point(0.0f, 2.0f, -2.0f);
-		qOrientation = quaternion();
-		scale = 1.0f;
-	} break;
-	case environment::CAVE: {
-		ptPosition = m_ptSharedScreen;
-		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
-		scale = m_sharedScreenScale;
-	} break;
-	}
+	ptPosition = m_ptSharedScreen;
+	qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
+	scale = m_sharedScreenScale;
 
 //Error:
 	return r;
@@ -344,12 +322,8 @@ RESULT DreamEnvironmentApp::GetSharedScreenPlacement(point& ptPosition, quaterni
 RESULT DreamEnvironmentApp::GetDefaultCameraPlacement(point& ptPosition, quaternion& qOrientation) {
 	RESULT r = R_PASS;
 
-	switch (m_currentType) {
-	case environment::CAVE: {
-		ptPosition = point(-0.97f, 0.239f, 0.0f);
-		qOrientation.SetValues(0.7046f, -0.06f, -.7046f, 0.06f);
-	} break;
-	}
+	ptPosition = point(-0.97f, 0.239f, 0.0f);
+	qOrientation.SetValues(0.7046f, -0.06f, -.7046f, 0.06f);
 
 	return r;
 }

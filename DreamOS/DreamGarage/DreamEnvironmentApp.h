@@ -34,7 +34,6 @@ namespace environment {
 		CAVE = 1,
 		CANYON = 2,
 		HOUSE = 3,
-		ISLAND,
 		INVALID
 	} ENVIRONMENT_TYPE;
 };
@@ -103,11 +102,7 @@ private:
 	environment::type m_currentType;
 
 	// environment loading maps
-	//TODO: incorporate new environment
 	std::map<environment::type, std::wstring> m_environmentFilenames = {
-		// legacy environment, potentially could be removed completely
-		// do not load during release startup
-	//	{environment::ISLAND, L"\\FloatingIsland\\env.obj"},
 		{environment::CAVE, L"\\model\\environment\\1\\environment.fbx"},
 		{environment::CANYON, L"\\model\\environment\\2\\environment.fbx"},
 		{environment::HOUSE, L"\\model\\environment\\3\\environment.fbx"}
@@ -128,7 +123,7 @@ private:
 	//populated in LoadAllEnvironments
 	std::map<environment::type, std::shared_ptr<model>> m_environmentModels;
 
-	// Environment positioning information (non-island) 
+	// Environment positioning information
 public:
 	RESULT GetEnvironmentSeatingPositionAndOrientation(point& ptPosition, quaternion& qOrientation, int seatIndex);
 	quaternion GetUIOffsetOrientation(int seatIndex);
