@@ -25,10 +25,10 @@
 #define NAME_LINE_HEIGHT .12f
 #define USERNAME_ANIMATION_DURATION 0.3f
 
-#define BASE_LABEL_WIDTH 0.4f
-#define LABEL_HEIGHT (BASE_LABEL_WIDTH) * (80.0f / 332.0f)
+#define BASE_LABEL_WIDTH 0.412f
+#define LABEL_HEIGHT (BASE_LABEL_WIDTH) * (80.0f / 342.0f)
 #define LABEL_PHOTO_WIDTH (LABEL_HEIGHT) // photo is square
-#define LABEL_GAP_WIDTH (BASE_LABEL_WIDTH) * (20.0f / 332.0f)
+#define LABEL_GAP_WIDTH (BASE_LABEL_WIDTH) * (30.0f / 342.0f)
 
 class user : public composite {
 public:
