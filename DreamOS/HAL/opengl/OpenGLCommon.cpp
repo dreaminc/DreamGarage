@@ -39,7 +39,7 @@ GLint GetInternalOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int bitsPerPixel, i
 			else if (bitsPerPixel == 16)
 				return GL_RGB16;
 		} break;
-
+		
 		case PIXEL_FORMAT::BGRA: 
 		case PIXEL_FORMAT::RGBA: {
 			if (bitsPerPixel == 8)
@@ -49,5 +49,5 @@ GLint GetInternalOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int bitsPerPixel, i
 		} break;
 	}
 
-	return 0; // no format for unknown
+	return GL_RGBA8; // no format for unknown
 }

@@ -5642,7 +5642,7 @@ RESULT HALTestSuite::AddTestTextureFormats() {
 			CN(pVolume);
 			pVolume->SetPosition(point(1.0f, 0.0f, 0.0f));
 
-			texture *pGrayscaleTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"greyscale_test_image.jpg");
+			texture *pGrayscaleTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"greyscale-test.tga");
 			CN(pGrayscaleTexture);
 
 			CR(pVolume->SetDiffuseTexture(pGrayscaleTexture));
