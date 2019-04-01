@@ -165,7 +165,8 @@ RESULT HALImp::Render() {
 
 	FlushHALBuffers();
 
-	ReleaseCurrentContext();
+	// NOTE: This is breaking NSight and Fraps
+	//ReleaseCurrentContext();
 
 Error:
 	return r;
