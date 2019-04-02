@@ -904,6 +904,16 @@ Error:
 	return r;
 }
 
+RESULT DreamUserApp::SetSeatingPosition(int seatPosition) {
+	RESULT r = R_PASS;
+	
+	CNR(m_pUserModel, R_SKIPPED);
+	m_pUserModel->SetSeatingPosition(seatPosition);
+
+Error:
+	return r;
+}
+
 float DreamUserApp::GetPXWidth() {
 	return m_userSettings->m_pxWidth;
 }

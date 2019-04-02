@@ -255,6 +255,16 @@ Error:
 	return r;
 }
 
+RESULT DreamPeerApp::SetSeatingPosition(int seatingPosition) {
+	RESULT r = R_PASS;
+
+	CNR(m_pUserModel, R_SKIPPED);
+	m_pUserModel->SetSeatingPosition(seatingPosition);
+
+Error:
+	return r;
+}
+
 // TODO: We should create a proper object pool design
 RESULT DreamPeerApp::ReleaseUserModel() {
 	RESULT r = R_PASS;

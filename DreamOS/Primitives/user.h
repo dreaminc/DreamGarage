@@ -87,6 +87,7 @@ public:
 	RESULT SetProfilePhoto(std::string strProfilePhoto);
 	RESULT SetScreenName(std::string strScreenName);
 	RESULT SetInitials(std::string strInitials);
+	RESULT SetSeatingPosition(int seatingPosition);
 	std::string GetInitials();
 
 	RESULT PendProfilePhotoDownload();
@@ -98,12 +99,12 @@ public:
 	bool IsUserNameVisible();
 
 private:
-	const wchar_t *k_wstrLeft = L"texture/user-label/background-left-0.png";
+	const wchar_t *k_wstrLeft = L"texture/user-label/background-left-";
 	const wchar_t *k_wstrMiddle = L"texture/user-label/background-middle.png";
 	const wchar_t *k_wstrRight = L"texture/user-label/background-right.png";
 
 	// Used instead of the left texture if the user does not have a profile picture
-	const wchar_t *k_wstrLeftEmpty = L"texture/user-label/background-left-empty-0.png";
+	const wchar_t *k_wstrLeftEmpty = L"texture/user-label/background-left-empty-";
 
 	// Used for photo while download is pending
 	const wchar_t *k_wstrPhoto = L"texture/user-label/background-photo-temp.png";
@@ -126,6 +127,8 @@ private:
 	std::shared_ptr<quad> m_pNameBackground = nullptr;
 	std::shared_ptr<quad> m_pRightGap = nullptr;
 	std::shared_ptr<texture> m_pTextBoxTexture = nullptr;
+
+	int m_seatingPosition = -1;
 
 	// appear and disappear duration in seconds (direct plug into PushAnimation)
 	float m_userNameAnimationDuration = USERNAME_ANIMATION_DURATION;

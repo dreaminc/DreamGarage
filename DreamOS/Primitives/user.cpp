@@ -297,6 +297,8 @@ RESULT user::InitializeUserNameLabel() {
 
 	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
 
+	std::wstring wstrSeatPosition = util::StringToWideString(std::to_string(m_seatingPosition));
+
 	CN(m_pUserLabelComposite);
 	m_pUserLabelComposite->SetVisible(true);
 	m_pUserLabelComposite->SetMaterialDiffuseColor(m_backgroundColor);
@@ -317,10 +319,10 @@ RESULT user::InitializeUserNameLabel() {
 	m_pLeftGap->SetPosition(point(leftGapX, NAMETAG_HEIGHT, backgroundDepth));
 
 	if (HasProfilePhoto()) {
-		m_pLeftGap->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wstrLeft)[0]));
+		m_pLeftGap->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wstrLeft + wstrSeatPosition + L".png")[0]));
 	} 
 	else {
-		m_pLeftGap->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wstrLeftEmpty)[0]));
+		m_pLeftGap->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wstrLeftEmpty + wstrSeatPosition + L".png")[0]));
 	}
 
 	m_pLeftGap->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
@@ -518,6 +520,11 @@ RESULT user::SetInitials(std::string strInitials) {
 	return R_PASS;
 }
 
+RESULT user::SetSeatingPosition(int seatingPosition) {
+	m_seatingPosition = seatingPosition;
+	return R_PASS;
+}
+
 std::string user::GetInitials() {
 	return m_strInitials;
 }
@@ -591,7 +598,7 @@ bool user::IsUserNameVisible() {
 RESULT user::Update() {
 	RESULT r = R_PASS;
 
-	if (m_pUIObjectComposite != nullptr && m_pNameBackground == nullptr && m_pTextUserName != nullptr && !m_pTextUserName->IsDirty()) {
+	if (m_pUIObjectComposite != nullptr && m_pNameBackground == nullptr && m_pTextUserName != nullptr && !m_pTextUserName->IsDirty() && m_seatingPosition != -1) {
 		CR(InitializeUserNameLabel());
 	}
 
