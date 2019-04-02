@@ -98,15 +98,15 @@ public:
 	bool IsUserNameVisible();
 
 private:
-	std::wstring k_wstrLeft = L"UserLabel/user-label-background-left.png";
-	std::wstring k_wstrMiddle = L"UserLabel/user-label-background-middle.png";
-	std::wstring k_wstrRight = L"UserLabel/user-label-background-right.png";
+	const wchar_t *k_wstrLeft = L"texture/user-label/background-left-0.png";
+	const wchar_t *k_wstrMiddle = L"texture/user-label/background-middle.png";
+	const wchar_t *k_wstrRight = L"texture/user-label/background-right.png";
 
 	// Used instead of the left texture if the user does not have a profile picture
-	std::wstring k_wstrLeftEmpty = L"UserLabel/user-label-background-left-empty.png";
+	const wchar_t *k_wstrLeftEmpty = L"texture/user-label/background-left-empty-0.png";
 
 	// Used for photo while download is pending
-	std::wstring k_wstrPhoto = L"UserLabel/user-label-background-photo-temp.png";
+	const wchar_t *k_wstrPhoto = L"texture/user-label/background-photo-temp.png";
 
 
 private:

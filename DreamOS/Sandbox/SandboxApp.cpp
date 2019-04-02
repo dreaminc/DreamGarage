@@ -2003,6 +2003,7 @@ Error:
 RESULT SandboxApp::RegisterSubscriber(HMDEventType hmdEvent, Subscriber<HMDEvent>* pHMDEventSubscriber) {
 	RESULT r = R_PASS;
 
+	CNR(m_SandboxConfiguration.fUseHMD, R_SKIPPED);
 	CNM(m_pHMD, "HMD not initialized");
 	CR(m_pHMD->RegisterSubscriber(hmdEvent, pHMDEventSubscriber));
 

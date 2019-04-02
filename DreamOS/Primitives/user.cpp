@@ -292,6 +292,11 @@ RESULT user::InitializeUserNameLabel() {
 
 	float backgroundDepth = -0.005f;
 
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
+
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+
 	CN(m_pUserLabelComposite);
 	m_pUserLabelComposite->SetVisible(true);
 	m_pUserLabelComposite->SetMaterialDiffuseColor(m_backgroundColor);
@@ -302,7 +307,7 @@ RESULT user::InitializeUserNameLabel() {
 		m_pPhotoQuad = m_pUserLabelComposite->AddQuad(LABEL_PHOTO_WIDTH, LABEL_HEIGHT);
 		CN(m_pPhotoQuad);
 		m_pPhotoQuad->SetPosition(point(photoX, NAMETAG_HEIGHT, backgroundDepth));
-		m_pPhotoQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &k_wstrPhoto[0]));
+		m_pPhotoQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wstrPhoto)[0]));
 		m_pPhotoQuad->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
 		m_pPhotoQuad->SetMaterialDiffuseColor(m_visibleColor);
 	}
@@ -312,10 +317,10 @@ RESULT user::InitializeUserNameLabel() {
 	m_pLeftGap->SetPosition(point(leftGapX, NAMETAG_HEIGHT, backgroundDepth));
 
 	if (HasProfilePhoto()) {
-		m_pLeftGap->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &k_wstrLeft[0]));
+		m_pLeftGap->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wstrLeft)[0]));
 	} 
 	else {
-		m_pLeftGap->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &k_wstrLeftEmpty[0]));
+		m_pLeftGap->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wstrLeftEmpty)[0]));
 	}
 
 	m_pLeftGap->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
@@ -324,7 +329,7 @@ RESULT user::InitializeUserNameLabel() {
 	m_pNameBackground = m_pUserLabelComposite->AddQuad(m_pTextUserName->GetWidth(), LABEL_HEIGHT);
 	CN(m_pNameBackground);
 
-	m_pTextBoxTexture = MakeTexture(texture::type::TEXTURE_2D, &k_wstrMiddle[0]);
+	m_pTextBoxTexture = MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wstrMiddle)[0]);
 	m_pNameBackground->SetPosition(point(textboxX, NAMETAG_HEIGHT, backgroundDepth));
 	m_pNameBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
 	m_pNameBackground->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
@@ -335,7 +340,7 @@ RESULT user::InitializeUserNameLabel() {
 	m_pRightGap = m_pUserLabelComposite->AddQuad(LABEL_GAP_WIDTH, LABEL_HEIGHT);
 	CN(m_pRightGap);
 	m_pRightGap->SetPosition(point(rightGapX, NAMETAG_HEIGHT, backgroundDepth));
-	m_pRightGap->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &k_wstrRight[0]));
+	m_pRightGap->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wstrRight)[0]));
 	m_pRightGap->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
 	m_pRightGap->SetMaterialDiffuseColor(m_backgroundColor);
 
