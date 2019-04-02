@@ -355,6 +355,7 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 		0,
 		GetAppUID(),
 		m_ptLeftPointer,
+		m_pUserModel->GetSeatingPosition(),
 		szInitials,
 		m_fLeftSphereOn && m_fLeftSphereInteracting,
 		true);
@@ -364,6 +365,7 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 		0,
 		GetAppUID(),
 		m_ptRightPointer,
+		m_pUserModel->GetSeatingPosition(),
 		szInitials,
 		m_fRightSphereOn && m_fRightSphereInteracting,
 		false);

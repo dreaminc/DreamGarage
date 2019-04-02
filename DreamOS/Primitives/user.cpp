@@ -520,13 +520,17 @@ RESULT user::SetInitials(std::string strInitials) {
 	return R_PASS;
 }
 
+std::string user::GetInitials() {
+	return m_strInitials;
+}
+
 RESULT user::SetSeatingPosition(int seatingPosition) {
 	m_seatingPosition = seatingPosition;
 	return R_PASS;
 }
 
-std::string user::GetInitials() {
-	return m_strInitials;
+int user::GetSeatingPosition() {
+	return m_seatingPosition;
 }
 
 RESULT user::PendProfilePhotoDownload() {

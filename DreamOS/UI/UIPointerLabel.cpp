@@ -9,6 +9,8 @@
 
 #include "HAL/opengl/OGLText.h"
 
+#include "Core/Utilities.h"
+
 UIPointerLabel::UIPointerLabel(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIView(pHALImp,pDreamOS)
 {
@@ -128,6 +130,38 @@ RESULT UIPointerLabel::RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad
 		m_pDotComposite->SetPosition(point(-screenOffset * 2.0f, 0.0f, 0.0f));
 		m_pRenderContext->SetPosition(point(-screenOffset, 0.0f, 0.0f));
 	}
+
+Error:
+	return r;
+}
+
+RESULT UIPointerLabel::RenderDot(std::shared_ptr<quad> pParentQuad, int seatPosition) {
+	RESULT r = R_PASS;
+
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
+
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+
+	m_seatingPosition = seatPosition;
+	std::wstring wstrSeatPosition = util::StringToWideString(std::to_string(m_seatingPosition));
+
+	texture *pPointerDot = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerDotTexture + wstrSeatPosition + L".png")[0]);
+
+	m_pParentQuad = pParentQuad;
+
+	// dot texture is a square
+	float height = pParentQuad->GetHeight()/2 * 0.06;
+
+	m_pDotComposite = AddComposite();
+	m_pDotComposite->SetVisible(false, false);
+
+	m_pDotQuad = m_pDotComposite->AddQuad(height, height);
+	m_pDotQuad->SetDiffuseTexture(pPointerDot);
+	m_pDotQuad->RotateZByDeg(90.0f);
+
+	float screenOffset = 0.01f;
+	m_pDotComposite->SetPosition(point(-screenOffset * 2.0f, 0.0f, 0.0f));
 
 Error:
 	return r;

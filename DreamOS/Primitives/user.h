@@ -87,8 +87,10 @@ public:
 	RESULT SetProfilePhoto(std::string strProfilePhoto);
 	RESULT SetScreenName(std::string strScreenName);
 	RESULT SetInitials(std::string strInitials);
-	RESULT SetSeatingPosition(int seatingPosition);
 	std::string GetInitials();
+
+	int GetSeatingPosition();
+	RESULT SetSeatingPosition(int seatingPosition);
 
 	RESULT PendProfilePhotoDownload();
 	RESULT OnProfilePhotoDownload(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext);
