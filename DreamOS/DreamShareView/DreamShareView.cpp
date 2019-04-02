@@ -134,12 +134,13 @@ RESULT DreamShareView::Update(void *pContext) {
 		CRM(UpdateFromPendingVideoFrame(), "Failed to update pending frame");
 	}
 
-	if (m_pointingObjects.size() > 0) {
-		
-		auto qRotation = m_pCastQuad->GetOrientation(true);
-
+	if (m_pCastQuad != nullptr) {
 		m_pMirrorQuad = m_pPointerContext->AddQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight());
 		m_pMirrorQuad->SetDiffuseTexture(m_pCastQuad->GetTextureDiffuse());
+		m_pPointerContext->RenderToQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight(), 0, 0);
+	}
+
+	if (m_pointingObjects.size() > 0) {
 		float scale = m_pCastQuad->GetScale(true).x();
 
 		for (auto pair : m_pointingObjects) {
@@ -147,22 +148,20 @@ RESULT DreamShareView::Update(void *pContext) {
 			for (std::shared_ptr<UIPointerLabel> pPointerLabel : userPointers) {
 
 				auto pLabelFlatContext = pPointerLabel->GetContext();
-				point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (pLabelFlatContext->GetPosition(true) - m_pCastQuad->GetOrigin(true)));
+				if (pLabelFlatContext->IsVisible()) {
+					point ptLabelQuad = pLabelFlatContext->GetCurrentQuad()->GetPosition(true);
+					point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (ptLabelQuad - m_pCastQuad->GetOrigin(true)));
 
-				auto pLabelQuad = pLabelFlatContext->GetCurrentQuad();
-				auto pFlatQuad = m_pPointerContext->AddQuad(pLabelQuad->GetWidth()/scale, pLabelQuad->GetHeight()/scale);
-				pFlatQuad->SetDiffuseTexture(pLabelFlatContext->GetFramebuffer()->GetColorTexture());
-				pFlatQuad->FlipUVVertical();
-				pFlatQuad->SetVisible(pLabelFlatContext->IsVisible());
+					auto pLabelQuad = pLabelFlatContext->GetCurrentQuad();
+					auto pFlatQuad = m_pPointerContext->AddQuad(pLabelQuad->GetWidth() / scale, pLabelQuad->GetHeight() / scale);
+					pFlatQuad->SetDiffuseTexture(pLabelFlatContext->GetFramebuffer()->GetColorTexture());
+					pFlatQuad->FlipUVVertical();
+					pFlatQuad->SetVisible(pLabelFlatContext->IsVisible());
 
-				// TODO: depending on final design of labels, cap positioning of the label quads so that
-				// the flat context is not resized
-				pFlatQuad->SetPosition(point(ptPosition.x()/scale, 0.0f, ptPosition.y()/scale));
+					pFlatQuad->SetPosition(point(ptPosition.x() / scale, 0.0f, ptPosition.y() / scale));
+				}
 			}
 		}
-
-		m_pPointerContext->RenderToQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight(), 0, 0);
-
 	}
 
 Error:
@@ -244,8 +243,9 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 
 		std::shared_ptr<UIPointerLabel> pPointer;
 		long userID = pUpdatePointerMessage->GetSenderUserID();
+		std::string strInitials(pUpdatePointerMessage->m_body.szInitials, 2);
 
-		CR(AllocateSpheres(userID, pUpdatePointerMessage->m_body.szInitials));
+		CR(AllocateSpheres(userID, strInitials));
 
 		if (pUpdatePointerMessage->m_body.fLeftHand) {
 			pPointer = m_pointingObjects[userID][0];
@@ -254,8 +254,8 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 			pPointer = m_pointingObjects[userID][1];
 		}
 
-		pPointer->GetContext()->SetPosition(pUpdatePointerMessage->m_body.ptPointer + point(-0.01f, 0.0f, 0.0f));
-		pPointer->GetContext()->SetVisible(pUpdatePointerMessage->m_body.fVisible, false);
+		CN(pPointer);
+		CR(pPointer->HandlePointerMessage(pUpdatePointerMessage));
 	}
 
 Error:
@@ -571,6 +571,21 @@ RESULT DreamShareView::OnVideoFrame(const std::string &strVideoTrackLabel, PeerC
 
 		if (r == R_OVERFLOW) {
 			DEBUG_LINEOUT("Overflow frame!");
+			std::unique_lock<std::mutex> lockBufferMutex(m_overflowBufferMutex);
+
+			m_overflowFrame.fPending = true;
+			m_overflowFrame.pxWidth = pxWidth;
+			m_overflowFrame.pxHeight = pxHeight;
+
+			// Allocate
+			// TODO: Might be able to avoid this if the video buffer is not changing size
+			// and just keep the memory allocated instead
+			m_overflowFrame.pDataBuffer_n = sizeof(uint8_t) * pxWidth * pxHeight * 4;
+			//m_pendingFrame.pDataBuffer = (uint8_t*)malloc(m_pendingFrame.pDataBuffer_n);
+
+			m_overflowFrame.pDataBuffer = pVideoFrameDataBuffer;
+
+			CNM(m_overflowFrame.pDataBuffer, "Failed to allocate video buffer mem");
 			return R_PASS;
 		}
 
@@ -691,7 +706,15 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 	}
 
 Error:
-	if (m_pendingFrame.pDataBuffer != nullptr) {
+	if (m_overflowFrame.fPending == true) {
+		std::unique_lock<std::mutex> lockBufferMutex(m_overflowBufferMutex);
+		m_pendingFrame = m_overflowFrame;
+		memcpy(m_pendingFrame.pDataBuffer, m_overflowFrame.pDataBuffer, m_overflowFrame.pDataBuffer_n);
+
+		m_overflowFrame.fPending = false;
+	}
+	
+	else if (m_pendingFrame.pDataBuffer != nullptr) {
 		delete [] m_pendingFrame.pDataBuffer;
 		m_pendingFrame.pDataBuffer = nullptr;
 
@@ -734,11 +757,10 @@ RESULT DreamShareView::AllocateSpheres(long userID, std::string strInitials) {
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
 
-
 	for (int i = 0; i < 2; i++) {
 		pView = m_pointerViewPool.front();
 
-		pView->RenderLabelWithInitials(m_pCastQuad->GetHeight(), strInitials);
+		pView->RenderLabelWithInitials(m_pCastQuad, strInitials);
 
 		userPointers.emplace_back(pView);
 		m_pointerViewPool.pop();

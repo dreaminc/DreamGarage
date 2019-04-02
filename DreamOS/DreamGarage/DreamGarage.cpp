@@ -336,30 +336,40 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 		CN(pEndNode);
 
 		// save interfaces to skybox nodes
-		m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pScatteringSkyboxProgram));
+		m_skyboxProgramNodes.push_back(dynamic_cast<SkyboxScatterProgram*>(pScatteringSkyboxProgram));
 		//m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pReflectionSkyboxProgram));
 		//m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pSkyboxProgram));
 
-		quad *pWaterQuad = MakeQuad(1000.0f, 1000.0f);
-		point ptQuadOffset = point(90.0f, -1.3f, -25.0f);
-		pWaterQuad->SetPosition(ptQuadOffset);
-		pWaterQuad->SetMaterialColors(color(57.0f / 255.0f, 112.0f / 255.0f, 151.0f / 255.0f, 1.0f));
-		CN(pWaterQuad);
+		// save interfaces to fog nodes
+		m_fogProgramNodes.push_back(dynamic_cast<FogProgram*>(pRenderEnvironmentProgramNode));
+		m_fogProgramNodes.push_back(dynamic_cast<FogProgram*>(pRefractionProgramNode));
+		m_fogProgramNodes.push_back(dynamic_cast<FogProgram*>(pReflectionProgramNode));
+
+		// save interface to water node
+		m_waterProgramNodes.push_back(pWaterProgramNode);
+
+		if (m_pWaterQuad == nullptr) {
+			m_pWaterQuad = MakeQuad(1000.0f, 1000.0f);
+			point ptQuadOffset = point(90.0f, -2.38f, -25.0f);
+			m_pWaterQuad->SetPosition(ptQuadOffset);
+			m_pWaterQuad->SetMaterialColors(color(57.0f / 255.0f, 112.0f / 255.0f, 151.0f / 255.0f, 1.0f));
+		}
+		CN(m_pWaterQuad);
 
 		if (pWaterProgramNode != nullptr) {
-			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(pWaterQuad));
+			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(m_pWaterQuad));
 		}
 
 		if (pReflectionProgramNode != nullptr) {
-			CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionObject(pWaterQuad));
+			CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionObject(m_pWaterQuad));
 		}
 
 		if (pRefractionProgramNode != nullptr) {
-			CR(dynamic_cast<OGLProgramRefraction*>(pRefractionProgramNode)->SetRefractionObject(pWaterQuad));
+			CR(dynamic_cast<OGLProgramRefraction*>(pRefractionProgramNode)->SetRefractionObject(m_pWaterQuad));
 		}
 
 		if (pReflectionSkyboxProgram != nullptr) {
-			CR(dynamic_cast<OGLProgramSkybox*>(pReflectionSkyboxProgram)->SetReflectionObject(pWaterQuad));
+			CR(dynamic_cast<OGLProgramSkybox*>(pReflectionSkyboxProgram)->SetReflectionObject(m_pWaterQuad));
 		}
 
 		if(m_pDreamEnvironmentApp == nullptr) {			// Pipelines made before Environment app will need to get the scenegraph node from it in LoadScene() apparently
@@ -383,6 +393,9 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 
 			CN(pRefractionProgramNode);
 			CR(pRefractionProgramNode->ConnectToInput("scenegraph", m_pDreamEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
+
+			CR(m_pDreamEnvironmentApp->SetFogPrograms(m_fogProgramNodes));
+			CR(m_pDreamEnvironmentApp->SetSkyboxPrograms(m_skyboxProgramNodes));
 		}
 	}
 
@@ -590,6 +603,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	if (m_pDreamEnvironmentApp != nullptr) {
 		m_pDreamEnvironmentApp->SetSkyboxPrograms(m_skyboxProgramNodes);
 		m_pDreamEnvironmentApp->SetScreenFadeProgram(m_pScreenFadeProgramNode);
+		m_pDreamEnvironmentApp->SetFogPrograms(m_fogProgramNodes);
 	}
 
 	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this, false);
@@ -1832,6 +1846,7 @@ Error:
 	return r;
 }
 
+// TODO: Make waterquad and light positionings programmatic?
 RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) {
 	RESULT r = R_PASS;
 
@@ -1843,6 +1858,49 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 	else {
 		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
 		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environment::type(environmentModelId)));
+		if (environment::type(environmentModelId) == environment::type::CAVE) {
+			m_pWaterQuad->SetPosition(point(90.0f, -1.28f, 0.0f));
+			
+			vector vWaterLightDirection = vector(-1.0f, -0.35f, 0.1f);
+			float lightIntensity = 2.0f;
+			auto pLight = MakeLight(LIGHT_DIRECTIONAL, lightIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(vWaterLightDirection));
+			CN(pLight);
+			
+			// This is breaking encapsulation - to be fixed with rest of garage 
+			for (auto pWaterProgram : m_waterProgramNodes) {
+				auto pOGLWaterProgram = dynamic_cast<OGLProgramWater*>(pWaterProgram);
+				pOGLWaterProgram->SetWaterReflectionLight(pLight);
+			}
+		}
+		else if (environment::type(environmentModelId) == environment::type::CANYON) {
+			m_pWaterQuad->SetPosition(point(90.0f, -18.32f, 0.0f));
+			
+			vector vWaterLightDirection = vector(0.4f, -0.35f, -1.0f);
+			float lightIntensity = 2.0f;
+			auto pLight = MakeLight(LIGHT_DIRECTIONAL, lightIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(vWaterLightDirection));
+			CN(pLight);
+			
+			// This is breaking encapsulation - to be fixed with rest of garage 
+			for (auto pWaterProgram : m_waterProgramNodes) {
+				auto pOGLWaterProgram = dynamic_cast<OGLProgramWater*>(pWaterProgram);
+				pOGLWaterProgram->SetWaterReflectionLight(pLight);
+			}
+		}
+		else if (environment::type(environmentModelId) == environment::type::HOUSE) {
+			m_pWaterQuad->SetPosition(point(90.0f, -2.6f, 0.0f));
+
+			// surprisingly close enough, though the sun position is just barely different from cave
+			vector vWaterLightDirection = vector(-1.0f, -0.35f, 0.1f);
+			float lightIntensity = 2.0f;
+			auto pLight = MakeLight(LIGHT_DIRECTIONAL, lightIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(vWaterLightDirection));
+			CN(pLight);
+
+			// This is breaking encapsulation - to be fixed with rest of garage 
+			for (auto pWaterProgram : m_waterProgramNodes) {
+				auto pOGLWaterProgram = dynamic_cast<OGLProgramWater*>(pWaterProgram);
+				pOGLWaterProgram->SetWaterReflectionLight(pLight);
+			}
+		}
 	}
 
 Error:

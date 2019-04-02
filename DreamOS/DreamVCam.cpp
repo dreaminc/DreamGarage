@@ -337,6 +337,14 @@ RESULT DreamVCam::Update(void *pContext) {
 		// Check if Active Source
 		if (m_pParentApp->GetActiveSource() != nullptr) {
 			if (m_pParentApp->GetActiveSource().get() == this && m_pParentApp->IsContentVisible()) {
+
+				if (m_pParentApp->IsScrollingTabs(HAND_TYPE::HAND_LEFT)) {
+					m_pDreamGamepadCamera->ClearUpdateFlags(HAND_TYPE::HAND_LEFT);
+				}
+				if (m_pParentApp->IsScrollingTabs(HAND_TYPE::HAND_RIGHT)) {
+					m_pDreamGamepadCamera->ClearUpdateFlags(HAND_TYPE::HAND_RIGHT);
+				}
+
 				if (m_pDreamGamepadCamera->GetCameraControlType() != DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER) {
 					CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
 				}
@@ -426,7 +434,7 @@ RESULT DreamVCam::ModuleProcess(void *pContext) {
 					lastSentTime = timeNow;
 				}
 				else {
-					DEBUG_LINEOUT("NamedPipeServer or Streaming Texture were nullptr in VCam Module Process");
+					//DEBUG_LINEOUT("NamedPipeServer or Streaming Texture were nullptr in VCam Module Process");
 				}
 			//}
 		}
@@ -538,7 +546,7 @@ RESULT DreamVCam::SendFirstFrame() {
 RESULT DreamVCam::CloseSource() {
 	RESULT r = R_PASS;
 
-	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
+	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition(true).x(), m_pCamera->GetPosition(true).y(), m_pCamera->GetPosition(true).z());
 
 	CR(GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(true), m_pCamera->GetOrientation()));
 
@@ -632,7 +640,7 @@ RESULT DreamVCam::OnCameraAtRest() {
 
 	CBR(m_fHasReceivedSettings, R_SKIPPED);
 	
-	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
+	//DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition().x(), m_pCamera->GetPosition().y(), m_pCamera->GetPosition().z());
 	GetDOS()->SaveCameraSettings(m_pCamera->GetPosition(true), m_pCamera->GetOrientation());
 
 	CNR(m_pParentApp, R_SKIPPED);

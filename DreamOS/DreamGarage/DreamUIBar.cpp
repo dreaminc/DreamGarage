@@ -779,7 +779,6 @@ RESULT DreamUIBar::HideApp() {
 	RESULT r = R_PASS;
 
 	composite *pComposite = m_pScrollView.get();
-	m_pMenuNode = nullptr;
 	m_menuState = MenuState::ANIMATING;
 
 	auto fnStartCallback = [&](void *pContext) {
@@ -790,12 +789,19 @@ RESULT DreamUIBar::HideApp() {
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 
+		std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
 		DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
 		CN(pDreamUIBar);
+		CN(pKeyboardApp);
 
 		GetComposite()->SetVisible(false, false);
 		m_pScrollView->Hide();
 		m_menuState = MenuState::NONE;
+
+		if (pKeyboardApp->IsVisible()) {
+			CR(pKeyboardApp->SetVisible(false));
+		}
+
 	Error:
 		return r;
 	};
@@ -820,45 +826,55 @@ Error:
 RESULT DreamUIBar::ShowApp() {
 	RESULT r = R_PASS;
 
-	composite *pComposite = m_pScrollView.get();
-	pComposite->SetPosition(point(0.0f, 0.1f, 0.0f));
-	//m_pScrollView->Show();
-//*
-	auto fnStartCallback = [&](void *pContext) {
-		RESULT r = R_PASS;
+	// "Website" is a folder type, we want the "ACTION" one that prompts the url search
+	if (m_pMenuNode->GetNodeType() == MenuNode::type::ACTION && m_pMenuNode->GetScope() == SCOPE_WEBSITE) {
+		std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
+		CN(pKeyboardApp);
+		CR(pKeyboardApp->SetVisible(true));
+		CR(pKeyboardApp->ShowTitleView());
+	}
 
-		DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
-		CN(pDreamUIBar);
+	else {
+		composite *pComposite = m_pScrollView.get();
+		pComposite->SetPosition(point(0.0f, 0.1f, 0.0f));
+		//m_pScrollView->Show();
+	//*
+		auto fnStartCallback = [&](void *pContext) {
+			RESULT r = R_PASS;
 
-		CR(pDreamUIBar->UpdateMenu(pContext));
-	Error:
-		return r;
-	};
+			DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
+			CN(pDreamUIBar);
 
-	auto fnEndCallback = [&](void *pContext) {
-		RESULT r = R_PASS;
+			CR(pDreamUIBar->UpdateMenu(pContext));
+		Error:
+			return r;
+		};
 
-		DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
-		CN(pDreamUIBar);
+		auto fnEndCallback = [&](void *pContext) {
+			RESULT r = R_PASS;
 
-		CR(pDreamUIBar->ClearMenuState(pContext));
-	Error:
-		return r;
-	};
+			DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
+			CN(pDreamUIBar);
 
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		pComposite,
-		pComposite->GetPosition(),
-		pComposite->GetOrientation(),
-		pComposite->GetScale(),
-		m_animationDuration,
-		//AnimationCurveType::EASE_OUT_BACK,
-		AnimationCurveType::EASE_OUT_QUAD,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
+			CR(pDreamUIBar->ClearMenuState(pContext));
+		Error:
+			return r;
+		};
+
+		CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+			pComposite,
+			pComposite->GetPosition(),
+			pComposite->GetOrientation(),
+			pComposite->GetScale(),
+			m_animationDuration,
+			//AnimationCurveType::EASE_OUT_BACK,
+			AnimationCurveType::EASE_OUT_QUAD,
+			AnimationFlags(),
+			fnStartCallback,
+			fnEndCallback,
+			this
+		));
+	}
 //*/
 
 Error:

@@ -11,8 +11,11 @@
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
+#include "../FogProgram.h"
 
-class OGLProgramMinimalTexture : public OGLProgram {
+class OGLFogParamsBlock;
+
+class OGLProgramMinimalTexture : public OGLProgram, public FogProgram {
 public:
 	OGLProgramMinimalTexture(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
@@ -44,6 +47,7 @@ private:
 	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
 
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
+	OGLFogParamsBlock *m_pFogParamsBlock = nullptr;
 };
 
 #endif // ! OGLPROGRAM_MINIMAL_TEXTURE_H_

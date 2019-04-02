@@ -8,6 +8,7 @@
 
 class UIControlView;
 struct UIEvent;
+struct HMDEvent;
 
 enum class FormType {
 	SIGN_IN,
@@ -25,7 +26,8 @@ enum class FormType {
 class DreamFormApp : public DreamApp<DreamFormApp>,
 					public DreamBrowserObserver,
 					public Subscriber<UIEvent>, 
-					public Subscriber<InteractionObjectEvent>
+					public Subscriber<InteractionObjectEvent>,
+					public Subscriber<HMDEvent>
 {
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
@@ -91,6 +93,7 @@ private:
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 	virtual RESULT Notify(UIEvent *pUIEvent) override;
+	virtual RESULT Notify(HMDEvent *pHMDEvent) override;
 
 public:
 	RESULT Show();
@@ -113,6 +116,8 @@ protected:
 	bool m_fFormVisible = false;
 	bool m_fPendShowFormView = false;
 	bool m_fSetAsActive = false;
+
+	bool m_fPendHMDRecenter = false;
 
 	FormType m_formType;
 };

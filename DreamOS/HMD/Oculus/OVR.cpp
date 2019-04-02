@@ -327,7 +327,7 @@ RESULT OVRHMD::UpdateHMD() {
 
 	ovrSessionStatus OVRSessionStatus;
 	ovr_GetSessionStatus(m_ovrSession, &OVRSessionStatus);
-
+	static bool fLostFocus = false;
 	if (OVRSessionStatus.ShouldQuit) {
 		DOSLOG(INFO, "ShouldQuit received from Oculus, shutting down sandbox")
 		m_pParentSandbox->HMDShutdown();
@@ -335,6 +335,19 @@ RESULT OVRHMD::UpdateHMD() {
 
 	if (OVRSessionStatus.ShouldRecenter) {
 		CR(RecenterHMD());
+		NotifySubscribers(HMD_EVENT_TYPE::HMD_EVENT_RESET_VIEW, &HMDEvent(HMD_EVENT_RESET_VIEW, HMDDeviceType::OCULUS));
+	}
+	
+	// TODO: These should be SessionStatus.HasInputFocus but we'd need to upgrade the PC SDK. Using these for now
+	//		 https://developer.oculus.com/documentation/pcsdk/latest/concepts/dg-dash/
+	if (!fLostFocus && !OVRSessionStatus.IsVisible) {
+		fLostFocus = true;
+		NotifySubscribers(HMD_EVENT_TYPE::HMD_EVENT_UNFOCUS, &HMDEvent(HMD_EVENT_UNFOCUS, HMDDeviceType::OCULUS));
+	}
+
+	if (fLostFocus && OVRSessionStatus.IsVisible) {
+		fLostFocus = false;
+		NotifySubscribers(HMD_EVENT_TYPE::HMD_EVENT_FOCUS, &HMDEvent(HMD_EVENT_FOCUS, HMDDeviceType::OCULUS));
 	}
 
 	CRM(m_pOVRPlatform->Update(), "Oculus Platform passed an error");

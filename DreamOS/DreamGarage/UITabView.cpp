@@ -127,11 +127,21 @@ Error:
 }
 
 float UITabView::GetBorderWidth() {
-	return m_borderWidth;
+	RESULT r = R_PASS;
+
+	CNR(m_pBackgroundQuad, R_SKIPPED);
+	return m_pBackgroundQuad->GetWidth();
+Error:
+	return 0.0f;
 }
 
 float UITabView::GetBorderHeight() {
-	return m_borderHeight;
+	RESULT r = R_PASS;
+
+	CNR(m_pBackgroundQuad, R_SKIPPED);
+	return m_pBackgroundQuad->GetHeight();
+Error:
+	return r;
 }
 
 RESULT UITabView::SetScrollFlag(bool fCanScroll, int index) {
@@ -243,6 +253,7 @@ RESULT UITabView::PendSelectTab(UIButton *pButtonContext, void *pContext) {
 	RESULT r = R_PASS;
 
 	if (!m_fForceContentFocus) {
+		CBR(m_pScrollView->CanScroll(), R_SKIPPED);
 		CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	}
 	m_fForceContentFocus = false;

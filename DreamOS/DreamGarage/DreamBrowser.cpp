@@ -341,9 +341,13 @@ Error:
 RESULT DreamBrowser::OnLoadError(int errorCode, std::string strError, std::string strFailedURL) {
 	RESULT r = R_PASS;
 
-	// currently the abort case (-3) is caused by OnCertificateError
-	if (m_pObserver != nullptr && errorCode != -3) {
-		CR(SetURI(m_pObserver->GetLoadErrorURL()));
+	// currently our handling of OnCertificateError causes an abort(-3)
+	// that error isn't handled here so the privacy message isn't overriden
+	if (m_pObserver != nullptr) {
+		CN(m_pWebBrowserController);
+		if (errorCode != -3 && m_pWebBrowserController->CheckIsError(errorCode)) {
+			CR(m_pWebBrowserController->ReplaceURL(m_pObserver->GetLoadErrorURL()));
+		}
 	}
 
 Error:
@@ -860,6 +864,7 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrow
 
 	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
+	// This check never fails, as long as ShareView has been initialized
 	CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);
 
 	if ((GetSourceTexture() == GetDOS()->GetSharedCameraTexture()) || (GetSourceTexture() == GetDOS()->GetSharedContentTexture())) {
@@ -986,16 +991,34 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	if (m_pObserver != nullptr) {
 
 		if (m_fForceObserverAudio || GetDOS()->GetSharedContentTexture() == m_pBrowserTexture.get() || GetDOS()->GetSharedCameraTexture() == m_pBrowserTexture.get()) {
+			//DOSLOG(INFO, "AudioPacket: Frames: %d, Channels: %d, SamplingRate: %d", pendingAudioPacket.GetNumFrames(), pendingAudioPacket.GetNumChannels(), pendingAudioPacket.GetSamplingRate());
+			if (m_strCurrentURL == "https://web.skype.com/") {
+				if (pendingAudioPacket.GetNumChannels() == 2 && pendingAudioPacket.GetNumFrames() == 480) {
+					//DOSLOG(INFO, "Pushing Packet!!!");
 
-			if (m_pRenderSoundBuffer != nullptr) {
+					if (m_pRenderSoundBuffer != nullptr) {
 
-				m_pRenderSoundBuffer->LockBuffer();
+						m_pRenderSoundBuffer->LockBuffer();
 
-				{
-					CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
+						{
+							CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
+						}
+
+						m_pRenderSoundBuffer->UnlockBuffer();
+					}
 				}
+			}
+			else {
+				if (m_pRenderSoundBuffer != nullptr) {
 
-				m_pRenderSoundBuffer->UnlockBuffer();
+					m_pRenderSoundBuffer->LockBuffer();
+
+					{
+						CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
+					}
+
+					m_pRenderSoundBuffer->UnlockBuffer();
+				}
 			}
 		}
 	}

@@ -2023,6 +2023,16 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::RegisterSubscriber(HMDEventType hmdEvent, Subscriber<HMDEvent>* pHMDEventSubscriber) {
+	RESULT r = R_PASS;
+
+	CNM(m_pHMD, "HMD not initialized");
+	CR(m_pHMD->RegisterSubscriber(hmdEvent, pHMDEventSubscriber));
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::UnregisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
 	RESULT r = R_PASS;
 	if (m_pHMD != nullptr) {

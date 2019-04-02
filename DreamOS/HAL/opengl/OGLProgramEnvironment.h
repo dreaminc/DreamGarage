@@ -11,8 +11,11 @@
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
+#include "../FogProgram.h"
 
-class OGLProgramEnvironment: public OGLProgram {
+class OGLFogParamsBlock;
+
+class OGLProgramEnvironment: public OGLProgram, public FogProgram {
 public:
 	OGLProgramEnvironment(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
@@ -44,6 +47,7 @@ private:
 	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
 
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
+	OGLFogParamsBlock *m_pFogParamsBlock = nullptr;
 };
 
 #endif // ! OGLPROGRAM_ENVIRONMENT_H_

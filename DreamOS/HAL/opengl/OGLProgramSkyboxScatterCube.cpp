@@ -126,6 +126,7 @@ RESULT OGLProgramSkyboxScatterCube::SetSunDirection(vector vSunDirection) {
 	RESULT r = R_PASS;
 	
 	m_sunDirection = vSunDirection;
+	m_fRendered = false;
 
 	return R_PASS;
 }

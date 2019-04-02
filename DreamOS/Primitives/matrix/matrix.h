@@ -974,6 +974,22 @@ matrix<TMat4x4, N, N> transpose(matrix<TMat4x4, N, N> mat) {
 	return retMatrix;
 }
 
+template <typename TMat, int N, int M>
+matrix<TMat, M, N> transpose(matrix<TMat, N, M> mat) {
+	RESULT r = R_PASS;
+
+	matrix<TMat, M, N> retMatrix;
+	retMatrix.clear();
+
+	for (int i = 0; i < M; i++) {
+		for (int j = 0; j < N; j++) {
+			retMatrix.element(i, j) = mat.element(j, i);
+		}
+	}
+
+	return retMatrix;
+}
+
 template <typename TMat4x4, int N, int M>
 matrix<TMat4x4, N, M> absolute(matrix<TMat4x4, N, M> mat) {
 	RESULT r = R_PASS;

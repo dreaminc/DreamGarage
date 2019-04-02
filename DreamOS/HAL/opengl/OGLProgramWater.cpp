@@ -170,6 +170,14 @@ Error:
 	return r;
 }
 
+RESULT OGLProgramWater::SetWaterReflectionLight(light* pLight) {
+	if (!m_lights.empty()) {
+		m_lights.clear();
+	}
+	m_lights.push_back(pLight);
+	return R_PASS;
+}
+
 RESULT OGLProgramWater::SetPlaneObject(VirtualObj* pReflectionObject) {
 	RESULT r = R_PASS;
 

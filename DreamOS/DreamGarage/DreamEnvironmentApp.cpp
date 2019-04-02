@@ -5,6 +5,7 @@
 #include "HAL/opengl/OGLProgramStandard.h"
 #include "HAL/opengl/OGLProgramScreenFade.h"
 #include "HAL/SkyboxScatterProgram.h"
+#include "HAL/FogProgram.h"
 
 #include "Primitives/user.h"
 
@@ -44,7 +45,6 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	// One strong "SUN" directional light, and a second dimmer "ambient" light from the opposite direction
 	float downwardAngle = 45.0f * ((float) M_PI / 180.0f);
 
-	//vector vSunDirection = vector(1.0f, -0.5f, 1.0f);
 	vector vSunDirection = vector(-1.0f, -0.25f, 0.1f);
 	vector vAmbientDirection = vector(1.0f, 0.25f, -0.1f);
 
@@ -109,34 +109,29 @@ RESULT DreamEnvironmentApp::PositionEnvironment(environment::type type, std::sha
 	m_ptSceneOffset = point(0.0f, 0.0f, 0.0f);
 	m_sceneScale = 0.1f;
 
-	if (type == environment::ISLAND) {
-		m_ptSceneOffset = point(90.0f, -5.0f, -25.0f);
-		m_sceneScale = 0.1f;
+	m_ptSceneOffset = point(0.0f, -0.1f, 0.0f);
+	m_sceneScale = m_environmentSceneScale;
+	pModel->RotateYByDeg(90.0f);
 
-	}
-	else {
-		m_ptSceneOffset = point(0.0f, -1.20f, 0.0f);
-		m_sceneScale = m_environmentSceneScale;
-		GetComposite()->RotateYByDeg(90.0f);
-	}
-	//*/
-
-	//GetComposite()->SetPosition(m_ptSceneOffset);
-	//GetComposite()->SetScale(m_sceneScale);
 	pModel->SetPosition(m_ptSceneOffset);
 	pModel->SetScale(m_sceneScale);
 
 	return r;
-
 }
 
 RESULT DreamEnvironmentApp::LoadAllEnvironments() {
 	RESULT r = R_PASS;
 
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+
 	for (auto& filenamePair : m_environmentFilenames) {
 
-		//TODO: with unique environment shader, change this to MakeModel
-		std::shared_ptr<model> pModel = GetComposite()->AddModel(filenamePair.second);
+		//TODO: with unique environment shader, change this to MakeModel	
+		std::wstring wstrModelPath = wstrAssetPath + filenamePair.second;
+
+		std::shared_ptr<model> pModel = GetComposite()->AddModel(wstrModelPath);
 		CN(pModel);
 
 		m_environmentModels[filenamePair.first] = pModel;
@@ -149,18 +144,35 @@ Error:
 }
 
 RESULT DreamEnvironmentApp::SetCurrentEnvironment(environment::type type) {
+	RESULT r = R_PASS;
+
 	m_pCurrentEnvironmentModel = m_environmentModels[type];
 	m_currentType = type;
+
+	for (auto *pProgram : m_fogPrograms) {
+		CR(pProgram->SetFogParams(m_environmentFogParams[m_currentType]));
+	}
+
+	for (auto pProgram : m_skyboxPrograms) {
+		pProgram->SetSunDirection(m_environmentSunDirection[m_currentType]);
+	}
+
+Error:
 	return R_PASS;
 }
 
-RESULT DreamEnvironmentApp::SetSkyboxPrograms(std::vector<SkyboxScatterProgram*> pPrograms) {
-	m_skyboxPrograms = pPrograms;
+RESULT DreamEnvironmentApp::SetSkyboxPrograms(std::vector<SkyboxScatterProgram*> skyboxPrograms) {
+	m_skyboxPrograms = skyboxPrograms;
 	return R_PASS;
 }
 
 RESULT DreamEnvironmentApp::SetScreenFadeProgram(OGLProgramScreenFade* pFadeProgram) {
 	m_pFadeProgram = pFadeProgram;
+	return R_PASS;
+}
+
+RESULT DreamEnvironmentApp::SetFogPrograms(std::vector<FogProgram*> fogPrograms) {
+	m_fogPrograms = fogPrograms;
 	return R_PASS;
 }
 
@@ -299,19 +311,9 @@ Error:
 RESULT DreamEnvironmentApp::GetSharedScreenPlacement(point& ptPosition, quaternion& qOrientation, float& scale) {
 	RESULT r = R_PASS;
 
-	switch (m_currentType) {
-	case environment::ISLAND: {
-		// legacy
-		ptPosition = point(0.0f, 2.0f, -2.0f);
-		qOrientation = quaternion();
-		scale = 1.0f;
-	} break;
-	case environment::CAVE: {
-		ptPosition = m_ptSharedScreen;
-		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
-		scale = m_sharedScreenScale;
-	} break;
-	}
+	ptPosition = m_ptSharedScreen;
+	qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
+	scale = m_sharedScreenScale;
 
 //Error:
 	return r;
@@ -320,12 +322,8 @@ RESULT DreamEnvironmentApp::GetSharedScreenPlacement(point& ptPosition, quaterni
 RESULT DreamEnvironmentApp::GetDefaultCameraPlacement(point& ptPosition, quaternion& qOrientation) {
 	RESULT r = R_PASS;
 
-	switch (m_currentType) {
-	case environment::CAVE: {
-		ptPosition = point(-0.97f, 0.214f, 0.0f);
-		qOrientation.SetValues(0.7046f, -0.06f, -.7046f, 0.06f);
-	} break;
-	}
+	ptPosition = point(-0.97f, 0.239f, 0.0f);
+	qOrientation.SetValues(0.7046f, -0.06f, -.7046f, 0.06f);
 
 	return r;
 }
@@ -348,12 +346,22 @@ RESULT DreamEnvironmentApp::GetEnvironmentSeatingPositionAndOrientation(point& p
 	} break;
 
 	case 2: {
-		ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, -(m_tableWidth) / 2.0f);
+		if (m_currentType == environment::CAVE) {
+			ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, -(m_tableWidth) / 2.0f);
+		}
+		else {
+			ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, -(m_tableWidth + 0.5f) / 2.0f);
+		}
 		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_middleAngle, 0.0f); break;
 	} break;
 
 	case 3: {
-		ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, (m_tableWidth) / 2.0f);
+		if (m_currentType == environment::CAVE) {
+			ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, (m_tableWidth) / 2.0f);
+		}
+		else {
+			ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, (m_tableWidth + 0.5f) / 2.0f);
+		}
 		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_middleAngle, 0.0f); break;
 	} break;
 

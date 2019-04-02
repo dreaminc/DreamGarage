@@ -119,6 +119,10 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
 		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_UP, this));
 
+		for (int i = 0; i < HMDEventType::HMD_EVENT_INVALID; i++) {
+			CR(GetDOS()->RegisterSubscriber((HMDEventType)(i), this));
+		}
+
 		float currentCenter = m_pControlView->GetBackgroundWidth() / 2.0f;
 		float totalCenter = (m_pControlView->GetBackgroundWidth() + m_pDreamUserApp->GetSpacingSize() + m_pDreamTabView->GetBorderWidth()) / 2.0f;
 		//m_centerOffset = currentCenter - totalCenter;
@@ -196,9 +200,9 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		bool fHeight = (ptSphereOrigin.z() > ptDreamTabView.z() - tabViewHeight / 2.0f &&
 						ptSphereOrigin.z() < ptDreamTabView.z() + tabViewHeight / 2.0f);
 
-		bool fMalletInTabView = fWidth && fHeight;
+		m_fMalletInTabView[i] = fWidth && fHeight;
 
-		m_pDreamTabView->SetScrollFlag(fMalletInTabView, i);
+		m_pDreamTabView->SetScrollFlag(m_fMalletInTabView[i], i);
 		
 	}
 
@@ -353,6 +357,8 @@ bool DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
 
 	//CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pView.get()), R_SKIPPED);
 	//CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get()), R_SKIPPED);
+	
+	CBR(GetComposite()->IsVisible(), R_SKIPPED);
 
 	//only allow button presses while keyboard isn't active
 	CBR(!IsAnimating(), R_SKIPPED);
@@ -1073,6 +1079,19 @@ bool DreamUserControlArea::IsSharingScreen() {
 	return (m_pCurrentScreenShare != nullptr);
 }
 
+bool DreamUserControlArea::IsScrollingTabs(HAND_TYPE handType) {
+
+	if (handType == HAND_TYPE::HAND_LEFT) {
+		return m_fMalletInTabView[0];
+	}
+	else if (handType == HAND_TYPE::HAND_RIGHT) {
+		return m_fMalletInTabView[1];
+	}
+
+	return false;
+	//return (m_fMalletInTabView[0] || m_fMalletInTabView[1]);
+}
+
 RESULT DreamUserControlArea::UpdateIsActive(bool fIsActive) {
 	RESULT r = R_PASS;
 
@@ -1369,6 +1388,77 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::Notify(HMDEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	DreamUserObserver *pEventApp = m_pDreamUserApp->m_pEventApp;
+	CBR(pEventApp == m_pControlView.get() ||
+		pEventApp == m_pDreamUIBar.get() /*||
+		pEventApp == nullptr*/, R_SKIPPED);
+
+	switch (pEvent->m_eventType) {
+
+	// Restore from previous state
+	case HMDEventType::HMD_EVENT_FOCUS: {
+		CNR(m_pDreamUIBar, R_SKIPPED);
+
+		if (m_fPendHMDRecenter) {
+			CR(ResetAppComposite());
+			m_fPendHMDRecenter = false;
+		}
+
+		if (m_fKeyboardUp) {
+			GetDOS()->GetKeyboardApp()->SetVisible(true);
+			GetDOS()->GetKeyboardApp()->ShowBrowserButtons();
+		}
+
+		if (pEventApp == m_pControlView.get()) {
+			GetComposite()->SetVisible(true, false);
+			m_pControlView->GetViewQuad()->SetVisible(true);	// because the quad is in UIScenegraph
+			if (m_fWasTabViewOpen) {
+				m_pDreamTabView->Show();
+				m_fWasTabViewOpen = false;
+			}
+		}
+
+		else if (pEventApp == m_pDreamUIBar.get()) {
+			CR(m_pDreamUIBar->ShowApp());
+		}
+	} break;
+
+	// Hide UI without changing state so we can restore from it
+	case HMDEventType::HMD_EVENT_UNFOCUS: {
+		CNR(m_pDreamUIBar, R_SKIPPED);
+
+		if (m_fKeyboardUp) {
+			GetDOS()->GetKeyboardApp()->SetVisible(false);
+			GetDOS()->GetKeyboardApp()->HideBrowserButtons();
+		}
+
+		if (pEventApp == m_pControlView.get()) {
+			if (m_pDreamTabView->IsVisible()) {
+				m_pDreamTabView->Hide();
+				m_fWasTabViewOpen = true;
+			}
+			GetComposite()->SetVisible(false, false);
+			m_pControlView->GetViewQuad()->SetVisible(false);	
+		}
+
+		else if (pEventApp == m_pDreamUIBar.get()) {
+			CR(m_pDreamUIBar->HideApp());
+		}
+	} break;
+	
+	// Reset UI with seat position
+	case HMDEventType::HMD_EVENT_RESET_VIEW: {
+		m_fPendHMDRecenter = true;
+	} break;
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
 	RESULT r = R_PASS;
 	
@@ -1376,6 +1466,7 @@ RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
 	point ptContact;
 
 	CNR(m_pActiveSource, R_SKIPPED);
+	CBR(GetComposite()->IsVisible(), R_SKIPPED);
 
 	wptContact = GetRelativePointofContact(pUIEvent->m_ptEvent);
 	ptContact = point(wptContact.x, wptContact.y, 0.0f);
@@ -1397,7 +1488,22 @@ RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
 		CR(OnMouseMove(ptContact));
 	} break;
 	case UI_SCROLL: {
-		CR(OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
+
+		bool fScrollingTabView = false;
+
+		auto pHand = dynamic_cast<hand*>(pUIEvent->m_pInteractionObject);
+		CNR(pHand, R_SKIPPED);
+
+		if (m_fMalletInTabView[0] && pHand->GetHandState().handType == HAND_TYPE::HAND_LEFT) {
+			fScrollingTabView = true;
+		}
+		if (m_fMalletInTabView[1] && pHand->GetHandState().handType == HAND_TYPE::HAND_RIGHT) {
+			fScrollingTabView = true;
+		}
+
+		if (!fScrollingTabView) {
+			CR(OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
+		}
 	}
 	};
 

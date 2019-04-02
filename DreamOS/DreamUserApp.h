@@ -120,7 +120,6 @@ public:
 	// Pointing
 public:
 	virtual RESULT Notify(HysteresisEvent *mEvent);
-
 private:
 
 	// Current Hysteresis Event (ON/OFF)
@@ -132,6 +131,9 @@ private:
 
 	point m_ptLeftPointer;
 	point m_ptRightPointer;
+
+	VirtualObj *m_pLeftInteractionObject = nullptr;
+	VirtualObj *m_pRightInteractionObject = nullptr;
 
 	HysteresisObject *m_pPointingArea = nullptr;
 

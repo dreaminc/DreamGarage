@@ -27,6 +27,7 @@ class EnvironmentShare;
 class AudioPacket;
 
 struct InteractionObjectEvent;
+struct HMDEvent;
 
 class UIStageProgram;
 
@@ -46,6 +47,7 @@ class quad;
 class DreamUserControlArea : public DreamApp<DreamUserControlArea>, 
 	public Subscriber<InteractionObjectEvent>,
 	public Subscriber<UIEvent>,
+	public Subscriber<HMDEvent>,
 	public DreamBrowserObserver {
 
 	friend class DreamAppManager;
@@ -190,6 +192,8 @@ public:
 	std::shared_ptr<EnvironmentShare> GetCurrentScreenShare();
 	bool IsSharingScreen();
 
+	bool IsScrollingTabs(HAND_TYPE handType);
+
 	RESULT UpdateIsActive(bool fIsActive);
 	RESULT HandleCameraClosed();
 
@@ -211,6 +215,7 @@ private:
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pSubscriberEvent) override;
+	virtual RESULT Notify(HMDEvent *pEvent) override;
 	virtual RESULT Notify(UIEvent *pUIEvent) override;
 
 // child applications
@@ -277,6 +282,7 @@ private:
 
 	// certainly temporary
 	bool m_fIsAnimating = false;
+	bool m_fMalletInTabView[2] = { false, false };
 
 	std::string m_strDesktopScope = SCOPE_DESKTOP;
 	std::string m_strWebsiteScope = SCOPE_WEBSITE;
@@ -284,6 +290,11 @@ private:
 
 	bool m_fUpdateDreamUIBar = false;
 	bool m_fPendDreamFormSuccess = false;
+	bool m_fPendHMDRecenter = false;
+
+	// Because preventing events to apps can't be done in a universal way i.e. mallets
+	// So need to be able to reload from a saved state. This may be the first of a bit mask for all apps
+	bool m_fWasTabViewOpen = false;
 
 	std::shared_ptr<EnvironmentAsset> m_pPendingEnvironmentAsset = nullptr;
 	std::shared_ptr<EnvironmentAsset> m_pPendingEnvironmentCameraAsset = nullptr;

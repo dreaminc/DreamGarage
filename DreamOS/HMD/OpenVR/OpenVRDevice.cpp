@@ -430,6 +430,18 @@ RESULT OpenVRDevice::HandleVREvent(vr::VREvent_t event) {
 			DEBUG_LINEOUT("Device %u updated.\n", event.trackedDeviceIndex);
 		} break;
 
+		case vr::VREvent_SeatedZeroPoseReset: {
+			NotifySubscribers(HMD_EVENT_TYPE::HMD_EVENT_RESET_VIEW, &HMDEvent(HMD_EVENT_RESET_VIEW, m_deviceType));
+		} break;
+
+		case vr::VREvent_DashboardActivated: {
+			NotifySubscribers(HMD_EVENT_TYPE::HMD_EVENT_UNFOCUS, &HMDEvent(HMD_EVENT_UNFOCUS, m_deviceType));
+		} break;
+
+		case vr::VREvent_DashboardDeactivated: {
+			NotifySubscribers(HMD_EVENT_TYPE::HMD_EVENT_FOCUS, &HMDEvent(HMD_EVENT_FOCUS, m_deviceType));
+		} break;
+
 		// TODO: Lots more events to ultimately map...
 		// TODO: this is probably where button presses should be detected:
 		// vr::VREvent_ButtonPress / vr::VREvent_ButtonUnpress

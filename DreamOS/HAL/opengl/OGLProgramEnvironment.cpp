@@ -4,6 +4,8 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
+#include "OGLFogParamsBlock.h"
+
 OGLProgramEnvironment::OGLProgramEnvironment(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglenvironment", optFlags)
 {
@@ -28,6 +30,7 @@ RESULT OGLProgramEnvironment::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
+	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pFogParamsBlock), std::string("ub_fogParams")));
 
 	//CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT));
 
@@ -148,6 +151,11 @@ RESULT OGLProgramEnvironment::ProcessNode(long frameID) {
 	glEnable(GL_BLEND);
 
 	SetLights(pLights);
+
+	if (m_pFogParamsBlock != nullptr) {
+		m_pFogParamsBlock->SetFogParams(m_fogParams);
+		m_pFogParamsBlock->UpdateOGLUniformBlockBuffers();
+	}
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 

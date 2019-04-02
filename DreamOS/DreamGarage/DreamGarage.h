@@ -27,6 +27,7 @@ class DreamEnvironmentApp;
 class UIStageProgram;
 class UpdateMouthMessage;
 class SkyboxScatterProgram;
+class FogProgram;
 class OGLProgramScreenFade;
 
 #define MAX_PEERS 8
@@ -224,11 +225,15 @@ private:
 	ProgramNode* m_pRefractionProgramNode = nullptr;
 	ProgramNode* m_pReflectionProgramNode = nullptr;
 
+	std::vector<FogProgram*> m_fogProgramNodes;
+	std::vector<ProgramNode*> m_waterProgramNodes;
+
 	// For mirror
 	ProgramNode* m_pRenderEnvironmentProgramNodeMirror = nullptr;
 	ProgramNode* m_pRefractionProgramNodeMirror = nullptr;
 	ProgramNode* m_pReflectionProgramNodeMirror = nullptr;
 
+	quad* m_pWaterQuad = nullptr;
 	DreamEnvironmentApp* m_pDreamEnvironmentApp = nullptr;
 	DreamUserControlArea* m_pDreamUserControlArea = nullptr;
 	DreamUIBar* m_pDreamUIBar = nullptr;
