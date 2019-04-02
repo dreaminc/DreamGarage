@@ -287,7 +287,7 @@ OGLTexture* OGLTexture::MakeTexture(OpenGLImp *pParentImp, texture::type type, i
 		CN(pTexture);
 	}
 	
-	CR(pTexture->SetFormat(PIXEL_FORMAT::RGBA));
+	CR(pTexture->SetFormat(PIXEL_FORMAT::BGRA));
 
 	CR(pTexture->OGLInitialize(NULL));
 	CR(pTexture->SetParams(width, height, channels, samples, levels));
