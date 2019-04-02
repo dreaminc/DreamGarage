@@ -650,17 +650,22 @@ Error:
 RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 6000.0f;
-	int nRepeats = 1;
+	TestObject::TestDescriptor testDescriptor;
+
+	testDescriptor.strTestName = "dreambrowser";
+	testDescriptor.strTestDescription = "Testing of Dream Browser App";
+	testDescriptor.sDuration = 6000.0f;
+	testDescriptor.nRepeats = 1;
 
 	struct TestContext {
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
 		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
 		std::shared_ptr<Dream2DMouseApp> m_pDream2DMouse = nullptr;
 		quad *m_pBrowserQuad = nullptr;
-	} *pTestContext = new TestContext();
+	};
+	testDescriptor.pContext = (void*)(new TestContext());
 
-	auto fnInitialize = [&](void *pContext) {
+	testDescriptor.fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		
 		//std::string strURL = "https://www.youtube.com/watch?v=YqzHvcwJmQY?autoplay=1";
@@ -713,13 +718,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		return R_PASS;
 	};
 
-	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
-		return R_PASS;
-	};
-
 	// Update Code
-	auto fnUpdate = [&](void *pContext) {
+	testDescriptor.fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -732,7 +732,7 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 	};
 
 	// Reset Code
-	auto fnReset = [&](void *pContext) {
+	testDescriptor.fnReset = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		// Will reset the sandbox as needed between tests
@@ -743,12 +743,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		return r;
 	};
 
-	auto pUITest = AddTest("dreambrowser", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest(testDescriptor);
 	CN(pUITest);
-
-	pUITest->SetTestDescription("Testing of Dream Browser App");
-	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;

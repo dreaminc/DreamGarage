@@ -359,7 +359,7 @@ OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::ty
 	CR(pTexture->SetFormat(pixelFormat));
 
 	GLenum glFormat = GetOpenGLPixelFormat(pixelFormat, channels);
-	GLint internalGLFormat = GetOpenGLPixelFormat(pixelFormat, channels);
+	GLint internalGLFormat = GetInternalOpenGLPixelFormat(pixelFormat, 8, channels);
 
 	CR(pTexture->AllocateGLTexture((unsigned char*)(pBuffer), internalGLFormat, glFormat, GL_UNSIGNED_BYTE));
 	
@@ -669,7 +669,7 @@ RESULT OGLTexture::LoadFlippedBufferFromTexture(void *pBuffer, size_t pBuffer_n)
 	else {
 	*/
 		//CR(m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
-	CR(m_pParentImp->GetTextureImage(m_glFlippedTextureIndex, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
+	CR(m_pParentImp->GetTextureImage(m_glFlippedTextureIndex, 0, GetOpenGLPixelFormat(m_pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
 	//}
 
 	CN(pBuffer);
