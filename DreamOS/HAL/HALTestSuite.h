@@ -30,13 +30,15 @@ public:
 	// Note: This should eventually call the DreamGarageApp pipeline
 	// function rather than duplicating it
 	virtual RESULT SetupPipeline(std::string strRenderShaderName = "standard") override;
-
 	virtual RESULT SetupTestSuite() override;
+
+	//virtual RESULT DefaultResetProcess(void *pContext) override;
 
 	// Skybox Test
 	RESULT AddTestSkybox();
 
 	// Shader Tests
+	RESULT AddTestEmptyPipeline();
 	RESULT AddTestFadeShader();
 	RESULT AddTestWaterShader();
 	RESULT AddTestWaterShaderCube();
@@ -50,6 +52,7 @@ public:
 	RESULT AddTestBlinnPhongShaderTextureBumpDisplacement();
 	RESULT AddTestMinimalShader();
 	RESULT AddTestMinimalTextureShader();
+	RESULT AddTestTextureFormats();
 	RESULT AddTestBlinnPhongShaderBlur();
 	RESULT AddTestDepthPeelingShader();
 	RESULT AddTestObjectMaterialsBump();
@@ -99,7 +102,7 @@ public:
 	RESULT AddTest3rdPersonCamera();
 
 private:
-	RESULT ResetTest(void *pContext);
+	virtual RESULT DefaultResetProcess(void *pContext) override;
 
 private:
 	HALImp* GetHALImp() {

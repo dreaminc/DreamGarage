@@ -33,6 +33,7 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	sandboxconfig.fInitSound = true;
 	sandboxconfig.fInitUserApp = false;		// Turn on for testing User app related functionality 
 	sandboxconfig.fInitNamedPipe = true;
+	sandboxconfig.fInitKeyboard = false;
 
 	sandboxconfig.fHMDMirror = true;
 	sandboxconfig.fHideWindow = false;

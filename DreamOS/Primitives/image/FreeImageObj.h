@@ -25,13 +25,18 @@ public:
 	virtual RESULT LoadFromMemory() override;
 	virtual RESULT Release() override;
 
+	virtual RESULT LoadImage() override;
+	virtual PIXEL_FORMAT GetPixelFormat() override;
+
 private:
 	FREE_IMAGE_FORMAT m_fiImageFormat;
 	
 	FIBITMAP* m_pfiBitmap = nullptr;
-	FIBITMAP* m_pfiBitmap32 = nullptr;
+	//FIBITMAP* m_pfiBitmap32 = nullptr;
 
 	int m_fiBitsPerPixel;
+	FREE_IMAGE_COLOR_TYPE m_fiColorType;
+	BITMAPINFO m_fiHeaderInfo;
 
 private:
 	static bool m_fFreeImageInitialized;

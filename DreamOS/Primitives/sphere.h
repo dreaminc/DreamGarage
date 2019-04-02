@@ -10,6 +10,8 @@
 
 #include "DimObj.h"
 
+#include "PrimParams.h"
+
 #include "Vertex.h"
 #include "point.h"
 #include "color.h"
@@ -18,11 +20,26 @@
 #define MIN_SPHERE_DIVISIONS 3
 
 class sphere : public virtual DimObj {
-public:
-	int m_numAngularDivisions;
-	int m_numVerticalDivisions;
 
 public:
+	struct params : 
+		public PrimParams 
+	{
+		virtual PRIMITIVE_TYPE GetPrimitiveType() override { return PRIMITIVE_TYPE::SPHERE; }
+
+		params(float radius, int numAngularDivisions, int numVerticalDivisions) :
+			radius(radius),
+			numAngularDivisions(numAngularDivisions),
+			numVerticalDivisions(numVerticalDivisions)
+		{ }
+
+		int numAngularDivisions = MIN_SPHERE_DIVISIONS;
+		int numVerticalDivisions = MIN_SPHERE_DIVISIONS;
+		float radius = 1.0f;
+	};
+
+public:
+	sphere(sphere::params *pSphereParams, color c = color(COLOR_WHITE));
 	sphere(float radius = 1.0f, int numAngularDivisions = MIN_SPHERE_DIVISIONS, int numVerticalDivisions = MIN_SPHERE_DIVISIONS, color c = color(COLOR_WHITE));
 	sphere(BoundingSphere *pBoundingSphere, bool fTriangleBased = true);
 
@@ -36,8 +53,8 @@ public:
 
 	RESULT UpdateFromBoundingSphere(BoundingSphere* pBoundingSphere, bool fTriangleBased = true);
 
-private:
-	float m_radius;
+protected:
+	sphere::params m_params;
 };
 
 #endif // !SPHERE_H_

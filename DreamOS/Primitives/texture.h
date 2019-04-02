@@ -155,7 +155,7 @@ public:
 	uint8_t *GetImageBuffer();
 
 protected:
-	PIXEL_FORMAT m_pixelFormat = PIXEL_FORMAT::Unspecified;
+	PIXEL_FORMAT m_pixelFormat = PIXEL_FORMAT::INVALID;
 	texture::type m_type = texture::type::INVALID;
 
 	int m_width = 0;
@@ -163,6 +163,7 @@ protected:
 	int m_channels = 0;
 	int m_samples = 0;
 	int m_levels = 0;
+	int m_bitsPerPixel = 8;
 
 	flags m_flags = texture::flags::NONE;
 

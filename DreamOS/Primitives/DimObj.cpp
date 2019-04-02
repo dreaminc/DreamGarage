@@ -978,23 +978,6 @@ RESULT DimObj::RotateVerticesByEulerVector(vector vEuler) {
 	return r;
 }
 
-RESULT DimObj::Notify(TimeEvent *event) {
-	quaternion_precision factor = 0.05f;
-	quaternion_precision filter = 0.1f;
-
-	static quaternion_precision x = 1.0f;
-	static quaternion_precision y = 1.0f;
-	static quaternion_precision z = 1.0f;
-
-	//x = ((1.0f - filter) * x) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-	//y = ((1.0f - filter) * y) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-	//z = ((1.0f - filter) * z) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-
-	RotateBy(x * factor, y * factor, z * factor);
-
-	return R_PASS;
-}
-
 // TODO: This shouldn't be baked in here ultimately
 material* DimObj::GetMaterial() {
 	return (&m_material);

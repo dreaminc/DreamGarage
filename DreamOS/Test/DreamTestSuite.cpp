@@ -34,6 +34,42 @@ Error:
 	return r;
 }
 
+RESULT DreamTestSuite::DefaultInitializeProcess(void *pContext) {
+	RESULT r = R_PASS;
+
+	// Do something for all tests that don't define this function
+
+Error:
+	return r;
+}
+
+RESULT DreamTestSuite::DefaultUpdateProcess(void *pContext) {
+	RESULT r = R_PASS;
+
+	// Do something for all tests that don't define this function
+
+Error:
+	return r;
+}
+
+RESULT DreamTestSuite::DefaultEvaluateProcess(void *pContext) {
+	RESULT r = R_PASS;
+
+	// Do something for all tests that don't define this function
+
+Error:
+	return r;
+}
+
+RESULT DreamTestSuite::DefaultResetProcess(void *pContext) {
+	RESULT r = R_PASS;
+
+	CRM(ResetTest(pContext), "Failed to reset test");
+
+Error:
+	return r;
+}
+
 RESULT DreamTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	RESULT r = R_PASS;
 

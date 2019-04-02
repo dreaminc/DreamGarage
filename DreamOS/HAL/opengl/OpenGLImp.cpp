@@ -321,6 +321,55 @@ Error:
 }
 */
 
+// This allows for separate HAL initialization of objects
+// Note, this will clobber the dim object on failure
+RESULT OpenGLImp::InitializeObject(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+	CN(pOGLObj);
+
+	CR(pOGLObj->OGLInitialize());
+
+Success:
+	return r;
+
+Error:
+	if (pDimObj != nullptr) {
+		delete pDimObj;
+		pDimObj = nullptr;
+	}
+
+	return r;
+}
+
+DimObj* OpenGLImp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+	OGLObj *pOGLObj = nullptr;
+
+	switch (pPrimParams->GetPrimitiveType()) {
+		case PRIMITIVE_TYPE::SPHERE: {
+			pOGLObj = MakeSphere(pPrimParams, fInitialize);
+			CN(pOGLObj);
+		} break;
+
+		case PRIMITIVE_TYPE::VOLUME: {
+			pOGLObj = MakeVolume(pPrimParams, fInitialize);
+			CN(pOGLObj);
+		} break;
+	}
+
+Success:
+	return pOGLObj;
+
+Error:
+	if (pOGLObj != nullptr) {
+		delete pOGLObj;
+		pOGLObj = nullptr;
+	}
+
+	return nullptr;
+}
 
 mesh *OpenGLImp::MakeMesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
@@ -589,7 +638,7 @@ DimPlane* OpenGLImp::MakePlane(point ptOrigin, vector vNormal) {
 	DimPlane *pPlane = new OGLPlane(this, ptOrigin, vNormal);
 	CN(pPlane);
 
-	//Success:
+Success:
 	return pPlane;
 
 Error:
@@ -600,20 +649,50 @@ Error:
 	return nullptr;
 }
 
+OGLSphere* OpenGLImp::MakeSphere(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLSphere *pOGLSphere = nullptr;
+
+	sphere::params *pSphereParams = dynamic_cast<sphere::params*>(pPrimParams);
+	CN(pSphereParams);
+
+	pOGLSphere = new OGLSphere(this, pSphereParams);
+	CN(pOGLSphere);
+
+	if (fInitialize) {
+		CR(pOGLSphere->OGLInitialize());
+	}
+
+Success:
+	return pOGLSphere;
+
+Error:
+	if (pOGLSphere != nullptr) {
+		delete pOGLSphere;
+		pOGLSphere = nullptr;
+	}
+
+	return nullptr;
+}
+
 sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 10, int numVerticalDivisions = 10, color c = color(COLOR_WHITE)) {
 	RESULT r = R_PASS;
 
-	sphere *pSphere = new OGLSphere(this, radius, numAngularDivisions, numVerticalDivisions, c);
-	CN(pSphere);
+	OGLSphere *pOGLSphere = new OGLSphere(this, radius, numAngularDivisions, numVerticalDivisions, c);
+	CN(pOGLSphere);
 
-//Success:
-	return pSphere;
+	CR(pOGLSphere->OGLInitialize());
+
+Success:
+	return pOGLSphere;
 
 Error:
-	if (pSphere != nullptr) {
-		delete pSphere;
-		pSphere = nullptr;
+	if (pOGLSphere != nullptr) {
+		delete pOGLSphere;
+		pOGLSphere = nullptr;
 	}
+
 	return nullptr;
 }
 
@@ -674,18 +753,48 @@ Error:
 volume* OpenGLImp::MakeVolume(double width, double length, double height, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = new OGLVolume(this, width, length, height, fTriangleBased);
-	CN(pVolume);
+	OGLVolume *pOGLVolume = new OGLVolume(this, width, length, height, fTriangleBased);
+	CN(pOGLVolume);
 
-//Success:
-	return pVolume;
+	CR(pOGLVolume->OGLInitialize());
+
+Success:
+	return pOGLVolume;
 
 Error:
-	if (pVolume != nullptr) {
-		delete pVolume;
-		pVolume = nullptr;
+	if (pOGLVolume != nullptr) {
+		delete pOGLVolume;
+		pOGLVolume = nullptr;
 	}
 	return nullptr;
+}
+
+OGLVolume* OpenGLImp::MakeVolume(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLVolume *pOGLVolume = nullptr;
+
+	volume::params *pVolumeParams = dynamic_cast<volume::params*>(pPrimParams);
+	CN(pVolumeParams);
+
+	pOGLVolume = new OGLVolume(this, pVolumeParams);
+	CN(pOGLVolume);
+
+	if (fInitialize) {
+		CR(pOGLVolume->OGLInitialize());
+	}
+
+Success:
+	return pOGLVolume;
+
+Error:
+	if (pOGLVolume != nullptr) {
+		delete pOGLVolume;
+		pOGLVolume = nullptr;
+	}
+
+	return nullptr;
+	
 }
 
 volume* OpenGLImp::MakeVolume(double side, bool fTriangleBased) {

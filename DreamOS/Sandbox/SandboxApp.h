@@ -14,6 +14,7 @@
 
 #include "HAL/HALImp.h"
 
+#include "Modules/TimeManagerModule.h"
 #include "Sandbox/PathManager.h"
 #include "Sandbox/CredentialManager.h"
 #include "Sandbox/CommandLineManager.h"
@@ -89,6 +90,7 @@ public:
 		unsigned fHideWindow : 1;
 		unsigned fInitUserApp : 1;
 		unsigned fInitNamedPipe : 1;
+		unsigned fInitKeyboard : 1;
 		HMD_TYPE hmdType = HMD_ANY_AVAILABLE;
 	};
 
@@ -129,7 +131,7 @@ public:
 private:
 	RESULT InitializePhysicsEngine();
 	RESULT InitializeInteractionEngine();
-	RESULT InitializeTimeManager();
+	RESULT InitializeTimeManagerModule();
 	RESULT InitializeDreamAppManager();
 	RESULT InitializeDreamModuleManager();
 	RESULT InitializeCamera();
@@ -251,6 +253,11 @@ public:
 	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal);
 	quad *MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 
+	RESULT InitializeObject(DimObj *pDimObj);
+	DimObj *MakeObject(PrimParams *pPrimParams, bool fInitialize = true);
+
+	// TODO: Remove all of these (going with factory solution)
+	// Do this after async objects are in and work with models
 	template<typename objType, typename... Targs>
 	objType *TAddObject(Targs... Fargs) {
 		RESULT r = R_PASS;
@@ -475,10 +482,6 @@ protected:
 	ObjectStoreNode *m_pAuxUISceneGraph = nullptr;
 	ObjectStoreNode *m_pBillboardSceneGraph = nullptr;
 
-	CloudController *m_pCloudController = nullptr;
-	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine = nullptr;
-	std::unique_ptr<InteractionEngine> m_pInteractionEngine = nullptr;
-
 	// TODO: Generalize to hands controller or something like that (should cover all of the various sensors)
 	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion = nullptr;
 	SenseKeyboard *m_pSenseKeyboard = nullptr;
@@ -488,10 +491,17 @@ protected:
 
 	// TODO: Create a "manager manager" or a more generalized way to add these
 	// All "managers" should be unique pointers 
-	std::unique_ptr<TimeManager> m_pTimeManager = nullptr;
 	std::unique_ptr<DreamAppManager> m_pDreamAppManager = nullptr;
 	std::unique_ptr<DreamModuleManager> m_pDreamModuleManager = nullptr;
 	std::unique_ptr<CredentialManager> m_pCredentialManager = nullptr;
+
+	// Sandbox (Core System) Modules
+	std::shared_ptr<TimeManagerModule> m_pTimeManagerModule = nullptr;
+
+	// TODO: These should be converted to module
+	CloudController *m_pCloudController = nullptr;
+	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine = nullptr;
+	std::unique_ptr<InteractionEngine> m_pInteractionEngine = nullptr;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;

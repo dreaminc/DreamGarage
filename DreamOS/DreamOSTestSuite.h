@@ -23,7 +23,7 @@ class DreamOSTestSuite :
 {
 public:
 	DreamOSTestSuite(DreamOS *pDreamOS);
-	~DreamOSTestSuite();
+	~DreamOSTestSuite() = default;
 
 	virtual RESULT AddTests() override;
 
@@ -31,7 +31,7 @@ public:
 	//RESULT SetupDreamAppPipeline();
 
 	virtual RESULT SetupPipeline(std::string strRenderProgramName = "standard") override;
-	virtual RESULT SetupTestSuite();
+	virtual RESULT SetupTestSuite() override;
 
 public:
 
@@ -56,6 +56,7 @@ public:
 	RESULT AddTestModuleManager();
 	RESULT AddTestDreamVCam();
 	RESULT AddTestDreamSoundSystem();
+	RESULT AddTestDreamObjectModule();
 
 	// Apps
 	RESULT AddTestUIKeyboard();
@@ -69,11 +70,7 @@ public:
 	RESULT AddTestDreamShareView();
 	RESULT AddTestBasicBrowserCast();
 
-	RESULT AddTestCredentialStorage();
-
-private:
-	
-	
+	RESULT AddTestCredentialStorage();	
 
 	// Used for creating a clickable quad in tests
 public:
@@ -81,8 +78,7 @@ public:
 	WebBrowserPoint GetRelativeBrowserPointFromContact(point ptIntersectionContact);
 
 private:
-	DreamOS *m_pDreamOS = nullptr;
-	UIStageProgram *m_pUIProgramNode;
+	UIStageProgram *m_pUIProgramNode = nullptr;
 
 //browser testing
 private:

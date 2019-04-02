@@ -1,5 +1,7 @@
 #include "DreamOS.h"
 
+#include "Primitives/PrimParams.h"
+
 //#include "DreamLogger/DreamLogger.h"
 #include "DreamAppManager.h"
 
@@ -145,17 +147,25 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	}
 	//*/
 
+	// Sandbox Modules and Apps
+
 	// Audio System
 	if (m_pSandbox->m_SandboxConfiguration.fInitSound) {
 		CRM(InitializeDreamSoundSystem(), "Failed to initialize the Dream Sound System");
 		CRM(RegisterSoundSystemObserver(this), "Failed to register this as sound system observer");
 	}
 
+	// Object Loader Module
+	CRM(InitializeDreamObjectModule(), "Failed to initialize the Dream Object Module");
+
+	// Dream User App
 	if (m_pSandbox->m_SandboxConfiguration.fInitUserApp) {
 		CRM(InitializeDreamUserApp(), "Failed to initalize user app");
 	}
 
-	CR(InitializeKeyboard());
+	if (m_pSandbox->m_SandboxConfiguration.fInitKeyboard) {
+		CR(InitializeKeyboard());
+	}
 
 	CRM(DidFinishLoading(), "Failed to run DidFinishLoading");
 
@@ -669,6 +679,52 @@ hand *DreamOS::GetHand(HAND_TYPE handType) {
 	return m_pSandbox->GetHand(handType);
 }
 
+DimObj *DreamOS::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
+	return m_pSandbox->MakeObject(pPrimParams, fInitialize);
+}
+
+RESULT DreamOS::InitializeObject(DimObj *pDimObj) {
+	return m_pSandbox->InitializeObject(pDimObj);
+}
+
+// TODO: 
+RESULT DreamOS::MakeModel(const std::wstring& wstrModelFilename, std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, ModelFactory::flags modelFactoryFlags) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::MakeSphere(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	sphere::params *pSphereParams = new sphere::params(radius, numAngularDivisions, numVerticalDivisions);
+	CN(pSphereParams);
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pSphereParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::MakeVolume(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, double width, double length, double height, bool fTriangleBased) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	volume::params *pVolumeParams = new volume::params(volume::VOLUME_TYPE::RECTANGULAR_CUBOID, width, length, height, fTriangleBased);
+	CN(pVolumeParams);
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pVolumeParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
+
+Error:
+	return r;
+}
+
 ProgramNode* DreamOS::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
 	RESULT r = R_PASS;
 
@@ -888,6 +944,18 @@ RESULT DreamOS::InitializeCloudController() {
 	RESULT r = R_PASS;
 
 	CR(m_pSandbox->InitializeCloudController());
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::InitializeDreamObjectModule() {
+	RESULT r = R_PASS;
+
+	DOSLOG(INFO, "Initializing Dream Object Module");
+
+	m_pDreamObjectModule = LaunchDreamModule<DreamObjectModule>(this);
+	CNM(m_pDreamObjectModule, "Failed to launch Dream Object Module");
 
 Error:
 	return r;

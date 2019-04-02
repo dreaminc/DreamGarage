@@ -50,7 +50,9 @@
 
 //#include "DreamLogger/DreamLogger.h"
 
+// Dream Modules
 #include "DreamGarage/DreamSoundSystem.h"
+#include "Modules/DreamObjectModule.h"
 
 #include "Primitives/model/ModelFactory.h"
 
@@ -69,6 +71,8 @@ class NamedPipeServer;
 class PeerStayAliveMessage;
 class PeerAckMessage;
 class PeerHandshakeMessage;
+
+struct PrimParams;
 
 #include "DreamVideoStreamSubscriber.h"
 
@@ -529,6 +533,14 @@ public:
 	// Hands
 	hand *GetHand(HAND_TYPE handType);
 
+	// Async Object 
+	DimObj *MakeObject(PrimParams *pPrimParams, bool fInitialize = true);
+	RESULT InitializeObject(DimObj *pDimObj);
+
+	RESULT MakeModel(const std::wstring& wstrModelFilename, std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext = nullptr, ModelFactory::flags modelFactoryFlags = ModelFactory::flags::NONE);
+	RESULT MakeSphere(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext = nullptr, float radius = 1.0f, int numAngularDivisions = 10, int numVerticalDivisions = 10, color c = color(COLOR_WHITE));
+	RESULT MakeVolume(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext = nullptr, double width = 1.0f, double length = 1.0f, double height = 1.0f, bool fTriangleBased = true);
+
 	// Shaders / Programs
 	ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
@@ -567,6 +579,9 @@ protected:
 	RESULT InitializeDreamSoundSystem();
 	RESULT RegisterSoundSystemObserver(DreamSoundSystem::observer *pObserver);
 	RESULT UnregisterSoundSystemObserver();
+
+	// Object Module
+	RESULT InitializeDreamObjectModule();
 
 	// DreamSoundSystem::observer
 	virtual RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) override;
@@ -655,6 +670,7 @@ protected:
 	// Modules
 protected:
 	std::shared_ptr<DreamSoundSystem> m_pDreamSoundSystem = nullptr;
+	std::shared_ptr<DreamObjectModule> m_pDreamObjectModule = nullptr;
 
 public:
 	std::shared_ptr<UIKeyboard> GetKeyboardApp();

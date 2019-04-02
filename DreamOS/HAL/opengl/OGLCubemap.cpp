@@ -78,18 +78,9 @@ Error:
 RESULT OGLCubemap::AllocateGLCubemap() {
 	RESULT r = R_PASS;
 
-	//CN(m_pImageBuffer);
-
-	//GLenum glFormat = GetOpenGLPixelFormat(m_pixelFormat, m_channels);
-	GLenum glFormat = GL_BGRA;
-
-	GLint internalGLFormat = GetOpenGLPixelFormat(PIXEL_FORMAT::Unspecified, m_channels);	
-	//GLint internalGLFormat = GL_RGB;
-
-	//CR(AllocateGLTexture(pImageBuffer, internalGLFormat, glFormat, GL_UNSIGNED_BYTE));
-
-	m_glInternalFormat = internalGLFormat;
-	m_glFormat = glFormat;
+	// TODO: Fix image format shit for cube maps
+	m_glInternalFormat = GetOpenGLPixelFormat(m_pixelFormat, m_channels);
+	m_glFormat = GL_BGRA;
 	m_glPixelDataType = GL_UNSIGNED_BYTE;
 
 	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {

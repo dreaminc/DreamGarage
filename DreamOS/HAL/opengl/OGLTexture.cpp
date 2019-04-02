@@ -83,12 +83,19 @@ RESULT OGLTexture::AllocateGLTexture(unsigned char *pImageBuffer, GLint internal
 	
 	CR(Bind());
 
-	// TODO: Pull deeper settings from texture object
-	CR(m_pParentImp->TexImage2D(m_glTextureTarget, 0, internalGLFormat, m_width, m_height, 0, glFormat, pixelDataType, pImageBuffer));
-
 	m_glInternalFormat = internalGLFormat;
 	m_glFormat = glFormat;
 	m_glPixelDataType = pixelDataType;
+
+	CR(m_pParentImp->TexImage2D(m_glTextureTarget,		// Texture Target
+								0,						// Level
+								m_glInternalFormat,		// Internal format
+								m_width,				// width
+								m_height,				// height
+								0,						// border 
+								m_glFormat,				// format
+								m_glPixelDataType,		// pixel data type
+								pImageBuffer));			// buffer data
 
 Error:
 	return r;
@@ -97,10 +104,8 @@ Error:
 RESULT OGLTexture::AllocateGLTexture(size_t optOffset) {
 	RESULT r = R_PASS;
 
-	GLenum glFormat = GetOGLPixelFormat();
-
-	//GLint internalGLFormat = static_cast<GLint>(glFormat);
-	GLint internalGLFormat = GetOpenGLPixelFormat(PIXEL_FORMAT::Unspecified, m_channels);
+	GLenum glFormat = GetOpenGLPixelFormat(m_pixelFormat, m_channels);
+	GLint internalGLFormat = GetInternalOpenGLPixelFormat(m_pixelFormat, m_bitsPerPixel, m_channels);
 
 	unsigned char *pImageBuffer = nullptr;
 
@@ -108,7 +113,7 @@ RESULT OGLTexture::AllocateGLTexture(size_t optOffset) {
 		pImageBuffer = m_pImage->GetImageBuffer() + (optOffset);
 	}
 
-	CR(AllocateGLTexture(pImageBuffer, GL_RGBA8, glFormat, GL_UNSIGNED_BYTE));
+	CR(AllocateGLTexture(pImageBuffer, internalGLFormat, glFormat, GL_UNSIGNED_BYTE));
 
 Error:
 	return r;
@@ -281,6 +286,8 @@ OGLTexture* OGLTexture::MakeTexture(OpenGLImp *pParentImp, texture::type type, i
 		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
 		CN(pTexture);
 	}
+	
+	CR(pTexture->SetFormat(PIXEL_FORMAT::BGRA));
 
 	CR(pTexture->OGLInitialize(NULL));
 	CR(pTexture->SetParams(width, height, channels, samples, levels));
@@ -351,13 +358,10 @@ OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::ty
 	CR(pTexture->SetParams(width, height, channels));
 	CR(pTexture->SetFormat(pixelFormat));
 
-	GLenum glFormat = pTexture->GetOGLPixelFormat();
-	GLint internalGLFormat = GetOpenGLPixelFormat(PIXEL_FORMAT::Unspecified, channels);
+	GLenum glFormat = GetOpenGLPixelFormat(pixelFormat, channels);
+	GLint internalGLFormat = GetInternalOpenGLPixelFormat(pixelFormat, 8, channels);
 
-	//CR(pTexture->CopyTextureImageBuffer(width, height, channels, pBuffer, (int)(pBuffer_n)));
-	//CR(pTexture->AllocateGLTexture());
 	CR(pTexture->AllocateGLTexture((unsigned char*)(pBuffer), internalGLFormat, glFormat, GL_UNSIGNED_BYTE));
-
 	
 	CR(pTexture->SetDefaultTextureParams());
 
@@ -664,7 +668,7 @@ RESULT OGLTexture::LoadFlippedBufferFromTexture(void *pBuffer, size_t pBuffer_n)
 	else {
 	*/
 		//CR(m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
-	CR(m_pParentImp->GetTextureImage(m_glFlippedTextureIndex, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
+	CR(m_pParentImp->GetTextureImage(m_glFlippedTextureIndex, 0, GetOpenGLPixelFormat(m_pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
 	//}
 
 	CN(pBuffer);
@@ -784,10 +788,6 @@ RESULT OGLTexture::Update(unsigned char* pBuffer, int width, int height, PIXEL_F
 
 Error:
 	return r;
-}
-
-GLenum OGLTexture::GetOGLPixelFormat() {
-	return GetOpenGLPixelFormat(m_pixelFormat, m_channels);
 }
 
 RESULT OGLTexture::EnableOGLPBOUnpack() {

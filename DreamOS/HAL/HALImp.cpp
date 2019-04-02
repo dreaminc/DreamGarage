@@ -158,12 +158,17 @@ Error:
 RESULT HALImp::Render() {
 	RESULT r = R_PASS;
 
+	MakeCurrentContext();
+
 	// Pipeline stuff
 	m_pRenderPipeline->RunPipeline();
 
 	FlushHALBuffers();
 
-//Error:
+	// NOTE: This is breaking NSight and Fraps
+	//ReleaseCurrentContext();
+
+Error:
 	return r;
 }
 

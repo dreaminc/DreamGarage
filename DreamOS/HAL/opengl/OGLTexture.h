@@ -69,7 +69,6 @@ public:
 	virtual RESULT LoadFlippedBufferFromTexture(void *pBuffer, size_t pBuffer_n) override;
 
 private:
-	GLenum GetOGLPixelFormat();
 	RESULT CopyTextureBufferFromTexture(OGLTexture *pTexture);
 	size_t GetTextureByteSize();
 
@@ -93,9 +92,9 @@ private:
 
 	// Note: this will work as long as the client is the one to allocate the texture
 	// if not these values may be incorrect 
-	GLint m_glInternalFormat; 
-	GLenum m_glFormat;
-	GLenum m_glPixelDataType;
+	GLint m_glInternalFormat = GL_BGRA; 
+	GLenum m_glFormat = GL_BGRA;
+	GLenum m_glPixelDataType = GL_UNSIGNED_BYTE;
 
 public:
 	RESULT EnableOGLPBOUnpack();

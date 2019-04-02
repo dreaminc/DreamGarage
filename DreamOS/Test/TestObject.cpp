@@ -1,87 +1,40 @@
 #include "TestObject.h"
 
-TestObject::TestObject(const TestObject::Functions &fnStruct, void *pContext) :
-	m_fnInitialize(fnStruct.fnInitialize),
-	m_fnUpdate(fnStruct.fnUpdate),
-	m_fnTest(fnStruct.fnTest),
-	m_fnReset(fnStruct.fnReset),
-	m_pContext(pContext)
+#include "TestSuite.h"
+
+TestObject::TestObject(const TestObject::TestDescriptor &testDescriptor) :
+	m_fnInitialize(testDescriptor.fnInitialize),
+	m_fnUpdate(testDescriptor.fnUpdate),
+	m_fnTest(testDescriptor.fnTest),
+	m_fnReset(testDescriptor.fnReset),
+	m_strTestName(testDescriptor.strTestName),
+	m_strDescription(testDescriptor.strTestDescription),
+	m_nRepeats(testDescriptor.nRepeats),
+	m_sDuration(testDescriptor.sDuration),
+	m_pContext(testDescriptor.pContext)
 {
-	if (fnStruct.fnTestNoContext != nullptr) {
+	if (testDescriptor.fnTestNoContext != nullptr) {
 		// Wrap it up
 		m_fnTest = [=](void *pContext) {
-			return fnStruct.fnTestNoContext();
+			return testDescriptor.fnTestNoContext();
 		};
 	}
 }
 
-// The rest of these can be removed 
-/*
-TestObject::TestObject(std::function<RESULT()> fnTestFunction, void *pContext) :
-	m_fnInitialize(nullptr),
-	m_fnUpdate(nullptr),
-	m_fnTest(nullptr),
-	m_fnReset(nullptr),
-	m_pContext(pContext)
-{
-	// Wrap it up
-	m_fnTest = [=](void *pContext) {
-		return fnTestFunction();
-	};
-}
-
-TestObject::TestObject(std::function<RESULT(void*)> fnTest, void *pContext) :
-	m_fnInitialize(nullptr),
-	m_fnUpdate(nullptr),
-	m_fnTest(fnTest),
-	m_fnReset(nullptr),
-	m_pContext(pContext)
-{
-	// empty
-}
-
-TestObject::TestObject(std::function<RESULT(void*)> fnInitialize, 
-					   std::function<RESULT(void*)> fnTest, 
-					   void *pContext) :
-	m_fnInitialize(fnInitialize),
-	m_fnUpdate(nullptr),
-	m_fnTest(fnTest),
-	m_fnReset(nullptr),
-	m_pContext(pContext)
-{
-	// empty
-}
-
-TestObject::TestObject(std::function<RESULT(void*)> fnInitialize,
-					   std::function<RESULT(void*)> fnUpdate,
-					   std::function<RESULT(void*)> fnTest,
-					   void *pContext) :
-	m_fnInitialize(fnInitialize),
-	m_fnUpdate(fnUpdate),
-	m_fnTest(fnTest),
-	m_fnReset(nullptr),
-	m_pContext(pContext)
-{
-	// empty
-}
-
-TestObject::TestObject(std::function<RESULT(void*)> fnInitialize,
-					   std::function<RESULT(void*)> fnUpdate,
-					   std::function<RESULT(void*)> fnTest,
-					   std::function<RESULT(void*)> fnReset,
-					   void *pContext) :
-	m_fnInitialize(fnInitialize),
-	m_fnUpdate(fnUpdate),
-	m_fnTest(fnTest),
-	m_fnReset(fnReset),
-	m_pContext(pContext)
-{
-	// empty
-}
-*/
-
 TestObject::~TestObject() {
 	/* stub */
+}
+
+RESULT TestObject::SetParentTestSuite(TestSuite *pParentTestSuite) {
+	RESULT r = R_PASS;
+
+	CNM(pParentTestSuite, "Cannot set nullptr parent test suite");
+	CBM((m_pParentTestSuite == nullptr), "Parent TestSuite already set");
+
+	m_pParentTestSuite = pParentTestSuite;
+
+Error:
+	return r;
 }
 
 RESULT TestObject::RunTest(void* pContext) {
@@ -95,10 +48,18 @@ RESULT TestObject::RunTest(void* pContext) {
 	// Allow for override 
 	m_timeStartRunTest = std::chrono::high_resolution_clock::now();
 	{
-		if (m_pContext != nullptr)
-			m_testResult = m_fnTest(m_pContext);
-		else
-			m_testResult = m_fnTest(pContext);
+		if (m_fnTest != nullptr) {
+			if (m_pContext != nullptr)
+				m_testResult = m_fnTest(m_pContext);
+			else
+				m_testResult = m_fnTest(pContext);
+		}
+		else {
+			if (m_pContext != nullptr)
+				m_testResult = m_pParentTestSuite->DefaultEvaluateProcess(m_pContext);
+			else
+				m_testResult = m_pParentTestSuite->DefaultEvaluateProcess(pContext);
+		}
 	}
 	m_timeDurationRunTest = std::chrono::high_resolution_clock::now() - m_timeStartRunTest;
 
@@ -122,10 +83,18 @@ RESULT TestObject::InitializeTest(void* pContext) {
 	// Allow for override 
 	m_timeStartInitialize = std::chrono::high_resolution_clock::now();
 	{
-		if (m_pContext != nullptr)
-			m_initializeResult = m_fnInitialize(m_pContext);
-		else
-			m_initializeResult = m_fnInitialize(pContext);
+		if (m_fnInitialize != nullptr) {
+			if (m_pContext != nullptr)
+				m_initializeResult = m_fnInitialize(m_pContext);
+			else
+				m_initializeResult = m_fnInitialize(pContext);
+		}
+		else {
+			if (m_pContext != nullptr)
+				m_initializeResult = m_pParentTestSuite->DefaultInitializeProcess(m_pContext);
+			else
+				m_initializeResult = m_pParentTestSuite->DefaultInitializeProcess(pContext);
+		}
 	}
 	m_timeDurationInitialize = std::chrono::high_resolution_clock::now() - m_timeStartInitialize;
 
@@ -147,15 +116,17 @@ RESULT TestObject::UpdateTest(void* pContext) {
 
 	m_timeStartUpdate = std::chrono::high_resolution_clock::now();
 	
-	if(m_fnUpdate != nullptr) {
-		// Allow for override 
+	if (m_fnUpdate != nullptr) {
 		if (m_pContext != nullptr)
 			m_updateResult = m_fnUpdate(m_pContext);
 		else
 			m_updateResult = m_fnUpdate(pContext);
 	}
 	else {
-		m_updateResult = R_SKIPPED;
+		if (m_pContext != nullptr)
+			m_updateResult = m_pParentTestSuite->DefaultUpdateProcess(m_pContext);
+		else
+			m_updateResult = m_pParentTestSuite->DefaultUpdateProcess(pContext);
 	}
 
 	m_timeDurationUpdate = std::chrono::high_resolution_clock::now() - m_timeStartUpdate;
@@ -175,21 +146,25 @@ Error:
 RESULT TestObject::StartTest() {
 	m_testState = TestObject::state::RUNNING;
 	m_timeStartTest = std::chrono::high_resolution_clock::now();
+
 	return R_PASS;
 }
 
 RESULT TestObject::ContinueTest() {
 	m_testState = TestObject::state::RUNNING;
+
 	return R_PASS;
 }
 
 RESULT TestObject::CompleteTest() {
 	m_testState = TestObject::state::DONE;
+
 	return R_PASS;
 }
 
 RESULT TestObject::StopTest() {
 	m_testState = TestObject::state::STOPPED;
+
 	return R_PASS;
 }
 
@@ -210,11 +185,18 @@ RESULT TestObject::ResetTest(void *pContext) {
 
 	CNR(m_fnReset, R_SKIPPED);
 
-	// Allow for override 
-	if (pContext == nullptr)
-		m_resetResult = m_fnReset(m_pContext);
-	else
-		m_resetResult = m_fnReset(pContext);
+	if (m_fnReset != nullptr) {
+		if (pContext == nullptr)
+			m_resetResult = m_fnReset(m_pContext);
+		else
+			m_resetResult = m_fnReset(pContext);
+	}
+	else {
+		if (pContext == nullptr)
+			m_resetResult = m_pParentTestSuite->DefaultResetProcess(m_pContext);
+		else
+			m_resetResult = m_pParentTestSuite->DefaultResetProcess(pContext);
+	}
 	
 	CRM(m_resetResult, "Test Reset Failed");
 

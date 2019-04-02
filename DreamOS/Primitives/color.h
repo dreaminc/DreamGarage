@@ -31,7 +31,7 @@ enum COLOR_TYPE {
 };
 
 enum class PIXEL_FORMAT {
-	Unspecified, // this will generate an RGB/RGBA based on the number of channels
+	GREYSCALE,
 	RGB,
 	RGBA,
 	BGR,

@@ -223,10 +223,6 @@ RESULT texture::LoadTextureFromFile(const wchar_t *pszFilename) {
 	else if (pPathManager->IsAbsolutePath(const_cast<wchar_t*>(pszFilename))) {
 		CR(LoadTextureFromPath(const_cast<wchar_t*>(pszFilename)));
 		CN(m_pImage);
-
-		// FreeImage uses a BGR[A] pixel layout under a Little Endian processor (Windows, Linux) 
-		// and uses a RGB[A] pixel layout under a Big Endian processor (Mac OS X or any Big Endian Linux / Unix)
-		m_pixelFormat = PIXEL_FORMAT::BGRA;	// TODO: move this into image
 	}
 	else {
 		CR(GetTextureFilePath(pszFilename, pszFilePath));
@@ -234,11 +230,9 @@ RESULT texture::LoadTextureFromFile(const wchar_t *pszFilename) {
 
 		CR(LoadTextureFromPath(pszFilePath));
 		CN(m_pImage);
-
-		// FreeImage uses a BGR[A] pixel layout under a Little Endian processor (Windows, Linux) 
-		// and uses a RGB[A] pixel layout under a Big Endian processor (Mac OS X or any Big Endian Linux / Unix)
-		m_pixelFormat = PIXEL_FORMAT::BGRA;	// TODO: move this into image
 	}
+
+	m_pixelFormat = m_pImage->GetPixelFormat();
 
 	// Update sizing
 	m_width = m_pImage->GetWidth();

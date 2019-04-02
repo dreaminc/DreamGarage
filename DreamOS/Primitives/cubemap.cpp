@@ -35,7 +35,7 @@ RESULT cubemap::GetCubeMapFiles(const wchar_t *pszName, std::vector<std::wstring
 	PathManager *pPathManager = PathManager::instance();
 	std::vector<std::wstring> vstrPathFiles;
 
-	CRM(pPathManager->GetFilesForNameInPath(PATH_TEXTURE_CUBE, pszName, vstrPathFiles), "Failed to get files for %S cube map", pszName);
+	CRM(pPathManager->GetFilesForNameInPath(PATH_CUBEMAP, pszName, vstrPathFiles), "Failed to get files for %S cube map", pszName);
 
 	// Filter out only the names - note: this will fail with unicode
 	for (auto &strFilename : vstrPathFiles) {
@@ -113,7 +113,7 @@ RESULT cubemap::LoadCubeMapFromFiles(const wchar_t *pszName, std::vector<std::ws
 		std::wstring wstrFilePath;
 
 		int CubeMapFace = static_cast<int>(GetCubeMapTypeFromFilename(strFilename));
-		CRM(pPathManager->GetFilePathForName(PATH_TEXTURE_CUBE, pszName, strFilename, wstrFilePath), "Failed to get %S path for %S cube map", pszName, strFilename.c_str());
+		CRM(pPathManager->GetFilePathForName(PATH_CUBEMAP, pszName, strFilename, wstrFilePath), "Failed to get %S path for %S cube map", pszName, strFilename.c_str());
 
 		m_pCubemapImages[CubeMapFace] = ImageFactory::MakeImageFromPath(IMAGE_FREEIMAGE, wstrFilePath);
 		CN(m_pCubemapImages[CubeMapFace]);

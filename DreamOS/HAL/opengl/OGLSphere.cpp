@@ -4,20 +4,27 @@
 // until c++ adds a special keyword to deal with this issue, this is by design
 #pragma warning(push)
 #pragma warning(disable : 4250)
+
+OGLSphere::OGLSphere(OpenGLImp *pParentImp, sphere::params *pSphereParams) :
+	sphere(pSphereParams),
+	OGLObj(pParentImp)
+{
+	//
+}
+
+
 OGLSphere::OGLSphere(OpenGLImp *pParentImp, float radius, int numAngularDivisions, int numVerticalDivisions, color c) :
 	sphere(radius, numAngularDivisions, numVerticalDivisions, c),
 	OGLObj(pParentImp)
 {
-	// TODO: Implement valid and CV EHM
-	RESULT r = OGLInitialize();
+	// 
 }
 
 OGLSphere::OGLSphere(OpenGLImp *pParentImp, BoundingSphere* pBoundingSphere, bool fTriangleBased) :
 	sphere(pBoundingSphere, fTriangleBased),
 	OGLObj(pParentImp)
 {
-	// TODO: Implement valid and CV EHM
-	RESULT r = OGLInitialize();
+	// 
 }
 
 RESULT OGLSphere::UpdateFromBoundingSphere(BoundingSphere* pBoundingSphere) {
@@ -49,8 +56,8 @@ RESULT OGLSphere::Render() {
 	// Strips
 	// TODO: quad strip?
 	int indexCount = 0;
-	int numTriangleStripVerts = 2 * (m_numAngularDivisions + 1);
-	int numStrips = m_numVerticalDivisions - 1;
+	int numTriangleStripVerts = 2 * (m_params.numAngularDivisions + 1);
+	int numStrips = m_params.numVerticalDivisions - 1;
 
 	for (int i = 0; i < numStrips; i++) {
 		void *pOffset = (void*)(sizeof(dimindex) * indexCount);

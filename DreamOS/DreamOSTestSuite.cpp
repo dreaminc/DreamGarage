@@ -52,13 +52,11 @@ DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	// empty
 }
 
-DreamOSTestSuite::~DreamOSTestSuite() {
-	// empty
-}
-
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestDreamObjectModule());
+	
 	CR(AddTestDreamSoundSystem());
 
 	CR(AddTestDreamBrowser());
@@ -76,8 +74,6 @@ RESULT DreamOSTestSuite::AddTests() {
 	CR(AddTestDreamLogger());
 
 	CR(AddTestEnvironmentSeating());
-
-	CR(AddTestCredentialStorage());
 
 	CR(AddTestEnvironmentSwitching());
 	
@@ -654,17 +650,22 @@ Error:
 RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 6000.0f;
-	int nRepeats = 1;
+	TestObject::TestDescriptor testDescriptor;
+
+	testDescriptor.strTestName = "dreambrowser";
+	testDescriptor.strTestDescription = "Testing of Dream Browser App";
+	testDescriptor.sDuration = 6000.0f;
+	testDescriptor.nRepeats = 1;
 
 	struct TestContext {
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
 		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
 		std::shared_ptr<Dream2DMouseApp> m_pDream2DMouse = nullptr;
 		quad *m_pBrowserQuad = nullptr;
-	} *pTestContext = new TestContext();
+	};
+	testDescriptor.pContext = (void*)(new TestContext());
 
-	auto fnInitialize = [&](void *pContext) {
+	testDescriptor.fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		
 		//std::string strURL = "https://www.youtube.com/watch?v=YqzHvcwJmQY?autoplay=1";
@@ -717,13 +718,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		return R_PASS;
 	};
 
-	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
-		return R_PASS;
-	};
-
 	// Update Code
-	auto fnUpdate = [&](void *pContext) {
+	testDescriptor.fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -736,7 +732,7 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 	};
 
 	// Reset Code
-	auto fnReset = [&](void *pContext) {
+	testDescriptor.fnReset = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		// Will reset the sandbox as needed between tests
@@ -747,12 +743,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		return r;
 	};
 
-	auto pUITest = AddTest("dreambrowser", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pUITest = AddTest(testDescriptor);
 	CN(pUITest);
-
-	pUITest->SetTestDescription("Testing of Dream Browser App");
-	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
@@ -1144,6 +1136,149 @@ RESULT DreamOSTestSuite::AddTestNamedPipes() {
 	pUITest->SetTestDescription("Test the named pipe server capabilities");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
+	RESULT r = R_PASS;
+
+	TestObject::TestDescriptor testDescriptor;
+	testDescriptor.strTestName = "dreamobjectmodule";
+	testDescriptor.strTestDescription = "Test object creation / destruction using the object module";
+	testDescriptor.sDuration = 100.0f;
+	
+	float radius = 0.1f;
+	int factor = 32;
+	float paddingRatio = 0.10f;
+
+	struct TestContext {
+		sphere *pSphere = nullptr;
+		model *pModel = nullptr;
+
+		RESULT OnSphereReady(DimObj *pDimObj, void *pContext) {
+			RESULT r = R_PASS;
+
+			point ptSphere;
+			sphere *pSphere = dynamic_cast<sphere*>(pDimObj);
+			CN(pSphere);
+
+			CN(pDreamOS);
+
+			if (pContext != nullptr) {
+				memcpy(&ptSphere, (point*)(pContext), sizeof(point));
+
+				delete pContext;
+				pContext = nullptr;
+			}
+
+			pSphere->SetPosition(ptSphere);
+
+			CRM(pDreamOS->AddObject(pSphere), "Failed to add async sphere");
+
+		Error:
+			return r;
+		}
+
+		RESULT OnVolumeReady(DimObj *pDimObj, void *pContext) {
+			RESULT r = R_PASS;
+
+			point ptVolume;
+			volume *pVolume = dynamic_cast<volume*>(pDimObj);
+			CN(pVolume);
+
+			CN(pDreamOS);
+
+			if (pContext != nullptr) {
+				memcpy(&ptVolume, (point*)(pContext), sizeof(point));
+
+				delete pContext;
+				pContext = nullptr;
+			}
+
+			pVolume->SetPosition(ptVolume);
+
+			CRM(pDreamOS->AddObject(pVolume), "Failed to add async sphere");
+
+		Error:
+			return r;
+		}
+
+		DreamOS *pDreamOS = nullptr;
+
+	};
+	testDescriptor.pContext = new TestContext();
+
+	testDescriptor.fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline("blinnphong"));
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		pTestContext->pDreamOS = m_pDreamOS;
+
+		{
+			light *pLight;
+			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
+
+			// 
+			//model *pModel = m_pDreamOS->AddModel(L"\\Cave\\cave.FBX");
+			//CN(pModel);
+			//pModel->SetPosition(point(2.0f, -2.5f, 0.0f));
+			//pModel->SetScale(0.05f);
+
+			// Test the creation of an arbitrarily large number of spheres
+			for (int i = 0; i < factor; i++) {
+				for (int j = 0; j < factor; j++) {
+					for (int k = 0; k < factor; k++) {
+						float xPos = ((float)i - ((float)(factor - 1) / 2.0f)) * (1.0 + paddingRatio) * (radius * 2.0f);
+						float yPos = ((float)j - ((float)(factor - 1) / 2.0f)) * (1.0 + paddingRatio) * (radius * 2.0f);
+						float zPos = ((float)k - ((float)(factor - 1) / 2.0f)) * (1.0 + paddingRatio) * (radius * 2.0f);
+
+						/* 
+						// sphere
+						point *pPtSphere = new point(xPos, yPos, zPos);
+						CN(pPtSphere);
+						CR(m_pDreamOS->MakeSphere(std::bind(&TestContext::OnSphereReady, pTestContext, std::placeholders::_1, std::placeholders::_2), 
+							(void*)(pPtSphere), radius, 10, 10));
+						*/
+
+						///*
+						// volume
+						point *pPtVolume = new point(xPos, yPos, zPos);
+						CN(pPtVolume);
+						CR(m_pDreamOS->MakeVolume(std::bind(&TestContext::OnVolumeReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
+							(void*)(pPtVolume), radius * 2.0f, radius * 2.0f, radius * 2.0f));
+						//*/
+					}
+				}
+			}
+
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code
+	testDescriptor.fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(testDescriptor);
+	CN(pUITest);
 
 Error:
 	return r;

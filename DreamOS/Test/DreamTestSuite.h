@@ -21,6 +21,11 @@ public:
 protected:
 	virtual RESULT ResetTest(void *pContext);
 
+	virtual RESULT DefaultInitializeProcess(void *pContext) override;
+	virtual RESULT DefaultUpdateProcess(void *pContext) override;
+	virtual RESULT DefaultEvaluateProcess(void *pContext) override;
+	virtual RESULT DefaultResetProcess(void *pContext) override;
+
 public:
 	virtual RESULT SetupPipeline(std::string strRenderProgramName = "standard");
 

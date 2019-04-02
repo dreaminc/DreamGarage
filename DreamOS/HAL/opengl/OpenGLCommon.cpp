@@ -2,11 +2,8 @@
 
 GLenum GetOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int channels) {
 	switch (pixelFormat) {
-		case PIXEL_FORMAT::Unspecified: {
-			if (channels == 3)
-				return GL_RGB;
-			else
-				return GL_RGBA;
+		case PIXEL_FORMAT::GREYSCALE: {
+			return GL_RED;
 		} break;
 
 		case PIXEL_FORMAT::RGB: {
@@ -27,4 +24,30 @@ GLenum GetOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int channels) {
 	}
 
 	return 0; // no format for unknown
+}
+
+GLint GetInternalOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int bitsPerPixel, int channels) {
+	switch (pixelFormat) {
+		case PIXEL_FORMAT::GREYSCALE: {
+			return GL_R8;
+		} break;
+
+		case PIXEL_FORMAT::BGR: 
+		case PIXEL_FORMAT::RGB: {
+			if (bitsPerPixel == 8)
+				return GL_RGB8;
+			else if (bitsPerPixel == 16)
+				return GL_RGB16;
+		} break;
+		
+		case PIXEL_FORMAT::BGRA: 
+		case PIXEL_FORMAT::RGBA: {
+			if (bitsPerPixel == 8)
+				return GL_RGBA8;
+			else if (bitsPerPixel == 16)
+				return GL_RGBA16;
+		} break;
+	}
+
+	return GL_RGBA8; // no format for unknown
 }
