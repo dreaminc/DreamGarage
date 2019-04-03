@@ -1229,8 +1229,8 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 
 			// Kick off new texture load for this quad
 			
-			CR(pDreamOS->LoadTexture(std::bind(&TestContext::OnQuadTextureReady, pObj, std::placeholders::_1, std::placeholders::_2),
-				(void*)(pObj), texture::type::TEXTURE_2D, L"greyscale-test.tga"));
+			//CR(pDreamOS->LoadTexture(std::bind(&TestContext::OnQuadTextureReady, this, std::placeholders::_1, std::placeholders::_2),
+			//	(void*)(pObj), texture::type::TEXTURE_2D, L"greyscale-test.tga"));
 
 		Error:
 			return r;
