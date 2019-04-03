@@ -397,10 +397,12 @@ std::shared_ptr<quad> text::AddGlyphQuad(CharacterGlyph glyph, float posX, float
 	point ptGlyphBg = point(glyphQuadXPosition, 0.0f, glyphBgQuadYPosition);
 	std::shared_ptr<quad> pQuadBg = AddQuad(glyphWidth, glyphBgHeight, ptGlyphBg, uvcoord(0.0f, 0.0f), uvcoord(0.0f, 0.0f));
 	pQuadBg->SetDiffuseTexture(m_pFont->GetTexture().get());
+	pQuadBg->SetPosition(ptGlyphBg);
 
 	point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
 	std::shared_ptr<quad> pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
 	pQuad->SetDiffuseTexture(m_pFont->GetTexture().get());
+	pQuad->SetPosition(ptGlyph);
 
 	return pQuad;
 
