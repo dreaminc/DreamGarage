@@ -50,6 +50,9 @@ protected:
 	float m_onThreshold = 0.5f;
 
 	std::map<VirtualObj*, HysteresisEventType> m_currentStates;
+
+	// should be accommodated for in ObjectState
+	std::map<VirtualObj*, vector> m_offsets;
 };
 
 #endif // ! HYSTERESIS_OBJECT_H_
