@@ -140,27 +140,33 @@ RESULT UIPointerLabel::RenderDot(std::shared_ptr<quad> pParentQuad, int seatPosi
 
 	PathManager *pPathManager = PathManager::instance();
 	std::wstring wstrAssetPath;
+	std::wstring wstrSeatPosition;
 
 	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
 
+	// dot texture is a square
+	float height = pParentQuad->GetHeight()/2 * 0.06;
+	float screenOffset = 0.01f;
+
+	CB(seatPosition != -1);
 	m_seatingPosition = seatPosition;
-	std::wstring wstrSeatPosition = util::StringToWideString(std::to_string(m_seatingPosition));
+
+	wstrSeatPosition = util::StringToWideString(std::to_string(m_seatingPosition));
 
 	texture *pPointerDot = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerDotTexture + wstrSeatPosition + L".png")[0]);
+	CN(pPointerDot);
 
 	m_pParentQuad = pParentQuad;
 
-	// dot texture is a square
-	float height = pParentQuad->GetHeight()/2 * 0.06;
-
 	m_pDotComposite = AddComposite();
+	CN(m_pDotComposite);
 	m_pDotComposite->SetVisible(false, false);
 
 	m_pDotQuad = m_pDotComposite->AddQuad(height, height);
+	CN(m_pDotQuad);
 	m_pDotQuad->SetDiffuseTexture(pPointerDot);
 	m_pDotQuad->RotateZByDeg(90.0f);
 
-	float screenOffset = 0.01f;
 	m_pDotComposite->SetPosition(point(-screenOffset * 2.0f, 0.0f, 0.0f));
 
 Error:
