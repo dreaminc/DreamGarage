@@ -343,6 +343,26 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::InitializeTexture(texture *pTexture) {
+	RESULT r = R_PASS;
+
+	OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTexture);
+	CN(pOGLTexture);
+
+	CR(pOGLTexture->OGLInitialize());
+
+Success:
+	return r;
+
+Error:
+	if (pOGLTexture != nullptr) {
+		delete pOGLTexture;
+		pOGLTexture = nullptr;
+	}
+
+	return r;
+}
+
 DimObj* OpenGLImp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 	OGLObj *pOGLObj = nullptr;
@@ -374,6 +394,44 @@ Error:
 	}
 
 	return nullptr;
+}
+
+texture* OpenGLImp::MakeTexture(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLTexture *pOGLTexture = nullptr;
+	texture::params *pTextureParams = nullptr;
+
+	CBM((pPrimParams->GetPrimitiveType() == PRIMITIVE_TYPE::TEXTURE), "Invalid Texture Params");
+
+	pTextureParams = dynamic_cast<texture::params*>(pPrimParams);
+	CN(pTextureParams);
+
+	pOGLTexture = new OGLTexture(this, pTextureParams);
+	CN(pOGLTexture);
+
+	if (pTextureParams->pszFilename != nullptr) {
+		CR(pOGLTexture->LoadTextureFromFile(pTextureParams->pszFilename));
+	}
+	else {
+		CBM((false), "Currently MakeTexture PrimParam path only supports path based textures")
+	}
+
+	if (fInitialize) {
+		CR(pOGLTexture->OGLInitialize());
+	}
+
+Success:
+	return pOGLTexture;
+
+Error:
+	if (pOGLTexture != nullptr) {
+		delete pOGLTexture;
+		pOGLTexture = nullptr;
+	}
+
+	return nullptr;
+
 }
 
 mesh *OpenGLImp::MakeMesh(const std::vector<vertex>& vertices) {

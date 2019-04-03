@@ -14,19 +14,40 @@
 #include <chrono>
 
 struct PrimParams;
+class DimObj;
+class texture;
 
 class DreamObjectModule : public DreamModule<DreamObjectModule>
 {
 	friend class DreamModuleManager;
 
 private:
-	struct PendingDimObject {
+	struct PendingObject {
+		PendingObject(PrimParams *pPrimParams, void *pContext);
+
 		PrimParams *pPrimParams = nullptr;
-		std::function<RESULT(DimObj*, void*)> fnOnObjectReady = nullptr;
 		void *pContext = nullptr;
+		
+		RESULT ClearObject();
+		virtual RESULT ClearObjectImp() = 0;
+	};
+
+	struct PendingDimObject : public PendingObject {
+		PendingDimObject(PrimParams *pPrimParams, std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext);
+
+		std::function<RESULT(DimObj*, void*)> fnOnObjectReady = nullptr;
 		DimObj *pDimObj = nullptr;
 
-		RESULT ClearObject();
+		virtual RESULT ClearObjectImp() override;
+	};
+
+	struct PendingTextureObject : public PendingObject {
+		PendingTextureObject(PrimParams *pPrimParams, std::function<RESULT(texture*, void*)> fnOnTextureReady, void *pContext);
+
+		std::function<RESULT(texture*, void*)> fnOnTextureReady = nullptr;
+		texture *pTexture = nullptr;
+
+		virtual RESULT ClearObjectImp() override;
 	};
 
 public:
@@ -41,16 +62,17 @@ public:
 	virtual RESULT ModuleProcess(void *pContext) override;
 
 	RESULT QueueNewObject(PrimParams *pPrimParams, std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext);
+	RESULT QueueNewTexture(PrimParams *pPrimParams, std::function<RESULT(texture*, void*)> fnOnTextureReady, void *pContext);
 
 protected:
 	static DreamObjectModule* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	std::mutex m_dimObjQueueLock;
-	std::queue<PendingDimObject> m_queuedDimObjects;
+	std::mutex m_objQueueLock;
+	std::queue<PendingObject*> m_queuedObjects;
 
-	std::mutex m_pendingDimObjLock;
-	std::queue<PendingDimObject> m_pendingInitializationDimbjects;
+	std::mutex m_pendingObjLock;
+	std::queue<PendingObject*> m_pendingInitializationObjects;
 };
 
 #endif // !DREAM_OBJECT_MODULE_H_

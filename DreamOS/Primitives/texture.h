@@ -11,6 +11,8 @@
 #include "Types/UID.h"
 #include <vector>
 
+#include "PrimParams.h"
+
 #include "color.h"
 
 class image;
@@ -33,10 +35,25 @@ public:
 		INVALID
 	};
 
+	struct params :
+		public PrimParams
+	{
+		virtual PRIMITIVE_TYPE GetPrimitiveType() override { return PRIMITIVE_TYPE::TEXTURE; }
+
+		params(texture::type textureType, const wchar_t *pszFilename = nullptr) :
+			textureType(textureType),
+			pszFilename(pszFilename)
+		{ }
+
+		texture::type textureType = type::TEXTURE_2D;
+		const wchar_t *pszFilename = nullptr;
+	};
+
 public:
 	texture();
 	texture(const texture& tex);
 	texture(texture::type texType);
+	texture(texture::params *pTextureParams);
 	texture(texture::type texType, int width, int height, int channels, int samples = 0);
 	texture(texture::type texType, int width, int height, int channels, void *pBuffer, int pBuffer_n, int samples = 0);
 	texture(texture::type texType, int width, int height, PIXEL_FORMAT format, int channels, void *pBuffer, int pBuffer_n, int samples = 0);
@@ -49,7 +66,7 @@ public:
 	~texture();
 
 	texture::type GetTextureType() {
-		return m_type;
+		return m_params.textureType;
 	}
 
 	size_t GetTextureSize();
@@ -156,7 +173,7 @@ public:
 
 protected:
 	PIXEL_FORMAT m_pixelFormat = PIXEL_FORMAT::INVALID;
-	texture::type m_type = texture::type::INVALID;
+	texture::params m_params;
 
 	int m_width = 0;
 	int m_height = 0;

@@ -1064,9 +1064,12 @@ Error:
 	return r;
 }
 
-
 RESULT SandboxApp::InitializeObject(DimObj *pDimObj) {
 	return m_pHALImp->InitializeObject(pDimObj);
+}
+
+RESULT SandboxApp::InitializeTexture(texture *pTexture) {
+	return m_pHALImp->InitializeTexture(pTexture);
 }
 
 DimObj *SandboxApp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
@@ -1082,6 +1085,25 @@ Error:
 	if (pDimObj != nullptr) {
 		delete pDimObj;
 		pDimObj = nullptr;
+	}
+
+	return nullptr;
+}
+
+texture *SandboxApp::MakeTexture(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+	texture *pTexture = nullptr;
+
+	pTexture = m_pHALImp->MakeTexture(pPrimParams, fInitialize);
+	CN(pTexture);
+
+Success:
+	return pTexture;
+
+Error:
+	if (pTexture != nullptr) {
+		delete pTexture;
+		pTexture = nullptr;
 	}
 
 	return nullptr;

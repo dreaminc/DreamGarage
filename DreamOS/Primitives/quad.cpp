@@ -126,6 +126,7 @@ quad::quad(float width, float height, point& ptCenter, const uvcoord& uvTopLeft,
 Success:
 	Validate();
 	return;
+
 Error:
 	Invalidate();
 	return;
@@ -144,6 +145,7 @@ quad::quad(BoundingQuad *pBoundingQuad, bool fTriangleBased) :
 Success:
 	Validate();
 	return;
+
 Error:
 	Invalidate();
 	return;

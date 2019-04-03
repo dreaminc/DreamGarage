@@ -1149,8 +1149,8 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 	testDescriptor.strTestDescription = "Test object creation / destruction using the object module";
 	testDescriptor.sDuration = 100.0f;
 	
-	float radius = 0.1f;
-	int factor = 32;
+	float radius = 0.2f;
+	int factor = 10;
 	float paddingRatio = 0.10f;
 
 	struct TestContext {
@@ -1227,6 +1227,25 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 
 			CRM(pDreamOS->AddObject(pObj), "Failed to add async sphere");
 
+			// Kick off new texture load for this quad
+			
+			CR(pDreamOS->LoadTexture(std::bind(&TestContext::OnQuadTextureReady, this, std::placeholders::_1, std::placeholders::_2),
+				(void*)(pObj), texture::type::TEXTURE_2D, L"cobblestone_color.png"));
+
+		Error:
+			return r;
+		}
+
+		RESULT OnQuadTextureReady(texture *pTexture, void *pContext) {
+			RESULT r = R_PASS;
+
+			quad *pObj = (quad*)(pContext);
+			CN(pObj);
+
+			CN(pTexture);
+
+			CR(pObj->SetDiffuseTexture(pTexture));
+
 		Error:
 			return r;
 		}
@@ -1241,7 +1260,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline("blinnphong"));
+		CR(SetupPipeline("blinnphong_texture"));
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);

@@ -271,6 +271,8 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 				ptOrigin,
 				uvcoord(uvLeft, uvTop),
 				uvcoord(uvRight, uvBottom));
+			CN(pQuad);
+			pQuad->SetPosition(ptOrigin);
 
 			pQuad->SetDiffuseTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetFramebuffer()->GetColorTexture());
 

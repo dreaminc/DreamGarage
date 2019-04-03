@@ -254,7 +254,9 @@ public:
 	quad *MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 
 	RESULT InitializeObject(DimObj *pDimObj);
+	RESULT InitializeTexture(texture *pTexture);
 	DimObj *MakeObject(PrimParams *pPrimParams, bool fInitialize = true);
+	texture *MakeTexture(PrimParams *pPrimParams, bool fInitialize = true);
 
 	// TODO: Remove all of these (going with factory solution)
 	// Do this after async objects are in and work with models

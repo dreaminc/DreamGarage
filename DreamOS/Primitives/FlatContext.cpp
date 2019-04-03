@@ -79,6 +79,9 @@ std::shared_ptr<quad> FlatContext::MakeQuad(double width, double height, point p
 	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin, uvTopLeft, uvBottomRight, vNormal));
 	CN(pQuad);
 
+	// Not a fan of this but this will resolve a lot of issues it seems
+	pQuad->SetPosition(ptOrigin);
+
 Success:
 	return pQuad;
 

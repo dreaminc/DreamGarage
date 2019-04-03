@@ -18,8 +18,9 @@ class OpenGLImp;
 
 class OGLTexture : public texture {
 public:
-	OGLTexture(OpenGLImp *pParentImp, texture::type type, GLenum textureTarget = GL_TEXTURE_2D);
 	OGLTexture(const OGLTexture &pOGLTexture);
+	OGLTexture(OpenGLImp *pParentImp, texture::params *pTextureParams);
+	OGLTexture(OpenGLImp *pParentImp, texture::type type, GLenum textureTarget = GL_TEXTURE_2D);
 
 
 public:
@@ -32,6 +33,7 @@ public:
 	RESULT SetTextureParameter(GLenum paramName, GLint paramVal);
 	
 	// border will be zero more often than the buffer is 
+	RESULT OGLInitialize();
 	RESULT OGLInitialize(GLuint textureID);
 
 	RESULT OGLInitializeTexture(GLenum textureTarget, GLint level, GLint internalformat, GLenum format, GLenum type, const void *pBuffer = nullptr, GLint border = 0);

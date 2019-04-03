@@ -54,7 +54,9 @@ public:
 	version GetGLSLVersion() { return m_versionGLSL; }
 
 	virtual RESULT InitializeObject(DimObj *pDimObj) override;
+	virtual RESULT InitializeTexture(texture *pTexture) override;
 	virtual DimObj* MakeObject(PrimParams *pPrimParams, bool fInitialize = true) override;
+	virtual texture* MakeTexture(PrimParams *pPrimParams, bool fInitialize = true) override;
 
 	// TODO: Remove and use param pack function
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) override;

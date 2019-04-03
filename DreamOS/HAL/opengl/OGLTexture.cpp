@@ -27,6 +27,22 @@ OGLTexture::OGLTexture(const OGLTexture &pOGLTexture) :
 	// NOTE: this will not copy buffers on either GPU or CPU side
 }
 
+OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::params *pTextureParams) :
+	texture(pTextureParams),
+	m_glTextureIndex(0),
+	m_pParentImp(pParentImp)
+{
+	switch(pTextureParams->textureType) {
+		case texture::type::RECTANGLE: {
+			m_glTextureTarget = GL_TEXTURE_RECTANGLE;
+		} break;
+
+		case texture::type::TEXTURE_2D: {
+			m_glTextureTarget = GL_TEXTURE_2D;
+		} break;
+	}
+}
+
 OGLTexture::~OGLTexture() {
 	RESULT r = R_PASS;
 
@@ -425,7 +441,16 @@ Error:
 	return r;
 }
 
+RESULT OGLTexture::OGLInitialize() {
+	RESULT r = R_PASS;
 
+	CR(OGLInitialize(NULL));
+	CR(AllocateGLTexture());
+	CR(SetDefaultTextureParams());
+
+Error:
+	return r;
+}
 
 RESULT OGLTexture::OGLInitialize(GLuint textureID) {
 	RESULT r = R_PASS;
