@@ -725,6 +725,22 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::MakeQuad(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	quad::params *pQuadParams = new quad::params(width, height, numHorizontalDivisions, numVerticalDivisions, vNormal);
+	CN(pQuadParams);
+
+	pQuadParams->pTextureHeight = pTextureHeight;
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pQuadParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
+
+Error:
+	return r;
+}
+
 ProgramNode* DreamOS::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
 	RESULT r = R_PASS;
 

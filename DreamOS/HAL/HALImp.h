@@ -172,8 +172,7 @@ public:
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
 
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) = 0;
-	virtual quad* MakeQuad(double width, double height, point origin, vector vNormal = vector::jVector()) = 0;
-	virtual quad* MakeQuad(double width, double height, point origin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector()) = 0;
+	virtual quad* MakeQuad(double width, double height, point ptCenter, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector()) = 0;
 	virtual quad* MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector()) = 0;
 
 	virtual sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) = 0;

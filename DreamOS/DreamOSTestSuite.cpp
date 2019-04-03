@@ -1157,25 +1157,26 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 		sphere *pSphere = nullptr;
 		model *pModel = nullptr;
 
+		// COMMANDMENT: Thou Shall Not Have Member Templates in a Local Class 
 		RESULT OnSphereReady(DimObj *pDimObj, void *pContext) {
 			RESULT r = R_PASS;
 
-			point ptSphere;
-			sphere *pSphere = dynamic_cast<sphere*>(pDimObj);
-			CN(pSphere);
+			point ptOrigin;
+			sphere *pObj = dynamic_cast<sphere*>(pDimObj);
+			CN(pObj);
 
 			CN(pDreamOS);
 
 			if (pContext != nullptr) {
-				memcpy(&ptSphere, (point*)(pContext), sizeof(point));
+				memcpy(&ptOrigin, (point*)(pContext), sizeof(point));
 
 				delete pContext;
 				pContext = nullptr;
 			}
 
-			pSphere->SetPosition(ptSphere);
+			pObj->SetPosition(ptOrigin);
 
-			CRM(pDreamOS->AddObject(pSphere), "Failed to add async sphere");
+			CRM(pDreamOS->AddObject(pObj), "Failed to add async sphere");
 
 		Error:
 			return r;
@@ -1184,22 +1185,47 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 		RESULT OnVolumeReady(DimObj *pDimObj, void *pContext) {
 			RESULT r = R_PASS;
 
-			point ptVolume;
-			volume *pVolume = dynamic_cast<volume*>(pDimObj);
-			CN(pVolume);
+			point ptOrigin;
+			volume *pObj = dynamic_cast<volume*>(pDimObj);
+			CN(pObj);
 
 			CN(pDreamOS);
 
 			if (pContext != nullptr) {
-				memcpy(&ptVolume, (point*)(pContext), sizeof(point));
+				memcpy(&ptOrigin, (point*)(pContext), sizeof(point));
 
 				delete pContext;
 				pContext = nullptr;
 			}
 
-			pVolume->SetPosition(ptVolume);
+			pObj->SetPosition(ptOrigin);
 
-			CRM(pDreamOS->AddObject(pVolume), "Failed to add async sphere");
+			CRM(pDreamOS->AddObject(pObj), "Failed to add async sphere");
+
+		Error:
+			return r;
+		}
+
+		RESULT OnQuadReady(DimObj *pDimObj, void *pContext) {
+			RESULT r = R_PASS;
+
+			point ptOrigin;
+			quad *pObj = dynamic_cast<quad*>(pDimObj);
+			CN(pObj);
+
+			CN(pDreamOS);
+
+			if (pContext != nullptr) {
+				memcpy(&ptOrigin, (point*)(pContext), sizeof(point));
+
+				delete pContext;
+				pContext = nullptr;
+			}
+
+			pObj->SetPosition(ptOrigin);
+			pObj->RotateXByDeg(90.0f);
+
+			CRM(pDreamOS->AddObject(pObj), "Failed to add async sphere");
 
 		Error:
 			return r;
@@ -1241,20 +1267,25 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 						float yPos = ((float)j - ((float)(factor - 1) / 2.0f)) * (1.0 + paddingRatio) * (radius * 2.0f);
 						float zPos = ((float)k - ((float)(factor - 1) / 2.0f)) * (1.0 + paddingRatio) * (radius * 2.0f);
 
+						point *pPtOrigin = new point(xPos, yPos, zPos);
+						CN(pPtOrigin);
+
 						/* 
 						// sphere
-						point *pPtSphere = new point(xPos, yPos, zPos);
-						CN(pPtSphere);
 						CR(m_pDreamOS->MakeSphere(std::bind(&TestContext::OnSphereReady, pTestContext, std::placeholders::_1, std::placeholders::_2), 
-							(void*)(pPtSphere), radius, 10, 10));
+							(void*)(pPtOrigin), radius, 10, 10));
 						*/
 
-						///*
+						/*
 						// volume
-						point *pPtVolume = new point(xPos, yPos, zPos);
-						CN(pPtVolume);
 						CR(m_pDreamOS->MakeVolume(std::bind(&TestContext::OnVolumeReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
-							(void*)(pPtVolume), radius * 2.0f, radius * 2.0f, radius * 2.0f));
+							(void*)(pPtOrigin), radius * 2.0f, radius * 2.0f, radius * 2.0f));
+						//*/
+
+						///*
+						// quad
+						CR(m_pDreamOS->MakeQuad(std::bind(&TestContext::OnQuadReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
+							(void*)(pPtOrigin), radius * 2.0f, radius * 2.0f));
 						//*/
 					}
 				}

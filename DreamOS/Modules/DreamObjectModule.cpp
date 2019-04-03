@@ -86,8 +86,10 @@ RESULT DreamObjectModule::Update(void *pContext) {
 
 	// This is GPU protected 
 	if (m_pendingInitializationDimbjects.empty() == false) {
-		PendingDimObject pendingObject = m_pendingInitializationDimbjects.front();
-		m_pendingInitializationDimbjects.pop();
+		m_pendingDimObjLock.lock();
+			PendingDimObject pendingObject = m_pendingInitializationDimbjects.front();
+			m_pendingInitializationDimbjects.pop();
+		m_pendingDimObjLock.unlock();
 
 		CN(pendingObject.pDimObj);
 
@@ -115,14 +117,19 @@ RESULT DreamObjectModule::ModuleProcess(void *pContext) {
 
 	while (fRunning) {
 		if (m_queuedDimObjects.empty() == false) {
-			PendingDimObject pendingObject = m_queuedDimObjects.front();
-			m_queuedDimObjects.pop();
+			
+			m_dimObjQueueLock.lock();
+				PendingDimObject pendingObject = m_queuedDimObjects.front();
+				m_queuedDimObjects.pop();
+			m_dimObjQueueLock.unlock();
 
 			pendingObject.pDimObj = GetDOS()->MakeObject(pendingObject.pPrimParams, false);
 			CN(pendingObject.pDimObj);
 
 			// Push to the GPU pending queue
-			m_pendingInitializationDimbjects.push(pendingObject);
+			m_pendingDimObjLock.lock(); 
+				m_pendingInitializationDimbjects.push(pendingObject);
+			m_pendingDimObjLock.unlock();
 		}
 
 		Sleep(1);
@@ -140,8 +147,10 @@ RESULT DreamObjectModule::QueueNewObject(PrimParams *pPrimParams, std::function<
 	newPendingObject.pPrimParams = pPrimParams;
 	newPendingObject.fnOnObjectReady = fnOnObjectReady;
 	newPendingObject.pContext = pContext;
-
-	m_queuedDimObjects.push(newPendingObject);
+	
+	m_dimObjQueueLock.lock();
+		m_queuedDimObjects.push(newPendingObject);
+	m_dimObjQueueLock.unlock();
 
 Error:
 	return r;

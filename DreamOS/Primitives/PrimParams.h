@@ -11,6 +11,7 @@
 enum class PRIMITIVE_TYPE {
 	SPHERE,
 	VOLUME,
+	QUAD,
 	INVALID
 };
 

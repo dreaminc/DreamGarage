@@ -34,6 +34,7 @@ class mesh;
 
 class OGLSphere;
 class OGLVolume;
+class OGLQuad;
 
 class OpenGLImp : public HALImp {
 private:
@@ -57,9 +58,10 @@ public:
 
 	// TODO: Remove and use param pack function
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) override;
+	
+	OGLQuad* MakeQuad(PrimParams *pPrimParams, bool fInitialize);
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) override;
-	virtual quad* MakeQuad(double width, double height, point ptOrigin, vector vNormal = vector::jVector()) override;
-	virtual quad* MakeQuad(double width, double height, point ptOrigin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector()) override;
+	virtual quad* MakeQuad(double width, double height, point ptCenter, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector()) override;
 	virtual quad* MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector()) override;
 
 	OGLSphere* MakeSphere(PrimParams *pSphereParams, bool fInitialize = false);

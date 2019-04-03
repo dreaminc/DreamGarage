@@ -17,7 +17,7 @@
 class OGLVolume : public volume, public OGLObj {
 public:
 	OGLVolume(OpenGLImp *pParentImp);
-	OGLVolume(OpenGLImp *pParentImp, volume::params *pSphereParams);
+	OGLVolume(OpenGLImp *pParentImp, volume::params *pVolumeParams);
 	OGLVolume(OpenGLImp *pParentImp, double width, double length, double height, bool fTriangleBased);
 	OGLVolume(OpenGLImp *pParentImp, double side, bool fTriangleBased);
 	OGLVolume(OpenGLImp *pParentImp, BoundingBox* pBoundingBox, bool fTriangleBased);

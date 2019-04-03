@@ -444,16 +444,41 @@ std::shared_ptr<volume> composite::AddVolume(double side) {
 	return AddVolume(side, side, side);
 }
 
-
 std::shared_ptr<quad> composite::MakeQuad(double width, double height, point ptOrigin) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin));
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height));
+	CN(pQuad);
 
-	//Success:
+	pQuad->SetPosition(ptOrigin);
+
+Success:
 	return pQuad;
 
-	//Error:
+Error:
+	if (pQuad != nullptr) {
+		pQuad = nullptr;
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<quad> composite::AddQuad(double width, double height, point ptOrigin) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad = MakeQuad(width, height, ptOrigin);
+	CN(pQuad);
+
+	CR(AddObject(pQuad));
+
+Success:
+	return pQuad;
+
+Error:
+	if (pQuad != nullptr) {
+		pQuad = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -463,63 +488,68 @@ std::shared_ptr<quad> composite::MakeQuad(float width, float height, int numHori
 	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, uvTopLeft, uvBottomRight, curveType, vNormal));
 	CN(pQuad);
 
-	//Success:
+Success:
 	return pQuad;
 
 Error:
+	if (pQuad != nullptr) {
+		pQuad = nullptr;
+	}
+
 	return nullptr;
 }
+
+
 
 std::shared_ptr<quad> composite::AddQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType, vector vNormal) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<quad> pQuad = MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, uvTopLeft, uvBottomRight, curveType, vNormal);
-	CR(AddObject(pQuad));
-
-	//Success:
-	return pQuad;
-
-Error:
-	return nullptr;
-}
-
-std::shared_ptr<quad> composite::AddQuad(double width, double height, point ptOrigin) {
-	RESULT r = R_PASS;
-
-	std::shared_ptr<quad> pQuad = MakeQuad(width, height, ptOrigin);
-	CR(AddObject(pQuad));
-
-	//Success:
-	return pQuad;
-
-Error:
-	return nullptr;
-}
-
-std::shared_ptr<quad> composite::MakeQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) {
-
-	RESULT r = R_PASS;
-
-	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin, uvTopLeft, uvBottomRight, vNormal));
 	CN(pQuad);
 
-	//Success:
+	CR(AddObject(pQuad));
+
+Success:
+	return pQuad;
+
+Error:
+	if (pQuad != nullptr) {
+		pQuad = nullptr;
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<quad> composite::MakeQuad(double width, double height, point ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) {
+
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptCenter, uvTopLeft, uvBottomRight, vNormal));
+	CN(pQuad);
+
+Success:
 	return pQuad;
 
 Error:
 	return nullptr;
 }
 
-std::shared_ptr<quad> composite::AddQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) {
+std::shared_ptr<quad> composite::AddQuad(double width, double height, point ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin, uvTopLeft, uvBottomRight, vNormal));
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptCenter, uvTopLeft, uvBottomRight, vNormal));
+	CN(pQuad);
+	
 	CR(AddObject(pQuad));
 
-	//Success:
+Success:
 	return pQuad;
 
 Error:
+	if (pQuad != nullptr) {
+		pQuad = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -529,10 +559,13 @@ std::shared_ptr<quad> composite::MakeQuad(double width, double height, int numHo
 	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal));
 	CN(pQuad);
 
-//Success:
+Success:
 	return pQuad;
 
 Error:
+	if (pQuad != nullptr) {
+		pQuad = nullptr;
+	}
 	return nullptr;
 }
 
@@ -541,11 +574,16 @@ std::shared_ptr<quad> composite::AddQuad(double width, double height, int numHor
 
 	std::shared_ptr<quad> pQuad = MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 	CN(pQuad);
+
 	CR(AddObject(pQuad));
 
 	return pQuad;
 
 Error:
+	if (pQuad != nullptr) {
+		pQuad = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -553,18 +591,34 @@ std::shared_ptr<DimRay> composite::MakeRay(point ptOrigin, vector vDirection, fl
 	RESULT r = R_PASS;
 
 	std::shared_ptr<DimRay> pRay(m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional));
+	CN(pRay);
 
+Success:
 	return pRay;
+
+Error:
+	if (pRay != nullptr) {
+		pRay = nullptr;
+	}
+
+	return nullptr;
 }
 
 std::shared_ptr<DimRay> composite::AddRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<DimRay> pRay(m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional));
+	CN(pRay);
+
 	CR(AddObject(pRay));
 
 	return pRay;
+
 Error:
+	if (pRay != nullptr) {
+		pRay = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -572,34 +626,71 @@ std::shared_ptr<FlatContext> composite::MakeFlatContext(int width, int height, i
 	RESULT r = R_PASS;
 
 	std::shared_ptr<FlatContext> pContext(m_pHALImp->MakeFlatContext(width, height, channels));
+	CN(pContext);
 
+Success:
 	return pContext;
+
+Error:
+	if (pContext != nullptr) {
+		pContext = nullptr;
+	}
+
+	return nullptr;
 }
 
 std::shared_ptr<FlatContext> composite::AddFlatContext(int width, int height, int channels) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<FlatContext> pContext(m_pHALImp->MakeFlatContext(width, height, channels));
+	CN(pContext);
+
 	CR(AddObject(pContext));
 
+Success:
 	return pContext;
+
 Error:
+	if (pContext != nullptr) {
+		pContext = nullptr;
+	}
+
 	return nullptr;
 }
 
 std::shared_ptr<UIView> composite::MakeUIView(DreamOS *pDreamOS) {
-	std::shared_ptr<UIView> pView(new UIView(m_pHALImp, pDreamOS));
+	RESULT r = R_PASS;
 
+	std::shared_ptr<UIView> pView(new UIView(m_pHALImp, pDreamOS));
+	CN(pView);
+
+Success:
 	return pView;
+
+Error:
+	if (pView != nullptr) {
+		pView = nullptr;
+	}
+
+	return nullptr;
 }
 
 std::shared_ptr<UIView> composite::AddUIView(DreamOS *pDreamOS) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<UIView> pView = MakeUIView(pDreamOS);
+	CN(pView);
+
 	CR(AddObject(pView));
+
+Success:
 	return pView;
+
 Error:
+	if (pView != nullptr) {
+		pView = nullptr;
+	}
+
 	return nullptr;
 }
 

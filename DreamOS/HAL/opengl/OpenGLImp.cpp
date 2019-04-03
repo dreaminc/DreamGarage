@@ -357,6 +357,11 @@ DimObj* OpenGLImp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 			pOGLObj = MakeVolume(pPrimParams, fInitialize);
 			CN(pOGLObj);
 		} break;
+
+		case PRIMITIVE_TYPE::QUAD: {
+			pOGLObj = MakeQuad(pPrimParams, fInitialize);
+			CN(pOGLObj);
+		} break;
 	}
 
 Success:
@@ -522,59 +527,92 @@ Error:
 
 // Quad
 
+OGLQuad* OpenGLImp::MakeQuad(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLQuad *pOGLQuad = nullptr;
+
+	quad::params *pQuadParams = dynamic_cast<quad::params*>(pPrimParams);
+	CN(pQuadParams);
+
+	pOGLQuad = new OGLQuad(this, pQuadParams);
+	CN(pOGLQuad);
+
+	if (fInitialize) {
+		CR(pOGLQuad->OGLInitialize());
+	}
+
+Success:
+	return pOGLQuad;
+
+Error:
+	if (pOGLQuad != nullptr) {
+		delete pOGLQuad;
+		pOGLQuad = nullptr;
+	}
+
+	return nullptr;
+}
+
 quad* OpenGLImp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	RESULT r = R_PASS;
 
-	quad *pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
-	CN(pQuad);
+	OGLQuad *pOGLQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
+	CN(pOGLQuad);
 
-//Success:
-	return pQuad;
+	CR(pOGLQuad->OGLInitialize());
+
+Success:
+	return pOGLQuad;
 
 Error:
-	if (pQuad != nullptr) {
-		delete pQuad;
-		pQuad = nullptr;
+	if (pOGLQuad != nullptr) {
+		delete pOGLQuad;
+		pOGLQuad = nullptr;
 	}
 	return nullptr;
 }
  
-quad* OpenGLImp::MakeQuad(double width, double height, point ptOrigin, vector vNormal) {
-	RESULT r = R_PASS;
-
-	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), 1, 1, nullptr, vNormal);
-	//pQuad->RotateXByDeg(90.0f);
-	pQuad->MoveTo(ptOrigin);
-
-	CN(pQuad);
-
+// TODO: This is a stupid thing should be removed
+//quad* OpenGLImp::MakeQuad(double width, double height, point ptOrigin, vector vNormal) {
+//	RESULT r = R_PASS;
+//
+//	OGLQuad* pOGLQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), 1, 1, nullptr, vNormal);
+//	
+//	CR(pOGLQuad->OGLInitialize());
+//	
+//	//pQuad->RotateXByDeg(90.0f);
+//	pOGLQuad->MoveTo(ptOrigin);
+//
+//	CN(pOGLQuad);
+//
 //Success:
-	return pQuad;
+//	return pOGLQuad;
+//
+//Error:
+//	if (pOGLQuad != nullptr) {
+//		delete pOGLQuad;
+//		pOGLQuad = nullptr;
+//	}
+//	return nullptr;
+//}
 
-Error:
-	if (pQuad != nullptr) {
-		delete pQuad;
-		pQuad = nullptr;
-	}
-	return nullptr;
-}
-
-quad* OpenGLImp::MakeQuad(double width, double height, point ptOrigin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal) {
+// TODO: Origin should not be baked into these calls (done at client)
+quad* OpenGLImp::MakeQuad(double width, double height, point ptCenter, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal) {
 	RESULT r = R_PASS;
 
-	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), ptOrigin, uvTopLeft, uvBottomRight, vNormal);
-	//pQuad->RotateXByDeg(90.0f);
-	pQuad->MoveTo(ptOrigin);
+	OGLQuad* pOGLQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), ptCenter, uvTopLeft, uvBottomRight, vNormal);
+	CN(pOGLQuad);
 
-	CN(pQuad);
+	CR(pOGLQuad->OGLInitialize());
 
-	//Success:
-	return pQuad;
+Success:
+	return pOGLQuad;
 
 Error:
-	if (pQuad != nullptr) {
-		delete pQuad;
-		pQuad = nullptr;
+	if (pOGLQuad != nullptr) {
+		delete pOGLQuad;
+		pOGLQuad = nullptr;
 	}
 
 	return nullptr;
@@ -583,16 +621,18 @@ Error:
 quad* OpenGLImp::MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType, vector vNormal) {
 	RESULT r = R_PASS;
 
-	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, uvTopLeft, uvBottomRight, curveType, vNormal);
-	CN(pQuad);	
+	OGLQuad* pOGLQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, uvTopLeft, uvBottomRight, curveType, vNormal);
+	CN(pOGLQuad);	
 
-	//Success:
-	return pQuad;
+	CR(pOGLQuad->OGLInitialize());
+
+Success:
+	return pOGLQuad;
 
 Error:
-	if (pQuad != nullptr) {
-		delete pQuad;
-		pQuad = nullptr;
+	if (pOGLQuad != nullptr) {
+		delete pOGLQuad;
+		pOGLQuad = nullptr;
 	}
 
 	return nullptr;
@@ -601,16 +641,16 @@ Error:
 cylinder* OpenGLImp::MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
 	RESULT r = R_PASS;
 
-	cylinder *pCylinder = new OGLCylinder(this, radius, height, numAngularDivisions, numVerticalDivisions);
-	CN(pCylinder);
+	OGLCylinder *pOGLCylinder = new OGLCylinder(this, radius, height, numAngularDivisions, numVerticalDivisions);
+	CN(pOGLCylinder);
 
-	//Success:
-	return pCylinder;
+Success:
+	return pOGLCylinder;
 
 Error:
-	if (pCylinder != nullptr) {
-		delete pCylinder;
-		pCylinder = nullptr;
+	if (pOGLCylinder != nullptr) {
+		delete pOGLCylinder;
+		pOGLCylinder = nullptr;
 	}
 	return nullptr;
 }
@@ -618,16 +658,16 @@ Error:
 DimRay* OpenGLImp::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
 	RESULT r = R_PASS;
 
-	DimRay *pRay = new OGLRay(this, ptOrigin, vDirection, step, fDirectional);
-	CN(pRay);
+	OGLRay *pOGLRay = new OGLRay(this, ptOrigin, vDirection, step, fDirectional);
+	CN(pOGLRay);
 
-	//Success:
-	return pRay;
+Success:
+	return pOGLRay;
 
 Error:
-	if (pRay != nullptr) {
-			delete pRay;
-			pRay = nullptr;
+	if (pOGLRay != nullptr) {
+			delete pOGLRay;
+			pOGLRay = nullptr;
 		}
 	return nullptr;
 }
@@ -794,7 +834,6 @@ Error:
 	}
 
 	return nullptr;
-	
 }
 
 volume* OpenGLImp::MakeVolume(double side, bool fTriangleBased) {

@@ -38,12 +38,19 @@ FlatContext::~FlatContext() {
 std::shared_ptr<quad> FlatContext::MakeQuad(double width, double height, point ptOrigin) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin));
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height));
+	CN(pQuad);
 
-//Success:
+	pQuad->SetPosition(ptOrigin);
+
+Success:
 	return pQuad;
 
-//Error:
+Error:
+	if (pQuad != nullptr) {
+		pQuad = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -51,12 +58,18 @@ std::shared_ptr<quad> FlatContext::AddQuad(double width, double height, point pt
 	RESULT r = R_PASS;
 
 	std::shared_ptr<quad> pQuad = MakeQuad(width, height, ptOrigin);
+	CN(pQuad);
+
 	CR(AddObject(pQuad));
 
-//Success:
+Success:
 	return pQuad;
 
 Error:
+	if (pQuad != nullptr) {
+		pQuad = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -64,11 +77,16 @@ std::shared_ptr<quad> FlatContext::MakeQuad(double width, double height, point p
 	RESULT r = R_PASS;
 
 	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin, uvTopLeft, uvBottomRight, vNormal));
+	CN(pQuad);
 
-	//Success:
+Success:
 	return pQuad;
 
-	//Error:
+Error:
+	if (pQuad != nullptr) {
+		pQuad = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -76,12 +94,18 @@ std::shared_ptr<quad> FlatContext::AddQuad(double width, double height, point pt
 	RESULT r = R_PASS;
 
 	std::shared_ptr<quad> pQuad = MakeQuad(width, height, ptOrigin, uvTopLeft, uvBottomRight, vNormal);
+	CN(pQuad);
+
 	CR(AddObject(pQuad));
 
-	//Success:
+Success:
 	return pQuad;
 
 Error:
+	if (pQuad != nullptr) {
+		pQuad = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -89,19 +113,35 @@ std::shared_ptr<text> FlatContext::MakeText(std::shared_ptr<font> pFont, texture
 	RESULT r = R_PASS;
 
 	std::shared_ptr<text> pText(m_pHALImp->MakeText(pFont, pFontTexture, content, size, fDistanceMap));
+	CN(pText);
+
+Success:
 	return pText;
+
+Error:
+	if (pText != nullptr) {
+		pText = nullptr;
+	}
+
+	return nullptr;
 }
 
 std::shared_ptr<text> FlatContext::AddText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& content, double size, bool fDistanceMap) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<text> pText = MakeText(pFont, pFontTexture, content, size, fDistanceMap);
+	CN(pText);
+
 	CR(AddObject(pText));
 
-//Success:
+Success:
 	return pText;
 
 Error:
+	if (pText != nullptr) {
+		pText = nullptr;
+	}
+
 	return nullptr;
 }
 
