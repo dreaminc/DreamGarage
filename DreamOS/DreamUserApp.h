@@ -117,6 +117,8 @@ public:
 
 	RESULT ResetAppComposite();
 
+	RESULT SetSeatingPosition(int seatPosition);
+
 	// Pointing
 public:
 	virtual RESULT Notify(HysteresisEvent *mEvent);

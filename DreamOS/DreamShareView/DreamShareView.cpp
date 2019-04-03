@@ -148,7 +148,7 @@ RESULT DreamShareView::Update(void *pContext) {
 			for (std::shared_ptr<UIPointerLabel> pPointerLabel : userPointers) {
 
 				auto pLabelFlatContext = pPointerLabel->GetContext();
-				if (pLabelFlatContext->IsVisible()) {
+				if (pLabelFlatContext->IsVisible() && pLabelFlatContext->GetCurrentQuad() != nullptr) {
 					point ptLabelQuad = pLabelFlatContext->GetCurrentQuad()->GetPosition(true);
 					point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (ptLabelQuad - m_pCastQuad->GetOrigin(true)));
 
@@ -245,7 +245,8 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 		long userID = pUpdatePointerMessage->GetSenderUserID();
 		std::string strInitials(pUpdatePointerMessage->m_body.szInitials, 2);
 
-		CR(AllocateSpheres(userID, strInitials));
+		CR(AllocatePointers(userID, pUpdatePointerMessage->m_body.seatPosition));
+		//CR(AllocateSpheres(userID, strInitials));
 
 		if (pUpdatePointerMessage->m_body.fLeftHand) {
 			pPointer = m_pointingObjects[userID][0];
@@ -760,9 +761,33 @@ RESULT DreamShareView::AllocateSpheres(long userID, std::string strInitials) {
 	for (int i = 0; i < 2; i++) {
 		pView = m_pointerViewPool.front();
 
-		pView->RenderLabelWithInitials(m_pCastQuad, strInitials);
+		CR(pView->RenderLabelWithInitials(m_pCastQuad, strInitials));
 
-		userPointers.emplace_back(pView);
+		userPointers.push_back(pView);
+		m_pointerViewPool.pop();
+	}
+
+	m_pointingObjects[userID] = userPointers;
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::AllocatePointers(long userID, int seatPosition) {
+	RESULT r = R_PASS;
+
+	std::vector<std::shared_ptr<UIPointerLabel>> userPointers;
+	std::shared_ptr<UIPointerLabel> pView = nullptr;
+
+	CBR(userID != -1, R_SKIPPED);
+	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
+
+	for (int i = 0; i < 2; i++) {
+		pView = m_pointerViewPool.front();
+
+		CR(pView->InitializeDot(m_pCastQuad, seatPosition));
+
+		userPointers.push_back(pView);
 		m_pointerViewPool.pop();
 	}
 
@@ -780,9 +805,9 @@ RESULT DreamShareView::AllocateSpheres(long userID) {
 	CBR(userID != -1, R_SKIPPED);
 	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
 
-	userPointers.emplace_back(m_pointerViewPool.front());
+	userPointers.push_back(m_pointerViewPool.front());
 	m_pointerViewPool.pop();
-	userPointers.emplace_back(m_pointerViewPool.front());
+	userPointers.push_back(m_pointerViewPool.front());
 	m_pointerViewPool.pop();
 
 	m_pointingObjects[userID] = userPointers;

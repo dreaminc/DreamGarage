@@ -17,6 +17,7 @@ public:
 public:
 	RESULT Initialize();
 	RESULT RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad, std::string strInitials);
+	RESULT InitializeDot(std::shared_ptr<quad> pParentQuad, int seatPosition);
 
 private:
 	RESULT RenderLabel();
@@ -48,13 +49,14 @@ private:
 private:
 	std::deque<point> m_recentPoints;
 	float m_currentAngle;
+	int m_seatingPosition = -1;
 
 // Resource strings
 private:
 	const wchar_t *k_wszPointerLeftTexture = L"texture/shared-view/pointer-left.png";
 	const wchar_t *k_wszPointerCenterTexture = L"texture/shared-view/pointer-center.png";
 	const wchar_t *k_wszPointerRightTexture = L"texture/shared-view/pointer-right.png";
-	const wchar_t *k_wszPointerDotTexture = L"texture/shared-view/pointer-dot.png";
+	const wchar_t *k_wszPointerDotTexture = L"texture/shared-view/pointer-dot-";
 
 // Resource textures
 private:

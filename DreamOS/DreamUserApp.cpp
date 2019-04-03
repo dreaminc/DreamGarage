@@ -355,6 +355,7 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 		0,
 		GetAppUID(),
 		m_ptLeftPointer,
+		m_pUserModel->GetSeatingPosition(),
 		szInitials,
 		m_fLeftSphereOn && m_fLeftSphereInteracting,
 		true);
@@ -364,6 +365,7 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 		0,
 		GetAppUID(),
 		m_ptRightPointer,
+		m_pUserModel->GetSeatingPosition(),
 		szInitials,
 		m_fRightSphereOn && m_fRightSphereInteracting,
 		false);
@@ -899,6 +901,16 @@ RESULT DreamUserApp::ResetAppComposite() {
 	RESULT r = R_PASS;
 
 	CR(UpdateCompositeWithHands(m_menuHeight));
+
+Error:
+	return r;
+}
+
+RESULT DreamUserApp::SetSeatingPosition(int seatPosition) {
+	RESULT r = R_PASS;
+	
+	CNR(m_pUserModel, R_SKIPPED);
+	m_pUserModel->SetSeatingPosition(seatPosition);
 
 Error:
 	return r;

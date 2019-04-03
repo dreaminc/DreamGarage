@@ -1066,6 +1066,7 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 		m_pDreamUserControlArea->ResetAppComposite();
 	}
 	m_pDreamUserApp->ResetAppComposite();
+	m_pDreamUserApp->SetSeatingPosition(seatingPosition);
 
 Error:
 	return r;
@@ -1203,6 +1204,8 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	// Assign Model From Pool and position peer
 	pDreamPeer->SetVisible(false);
 	CR(AllocateAndAssignUserModelFromPool(pDreamPeer));
+	pDreamPeer->SetSeatingPosition(remoteSeatingPosition);
+
 	CR(SetRoundtablePosition(pDreamPeer, remoteSeatingPosition));
 	pDreamPeer->SetVisible(true);
 

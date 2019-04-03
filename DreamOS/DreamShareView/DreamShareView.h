@@ -95,6 +95,7 @@ public:
 	// Pointing
 	RESULT AllocateSpheres(long userID);
 	RESULT AllocateSpheres(long userID, std::string strInitials);
+	RESULT AllocatePointers(long userID, int seatPosition);
 	RESULT DeallocateSpheres(long userID);
 
 	struct PendingFrame {

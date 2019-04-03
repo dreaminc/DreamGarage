@@ -139,6 +139,7 @@ public:
 	RESULT UpdateHand(const hand::HandState& pHandState);
 	RESULT UpdateMouth(float mouthScale);
 	RESULT RotateByDeg(float degX, float degY, float degZ);
+	RESULT SetSeatingPosition(int seatingPosition);
 	
 	RESULT HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMessage);
 
