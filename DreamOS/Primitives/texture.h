@@ -173,8 +173,6 @@ public:
 
 protected:
 	PIXEL_FORMAT m_pixelFormat = PIXEL_FORMAT::INVALID;
-	//texture::type m_type = texture::type::INVALID;
-
 	texture::params m_params;
 
 	int m_width = 0;

@@ -527,6 +527,9 @@ std::shared_ptr<quad> composite::MakeQuad(double width, double height, point ptC
 	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptCenter, uvTopLeft, uvBottomRight, vNormal));
 	CN(pQuad);
 
+	// Not a fan of this but this will resolve a lot of issues it seems
+	pQuad->SetPosition(ptCenter);
+
 Success:
 	return pQuad;
 
