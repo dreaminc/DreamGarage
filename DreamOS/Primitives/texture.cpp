@@ -11,15 +11,24 @@
 #include "Primitives/image/ImageFactory.h"
 
 texture::texture() :
-	m_type(texture::type::INVALID)
+	m_params(texture::type::INVALID)
 {
 	Invalidate();
+	return;
 }
 
 texture::texture(texture::type texType) :
-	m_type(texType)
+	m_params(texType)
 {
 	Validate();
+	return;
+}
+
+texture::texture(texture::params *pTextureParams) :
+	m_params(*pTextureParams)
+{
+	Validate();
+	return;
 }
 
 texture::texture(const texture& tex) :
@@ -28,10 +37,11 @@ texture::texture(const texture& tex) :
 	m_channels(tex.m_channels),
 	m_samples(tex.m_samples),
 	m_pixelFormat(tex.m_pixelFormat),
-	m_type(tex.m_type)
+	m_params(tex.m_params.textureType)
 {
 	// NOTE: this will not copy buffers on either GPU or CPU side
 	Validate();
+	return;
 }
 
 texture::texture(texture::type texType, int width, int height, int channels, int samples) :
@@ -39,9 +49,10 @@ texture::texture(texture::type texType, int width, int height, int channels, int
 	m_height(height),
 	m_channels(channels),
 	m_samples(samples),
-	m_type(texType)
+	m_params(texType)
 {
 	Validate();
+	return;
 }
 
 texture::texture(texture::type texType, int width, int height, int channels, void *pBuffer, int pBuffer_n, int samples) :
@@ -49,7 +60,7 @@ texture::texture(texture::type texType, int width, int height, int channels, voi
 	m_height(height),
 	m_channels(channels),
 	m_samples(samples),
-	m_type(texType)
+	m_params(texType)
 {
 	RESULT r = R_PASS;
 
@@ -65,7 +76,7 @@ Error:
 
 // Loads from a file buffer (file loaded into buffer)
 texture::texture(texture::type texType, uint8_t *pBuffer, size_t pBuffer_n) :
-	m_type(texType)
+	m_params(texType)
 {
 	RESULT r = R_PASS;
 
@@ -84,7 +95,7 @@ texture::texture(texture::type texType, int width, int height, PIXEL_FORMAT form
 	m_channels(channels),
 	m_samples(samples),
 	m_pixelFormat(format),
-	m_type(texType)
+	m_params(texType)
 {
 	RESULT r = R_PASS;
 
@@ -98,7 +109,7 @@ Error:
 }
 
 texture::texture(texture::type texType, wchar_t *pszFilename) :
-	m_type(texType)
+	m_params(texType)
 {
 	RESULT r = R_PASS;
 

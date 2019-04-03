@@ -5,7 +5,22 @@
 #include "Primitives/sphere.h"
 #include "DreamOS.h"
 
-RESULT DreamObjectModule::PendingDimObject::ClearObject() {
+DreamObjectModule::PendingObject::PendingObject(PrimParams *pPrimParams, void *pContext) :
+	pPrimParams(pPrimParams),
+	pContext(pContext)
+{ }
+
+DreamObjectModule::PendingDimObject::PendingDimObject(PrimParams *pPrimParams, std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext) :
+	PendingObject(pPrimParams, pContext),
+	fnOnObjectReady(fnOnObjectReady)
+{ }
+
+DreamObjectModule::PendingTextureObject::PendingTextureObject(PrimParams *pPrimParams, std::function<RESULT(texture*, void*)> fnOnTextureReady, void *pContext) :
+	PendingObject(pPrimParams, pContext),
+	fnOnTextureReady(fnOnTextureReady)
+{ }
+
+RESULT DreamObjectModule::PendingObject::ClearObject() {
 	RESULT r = R_PASS;
 
 	if (pPrimParams != nullptr) {
@@ -13,14 +28,29 @@ RESULT DreamObjectModule::PendingDimObject::ClearObject() {
 		pPrimParams = nullptr;
 	}
 
+	CR(ClearObjectImp());
+
+Error:
+	return r;
+}
+
+RESULT DreamObjectModule::PendingDimObject::ClearObjectImp() {
 	if (pDimObj != nullptr) {
 		delete pDimObj;
 		pDimObj = nullptr;
 	}
 
-Error:
-	return r;
-}
+	return R_PASS;
+};
+
+RESULT DreamObjectModule::PendingTextureObject::ClearObjectImp() {
+	if (pTexture != nullptr) {
+		delete pTexture;
+		pTexture = nullptr;
+	}
+
+	return R_PASS;
+};
 
 DreamObjectModule::DreamObjectModule(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamObjectModule>(pDreamOS, pContext)
@@ -65,16 +95,18 @@ RESULT DreamObjectModule::OnDidFinishInitializing(void *pContext) {
 RESULT DreamObjectModule::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
-	while (m_queuedDimObjects.empty() != true) {
-		PendingDimObject pendingObject = m_queuedDimObjects.front();
-		m_queuedDimObjects.pop();
-		pendingObject.ClearObject();
+	while (m_queuedObjects.empty() != true) {
+		PendingObject *pPendingObject = m_queuedObjects.front();
+		m_queuedObjects.pop();
+
+		pPendingObject->ClearObject();
 	}
 
-	while (m_pendingInitializationDimbjects.empty() != true) {
-		PendingDimObject pendingObject = m_pendingInitializationDimbjects.front();
-		m_pendingInitializationDimbjects.pop();
-		pendingObject.ClearObject();
+	while (m_pendingInitializationObjects.empty() != true) {
+		PendingObject *pPendingObject = m_pendingInitializationObjects.front();
+		m_pendingInitializationObjects.pop();
+
+		pPendingObject->ClearObject();
 	}
 
 Error:
@@ -85,24 +117,46 @@ RESULT DreamObjectModule::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	// This is GPU protected 
-	if (m_pendingInitializationDimbjects.empty() == false) {
-		m_pendingDimObjLock.lock();
-			PendingDimObject pendingObject = m_pendingInitializationDimbjects.front();
-			m_pendingInitializationDimbjects.pop();
-		m_pendingDimObjLock.unlock();
+	if (m_pendingInitializationObjects.empty() == false) {
+		m_pendingObjLock.lock();
+			PendingObject *pPendingObject = m_pendingInitializationObjects.front();
+			m_pendingInitializationObjects.pop();
+		m_pendingObjLock.unlock();
 
-		CN(pendingObject.pDimObj);
+		// Fork for texture vs. Object etc
 
-		CR(GetDOS()->InitializeObject(pendingObject.pDimObj));
-		CN(pendingObject.pDimObj);
+		PendingDimObject *pPendingDimObject = dynamic_cast<PendingDimObject*>(pPendingObject);
+		if (pPendingDimObject != nullptr) {
+			CN(pPendingDimObject->pDimObj);
+			
+			CR(GetDOS()->InitializeObject(pPendingDimObject->pDimObj));
+			CN(pPendingDimObject->pDimObj);
 
-		// Execute the call back
-		CR(pendingObject.fnOnObjectReady(pendingObject.pDimObj, pendingObject.pContext));
+			// Execute the call back
+			CR(pPendingDimObject->fnOnObjectReady(pPendingDimObject->pDimObj, pPendingDimObject->pContext));
+		}
+
+		PendingTextureObject *pPendingTexture = dynamic_cast<PendingTextureObject*>(pPendingObject);
+		if (pPendingTexture != nullptr) {
+			CN(pPendingTexture->pTexture);
+
+			CR(GetDOS()->InitializeTexture(pPendingTexture->pTexture));
+			CN(pPendingTexture->pTexture);
+
+			// Execute the call back
+			CR(pPendingTexture->fnOnTextureReady(pPendingTexture->pTexture, pPendingTexture->pContext));
+		}
+		
 
 		// Clean out the params
-		if (pendingObject.pPrimParams != nullptr) {
-			delete pendingObject.pPrimParams;
-			pendingObject.pPrimParams = nullptr;
+		if ((pPendingTexture != nullptr || pPendingDimObject != nullptr)) {
+			if (pPendingObject->pPrimParams != nullptr) {
+				delete pPendingObject->pPrimParams;
+				pPendingObject->pPrimParams = nullptr;
+			}
+		}
+		else {
+			DEBUG_LINEOUT("Pending HAL object is invalid");
 		}
 	}
 
@@ -116,20 +170,34 @@ RESULT DreamObjectModule::ModuleProcess(void *pContext) {
 	bool fRunning = true;
 
 	while (fRunning) {
-		if (m_queuedDimObjects.empty() == false) {
+		if (m_queuedObjects.empty() == false) {
 			
-			m_dimObjQueueLock.lock();
-				PendingDimObject pendingObject = m_queuedDimObjects.front();
-				m_queuedDimObjects.pop();
-			m_dimObjQueueLock.unlock();
+			m_objQueueLock.lock();
+				PendingObject *pPendingObject = m_queuedObjects.front();
+				m_queuedObjects.pop();
+			m_objQueueLock.unlock();
 
-			pendingObject.pDimObj = GetDOS()->MakeObject(pendingObject.pPrimParams, false);
-			CN(pendingObject.pDimObj);
+			PendingDimObject *pPendingDimObject = dynamic_cast<PendingDimObject*>(pPendingObject);
+			if (pPendingDimObject != nullptr) {
+				pPendingDimObject->pDimObj = GetDOS()->MakeObject(pPendingDimObject->pPrimParams, false);
+				CN(pPendingDimObject->pDimObj);
+			}
+			
+			PendingTextureObject *pPendingTexture = dynamic_cast<PendingTextureObject*>(pPendingObject);
+			if (pPendingTexture != nullptr) {
+				pPendingTexture->pTexture = GetDOS()->MakeTexture(pPendingDimObject->pPrimParams, false);
+				CN(pPendingTexture->pTexture);
+			}
 
-			// Push to the GPU pending queue
-			m_pendingDimObjLock.lock(); 
-				m_pendingInitializationDimbjects.push(pendingObject);
-			m_pendingDimObjLock.unlock();
+			if ((pPendingTexture != nullptr || pPendingObject != nullptr)) {
+				// Push to the GPU pending queue
+				m_pendingObjLock.lock();
+					m_pendingInitializationObjects.push(pPendingObject);
+				m_pendingObjLock.unlock();
+			}
+			else {
+				DEBUG_LINEOUT("Pending object is invalid");
+			}
 		}
 
 		Sleep(1);
@@ -142,16 +210,28 @@ Error:
 RESULT DreamObjectModule::QueueNewObject(PrimParams *pPrimParams, std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext) {
 	RESULT r = R_PASS;
 
-	PendingDimObject newPendingObject;
-
-	newPendingObject.pPrimParams = pPrimParams;
-	newPendingObject.fnOnObjectReady = fnOnObjectReady;
-	newPendingObject.pContext = pContext;
+	PendingDimObject *pNewPendingObject = new PendingDimObject(pPrimParams, fnOnObjectReady, pContext);
+	CN(pNewPendingObject);
 	
-	m_dimObjQueueLock.lock();
-		m_queuedDimObjects.push(newPendingObject);
-	m_dimObjQueueLock.unlock();
+	m_objQueueLock.lock();
+		m_queuedObjects.push(pNewPendingObject);
+	m_objQueueLock.unlock();
 
 Error:
 	return r;
 }
+
+RESULT DreamObjectModule::QueueNewTexture(PrimParams *pPrimParams, std::function<RESULT(texture*, void*)> fnOnTextureReady, void *pContext) {
+	RESULT r = R_PASS;
+
+	PendingTextureObject *pNewPendingTexture = new PendingTextureObject(pPrimParams, fnOnTextureReady, pContext);
+	CN(pNewPendingTexture);
+
+	m_objQueueLock.lock();
+		m_queuedObjects.push(pNewPendingTexture);
+	m_objQueueLock.unlock();
+
+Error:
+	return r;
+}
+

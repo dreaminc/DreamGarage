@@ -166,7 +166,9 @@ public:
 	}
 
 	virtual DimObj *MakeObject(PrimParams *pPrimParams, bool fInitialize = true) = 0;
+	virtual texture* MakeTexture(PrimParams *pPrimParams, bool fInitialize = true) = 0;
 	virtual RESULT InitializeObject(DimObj *pDimObj) = 0;
+	virtual RESULT InitializeTexture(texture *pTexture) = 0;
 
 	// TODO: Remove and use param pack function
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;

@@ -1227,6 +1227,25 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 
 			CRM(pDreamOS->AddObject(pObj), "Failed to add async sphere");
 
+			// Kick off new texture load for this quad
+			
+			CR(pDreamOS->LoadTexture(std::bind(&TestContext::OnQuadTextureReady, pObj, std::placeholders::_1, std::placeholders::_2),
+				(void*)(pObj), texture::type::TEXTURE_2D, L"greyscale-test.tga"));
+
+		Error:
+			return r;
+		}
+
+		RESULT OnQuadTextureReady(texture *pTexture, void *pContext) {
+			RESULT r = R_PASS;
+
+			DimObj *pDimObj = (DimObj*)(pContext);
+
+			CN(pDimObj);
+			CN(pTexture);
+
+			CR(pDimObj->SetDiffuseTexture(pTexture));
+
 		Error:
 			return r;
 		}

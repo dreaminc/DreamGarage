@@ -683,8 +683,16 @@ DimObj *DreamOS::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 	return m_pSandbox->MakeObject(pPrimParams, fInitialize);
 }
 
+texture *DreamOS::MakeTexture(PrimParams *pPrimParams, bool fInitialize) {
+	return m_pSandbox->MakeTexture(pPrimParams, fInitialize);
+}
+
 RESULT DreamOS::InitializeObject(DimObj *pDimObj) {
 	return m_pSandbox->InitializeObject(pDimObj);
+}
+
+RESULT DreamOS::InitializeTexture(texture *pTexture) {
+	return m_pSandbox->InitializeTexture(pTexture);
 }
 
 // TODO: 
@@ -736,6 +744,21 @@ RESULT DreamOS::MakeQuad(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, 
 	pQuadParams->pTextureHeight = pTextureHeight;
 
 	CRM(m_pDreamObjectModule->QueueNewObject(pQuadParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::LoadTexture(std::function<RESULT(texture*, void*)> fnOnTextureReady, void *pContext, texture::type type, const wchar_t *pszFilename) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	texture::params *pTextureParams = new texture::params(type, pszFilename);
+	CN(pTextureParams);
+
+	
+	CRM(m_pDreamObjectModule->QueueNewTexture(pTextureParams, fnOnTextureReady, pContext), "Failed to queue new object in async obj module");
 
 Error:
 	return r;
