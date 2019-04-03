@@ -151,7 +151,7 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 		m_ptLeftStick.y() = m_ptPendLeftStick.y();
 		m_fUpdateLeftStick = false;
 	}
-	else {
+	else if (m_controlType == CameraControlType::SENSECONTROLLER) {
 		m_ptLeftStick.x() = 0.0f;
 		m_ptLeftStick.y() = 0.0f;
 	}
@@ -167,7 +167,7 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 		}
 		m_fUpdateRightStick = false;
 	}
-	else {
+	else if (m_controlType == CameraControlType::SENSECONTROLLER) {
 		m_ptRightStick.x() = 0.0f;
 		m_ptRightStick.y() = 0.0f;
 	}
