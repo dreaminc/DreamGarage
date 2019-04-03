@@ -17,7 +17,7 @@ public:
 public:
 	RESULT Initialize();
 	RESULT RenderLabelWithInitials(std::shared_ptr<quad> pParentQuad, std::string strInitials);
-	RESULT RenderDot(std::shared_ptr<quad> pParentQuad, int seatPosition);
+	RESULT InitializeDot(std::shared_ptr<quad> pParentQuad, int seatPosition);
 
 private:
 	RESULT RenderLabel();

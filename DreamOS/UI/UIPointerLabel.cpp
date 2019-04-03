@@ -135,7 +135,7 @@ Error:
 	return r;
 }
 
-RESULT UIPointerLabel::RenderDot(std::shared_ptr<quad> pParentQuad, int seatPosition) {
+RESULT UIPointerLabel::InitializeDot(std::shared_ptr<quad> pParentQuad, int seatPosition) {
 	RESULT r = R_PASS;
 
 	PathManager *pPathManager = PathManager::instance();
