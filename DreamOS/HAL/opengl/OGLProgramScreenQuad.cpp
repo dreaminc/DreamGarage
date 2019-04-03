@@ -42,6 +42,7 @@ RESULT OGLProgramScreenQuad::OGLInitialize() {
 
 	m_pScreenQuad = new OGLQuad(m_pParentImp, 1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f)); // , nullptr, vNormal);
 	CN(m_pScreenQuad);
+	CR(m_pScreenQuad->OGLInitialize());
 
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 	//InitializeFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 4);

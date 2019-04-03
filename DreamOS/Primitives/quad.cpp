@@ -4,11 +4,7 @@
 
 // copy ctor
 quad::quad(quad& q) :
-	m_quadType(q.m_quadType),
-	m_numHorizontalDivisions(q.m_numHorizontalDivisions),
-	m_numVerticalDivisions(q.m_numVerticalDivisions),
-	m_pTextureHeight(q.m_pTextureHeight),
-	m_heightMapScale(q.m_heightMapScale)
+	m_params(q.m_params)
 {
 	m_pVertices = q.m_pVertices;
 	m_pIndices = q.m_pIndices;
@@ -19,11 +15,7 @@ quad::quad(quad& q) :
 
 // move ctor
 quad::quad(quad&& q) :
-	m_quadType(q.m_quadType),
-	m_numHorizontalDivisions(q.m_numHorizontalDivisions),
-	m_numVerticalDivisions(q.m_numVerticalDivisions),
-	m_pTextureHeight(q.m_pTextureHeight),
-	m_heightMapScale(q.m_heightMapScale)
+	m_params(q.m_params)
 {
 	m_pVertices = q.m_pVertices;
 	m_pIndices = q.m_pIndices;
@@ -34,13 +26,13 @@ quad::quad(quad&& q) :
 
 // Square
 quad::quad(float side, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) :
-	m_quadType(type::SQUARE),
-	m_numHorizontalDivisions(numHorizontalDivisions),
-	m_numVerticalDivisions(numVerticalDivisions),
-	m_pTextureHeight(pTextureHeight),
-	m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE)
+	m_params(side, side, numHorizontalDivisions, numVerticalDivisions, vNormal)
 {
 	RESULT r = R_PASS;
+
+	m_params.quadType = type::SQUARE;	
+	m_params.pTextureHeight = pTextureHeight;
+	m_params.heightMapScale = DEFAULT_HEIGHT_MAP_SCALE;
 
 	CR(SetVertices(side, side, vNormal));
 	
@@ -50,7 +42,7 @@ quad::quad(float side, int numHorizontalDivisions, int numVerticalDivisions, tex
 	CR(InitializeBoundingQuad(GetOrigin(), side, side, vNormal));
 	//TODO: CR(InitializeBoundingPlane());
 
-	// Success:
+ Success:
 	Validate();
 	return;
 
@@ -61,13 +53,13 @@ Error:
 
 // Rectangle
 quad::quad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) :
-	m_quadType(type::RECTANGLE),
-	m_numHorizontalDivisions(numHorizontalDivisions),
-	m_numVerticalDivisions(numVerticalDivisions),
-	m_pTextureHeight(pTextureHeight),
-	m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE)
+	m_params(width, height, numHorizontalDivisions, numVerticalDivisions, vNormal)
 {
 	RESULT r = R_PASS;
+
+	m_params.quadType = quad::type::RECTANGLE;
+	m_params.pTextureHeight = pTextureHeight;
+	m_params.heightMapScale = DEFAULT_HEIGHT_MAP_SCALE;
 
 	CR(SetVertices(width, height, vNormal));
 
@@ -78,7 +70,7 @@ quad::quad(float width, float height, int numHorizontalDivisions, int numVertica
 	CR(InitializeBoundingQuad(GetOrigin(), width, height, vNormal));
 	//TODO: CR(InitializeBoundingPlane());
 
-// Success:
+Success:
 	Validate();
 	return;
 
@@ -90,20 +82,19 @@ Error:
 // This needs to be re-designed, too specific for 2D blits.
 //quad::quad(float height, float width, point& ptCenter, uvcoord& uvBottomLeft, uvcoord& uvUpperRight, vector vNormal) :
 quad::quad(float width, float height, point& ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) :
-	m_quadType(type::RECTANGLE),
-	m_numHorizontalDivisions(1),
-	m_numVerticalDivisions(1),
-	m_pTextureHeight(nullptr),
-	m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE)
+	m_params(width, height, 1, 1, vNormal)
 {
 	RESULT r = R_PASS;
 	
+	m_params.quadType = quad::type::RECTANGLE;
+	m_params.heightMapScale = DEFAULT_HEIGHT_MAP_SCALE;
+
 	// TODO: UV thing
 	CR(SetVertices(width, height, vNormal, uvTopLeft, uvBottomRight));
 
 	CR(InitializeBoundingQuad(GetOrigin(), width, height, vNormal));
 
-//Success:
+Success:
 	Validate();
 	return;
 Error:
@@ -112,17 +103,16 @@ Error:
 }
 
 quad::quad(BoundingQuad *pBoundingQuad, bool fTriangleBased) :
-	m_quadType(type::RECTANGLE),
-	m_numHorizontalDivisions(1),
-	m_numVerticalDivisions(1),
-	m_pTextureHeight(nullptr),
-	m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE)
+	m_params()
 {
 	RESULT r = R_PASS;
 
+	m_params.quadType = quad::type::RECTANGLE;
+	m_params.heightMapScale = DEFAULT_HEIGHT_MAP_SCALE;
+
 	CR(SetVertices(pBoundingQuad, fTriangleBased));
 	
-//Success:
+Success:
 	Validate();
 	return;
 Error:
@@ -131,14 +121,14 @@ Error:
 }
 
 quad::quad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, CurveType curveType, vector vNormal) :
-	m_quadType(type::RECTANGLE),
-	m_numHorizontalDivisions(numHorizontalDivisions),
-	m_numVerticalDivisions(numVerticalDivisions),
-	m_pTextureHeight(nullptr),
-	m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE),
-	m_quadCurveType(curveType)
+	m_params(width, height, numHorizontalDivisions, numVerticalDivisions, vNormal)
+
 {
 	RESULT r = R_PASS;
+
+	m_params.quadType = quad::type::RECTANGLE;
+	m_params.heightMapScale = DEFAULT_HEIGHT_MAP_SCALE;
+	m_params.quadCurveType = curveType;
 
 	// TODO: UV thing
 	CR(SetVertices(width, height, vNormal, uvTopLeft, uvBottomRight));
@@ -169,14 +159,14 @@ RESULT quad::Allocate() {
 inline unsigned int quad::NumberVertices() {
 //return NUM_QUAD_POINTS; 
 
-	unsigned int numVerts = (m_numVerticalDivisions + 1) * (m_numHorizontalDivisions + 1);
+	unsigned int numVerts = (m_params.numVerticalDivisions + 1) * (m_params.numHorizontalDivisions + 1);
 	return numVerts;
 }
 
 inline unsigned int quad::NumberIndices() {
 	//return NUM_QUAD_TRIS * 3; 
 
-	unsigned int numDivisions = m_numVerticalDivisions * m_numHorizontalDivisions;
+	unsigned int numDivisions = m_params.numVerticalDivisions * m_params.numHorizontalDivisions;
 	unsigned int numTris = numDivisions * 2;
 	unsigned int numIndices = numTris * 3;
 
@@ -184,27 +174,27 @@ inline unsigned int quad::NumberIndices() {
 }
 
 bool quad::IsBillboard() {
-	return m_fBillboard; 
+	return m_params.fBillboard;
 }
 
 void quad::SetBillboard(bool fBillboard) {
-	m_fBillboard = fBillboard; 
+	m_params.fBillboard = fBillboard;
 }
 
 bool quad::IsScaledBillboard() {
-	return m_fScaledBillboard; 
+	return m_params.fScaledBillboard;
 }
 
 void quad::SetScaledBillboard(bool fScale) {
-	m_fScaledBillboard = fScale; 
+	m_params.fScaledBillboard = fScale;
 }
 
 float quad::GetWidth() {
-	return m_width;
+	return m_params.width;
 }
 
 float quad::GetHeight() {
-	return m_height;
+	return m_params.height;
 }
 
 // Note: Always in absolute space (vs composite)
@@ -217,10 +207,10 @@ plane quad::GetPlane() {
 RESULT quad::UpdateParams(float width, float height, vector vNormal) {
 	RESULT r = R_PASS;
 
-	if (width != m_width || height != m_height || vNormal != m_vNormal) {
-		m_width = width;
-		m_height = height;
-		m_vNormal = vNormal;
+	if (width != m_params.width || height != m_params.height || vNormal != m_params.vNormal) {
+		m_params.width = width;
+		m_params.height = height;
+		m_params.vNormal = vNormal;
 
 		CR(SetVertices(width, height, vNormal));
 	}
@@ -235,13 +225,17 @@ Error:
 RESULT quad::UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	if (pBoundingQuad->GetWidth(false) != m_width || pBoundingQuad->GetHeight(false) != m_height || pBoundingQuad->GetNormal() != m_vNormal) {
+	if (pBoundingQuad->GetWidth(false) != m_params.width || 
+		pBoundingQuad->GetHeight(false) != m_params.height || 
+		pBoundingQuad->GetNormal() != m_params.vNormal) 
+	{
 		CR(SetVertices(pBoundingQuad, fTriangleBased));
 	}
 
 	SetOrigin(pBoundingQuad->GetOrigin());
 	SetOrientation(pBoundingQuad->GetOrientation());
 	//SetScale(pBoundingQuad->GetScale());
+
 Error:
 	return r;
 }
@@ -251,12 +245,11 @@ RESULT quad::SetVertices(BoundingQuad* pBoundingQuad, bool fTriangleBased) {
 
 	SetOrigin(pBoundingQuad->GetOrigin());
 
-	m_width = pBoundingQuad->GetWidth(false);
-	m_height = pBoundingQuad->GetHeight(false);
+	m_params.width = pBoundingQuad->GetWidth(false);
+	m_params.height = pBoundingQuad->GetHeight(false);
+	m_params.vNormal = pBoundingQuad->GetNormal();
 
-	m_vNormal = pBoundingQuad->GetNormal();
-
-	CR(SetVertices(m_width, m_height, m_vNormal));
+	CR(SetVertices(m_params.width, m_params.height, m_params.vNormal));
 
 Error:
 	return r;
@@ -267,8 +260,8 @@ RESULT quad::FlipUVVertical() {
 
 	int vertCount = 0;
 
-	for (int i = 0; i < m_numHorizontalDivisions + 1; i++) {
-		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
+	for (int i = 0; i < m_params.numHorizontalDivisions + 1; i++) {
+		for (int j = 0; j < m_params.numVerticalDivisions + 1; j++) {
 			uv_precision uValue = m_pVertices[vertCount].GetUV().u();
 			uv_precision vValue = m_pVertices[vertCount].GetUV().v();
 
@@ -289,8 +282,8 @@ RESULT quad::FlipUVHorizontal() {
 
 	int vertCount = 0;
 
-	for (int i = 0; i < m_numHorizontalDivisions + 1; i++) {
-		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
+	for (int i = 0; i < m_params.numHorizontalDivisions + 1; i++) {
+		for (int j = 0; j < m_params.numVerticalDivisions + 1; j++) {
 			uv_precision uValue = m_pVertices[vertCount].GetUV().u();
 			uv_precision vValue = m_pVertices[vertCount].GetUV().v();
 
@@ -311,11 +304,11 @@ RESULT quad::SetUVValues(float top, float left, float bottom, float right) {
 
 	int vertCount = 0;
 
-	for (int i = 0; i < m_numHorizontalDivisions + 1; i++) {
-		uv_precision uValue = left + (i * (right - left) / m_numHorizontalDivisions);
+	for (int i = 0; i < m_params.numHorizontalDivisions + 1; i++) {
+		uv_precision uValue = left + (i * (right - left) / m_params.numHorizontalDivisions);
 
-		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
-			uv_precision vValue = top + (j * (bottom - top) / m_numVerticalDivisions);
+		for (int j = 0; j < m_params.numVerticalDivisions + 1; j++) {
+			uv_precision vValue = top + (j * (bottom - top) / m_params.numVerticalDivisions);
 
 			m_pVertices[vertCount++].SetUV(uValue, vValue);
 		}
@@ -333,14 +326,14 @@ RESULT quad::SetDiffuseTexture(texture* pTexture) {
 	CN(pTexture);
 	
 	// if the new texture is flipped, and quad is not flipped
-	if (pTexture->IsUVVerticalFlipped() && !m_fTextureUVFlipVertical) {
+	if (pTexture->IsUVVerticalFlipped() && !m_params.fTextureUVFlipVertical) {
 		FlipUVVertical();
-		m_fTextureUVFlipVertical = true;
+		m_params.fTextureUVFlipVertical = true;
 	}
 	// if the new texture is not flipped and quad is flipped
-	else if (!pTexture->IsUVVerticalFlipped() && m_fTextureUVFlipVertical) {
+	else if (!pTexture->IsUVVerticalFlipped() && m_params.fTextureUVFlipVertical) {
 		FlipUVVertical();
-		m_fTextureUVFlipVertical = false;
+		m_params.fTextureUVFlipVertical = false;
 	}
 
 	m_pTextureDiffuse = pTexture;
@@ -350,7 +343,7 @@ Error:
 }
 
 vector quad::GetNormal(bool fAbsolute) {
-	vector vNormal = m_vNormal;
+	vector vNormal = m_params.vNormal;
 
 	if (fAbsolute) {
 		//vNormal = GetModelMatrix() * vNormal;
@@ -368,19 +361,19 @@ RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoor
 
 	CR(Allocate());
 
-	m_width = width;
-	m_height = height;
-	m_vNormal = vNormal;
+	m_params.width = width;
+	m_params.height = height;
+	m_params.vNormal = vNormal;
 
 	//m_heightMapScale = sqrt(m_width * m_width + m_height * m_height);
 
-	m_heightMapScale = 2.0f;
+	m_params.heightMapScale = 2.0f;
 
 	float halfHeight = height / 2.0f;
 	float halfWidth = width / 2.0f;
 
-	float widthInc = width / m_numHorizontalDivisions;
-	float heightInc = height / m_numVerticalDivisions;
+	float widthInc = width / m_params.numHorizontalDivisions;
+	float heightInc = height / m_params.numVerticalDivisions;
 
 	int vertCount = 0;
 	int indexCount = 0;
@@ -389,20 +382,20 @@ RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoor
 	// Set up indices 
 	TriangleIndexGroup *pTriIndices = reinterpret_cast<TriangleIndexGroup*>(m_pIndices);
 
-	for (int i = 0; i < m_numHorizontalDivisions + 1; i++) {
-		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
+	for (int i = 0; i < m_params.numHorizontalDivisions + 1; i++) {
+		for (int j = 0; j < m_params.numVerticalDivisions + 1; j++) {
 
 			double yValue = 0.0f;
 
 			uv_precision uRange = uvBottomRight.u() - uvTopLeft.u();
 			uv_precision vRange = uvBottomRight.v() - uvTopLeft.v();
 
-			uv_precision uValue = uvTopLeft.u() + (((float)(i) / (float)(m_numHorizontalDivisions)) * uRange);
-			uv_precision vValue = uvTopLeft.v() + (((float)(j) / (float)(m_numVerticalDivisions)) * vRange);
+			uv_precision uValue = uvTopLeft.u() + (((float)(i) / (float)(m_params.numHorizontalDivisions)) * uRange);
+			uv_precision vValue = uvTopLeft.v() + (((float)(j) / (float)(m_params.numVerticalDivisions)) * vRange);
 
-			if (m_pTextureHeight != nullptr) {
-				yValue = m_pTextureHeight->GetAverageValueAtUV(uValue, 1.0f - vValue);
-				yValue *= m_heightMapScale;
+			if (m_params.pTextureHeight != nullptr) {
+				yValue = m_params.pTextureHeight->GetAverageValueAtUV(uValue, 1.0f - vValue);
+				yValue *= m_params.heightMapScale;
 			}
 
 			m_pVertices[vertCount] = vertex(point((widthInc * i) - halfWidth, static_cast<float>(yValue), (heightInc * j) - halfHeight),
@@ -431,13 +424,13 @@ RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoor
 		}
 	}
 
-	for (int i = 0; i < m_numHorizontalDivisions; i++) {
-		for (int j = 0; j < m_numVerticalDivisions; j++) {
-			A = (i)+((m_numHorizontalDivisions + 1) * j);
-			B = (i + 1) + ((m_numHorizontalDivisions + 1) * j);
+	for (int i = 0; i < m_params.numHorizontalDivisions; i++) {
+		for (int j = 0; j < m_params.numVerticalDivisions; j++) {
+			A = (i) + ((m_params.numHorizontalDivisions + 1) * j);
+			B = (i + 1) + ((m_params.numHorizontalDivisions + 1) * j);
 
-			C = (i)+((m_numHorizontalDivisions + 1) * (j + 1));
-			D = (i + 1) + ((m_numHorizontalDivisions + 1) * (j + 1));
+			C = (i) + ((m_params.numHorizontalDivisions + 1) * (j + 1));
+			D = (i + 1) + ((m_params.numHorizontalDivisions + 1) * (j + 1));
 
 			pTriIndices[indexCount++] = TriangleIndexGroup(A, B, C);
 			SetTriangleNormal(A, B, C);
@@ -653,36 +646,36 @@ std::pair<T, T> quad::GetCurveNormal(T xVal, std::vector<std::pair<T, T>> curveV
 RESULT quad::ApplyCurveToVertices() {
 	RESULT r = R_PASS;
 
-	size_t divisions = m_numHorizontalDivisions + 1;
-	float effRange = ((float)(m_numHorizontalDivisions));
+	size_t divisions = m_params.numHorizontalDivisions + 1;
+	float effRange = ((float)(m_params.numHorizontalDivisions));
 
-	float val = m_width / 2.0f;
+	float val = m_params.width / 2.0f;
 
 	float startVal = 0.0f;
 	float endVal = 0.0f;
 
-	auto pairStartEnd = GetStartEndForCurveLengthWithMidpoint(m_width, 0.0f, (int)(divisions), m_quadCurveType, val);
+	auto pairStartEnd = GetStartEndForCurveLengthWithMidpoint(m_params.width, 0.0f, (int)(divisions), m_params.quadCurveType, val);
 	startVal = pairStartEnd.first;
 	endVal = pairStartEnd.second;
 
-	float curveArcLength = GetCurveArcLength<float>(startVal, endVal, (int)(divisions), m_quadCurveType, val);
+	float curveArcLength = GetCurveArcLength<float>(startVal, endVal, (int)(divisions), m_params.quadCurveType, val);
 
-	std::vector<std::pair<float, float>> curveValues = GetCurveBuffer<float>(startVal, endVal, (int)(divisions), m_quadCurveType, val);
+	std::vector<std::pair<float, float>> curveValues = GetCurveBuffer<float>(startVal, endVal, (int)(divisions), m_params.quadCurveType, val);
 	curveArcLength = GetCurveBufferArcLength<float>(curveValues);
 
-	auto ptFocus = GetCurveFocus(m_quadCurveType, val);
+	auto ptFocus = GetCurveFocus(m_params.quadCurveType, val);
 
-	CB((m_quadCurveType != CurveType::FLAT));
+	CB((m_params.quadCurveType != CurveType::FLAT));
 
-	for (int i = 0; i < m_numHorizontalDivisions + 1; i++) {
-		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
-			int vertNum = (i * (m_numHorizontalDivisions + 1)) + j;
+	for (int i = 0; i < m_params.numHorizontalDivisions + 1; i++) {
+		for (int j = 0; j < m_params.numVerticalDivisions + 1; j++) {
+			int vertNum = (i * (m_params.numHorizontalDivisions + 1)) + j;
 
 			// Displacement
 			vertex *pVertex = &(m_pVertices[vertNum]);
 			
 			point ptVert = pVertex->GetPoint();
-			ptVert = ptVert + (m_vNormal * curveValues[i].second);
+			ptVert = ptVert + (m_params.vNormal * curveValues[i].second);
 			ptVert.x() = curveValues[i].first;
 
 			pVertex->SetPoint(ptVert);

@@ -24,7 +24,7 @@ public:
 	OGLQuad(OpenGLImp *pParentImp, float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector());
 	OGLQuad(OpenGLImp *pParentImp, BoundingQuad* pBoundingQuad, bool fTriangleBased);
 
-	~OGLQuad();
+	~OGLQuad() = default;
 
 	RESULT UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad);
 };

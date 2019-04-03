@@ -13,6 +13,9 @@
 #define DEFAULT_HEIGHT_MAP_SCALE 1.0f
 
 #include "DimObj.h"
+
+#include "PrimParams.h"
+
 #include "Vertex.h"
 #include "point.h"
 #include "color.h"
@@ -39,6 +42,33 @@ public:
 		PARABOLIC,
 		CIRCLE,
 		INVALID
+	};
+
+	struct params :
+		public PrimParams
+	{
+		virtual PRIMITIVE_TYPE GetPrimitiveType() override { return PRIMITIVE_TYPE::VOLUME; }
+
+		params(double width = 1.0f, double height = 1.0f, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, vector vNormal = vector::jVector()) :
+			width(width),
+			height(height),
+			numVerticalDivisions(numVerticalDivisions),
+			numHorizontalDivisions(numHorizontalDivisions),
+			vNormal(vNormal)
+		{ }
+
+		type quadType = type::INVALID;
+		CurveType quadCurveType = CurveType::INVALID;
+		int numVerticalDivisions = 1;
+		int numHorizontalDivisions = 1;
+		texture *pTextureHeight = nullptr;
+		double heightMapScale = 1.0f;
+		float width = 1.0f;
+		float height = 1.0f;
+		vector vNormal;
+		bool fBillboard = false;
+		bool fScaledBillboard = false;
+		bool fTextureUVFlipVertical = false;
 	};
 
 public:
@@ -111,23 +141,7 @@ public:
 	plane GetPlane();
 
 private:
-	type m_quadType = type::INVALID;
-	CurveType m_quadCurveType = CurveType::INVALID;
-
-	int m_numVerticalDivisions = 1;
-	int m_numHorizontalDivisions = 1;
-
-	texture *m_pTextureHeight = nullptr;
-	double m_heightMapScale = 1.0f;
-
-	float m_width;
-	float m_height;
-	vector m_vNormal;
-
-	bool m_fBillboard = false;
-	bool m_fScaledBillboard = false;
-
-	bool m_fTextureUVFlipVertical = false;
+	quad::params m_params;
 
 };
 
