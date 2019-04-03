@@ -410,6 +410,13 @@ texture* OpenGLImp::MakeTexture(PrimParams *pPrimParams, bool fInitialize) {
 	pOGLTexture = new OGLTexture(this, pTextureParams);
 	CN(pOGLTexture);
 
+	if (pTextureParams->pszFilename != nullptr) {
+		CR(pOGLTexture->LoadTextureFromFile(pTextureParams->pszFilename));
+	}
+	else {
+		CBM((false), "Currently MakeTexture PrimParam path only supports path based textures")
+	}
+
 	if (fInitialize) {
 		CR(pOGLTexture->OGLInitialize());
 	}

@@ -5600,7 +5600,7 @@ RESULT HALTestSuite::AddTestTextureFormats() {
 		CR(pHAL->MakeCurrentContext());
 
 		ProgramNode* pRenderProgramNode;
-		pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+		pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_texture");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -5620,32 +5620,38 @@ RESULT HALTestSuite::AddTestTextureFormats() {
 
 		// Objects 
 
-		volume *pVolume;
-		pVolume = nullptr;
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_SPOT, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		quad *pQuad;
+		pQuad = nullptr;
 
 		{
 
 			// Color 
 
-			pVolume = m_pDreamOS->AddVolume(width, height, length);
-			CN(pVolume);
-			pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+			pQuad = m_pDreamOS->AddQuad(width, height);
+			CN(pQuad);
+			pQuad->SetPosition(point(-1.0f, 0.0f, 0.0f));
+			pQuad->RotateXByDeg(90.0f);
 
 			//texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"island-diffuse.jpg");
-			//CN(pColorTexture);
-			//
-			//CR(pVolume->SetDiffuseTexture(pColorTexture));
+			texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"cobblestone_color.png");
+			CN(pColorTexture);
+			
+			CR(pQuad->SetDiffuseTexture(pColorTexture));
 
 			// Grayscale 
 
-			pVolume = m_pDreamOS->AddVolume(width, height, length);
-			CN(pVolume);
-			pVolume->SetPosition(point(1.0f, 0.0f, 0.0f));
+			pQuad = m_pDreamOS->AddQuad(width, height);
+			CN(pQuad);
+			pQuad->SetPosition(point(1.0f, 0.0f, 0.0f));
+			pQuad->RotateXByDeg(90.0f);
 
 			texture *pGrayscaleTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"greyscale-test.tga");
 			CN(pGrayscaleTexture);
 
-			CR(pVolume->SetDiffuseTexture(pGrayscaleTexture));
+			CR(pQuad->SetDiffuseTexture(pGrayscaleTexture));
 		}
 
 

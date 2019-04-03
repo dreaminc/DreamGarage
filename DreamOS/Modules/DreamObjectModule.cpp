@@ -185,7 +185,7 @@ RESULT DreamObjectModule::ModuleProcess(void *pContext) {
 			
 			PendingTextureObject *pPendingTexture = dynamic_cast<PendingTextureObject*>(pPendingObject);
 			if (pPendingTexture != nullptr) {
-				pPendingTexture->pTexture = GetDOS()->MakeTexture(pPendingDimObject->pPrimParams, false);
+				pPendingTexture->pTexture = GetDOS()->MakeTexture(pPendingTexture->pPrimParams, false);
 				CN(pPendingTexture->pTexture);
 			}
 

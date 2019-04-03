@@ -1095,6 +1095,7 @@ texture *SandboxApp::MakeTexture(PrimParams *pPrimParams, bool fInitialize) {
 	texture *pTexture = nullptr;
 
 	pTexture = m_pHALImp->MakeTexture(pPrimParams, fInitialize);
+	CN(pTexture);
 
 Success:
 	return pTexture;
