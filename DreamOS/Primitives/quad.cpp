@@ -24,6 +24,35 @@ quad::quad(quad&& q) :
 	q.m_pIndices = nullptr;
 }
 
+quad::quad(quad::params *pQuadParams) :
+	m_params(*pQuadParams)
+{
+	RESULT r = R_PASS;
+
+	if(m_params.width == m_params.height)
+		m_params.quadType = type::SQUARE;
+	else 
+		m_params.quadType = type::RECTANGLE;
+
+	m_params.heightMapScale = DEFAULT_HEIGHT_MAP_SCALE;
+
+	CR(SetVertices(m_params.width, m_params.height, m_params.vNormal));
+
+	//CR(InitializeOBB());
+	//CR(InitializeBoundingSphere());
+
+	CR(InitializeBoundingQuad(GetOrigin(), m_params.width, m_params.height, m_params.vNormal));
+	//TODO: CR(InitializeBoundingPlane());
+
+Success:
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
+}
+
 // Square
 quad::quad(float side, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) :
 	m_params(side, side, numHorizontalDivisions, numVerticalDivisions, vNormal)

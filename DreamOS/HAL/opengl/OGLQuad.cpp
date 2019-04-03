@@ -14,6 +14,13 @@ OGLQuad::OGLQuad(OpenGLImp *pParentImp, quad&& q) :
 	// 
 }
 
+OGLQuad::OGLQuad(OpenGLImp *pParentImp, quad::params *pQuadParams) :
+	quad(pQuadParams),
+	OGLObj(pParentImp)
+{
+	//
+}
+
 OGLQuad::OGLQuad(OpenGLImp *pParentImp, float side, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) :
 	quad(side, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal),
 	OGLObj(pParentImp)

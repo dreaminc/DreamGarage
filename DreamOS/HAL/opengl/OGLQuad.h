@@ -18,6 +18,7 @@ class OGLQuad : public quad, public OGLObj {
 public:
 	OGLQuad(OpenGLImp *pParentImp);
 	OGLQuad(OpenGLImp *pParentImp, quad&& q);
+	OGLQuad(OpenGLImp *pParentImp, quad::params *pQuadParams);
 	OGLQuad(OpenGLImp *pParentImp, float side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 	OGLQuad(OpenGLImp *pParentImp, float width, float height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 	OGLQuad(OpenGLImp *pParentImp, float width, float height, point& ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal);

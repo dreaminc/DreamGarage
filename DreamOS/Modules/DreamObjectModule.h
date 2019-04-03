@@ -46,7 +46,10 @@ protected:
 	static DreamObjectModule* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
+	std::mutex m_dimObjQueueLock;
 	std::queue<PendingDimObject> m_queuedDimObjects;
+
+	std::mutex m_pendingDimObjLock;
 	std::queue<PendingDimObject> m_pendingInitializationDimbjects;
 };
 

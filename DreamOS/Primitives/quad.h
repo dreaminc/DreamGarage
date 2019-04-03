@@ -47,7 +47,7 @@ public:
 	struct params :
 		public PrimParams
 	{
-		virtual PRIMITIVE_TYPE GetPrimitiveType() override { return PRIMITIVE_TYPE::VOLUME; }
+		virtual PRIMITIVE_TYPE GetPrimitiveType() override { return PRIMITIVE_TYPE::QUAD; }
 
 		params(double width = 1.0f, double height = 1.0f, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, vector vNormal = vector::jVector()) :
 			width(width),
@@ -74,6 +74,8 @@ public:
 public:
 	quad(quad& q);	// copy ctor
 	quad(quad&& q);	// move ctor
+
+	quad(quad::params *pQuadParams);
 
 	quad(float side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 	quad(float width, float height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());

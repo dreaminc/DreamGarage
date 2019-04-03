@@ -1223,6 +1223,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			}
 
 			pObj->SetPosition(ptOrigin);
+			pObj->RotateXByDeg(90.0f);
 
 			CRM(pDreamOS->AddObject(pObj), "Failed to add async sphere");
 
@@ -1284,7 +1285,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 						///*
 						// quad
 						CR(m_pDreamOS->MakeQuad(std::bind(&TestContext::OnQuadReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
-							(void*)(pPtOrigin), radius * 2.0f, radius * 2.0f, radius * 2.0f));
+							(void*)(pPtOrigin), radius * 2.0f, radius * 2.0f));
 						//*/
 					}
 				}
