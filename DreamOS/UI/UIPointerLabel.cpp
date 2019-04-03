@@ -216,9 +216,11 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		}
 
 		// calculate orientation
+		/*
 		if (m_recentPoints.size() == NUM_POINTS) {
 			UpdateOrientationFromPoints();
 		}
+		//*/
 	}
 
 
