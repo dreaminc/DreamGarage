@@ -1272,11 +1272,11 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			light *pLight;
 			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 
-			// 
-			//model *pModel = m_pDreamOS->AddModel(L"\\Cave\\cave.FBX");
-			//CN(pModel);
-			//pModel->SetPosition(point(2.0f, -2.5f, 0.0f));
-			//pModel->SetScale(0.05f);
+			
+			model *pModel = m_pDreamOS->AddModel(L"dreamos:\\Assets\\model\\avatar\\3\\head.fbx");
+			CN(pModel);
+			pModel->SetPosition(point(2.0f, -2.5f, 0.0f));
+			pModel->SetScale(0.05f);
 
 			// Test the creation of an arbitrarily large number of spheres
 			for (int i = 0; i < factor; i++) {
@@ -1301,7 +1301,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 							(void*)(pPtOrigin), radius * 2.0f, radius * 2.0f, radius * 2.0f));
 						//*/
 
-						///*
+						/*
 						// quad
 						CR(m_pDreamOS->MakeQuad(std::bind(&TestContext::OnQuadReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
 							(void*)(pPtOrigin), radius * 2.0f, radius * 2.0f));

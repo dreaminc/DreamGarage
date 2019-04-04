@@ -116,6 +116,9 @@ public:
 	RESULT GetValuePath(PATH_VALUE_TYPE type, std::wstring &r_wstrPath);
 
 	RESULT GetValuePathVersion(PATH_VALUE_TYPE type, version ver, wchar_t* &n_pszVersionPath);
+ 
+	RESULT GetFilePath(std::wstring wstrFilename, char* &n_pszFilePath);
+	RESULT GetFilePath(std::wstring wstrFilename, std::wstring &r_wstrFilePath);
 
 	RESULT GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName, wchar_t* &n_pszFilePath);
 	RESULT GetFilePath(PATH_VALUE_TYPE type, std::wstring wstrFilename, char* &n_pszFilePath);
@@ -132,9 +135,9 @@ public:
 	std::wstring GetDirectoryPathFromFilePath(std::wstring wstrFilePath);
 	std::string GetDirectoryPathFromFilePath(std::string strFilePath);
 
-	bool IsRootPath(wchar_t *pwszRoot, wchar_t *pwszFilename);
+	bool IsRootPath(wchar_t *pwszRoot, wchar_t *pwszFilename, wchar_t** ppszOptPath = nullptr);
 	bool IsAbsolutePath(wchar_t *pwszFilename);
-	bool IsDreamPath(wchar_t *pwszFilename);
+	bool IsDreamPath(wchar_t *pwszFilename, wchar_t** ppszOptPath = nullptr);
 
 	virtual RESULT DoesPathExist(const wchar_t *pszPath) = 0;
 	virtual RESULT GetListOfDirectoriesInPath(PATH_VALUE_TYPE type, std::list<wchar_t*>* pListDirs) = 0;

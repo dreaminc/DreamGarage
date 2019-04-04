@@ -308,6 +308,10 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 		CRM(pPathManager->GetFilePath(PATH_MODEL, wstrModelFilename, wstrModelFilePath), "Failed to get model file path");
 		CRM(pPathManager->DoesPathExist(wstrModelFilePath, true), "Model file path not found");
 	}
+	else if (pPathManager->IsDreamPath(&wstrModelFilename[0]) == true) {
+		CRM(pPathManager->GetFilePath(wstrModelFilename, wstrModelFilePath), "Failed to get model file path");
+		CRM(pPathManager->DoesPathExist(wstrModelFilePath, true), "Model file path not found");
+	}
 	else {
 		wstrModelFilePath = wstrModelFilename;
 	}
