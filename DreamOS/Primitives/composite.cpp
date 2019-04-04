@@ -213,6 +213,7 @@ Error:
 	if (pHand != nullptr) {
 		pHand = nullptr;
 	}
+
 	return nullptr;
 }
 

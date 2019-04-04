@@ -1077,7 +1077,7 @@ DimObj *SandboxApp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 	DimObj *pDimObj = nullptr;
 
 	if (pPrimParams->GetPrimitiveType() == PRIMITIVE_TYPE::MODEL) {
-		pDimObj = ModelFactory::MakeModel(pPrimParams, fInitialize);
+		pDimObj = ModelFactory::MakeModel(m_pHALImp, pPrimParams, fInitialize);
 		CN(pDimObj);
 	}
 	else {

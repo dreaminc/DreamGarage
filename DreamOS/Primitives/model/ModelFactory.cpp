@@ -21,7 +21,7 @@
 #include "Primitives/Vertex.h"
 #include "Primitives/color.h"
 
-std::vector<texture*> MakeTexturesFromAssetImporterMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiTextureType textureType, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
+std::vector<texture*> MakeTexturesFromAssetImporterMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiTextureType textureType, aiMaterial *pAIMaterial, const aiScene *pAIScene, bool fLoadAsync = false) {
 	RESULT r = R_PASS;
 	std::vector<texture*> retTextures;
 
@@ -58,7 +58,7 @@ Error:
 	return std::vector<texture*>();
 }
 
-RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
+RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiMaterial *pAIMaterial, const aiScene *pAIScene, bool fLoadAsync = false) {
 	RESULT r = R_PASS;
 
 	aiColor4D aic;
@@ -110,48 +110,54 @@ RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMe
 	}
 
 	// Textures
-	// TODO: Support more than one texture
-	// TODO: Bump maps
-	if (pAIMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-		auto diffuseTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_DIFFUSE, pAIMaterial, pAIScene);
-		
-		if (diffuseTextures.size() > 0) {
-			pMesh->SetDiffuseTexture(diffuseTextures[0]);
+
+	if (fLoadAsync == false) {
+		// TODO: Support more than one texture
+		// TODO: Bump maps
+		if (pAIMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+			auto diffuseTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_DIFFUSE, pAIMaterial, pAIScene, fLoadAsync);
+
+			if (diffuseTextures.size() > 0) {
+				pMesh->SetDiffuseTexture(diffuseTextures[0]);
+			}
+		}
+
+		if (pAIMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0) {
+			auto specularTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_SPECULAR, pAIMaterial, pAIScene, fLoadAsync);
+
+			if (specularTextures.size() > 0) {
+				pMesh->SetSpecularTexture(specularTextures[0]);
+			}
+		}
+
+		// TODO: This may or may not be a bug with assimp
+		//if (pAIMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
+		if (pAIMaterial->GetTextureCount(aiTextureType_HEIGHT) > 0) {
+			//auto bumpTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_NORMALS, pAIMaterial, pAIScene);
+			auto bumpTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_HEIGHT, pAIMaterial, pAIScene, fLoadAsync);
+
+			if (bumpTextures.size() > 0) {
+				pMesh->SetBumpTexture(bumpTextures[0]);
+			}
+		}
+
+		if (pAIMaterial->GetTextureCount(aiTextureType_AMBIENT) > 0) {
+			auto ambientTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_AMBIENT, pAIMaterial, pAIScene, fLoadAsync);
+
+			if (ambientTextures.size() > 0) {
+				pMesh->SetAmbientTexture(ambientTextures[0]);
+			}
 		}
 	}
-
-	if (pAIMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0) {
-		auto specularTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_SPECULAR, pAIMaterial, pAIScene);
-
-		if (specularTextures.size() > 0) {
-			pMesh->SetSpecularTexture(specularTextures[0]);
-		}
+	else {
+		// TODO: 
 	}
 
-	// TODO: This may or may not be a bug with assimp
-	//if (pAIMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
-	if (pAIMaterial->GetTextureCount(aiTextureType_HEIGHT) > 0) {
-		//auto bumpTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_NORMALS, pAIMaterial, pAIScene);
-		auto bumpTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_HEIGHT, pAIMaterial, pAIScene);
-
-		if (bumpTextures.size() > 0) {
-			pMesh->SetBumpTexture(bumpTextures[0]);
-		}
-	}
-
-	if (pAIMaterial->GetTextureCount(aiTextureType_AMBIENT) > 0) {
-		auto ambientTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_AMBIENT, pAIMaterial, pAIScene);
-
-		if (ambientTextures.size() > 0) {
-			pMesh->SetAmbientTexture(ambientTextures[0]);
-		}
-	}
-
-//Error:
+Error:
 	return r;
 }
 
-RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *pAIScene) {
+RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *pAIScene, bool fLoadAsync = false) {
 	RESULT r = R_PASS;
 
 	std::vector<vertex> vertices;
@@ -256,15 +262,19 @@ RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *p
 		}
 	}
 	
-	// Create the mesh and add to model
-	std::shared_ptr<mesh> pMesh = pModel->AddMesh(vertices, indices);
-	CN(pMesh);
+	if (fLoadAsync == false) {
+		// Create the mesh and add to model
+		std::shared_ptr<mesh> pMesh = pModel->AddMesh(vertices, indices);
+		CN(pMesh);
 
-	// Materials 
-	//if (pAIMesh->mMaterialIndex != 0) {
-	if (pAIScene->mNumMaterials > 0) {
-		aiMaterial *pAIMaterial = pAIScene->mMaterials[pAIMesh->mMaterialIndex];
-		CRM(ProcessAssetImporterMeshMaterial(pModel, pMesh, pAIMaterial, pAIScene), "Failed to process material for mesh");
+		// Materials 
+		if (pAIScene->mNumMaterials > 0) {
+			aiMaterial *pAIMaterial = pAIScene->mMaterials[pAIMesh->mMaterialIndex];
+			CRM(ProcessAssetImporterMeshMaterial(pModel, pMesh, pAIMaterial, pAIScene, fLoadAsync), "Failed to process material for mesh");
+		}
+	}
+	else {
+
 	}
 
 
@@ -272,7 +282,7 @@ Error:
 	return r;
 }
 
-RESULT ProcessAssetImporterNode(model *pModel, aiNode *pAINode, const aiScene *pAIScene) {
+RESULT ProcessAssetImporterNode(model *pModel, aiNode *pAINode, const aiScene *pAIScene, bool fLoadAsync = false) {
 	RESULT r = R_PASS;
 
 	// Process all the node's meshes (if any)
@@ -281,12 +291,12 @@ RESULT ProcessAssetImporterNode(model *pModel, aiNode *pAINode, const aiScene *p
 		
 		//meshes.push_back(ProcessAssetImporterMesh(pModel, pAIMesh, pAIScene));
 
-		CR(ProcessAssetImporterMesh(pModel, pAIMesh, pAIScene));
+		CR(ProcessAssetImporterMesh(pModel, pAIMesh, pAIScene, fLoadAsync));
 	}
 
 	// Then do the same for each of its children
 	for (unsigned int i = 0; i < pAINode->mNumChildren; i++) {
-		ProcessAssetImporterNode(pModel, pAINode->mChildren[i], pAIScene);
+		ProcessAssetImporterNode(pModel, pAINode->mChildren[i], pAIScene, fLoadAsync);
 	}
 
 Error:
@@ -351,37 +361,22 @@ unsigned int GetAssImpFlags(ModelFactory::flags modelFactoryFlags) {
 	return assimpFlags;
 }
 
-const aiScene *ReadModelFromDisk(std::wstring wstrFilePath, unsigned int assimpFlags) {
-	RESULT r = R_PASS;
-
-	Assimp::Importer assetImporter;
-
-	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(wstrFilePath), assimpFlags);
-
-	CNM(pAIScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());
-	CBM(((pAIScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) == 0), "Asset Importer Scene Incomplete: %s", assetImporter.GetErrorString());
-	CNM(pAIScene->mRootNode, "Asset Importer scene root is null: %s", assetImporter.GetErrorString());
-
-Success:
-	return pAIScene;
-
-Error:
-	return nullptr;
-}
-
 model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
 	RESULT r = R_PASS;
 
 	model *pModel = nullptr;
+	Assimp::Importer assetImporter;
 
 	pModel = MakeAndInitializeModel(pParentImp, wstrModelFilename);
 	CNM(pModel, "Failed to load model");
 
 	// Load model from disk
-	const aiScene *pAIScene = ReadModelFromDisk(pModel->GetModelFilePath(), GetAssImpFlags(modelFactoryFlags));
-	CN(pAIScene);
+	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(pModel->GetModelFilePath()), GetAssImpFlags(modelFactoryFlags));
+	CNM(pAIScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());
+	CBM(((pAIScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) == 0), "Asset Importer Scene Incomplete: %s", assetImporter.GetErrorString());
+	CNM(pAIScene->mRootNode, "Asset Importer scene root is null: %s", assetImporter.GetErrorString());
 
-	CRM(ProcessAssetImporterNode(pModel, pAIScene->mRootNode, pAIScene), "Failed to process Asset Importer root node");
+	CRM(ProcessAssetImporterNode(pModel, pAIScene->mRootNode, pAIScene, false), "Failed to process Asset Importer root node");
 
 	//pModel->UpdateBoundingVolume();
 
@@ -410,12 +405,14 @@ model *ModelFactory::MakeModel(HALImp *pParentImp, PrimParams *pPrimParams, bool
 	CNM(pModel, "Failed to load model");
 
 	// Load model from disk
-	const aiScene *pAIScene = ReadModelFromDisk(pModel->GetModelFilePath(), GetAssImpFlags(pModelParams->modelFactoryFlags));
-	CN(pAIScene);
+	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(pModel->GetModelFilePath()), GetAssImpFlags(pModelParams->modelFactoryFlags));
+	CNM(pAIScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());
+	CBM(((pAIScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) == 0), "Asset Importer Scene Incomplete: %s", assetImporter.GetErrorString());
+	CNM(pAIScene->mRootNode, "Asset Importer scene root is null: %s", assetImporter.GetErrorString());
 
-	// TODO: Find another route for process that can be async (it's really just about the mesh/texture load requests 
-	// and handling them correctly with context
-	// 
+	CRM(ProcessAssetImporterNode(pModel, pAIScene->mRootNode, pAIScene, true), "Failed to process Asset Importer root node");
+
+	//pModel->UpdateBoundingVolume();
 
 Success:
 	return pModel;
