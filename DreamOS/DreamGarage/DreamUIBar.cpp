@@ -509,7 +509,6 @@ RESULT DreamUIBar::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pB
 			if (pObj->GetParentScope() == "" || pObj->GetParentScope() == m_pMenuNode->GetScope()) {
 				m_downloadQueue.push(std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>(pObj, pBufferVector));
 			}
-			m_pendingRequests--;
 		}
 	}
 
@@ -564,6 +563,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 		m_requestQueue = std::queue<std::shared_ptr<MenuNode>>();
 		m_pScrollView->ClearScrollViewNodes();
 		m_loadedMenuItems = 0;
+		m_pendingRequests = 0;
 
 		CR(MakeMenuItems());
 	}
@@ -725,6 +725,7 @@ RESULT DreamUIBar::ProcessDownloadMenuItemTexture() {
 		if (pBufferVector != nullptr) {
 			pBufferVector = nullptr;
 		}
+		m_pendingRequests--;
 		m_downloadQueue.pop();
 	}
 
