@@ -296,7 +296,6 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 	RESULT r = R_PASS;
 
 	model *pModel = nullptr;
-
 	Assimp::Importer assetImporter;
 
 	// Get file path
@@ -316,7 +315,6 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 		wstrModelFilePath = wstrModelFilename;
 	}
 
-	//pModel = new model(pParentImp);
 	pModel = pParentImp->MakeModel();
 	CN(pModel);
 	CR(pModel->InitializeOBB());
@@ -347,6 +345,29 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 	CRM(ProcessAssetImporterNode(pModel, pAIScene->mRootNode, pAIScene), "Failed to process Asset Importer root node");
 
 	//pModel->UpdateBoundingVolume();
+
+Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+
+	return nullptr;
+}
+
+model *ModelFactory::MakeModel(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	model *pModel = nullptr;
+	Assimp::Importer assetImporter;
+
+	model::params *pModelParams = dynamic_cast<model::params*>(pPrimParams);
+	CN(pModelParams);
+
+
 
 Success:
 	return pModel;

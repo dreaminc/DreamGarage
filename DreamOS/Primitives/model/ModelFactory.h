@@ -8,6 +8,8 @@
 
 #include <string>
 
+#include "Primitives/PrimParams.h"
+
 class model;
 class HALImp;
 
@@ -22,6 +24,7 @@ public:
 
 public:
 	static model* MakeModel(HALImp *pParentImp, std::wstring wstrModelFilename, ModelFactory::flags modelFactoryFlags = ModelFactory::flags::NONE);
+	static model* MakeModel(PrimParams *pPrimParams, bool fInitialize = false);
 };
 
 #endif // ! MODEL_FACTORY_H_

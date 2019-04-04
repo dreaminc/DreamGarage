@@ -383,10 +383,10 @@ DimObj* OpenGLImp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 			CN(pOGLObj);
 		} break;
 
-		case PRIMITIVE_TYPE::MODEL: {
-			pOGLObj = MakeModel(pPrimParams, fInitialize);
-			CN(pOGLObj);
-		} break;
+		//case PRIMITIVE_TYPE::MODEL: {
+		//	pOGLObj = MakeModel(pPrimParams, fInitialize);
+		//	CN(pOGLObj);
+		//} break;
 	}
 
 Success:
