@@ -28,6 +28,9 @@ public:
 	std::shared_ptr<FlatContext> GetContext();
 	bool IsPointingLeft();
 
+public:
+	RESULT CreateHapticImpulse(bool fLeft, bool fIsOn);
+
 private:
 	std::shared_ptr<FlatContext> m_pRenderContext = nullptr;
 

@@ -208,6 +208,12 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 			height / 2.0f + ptPosition.y() < m_pRenderContext->GetHeight()/2.0f) {
 			fInBounds = false;
 		}
+
+		bool fShouldBeVisible = fInBounds && pUpdatePointerMessage->m_body.fVisible;
+		if (m_pDotComposite->IsVisible() != fShouldBeVisible) {
+			CR(CreateHapticImpulse(pUpdatePointerMessage->m_body.fLeftHand, fShouldBeVisible));
+		}
+
 		m_pRenderContext->SetVisible(fInBounds && pUpdatePointerMessage->m_body.fVisible, false);
 		m_pDotComposite->SetVisible(fInBounds && pUpdatePointerMessage->m_body.fVisible, false);
 
@@ -374,5 +380,26 @@ std::shared_ptr<FlatContext> UIPointerLabel::GetContext() {
 
 bool UIPointerLabel::IsPointingLeft() {
 	return m_fPointingLeft;
+}
+
+RESULT UIPointerLabel::CreateHapticImpulse(bool fLeft, bool fIsOn) {
+	RESULT r = R_PASS;
+
+	int controllerType = fLeft ? 0 : 1;
+	float amplitude = fIsOn ? 4.0f : 0.5f;
+
+	CNR(m_pDreamOS->GetHMD(), R_SKIPPED);
+	CNR(m_pDreamOS->GetHMD()->GetSenseController(), R_SKIPPED);
+
+	CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(
+		CONTROLLER_TYPE(controllerType),
+		SenseController::HapticCurveType::SINE,
+		amplitude,
+		1.0f,
+		1
+	));
+
+Error:
+	return r;
 }
 
