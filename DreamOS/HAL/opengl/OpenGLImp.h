@@ -35,6 +35,7 @@ class mesh;
 class OGLSphere;
 class OGLVolume;
 class OGLQuad;
+class OGLModel;
 
 class OpenGLImp : public HALImp {
 private:
@@ -97,6 +98,7 @@ public:
 	mesh *MakeMesh(const std::vector<vertex>& vertices);
 	mesh *MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
+	OGLModel* MakeModel(PrimParams *pPrimParams, bool fInitialize = false);
 	virtual composite *MakeComposite() override;
 	virtual model *MakeModel() override;
 

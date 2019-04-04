@@ -1182,6 +1182,31 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			return r;
 		}
 
+		RESULT OnModelReady(DimObj *pDimObj, void *pContext) {
+			RESULT r = R_PASS;
+
+			point ptOrigin;
+			model *pObj = dynamic_cast<model*>(pDimObj);
+			CN(pObj);
+
+			CN(pDreamOS);
+
+			if (pContext != nullptr) {
+				memcpy(&ptOrigin, (point*)(pContext), sizeof(point));
+
+				delete pContext;
+				pContext = nullptr;
+			}
+
+			pObj->SetPosition(ptOrigin);
+			pModel->SetScale(0.05f);
+
+			CRM(pDreamOS->AddObject(pObj), "Failed to add async sphere");
+
+		Error:
+			return r;
+		}
+
 		RESULT OnVolumeReady(DimObj *pDimObj, void *pContext) {
 			RESULT r = R_PASS;
 
@@ -1272,11 +1297,9 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			light *pLight;
 			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 
-			
-			model *pModel = m_pDreamOS->AddModel(L"dreamos:\\Assets\\model\\avatar\\3\\head.fbx");
-			CN(pModel);
-			pModel->SetPosition(point(2.0f, -2.5f, 0.0f));
-			pModel->SetScale(0.05f);
+			point *pPtOrigin = new point(2.0f, -2.5f, 0.0f);
+			CR(m_pDreamOS->MakeModel(std::bind(&TestContext::OnModelReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
+				(void*)(pPtOrigin), L"dreamos:\\Assets\\model\\avatar\\3\\head.fbx"));
 
 			// Test the creation of an arbitrarily large number of spheres
 			for (int i = 0; i < factor; i++) {
@@ -1286,7 +1309,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 						float yPos = ((float)j - ((float)(factor - 1) / 2.0f)) * (1.0 + paddingRatio) * (radius * 2.0f);
 						float zPos = ((float)k - ((float)(factor - 1) / 2.0f)) * (1.0 + paddingRatio) * (radius * 2.0f);
 
-						point *pPtOrigin = new point(xPos, yPos, zPos);
+						pPtOrigin = new point(xPos, yPos, zPos);
 						CN(pPtOrigin);
 
 						/* 

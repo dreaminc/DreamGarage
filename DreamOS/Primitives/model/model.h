@@ -15,10 +15,28 @@
 
 #include "Primitives/composite.h"
 
+#include "Primitives/PrimParams.h"
+
 class HALImp;
 class mesh;
 
 class model : public composite {
+public:
+	struct params :
+		public PrimParams
+	{
+		virtual PRIMITIVE_TYPE GetPrimitiveType() override { return PRIMITIVE_TYPE::MODEL; }
+
+		params(std::wstring wstrModelFilePath, ModelFactory::flags modelFactoryFlags = ModelFactory::NONE) :
+			wstrModelFilePath(wstrModelFilePath),
+			modelFactoryFlags(modelFactoryFlags)
+		{ }
+
+		std::wstring wstrModelFilePath = L"";
+		std::wstring wstrModelDirectoryPath;
+		ModelFactory::flags modelFactoryFlags = ModelFactory::NONE;
+	};
+
 public:
 	model(HALImp *pParentImp);
 
@@ -55,8 +73,7 @@ private:
 	std::wstring GetModelDirectoryPath();
 
 private:
-	std::wstring m_wstrModelFilePath;
-	std::wstring m_wstModelDirectoryPath;
+	model::params m_params;
 };
 
 #endif // ! MODEL_H_

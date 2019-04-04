@@ -382,6 +382,11 @@ DimObj* OpenGLImp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 			pOGLObj = MakeQuad(pPrimParams, fInitialize);
 			CN(pOGLObj);
 		} break;
+
+		case PRIMITIVE_TYPE::MODEL: {
+			pOGLObj = MakeModel(pPrimParams, fInitialize);
+			CN(pOGLObj);
+		} break;
 	}
 
 Success:
@@ -475,7 +480,7 @@ model* OpenGLImp::MakeModel() {
 	model *pModel = new OGLModel(this);
 	CN(pModel);
 
-	//Success:
+Success:
 	return pModel;
 
 Error:
@@ -492,7 +497,7 @@ composite *OpenGLImp::MakeComposite() {
 	composite *pComposite = new OGLComposite(this);
 	CN(pComposite);
 
-//Success:
+Success:
 	return pComposite;
 
 Error:
@@ -607,6 +612,33 @@ Error:
 	if (pOGLQuad != nullptr) {
 		delete pOGLQuad;
 		pOGLQuad = nullptr;
+	}
+
+	return nullptr;
+}
+
+OGLModel* OpenGLImp::MakeModel(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLModel *pOGLModel = nullptr;
+
+	model::params *pQuadParams = dynamic_cast<model::params*>(pPrimParams);
+	CN(pQuadParams);
+
+	pOGLModel = new OGLModel(this);
+	CN(pOGLModel);
+
+	if (fInitialize) {
+		CR(pOGLModel->OGLInitialize());
+	}
+
+Success:
+	return pOGLModel;
+
+Error:
+	if (pOGLModel != nullptr) {
+		delete pOGLModel;
+		pOGLModel = nullptr;
 	}
 
 	return nullptr;

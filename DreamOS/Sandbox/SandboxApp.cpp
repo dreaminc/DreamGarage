@@ -1819,7 +1819,7 @@ model* SandboxApp::AddModel(const std::wstring& wstrModelFilename, texture* pTex
 
 	CR(AddObject(pModel));
 
-// Success:
+Success:
 	return pModel;
 
 Error:
@@ -1839,7 +1839,7 @@ model *SandboxApp::MakeModel(const std::wstring& wstrModelFilename, ModelFactory
 	model *pModel = ModelFactory::MakeModel(m_pHALImp, wstrModelFilename, modelFactoryFlags);
 	CN(pModel);
 
-	// Success:
+Success:
 	return pModel;
 
 Error:
@@ -1859,7 +1859,7 @@ model *SandboxApp::AddModel(const std::wstring& wstrModelFilename, ModelFactory:
 
 	CR(AddObject(pModel));
 
-	// Success:
+Success:
 	return pModel;
 
 Error:

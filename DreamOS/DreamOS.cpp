@@ -700,10 +700,10 @@ RESULT DreamOS::MakeModel(std::function<RESULT(DimObj*, void*)> fnOnObjectReady,
 
 	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
 
-	//model::params *pModelParams = new model::params(wstrModelFilename, modelFactoryFlags);
-	//CN(pModelParams);
-	//
-	//CRM(m_pDreamObjectModule->QueueNewObject(pModelParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
+	model::params *pModelParams = new model::params(wstrModelFilename, modelFactoryFlags);
+	CN(pModelParams);
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pModelParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
 
 Error:
 	return r;

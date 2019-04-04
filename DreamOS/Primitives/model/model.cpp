@@ -5,7 +5,8 @@
 #include "Sandbox/PathManager.h"
 
 model::model(HALImp *pParentImp) :
-	composite(pParentImp)
+	composite(pParentImp),
+	m_params(L"")
 {
 	RESULT r = R_PASS;
 
@@ -13,12 +14,13 @@ model::model(HALImp *pParentImp) :
 	//CR(InitializeBoundingSphere());
 	//CR(InitializeOBB());
 
+Success:
 	Validate();
 	return;
 
-//Error:
-//	Invalidate();
-//	return;
+Error:
+	Invalidate();
+	return;
 }
 
 std::shared_ptr<mesh> model::AddMesh(const std::vector<vertex>& vertices) {
@@ -27,7 +29,7 @@ std::shared_ptr<mesh> model::AddMesh(const std::vector<vertex>& vertices) {
 	std::shared_ptr<mesh> pMesh = MakeMesh(vertices);
 	CR(AddObject(pMesh));
 
-	//Success:
+Success:
 	return pMesh;
 
 Error:
@@ -41,7 +43,7 @@ std::shared_ptr<mesh> model::MakeMesh(const std::vector<vertex>& vertices) {
 	std::shared_ptr<mesh> pMesh(m_pHALImp->MakeMesh(vertices));
 	CN(pMesh);
 
-	//Success:
+Success:
 	return pMesh;
 
 Error:
@@ -55,7 +57,7 @@ std::shared_ptr<mesh> model::AddMesh(const std::vector<vertex>& vertices, const 
 	std::shared_ptr<mesh> pMesh = MakeMesh(vertices, indices);
 	CR(AddObject(pMesh));
 
-//Success:
+Success:
 	return pMesh;
 
 Error:
@@ -92,7 +94,7 @@ std::shared_ptr<mesh> model::MakeMesh(const std::vector<vertex>& vertices, const
 	std::shared_ptr<mesh> pMesh(m_pHALImp->MakeMesh(vertices, indices));
 	CN(pMesh);
 
-//Success:
+Success:
 	return pMesh;
 
 Error:
@@ -101,18 +103,18 @@ Error:
 }
 
 RESULT model::SetModelFilePath(std::wstring wstrFilepath) {
-	m_wstrModelFilePath = wstrFilepath;
+	m_params.wstrModelFilePath = wstrFilepath;
 
 	// Set the directory path
 	PathManager* pPathManager = PathManager::instance();
-	m_wstModelDirectoryPath = pPathManager->GetDirectoryPathFromFilePath(m_wstrModelFilePath);
+	m_params.wstrModelDirectoryPath = pPathManager->GetDirectoryPathFromFilePath(m_params.wstrModelFilePath);
 
 	return R_PASS;
 }
 std::wstring model::GetModelFilePath() {
-	return m_wstrModelFilePath;
+	return m_params.wstrModelFilePath;
 }
 
 std::wstring model::GetModelDirectoryPath() {
-	return m_wstModelDirectoryPath;
+	return m_params.wstrModelDirectoryPath;
 }
