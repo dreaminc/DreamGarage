@@ -24,7 +24,7 @@ public:
 
 public:
 	static model* MakeModel(HALImp *pParentImp, std::wstring wstrModelFilename, ModelFactory::flags modelFactoryFlags = ModelFactory::flags::NONE);
-	static model* MakeModel(PrimParams *pPrimParams, bool fInitialize = false);
+	static model* MakeModel(HALImp *pParentImp, PrimParams *pPrimParams, bool fInitialize = false);
 };
 
 #endif // ! MODEL_FACTORY_H_

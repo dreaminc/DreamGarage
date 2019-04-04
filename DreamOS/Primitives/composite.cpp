@@ -152,11 +152,16 @@ std::shared_ptr<texture> composite::MakeTexture(texture::type type, wchar_t *psz
 	RESULT r = R_PASS;
 
 	std::shared_ptr<texture> pTexture(m_pHALImp->MakeTexture(type, pszFilename));
+	CN(pTexture);
 
-	//Success:
+Success:
 	return pTexture;
 
-	//Error:
+Error:
+	if (pTexture != nullptr) {
+		pTexture = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -164,9 +169,17 @@ std::shared_ptr<texture> composite::MakeTexture(texture::type type, int width, i
 	RESULT r = R_PASS;
 
 	std::shared_ptr<texture> pTexture(m_pHALImp->MakeTexture(type, width, height, pixelFormat, channels, pBuffer, pBuffer_n));
+	CN(pTexture);
 
-	//Success:
+Success:
 	return pTexture;
+
+Error:
+	if (pTexture != nullptr) {
+		pTexture = nullptr;
+	}
+
+	return nullptr;
 }
 
 texture* composite::MakeTextureRaw(texture::type type, wchar_t *pszFilename) {
@@ -175,10 +188,15 @@ texture* composite::MakeTextureRaw(texture::type type, wchar_t *pszFilename) {
 	texture* pTexture = m_pHALImp->MakeTexture(type, pszFilename);
 	CN(pTexture);
 
-	//Success:
+Success:
 	return pTexture;
 
 Error:
+	if (pTexture != nullptr) {
+		delete pTexture;
+		pTexture = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -186,11 +204,15 @@ std::shared_ptr<hand> composite::MakeHand(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<hand> pHand(m_pHALImp->MakeHand(type));
+	CN(pHand);
 
-	//Success:
+Success:
 	return pHand;
 
-	//Error:
+Error:
+	if (pHand != nullptr) {
+		pHand = nullptr;
+	}
 	return nullptr;
 }
 
@@ -198,23 +220,34 @@ std::shared_ptr<hand> composite::AddHand(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<hand> pHand = MakeHand(type);
+	CN(pHand);
+
 	CR(AddObject(pHand));
 
-	//Success:
+Success:
 	return pHand;
 
 Error:
+	if (pHand != nullptr) {
+		pHand = nullptr;
+	}
+
 	return nullptr;
 }
 
 std::shared_ptr<hand> composite::MakeHand(HAND_TYPE type, long avatarID) {
+	RESULT r = R_PASS;
 
 	std::shared_ptr<hand> pHand(m_pHALImp->MakeHand(type, avatarID));
+	CN(pHand);
 
-	//Success:
+Success:
 	return pHand;
 
-	//Error:
+Error:
+	if (pHand != nullptr) {
+		pHand = nullptr;
+	}
 	return nullptr;
 }
 
@@ -222,12 +255,18 @@ std::shared_ptr<hand> composite::AddHand(HAND_TYPE type, long avatarID) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<hand> pHand = MakeHand(type, avatarID);
+	CN(pHand);
+
 	CR(AddObject(pHand));
 
-	//Success:
+Success:
 	return pHand;
 
 Error:
+	if (pHand != nullptr) {
+		pHand = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -235,11 +274,16 @@ std::shared_ptr<user> composite::MakeUser() {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<user> pUser(m_pHALImp->MakeUser());
+	CN(pUser);
 
-	//Success:
+Success:
 	return pUser;
 
-//Error:
+Error:
+	if (pUser != nullptr) {
+		pUser = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -247,12 +291,18 @@ std::shared_ptr<user> composite::AddUser() {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<user> pUser = MakeUser();
+	CN(pUser);
+
 	CR(AddObject(pUser));
 
-	//Success:
+Success:
 	return pUser;
 
 Error:
+	if (pUser != nullptr) {
+		pUser = nullptr;
+	}
+
 	return nullptr;
 }
 

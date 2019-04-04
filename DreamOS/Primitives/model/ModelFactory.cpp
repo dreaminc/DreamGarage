@@ -275,7 +275,7 @@ Error:
 RESULT ProcessAssetImporterNode(model *pModel, aiNode *pAINode, const aiScene *pAIScene) {
 	RESULT r = R_PASS;
 
-	// process all the node's meshes (if any)
+	// Process all the node's meshes (if any)
 	for (unsigned int i = 0; i < pAINode->mNumMeshes; i++) {
 		aiMesh *pAIMesh = pAIScene->mMeshes[pAINode->mMeshes[i]];
 		
@@ -283,7 +283,8 @@ RESULT ProcessAssetImporterNode(model *pModel, aiNode *pAINode, const aiScene *p
 
 		CR(ProcessAssetImporterMesh(pModel, pAIMesh, pAIScene));
 	}
-	// then do the same for each of its children
+
+	// Then do the same for each of its children
 	for (unsigned int i = 0; i < pAINode->mNumChildren; i++) {
 		ProcessAssetImporterNode(pModel, pAINode->mChildren[i], pAIScene);
 	}
@@ -292,11 +293,9 @@ Error:
 	return r;
 }
 
-model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+model *MakeAndInitializeModel(HALImp *pParentImp, std::wstring wstrModelFilename) {
 	RESULT r = R_PASS;
-
 	model *pModel = nullptr;
-	Assimp::Importer assetImporter;
 
 	// Get file path
 	// Root folder
@@ -323,24 +322,64 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 	// Set the path (used in texture loading)
 	CR(pModel->SetModelFilePath(wstrModelFilePath));
 
+Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+
+	return nullptr;
+}
+
+unsigned int GetAssImpFlags(ModelFactory::flags modelFactoryFlags) {
 	unsigned int assimpFlags = //aiProcess_FlipUVs |
-								aiProcess_CalcTangentSpace |
-								aiProcess_GenNormals |
-								//aiProcess_FixInfacingNormals |
-								aiProcess_OptimizeMeshes |
-								aiProcess_PreTransformVertices |
-								//aiProcess_JoinIdenticalVertices |
-								aiProcess_Triangulate;
+		aiProcess_CalcTangentSpace |
+		aiProcess_GenNormals |
+		//aiProcess_FixInfacingNormals |
+		aiProcess_OptimizeMeshes |
+		aiProcess_PreTransformVertices |
+		//aiProcess_JoinIdenticalVertices |
+		aiProcess_Triangulate;
 
 	if ((modelFactoryFlags & ModelFactory::flags::FLIP_WINDING) != 0) {
 		assimpFlags |= aiProcess_FlipWindingOrder;
 	}
 
-	// Load model from disk
-	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(wstrModelFilePath), assimpFlags);
+	return assimpFlags;
+}
+
+const aiScene *ReadModelFromDisk(std::wstring wstrFilePath, unsigned int assimpFlags) {
+	RESULT r = R_PASS;
+
+	Assimp::Importer assetImporter;
+
+	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(wstrFilePath), assimpFlags);
+
 	CNM(pAIScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());
 	CBM(((pAIScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) == 0), "Asset Importer Scene Incomplete: %s", assetImporter.GetErrorString());
 	CNM(pAIScene->mRootNode, "Asset Importer scene root is null: %s", assetImporter.GetErrorString());
+
+Success:
+	return pAIScene;
+
+Error:
+	return nullptr;
+}
+
+model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+	RESULT r = R_PASS;
+
+	model *pModel = nullptr;
+
+	pModel = MakeAndInitializeModel(pParentImp, wstrModelFilename);
+	CNM(pModel, "Failed to load model");
+
+	// Load model from disk
+	const aiScene *pAIScene = ReadModelFromDisk(pModel->GetModelFilePath(), GetAssImpFlags(modelFactoryFlags));
+	CN(pAIScene);
 
 	CRM(ProcessAssetImporterNode(pModel, pAIScene->mRootNode, pAIScene), "Failed to process Asset Importer root node");
 
@@ -358,7 +397,7 @@ Error:
 	return nullptr;
 }
 
-model *ModelFactory::MakeModel(PrimParams *pPrimParams, bool fInitialize) {
+model *ModelFactory::MakeModel(HALImp *pParentImp, PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 
 	model *pModel = nullptr;
@@ -367,7 +406,16 @@ model *ModelFactory::MakeModel(PrimParams *pPrimParams, bool fInitialize) {
 	model::params *pModelParams = dynamic_cast<model::params*>(pPrimParams);
 	CN(pModelParams);
 
+	pModel = MakeAndInitializeModel(pParentImp, pModelParams->wstrModelFilePath);
+	CNM(pModel, "Failed to load model");
 
+	// Load model from disk
+	const aiScene *pAIScene = ReadModelFromDisk(pModel->GetModelFilePath(), GetAssImpFlags(pModelParams->modelFactoryFlags));
+	CN(pAIScene);
+
+	// TODO: Find another route for process that can be async (it's really just about the mesh/texture load requests 
+	// and handling them correctly with context
+	// 
 
 Success:
 	return pModel;
