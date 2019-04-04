@@ -92,7 +92,7 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	//m_pPointingArea = pDreamOS->MakeHysteresisObject(0.4f, 0.3f, CYLINDER);
 
 	// distance if mallets are being used
-	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.6f, 0.5f, CYLINDER);
+	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.75f, 0.4f, CYLINDER);
 
 	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::ON, this));
 	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::OFF, this));

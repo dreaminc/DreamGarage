@@ -386,17 +386,34 @@ RESULT UIPointerLabel::CreateHapticImpulse(bool fLeft, bool fIsOn) {
 	RESULT r = R_PASS;
 
 	int controllerType = fLeft ? 0 : 1;
-	float amplitude = fIsOn ? 4.0f : 0.5f;
+
+	float amplitude;
+	float msDuration;
+	float cycles;
+	SenseController::HapticCurveType curveType;
+
+	if (fIsOn) {
+		amplitude = 8.0f;
+		msDuration = 20.0f;
+		cycles = 1;
+		curveType = SenseController::HapticCurveType::SINE;
+	}
+	else {
+		amplitude = 1.0f;
+		msDuration = 4.0f;
+		cycles = 1;
+		curveType = SenseController::HapticCurveType::SINE;
+	}
 
 	CNR(m_pDreamOS->GetHMD(), R_SKIPPED);
 	CNR(m_pDreamOS->GetHMD()->GetSenseController(), R_SKIPPED);
 
 	CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(
 		CONTROLLER_TYPE(controllerType),
-		SenseController::HapticCurveType::SINE,
+		curveType,
 		amplitude,
-		1.0f,
-		1
+		msDuration,
+		cycles
 	));
 
 Error:
