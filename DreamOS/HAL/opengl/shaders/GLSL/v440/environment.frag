@@ -26,6 +26,7 @@ void main(void) {
 	if (u_hasTextureColor == true) {
 		float luminance = texture(u_textureColor, DataIn.uvCoord).r;
 		textureColor = vec4(luminance, luminance, luminance, 1.0f);
+		//textureColor = texture(u_textureColor, DataIn.uvCoord);
 	}
 	else {
 		textureColor = DataIn.color;
