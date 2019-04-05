@@ -229,7 +229,7 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 
 			m_fIsOn = true;
 
-			//CR(PopIn());
+			CR(PopIn());
 		}
 		
 		else if (m_fActuated && !pUpdatePointerMessage->m_body.fActuated) {
@@ -250,6 +250,7 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		SetPosition(ptMessage);
 
 		// update saved points queue
+		/*
 		if (m_recentPoints.size() == 0 || ptPosition != m_recentPoints.back()) {
 			m_recentPoints.push_back(ptPosition);
 		}
@@ -258,7 +259,6 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		}
 
 		// calculate orientation
-		/*
 		if (m_recentPoints.size() == NUM_POINTS) {
 			UpdateOrientationFromPoints();
 		}
@@ -454,12 +454,13 @@ Error:
 RESULT UIPointerLabel::PopIn() {
 	RESULT r = R_PASS;
 
+	m_pDotComposite->SetScale(0.1f);
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pDotComposite.get(),
 		m_pDotComposite->GetPosition(),
 		m_pDotComposite->GetOrientation(),
-		m_pDotComposite->GetScale(),
-		0.2,
+		1.0,
+		0.5,
 		AnimationCurveType::SIGMOID,
 		AnimationFlags(),
 		nullptr,

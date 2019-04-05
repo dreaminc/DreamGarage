@@ -89,10 +89,10 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	m_pMessageQuadBackground->RotateXByDeg(90);
 
 	// distance if using hands as the object
-	//m_pPointingArea = pDreamOS->MakeHysteresisObject(0.4f, 0.3f, CYLINDER);
+	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.7f, 0.3f, CYLINDER);
 
 	// distance if mallets are being used
-	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.95f, 0.4f, CYLINDER);
+	//m_pPointingArea = pDreamOS->MakeHysteresisObject(0.95f, 0.4f, CYLINDER);
 
 	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::ON, this));
 	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::OFF, this));
@@ -642,10 +642,12 @@ RESULT DreamUserApp::Notify(HysteresisEvent *mEvent) {
 
 	case HysteresisEventType::ON: {
 
-		if (m_pLeftInteractionObject == mEvent->m_pEventObject) {
+		//if (m_pLeftInteractionObject == mEvent->m_pEventObject) {
+		if (m_pLeftHand == mEvent->m_pEventObject) {
 			m_fLeftSphereOn = true;
 		}
-		else if (m_pRightInteractionObject == mEvent->m_pEventObject) {
+		//else if (m_pRightInteractionObject == mEvent->m_pEventObject) {
+		else if (m_pRightHand == mEvent->m_pEventObject) {
 			m_fRightSphereOn = true;
 		}
 
@@ -653,10 +655,12 @@ RESULT DreamUserApp::Notify(HysteresisEvent *mEvent) {
 
 	case HysteresisEventType::OFF: {
 
-		if (m_pLeftInteractionObject == mEvent->m_pEventObject) {
+		if (m_pLeftHand == mEvent->m_pEventObject) {
+		//if (m_pLeftInteractionObject == mEvent->m_pEventObject) {
 			m_fLeftSphereOn = false;
 		}
-		else if (m_pRightInteractionObject == mEvent->m_pEventObject) {
+		//else if (m_pRightInteractionObject == mEvent->m_pEventObject) {
+		else if (m_pRightHand == mEvent->m_pEventObject) {
 			m_fRightSphereOn = false;
 		}
 
@@ -704,8 +708,8 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 
 	CR(pHand->InitializeWithContext(pDreamOS));
 
-	CR(m_pPointingArea->RegisterObject(pHand->GetMalletHead()));
-	//CR(m_pPointingArea->RegisterObject(pHand));
+	//CR(m_pPointingArea->RegisterObject(pHand->GetMalletHead()));
+	CR(m_pPointingArea->RegisterObject(pHand));
 
 	if (type == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;

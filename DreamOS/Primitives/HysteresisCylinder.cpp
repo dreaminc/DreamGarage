@@ -24,6 +24,12 @@ inline bool HysteresisCylinder::Resolve(VirtualObj *pObj) {
 
 	// TODO: this should be handled in the ObjectState in the VirtualObj
 	//vector velocity = pObj->GetState().GetVelocity();
+	//vector velocity = pObj->GetState().GetInstantVelocity();
+	//velocity = vector(velocity.x(), 0.0f, velocity.z());
+
+	// test
+	//auto pDimObj = dynamic_cast<DimObj*>(pObj);
+	//auto pHand = pDimObj->GetParent();
 
 	vector vOffset = vector(ptSphereOrigin.x(), 0.0f, ptSphereOrigin.z());
 
@@ -36,7 +42,7 @@ inline bool HysteresisCylinder::Resolve(VirtualObj *pObj) {
 	// calculate the object's velocity projected onto the direction of its current offset
 	vector vOffsetUnit = vOffset / vOffset.magnitude();
 	float velocityProj = velocity.dot(vOffsetUnit);
-	float advanceFrames = 30;
+	float advanceFrames = 40;
 
 	float distance = vector(vOffset * (1 + velocityProj * advanceFrames)).magnitude();
 	//float distance = vOffset.magnitude();

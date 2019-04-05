@@ -72,54 +72,63 @@ point VirtualObj::GetPosition(bool fAbsolute) {
 }
 
 VirtualObj* VirtualObj::translate(matrix <point_precision, 4, 1> v) {
+	m_objectState.m_ptPreviousOrigin = m_objectState.m_ptOrigin;
 	m_objectState.translate(v);
 	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::translate(point_precision x, point_precision y, point_precision z) {
+	m_objectState.m_ptPreviousOrigin = m_objectState.m_ptOrigin;
 	m_objectState.m_ptOrigin.translate(x, y, z);
 	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::translateX(point_precision x) {
+	m_objectState.m_ptPreviousOrigin = m_objectState.m_ptOrigin;
 	m_objectState.m_ptOrigin.translateX(x);
 	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::translateY(point_precision y) {
+	m_objectState.m_ptPreviousOrigin = m_objectState.m_ptOrigin;
 	m_objectState.m_ptOrigin.translateY(y);
 	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::translateZ(point_precision z) {
+	m_objectState.m_ptPreviousOrigin = m_objectState.m_ptOrigin;
 	m_objectState.m_ptOrigin.translateZ(z);
 	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::SetOrigin(point p) {
+	m_objectState.m_ptPreviousOrigin = m_objectState.m_ptOrigin;
 	m_objectState.m_ptOrigin = p;
 	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::SetPosition(point p) {
+	m_objectState.m_ptPreviousOrigin = m_objectState.m_ptOrigin;
 	m_objectState.m_ptOrigin = p;
 	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::SetPosition(point_precision x, point_precision y, point_precision z) {
+	m_objectState.m_ptPreviousOrigin = m_objectState.m_ptOrigin;
 	m_objectState.m_ptOrigin = point(x, y, z);
 	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::MoveTo(point p) {
+	m_objectState.m_ptPreviousOrigin = m_objectState.m_ptOrigin;
 	m_objectState.m_ptOrigin = p;
 	OnManipulation();
 	return this;

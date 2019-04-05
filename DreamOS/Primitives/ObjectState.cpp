@@ -348,6 +348,10 @@ const vector ObjectState::GetVelocity() {
 	return m_vVelocity; 
 }
 
+const vector ObjectState::GetInstantVelocity() {
+	return vector(m_ptOrigin - m_ptPreviousOrigin);
+}
+
 const vector ObjectState::GetAngularVelocity() {
 	return m_vAngularVelocity;
 }
