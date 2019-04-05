@@ -27,15 +27,12 @@ public:
 	RESULT HandlePointerMessage(DreamShareViewPointerMessage *pUpdatePointerMessage);
 
 	std::shared_ptr<FlatContext> GetContext();
+	std::shared_ptr<composite> GetDotComposite();
+	std::shared_ptr<quad> GetDot();
 	bool IsPointingLeft();
 
 public:
 	RESULT CreateHapticImpulse(bool fLeft, bool fIsOn);
-
-// Animations
-public:
-	RESULT PopIn();
-	RESULT PopOut();
 
 private:
 	std::shared_ptr<FlatContext> m_pRenderContext = nullptr;

@@ -210,13 +210,13 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		bool fInBounds = true;
 
 		// left/right bounds check
-		if (width / 2.0f - ptPosition.x() < 0 ||
-			width / 2.0f + ptPosition.x() < 0) {
+		if (width / 2.0f - ptPosition.x() < m_pointerSide/2.0f ||
+			width / 2.0f + ptPosition.x() < m_pointerSide/2.0f) {
 			fInBounds = false;
 		}
 		// bottom/top bounds check
-		if (height / 2.0f - ptPosition.y() < m_pointerSide ||
-			height / 2.0f + ptPosition.y() < m_pointerSide) {
+		if (height / 2.0f - ptPosition.y() < m_pointerSide/2.0f ||
+			height / 2.0f + ptPosition.y() < m_pointerSide/2.0f) {
 			fInBounds = false;
 		}
 
@@ -228,8 +228,6 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 			CR(m_pDreamOS->PlaySoundFile(m_pActuateSound));
 
 			m_fIsOn = true;
-
-			CR(PopIn());
 		}
 		
 		else if (m_fActuated && !pUpdatePointerMessage->m_body.fActuated) {
@@ -238,8 +236,6 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 			CR(m_pDreamOS->PlaySoundFile(m_pCancelSound));
 
 			m_fIsOn = false;
-
-			//CR(PopOut());
 		}
 
 		m_fActuated = pUpdatePointerMessage->m_body.fActuated;
@@ -408,6 +404,14 @@ std::shared_ptr<FlatContext> UIPointerLabel::GetContext() {
 	return m_pRenderContext;
 }
 
+std::shared_ptr<composite> UIPointerLabel::GetDotComposite() {
+	return m_pDotComposite;
+}
+
+std::shared_ptr<quad> UIPointerLabel::GetDot() {
+	return m_pDotQuad;
+}
+
 bool UIPointerLabel::IsPointingLeft() {
 	return m_fPointingLeft;
 }
@@ -444,48 +448,6 @@ RESULT UIPointerLabel::CreateHapticImpulse(bool fLeft, bool fIsOn) {
 		amplitude,
 		msDuration,
 		cycles
-	));
-
-Error:
-	return r;
-}
-
-
-RESULT UIPointerLabel::PopIn() {
-	RESULT r = R_PASS;
-
-	m_pDotComposite->SetScale(0.1f);
-	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pDotComposite.get(),
-		m_pDotComposite->GetPosition(),
-		m_pDotComposite->GetOrientation(),
-		1.0,
-		0.5,
-		AnimationCurveType::SIGMOID,
-		AnimationFlags(),
-		nullptr,
-		nullptr,
-		nullptr	
-	));
-
-Error:
-	return r;
-}
-
-RESULT UIPointerLabel::PopOut() {
-	RESULT r = R_PASS;
-
-	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pDotComposite.get(),
-		m_pDotComposite->GetPosition(),
-		m_pDotComposite->GetOrientation(),
-		m_pDotComposite->GetScale(),
-		0.2,
-		AnimationCurveType::SIGMOID,
-		AnimationFlags(),
-		nullptr,
-		nullptr,
-		nullptr	
 	));
 
 Error:

@@ -134,19 +134,28 @@ RESULT DreamShareView::Update(void *pContext) {
 		CRM(UpdateFromPendingVideoFrame(), "Failed to update pending frame");
 	}
 
-	if (m_pCastQuad != nullptr) {
-		m_pMirrorQuad = m_pPointerContext->AddQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight());
-		m_pMirrorQuad->SetDiffuseTexture(m_pCastQuad->GetTextureDiffuse());
-		m_pPointerContext->RenderToQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight(), 0, 0);
-	}
-
 	if (m_pointingObjects.size() > 0) {
 		float scale = m_pCastQuad->GetScale(true).x();
+
+		m_pMirrorQuad = m_pPointerContext->AddQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight());
+		m_pMirrorQuad->SetDiffuseTexture(m_pCastQuad->GetTextureDiffuse());
 
 		for (auto pair : m_pointingObjects) {
 			std::vector<std::shared_ptr<UIPointerLabel>> userPointers = pair.second;
 			for (std::shared_ptr<UIPointerLabel> pPointerLabel : userPointers) {
+				
+				auto pQuad = pPointerLabel->GetDot();
+				auto pComposite = pPointerLabel->GetDotComposite();
+				//m_pPointerContext->AddObject(pPointerLabel->GetDot());
+				if (pComposite->IsVisible()) {
+					point ptQuad = pQuad->GetPosition(true);
+					point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (ptQuad - m_pCastQuad->GetOrigin(true)));
+					auto pFlatQuad = m_pPointerContext->AddQuad(pQuad->GetWidth() / scale, pQuad->GetHeight() / scale);
+					pFlatQuad->SetDiffuseTexture(pQuad->GetTextureDiffuse());
+					pFlatQuad->SetPosition(point(ptPosition.x() / scale, 0.0f, ptPosition.y() / scale));
+				}
 
+				/*
 				auto pLabelFlatContext = pPointerLabel->GetContext();
 				if (pLabelFlatContext->IsVisible() && pLabelFlatContext->GetCurrentQuad() != nullptr) {
 					point ptLabelQuad = pLabelFlatContext->GetCurrentQuad()->GetPosition(true);
@@ -160,8 +169,11 @@ RESULT DreamShareView::Update(void *pContext) {
 
 					pFlatQuad->SetPosition(point(ptPosition.x() / scale, 0.0f, ptPosition.y() / scale));
 				}
+				//*/
 			}
 		}
+
+		m_pPointerContext->RenderToQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight(), 0, 0);
 	}
 
 Error:
