@@ -44,7 +44,7 @@ AudioPacket::AudioPacket(int frames, int channels, int bitsPerSample, int sampli
 
 RESULT AudioPacket::DeleteBuffer() {
 	if (m_pDataBuffer != nullptr) {
-		free(m_pDataBuffer);
+		delete[] m_pDataBuffer;
 		m_pDataBuffer = nullptr;
 	}
 

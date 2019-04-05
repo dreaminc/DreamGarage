@@ -245,6 +245,7 @@ RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptur
 	}
 
 Error:
+	pendingAudioPacket.DeleteBuffer();
 	return r;
 }
 

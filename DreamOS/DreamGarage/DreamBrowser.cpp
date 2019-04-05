@@ -964,6 +964,8 @@ RESULT DreamBrowser::AudioProcess() {
 							DOSLOG(INFO, "Handle Audio Packet Failed");
 						}
 					}
+
+					pendingAudioPacket.DeleteBuffer();
 				}
 			}
 
