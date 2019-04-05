@@ -513,7 +513,6 @@ RESULT UISpatialScrollView::UpdateScrollViewNode(MenuNode* pMenuNode) {
 		if (pMenuItem != nullptr) {
 			pMenuItem->GetSurface()->SetDiffuseTexture(pMenuNode->GetThumbnailTexture());
 			pMenuItem->SetName(pMenuNode->GetTitle());	// Because we can
-			DEBUG_LINEOUT("updated button");
 		}
 	}
 

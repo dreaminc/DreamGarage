@@ -501,16 +501,18 @@ RESULT DreamUIBar::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pB
 
 	if (pContext != nullptr) {
 		MenuNode* pObj = reinterpret_cast<MenuNode*>(pContext);
-		
+		CN(pObj);
 		if (pObj->GetTitle() == m_strIconTitle) {
 			m_pPendingIconTextureBuffer = pBufferVector;
 		}
 		else {
-			m_downloadQueue.push_back(std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>(pObj, pBufferVector));
+			if (pObj->GetParentScope() == "" || pObj->GetParentScope() == m_pMenuNode->GetScope()) {
+				m_downloadQueue.push(std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>(pObj, pBufferVector));
+			}
 		}
 	}
 
-//Error:
+Error:
 	return r;
 }
 
@@ -557,10 +559,11 @@ RESULT DreamUIBar::Update(void *pContext) {
 	// Got a new MenuNode - moving to a different level in menu from the current one
 	// So clear everything and create buttons
 	if (m_pMenuNode && m_pMenuNode->IsDirty()) {	// this is iffy, it relies on dirty only being set if we move to a new menu level
-		m_downloadQueue.clear();
+		m_downloadQueue = std::queue<std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>>();
 		m_requestQueue = std::queue<std::shared_ptr<MenuNode>>();
 		m_pScrollView->ClearScrollViewNodes();
 		m_loadedMenuItems = 0;
+		m_pendingRequests = 0;
 
 		CR(MakeMenuItems());
 	}
@@ -681,12 +684,13 @@ RESULT DreamUIBar::RequestMenuItemTexture() {
 
 	if (m_pMenuNode->NumSubMenuNodes() > 0) {
 		auto strHeaders = GetStringHeaders();
-		int elements = (m_requestQueue.size() > m_concurrentRequestLimit ? m_concurrentRequestLimit : (int)m_requestQueue.size());
+		int elements = (m_requestQueue.size() > (m_concurrentRequestLimit - m_pendingRequests) ? (m_concurrentRequestLimit - m_pendingRequests) : (int)m_requestQueue.size());
 
 		for (int i = 0; i < elements; i++) {
 			auto strURI = m_requestQueue.front()->GetThumbnailURL();
 			if (strURI != "") {
 				CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_requestQueue.front().get()));
+				m_pendingRequests++;
 			}
 			m_requestQueue.pop();
 		}
@@ -703,13 +707,10 @@ RESULT DreamUIBar::ProcessDownloadMenuItemTexture() {
 	int elements = (m_downloadQueue.size() > m_concurrentRequestLimit ? m_concurrentRequestLimit : (int)m_downloadQueue.size());
 
 	for (int i = m_loadedMenuItems; i < elements + m_loadedMenuItems; i++) {
-		//for (int i = 0; i <= m_downloadQueue.size(); i++) {
-		auto pQueueObj = m_downloadQueue.back();
+		auto pQueueObj = m_downloadQueue.front();
 		auto pMenuNode = pQueueObj.first;
 		auto pBufferVector = pQueueObj.second;
-
 		texture *pTexture = nullptr;
-
 		CN(pBufferVector);
 		uint8_t* pBuffer = &(pBufferVector->operator[](0));
 		size_t pBuffer_n = pBufferVector->size();
@@ -719,13 +720,13 @@ RESULT DreamUIBar::ProcessDownloadMenuItemTexture() {
 
 		pMenuNode->SetThumbnailTexture(pTexture);
 
-		m_pScrollView->UpdateScrollViewNode(pMenuNode);
+		CR(m_pScrollView->UpdateScrollViewNode(pMenuNode));
 		
 		if (pBufferVector != nullptr) {
 			pBufferVector = nullptr;
 		}
-
-		m_downloadQueue.pop_back();
+		m_pendingRequests--;
+		m_downloadQueue.pop();
 	}
 
 	m_loadedMenuItems += elements;

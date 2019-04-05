@@ -147,11 +147,11 @@ private:
 	HTTPControllerProxy *m_pHTTPControllerProxy = nullptr;
 	UserControllerProxy *m_pUserControllerProxy = nullptr;
 
-	int m_concurrentRequestLimit = 1;
+	int m_concurrentRequestLimit = 4;
 	int m_loadedMenuItems = 0;
 	std::shared_ptr<MenuNode> m_pMenuNode = nullptr;
-	std::vector<std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>> m_downloadQueue;
-	
+	std::queue<std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>> m_downloadQueue;
+	int m_pendingRequests = 0;
 	std::queue<std::shared_ptr<MenuNode>> m_requestQueue;
 	bool m_fRequestTexture = false;
 

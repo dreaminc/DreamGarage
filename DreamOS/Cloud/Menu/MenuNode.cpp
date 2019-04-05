@@ -27,6 +27,7 @@ MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 	if (jsonMenuNode["/submenu"_json_pointer].is_array()) {
 		for (auto &subMenuNode : jsonMenuNode["/submenu"_json_pointer]) {
 			std::shared_ptr<MenuNode> pSubMenuNode = std::make_shared<MenuNode>(subMenuNode);
+			pSubMenuNode->m_strParentScope = m_strScope;
 			m_menuNodes.push_back(pSubMenuNode);
 		}
 	}
@@ -173,6 +174,10 @@ const std::string& MenuNode::GetIconURL() {
 
 const std::string& MenuNode::GetThumbnailURL() {
 	return m_strThumbnailURL;
+}
+
+const std::string& MenuNode::GetParentScope() {
+	return m_strParentScope;
 }
 
 std::string MenuNode::GetKey() {
