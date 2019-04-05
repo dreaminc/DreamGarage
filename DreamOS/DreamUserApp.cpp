@@ -92,7 +92,7 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	//m_pPointingArea = pDreamOS->MakeHysteresisObject(0.4f, 0.3f, CYLINDER);
 
 	// distance if mallets are being used
-	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.75f, 0.4f, CYLINDER);
+	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.95f, 0.4f, CYLINDER);
 
 	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::ON, this));
 	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::OFF, this));
@@ -357,7 +357,8 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 		m_ptLeftPointer,
 		m_pUserModel->GetSeatingPosition(),
 		szInitials,
-		m_fLeftSphereOn && m_fLeftSphereInteracting,
+		m_fLeftSphereOn,
+		m_fLeftSphereInteracting,
 		true);
 
 	DreamShareViewPointerMessage *pPointerMessageRight = new DreamShareViewPointerMessage(
@@ -367,7 +368,8 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 		m_ptRightPointer,
 		m_pUserModel->GetSeatingPosition(),
 		szInitials,
-		m_fRightSphereOn && m_fRightSphereInteracting,
+		m_fRightSphereOn,
+		m_fRightSphereInteracting,
 		false);
 
 	DreamAppMessage::flags messageFlags = DreamAppMessage::flags::SHARE_NETWORK | DreamAppMessage::flags::SHARE_LOCAL;

@@ -13,20 +13,19 @@
 class DreamShareViewPointerMessage : public DreamShareViewMessage {
 
 public:
-	__declspec(align(8)) struct MessageBody {
+	__declspec(align(4)) struct MessageBody {
 		point ptPointer;
 		int seatPosition;
 		char szInitials[2]; // always 2 characters
 
-		bool fVisible;
+		bool fActuated;
+		bool fInteracting;
 		bool fLeftHand;
-		unsigned int reserved0;
-		unsigned int reserved1;
 
 	} m_body;
 
 public:
-	DreamShareViewPointerMessage(long senderUserID, long receiverUserID, UID uidSenderDreamApp, point ptPointer, int seatPosition, char strInitials[2], bool fVisible, bool fLeftHand);
+	DreamShareViewPointerMessage(long senderUserID, long receiverUserID, UID uidSenderDreamApp, point ptPointer, int seatPosition, char strInitials[2], bool fActuated, bool fInteracting, bool fLeftHand);
 	~DreamShareViewPointerMessage();
 
 	RESULT PrintMessage() override;

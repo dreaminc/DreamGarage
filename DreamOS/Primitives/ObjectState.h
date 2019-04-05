@@ -120,6 +120,7 @@ private:
 
 protected:
 	point m_ptOrigin;					// Origin			
+	point m_ptPreviousOrigin;			// Previous Origin
 	vector m_vMomentum;					// Momentum
 
 	point m_ptCenterOfMass;									// Center of Mass

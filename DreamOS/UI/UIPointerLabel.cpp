@@ -9,6 +9,10 @@
 
 #include "HAL/opengl/OGLText.h"
 
+#include "InteractionEngine/AnimationItem.h"
+
+#include "Sound/SoundFile.h"
+
 #include "Core/Utilities.h"
 
 UIPointerLabel::UIPointerLabel(HALImp *pHALImp, DreamOS *pDreamOS) :
@@ -36,6 +40,13 @@ RESULT UIPointerLabel::Initialize() {
 
 	m_pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Black.fnt", true);
 	CN(m_pFont);
+
+	m_pActuateSound = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-standard.wav", SoundFile::type::WAVE));
+	CN(m_pActuateSound);
+
+	m_pCancelSound = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-delete.wav", SoundFile::type::WAVE));
+	CN(m_pActuateSound);
+
 
 Error:
 	return r;
@@ -145,7 +156,7 @@ RESULT UIPointerLabel::InitializeDot(std::shared_ptr<quad> pParentQuad, int seat
 	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
 
 	// dot texture is a square
-	float height = pParentQuad->GetHeight()/2 * 0.06;
+	m_pointerSide = pParentQuad->GetHeight()/2 * 0.06;
 	float screenOffset = 0.01f;
 
 	CB(seatPosition != -1);
@@ -162,7 +173,7 @@ RESULT UIPointerLabel::InitializeDot(std::shared_ptr<quad> pParentQuad, int seat
 	CN(m_pDotComposite);
 	m_pDotComposite->SetVisible(false, false);
 
-	m_pDotQuad = m_pDotComposite->AddQuad(height, height);
+	m_pDotQuad = m_pDotComposite->AddQuad(m_pointerSide, m_pointerSide);
 	CN(m_pDotQuad);
 	m_pDotQuad->SetDiffuseTexture(pPointerDot);
 	m_pDotQuad->RotateZByDeg(90.0f);
@@ -204,18 +215,37 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 			fInBounds = false;
 		}
 		// bottom/top bounds check
-		if (height / 2.0f - ptPosition.y() < m_pRenderContext->GetHeight()/2.0f ||
-			height / 2.0f + ptPosition.y() < m_pRenderContext->GetHeight()/2.0f) {
+		if (height / 2.0f - ptPosition.y() < m_pointerSide ||
+			height / 2.0f + ptPosition.y() < m_pointerSide) {
 			fInBounds = false;
 		}
 
-		bool fShouldBeVisible = fInBounds && pUpdatePointerMessage->m_body.fVisible;
-		if (m_pDotComposite->IsVisible() != fShouldBeVisible) {
+		bool fShouldBeVisible = fInBounds && pUpdatePointerMessage->m_body.fActuated && pUpdatePointerMessage->m_body.fInteracting;
+
+		if (!m_pDotComposite->IsVisible() && fShouldBeVisible && !m_fIsOn) {
 			CR(CreateHapticImpulse(pUpdatePointerMessage->m_body.fLeftHand, fShouldBeVisible));
+
+			CR(m_pDreamOS->PlaySoundFile(m_pActuateSound));
+
+			m_fIsOn = true;
+
+			//CR(PopIn());
+		}
+		
+		else if (m_fActuated && !pUpdatePointerMessage->m_body.fActuated) {
+			CR(CreateHapticImpulse(pUpdatePointerMessage->m_body.fLeftHand, false));
+
+			CR(m_pDreamOS->PlaySoundFile(m_pCancelSound));
+
+			m_fIsOn = false;
+
+			//CR(PopOut());
 		}
 
-		m_pRenderContext->SetVisible(fInBounds && pUpdatePointerMessage->m_body.fVisible, false);
-		m_pDotComposite->SetVisible(fInBounds && pUpdatePointerMessage->m_body.fVisible, false);
+		m_fActuated = pUpdatePointerMessage->m_body.fActuated;
+
+		m_pRenderContext->SetVisible(fShouldBeVisible, false);
+		m_pDotComposite->SetVisible(fShouldBeVisible, false);
 
 		SetPosition(ptMessage);
 
@@ -420,3 +450,43 @@ Error:
 	return r;
 }
 
+
+RESULT UIPointerLabel::PopIn() {
+	RESULT r = R_PASS;
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pDotComposite.get(),
+		m_pDotComposite->GetPosition(),
+		m_pDotComposite->GetOrientation(),
+		m_pDotComposite->GetScale(),
+		0.2,
+		AnimationCurveType::SIGMOID,
+		AnimationFlags(),
+		nullptr,
+		nullptr,
+		nullptr	
+	));
+
+Error:
+	return r;
+}
+
+RESULT UIPointerLabel::PopOut() {
+	RESULT r = R_PASS;
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pDotComposite.get(),
+		m_pDotComposite->GetPosition(),
+		m_pDotComposite->GetOrientation(),
+		m_pDotComposite->GetScale(),
+		0.2,
+		AnimationCurveType::SIGMOID,
+		AnimationFlags(),
+		nullptr,
+		nullptr,
+		nullptr	
+	));
+
+Error:
+	return r;
+}

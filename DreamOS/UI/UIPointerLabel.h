@@ -8,6 +8,7 @@
 class FlatContext;
 class font;
 class DreamShareViewPointerMessage;
+class SoundFile;
 
 class UIPointerLabel : public UIView {
 public:
@@ -31,6 +32,11 @@ public:
 public:
 	RESULT CreateHapticImpulse(bool fLeft, bool fIsOn);
 
+// Animations
+public:
+	RESULT PopIn();
+	RESULT PopOut();
+
 private:
 	std::shared_ptr<FlatContext> m_pRenderContext = nullptr;
 
@@ -52,7 +58,10 @@ private:
 private:
 	std::deque<point> m_recentPoints;
 	float m_currentAngle;
+	float m_pointerSide;
 	int m_seatingPosition = -1;
+	bool m_fActuated = false;
+	bool m_fIsOn = false;
 
 // Resource strings
 private:
@@ -60,6 +69,11 @@ private:
 	const wchar_t *k_wszPointerCenterTexture = L"texture/shared-view/pointer-center.png";
 	const wchar_t *k_wszPointerRightTexture = L"texture/shared-view/pointer-right.png";
 	const wchar_t *k_wszPointerDotTexture = L"texture/shared-view/pointer-dot-";
+
+// Sounds
+private:
+	std::shared_ptr<SoundFile> m_pActuateSound = nullptr;
+	std::shared_ptr<SoundFile> m_pCancelSound = nullptr;
 
 // Resource textures
 private:

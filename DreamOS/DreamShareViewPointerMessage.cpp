@@ -1,13 +1,14 @@
 #include "DreamShareViewPointerMessage.h"
 
-DreamShareViewPointerMessage::DreamShareViewPointerMessage(long senderUserID, long receiverUserID, UID uidSenderDreamApp, point ptPointer, int seatPosition, char strInitials[2], bool fVisible, bool fLeftHand) :
+DreamShareViewPointerMessage::DreamShareViewPointerMessage(long senderUserID, long receiverUserID, UID uidSenderDreamApp, point ptPointer, int seatPosition, char strInitials[2], bool fActuated, bool fInteracting, bool fLeftHand) :
 	DreamShareViewMessage(senderUserID, receiverUserID, sizeof(DreamShareViewPointerMessage), uidSenderDreamApp, DreamShareViewMessage::type::POINTER)
 {
 	m_body.ptPointer = ptPointer;
 	m_body.seatPosition = seatPosition;
 	m_body.szInitials[0] = strInitials[0];
 	m_body.szInitials[1] = strInitials[1];
-	m_body.fVisible = fVisible;
+	m_body.fActuated = fActuated;
+	m_body.fInteracting = fInteracting;
 	m_body.fLeftHand = fLeftHand;
 }
 

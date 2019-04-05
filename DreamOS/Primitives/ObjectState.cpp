@@ -338,6 +338,7 @@ RESULT ObjectState::Translate(vector vTranslation) {
 
 RESULT ObjectState::translate(vector v) {
 	if (m_fImmovable == false)
+		m_ptPreviousOrigin = m_ptOrigin;
 		m_ptOrigin.translate(v);
 
 	return R_SUCCESS;

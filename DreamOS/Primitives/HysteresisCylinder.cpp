@@ -36,7 +36,7 @@ inline bool HysteresisCylinder::Resolve(VirtualObj *pObj) {
 	// calculate the object's velocity projected onto the direction of its current offset
 	vector vOffsetUnit = vOffset / vOffset.magnitude();
 	float velocityProj = velocity.dot(vOffsetUnit);
-	float advanceFrames = 45;
+	float advanceFrames = 30;
 
 	float distance = vector(vOffset * (1 + velocityProj * advanceFrames)).magnitude();
 	//float distance = vOffset.magnitude();
