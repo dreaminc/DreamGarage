@@ -195,9 +195,6 @@ RESULT DreamShareView::HandleDreamAppMessage(PeerConnection* pPeerConnection, Dr
 	}
 
 Error:
-	if (pDreamAppMessage != nullptr) {
-		pDreamAppMessage = nullptr;
-	}
 	return r;
 }
 
