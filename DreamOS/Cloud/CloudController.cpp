@@ -954,6 +954,10 @@ RESULT CloudController::BroadcastDataMessage(Message *pDataMessage) {
 	}
 
 Error:
+	if (pDatachannelBuffer != nullptr) {
+		delete[] pDatachannelBuffer;
+		pDatachannelBuffer = nullptr;
+	}
 	return r;
 }
 

@@ -349,7 +349,7 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 	if (strInitials.size() >= 2) {
 		szInitials[1] = strInitials[1];
 	}
-	/*
+
 	DreamShareViewPointerMessage *pPointerMessageLeft = new DreamShareViewPointerMessage(
 		userID,
 		0,
@@ -377,7 +377,7 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 
 	CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageLeft, messageFlags));
 	CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageRight, messageFlags));
-	//*/
+
 Error:
 	return r;
 }
