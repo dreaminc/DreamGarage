@@ -453,6 +453,8 @@ RESULT CEFBrowserController::PushPendingAudioPacket(int audioStreamID, int frame
 
 		// This will push directly into the pending buffer
 		CR(m_pWebBrowserControllerObserver->OnAudioPacket(newPendingPacket));
+
+		newPendingPacket.DeleteBuffer();
 	}
 
 Error:
