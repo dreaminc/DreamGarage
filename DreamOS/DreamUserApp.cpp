@@ -337,6 +337,9 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 	std::string strInitials;
 	char szInitials[2];
 
+	DreamShareViewPointerMessage *pPointerMessageLeft = nullptr;
+	DreamShareViewPointerMessage *pPointerMessageRight = nullptr;
+
 	CN(pCloudController);
 	CNR(m_pUserModel, R_SKIPPED);
 
@@ -350,7 +353,15 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 		szInitials[1] = strInitials[1];
 	}
 
-	DreamShareViewPointerMessage *pPointerMessageLeft = new DreamShareViewPointerMessage(
+	if (m_fLeftSphereOn && m_fLeftSphereInteracting) {
+		m_fSendLeftPointerMessage = true;
+	}
+
+	if (m_fRightSphereOn && m_fRightSphereInteracting) {
+		m_fSendRightPointerMessage = true;
+	}
+
+	pPointerMessageLeft = new DreamShareViewPointerMessage(
 		userID,
 		0,
 		GetAppUID(),
@@ -361,7 +372,7 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 		m_fLeftSphereInteracting,
 		true);
 
-	DreamShareViewPointerMessage *pPointerMessageRight = new DreamShareViewPointerMessage(
+	pPointerMessageRight = new DreamShareViewPointerMessage(
 		userID,
 		0,
 		GetAppUID(),
@@ -377,10 +388,31 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 	m_pPointingArea->SetPosition(GetDOS()->GetCamera()->GetPosition(true));
 	CR(m_pPointingArea->Update());
 
-	CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageLeft, messageFlags));
-	CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageRight, messageFlags));
+	if (m_fSendLeftPointerMessage) {
+		CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageLeft, messageFlags));
+
+		if (!pPointerMessageLeft->m_body.fActuated) {
+			m_fSendLeftPointerMessage = false;
+		}
+	}
+
+	if (m_fSendRightPointerMessage) {
+		CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageRight, messageFlags));
+
+		if (!pPointerMessageLeft->m_body.fActuated) {
+			m_fSendRightPointerMessage = false;
+		}
+	}
 
 Error:
+	if (pPointerMessageLeft != nullptr) {
+		delete pPointerMessageLeft;
+		pPointerMessageLeft = nullptr;
+	}
+	if (pPointerMessageRight != nullptr) {
+		delete pPointerMessageRight;
+		pPointerMessageRight = nullptr;
+	}
 	return r;
 }
 

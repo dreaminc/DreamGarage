@@ -13,14 +13,14 @@
 class DreamShareViewPointerMessage : public DreamShareViewMessage {
 
 public:
-	__declspec(align(4)) struct MessageBody {
+	__declspec(align(8)) struct MessageBody {
 		point ptPointer;
 		int seatPosition;
 		char szInitials[2]; // always 2 characters
 
-		bool fActuated;
-		bool fInteracting;
-		bool fLeftHand;
+		bool fActuated : 1;
+		bool fInteracting : 1;
+		bool fLeftHand : 1;
 
 	} m_body;
 

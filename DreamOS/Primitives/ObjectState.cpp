@@ -102,6 +102,10 @@ const point ObjectState::GetOrigin() {
 	return m_ptOrigin; 
 }
 
+const point ObjectState::GetPreviousOrigin() {
+	return m_ptPreviousOrigin;
+}
+
 RESULT ObjectState::SetImmovable(bool fImmovable) {
 	m_fImmovable = fImmovable;
 	return R_SUCCESS;

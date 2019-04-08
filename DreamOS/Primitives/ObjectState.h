@@ -95,6 +95,7 @@ public:
 	const vector GetMomentum();
 
 	const point GetOrigin();
+	const point GetPreviousOrigin();
 	RESULT Translate(vector vTranslation);
 	RESULT translate(vector v);
 
