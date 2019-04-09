@@ -220,25 +220,25 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 			fInBounds = false;
 		}
 
-		bool fShouldBeVisible = fInBounds && pUpdatePointerMessage->m_body.fActuated && pUpdatePointerMessage->m_body.fInteracting;
+		bool fShouldBeVisible = fInBounds && pUpdatePointerMessage->IsActuated() && pUpdatePointerMessage->IsInteracting();
 
 		if (fShouldBeVisible && !m_fIsOn) {
-			CR(CreateHapticImpulse(pUpdatePointerMessage->m_body.fLeftHand, fShouldBeVisible));
+			CR(CreateHapticImpulse(pUpdatePointerMessage->IsLeft(), fShouldBeVisible));
 
 			CR(m_pDreamOS->PlaySoundFile(m_pActuateSound));
 
 			m_fIsOn = true;
 		}
 		
-		else if (m_fIsOn && !pUpdatePointerMessage->m_body.fActuated) {
-			CR(CreateHapticImpulse(pUpdatePointerMessage->m_body.fLeftHand, false));
+		else if (m_fIsOn && !pUpdatePointerMessage->IsActuated()) {
+			CR(CreateHapticImpulse(pUpdatePointerMessage->IsLeft(), false));
 
 			CR(m_pDreamOS->PlaySoundFile(m_pCancelSound));
 
 			m_fIsOn = false;
 		}
 
-		m_fActuated = pUpdatePointerMessage->m_body.fActuated;
+		m_fActuated = pUpdatePointerMessage->IsActuated();
 
 		m_pRenderContext->SetVisible(fShouldBeVisible, false);
 		m_pDotComposite->SetVisible(fShouldBeVisible, false);

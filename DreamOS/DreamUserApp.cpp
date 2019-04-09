@@ -389,7 +389,7 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 	if (m_fSendLeftPointerMessage) {
 		CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageLeft, messageFlags));
 
-		if (!pPointerMessageLeft->m_body.fActuated) {
+		if (!pPointerMessageLeft->IsActuated()) {
 			m_fSendLeftPointerMessage = false;
 		}
 	}
@@ -397,7 +397,7 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 	if (m_fSendRightPointerMessage) {
 		CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageRight, messageFlags));
 
-		if (!pPointerMessageLeft->m_body.fActuated) {
+		if (!pPointerMessageRight->IsActuated()) {
 			m_fSendRightPointerMessage = false;
 		}
 	}

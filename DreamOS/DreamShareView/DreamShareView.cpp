@@ -259,7 +259,7 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 		CR(AllocatePointers(userID, pUpdatePointerMessage->m_body.seatPosition));
 		//CR(AllocateSpheres(userID, strInitials));
 
-		if (pUpdatePointerMessage->m_body.fLeftHand) {
+		if (pUpdatePointerMessage->IsLeft()) {
 			pPointer = m_pointingObjects[userID][0];
 		}
 		else {
