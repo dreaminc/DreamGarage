@@ -90,7 +90,7 @@ Error:
 	return r;
 }
 
-RESULT model::QueueMesh(std::string strName, const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+RESULT model::QueueMesh(const mesh::params &meshParams) {
 	RESULT r = R_PASS;
 
 	std::function<RESULT(DimObj*, void*)> fnHandleOnMeshReady =
@@ -99,11 +99,9 @@ RESULT model::QueueMesh(std::string strName, const std::vector<vertex>& vertices
 	CNM(m_pDreamOS, "DreamObjectModule not initialized");
 	CRM(m_pDreamOS->MakeMesh(
 		fnHandleOnMeshReady,		// fnHandler
-		strName,					// name
-		vertices,					// verts
-		indices,					// indices
+		meshParams,					// mesh params
 		nullptr						// context
-	), "Failed to queue mesh %s", strName.c_str());
+	), "Failed to queue mesh %s", meshParams.strName.c_str());
 
 Error:
 	return r;

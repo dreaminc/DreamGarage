@@ -17,8 +17,9 @@
 
 #include "Primitives/PrimParams.h"
 
+#include "mesh.h"
+
 class HALImp;
-class mesh;
 
 class model : public composite {
 public:
@@ -51,7 +52,7 @@ public:
 
 	std::shared_ptr<mesh> GetChildMesh(int index);
 
-	RESULT QueueMesh(std::string strName, const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
+	RESULT QueueMesh(const mesh::params &meshParams);
 	RESULT HandleOnMeshReady(DimObj* pMesh, void *pContext);
 
 	/*

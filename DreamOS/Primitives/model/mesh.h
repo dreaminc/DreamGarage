@@ -33,8 +33,13 @@ public:
 		std::string strName;
 		std::vector<vertex> vertices;
 		std::vector<dimindex> indices;
-
+		
 		// material
+		material meshMaterial = material();
+		std::vector<std::wstring> diffuseTexturePaths;
+		std::vector<std::wstring> specularTexturePaths;
+		std::vector<std::wstring> normalsTexturePaths;
+		std::vector<std::wstring> ambientTexturePaths;
 	};
 
 public:

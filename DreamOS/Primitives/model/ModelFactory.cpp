@@ -23,7 +23,7 @@
 #include "Primitives/Vertex.h"
 #include "Primitives/color.h"
 
-std::vector<texture*> MakeTexturesFromAssetImporterMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiTextureType textureType, aiMaterial *pAIMaterial, const aiScene *pAIScene, bool fLoadAsync = false) {
+std::vector<texture*> MakeTexturesFromAssetImporterMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiTextureType textureType, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
 	RESULT r = R_PASS;
 	std::vector<texture*> retTextures;
 
@@ -60,7 +60,108 @@ Error:
 	return std::vector<texture*>();
 }
 
-RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiMaterial *pAIMaterial, const aiScene *pAIScene, bool fLoadAsync = false) {
+std::vector<std::wstring> GetTexturePaths(model *pModel, aiTextureType textureType, aiMaterial *pAIMaterial) {
+	RESULT r = R_PASS;
+
+	std::vector<std::wstring> texturePaths = std::vector<std::wstring>();
+
+	unsigned int nTextures = pAIMaterial->GetTextureCount(textureType);
+
+	for (unsigned int i = 0; i < nTextures; i++) {
+		aiString aistrTextureFilepath;
+		pAIMaterial->GetTexture(textureType, i, &aistrTextureFilepath);
+
+		// Automatically detect if absolute path, dream path, or local path
+		std::wstring wstrFilename = pModel->GetModelDirectoryPath() + util::CStringToWideCString(aistrTextureFilepath.C_Str());
+		texturePaths.push_back(wstrFilename);
+	}
+
+Success:
+	return texturePaths;
+
+	// redundant
+Error:
+	return std::vector<std::wstring>();
+}
+
+RESULT ProcessAssetImporterMeshMaterial(model *pModel, aiMaterial *pAIMaterial, const aiScene *pAIScene, mesh::params *pMeshParams) {
+	RESULT r = R_PASS;
+
+	aiColor4D aic;
+
+	float aiShininess;
+	float aiBumpscale;
+
+	unsigned int retArraySize = 0;
+
+	//float aiStrength;
+	//float aiMax;
+
+	color c;
+
+	// Diffuse Color
+	if (aiGetMaterialColor(pAIMaterial, AI_MATKEY_COLOR_DIFFUSE, &aic) == AI_SUCCESS) {
+		c = color(aic.r, aic.g, aic.b, aic.a);
+		pMeshParams->meshMaterial.SetDiffuseColor(c);
+	}
+
+	// Specular Color
+	if (aiGetMaterialColor(pAIMaterial, AI_MATKEY_COLOR_SPECULAR, &aic) == AI_SUCCESS) {
+		c = color(aic.r, aic.g, aic.b, aic.a);
+		pMeshParams->meshMaterial.SetSpecularColor(c);
+	}
+
+	// Ambient Color
+	if (aiGetMaterialColor(pAIMaterial, AI_MATKEY_COLOR_AMBIENT, &aic) == AI_SUCCESS) {
+		c = color(aic.r, aic.g, aic.b, aic.a);
+		pMeshParams->meshMaterial.SetAmbientColor(c);
+	}
+
+	// TODO: Emission Color
+	/*
+	if (aiGetMaterialColor(pAIMaterial, AI_MATKEY_COLOR_EMISSIVE, &aic) == AI_SUCCESS) {
+	c = color(aic.r, aic.g, aic.b, aic.a);
+	pMesh->SetMaterialEmissiveColor(c, false);
+	}
+	*/
+
+	// Shininess 
+	if (aiGetMaterialFloatArray(pAIMaterial, AI_MATKEY_SHININESS, &aiShininess, &retArraySize) == AI_SUCCESS && retArraySize != 0) {
+		pMeshParams->meshMaterial.SetShininess(aiShininess);
+	}
+
+	// Bumpiness
+	if (aiGetMaterialFloatArray(pAIMaterial, AI_MATKEY_BUMPSCALING, &aiBumpscale, &retArraySize) == AI_SUCCESS && retArraySize != 0) {
+		pMeshParams->meshMaterial.SetBumpiness(aiBumpscale);
+	}
+
+	// Textures
+	// TODO: Support more than one texture
+	// TODO: Bump maps
+	if (pAIMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+		pMeshParams->diffuseTexturePaths = GetTexturePaths(pModel, aiTextureType_DIFFUSE, pAIMaterial);
+	}
+
+	if (pAIMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0) {
+		pMeshParams->specularTexturePaths = GetTexturePaths(pModel, aiTextureType_SPECULAR, pAIMaterial);
+	}
+
+	// TODO: This may or may not be a bug with assimp
+	//if (pAIMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
+	if (pAIMaterial->GetTextureCount(aiTextureType_HEIGHT) > 0) {
+		//pMeshParams->specularTexturePaths = GetTexturePaths(pModel, aiTextureType_NORMALS, pAIMaterial);
+		pMeshParams->normalsTexturePaths = GetTexturePaths(pModel, aiTextureType_HEIGHT, pAIMaterial);
+	}
+
+	if (pAIMaterial->GetTextureCount(aiTextureType_AMBIENT) > 0) {
+		pMeshParams->ambientTexturePaths = GetTexturePaths(pModel, aiTextureType_AMBIENT, pAIMaterial);
+	}
+
+Error:
+	return r;
+}
+
+RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
 	RESULT r = R_PASS;
 
 	aiColor4D aic;
@@ -112,47 +213,41 @@ RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMe
 	}
 
 	// Textures
+	// TODO: Support more than one texture
+	// TODO: Bump maps
+	if (pAIMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+		auto diffuseTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_DIFFUSE, pAIMaterial, pAIScene);
 
-	if (fLoadAsync == false) {
-		// TODO: Support more than one texture
-		// TODO: Bump maps
-		if (pAIMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-			auto diffuseTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_DIFFUSE, pAIMaterial, pAIScene, fLoadAsync);
-
-			if (diffuseTextures.size() > 0) {
-				pMesh->SetDiffuseTexture(diffuseTextures[0]);
-			}
-		}
-
-		if (pAIMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0) {
-			auto specularTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_SPECULAR, pAIMaterial, pAIScene, fLoadAsync);
-
-			if (specularTextures.size() > 0) {
-				pMesh->SetSpecularTexture(specularTextures[0]);
-			}
-		}
-
-		// TODO: This may or may not be a bug with assimp
-		//if (pAIMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
-		if (pAIMaterial->GetTextureCount(aiTextureType_HEIGHT) > 0) {
-			//auto bumpTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_NORMALS, pAIMaterial, pAIScene);
-			auto bumpTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_HEIGHT, pAIMaterial, pAIScene, fLoadAsync);
-
-			if (bumpTextures.size() > 0) {
-				pMesh->SetBumpTexture(bumpTextures[0]);
-			}
-		}
-
-		if (pAIMaterial->GetTextureCount(aiTextureType_AMBIENT) > 0) {
-			auto ambientTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_AMBIENT, pAIMaterial, pAIScene, fLoadAsync);
-
-			if (ambientTextures.size() > 0) {
-				pMesh->SetAmbientTexture(ambientTextures[0]);
-			}
+		if (diffuseTextures.size() > 0) {
+			pMesh->SetDiffuseTexture(diffuseTextures[0]);
 		}
 	}
-	else {
-		// TODO: 
+
+	if (pAIMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0) {
+		auto specularTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_SPECULAR, pAIMaterial, pAIScene);
+
+		if (specularTextures.size() > 0) {
+			pMesh->SetSpecularTexture(specularTextures[0]);
+		}
+	}
+
+	// TODO: This may or may not be a bug with assimp
+	//if (pAIMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
+	if (pAIMaterial->GetTextureCount(aiTextureType_HEIGHT) > 0) {
+		//auto bumpTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_NORMALS, pAIMaterial, pAIScene);
+		auto bumpTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_HEIGHT, pAIMaterial, pAIScene);
+
+		if (bumpTextures.size() > 0) {
+			pMesh->SetBumpTexture(bumpTextures[0]);
+		}
+	}
+
+	if (pAIMaterial->GetTextureCount(aiTextureType_AMBIENT) > 0) {
+		auto ambientTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_AMBIENT, pAIMaterial, pAIScene);
+
+		if (ambientTextures.size() > 0) {
+			pMesh->SetAmbientTexture(ambientTextures[0]);
+		}
 	}
 
 Error:
@@ -272,12 +367,21 @@ RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *p
 		// Materials 
 		if (pAIScene->mNumMaterials > 0) {
 			aiMaterial *pAIMaterial = pAIScene->mMaterials[pAIMesh->mMaterialIndex];
-			CRM(ProcessAssetImporterMeshMaterial(pModel, pMesh, pAIMaterial, pAIScene, fLoadAsync), "Failed to process material for mesh");
+			CRM(ProcessAssetImporterMeshMaterial(pModel, pMesh, pAIMaterial, pAIScene), "Failed to process material for mesh");
 		}
 	}
 	else {
+		mesh::params meshParams(strMeshName, vertices, indices);
+
+		// Materials 
+		if (pAIScene->mNumMaterials > 0) {
+			aiMaterial *pAIMaterial = pAIScene->mMaterials[pAIMesh->mMaterialIndex];
+			CRM(ProcessAssetImporterMeshMaterial(pModel, pAIMaterial, pAIScene, &meshParams), 
+				"Failed to process material for mesh");
+		}
+
 		// This will queue the mesh which will get added to the model
-		CR(pModel->QueueMesh(strMeshName, vertices, indices));
+		CR(pModel->QueueMesh(meshParams));
 	}
 
 
