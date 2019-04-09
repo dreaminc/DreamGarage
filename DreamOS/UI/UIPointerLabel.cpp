@@ -28,10 +28,10 @@ RESULT UIPointerLabel::Initialize() {
 	std::wstring wstrAssetPath;
 
 	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
-	m_pPointerLeft = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerLeftTexture)[0]);
-	m_pPointerCenter = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerCenterTexture)[0]);
-	m_pPointerRight = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerRightTexture)[0]);
-	m_pPointerDot = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerDotTexture)[0]);
+	//m_pPointerLeft = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerLeftTexture)[0]);
+	//m_pPointerCenter = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerCenterTexture)[0]);
+	//m_pPointerRight = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerRightTexture)[0]);
+	//m_pPointerDot = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, &(wstrAssetPath + k_wszPointerDotTexture)[0]);
 
 	m_pRenderContext = AddFlatContext();
 	m_pRenderContext->RotateXByDeg(90.0f);

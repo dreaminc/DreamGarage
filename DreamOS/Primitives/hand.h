@@ -128,7 +128,7 @@ protected:
 
 protected:
 
-	std::wstring k_wstrFolder = L"/avatar/";
+	std::wstring k_wstrFolder = L"/model/avatar/";
 	std::wstring k_wstrLeft = L"left-hand";
 	std::wstring k_wstrRight = L"right-hand";
 	std::wstring k_wstrFileType = L".fbx";
