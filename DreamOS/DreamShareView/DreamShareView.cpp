@@ -146,7 +146,6 @@ RESULT DreamShareView::Update(void *pContext) {
 				
 				auto pQuad = pPointerLabel->GetDot();
 				auto pComposite = pPointerLabel->GetDotComposite();
-				//m_pPointerContext->AddObject(pPointerLabel->GetDot());
 				if (pComposite->IsVisible()) {
 					point ptQuad = pQuad->GetPosition(true);
 					point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (ptQuad - m_pCastQuad->GetOrigin(true)));

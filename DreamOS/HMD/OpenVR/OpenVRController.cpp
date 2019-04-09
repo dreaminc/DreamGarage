@@ -45,12 +45,12 @@ RESULT OpenVRController::SubmitHapticImpulse(ControllerType controllerType, Hapt
 	util::Clamp<unsigned short>(usDuration, 100, 3999);	// undocumented max range
 	uint32_t axisIndex = vr::k_EButton_Axis0 - vr::k_EButton_Axis0;		// Add different button axes
 
-	//m_pIVRHMD->TriggerHapticPulse(unControllerDeviceIndex, axisIndex, usDuration);
-
+	// TODO: this function is deprecated, for more control the lower function needs to be supported
+	m_pIVRHMD->TriggerHapticPulse(unControllerDeviceIndex, axisIndex, usDuration);
 	
-	float sDuration = msDuration / 1000.0f;
-	float freq = 1.0f / sDuration;
-	vr::VRInput()->TriggerHapticVibrationAction(unControllerDeviceIndex, 0, sDuration, freq, amplitude, vr::k_ulInvalidInputValueHandle);
+	//float sDuration = msDuration / 1000.0f;
+	//float freq = 1.0f / sDuration;
+	//vr::VRInput()->TriggerHapticVibrationAction(unControllerDeviceIndex, 0, sDuration, freq, amplitude, vr::k_ulInvalidInputValueHandle);
 
 Error:
 	return r;
