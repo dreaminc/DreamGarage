@@ -146,7 +146,7 @@ private:
 
 private:
 
-	std::wstring k_wstrAvatarPath = L"/avatar/";
+	std::wstring k_wstrAvatarPath = L"/model/avatar/";
 	std::wstring k_wstrMouthFileType = L".png";
 
 private:
