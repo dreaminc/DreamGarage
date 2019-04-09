@@ -1283,7 +1283,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline("blinnphong_texture"));
+		CR(SetupPipeline("environment"));
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -1302,10 +1302,11 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			CR(m_pDreamOS->MakeModel(std::bind(&TestContext::OnModelReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
 				(void*)(pPtOrigin), L"dreamos:\\Assets\\model\\environment\\1\\environment.fbx"));
 
-			//model *pModel = m_pDreamOS->AddModel(L"dreamos:\\Assets\\model\\avatar\\3\\head.fbx");
+			//model *pModel = m_pDreamOS->AddModel(L"dreamos:\\Assets\\model\\environment\\1\\environment.fbx");
 			//CN(pModel);
 			//pModel->SetPosition(*pPtOrigin);
-			//pModel->SetScale(0.05f);
+			//pModel->SetScale(0.025f);
+			//pModel->RotateYByDeg(180.0f);
 
 			// Test the creation of an arbitrarily large number of spheres
 			for (int i = 0; i < factor; i++) {
@@ -1338,6 +1339,10 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 					}
 				}
 			}
+
+			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CN(pDreamGamepadApp);
+			CR(pDreamGamepadApp->SetCamera(m_pDreamOS->GetCamera(), DreamGamepadCameraApp::CameraControlType::GAMEPAD));
 
 		}
 

@@ -53,7 +53,13 @@ public:
 	std::shared_ptr<mesh> GetChildMesh(int index);
 
 	RESULT QueueMesh(const mesh::params &meshParams);
+
+	// Async Callbacks
 	RESULT HandleOnMeshReady(DimObj* pMesh, void *pContext);
+	RESULT HandleOnMeshDiffuseTextureReady(texture *pTexture, void *pContext);
+	RESULT HandleOnMeshSpecularTextureReady(texture *pTexture, void *pContext);
+	RESULT HandleOnMeshNormalTextureReady(texture *pTexture, void *pContext);
+	RESULT HandleOnMeshAmbientTextureReady(texture *pTexture, void *pContext);
 
 	/*
 public:
@@ -81,9 +87,9 @@ private:
 
 protected:
 	RESULT SetDreamOS(DreamOS *pDOS);
+	model::params m_params;
 
 private:
-	model::params m_params;
 	DreamOS *m_pDreamOS = nullptr;
 };
 

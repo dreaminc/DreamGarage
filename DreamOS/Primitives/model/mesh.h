@@ -15,6 +15,9 @@
 
 class mesh : public virtual DimObj {
 public:
+	friend class model;
+
+public:
 	struct params :
 		public PrimParams
 	{
@@ -64,6 +67,7 @@ public:
 private:
 	RESULT SetVertices(const std::vector<vertex>& vertices);
 
+protected:
 	mesh::params m_params;
 };
 

@@ -73,6 +73,60 @@ Error:
 	return nullptr;
 }
 
+// Note:  I don't love the code duplication, but it's mostly sanity check code and a 
+// wrap of the set X texture method for the mesh.  Better than messing with the async obj arch
+RESULT model::HandleOnMeshDiffuseTextureReady(texture *pTexture, void *pContext) {
+	RESULT r = R_PASS;
+
+	mesh *pMesh = (mesh*)(pContext);
+	CN(pMesh);
+	CN(pTexture);
+
+	CR(pMesh->SetDiffuseTexture(pTexture));
+
+Error:
+	return r;
+}
+
+RESULT model::HandleOnMeshSpecularTextureReady(texture *pTexture, void *pContext) {
+	RESULT r = R_PASS;
+
+	mesh *pMesh = (mesh*)(pContext);
+	CN(pMesh);
+	CN(pTexture);
+
+	CR(pMesh->SetSpecularTexture(pTexture));
+
+Error:
+	return r;
+}
+
+RESULT model::HandleOnMeshNormalTextureReady(texture *pTexture, void *pContext) {
+	RESULT r = R_PASS;
+
+	mesh *pMesh = (mesh*)(pContext);
+	CN(pMesh);
+	CN(pTexture);
+
+	CR(pMesh->SetBumpTexture(pTexture));
+
+Error:
+	return r;
+}
+
+RESULT model::HandleOnMeshAmbientTextureReady(texture *pTexture, void *pContext) {
+	RESULT r = R_PASS;
+
+	mesh *pMesh = (mesh*)(pContext);
+	CN(pMesh);
+	CN(pTexture);
+
+	CR(pMesh->SetAmbientTexture(pTexture));
+
+Error:
+	return r;
+}
+
 RESULT model::HandleOnMeshReady(DimObj* pDimObj, void *pContext) {
 	RESULT r = R_PASS;
 
@@ -84,7 +138,22 @@ RESULT model::HandleOnMeshReady(DimObj* pDimObj, void *pContext) {
 	// Mesh has been loaded and added to GPU 
 	CRM(AddObject(std::shared_ptr<mesh>(pMesh)), "Failed to add mesh to model");
 
-	// TODO: Textures
+	CNM(m_pDreamOS, "DreamOS handle must be initialized for async object creation");
+	
+	// Textures
+
+	// Diffuse 
+	if (pMesh->m_params.diffuseTexturePaths.size() > 0) {
+		std::function<RESULT(texture*, void*)> fnHandleOnMeshDiffuseTextureReady =
+			std::bind(&model::HandleOnMeshDiffuseTextureReady, this, std::placeholders::_1, std::placeholders::_2);
+
+		CRM(m_pDreamOS->LoadTexture(
+			fnHandleOnMeshDiffuseTextureReady,
+			(void*)(pMesh),
+			texture::type::TEXTURE_2D,
+			pMesh->m_params.diffuseTexturePaths[0].c_str()
+		), "Failed to load mesh diffuse texture");
+	}
 
 Error:
 	return r;
@@ -96,7 +165,7 @@ RESULT model::QueueMesh(const mesh::params &meshParams) {
 	std::function<RESULT(DimObj*, void*)> fnHandleOnMeshReady =
 		std::bind(&model::HandleOnMeshReady, this, std::placeholders::_1, std::placeholders::_2);
 
-	CNM(m_pDreamOS, "DreamObjectModule not initialized");
+	CNM(m_pDreamOS, "DreamOS handle must be initialized for async object creation");
 	CRM(m_pDreamOS->MakeMesh(
 		fnHandleOnMeshReady,		// fnHandler
 		meshParams,					// mesh params

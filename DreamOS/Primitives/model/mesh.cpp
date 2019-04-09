@@ -62,6 +62,9 @@ mesh::mesh(mesh::params *pMeshParams) :
 	//CR(InitializeBoundingSphere());
 	CR(InitializeOBB());
 
+	// Apply Materials
+	CR(SetMaterial(pMeshParams->meshMaterial));
+
 	Validate();
 	return;
 
