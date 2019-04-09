@@ -1154,9 +1154,6 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 	float paddingRatio = 0.10f;
 
 	struct TestContext {
-		sphere *pSphere = nullptr;
-		model *pModel = nullptr;
-
 		// COMMANDMENT: Thou Shall Not Have Member Templates in a Local Class 
 		RESULT OnSphereReady(DimObj *pDimObj, void *pContext) {
 			RESULT r = R_PASS;
@@ -1199,7 +1196,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			}
 
 			pObj->SetPosition(ptOrigin);
-			pModel->SetScale(0.05f);
+			pObj->SetScale(0.05f);
 
 			CRM(pDreamOS->AddObject(pObj), "Failed to add async sphere");
 

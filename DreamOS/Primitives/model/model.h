@@ -22,6 +22,9 @@ class mesh;
 
 class model : public composite {
 public:
+	friend class ModelFactory;
+
+public:
 	struct params :
 		public PrimParams
 	{
@@ -48,6 +51,9 @@ public:
 
 	std::shared_ptr<mesh> GetChildMesh(int index);
 
+	RESULT QueueMesh(std::string strName, const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
+	RESULT HandleOnMeshReady(DimObj* pMesh, void *pContext);
+
 	/*
 public:
 	virtual RESULT Allocate() override;
@@ -72,8 +78,12 @@ private:
 	std::wstring GetModelFilePath();
 	std::wstring GetModelDirectoryPath();
 
+protected:
+	RESULT SetDreamOS(DreamOS *pDOS);
+
 private:
 	model::params m_params;
+	DreamOS *m_pDreamOS = nullptr;
 };
 
 #endif // ! MODEL_H_

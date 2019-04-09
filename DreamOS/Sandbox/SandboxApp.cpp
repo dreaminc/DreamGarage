@@ -1077,7 +1077,9 @@ DimObj *SandboxApp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 	DimObj *pDimObj = nullptr;
 
 	if (pPrimParams->GetPrimitiveType() == PRIMITIVE_TYPE::MODEL) {
-		pDimObj = ModelFactory::MakeModel(m_pHALImp, pPrimParams, fInitialize);
+		CNM(m_pDreamOSHandle, "Async model loading not supported without a DreamOS handle in Sandbox");
+
+		pDimObj = ModelFactory::MakeModel(m_pDreamOSHandle, pPrimParams, fInitialize);
 		CN(pDimObj);
 	}
 	else {

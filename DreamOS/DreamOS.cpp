@@ -709,6 +709,20 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::MakeMesh(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, std::string strName, const std::vector<vertex>& vertices, const std::vector<dimindex>& indices, void *pContext) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	mesh::params *pMeshParams = new mesh::params(strName, vertices, indices);
+	CN(pMeshParams);
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pMeshParams, fnOnObjectReady, pContext), "Failed to queue new mesh object in async obj module");
+
+Error:
+	return r;
+}
+
 RESULT DreamOS::MakeSphere(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	RESULT r = R_PASS;
 

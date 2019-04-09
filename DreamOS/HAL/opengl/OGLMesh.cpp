@@ -4,16 +4,21 @@ OGLMesh::OGLMesh(OpenGLImp *pParentImp, const std::vector<vertex>& vertices) :
 	mesh(vertices),
 	OGLObj(pParentImp)
 {
-	// TODO: Implement valid and CV EHM
-	RESULT r = OGLInitialize();
+	// 
 }
 
 OGLMesh::OGLMesh(OpenGLImp *pParentImp, const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) :
 	mesh(vertices, indices),
 	OGLObj(pParentImp)
 {
-	// TODO: Implement valid and CV EHM
-	RESULT r = OGLInitialize();
+	// 
+}
+
+OGLMesh::OGLMesh(OpenGLImp *pParentImp, mesh::params *pMeshParams) :
+	mesh(pMeshParams),
+	OGLObj(pParentImp)
+{
+	// 
 }
 
 /*

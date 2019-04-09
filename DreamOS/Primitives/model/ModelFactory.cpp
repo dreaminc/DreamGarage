@@ -2,6 +2,8 @@
 
 #include "Sandbox/PathManager.h"
 
+#include "DreamOS.h"
+
 // Add assimp
 
 #include "assimp/Importer.hpp"
@@ -274,7 +276,8 @@ RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *p
 		}
 	}
 	else {
-
+		// This will queue the mesh which will get added to the model
+		CR(pModel->QueueMesh(strMeshName, vertices, indices));
 	}
 
 
@@ -294,7 +297,7 @@ RESULT ProcessAssetImporterNode(model *pModel, aiNode *pAINode, const aiScene *p
 		CR(ProcessAssetImporterMesh(pModel, pAIMesh, pAIScene, fLoadAsync));
 	}
 
-	// Then do the same for each of its children
+	// Then do the same for each of its children (just gets added flat - no model heirarchy transferred)
 	for (unsigned int i = 0; i < pAINode->mNumChildren; i++) {
 		ProcessAssetImporterNode(pModel, pAINode->mChildren[i], pAIScene, fLoadAsync);
 	}
@@ -392,7 +395,7 @@ Error:
 	return nullptr;
 }
 
-model *ModelFactory::MakeModel(HALImp *pParentImp, PrimParams *pPrimParams, bool fInitialize) {
+model *ModelFactory::MakeModel(DreamOS *pDOS, PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 
 	model *pModel = nullptr;
@@ -401,8 +404,9 @@ model *ModelFactory::MakeModel(HALImp *pParentImp, PrimParams *pPrimParams, bool
 	model::params *pModelParams = dynamic_cast<model::params*>(pPrimParams);
 	CN(pModelParams);
 
-	pModel = MakeAndInitializeModel(pParentImp, pModelParams->wstrModelFilePath);
+	pModel = MakeAndInitializeModel(pDOS->GetHALImp(), pModelParams->wstrModelFilePath);
 	CNM(pModel, "Failed to load model");
+	CR(pModel->SetDreamOS(pDOS));
 
 	// Load model from disk
 	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(pModel->GetModelFilePath()), GetAssImpFlags(pModelParams->modelFactoryFlags));

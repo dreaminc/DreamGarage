@@ -33,11 +33,51 @@ Error:
 }
 */
 
-mesh::mesh(const std::vector<vertex>& vertices) {
+mesh::mesh(mesh::params *pMeshParams) :
+	m_params(*pMeshParams)
+{
+	RESULT r = R_PASS;
+
+	m_nIndices = static_cast<unsigned int>(pMeshParams->indices.size());
+	m_nVertices = static_cast<unsigned int>(pMeshParams->vertices.size());
+
+	CR(Allocate());
+
+	unsigned int indexCount = 0;
+
+	for (auto& v : pMeshParams->vertices) {
+		m_pVertices[indexCount] = vertex(v);
+		m_pVertices[indexCount].SetTangentBitangentFromNormal();
+
+		indexCount++;
+	}
+
+	indexCount = 0;
+
+	for (auto& i : pMeshParams->indices) {
+		m_pIndices[indexCount++] = i;
+	}
+
+	// Bounding Box
+	//CR(InitializeBoundingSphere());
+	CR(InitializeOBB());
+
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
+}
+
+mesh::mesh(const std::vector<vertex>& vertices) :
+	m_params("mesh")
+{
+	RESULT r = R_PASS;
+
 	// init a model with index for each vertex
 	m_nIndices = m_nVertices;
 
-	RESULT r = R_PASS;
 	CR(SetVertices(vertices));
 
 	// Bounding Box
@@ -52,7 +92,9 @@ Error:
 	return;
 }
 
-mesh::mesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+mesh::mesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) :
+	m_params("mesh") 
+{
 	RESULT r = R_PASS;
 
 	m_nIndices = static_cast<unsigned int>(indices.size());
@@ -120,10 +162,10 @@ Error:
 }
 
 RESULT mesh::SetName(std::string strName) {
-	m_strName = strName;
+	m_params.strName = strName;
 	return R_PASS;
 }
 
 std::string mesh::GetName() {
-	return m_strName;
+	return m_params.strName;
 }
