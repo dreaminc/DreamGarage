@@ -63,7 +63,9 @@ RESULT DreamBrowser::Shutdown(void *pContext) {
 	}
 	//*/
 
-//Error:
+	CRM(TeardownAudioBusSoundBuffers(), "Failed to tear down browser audio bus sound buffers");
+
+Error:
 	return r;
 }
 
@@ -890,9 +892,9 @@ RESULT DreamBrowser::InitializeDreamBrowserSoundSystem() {
 	int samplingRate = 48000;
 	sound::type bufferType = sound::type::SIGNED_16_BIT;
 
-	// Set up the render Sound buffer
-	CRM(InitializeRenderSoundBuffer(numChannels, samplingRate, bufferType),
-		"Failed to initialize dream borwser render sound buffer");
+	//// Set up the render Sound buffer
+	//CRM(InitializeRenderSoundBuffer(numChannels, samplingRate, bufferType),
+	//	"Failed to initialize dream browser render sound buffer");
 
 	m_soundState = sound::state::RUNNING;
 	m_browserAudioProcessingThread = std::thread(&DreamBrowser::AudioProcess, this);
@@ -901,6 +903,7 @@ Error:
 	return r;
 }
 
+/*
 RESULT DreamBrowser::InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType) {
 	RESULT r = R_PASS;
 
@@ -913,6 +916,104 @@ RESULT DreamBrowser::InitializeRenderSoundBuffer(int numChannels, int samplingRa
 
 Error:
 	return r;
+}
+*/
+
+RESULT DreamBrowser::TeardownAudioBusSoundBuffers() {
+	RESULT r = R_PASS;
+
+	for (auto &pRenderBus : m_renderAudioBuses) {
+		if (pRenderBus.second != nullptr) {
+			delete pRenderBus.second;
+			pRenderBus.second = nullptr;
+		}
+	}
+
+	m_renderAudioBuses.clear();
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::InitializeNewRenderBusSoundBuffer(const AudioPacket& pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	SoundBuffer *pRenderSoundBuffer = nullptr;
+
+	int audioStreamID = pendingAudioPacket.GetAudioStreamID(); 
+	int numChannels = pendingAudioPacket.GetNumChannels(); 
+	int samplingRate = pendingAudioPacket.GetSamplingRate();
+	sound::type bufferType = sound::type::SIGNED_16_BIT;	// T
+
+	CBM((m_renderAudioBuses.find(audioStreamID) == m_renderAudioBuses.end()), "Audio Bus %d already set up in browser", audioStreamID);
+
+	//pRenderSoundBuffer = SoundBuffer::Make(numChannels, samplingRate, bufferType);
+	// TODO: Sampling rate currently hard coded to 48000
+	pRenderSoundBuffer = SoundBuffer::Make(numChannels, m_defaultBrowserSamplingRate, bufferType);
+	CN(pRenderSoundBuffer);
+
+	m_renderAudioBuses[audioStreamID] = pRenderSoundBuffer;
+
+	DEBUG_LINEOUT("Initialized new Dream Browser Bus ID: %d Render Sound Buffer %d channels type: %s", 
+		audioStreamID, numChannels, SoundBuffer::TypeString(bufferType));
+
+Error:
+	return r;
+}
+
+int DreamBrowser::GetPendingAudioFrames() {
+	int maxPendingFrames = 0;
+	int pendingFrames = 0;
+
+	for (auto &pSoundBuffer : m_renderAudioBuses) {
+		if ((pendingFrames = pSoundBuffer.second->NumPendingFrames()) > maxPendingFrames) {
+			maxPendingFrames = pendingFrames;
+		}
+	}
+
+	return maxPendingFrames;
+}
+
+AudioPacket DreamBrowser::GetPendingRenderAudioPacket(int numFrames) {
+	RESULT r = R_PASS;
+	
+	// Create a sink audio packet to mix into
+
+	int numChannels = 2;
+	int samplingRate = m_defaultBrowserSamplingRate;
+
+	size_t pDataBuffer_n = numFrames * sizeof(int16_t) * numChannels;
+	int16_t *pDataBuffer = (int16_t*)malloc(pDataBuffer_n);
+	memset(pDataBuffer, 0, pDataBuffer_n);
+
+	AudioPacket pendingAudioPacket(numFrames, numChannels, sizeof(int16_t), samplingRate, sound::type::SIGNED_16_BIT, (uint8_t*)(pDataBuffer));
+
+	// NOTE: This code is largely duplicated from DreamSoundSystem - might
+	// be good to look into a consolidated arch for this
+	for (auto &pSoundBuffer : m_renderAudioBuses) {
+		auto pBufferTarget = pSoundBuffer.second;
+
+		if (pBufferTarget->NumPendingFrames() >= numFrames) {
+
+			AudioPacket tempMonoAudioPacket;
+
+			pBufferTarget->LockBuffer();
+
+			{
+				// This is non mix-down
+				pBufferTarget->GetAudioPacket(numFrames, &tempMonoAudioPacket);
+			}
+
+			pBufferTarget->UnlockBuffer();
+
+			pendingAudioPacket.MixInAudioPacket(tempMonoAudioPacket);
+
+			tempMonoAudioPacket.DeleteBuffer();
+		}
+	}
+
+Error:
+	return pendingAudioPacket;
 }
 
 // TODO: This is not cross platform 
@@ -938,38 +1039,50 @@ RESULT DreamBrowser::AudioProcess() {
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 		auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
 
-		int audioBufferSampleLength10ms = m_pRenderSoundBuffer->GetSamplingRate() / 100;
+		//int audioBufferSampleLength10ms = m_pRenderSoundBuffer->GetSamplingRate() / 100;
+		int audioBufferSampleLength10ms = m_defaultBrowserSamplingRate / 100;
 
 		//if (m_pRenderSoundBuffer != nullptr ) {
 		//if (m_pRenderSoundBuffer != nullptr && diffVal > 9) {
-		if (m_pRenderSoundBuffer != nullptr && m_pRenderSoundBuffer->NumPendingFrames() >= audioBufferSampleLength10ms) {
+		//if (m_pRenderSoundBuffer != nullptr && m_pRenderSoundBuffer->NumPendingFrames() >= audioBufferSampleLength10ms) {
+		if(m_renderAudioBuses.size() != 0 && GetPendingAudioFrames() >= audioBufferSampleLength10ms) {
 
-			m_pRenderSoundBuffer->LockBuffer();
+			//m_pRenderSoundBuffer->LockBuffer();
+			//
+			//{
+			//	pendingBytes = m_pRenderSoundBuffer->NumPendingFrames();
+			//
+			//	if (pendingBytes >= audioBufferSampleLength10ms) {
+			//
+			//		//DEBUG_LINEOUT("pending %d", (int)pendingBytes)
+			//
+			//		lastUpdateTime = timeNow - std::chrono::milliseconds(diffVal - 10);
+			//
+			//		AudioPacket pendingAudioPacket;
+			//
+			//		m_pRenderSoundBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket);
+			//
+			//		if (m_pObserver != nullptr) {
+			//			if (RCHECK(m_pObserver->HandleAudioPacket(pendingAudioPacket, this)) == false) {
+			//				DOSLOG(INFO, "Handle Audio Packet Failed");
+			//			}
+			//		}
+			//	}
+			//}
+			//
+			//m_pRenderSoundBuffer->UnlockBuffer();
 
-			{
-				pendingBytes = m_pRenderSoundBuffer->NumPendingFrames();
+			AudioPacket pendingAudioPacket = GetPendingRenderAudioPacket(audioBufferSampleLength10ms);
 
-				if (pendingBytes >= audioBufferSampleLength10ms) {
+			// Send to observer
 
-					//DEBUG_LINEOUT("pending %d", (int)pendingBytes)
-
-					lastUpdateTime = timeNow - std::chrono::milliseconds(diffVal - 10);
-
-					AudioPacket pendingAudioPacket;
-
-					m_pRenderSoundBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket);
-
-					if (m_pObserver != nullptr) {
-						if (RCHECK(m_pObserver->HandleAudioPacket(pendingAudioPacket, this)) == false) {
-							DOSLOG(INFO, "Handle Audio Packet Failed");
-						}
-					}
-
-					pendingAudioPacket.DeleteBuffer();
+			if (m_pObserver != nullptr) {
+				if (RCHECK(m_pObserver->HandleAudioPacket(pendingAudioPacket, this)) == false) {
+					DOSLOG(INFO, "Handle Audio Packet Failed");
 				}
 			}
 
-			m_pRenderSoundBuffer->UnlockBuffer();
+			pendingAudioPacket.DeleteBuffer();
 
 		}
 
@@ -988,43 +1101,51 @@ Error:
 RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
+	// Handle different audio buses here
+	if ((m_renderAudioBuses.find(pendingAudioPacket.GetAudioStreamID()) == m_renderAudioBuses.end())) {
+		CRM(InitializeNewRenderBusSoundBuffer(pendingAudioPacket), 
+			"Failed to create redner audio bus for stream id %d", pendingAudioPacket.GetAudioStreamID());
+	}
+
 	// TODO: Handle this (if streaming we broadcast into webrtc
 	// TODO: Either put this back in or move it to a different layer
 	if (m_pObserver != nullptr) {
 
 		if (m_fForceObserverAudio || GetDOS()->GetSharedContentTexture() == m_pBrowserTexture.get() || GetDOS()->GetSharedCameraTexture() == m_pBrowserTexture.get()) {
 			//DOSLOG(INFO, "AudioPacket: Frames: %d, Channels: %d, SamplingRate: %d", pendingAudioPacket.GetNumFrames(), pendingAudioPacket.GetNumChannels(), pendingAudioPacket.GetSamplingRate());
+			
+			bool fPushPacket = false;
+
+			// Some basic filtering rules
 			if (m_strCurrentURL == "https://web.skype.com/") {
 				if (pendingAudioPacket.GetNumChannels() == 2 && pendingAudioPacket.GetNumFrames() == 480) {
 					//DOSLOG(INFO, "Pushing Packet!!!");
-
-					if (m_pRenderSoundBuffer != nullptr) {
-
-						m_pRenderSoundBuffer->LockBuffer();
-
-						{
-							CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
-						}
-
-						m_pRenderSoundBuffer->UnlockBuffer();
-					}
+					fPushPacket = true;
 				}
 			}
 			else {
-				if (m_pRenderSoundBuffer != nullptr) {
+				fPushPacket = true;
+			}
 
-					m_pRenderSoundBuffer->LockBuffer();
+			// Push the packet to the target audio bus buffer
+			if(fPushPacket) {
+				auto pBufferTarget = m_renderAudioBuses[pendingAudioPacket.GetAudioStreamID()];
+
+				if (pBufferTarget != nullptr) {
+
+					pBufferTarget->LockBuffer();
 
 					{
-						CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
+						CR(pBufferTarget->PushAudioPacket(pendingAudioPacket, true));
 					}
 
-					m_pRenderSoundBuffer->UnlockBuffer();
+					pBufferTarget->UnlockBuffer();
 				}
 			}
 		}
 	}
 	
+	// TODO: This is a hack to get Skype to work
 	if (pendingAudioPacket.GetSamplingRate() == 44100) {
 		CR(GetDOS()->GetDreamSoundSystem()->PlayAudioPacket(pendingAudioPacket));
 	}

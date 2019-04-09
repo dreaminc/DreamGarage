@@ -420,7 +420,7 @@ AudioPacket CEFBrowserController::PopPendingAudioPacket() {
 	return pendingAudioPacket;
 }
 
-RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, int bitsPerSample, uint8_t *pDataBuffer) {
+RESULT CEFBrowserController::PushPendingAudioPacket(int audioStreamID, int frames, int channels, int bitsPerSample, uint8_t *pDataBuffer) {
 	RESULT r = R_PASS;
 
 	///*
@@ -446,12 +446,15 @@ RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, in
 			//pDataBuffer
 		);
 
+		newPendingPacket.SetAudioStreamID(audioStreamID);
 		newPendingPacket.SetSoundType(sound::type::SIGNED_16_BIT);
 
 		//m_pendingAudioPackets.push(newPendingPacket);
 
 		// This will push directly into the pending buffer
 		CR(m_pWebBrowserControllerObserver->OnAudioPacket(newPendingPacket));
+
+		newPendingPacket.DeleteBuffer();
 	}
 
 Error:
@@ -462,12 +465,12 @@ bool CEFBrowserController::IsAudioPacketPending() {
 	return (m_pendingAudioPackets.size() > 0) ? true : false;
 }
 
-RESULT CEFBrowserController::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
+RESULT CEFBrowserController::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int audioSteamID, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
 	RESULT r = R_PASS;
 	//DEBUG_LINEOUT("CEFBrowserManager: OnAudioData");
 
 	// Queue up new audio packet 
-	CR(PushPendingAudioPacket(frames, channels, bitsPerSample, (uint8_t*)pDataBuffer));
+	CR(PushPendingAudioPacket(audioSteamID, frames, channels, bitsPerSample, (uint8_t*)pDataBuffer));
 
 Error:
 	return r;

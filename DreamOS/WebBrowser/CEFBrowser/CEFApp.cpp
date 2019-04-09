@@ -41,11 +41,11 @@ Error:
 	return r;
 }
 
-RESULT CEFApp::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
+RESULT CEFApp::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int audioSteamID, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
 	RESULT r = R_PASS;
 
 	CN(m_pCEFAppObserver);
-	CR(m_pCEFAppObserver->OnAudioData(pCEFBrowser, frames, channels, bitsPerSample, pDataBuffer));
+	CR(m_pCEFAppObserver->OnAudioData(pCEFBrowser, audioSteamID, frames, channels, bitsPerSample, pDataBuffer));
 
 Error:
 	return r;
