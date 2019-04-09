@@ -22,7 +22,18 @@ inline bool HysteresisCylinder::Resolve(VirtualObj *pObj) {
 	point ptSphereOrigin = pObj->GetOrigin(true);
 	ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation(true))) * (ptSphereOrigin - GetOrigin(true)));
 
-	float distance = vector(ptSphereOrigin.x(), 0.0f, ptSphereOrigin.z()).magnitude();
+	vector vOffset = vector(ptSphereOrigin.x(), 0.0f, ptSphereOrigin.z());
+
+	vector velocity = pObj->GetState().GetInstantVelocity();
+	velocity = (point)(inverse(RotationMatrix(GetOrientation(true))) * (velocity));
+
+	// calculate the object's velocity projected onto the direction of its current offset
+	vector vOffsetUnit = vOffset / vOffset.magnitude();
+	float velocityProj = velocity.dot(vOffsetUnit);
+	float advanceFrames = 40;
+
+	float distance = vector(vOffset * (1 + velocityProj * advanceFrames)).magnitude();
+
 	if (m_currentStates.count(pObj) == 0 || m_currentStates[pObj] == OFF) {
 		return distance > m_onThreshold;
 	}

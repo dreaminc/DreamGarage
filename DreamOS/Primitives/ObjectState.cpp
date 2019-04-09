@@ -102,6 +102,10 @@ const point ObjectState::GetOrigin() {
 	return m_ptOrigin; 
 }
 
+const point ObjectState::GetPreviousOrigin() {
+	return m_ptPreviousOrigin;
+}
+
 RESULT ObjectState::SetImmovable(bool fImmovable) {
 	m_fImmovable = fImmovable;
 	return R_SUCCESS;
@@ -338,6 +342,7 @@ RESULT ObjectState::Translate(vector vTranslation) {
 
 RESULT ObjectState::translate(vector v) {
 	if (m_fImmovable == false)
+		m_ptPreviousOrigin = m_ptOrigin;
 		m_ptOrigin.translate(v);
 
 	return R_SUCCESS;
@@ -345,6 +350,10 @@ RESULT ObjectState::translate(vector v) {
 
 const vector ObjectState::GetVelocity() { 
 	return m_vVelocity; 
+}
+
+const vector ObjectState::GetInstantVelocity() {
+	return vector(m_ptOrigin - m_ptPreviousOrigin);
 }
 
 const vector ObjectState::GetAngularVelocity() {

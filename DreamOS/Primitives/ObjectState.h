@@ -63,6 +63,7 @@ public:
 
 	RESULT SetVelocity(vector vVelocity);
 	const vector GetVelocity();
+	const vector GetInstantVelocity();
 	const vector GetAngularVelocity();
 	const vector GetVelocityAtPoint(point ptRefObj);
 	RESULT AddMomentumImpulse(vector vImplulse);
@@ -94,6 +95,7 @@ public:
 	const vector GetMomentum();
 
 	const point GetOrigin();
+	const point GetPreviousOrigin();
 	RESULT Translate(vector vTranslation);
 	RESULT translate(vector v);
 
@@ -120,6 +122,7 @@ private:
 
 protected:
 	point m_ptOrigin;					// Origin			
+	point m_ptPreviousOrigin;			// Previous Origin
 	vector m_vMomentum;					// Momentum
 
 	point m_ptCenterOfMass;									// Center of Mass

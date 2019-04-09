@@ -88,11 +88,8 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	m_pMessageQuadBackground->SetVisible(true);
 	m_pMessageQuadBackground->RotateXByDeg(90);
 
-	// distance if using hands as the object
-	//m_pPointingArea = pDreamOS->MakeHysteresisObject(0.4f, 0.3f, CYLINDER);
-
-	// distance if mallets are being used
-	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.6f, 0.5f, CYLINDER);
+	// distances if using hands as the object
+	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.7f, 0.3f, CYLINDER);
 
 	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::ON, this));
 	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::OFF, this));
@@ -337,6 +334,9 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 	std::string strInitials;
 	char szInitials[2];
 
+	DreamShareViewPointerMessage *pPointerMessageLeft = nullptr;
+	DreamShareViewPointerMessage *pPointerMessageRight = nullptr;
+
 	CN(pCloudController);
 	CNR(m_pUserModel, R_SKIPPED);
 
@@ -350,24 +350,35 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 		szInitials[1] = strInitials[1];
 	}
 
-	DreamShareViewPointerMessage *pPointerMessageLeft = new DreamShareViewPointerMessage(
+	if (m_fLeftSphereOn && m_fLeftSphereInteracting) {
+		m_fSendLeftPointerMessage = true;
+	}
+
+	if (m_fRightSphereOn && m_fRightSphereInteracting) {
+		m_fSendRightPointerMessage = true;
+	}
+				//m_pPointerContext->AddObject(pPointerLabel->GetDot());
+
+	pPointerMessageLeft = new DreamShareViewPointerMessage(
 		userID,
 		0,
 		GetAppUID(),
 		m_ptLeftPointer,
 		m_pUserModel->GetSeatingPosition(),
 		szInitials,
-		m_fLeftSphereOn && m_fLeftSphereInteracting,
+		m_fLeftSphereOn,
+		m_fLeftSphereInteracting,
 		true);
 
-	DreamShareViewPointerMessage *pPointerMessageRight = new DreamShareViewPointerMessage(
+	pPointerMessageRight = new DreamShareViewPointerMessage(
 		userID,
 		0,
 		GetAppUID(),
 		m_ptRightPointer,
 		m_pUserModel->GetSeatingPosition(),
 		szInitials,
-		m_fRightSphereOn && m_fRightSphereInteracting,
+		m_fRightSphereOn,
+		m_fRightSphereInteracting,
 		false);
 
 	DreamAppMessage::flags messageFlags = DreamAppMessage::flags::SHARE_NETWORK | DreamAppMessage::flags::SHARE_LOCAL;
@@ -375,10 +386,31 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 	m_pPointingArea->SetPosition(GetDOS()->GetCamera()->GetPosition(true));
 	CR(m_pPointingArea->Update());
 
-	CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageLeft, messageFlags));
-	CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageRight, messageFlags));
+	if (m_fSendLeftPointerMessage) {
+		CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageLeft, messageFlags));
+
+		if (!pPointerMessageLeft->IsActuated()) {
+			m_fSendLeftPointerMessage = false;
+		}
+	}
+
+	if (m_fSendRightPointerMessage) {
+		CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageRight, messageFlags));
+
+		if (!pPointerMessageRight->IsActuated()) {
+			m_fSendRightPointerMessage = false;
+		}
+	}
 
 Error:
+	if (pPointerMessageLeft != nullptr) {
+		delete pPointerMessageLeft;
+		pPointerMessageLeft = nullptr;
+	}
+	if (pPointerMessageRight != nullptr) {
+		delete pPointerMessageRight;
+		pPointerMessageRight = nullptr;
+	}
 	return r;
 }
 
@@ -640,10 +672,10 @@ RESULT DreamUserApp::Notify(HysteresisEvent *mEvent) {
 
 	case HysteresisEventType::ON: {
 
-		if (m_pLeftInteractionObject == mEvent->m_pEventObject) {
+		if (m_pLeftHand == mEvent->m_pEventObject) {
 			m_fLeftSphereOn = true;
 		}
-		else if (m_pRightInteractionObject == mEvent->m_pEventObject) {
+		else if (m_pRightHand == mEvent->m_pEventObject) {
 			m_fRightSphereOn = true;
 		}
 
@@ -651,10 +683,10 @@ RESULT DreamUserApp::Notify(HysteresisEvent *mEvent) {
 
 	case HysteresisEventType::OFF: {
 
-		if (m_pLeftInteractionObject == mEvent->m_pEventObject) {
+		if (m_pLeftHand == mEvent->m_pEventObject) {
 			m_fLeftSphereOn = false;
 		}
-		else if (m_pRightInteractionObject == mEvent->m_pEventObject) {
+		else if (m_pRightHand == mEvent->m_pEventObject) {
 			m_fRightSphereOn = false;
 		}
 
@@ -702,8 +734,8 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 
 	CR(pHand->InitializeWithContext(pDreamOS));
 
-	CR(m_pPointingArea->RegisterObject(pHand->GetMalletHead()));
-	//CR(m_pPointingArea->RegisterObject(pHand));
+	//CR(m_pPointingArea->RegisterObject(pHand->GetMalletHead()));
+	CR(m_pPointingArea->RegisterObject(pHand));
 
 	if (type == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;

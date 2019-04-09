@@ -232,6 +232,9 @@ private:
 	DreamUserObserver* m_pEventApp = nullptr;
 	DreamUserObserver* m_pPreviousApp = nullptr;
 
+	bool m_fSendLeftPointerMessage = false;
+	bool m_fSendRightPointerMessage = false;
+
 	// reflection of the member 
 	bool m_fStreaming = false;
 

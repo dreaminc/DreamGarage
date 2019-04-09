@@ -9,6 +9,10 @@
 
 #include "HAL/opengl/OGLText.h"
 
+#include "InteractionEngine/AnimationItem.h"
+
+#include "Sound/SoundFile.h"
+
 #include "Core/Utilities.h"
 
 UIPointerLabel::UIPointerLabel(HALImp *pHALImp, DreamOS *pDreamOS) :
@@ -36,6 +40,13 @@ RESULT UIPointerLabel::Initialize() {
 
 	m_pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Black.fnt", true);
 	CN(m_pFont);
+
+	m_pActuateSound = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-standard.wav", SoundFile::type::WAVE));
+	CN(m_pActuateSound);
+
+	m_pCancelSound = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-delete.wav", SoundFile::type::WAVE));
+	CN(m_pActuateSound);
+
 
 Error:
 	return r;
@@ -145,7 +156,7 @@ RESULT UIPointerLabel::InitializeDot(std::shared_ptr<quad> pParentQuad, int seat
 	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
 
 	// dot texture is a square
-	float height = pParentQuad->GetHeight()/2 * 0.06;
+	m_pointerSide = pParentQuad->GetHeight()/2 * 0.06;
 	float screenOffset = 0.01f;
 
 	CB(seatPosition != -1);
@@ -162,7 +173,7 @@ RESULT UIPointerLabel::InitializeDot(std::shared_ptr<quad> pParentQuad, int seat
 	CN(m_pDotComposite);
 	m_pDotComposite->SetVisible(false, false);
 
-	m_pDotQuad = m_pDotComposite->AddQuad(height, height);
+	m_pDotQuad = m_pDotComposite->AddQuad(m_pointerSide, m_pointerSide);
 	CN(m_pDotQuad);
 	m_pDotQuad->SetDiffuseTexture(pPointerDot);
 	m_pDotQuad->RotateZByDeg(90.0f);
@@ -199,21 +210,43 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		bool fInBounds = true;
 
 		// left/right bounds check
-		if (width / 2.0f - ptPosition.x() < 0 ||
-			width / 2.0f + ptPosition.x() < 0) {
+		if (width / 2.0f - ptPosition.x() < m_pointerSide/2.0f ||
+			width / 2.0f + ptPosition.x() < m_pointerSide/2.0f) {
 			fInBounds = false;
 		}
 		// bottom/top bounds check
-		if (height / 2.0f - ptPosition.y() < m_pRenderContext->GetHeight()/2.0f ||
-			height / 2.0f + ptPosition.y() < m_pRenderContext->GetHeight()/2.0f) {
+		if (height / 2.0f - ptPosition.y() < m_pointerSide/2.0f ||
+			height / 2.0f + ptPosition.y() < m_pointerSide/2.0f) {
 			fInBounds = false;
 		}
-		m_pRenderContext->SetVisible(fInBounds && pUpdatePointerMessage->m_body.fVisible, false);
-		m_pDotComposite->SetVisible(fInBounds && pUpdatePointerMessage->m_body.fVisible, false);
+
+		bool fShouldBeVisible = fInBounds && pUpdatePointerMessage->IsActuated() && pUpdatePointerMessage->IsInteracting();
+
+		if (fShouldBeVisible && !m_fIsOn) {
+			CR(CreateHapticImpulse(pUpdatePointerMessage->IsLeft(), fShouldBeVisible));
+
+			CR(m_pDreamOS->PlaySoundFile(m_pActuateSound));
+
+			m_fIsOn = true;
+		}
+		
+		else if (m_fIsOn && !pUpdatePointerMessage->IsActuated()) {
+			CR(CreateHapticImpulse(pUpdatePointerMessage->IsLeft(), false));
+
+			CR(m_pDreamOS->PlaySoundFile(m_pCancelSound));
+
+			m_fIsOn = false;
+		}
+
+		m_fActuated = pUpdatePointerMessage->IsActuated();
+
+		m_pRenderContext->SetVisible(fShouldBeVisible, false);
+		m_pDotComposite->SetVisible(fShouldBeVisible, false);
 
 		SetPosition(ptMessage);
 
 		// update saved points queue
+		/*
 		if (m_recentPoints.size() == 0 || ptPosition != m_recentPoints.back()) {
 			m_recentPoints.push_back(ptPosition);
 		}
@@ -222,7 +255,6 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		}
 
 		// calculate orientation
-		/*
 		if (m_recentPoints.size() == NUM_POINTS) {
 			UpdateOrientationFromPoints();
 		}
@@ -372,7 +404,52 @@ std::shared_ptr<FlatContext> UIPointerLabel::GetContext() {
 	return m_pRenderContext;
 }
 
+std::shared_ptr<composite> UIPointerLabel::GetDotComposite() {
+	return m_pDotComposite;
+}
+
+std::shared_ptr<quad> UIPointerLabel::GetDot() {
+	return m_pDotQuad;
+}
+
 bool UIPointerLabel::IsPointingLeft() {
 	return m_fPointingLeft;
 }
 
+RESULT UIPointerLabel::CreateHapticImpulse(bool fLeft, bool fIsOn) {
+	RESULT r = R_PASS;
+
+	int controllerType = fLeft ? 0 : 1;
+
+	float amplitude;
+	float msDuration;
+	float cycles;
+	SenseController::HapticCurveType curveType;
+
+	if (fIsOn) {
+		amplitude = 8.0f;
+		msDuration = 20.0f;
+		cycles = 1;
+		curveType = SenseController::HapticCurveType::SINE;
+	}
+	else {
+		amplitude = 1.0f;
+		msDuration = 4.0f;
+		cycles = 1;
+		curveType = SenseController::HapticCurveType::SINE;
+	}
+
+	CNR(m_pDreamOS->GetHMD(), R_SKIPPED);
+	CNR(m_pDreamOS->GetHMD()->GetSenseController(), R_SKIPPED);
+
+	CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(
+		CONTROLLER_TYPE(controllerType),
+		curveType,
+		amplitude,
+		msDuration,
+		cycles
+	));
+
+Error:
+	return r;
+}
