@@ -412,6 +412,7 @@ Error:
 
 model *MakeAndInitializeModel(HALImp *pParentImp, std::wstring wstrModelFilename) {
 	RESULT r = R_PASS;
+
 	model *pModel = nullptr;
 
 	// Get file path
@@ -433,6 +434,8 @@ model *MakeAndInitializeModel(HALImp *pParentImp, std::wstring wstrModelFilename
 
 	pModel = pParentImp->MakeModel();
 	CN(pModel);
+
+	//CR(pModel->OGLInitialize());
 	CR(pModel->InitializeOBB());
 	//CR(pModel->InitializeBoundingSphere());
 

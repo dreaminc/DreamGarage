@@ -155,6 +155,45 @@ RESULT model::HandleOnMeshReady(DimObj* pDimObj, void *pContext) {
 		), "Failed to load mesh diffuse texture");
 	}
 
+	// Specular
+	if (pMesh->m_params.specularTexturePaths.size() > 0) {
+		std::function<RESULT(texture*, void*)> fnHandleOnMeshSpecularTextureReady =
+			std::bind(&model::HandleOnMeshSpecularTextureReady, this, std::placeholders::_1, std::placeholders::_2);
+
+		CRM(m_pDreamOS->LoadTexture(
+			fnHandleOnMeshSpecularTextureReady,
+			(void*)(pMesh),
+			texture::type::TEXTURE_2D,
+			pMesh->m_params.specularTexturePaths[0].c_str()
+		), "Failed to load mesh specular texture");
+	}
+
+	// Normal Map 
+	if (pMesh->m_params.normalsTexturePaths.size() > 0) {
+		std::function<RESULT(texture*, void*)> fnHandleOnMeshNormalTextureReady =
+			std::bind(&model::HandleOnMeshNormalTextureReady, this, std::placeholders::_1, std::placeholders::_2);
+
+		CRM(m_pDreamOS->LoadTexture(
+			fnHandleOnMeshNormalTextureReady,
+			(void*)(pMesh),
+			texture::type::TEXTURE_2D,
+			pMesh->m_params.normalsTexturePaths[0].c_str()
+		), "Failed to load mesh normal map texture");
+	}
+
+	// Ambient 
+	if (pMesh->m_params.ambientTexturePaths.size() > 0) {
+		std::function<RESULT(texture*, void*)> fnHandleOnMeshAmbientTextureReady =
+			std::bind(&model::HandleOnMeshAmbientTextureReady, this, std::placeholders::_1, std::placeholders::_2);
+
+		CRM(m_pDreamOS->LoadTexture(
+			fnHandleOnMeshAmbientTextureReady,
+			(void*)(pMesh),
+			texture::type::TEXTURE_2D,
+			pMesh->m_params.ambientTexturePaths[0].c_str()
+		), "Failed to load mesh ambient texture");
+	}
+
 Error:
 	return r;
 }

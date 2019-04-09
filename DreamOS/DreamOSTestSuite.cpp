@@ -1196,7 +1196,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			}
 
 			pObj->SetPosition(ptOrigin);
-			pObj->SetScale(0.05f);
+			pObj->SetScale(0.025f);
 			pObj->RotateYByDeg(180.0f);
 
 			CRM(pDreamOS->AddObject(pObj), "Failed to add async sphere");
@@ -1300,7 +1300,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			//	(void*)(pPtOrigin), L"dreamos:\\Assets\\model\\avatar\\3\\head.fbx"));
 
 			CR(m_pDreamOS->MakeModel(std::bind(&TestContext::OnModelReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
-				(void*)(pPtOrigin), L"dreamos:\\Assets\\model\\environment\\1\\environment.fbx"));
+				(void*)(pPtOrigin), L"dreamos:\\Assets\\model\\environment\\2\\environment.fbx"));
 
 			//model *pModel = m_pDreamOS->AddModel(L"dreamos:\\Assets\\model\\environment\\1\\environment.fbx");
 			//CN(pModel);
