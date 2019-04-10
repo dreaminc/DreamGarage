@@ -731,6 +731,9 @@ RESULT DreamVCam::BroadcastVCamMessage() {
 	m_pParentApp->BroadcastDreamAppMessage(pMessage);
 
 Error:
+	if (pMessage != nullptr) {
+		delete pMessage;
+	}
 	return r;
 }
 

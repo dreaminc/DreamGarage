@@ -129,15 +129,17 @@ RESULT DreamShareView::OnAppDidFinishInitializing(void *pContext) {
 
 RESULT DreamShareView::Update(void *pContext) {
 	RESULT r = R_PASS;
-
+	static bool fOnce = false;
 	if (m_fReceivingStream && m_pendingFrame.fPending) {
 		CRM(UpdateFromPendingVideoFrame(), "Failed to update pending frame");
 	}
-
+	//*
 	if (m_pointingObjects.size() > 0) {
 		float scale = m_pCastQuad->GetScale(true).x();
-
-		m_pMirrorQuad = m_pPointerContext->AddQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight());
+		if (!fOnce) {
+			m_pMirrorQuad = m_pPointerContext->AddQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight());
+			fOnce = true;
+		}
 		m_pMirrorQuad->SetDiffuseTexture(m_pCastQuad->GetTextureDiffuse());
 
 		for (auto pair : m_pointingObjects) {
@@ -153,27 +155,12 @@ RESULT DreamShareView::Update(void *pContext) {
 					pFlatQuad->SetDiffuseTexture(pQuad->GetTextureDiffuse());
 					pFlatQuad->SetPosition(point(ptPosition.x() / scale, 0.0f, ptPosition.y() / scale));
 				}
-
-				/*
-				auto pLabelFlatContext = pPointerLabel->GetContext();
-				if (pLabelFlatContext->IsVisible() && pLabelFlatContext->GetCurrentQuad() != nullptr) {
-					point ptLabelQuad = pLabelFlatContext->GetCurrentQuad()->GetPosition(true);
-					point ptPosition = (point)(inverse(RotationMatrix(m_pCastQuad->GetOrientation(true))) * (ptLabelQuad - m_pCastQuad->GetOrigin(true)));
-
-					auto pLabelQuad = pLabelFlatContext->GetCurrentQuad();
-					auto pFlatQuad = m_pPointerContext->AddQuad(pLabelQuad->GetWidth() / scale, pLabelQuad->GetHeight() / scale);
-					pFlatQuad->SetDiffuseTexture(pLabelFlatContext->GetFramebuffer()->GetColorTexture());
-					pFlatQuad->FlipUVVertical();
-					pFlatQuad->SetVisible(pLabelFlatContext->IsVisible());
-
-					pFlatQuad->SetPosition(point(ptPosition.x() / scale, 0.0f, ptPosition.y() / scale));
-				}
-				//*/
 			}
 		}
 
 		m_pPointerContext->RenderToQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight(), 0, 0);
 	}
+	//*/
 
 Error:
 	return r;
@@ -599,6 +586,11 @@ RESULT DreamShareView::OnVideoFrame(const std::string &strVideoTrackLabel, PeerC
 			DEBUG_LINEOUT("Overflow frame!");
 			std::unique_lock<std::mutex> lockBufferMutex(m_overflowBufferMutex);
 
+			if (m_overflowFrame.fPending = true) {
+				DOSLOG(INFO, "There's already an overflow frame, overwriting");
+				m_overflowFrame.fPending = false;
+			}
+
 			m_overflowFrame.fPending = true;
 			m_overflowFrame.pxWidth = pxWidth;
 			m_overflowFrame.pxHeight = pxHeight;
@@ -732,19 +724,18 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 	}
 
 Error:
-	if (m_overflowFrame.fPending == true) {
-		std::unique_lock<std::mutex> lockBufferMutex(m_overflowBufferMutex);
-		m_pendingFrame = m_overflowFrame;
-		memcpy(m_pendingFrame.pDataBuffer, m_overflowFrame.pDataBuffer, m_overflowFrame.pDataBuffer_n);
-
-		m_overflowFrame.fPending = false;
-	}
-	
-	else if (m_pendingFrame.pDataBuffer != nullptr) {
-		delete [] m_pendingFrame.pDataBuffer;
+	if (m_pendingFrame.pDataBuffer != nullptr) {
+		delete[] m_pendingFrame.pDataBuffer;
 		m_pendingFrame.pDataBuffer = nullptr;
 
 		memset(&m_pendingFrame, 0, sizeof(PendingFrame));
+	}
+	if (m_overflowFrame.fPending == true) {
+		std::unique_lock<std::mutex> lockBufferMutex(m_overflowBufferMutex);
+		m_pendingFrame = PendingFrame(m_overflowFrame);
+		memcpy(m_pendingFrame.pDataBuffer, m_overflowFrame.pDataBuffer, m_overflowFrame.pDataBuffer_n);
+
+		m_overflowFrame.fPending = false;
 	}
 
 	return r;
