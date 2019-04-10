@@ -146,6 +146,9 @@ Error:
 RESULT DreamEnvironmentApp::SetCurrentEnvironment(environment::type type) {
 	RESULT r = R_PASS;
 
+	if (m_pCurrentEnvironmentModel != nullptr) {
+		m_pCurrentEnvironmentModel->SetVisible(false);
+	}
 	m_pCurrentEnvironmentModel = m_environmentModels[type];
 	m_currentType = type;
 
