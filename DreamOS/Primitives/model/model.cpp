@@ -187,6 +187,7 @@ RESULT model::HandleOnMeshReady(DimObj* pDimObj, void *pContext) {
 		), "Failed to load mesh diffuse texture");
 
 		// Push it, push it good
+		m_totalTextures++;
 		m_pendingTextures.push_back(pMesh->m_params.diffuseTexturePaths[0]);
 	}
 
@@ -203,6 +204,7 @@ RESULT model::HandleOnMeshReady(DimObj* pDimObj, void *pContext) {
 		), "Failed to load mesh specular texture");
 
 		// Push it, push it good
+		m_totalTextures++;
 		m_pendingTextures.push_back(pMesh->m_params.specularTexturePaths[0]);
 	}
 
@@ -219,6 +221,7 @@ RESULT model::HandleOnMeshReady(DimObj* pDimObj, void *pContext) {
 		), "Failed to load mesh normal map texture");
 
 		// Push it, push it good
+		m_totalTextures++;
 		m_pendingTextures.push_back(pMesh->m_params.normalsTexturePaths[0]);
 	}
 
@@ -235,6 +238,7 @@ RESULT model::HandleOnMeshReady(DimObj* pDimObj, void *pContext) {
 		), "Failed to load mesh ambient texture");
 
 		// Push it, push it good
+		m_totalTextures++;
 		m_pendingTextures.push_back(pMesh->m_params.ambientTexturePaths[0]);
 	}
 
@@ -275,6 +279,7 @@ RESULT model::QueueMesh(const mesh::params &meshParams) {
 	), "Failed to queue mesh %s", meshParams.strName.c_str());
 
 	// Push it, push it good
+	m_totalMeshes++;
 	m_pendingMeshIDs.push_back(*pPendingMeshID);
 
 Error:
@@ -288,6 +293,15 @@ bool model::IsModelLoaded() {
 	else {
 		return false;
 	}
+}
+
+float model::ModelLoadingProgress() {
+	unsigned int totalElementsLoaded = m_totalMeshes + m_totalTextures;
+	unsigned int totalPendingElements = m_pendingMeshIDs.size() + m_pendingTextures.size();
+
+	float loadProgress = 1.0f - ((float)(totalPendingElements) / (float)(totalElementsLoaded));
+
+	return loadProgress;
 }
 
 std::shared_ptr<mesh> model::GetChildMesh(int index) {
