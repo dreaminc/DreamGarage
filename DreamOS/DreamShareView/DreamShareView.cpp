@@ -129,17 +129,15 @@ RESULT DreamShareView::OnAppDidFinishInitializing(void *pContext) {
 
 RESULT DreamShareView::Update(void *pContext) {
 	RESULT r = R_PASS;
-	static bool fOnce = false;
+	
 	if (m_fReceivingStream && m_pendingFrame.fPending) {
 		CRM(UpdateFromPendingVideoFrame(), "Failed to update pending frame");
 	}
 	//*
 	if (m_pointingObjects.size() > 0) {
 		float scale = m_pCastQuad->GetScale(true).x();
-		if (!fOnce) {
-			m_pMirrorQuad = m_pPointerContext->AddQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight());
-			fOnce = true;
-		}
+
+		m_pMirrorQuad = m_pPointerContext->AddQuad(m_pCastQuad->GetWidth(), m_pCastQuad->GetHeight());
 		m_pMirrorQuad->SetDiffuseTexture(m_pCastQuad->GetTextureDiffuse());
 
 		for (auto pair : m_pointingObjects) {
