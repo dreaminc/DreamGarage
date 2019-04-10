@@ -488,6 +488,8 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 
 	CRM(ProcessAssetImporterNode(pModel, pAIScene->mRootNode, pAIScene, false), "Failed to process Asset Importer root node");
 
+	pModel->SetModelLoaded(true);
+
 	//pModel->UpdateBoundingVolume();
 
 Success:

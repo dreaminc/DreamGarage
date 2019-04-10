@@ -18,6 +18,8 @@
 class image;
 
 class texture : public valid {
+	friend class model;
+
 public:
 	enum class flags : uint16_t {
 		NONE = 0,
