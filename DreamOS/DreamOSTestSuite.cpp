@@ -1152,6 +1152,8 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 	float paddingRatio = 0.10f;
 
 	struct TestContext {
+		model *pModel = nullptr;
+
 		// COMMANDMENT: Thou Shall Not Have Member Templates in a Local Class 
 		RESULT OnSphereReady(DimObj *pDimObj, void *pContext) {
 			RESULT r = R_PASS;
@@ -1196,6 +1198,9 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			pObj->SetPosition(ptOrigin);
 			pObj->SetScale(0.025f);
 			pObj->RotateYByDeg(180.0f);
+			pObj->SetVisible(false);
+
+			pModel = pObj;
 
 			CRM(pDreamOS->AddObject(pObj), "Failed to add async sphere");
 
@@ -1297,14 +1302,14 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			//CR(m_pDreamOS->MakeModel(std::bind(&TestContext::OnModelReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
 			//	(void*)(pPtOrigin), L"dreamos:\\Assets\\model\\avatar\\3\\head.fbx"));
 
-			CR(m_pDreamOS->MakeModel(std::bind(&TestContext::OnModelReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
-				(void*)(pPtOrigin), L"dreamos:\\Assets\\model\\environment\\2\\environment.fbx"));
+			//CR(m_pDreamOS->MakeModel(std::bind(&TestContext::OnModelReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
+			//	(void*)(pPtOrigin), L"dreamos:\\Assets\\model\\environment\\2\\environment.fbx"));
 
-			//model *pModel = m_pDreamOS->AddModel(L"dreamos:\\Assets\\model\\environment\\2\\environment.fbx");
-			//CN(pModel);
-			//pModel->SetPosition(*pPtOrigin);
-			//pModel->SetScale(0.025f);
-			//pModel->RotateYByDeg(180.0f);
+			model *pModel = m_pDreamOS->AddModel(L"dreamos:\\Assets\\model\\environment\\3\\environment.fbx");
+			CN(pModel);
+			pModel->SetPosition(*pPtOrigin);
+			pModel->SetScale(0.025f);
+			pModel->RotateYByDeg(180.0f);
 
 			// Test the creation of an arbitrarily large number of spheres
 			for (int i = 0; i < factor; i++) {
@@ -1354,6 +1359,14 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
+
+		{
+			if (pTestContext->pModel != nullptr) {
+				if (pTestContext->pModel->IsModelLoaded() == true) {
+					pTestContext->pModel->SetVisible(true);
+				}
+			}
+		}
 
 	Error:
 		return r;

@@ -61,6 +61,9 @@ public:
 	RESULT HandleOnMeshNormalTextureReady(texture *pTexture, void *pContext);
 	RESULT HandleOnMeshAmbientTextureReady(texture *pTexture, void *pContext);
 
+	bool IsModelLoaded();
+	float ModelLoadingProgress();
+
 	/*
 public:
 	virtual RESULT Allocate() override;
@@ -88,6 +91,11 @@ private:
 protected:
 	RESULT SetDreamOS(DreamOS *pDOS);
 	model::params m_params;
+
+	unsigned int m_totalMeshes = 0;
+	unsigned int m_totalTextures = 0;
+	std::vector<unsigned long> m_pendingMeshIDs;
+	std::vector<std::wstring> m_pendingTextures;
 
 private:
 	DreamOS *m_pDreamOS = nullptr;
