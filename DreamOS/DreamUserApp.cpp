@@ -89,7 +89,7 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	m_pMessageQuadBackground->RotateXByDeg(90);
 
 	// distances if using hands as the object
-	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.7f, 0.3f, CYLINDER);
+	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.7f, 0.25f, CYLINDER);
 
 	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::ON, this));
 	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::OFF, this));
