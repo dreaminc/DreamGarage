@@ -382,6 +382,16 @@ DimObj* OpenGLImp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 			pOGLObj = MakeQuad(pPrimParams, fInitialize);
 			CN(pOGLObj);
 		} break;
+
+		//case PRIMITIVE_TYPE::MODEL: {
+		//	pOGLObj = MakeModel(pPrimParams, fInitialize);
+		//	CN(pOGLObj);
+		//} break;
+
+		case PRIMITIVE_TYPE::MESH: {
+			pOGLObj = MakeMesh(pPrimParams, fInitialize);
+			CN(pOGLObj);
+		} break;
 	}
 
 Success:
@@ -434,19 +444,48 @@ Error:
 
 }
 
+OGLMesh* OpenGLImp::MakeMesh(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLMesh *pOGLMesh = nullptr;
+
+	mesh::params *pMeshParams = dynamic_cast<mesh::params*>(pPrimParams);
+	CN(pMeshParams);
+
+	pOGLMesh = new OGLMesh(this, pMeshParams);
+	CN(pOGLMesh);
+
+	if (fInitialize) {
+		CR(pOGLMesh->OGLInitialize());
+	}
+
+Success:
+	return pOGLMesh;
+
+Error:
+	if (pOGLMesh != nullptr) {
+		delete pOGLMesh;
+		pOGLMesh = nullptr;
+	}
+
+	return nullptr;
+}
+
 mesh *OpenGLImp::MakeMesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
 
-	mesh *pMesh = new OGLMesh(this, vertices);
-	CN(pMesh);
+	OGLMesh *pOGLMesh = new OGLMesh(this, vertices);
+	CN(pOGLMesh);
 
-	//Success:
-	return pMesh;
+	CR(pOGLMesh->OGLInitialize());
+
+Success:
+	return pOGLMesh;
 
 Error:
-	if (pMesh != nullptr) {
-		delete pMesh;
-		pMesh = nullptr;
+	if (pOGLMesh != nullptr) {
+		delete pOGLMesh;
+		pOGLMesh = nullptr;
 	}
 	return nullptr;
 }
@@ -455,16 +494,18 @@ mesh *OpenGLImp::MakeMesh(const std::vector<vertex>& vertices, const std::vector
 	RESULT r = R_PASS;
 
 	// Not implemented yet, until size_t <-> dimindex conflict is resolved.
-	mesh *pMesh = new OGLMesh(this, vertices, indices);
-	CN(pMesh);
+	OGLMesh *pOGLMesh = new OGLMesh(this, vertices, indices);
+	CN(pOGLMesh);
 
-	//Success:
-	return pMesh;
+	CR(pOGLMesh->OGLInitialize());
+
+Success:
+	return pOGLMesh;
 
 Error:
-	if (pMesh != nullptr) {
-		delete pMesh;
-		pMesh = nullptr;
+	if (pOGLMesh != nullptr) {
+		delete pOGLMesh;
+		pOGLMesh = nullptr;
 	}
 	return nullptr;
 }
@@ -475,7 +516,7 @@ model* OpenGLImp::MakeModel() {
 	model *pModel = new OGLModel(this);
 	CN(pModel);
 
-	//Success:
+Success:
 	return pModel;
 
 Error:
@@ -492,7 +533,7 @@ composite *OpenGLImp::MakeComposite() {
 	composite *pComposite = new OGLComposite(this);
 	CN(pComposite);
 
-//Success:
+Success:
 	return pComposite;
 
 Error:
@@ -607,6 +648,33 @@ Error:
 	if (pOGLQuad != nullptr) {
 		delete pOGLQuad;
 		pOGLQuad = nullptr;
+	}
+
+	return nullptr;
+}
+
+OGLModel* OpenGLImp::MakeModel(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLModel *pOGLModel = nullptr;
+
+	model::params *pQuadParams = dynamic_cast<model::params*>(pPrimParams);
+	CN(pQuadParams);
+
+	pOGLModel = new OGLModel(this);
+	CN(pOGLModel);
+
+	if (fInitialize) {
+		CR(pOGLModel->OGLInitialize());
+	}
+
+Success:
+	return pOGLModel;
+
+Error:
+	if (pOGLModel != nullptr) {
+		delete pOGLModel;
+		pOGLModel = nullptr;
 	}
 
 	return nullptr;

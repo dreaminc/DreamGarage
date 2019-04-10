@@ -13,6 +13,8 @@ enum class PRIMITIVE_TYPE {
 	VOLUME,
 	QUAD,
 	TEXTURE,
+	MODEL,
+	MESH,
 	INVALID
 };
 

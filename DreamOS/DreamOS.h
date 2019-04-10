@@ -115,6 +115,8 @@ class DreamOS :
 	friend class MultiContentTestSuite;
 	friend class DimensionTestSuite;
 
+	friend class ModelFactory;
+
 public:
 	DreamVideoStreamSubscriber* m_pVideoStreamSubscriber = nullptr;
 	PeerConnection *m_pVideoStreamPeerConnectionSource = nullptr;
@@ -539,7 +541,8 @@ public:
 	RESULT InitializeObject(DimObj *pDimObj);
 	RESULT InitializeTexture(texture *pTexture);
 
-	RESULT MakeModel(const std::wstring& wstrModelFilename, std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext = nullptr, ModelFactory::flags modelFactoryFlags = ModelFactory::flags::NONE);
+	RESULT MakeMesh(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, const mesh::params &meshParams, void *pContext = nullptr);
+	RESULT MakeModel(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext = nullptr, const std::wstring& wstrModelFilename = L"", ModelFactory::flags modelFactoryFlags = ModelFactory::flags::NONE);
 	RESULT MakeSphere(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext = nullptr, float radius = 1.0f, int numAngularDivisions = 10, int numVerticalDivisions = 10, color c = color(COLOR_WHITE));
 	RESULT MakeVolume(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext = nullptr, double width = 1.0f, double length = 1.0f, double height = 1.0f, bool fTriangleBased = true);
 	RESULT MakeQuad(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext = nullptr, double width = 1.0f, double height = 1.0f, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());

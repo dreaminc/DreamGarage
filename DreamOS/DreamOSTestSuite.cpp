@@ -1152,9 +1152,6 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 	float paddingRatio = 0.10f;
 
 	struct TestContext {
-		sphere *pSphere = nullptr;
-		model *pModel = nullptr;
-
 		// COMMANDMENT: Thou Shall Not Have Member Templates in a Local Class 
 		RESULT OnSphereReady(DimObj *pDimObj, void *pContext) {
 			RESULT r = R_PASS;
@@ -1173,6 +1170,32 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			}
 
 			pObj->SetPosition(ptOrigin);
+
+			CRM(pDreamOS->AddObject(pObj), "Failed to add async sphere");
+
+		Error:
+			return r;
+		}
+
+		RESULT OnModelReady(DimObj *pDimObj, void *pContext) {
+			RESULT r = R_PASS;
+
+			point ptOrigin;
+			model *pObj = dynamic_cast<model*>(pDimObj);
+			CN(pObj);
+
+			CN(pDreamOS);
+
+			if (pContext != nullptr) {
+				memcpy(&ptOrigin, (point*)(pContext), sizeof(point));
+
+				delete pContext;
+				pContext = nullptr;
+			}
+
+			pObj->SetPosition(ptOrigin);
+			pObj->SetScale(0.025f);
+			pObj->RotateYByDeg(180.0f);
 
 			CRM(pDreamOS->AddObject(pObj), "Failed to add async sphere");
 
@@ -1258,7 +1281,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline("blinnphong_texture"));
+		CR(SetupPipeline("environment"));
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -1270,11 +1293,18 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 			light *pLight;
 			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 
-			// 
-			//model *pModel = m_pDreamOS->AddModel(L"\\Cave\\cave.FBX");
+			point *pPtOrigin = new point(2.0f, -2.5f, 0.0f);
+			//CR(m_pDreamOS->MakeModel(std::bind(&TestContext::OnModelReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
+			//	(void*)(pPtOrigin), L"dreamos:\\Assets\\model\\avatar\\3\\head.fbx"));
+
+			CR(m_pDreamOS->MakeModel(std::bind(&TestContext::OnModelReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
+				(void*)(pPtOrigin), L"dreamos:\\Assets\\model\\environment\\2\\environment.fbx"));
+
+			//model *pModel = m_pDreamOS->AddModel(L"dreamos:\\Assets\\model\\environment\\2\\environment.fbx");
 			//CN(pModel);
-			//pModel->SetPosition(point(2.0f, -2.5f, 0.0f));
-			//pModel->SetScale(0.05f);
+			//pModel->SetPosition(*pPtOrigin);
+			//pModel->SetScale(0.025f);
+			//pModel->RotateYByDeg(180.0f);
 
 			// Test the creation of an arbitrarily large number of spheres
 			for (int i = 0; i < factor; i++) {
@@ -1284,7 +1314,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 						float yPos = ((float)j - ((float)(factor - 1) / 2.0f)) * (1.0 + paddingRatio) * (radius * 2.0f);
 						float zPos = ((float)k - ((float)(factor - 1) / 2.0f)) * (1.0 + paddingRatio) * (radius * 2.0f);
 
-						point *pPtOrigin = new point(xPos, yPos, zPos);
+						pPtOrigin = new point(xPos, yPos, zPos);
 						CN(pPtOrigin);
 
 						/* 
@@ -1299,7 +1329,7 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 							(void*)(pPtOrigin), radius * 2.0f, radius * 2.0f, radius * 2.0f));
 						//*/
 
-						///*
+						/*
 						// quad
 						CR(m_pDreamOS->MakeQuad(std::bind(&TestContext::OnQuadReady, pTestContext, std::placeholders::_1, std::placeholders::_2),
 							(void*)(pPtOrigin), radius * 2.0f, radius * 2.0f));
@@ -1307,6 +1337,10 @@ RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
 					}
 				}
 			}
+
+			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CN(pDreamGamepadApp);
+			CR(pDreamGamepadApp->SetCamera(m_pDreamOS->GetCamera(), DreamGamepadCameraApp::CameraControlType::GAMEPAD));
 
 		}
 

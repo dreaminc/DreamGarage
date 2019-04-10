@@ -695,11 +695,29 @@ RESULT DreamOS::InitializeTexture(texture *pTexture) {
 	return m_pSandbox->InitializeTexture(pTexture);
 }
 
-// TODO: 
-RESULT DreamOS::MakeModel(const std::wstring& wstrModelFilename, std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, ModelFactory::flags modelFactoryFlags) {
+RESULT DreamOS::MakeModel(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
 	RESULT r = R_PASS;
 
 	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	model::params *pModelParams = new model::params(wstrModelFilename, modelFactoryFlags);
+	CN(pModelParams);
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pModelParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::MakeMesh(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, const mesh::params &meshParams, void *pContext) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	mesh::params *pMeshParams = new mesh::params(meshParams);
+	CN(pMeshParams);
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pMeshParams, fnOnObjectReady, pContext), "Failed to queue new mesh object in async obj module");
 
 Error:
 	return r;

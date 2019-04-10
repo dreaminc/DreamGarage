@@ -264,6 +264,100 @@ Error:
 }
 
 // TODO: Move this to get file / FileManager
+
+// TODO: Add a better system for registering custom schemas
+RESULT PathManager::GetFilePath(std::wstring wstrFilename, char* &n_pszFilePath) {
+	RESULT r = R_PASS;
+
+	size_t wstrFilename_n = wstrFilename.size();
+	size_t n_pszFilePath_n = 0;
+
+	char *pszRootPath = nullptr;
+	size_t pszRootPath_n = 0;
+
+	std::string strFilename = util::WideStringToString(wstrFilename);
+
+	if (IsAbsolutePath(&wstrFilename[0])) {
+		wchar_t *pszPath = nullptr;
+
+		if (IsDreamPath(&wstrFilename[0], &pszPath) == true) {
+			CN(pszPath);
+			CRM(GetDreamPath(pszRootPath), "Failed to get root path");
+			pszRootPath_n = strlen(pszRootPath);
+			wstrFilename = std::wstring(pszPath);
+			if (pszPath != nullptr) {
+				delete[] pszPath;
+				pszPath = nullptr;
+			}
+		}
+		else {
+			n_pszFilePath_n = strFilename.size() + 1;
+			n_pszFilePath = (char *)(new char[n_pszFilePath_n]);
+			CN(n_pszFilePath);
+
+			memcpy(n_pszFilePath, strFilename.c_str(), n_pszFilePath_n);
+
+			return r;
+		}
+	}
+	else {
+		CRM(GetDreamPath(pszRootPath), "Failed to get root path");
+		pszRootPath_n = strlen(pszRootPath);
+	}
+
+	n_pszFilePath_n = strlen(pszRootPath) + 1 + strFilename.size() + 1;
+	n_pszFilePath = (char *)(new char[n_pszFilePath_n]);
+	CN(n_pszFilePath);
+
+	memset(n_pszFilePath, 0, n_pszFilePath_n);
+
+	// Compose the path
+	// TODO: Maybe do some lower level parsing here since ./ will just get attached
+	strncat(n_pszFilePath, pszRootPath, pszRootPath_n);
+	strncat(n_pszFilePath, strFilename.c_str(), strFilename.size());
+
+Error:
+	// Release memory from GetValuePath
+	if (pszRootPath != nullptr) {
+		delete[] pszRootPath;
+		pszRootPath = nullptr;
+	}
+
+	return r;
+}
+
+RESULT PathManager::GetFilePath(std::wstring wstrFilename, std::wstring &r_wstrFilePath) {
+	RESULT r = R_PASS;
+
+	r_wstrFilePath.clear();
+
+	if (IsAbsolutePath(&wstrFilename[0])) {
+		wchar_t *pszPath = nullptr;
+
+		if (IsDreamPath(&wstrFilename[0], &pszPath) == true) {
+			CN(pszPath);
+			CRM(GetDreamPath(r_wstrFilePath), "Failed to get root path");
+			wstrFilename = std::wstring(pszPath);
+			if (pszPath != nullptr) {
+				delete[] pszPath;
+				pszPath = nullptr;
+			}
+		}
+		else {
+			r_wstrFilePath = wstrFilename;
+			return r;
+		}
+	}
+	else {
+		CRM(GetDreamPath(r_wstrFilePath), "Failed to get root path");
+	}
+
+	r_wstrFilePath += wstrFilename;
+
+Error:
+	return r;
+}
+
 RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, std::wstring wstrFilename, char* &n_pszFilePath) {
 	RESULT r = R_PASS;
 
@@ -457,7 +551,7 @@ std::string PathManager::GetDirectoryPathFromFilePath(std::string strFilePath) {
 	return strFilePath.substr(0, strFilePath.find_last_of("\\/")) + "\\";
 }
 
-bool PathManager::IsRootPath(wchar_t *pwszRoot, wchar_t *pwszFilename) {
+bool PathManager::IsRootPath(wchar_t *pwszRoot, wchar_t *pwszFilename, wchar_t** ppszOptPath) {
 	wchar_t *pwszFirst = nullptr;
 	bool fRetVal = false;
 
@@ -483,6 +577,15 @@ bool PathManager::IsRootPath(wchar_t *pwszRoot, wchar_t *pwszFilename) {
 	delete[] pwszRootTemp;
 	pwszRootTemp = nullptr;
 
+	if (ppszOptPath != nullptr) {
+		size_t ppszOptPath_n = wcslen(pwszFirst);
+		*ppszOptPath = new wchar_t[ppszOptPath_n + 1];
+		memset(*ppszOptPath, 0, sizeof(wchar_t) * (ppszOptPath_n + 1));
+
+		// Skip the ':'
+		wcsncpy(*ppszOptPath, pwszFirst + 1, ppszOptPath_n);
+	}
+
 	return fRetVal;
 }
 
@@ -499,8 +602,8 @@ bool PathManager::IsAbsolutePath(wchar_t *pwszFilename) {
 	}
 }
 
-bool PathManager::IsDreamPath(wchar_t *pwszFilename) {
-	return IsRootPath(DREAM_OS_PATH_WROOT, pwszFilename);
+bool PathManager::IsDreamPath(wchar_t *pwszFilename, wchar_t** ppszOptPath) {
+	return IsRootPath(DREAM_OS_PATH_WROOT, pwszFilename, ppszOptPath);
 }
 
 RESULT PathManager::DoesPathExist(PATH_VALUE_TYPE type) {

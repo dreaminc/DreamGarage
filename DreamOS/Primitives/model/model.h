@@ -15,10 +15,32 @@
 
 #include "Primitives/composite.h"
 
+#include "Primitives/PrimParams.h"
+
+#include "mesh.h"
+
 class HALImp;
-class mesh;
 
 class model : public composite {
+public:
+	friend class ModelFactory;
+
+public:
+	struct params :
+		public PrimParams
+	{
+		virtual PRIMITIVE_TYPE GetPrimitiveType() override { return PRIMITIVE_TYPE::MODEL; }
+
+		params(std::wstring wstrModelFilePath, ModelFactory::flags modelFactoryFlags = ModelFactory::NONE) :
+			wstrModelFilePath(wstrModelFilePath),
+			modelFactoryFlags(modelFactoryFlags)
+		{ }
+
+		std::wstring wstrModelFilePath = L"";
+		std::wstring wstrModelDirectoryPath;
+		ModelFactory::flags modelFactoryFlags = ModelFactory::NONE;
+	};
+
 public:
 	model(HALImp *pParentImp);
 
@@ -29,6 +51,15 @@ public:
 	std::shared_ptr<mesh> AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
 	std::shared_ptr<mesh> GetChildMesh(int index);
+
+	RESULT QueueMesh(const mesh::params &meshParams);
+
+	// Async Callbacks
+	RESULT HandleOnMeshReady(DimObj* pMesh, void *pContext);
+	RESULT HandleOnMeshDiffuseTextureReady(texture *pTexture, void *pContext);
+	RESULT HandleOnMeshSpecularTextureReady(texture *pTexture, void *pContext);
+	RESULT HandleOnMeshNormalTextureReady(texture *pTexture, void *pContext);
+	RESULT HandleOnMeshAmbientTextureReady(texture *pTexture, void *pContext);
 
 	/*
 public:
@@ -54,9 +85,12 @@ private:
 	std::wstring GetModelFilePath();
 	std::wstring GetModelDirectoryPath();
 
+protected:
+	RESULT SetDreamOS(DreamOS *pDOS);
+	model::params m_params;
+
 private:
-	std::wstring m_wstrModelFilePath;
-	std::wstring m_wstModelDirectoryPath;
+	DreamOS *m_pDreamOS = nullptr;
 };
 
 #endif // ! MODEL_H_

@@ -35,6 +35,8 @@ class mesh;
 class OGLSphere;
 class OGLVolume;
 class OGLQuad;
+class OGLModel;
+class OGLMesh;
 
 class OpenGLImp : public HALImp {
 private:
@@ -94,9 +96,11 @@ public:
 	skybox *MakeSkybox();
 
 	//mesh *MakeMesh(wchar_t *pszModelName);
+	OGLMesh* MakeMesh(PrimParams *pPrimParams, bool fInitialize = false);
 	mesh *MakeMesh(const std::vector<vertex>& vertices);
 	mesh *MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
+	OGLModel* MakeModel(PrimParams *pPrimParams, bool fInitialize = false);
 	virtual composite *MakeComposite() override;
 	virtual model *MakeModel() override;
 

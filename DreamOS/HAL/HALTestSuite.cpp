@@ -1358,11 +1358,10 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		CR(pReflectionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 		ProgramNode* pReflectionSkyboxProgram;
-		pReflectionSkyboxProgram = nullptr;
-		pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox", PIPELINE_FLAGS::PASSTHRU);
 		CN(pReflectionSkyboxProgram);
-		CR(pReflectionSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pReflectionSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 		
 		// Connect output as pass-thru to internal blend program
 		CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer", pReflectionProgramNode->Output("output_framebuffer")));
@@ -1401,7 +1400,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		// Standard Shader
 
 		ProgramNode* pRenderProgramNode;
-		pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		pRenderProgramNode = pHAL->MakeProgramNode("standard", PIPELINE_FLAGS::PASSTHRU);
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -1410,10 +1409,10 @@ RESULT HALTestSuite::AddTestWaterShader() {
 
 		// Skybox
 		ProgramNode* pSkyboxProgram;
-		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox", PIPELINE_FLAGS::PASSTHRU);
 		CN(pSkyboxProgram);
-		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 
 		// Connect output as pass-thru to internal blend program
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
@@ -1522,7 +1521,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 			}
 
 			if (pReflectionSkyboxProgram != nullptr) {
-				CR(dynamic_cast<OGLProgramSkyboxScatter*>(pReflectionSkyboxProgram)->SetReflectionObject(pTestContext->pWaterQuad));
+				CR(dynamic_cast<OGLProgramSkybox*>(pReflectionSkyboxProgram)->SetReflectionObject(pTestContext->pWaterQuad));
 			}
 
 			// NOTE: Refraction skybox needs no reflection plane - it's just looking through
@@ -1552,8 +1551,8 @@ RESULT HALTestSuite::AddTestWaterShader() {
 			CR(pVolume->SetVertexColor(COLOR_BLUE));
 			*/
 
-			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
-			CN(pDreamGamepadApp)
+			//auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			//CN(pDreamGamepadApp)
 
 		}
 
@@ -6208,7 +6207,7 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 
 		ProgramNode* pRenderProgramNode;
 		//pRenderProgramNode = pHAL->MakeProgramNode("irrandiance_map_lighting");
-		pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		pRenderProgramNode = pHAL->MakeProgramNode("standard", PIPELINE_FLAGS::PASSTHRU);
 		//pRenderProgramNode = pHAL->MakeProgramNode("gbuffer");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_irradiance_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
@@ -6222,7 +6221,7 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 		//CR(pSSAOProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));		
 
 		ProgramNode* pVisualNormalsProgram;
-		pVisualNormalsProgram = pHAL->MakeProgramNode("visualize_normals");
+		pVisualNormalsProgram = pHAL->MakeProgramNode("visualize_normals", PIPELINE_FLAGS::PASSTHRU);
 		//pVisualNormalsProgram = pHAL->MakeProgramNode("minimal");
 		CN(pVisualNormalsProgram);
 		CR(pVisualNormalsProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
@@ -6231,7 +6230,7 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 		CR(pVisualNormalsProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 		
 		ProgramNode* pSkyboxProgramNode;
-		pSkyboxProgramNode = pHAL->MakeProgramNode("skybox");
+		pSkyboxProgramNode = pHAL->MakeProgramNode("skybox", PIPELINE_FLAGS::PASSTHRU);
 		CN(pSkyboxProgramNode);
 		CR(pSkyboxProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 		CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
@@ -6276,6 +6275,7 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 			pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
 			//CR(pVolume->SetDiffuseTexture(pColorTexture));
 
+			/*
 			//model *pModel = m_pDreamOS->AddModel(L"\\head_01\\head_01.FBX");
 			model *pModel = m_pDreamOS->AddModel(L"\\4\\head.fbx");
 			CN(pModel);
@@ -6301,6 +6301,7 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 			CN(pDreamGamepadApp);
 			CR(pDreamGamepadApp->SetCamera(m_pDreamOS->GetCamera(), DreamGamepadCameraApp::CameraControlType::GAMEPAD));
+			*/
 
 		}
 

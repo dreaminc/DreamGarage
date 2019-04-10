@@ -1076,7 +1076,16 @@ DimObj *SandboxApp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 	DimObj *pDimObj = nullptr;
 
-	pDimObj = m_pHALImp->MakeObject(pPrimParams, fInitialize);
+	if (pPrimParams->GetPrimitiveType() == PRIMITIVE_TYPE::MODEL) {
+		CNM(m_pDreamOSHandle, "Async model loading not supported without a DreamOS handle in Sandbox");
+
+		pDimObj = ModelFactory::MakeModel(m_pDreamOSHandle, pPrimParams, fInitialize);
+		CN(pDimObj);
+	}
+	else {
+		pDimObj = m_pHALImp->MakeObject(pPrimParams, fInitialize);
+		CN(pDimObj);
+	}
 
 Success:
 	return pDimObj;
@@ -1819,7 +1828,7 @@ model* SandboxApp::AddModel(const std::wstring& wstrModelFilename, texture* pTex
 
 	CR(AddObject(pModel));
 
-// Success:
+Success:
 	return pModel;
 
 Error:
@@ -1839,7 +1848,7 @@ model *SandboxApp::MakeModel(const std::wstring& wstrModelFilename, ModelFactory
 	model *pModel = ModelFactory::MakeModel(m_pHALImp, wstrModelFilename, modelFactoryFlags);
 	CN(pModel);
 
-	// Success:
+Success:
 	return pModel;
 
 Error:
@@ -1859,7 +1868,7 @@ model *SandboxApp::AddModel(const std::wstring& wstrModelFilename, ModelFactory:
 
 	CR(AddObject(pModel));
 
-	// Success:
+Success:
 	return pModel;
 
 Error:

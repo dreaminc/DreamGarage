@@ -15,7 +15,7 @@
 #pragma warning(disable : 4250)
 class OGLMesh : public mesh, public OGLObj {
 public:
-
+	OGLMesh(OpenGLImp *pParentImp, mesh::params *pMeshParams);
 	OGLMesh(OpenGLImp *pParentImp, const std::vector<vertex>& vertices);
 	OGLMesh(OpenGLImp *pParentImp, const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 

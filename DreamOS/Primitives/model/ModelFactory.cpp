@@ -2,6 +2,8 @@
 
 #include "Sandbox/PathManager.h"
 
+#include "DreamOS.h"
+
 // Add assimp
 
 #include "assimp/Importer.hpp"
@@ -56,6 +58,107 @@ Error:
 	retTextures.clear();
 
 	return std::vector<texture*>();
+}
+
+std::vector<std::wstring> GetTexturePaths(model *pModel, aiTextureType textureType, aiMaterial *pAIMaterial) {
+	RESULT r = R_PASS;
+
+	std::vector<std::wstring> texturePaths = std::vector<std::wstring>();
+
+	unsigned int nTextures = pAIMaterial->GetTextureCount(textureType);
+
+	for (unsigned int i = 0; i < nTextures; i++) {
+		aiString aistrTextureFilepath;
+		pAIMaterial->GetTexture(textureType, i, &aistrTextureFilepath);
+
+		// Automatically detect if absolute path, dream path, or local path
+		std::wstring wstrFilename = pModel->GetModelDirectoryPath() + util::CStringToWideCString(aistrTextureFilepath.C_Str());
+		texturePaths.push_back(wstrFilename);
+	}
+
+Success:
+	return texturePaths;
+
+	// redundant
+Error:
+	return std::vector<std::wstring>();
+}
+
+RESULT ProcessAssetImporterMeshMaterial(model *pModel, aiMaterial *pAIMaterial, const aiScene *pAIScene, mesh::params *pMeshParams) {
+	RESULT r = R_PASS;
+
+	aiColor4D aic;
+
+	float aiShininess;
+	float aiBumpscale;
+
+	unsigned int retArraySize = 0;
+
+	//float aiStrength;
+	//float aiMax;
+
+	color c;
+
+	// Diffuse Color
+	if (aiGetMaterialColor(pAIMaterial, AI_MATKEY_COLOR_DIFFUSE, &aic) == AI_SUCCESS) {
+		c = color(aic.r, aic.g, aic.b, aic.a);
+		pMeshParams->meshMaterial.SetDiffuseColor(c);
+	}
+
+	// Specular Color
+	if (aiGetMaterialColor(pAIMaterial, AI_MATKEY_COLOR_SPECULAR, &aic) == AI_SUCCESS) {
+		c = color(aic.r, aic.g, aic.b, aic.a);
+		pMeshParams->meshMaterial.SetSpecularColor(c);
+	}
+
+	// Ambient Color
+	if (aiGetMaterialColor(pAIMaterial, AI_MATKEY_COLOR_AMBIENT, &aic) == AI_SUCCESS) {
+		c = color(aic.r, aic.g, aic.b, aic.a);
+		pMeshParams->meshMaterial.SetAmbientColor(c);
+	}
+
+	// TODO: Emission Color
+	/*
+	if (aiGetMaterialColor(pAIMaterial, AI_MATKEY_COLOR_EMISSIVE, &aic) == AI_SUCCESS) {
+	c = color(aic.r, aic.g, aic.b, aic.a);
+	pMesh->SetMaterialEmissiveColor(c, false);
+	}
+	*/
+
+	// Shininess 
+	if (aiGetMaterialFloatArray(pAIMaterial, AI_MATKEY_SHININESS, &aiShininess, &retArraySize) == AI_SUCCESS && retArraySize != 0) {
+		pMeshParams->meshMaterial.SetShininess(aiShininess);
+	}
+
+	// Bumpiness
+	if (aiGetMaterialFloatArray(pAIMaterial, AI_MATKEY_BUMPSCALING, &aiBumpscale, &retArraySize) == AI_SUCCESS && retArraySize != 0) {
+		pMeshParams->meshMaterial.SetBumpiness(aiBumpscale);
+	}
+
+	// Textures
+	// TODO: Support more than one texture
+	// TODO: Bump maps
+	if (pAIMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+		pMeshParams->diffuseTexturePaths = GetTexturePaths(pModel, aiTextureType_DIFFUSE, pAIMaterial);
+	}
+
+	if (pAIMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0) {
+		pMeshParams->specularTexturePaths = GetTexturePaths(pModel, aiTextureType_SPECULAR, pAIMaterial);
+	}
+
+	// TODO: This may or may not be a bug with assimp
+	//if (pAIMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
+	if (pAIMaterial->GetTextureCount(aiTextureType_HEIGHT) > 0) {
+		//pMeshParams->specularTexturePaths = GetTexturePaths(pModel, aiTextureType_NORMALS, pAIMaterial);
+		pMeshParams->normalsTexturePaths = GetTexturePaths(pModel, aiTextureType_HEIGHT, pAIMaterial);
+	}
+
+	if (pAIMaterial->GetTextureCount(aiTextureType_AMBIENT) > 0) {
+		pMeshParams->ambientTexturePaths = GetTexturePaths(pModel, aiTextureType_AMBIENT, pAIMaterial);
+	}
+
+Error:
+	return r;
 }
 
 RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
@@ -114,7 +217,7 @@ RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMe
 	// TODO: Bump maps
 	if (pAIMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
 		auto diffuseTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_DIFFUSE, pAIMaterial, pAIScene);
-		
+
 		if (diffuseTextures.size() > 0) {
 			pMesh->SetDiffuseTexture(diffuseTextures[0]);
 		}
@@ -147,11 +250,11 @@ RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMe
 		}
 	}
 
-//Error:
+Error:
 	return r;
 }
 
-RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *pAIScene) {
+RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *pAIScene, bool fLoadAsync = false) {
 	RESULT r = R_PASS;
 
 	std::vector<vertex> vertices;
@@ -256,15 +359,29 @@ RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *p
 		}
 	}
 	
-	// Create the mesh and add to model
-	std::shared_ptr<mesh> pMesh = pModel->AddMesh(vertices, indices);
-	CN(pMesh);
+	if (fLoadAsync == false) {
+		// Create the mesh and add to model
+		std::shared_ptr<mesh> pMesh = pModel->AddMesh(vertices, indices);
+		CN(pMesh);
 
-	// Materials 
-	//if (pAIMesh->mMaterialIndex != 0) {
-	if (pAIScene->mNumMaterials > 0) {
-		aiMaterial *pAIMaterial = pAIScene->mMaterials[pAIMesh->mMaterialIndex];
-		CRM(ProcessAssetImporterMeshMaterial(pModel, pMesh, pAIMaterial, pAIScene), "Failed to process material for mesh");
+		// Materials 
+		if (pAIScene->mNumMaterials > 0) {
+			aiMaterial *pAIMaterial = pAIScene->mMaterials[pAIMesh->mMaterialIndex];
+			CRM(ProcessAssetImporterMeshMaterial(pModel, pMesh, pAIMaterial, pAIScene), "Failed to process material for mesh");
+		}
+	}
+	else {
+		mesh::params meshParams(strMeshName, vertices, indices);
+
+		// Materials 
+		if (pAIScene->mNumMaterials > 0) {
+			aiMaterial *pAIMaterial = pAIScene->mMaterials[pAIMesh->mMaterialIndex];
+			CRM(ProcessAssetImporterMeshMaterial(pModel, pAIMaterial, pAIScene, &meshParams), 
+				"Failed to process material for mesh");
+		}
+
+		// This will queue the mesh which will get added to the model
+		CR(pModel->QueueMesh(meshParams));
 	}
 
 
@@ -272,32 +389,31 @@ Error:
 	return r;
 }
 
-RESULT ProcessAssetImporterNode(model *pModel, aiNode *pAINode, const aiScene *pAIScene) {
+RESULT ProcessAssetImporterNode(model *pModel, aiNode *pAINode, const aiScene *pAIScene, bool fLoadAsync = false) {
 	RESULT r = R_PASS;
 
-	// process all the node's meshes (if any)
+	// Process all the node's meshes (if any)
 	for (unsigned int i = 0; i < pAINode->mNumMeshes; i++) {
 		aiMesh *pAIMesh = pAIScene->mMeshes[pAINode->mMeshes[i]];
 		
 		//meshes.push_back(ProcessAssetImporterMesh(pModel, pAIMesh, pAIScene));
 
-		CR(ProcessAssetImporterMesh(pModel, pAIMesh, pAIScene));
+		CR(ProcessAssetImporterMesh(pModel, pAIMesh, pAIScene, fLoadAsync));
 	}
-	// then do the same for each of its children
+
+	// Then do the same for each of its children (just gets added flat - no model heirarchy transferred)
 	for (unsigned int i = 0; i < pAINode->mNumChildren; i++) {
-		ProcessAssetImporterNode(pModel, pAINode->mChildren[i], pAIScene);
+		ProcessAssetImporterNode(pModel, pAINode->mChildren[i], pAIScene, fLoadAsync);
 	}
 
 Error:
 	return r;
 }
 
-model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+model *MakeAndInitializeModel(HALImp *pParentImp, std::wstring wstrModelFilename) {
 	RESULT r = R_PASS;
 
 	model *pModel = nullptr;
-
-	Assimp::Importer assetImporter;
 
 	// Get file path
 	// Root folder
@@ -308,39 +424,104 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 		CRM(pPathManager->GetFilePath(PATH_MODEL, wstrModelFilename, wstrModelFilePath), "Failed to get model file path");
 		CRM(pPathManager->DoesPathExist(wstrModelFilePath, true), "Model file path not found");
 	}
+	else if (pPathManager->IsDreamPath(&wstrModelFilename[0]) == true) {
+		CRM(pPathManager->GetFilePath(wstrModelFilename, wstrModelFilePath), "Failed to get model file path");
+		CRM(pPathManager->DoesPathExist(wstrModelFilePath, true), "Model file path not found");
+	}
 	else {
 		wstrModelFilePath = wstrModelFilename;
 	}
 
-	//pModel = new model(pParentImp);
 	pModel = pParentImp->MakeModel();
 	CN(pModel);
+
+	//CR(pModel->OGLInitialize());
 	CR(pModel->InitializeOBB());
 	//CR(pModel->InitializeBoundingSphere());
 
 	// Set the path (used in texture loading)
 	CR(pModel->SetModelFilePath(wstrModelFilePath));
 
+Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+
+	return nullptr;
+}
+
+unsigned int GetAssImpFlags(ModelFactory::flags modelFactoryFlags) {
 	unsigned int assimpFlags = //aiProcess_FlipUVs |
-								aiProcess_CalcTangentSpace |
-								aiProcess_GenNormals |
-								//aiProcess_FixInfacingNormals |
-								aiProcess_OptimizeMeshes |
-								aiProcess_PreTransformVertices |
-								//aiProcess_JoinIdenticalVertices |
-								aiProcess_Triangulate;
+		aiProcess_CalcTangentSpace |
+		aiProcess_GenNormals |
+		//aiProcess_FixInfacingNormals |
+		aiProcess_OptimizeMeshes |
+		aiProcess_PreTransformVertices |
+		//aiProcess_JoinIdenticalVertices |
+		aiProcess_Triangulate;
 
 	if ((modelFactoryFlags & ModelFactory::flags::FLIP_WINDING) != 0) {
 		assimpFlags |= aiProcess_FlipWindingOrder;
 	}
 
+	return assimpFlags;
+}
+
+model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+	RESULT r = R_PASS;
+
+	model *pModel = nullptr;
+	Assimp::Importer assetImporter;
+
+	pModel = MakeAndInitializeModel(pParentImp, wstrModelFilename);
+	CNM(pModel, "Failed to load model");
+
 	// Load model from disk
-	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(wstrModelFilePath), assimpFlags);
+	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(pModel->GetModelFilePath()), GetAssImpFlags(modelFactoryFlags));
 	CNM(pAIScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());
 	CBM(((pAIScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) == 0), "Asset Importer Scene Incomplete: %s", assetImporter.GetErrorString());
 	CNM(pAIScene->mRootNode, "Asset Importer scene root is null: %s", assetImporter.GetErrorString());
 
-	CRM(ProcessAssetImporterNode(pModel, pAIScene->mRootNode, pAIScene), "Failed to process Asset Importer root node");
+	CRM(ProcessAssetImporterNode(pModel, pAIScene->mRootNode, pAIScene, false), "Failed to process Asset Importer root node");
+
+	//pModel->UpdateBoundingVolume();
+
+Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+
+	return nullptr;
+}
+
+model *ModelFactory::MakeModel(DreamOS *pDOS, PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	model *pModel = nullptr;
+	Assimp::Importer assetImporter;
+
+	model::params *pModelParams = dynamic_cast<model::params*>(pPrimParams);
+	CN(pModelParams);
+
+	pModel = MakeAndInitializeModel(pDOS->GetHALImp(), pModelParams->wstrModelFilePath);
+	CNM(pModel, "Failed to load model");
+	CR(pModel->SetDreamOS(pDOS));
+
+	// Load model from disk
+	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(pModel->GetModelFilePath()), GetAssImpFlags(pModelParams->modelFactoryFlags));
+	CNM(pAIScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());
+	CBM(((pAIScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) == 0), "Asset Importer Scene Incomplete: %s", assetImporter.GetErrorString());
+	CNM(pAIScene->mRootNode, "Asset Importer scene root is null: %s", assetImporter.GetErrorString());
+
+	CRM(ProcessAssetImporterNode(pModel, pAIScene->mRootNode, pAIScene, true), "Failed to process Asset Importer root node");
 
 	//pModel->UpdateBoundingVolume();
 
