@@ -64,6 +64,9 @@ public:
 	RESULT StopSending();
 	RESULT HandleStopEvent();
 
+	RESULT ShowPointers();
+	RESULT HidePointers();
+
 	// App Messaging
 	RESULT BeginStream();
 	RESULT BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType = DreamShareViewShareMessage::type::INVALID);

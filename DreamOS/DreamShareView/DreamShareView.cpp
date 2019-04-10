@@ -313,12 +313,7 @@ RESULT DreamShareView::Show() {
 	m_pCastQuad->SetVisible(true);
 	m_pCastBackgroundQuad->SetVisible(true);
 
-	//*
-	for (auto it = m_pointingObjects.begin(); it != m_pointingObjects.end(); it++) {
-		it->second[0]->SetVisible(true, false);
-		it->second[1]->SetVisible(true, false);
-	}
-	//*/
+	CR(ShowPointers());
 
 Error:
 	return r;
@@ -330,10 +325,7 @@ RESULT DreamShareView::Hide() {
 	m_pCastQuad->SetVisible(false);
 	m_pCastBackgroundQuad->SetVisible(false);
 
-	for (auto it = m_pointingObjects.begin(); it != m_pointingObjects.end(); it++) {
-		it->second[0]->SetVisible(false, false);
-		it->second[1]->SetVisible(false, false);
-	}
+	CR(HidePointers());
 
 Error:
 	return r;
@@ -345,8 +337,7 @@ RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
 	m_pStreamerPeerConnection = pPeerConnection;
 
 	//ShowCastingTexture();
-	m_pCastQuad->SetVisible(true);
-	m_pCastBackgroundQuad->SetVisible(true);
+	CR(Show());
 	m_pCastQuad->SetDiffuseTexture(m_pVideoCastTexture.get());
 
 	// Switch to input
@@ -448,6 +439,30 @@ RESULT DreamShareView::HandleStopEvent() {
 
 //	CR(m_pEnvironmentControllerProxy->RequestStopSharing(m_currentEnvironmentAssetID, m_strScope, m_strPath));
 	CR(SetStreamingState(false));
+Error:
+	return r;
+}
+
+RESULT DreamShareView::ShowPointers() {
+	RESULT r = R_PASS;
+
+	for (auto it = m_pointingObjects.begin(); it != m_pointingObjects.end(); it++) {
+		it->second[0]->SetVisible(true, false);
+		it->second[1]->SetVisible(true, false);
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::HidePointers() {
+	RESULT r = R_PASS;
+
+	for (auto it = m_pointingObjects.begin(); it != m_pointingObjects.end(); it++) {
+		it->second[0]->SetVisible(false, false);
+		it->second[1]->SetVisible(false, false);
+	}
+
 Error:
 	return r;
 }
