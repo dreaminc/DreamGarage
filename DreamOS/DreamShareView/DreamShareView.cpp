@@ -312,6 +312,14 @@ RESULT DreamShareView::Show() {
 	//CR(GetComposite()->SetVisible(true));
 	m_pCastQuad->SetVisible(true);
 	m_pCastBackgroundQuad->SetVisible(true);
+
+	//*
+	for (auto it = m_pointingObjects.begin(); it != m_pointingObjects.end(); it++) {
+		it->second[0]->SetVisible(true, false);
+		it->second[1]->SetVisible(true, false);
+	}
+	//*/
+
 Error:
 	return r;
 }
@@ -321,6 +329,12 @@ RESULT DreamShareView::Hide() {
 	//CR(GetComposite()->SetVisible(false));
 	m_pCastQuad->SetVisible(false);
 	m_pCastBackgroundQuad->SetVisible(false);
+
+	for (auto it = m_pointingObjects.begin(); it != m_pointingObjects.end(); it++) {
+		it->second[0]->SetVisible(false, false);
+		it->second[1]->SetVisible(false, false);
+	}
+
 Error:
 	return r;
 }

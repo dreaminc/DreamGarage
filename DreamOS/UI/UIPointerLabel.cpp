@@ -188,8 +188,10 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		point ptMessage = pUpdatePointerMessage->m_body.ptPointer;
 
 		// smoothing
-		float newAmount = 0.3f;
-		ptMessage = (1.0f - newAmount) * GetPosition() + (newAmount)* ptMessage;
+		if (!m_fIsOn) {
+			float newAmount = 0.3f;
+			ptMessage = (1.0f - newAmount) * GetPosition() + (newAmount)* ptMessage;
+		}
 
 		// calculate position on the screen quad
 		point ptPosition = (point)(inverse(RotationMatrix(m_pParentQuad->GetOrientation(true))) * (ptMessage - m_pParentQuad->GetOrigin(true)));
