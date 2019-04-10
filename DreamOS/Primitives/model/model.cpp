@@ -297,7 +297,7 @@ bool model::IsModelLoaded() {
 
 float model::ModelLoadingProgress() {
 	unsigned int totalElementsLoaded = m_totalMeshes + m_totalTextures;
-	unsigned int totalPendingElements = m_pendingMeshIDs.size() + m_pendingTextures.size();
+	unsigned int totalPendingElements = (unsigned int)(m_pendingMeshIDs.size()) + (unsigned int)(m_pendingTextures.size());
 
 	float loadProgress = 1.0f - ((float)(totalPendingElements) / (float)(totalElementsLoaded));
 
