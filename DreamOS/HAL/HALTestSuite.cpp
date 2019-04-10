@@ -5600,7 +5600,7 @@ RESULT HALTestSuite::AddTestTextureFormats() {
 		CR(pHAL->MakeCurrentContext());
 
 		ProgramNode* pRenderProgramNode;
-		pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_texture");
+		pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -5636,7 +5636,8 @@ RESULT HALTestSuite::AddTestTextureFormats() {
 			pQuad->RotateXByDeg(90.0f);
 
 			//texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"island-diffuse.jpg");
-			texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"cobblestone_color.png");
+			//texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"cobblestone_color.png");
+			texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"test-img.png");
 			CN(pColorTexture);
 			
 			CR(pQuad->SetDiffuseTexture(pColorTexture));

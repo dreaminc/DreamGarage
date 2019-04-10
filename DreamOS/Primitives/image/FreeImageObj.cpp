@@ -81,14 +81,21 @@ RESULT FreeImageObj::LoadImage() {
 		} break;
 
 		case FIC_RGB: {
-			m_channels = 3;
+			if (m_fiBitsPerPixel != 32) {
+				m_pfiBitmap = FreeImage_ConvertTo32Bits(m_pfiBitmap);
+				CNM(m_pfiBitmap, "Failed to convert to 32 bits");
+				m_fiBitsPerPixel = 32;
+			}
+
+			m_fiColorType = FIC_RGBALPHA;
+			m_channels = 4;
 		} break;
 
 		case FIC_RGBALPHA: {
 			m_channels = 4;
 		} break;
 
-			
+	
 		case FIC_PALETTE:
 		case FIC_CMYK:
 		default: {
