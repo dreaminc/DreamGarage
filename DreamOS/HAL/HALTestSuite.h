@@ -38,7 +38,6 @@ public:
 	RESULT AddTestSkybox();
 
 	// Shader Tests
-	RESULT AddTestEmptyPipeline();
 	RESULT AddTestFadeShader();
 	RESULT AddTestWaterShader();
 	RESULT AddTestWaterShaderCube();

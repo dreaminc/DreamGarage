@@ -46,6 +46,9 @@
     <Filter Include="DreamTestApp\Suites\Dimension">
       <UniqueIdentifier>{58c01bef-5742-42c3-b61e-adf542c0a50a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DreamTestApp\Suites\HAL\Pipeline">
+      <UniqueIdentifier>{053b723b-9556-4df3-adcf-c3da467227f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
@@ -92,9 +95,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\DimensionTestSuite.cpp">
       <Filter>DreamTestApp\Suites\Dimension</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCTestSuite.cpp">
       <Filter>DreamTestApp\Suites\Cloud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\Pipeline\PipelineTestSuite.cpp">
+      <Filter>DreamTestApp\Suites\HAL\Pipeline</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -142,9 +148,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\DimensionTestSuite.h">
       <Filter>DreamTestApp\Suites\Dimension</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCTestSuite.h">
       <Filter>DreamTestApp\Suites\Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\Pipeline\PipelineTestSuite.h">
+      <Filter>DreamTestApp\Suites\HAL\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -102,6 +102,7 @@ class DreamOS :
 	friend class DreamTestSuite;
 	friend class UIModule;
 	friend class HALTestSuite;
+	friend class PipelineTestSuite;
 	friend class UITestSuite;
 	friend class InteractionEngineTestSuite;
 	friend class PhysicsEngineTestSuite;

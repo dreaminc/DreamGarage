@@ -362,6 +362,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
     <ClCompile Include="..\..\..\DreamShareView\MultiContentTestSuite.cpp" />
     <ClCompile Include="..\..\..\DreamTestingApp.cpp" />
     <ClCompile Include="..\..\..\HAL\HALTestSuite.cpp" />
+    <ClCompile Include="..\..\..\HAL\Pipeline\PipelineTestSuite.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionTestSuite.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp" />
@@ -380,6 +381,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
     <ClInclude Include="..\..\..\DreamShareView\MultiContentTestSuite.h" />
     <ClInclude Include="..\..\..\DreamTestingApp.h" />
     <ClInclude Include="..\..\..\HAL\HALTestSuite.h" />
+    <ClInclude Include="..\..\..\HAL\Pipeline\PipelineTestSuite.h" />
     <ClInclude Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionTestSuite.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h" />
