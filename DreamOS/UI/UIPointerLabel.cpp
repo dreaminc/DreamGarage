@@ -223,7 +223,6 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 				CR(CreateHapticImpulse(pUpdatePointerMessage->IsLeft(), fShouldBeVisible));
 				CR(m_pDreamOS->PlaySoundFile(m_pActuateSound));
 			}
-			SetVisible(true, false);
 
 			m_fIsOn = true;
 		}
