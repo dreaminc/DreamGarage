@@ -1151,34 +1151,39 @@ Error:
 RESULT DreamUserControlArea::ShutdownAllSources() {
 	RESULT r = R_PASS;
 
-	GetDOS()->OnStopReceivingCameraPlacement();
+	//GetDOS()->OnStopReceivingCameraPlacement();
 
 	m_pDreamUIBar->HandleEvent(UserObserverEventType::DISMISS);
 
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 	//*
-	CNR(m_pActiveSource, R_SKIPPED);
-	if (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
-	//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
-		GetDOS()->OnStopSending(m_pCurrentScreenShare);
-	}
-	else {
-		for (auto pSource : m_pDreamTabView->GetAllSources()) {
-			if (pSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
-			//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(pSource->GetCurrentAssetID()), "Failed to share environment asset");
-				GetDOS()->OnStopSending(m_pCurrentScreenShare);
+	if (m_pActiveSource != nullptr) {
+		if (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
+			//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
+			GetDOS()->OnStopSending(m_pCurrentScreenShare);
+		}
+		else {
+			for (auto pSource : m_pDreamTabView->GetAllSources()) {
+				if (pSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
+					//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(pSource->GetCurrentAssetID()), "Failed to share environment asset");
+					GetDOS()->OnStopSending(m_pCurrentScreenShare);
+				}
 			}
 		}
+		//*/
+
+		// related to crash on exit?
+		//GetDOS()->OnStopSending();
+		//GetDOS()->OnStopReceiving();
+
+		m_pDreamTabView->FlagShutdownAllSources();
+		CloseActiveAsset();
 	}
-	//*/
 
-	// related to crash on exit?
-	//GetDOS()->OnStopSending();
-	//GetDOS()->OnStopReceiving();
-
-	m_pDreamTabView->FlagShutdownAllSources();
-	CloseActiveAsset();
+	if (m_pDreamVCam->IsReceivingCameraPlacement()) {
+		CR(GetDOS()->OnStopReceivingCameraPlacement());
+	}
 
 Error:
 	return r;
