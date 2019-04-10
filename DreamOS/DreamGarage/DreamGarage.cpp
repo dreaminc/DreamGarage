@@ -1726,7 +1726,7 @@ RESULT DreamGarage::OnSwitchTeams() {
 
 		// questionable what kind of resets the flags need
 
-		CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
+		//CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
 		//CRM(pUserController->SwitchTeam(), "switch team failed");
 		CR(PendSwitchTeams());
