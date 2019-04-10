@@ -182,7 +182,10 @@ RESULT UIPointerLabel::RenderLabel() {
 RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdatePointerMessage) {
 	RESULT r = R_PASS;
 
+	auto pCloudController = m_pDreamOS->GetCloudController();
+
 	CN(pUpdatePointerMessage);
+	CN(pCloudController);
 
 	{
 		point ptMessage = pUpdatePointerMessage->m_body.ptPointer;
@@ -216,17 +219,19 @@ RESULT UIPointerLabel::HandlePointerMessage(DreamShareViewPointerMessage *pUpdat
 		bool fShouldBeVisible = fInBounds && pUpdatePointerMessage->IsActuated() && pUpdatePointerMessage->IsInteracting();
 
 		if (fShouldBeVisible && !m_fIsOn) {
-			CR(CreateHapticImpulse(pUpdatePointerMessage->IsLeft(), fShouldBeVisible));
-
-			CR(m_pDreamOS->PlaySoundFile(m_pActuateSound));
+			if (pUpdatePointerMessage->GetSenderUserID() == pCloudController->GetUserID()) {
+				CR(CreateHapticImpulse(pUpdatePointerMessage->IsLeft(), fShouldBeVisible));
+				CR(m_pDreamOS->PlaySoundFile(m_pActuateSound));
+			}
 
 			m_fIsOn = true;
 		}
 		
 		else if (m_fIsOn && !pUpdatePointerMessage->IsActuated()) {
-			CR(CreateHapticImpulse(pUpdatePointerMessage->IsLeft(), false));
-
-			CR(m_pDreamOS->PlaySoundFile(m_pCancelSound));
+			if (pUpdatePointerMessage->GetSenderUserID() == pCloudController->GetUserID()) {
+				CR(CreateHapticImpulse(pUpdatePointerMessage->IsLeft(), false));
+				CR(m_pDreamOS->PlaySoundFile(m_pCancelSound));
+			}
 
 			m_fIsOn = false;
 		}
