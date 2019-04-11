@@ -150,7 +150,6 @@ Error:
 RESULT user::OnModelReady(DimObj *pDimObj, void *pContext) {
 	RESULT r = R_PASS;
 
-	color modelColor;
 	vector vHeadOffset = vector(0.0f, (float)(M_PI), 0.0f);
 
 	model *pObj = dynamic_cast<model*>(pDimObj);
@@ -160,9 +159,6 @@ RESULT user::OnModelReady(DimObj *pDimObj, void *pContext) {
 	CR(m_pHead->AddObject(m_pHeadModel));
 	m_pHead->SetVisible(true);
 
-	// TODO: broken with async load, not sure why it was important
-	//modelColor = m_pHeadModel->GetChildMesh(0)->GetDiffuseColor();
-	//m_pHeadModel->SetMaterialSpecularColor(modelColor, true);
 
 	m_pHeadModel->SetMaterialShininess(4.0f, true);
 
@@ -191,6 +187,7 @@ RESULT user::LoadHeadModelFromID() {
 	//m_pHeadModel = AddModel(wstrHeadModel);
 	//CN(m_pHeadModel)
 	CR(m_pDreamOS->MakeModel(std::bind(&user::OnModelReady, this, std::placeholders::_1, std::placeholders::_2), this, wstrHeadModel));
+	m_fLoadingModel = true;
 
 	m_pMouth = m_pMouthComposite->AddModel(wstrMouthModel);
 	CN(m_pMouth);
@@ -662,6 +659,14 @@ RESULT user::Update() {
 		if (m_pPendingPhotoTextureBuffer != nullptr) {
 			CR(UpdateProfilePhoto());
 		}
+	}
+
+	if (m_fLoadingModel && m_pHeadModel != nullptr && m_pHeadModel->IsModelLoaded()) {
+
+		color modelColor = m_pHeadModel->GetChildMesh(0)->GetDiffuseColor();
+		m_pHeadModel->SetMaterialSpecularColor(modelColor, true);
+
+		m_fLoadingModel = false;
 	}
 
 Error:
