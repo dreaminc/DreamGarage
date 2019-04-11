@@ -198,14 +198,14 @@ RESULT PipelineTestSuite::AddTestDynamicPipe() {
 					if (pTestContext->pRenderProgramNodeB != nullptr) {
 						CRM(pTestContext->pRenderProgramNodeB->Disconnect(), "Disconnect failed");
 					}
-				
+
 					if (pTestContext->pRenderProgramNodeA == nullptr) {
 						pTestContext->pRenderProgramNodeA = pHAL->MakeProgramNode("minimal");
 						CN(pTestContext->pRenderProgramNodeA);
 						CR(pTestContext->pRenderProgramNodeA->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 						CR(pTestContext->pRenderProgramNodeA->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 					}
-				
+
 					CR(pTestContext->pRenderScreenQuad->ConnectToInput("input_framebuffer", pTestContext->pRenderProgramNodeA->Output("output_framebuffer")));
 					counter++;
 				}
