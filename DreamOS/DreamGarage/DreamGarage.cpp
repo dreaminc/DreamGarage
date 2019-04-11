@@ -653,7 +653,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	}
 
 	// DEBUG:
-//#ifdef _DEBUG
+#ifdef _DEBUG
 	{
 		m_fHasCredentials = true;
 
@@ -682,7 +682,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->RequestAccessToken(strDebugRefreshToken);
 		}
 	}
-//#endif
+#endif
 
 	// Initial step of login flow:
 	DOSLOG(INFO, "Checking API connection (internet access)");
