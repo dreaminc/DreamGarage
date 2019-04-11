@@ -25,7 +25,7 @@ public:
 
 public:
 	// Mark the object as dirty, data should be updated by the renderer
-	RESULT SetDirty() {
+	virtual RESULT SetDirty() {
 		m_fDirty = true;
 		return R_PASS;
 	}

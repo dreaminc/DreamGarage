@@ -26,6 +26,9 @@ RESULT OGLProgramSkyboxScatterCube::OGLInitialize() {
 
 	CR(OGLProgram::OGLInitialize());
 
+	CR(SetDirtyFlagEnabled(true));
+	CR(SetDirty(true));
+
 	CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributePosition), std::string("inV_vec4Position")));
 	CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeColor), std::string("inV_vec4Color")));
 
@@ -126,9 +129,11 @@ RESULT OGLProgramSkyboxScatterCube::SetSunDirection(vector vSunDirection) {
 	RESULT r = R_PASS;
 	
 	m_sunDirection = vSunDirection;
-	m_fRendered = false;
+	
+	CR(SetDirty());
 
-	return R_PASS;
+Error:
+	return r;
 }
 
 RESULT OGLProgramSkyboxScatterCube::SetupConnections() {
@@ -200,9 +205,6 @@ RESULT OGLProgramSkyboxScatterCube::ProcessNode(long frameID) {
 
 	CN(m_pSkybox);
 
-	if (m_fRendered)
-		return r;
-
 	UseProgram();
 
 	//if (m_pOGLFramebufferCubemap != nullptr) {
@@ -247,8 +249,6 @@ RESULT OGLProgramSkyboxScatterCube::ProcessNode(long frameID) {
 			RenderObject(m_pSkybox);
 		}
 	}
-
-	m_fRendered = true;
 
 	UnbindFramebuffer();
 	//*/

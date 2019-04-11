@@ -21,6 +21,9 @@ RESULT OGLProgramCubemapConvolution::OGLInitialize() {
 
 	CR(OGLProgram::OGLInitialize());
 
+	CR(SetDirtyFlagEnabled(true));
+	CR(SetDirty(true));
+
 	CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributePosition), std::string("inV_vec4Position")));
 	CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeColor), std::string("inV_vec4Color")));
 
@@ -121,7 +124,7 @@ RESULT OGLProgramCubemapConvolution::SetupConnections() {
 
 	// Inputs
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer_cubemap", &m_pOGLInputFramebufferCubemap, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_cubemap", &m_pOGLInputFramebufferCubemap));
 
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebuffer_cube", m_pOGLFramebufferCubemap));
@@ -182,9 +185,6 @@ RESULT OGLProgramCubemapConvolution::ProcessNode(long frameID) {
 
 	CN(m_pSkybox);
 
-	if (m_fRendered)
-		return r;
-
 	UseProgram();
 
 	int pxWidth = m_pOGLFramebufferCubemap->GetWidth();
@@ -218,8 +218,6 @@ RESULT OGLProgramCubemapConvolution::ProcessNode(long frameID) {
 			RenderObject(m_pSkybox);
 		}
 	}
-
-	m_fRendered = true;
 
 	UnbindFramebuffer();
 	//*/

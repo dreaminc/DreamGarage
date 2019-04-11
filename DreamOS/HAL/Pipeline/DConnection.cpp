@@ -185,3 +185,15 @@ RESULT DConnection::RenderConnections(long frameID) {
 RESULT DConnection::RenderParent(long frameID) {
 	return m_pParentNode->RenderNode(frameID);
 }
+
+RESULT DConnection::SetConnectionsDirty(long frameID) {
+	for (auto &pConnection : m_connections) {
+		if (pConnection->IsActive()) {
+			if (pConnection->m_pParentNode->IsDirtyFlagSet() && pConnection->m_pParentNode->IsDirty() == false) {
+				pConnection->m_pParentNode->SetDirty(frameID);
+			}
+		}
+	}
+
+	return R_PASS;
+}

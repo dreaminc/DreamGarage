@@ -6,6 +6,7 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
 
+#include "HAL/SkyboxScatterProgram.h"
 
 PipelineTestSuite::PipelineTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("pipeline", pDreamOS)
@@ -19,7 +20,10 @@ RESULT PipelineTestSuite::AddTests() {
 	// Add the tests
 
 	CR(AddTestEmptyPipeline());
+
 	CR(AddTestDynamicPipe());
+
+	CR(AddTestDirtyNode());
 
 Error:
 	return r;
@@ -83,6 +87,137 @@ RESULT PipelineTestSuite::AddTestEmptyPipeline() {
 			// Making a sphere seems to flip the right bits for some reason
 			//auto pSphere = m_pDreamOS->MakeSphere(1.0f);
 			//CN(pSphere);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(testDestriptor);
+	CN(pNewTest);
+
+Error:
+	return r;
+}
+
+RESULT PipelineTestSuite::AddTestDirtyNode() {
+	RESULT r = R_PASS;
+
+	TestObject::TestDescriptor testDestriptor;
+
+	testDestriptor.strTestName = "dirtynode";
+	testDestriptor.strTestDescription = "Testing the dirty node functionality";
+	testDestriptor.sDuration = 1000.0f;
+	testDestriptor.nRepeats = 1;
+
+	struct TestContext {
+		SkyboxScatterProgram *pSkyboxProgramNode = nullptr;
+	};
+
+	testDestriptor.pContext = (void*)(new TestContext());
+
+	// Initialize Code 
+	testDestriptor.fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		ProgramNode* pScatteringSkyboxCubeProgram;
+		pScatteringSkyboxCubeProgram = pHAL->MakeProgramNode("skybox_scatter_cube");
+		CN(pScatteringSkyboxCubeProgram);
+		CR(pScatteringSkyboxCubeProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		pTestContext->pSkyboxProgramNode = dynamic_cast<SkyboxScatterProgram*>(pScatteringSkyboxCubeProgram);
+		CN(pTestContext->pSkyboxProgramNode);
+
+		ProgramNode* pSkyboxConvolutionProgramNode;
+		pSkyboxConvolutionProgramNode = pHAL->MakeProgramNode("cubemap_convolution");
+		CN(pSkyboxConvolutionProgramNode);
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxCubeProgram->Output("output_framebuffer_cube")));
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_irradiance_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
+		//CR(pRenderProgramNode->ConnectToInput("input_framebuffer_environment_cubemap", pScatteringSkyboxCubeProgram->Output("output_framebuffer_cube")));
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Skybox
+		ProgramNode* pSkyboxProgram;
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox", PIPELINE_FLAGS::PASSTHRU);
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxCubeProgram->Output("output_framebuffer_cube")));
+
+		// Connect output as pass-thru to internal blend program
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		ProgramNode *pRenderScreenQuad;
+		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		{
+			//light *pLight;
+			//pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, 0.0f, -0.5f));
+
+			auto pSphere = m_pDreamOS->AddSphere(1.0f);
+			CN(pSphere);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	testDestriptor.fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		static vector vSun(0.0f, 0.0f, -1.0f);
+
+		static std::chrono::system_clock::time_point s_lastTime = std::chrono::system_clock::now();
+		static long counter = 2;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		{
+			std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+			auto sDifference = std::chrono::duration_cast<std::chrono::seconds>(timeNow - s_lastTime).count();
+
+			if (sDifference > 1) {
+				HALImp *pHAL = m_pDreamOS->GetHALImp();
+				CN(pHAL);
+
+				// Update sun position
+
+				pTestContext->pSkyboxProgramNode->SetSunDirection(vSun);
+				vSun = (vector)(RotationMatrix(-0.025f, 0.0f, 0.0f) * vSun);
+				vSun.Normalize();
+				
+				s_lastTime = timeNow;
+			}
 		}
 
 	Error:

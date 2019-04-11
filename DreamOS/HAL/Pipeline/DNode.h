@@ -14,18 +14,24 @@
 #include "PipelineCommon.h"
 #include "DConnection.h"
 
-class DNode : public DObject {
+#include "Primitives/dirty.h"
+
+class DNode : 
+	public DObject,
+	public dirty
+{
+
+	friend class DConnection;
 
 public:
 	DNode(PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 	DNode(std::string strName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
-	~DNode();
+	
+	~DNode() = default;
 
 	RESULT ClearInputConnections();
 	RESULT ClearOutputConnections();
 	RESULT ClearConnections();
-
-	bool IsPassthru();
 
 	template <class objType>
 	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type, objType *pDestination, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) {
@@ -176,6 +182,16 @@ public:
 		pNode = nullptr;
 		return nullptr;
 	}
+
+public:
+	bool IsPassthru();
+	bool IsDirtyFlagSet();
+
+protected:
+	RESULT SetDirtyFlagEnabled(bool fDirtyEnabled);
+	
+	virtual RESULT SetDirty() override;
+	RESULT SetDirty(long frameID);
 
 private:
 	std::vector<DConnection*>* GetConnectionSet(CONNECTION_TYPE type);

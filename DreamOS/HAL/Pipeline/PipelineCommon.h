@@ -35,6 +35,12 @@ operator|(PIPELINE_FLAGS __x, PIPELINE_FLAGS __y) {
 		(static_cast<int>(__x) | static_cast<int>(__y));
 }
 
+inline constexpr PIPELINE_FLAGS
+operator~(PIPELINE_FLAGS __x) {
+	return static_cast<PIPELINE_FLAGS>
+		(~(static_cast<int>(__x)));
+}
+
 class DNode;
 class DConnection;
 

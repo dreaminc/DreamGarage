@@ -136,6 +136,24 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 #define CR(res) do{r=(res);if(r&0x80000000){DOSLogError("CR", r); goto Error;}}while(0);
 #define CRM(res, msg, ...) do{r= (res);if(r&0x80000000){DOSLogErrorMessage("CRM", res, msg, ##__VA_ARGS__); DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("Error: 0x%x\n",r);goto Error;}}while(0);
 
+// CP - Critical Path
+// This will resolve to the internal value in release
+#ifdef _DEBUG
+	#define CRCP(res) CR(res)
+	#define CRMCP(res, msg, ...) CRM(res, msg, ##__VA_ARGS__)
+	#define CBCP(condition) CB(condition)
+	#define CBMCP(condition, msg, ...) CBM(condition, msg, ##__VA_ARGS__)
+	#define CBCPS(condition) CB(condition)
+	#define CBMCPS(condition, msg, ...) CBM(condition, msg, ##__VA_ARGS__)
+#else
+	#define CRCP(res) res
+	#define CRMCP(res, msg, ...) res
+	#define CBCP(condition) condition
+	#define CBMCP(condition, msg, ...) condition
+	#define CBCPS(condition) 
+	#define CBMCPS(condition, msg, ...) 
+#endif
+
 // Check result no assign (this allows for mapping with non RESULT error types without having to cast
 #define CRNA(res) do{if(res&0x80000000){DOSLogError("CRNA", r); r=R_FAIL;goto Error;}}while(0);
 #define CRNAM(res, msg, ...) do{if(res&0x80000000){DOSLogErrorMessage("CRNAM", res, msg, ##__VA_ARGS__); DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("Error: 0x%x\n", res);r=R_FAIL;goto Error;}}while(0);

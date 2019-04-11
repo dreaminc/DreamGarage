@@ -28,6 +28,7 @@ public:
 
 	RESULT AddTestEmptyPipeline();
 	RESULT AddTestDynamicPipe();
+	RESULT AddTestDirtyNode();
 
 	// TODO: 
 	// Flags (no render)
