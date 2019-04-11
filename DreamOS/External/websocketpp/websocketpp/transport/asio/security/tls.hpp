@@ -196,6 +196,10 @@ protected:
         m_socket = lib::make_shared<socket_type>(
             _WEBSOCKETPP_REF(*service),lib::ref(*m_context));
 
+        if (m_socket_init_handler) {
+            m_socket_init_handler(m_hdl, get_socket());
+        }
+
         m_io_service = service;
         m_strand = strand;
         m_is_server = is_server;
@@ -232,24 +236,21 @@ protected:
         // TODO: is this the best way to check whether this function is 
         //       available in the version of OpenSSL being used?
         // TODO: consider case where host is an IP address
-// Dream custom code - SSL_set_tlsext_host_name crash on OpenSSL version 1.0.2-stable
-#if 0
 #if OPENSSL_VERSION_NUMBER >= 0x90812f
         if (!m_is_server) {
             // For clients on systems with a suitable OpenSSL version, set the
             // TLS SNI hostname header so connecting to TLS servers using SNI
             // will work.
-            long res = SSL_set_tlsext_host_name(
-                get_socket().native_handle(), m_uri->get_host().c_str());
-            if (!(1 == res)) {
-                callback(socket::make_error_code(socket::error::tls_failed_sni_hostname));
-            }
+
+			// IDANSEZ: this is blowing up for some reason, I think maybe because of
+			// OpenSSL (null is in there), but I've updated OpenSSL and there's still an issue
+            //long res = SSL_set_tlsext_host_name(
+            //    get_socket().native_handle(), m_uri->get_host().c_str());
+            //if (!(1 == res)) {
+            //    callback(socket::make_error_code(socket::error::tls_failed_sni_hostname));
+            //}
         }
 #endif
-#endif
-        if (m_socket_init_handler) {
-            m_socket_init_handler(m_hdl,get_socket());
-        }
 
         callback(lib::error_code());
     }
@@ -335,6 +336,7 @@ protected:
         }
     }
 
+public:
     /// Translate any security policy specific information about an error code
     /**
      * Translate_ec takes an Asio error code and attempts to convert its value
@@ -355,33 +357,23 @@ protected:
      * @return The translated error code
      */
     template <typename ErrorCodeType>
+    static
     lib::error_code translate_ec(ErrorCodeType ec) {
         if (ec.category() == lib::asio::error::get_ssl_category()) {
-            if (ERR_GET_REASON(ec.value()) == SSL_R_SHORT_READ) {
-                return make_error_code(transport::error::tls_short_read);
-            } else {
-                // We know it is a TLS related error, but otherwise don't know
-                // more. Pass through as TLS generic.
-                return make_error_code(transport::error::tls_error);
-            }
+            // We know it is a TLS related error, but otherwise don't know more.
+            // Pass through as TLS generic.
+            return make_error_code(transport::error::tls_error);
         } else {
             // We don't know any more information about this error so pass
             // through
             return make_error_code(transport::error::pass_through);
         }
     }
-    
+
+    static
     /// Overload of translate_ec to catch cases where lib::error_code is the
     /// same type as lib::asio::error_code
     lib::error_code translate_ec(lib::error_code ec) {
-        // Normalize the tls_short_read error as it is used by the library and 
-        // needs a consistent value. All other errors pass through natively.
-        // TODO: how to get the SSL category from std::error?
-        /*if (ec.category() == lib::asio::error::get_ssl_category()) {
-            if (ERR_GET_REASON(ec.value()) == SSL_R_SHORT_READ) {
-                return make_error_code(transport::error::tls_short_read);
-            }
-        }*/
         return ec;
     }
 private:

@@ -52,6 +52,7 @@ public:
 
 	// Websocket Side callbacks
 	typedef std::function<void(WebsocketClient*, websocketpp::connection_hdl, message_ptr)> OnWebsocketMessageCallback;
+	typedef std::function<void(websocketpp::connection_hdl)> OnWebsocketInitCallback;
 	typedef std::function<void(websocketpp::connection_hdl)> OnWebsocketConnectionOpenCallback;
 	typedef std::function<void(websocketpp::connection_hdl)> OnWebsocketConnectionCloseCallback;
 	typedef std::function<void(websocketpp::connection_hdl)> OnWebsocketConnectionFailCallback;
@@ -61,6 +62,7 @@ public:
 	typedef std::function<void(void)> HandleWebsocketConnectionOpenCallback;
 	typedef std::function<void(void)> HandleWebsocketConnectionCloseCallback;
 	typedef std::function<void(void)> HandleWebsocketConnectionFailCallback;
+	typedef std::function<void(void)> HandleWebsocketInitlCallback;
 
 	Websocket(const std::string& strURI, const HandleWebsocketMessageCallback& fnHandleWebsocketMessageCallback,
 			  const HandleWebsocketConnectionOpenCallback&	fnHandleWebsocketConnectionOpenCallback,
@@ -68,8 +70,9 @@ public:
 			  const HandleWebsocketConnectionFailCallback&	fnHandleWebsocketConnectionFailCallback);
 
 	Websocket(const std::string& strURI);
-	~Websocket();
+	~Websocket() = default;
 
+	RESULT Initialize();
 	RESULT Send(const std::string& strMessage);
 	RESULT Start();
 	RESULT Stop();
@@ -85,28 +88,32 @@ public:
 	}
 
 private:
-	websocketpp::lib::shared_ptr<websocketpp::lib::thread> m_pWebsockThread;
+	websocketpp::lib::shared_ptr<websocketpp::lib::thread> m_pWebsocketThread;
 	void OnMessage(WebsocketClient* pWebsicketClient, websocketpp::connection_hdl hWebsocketConnection, message_ptr pWebsocketMessage);
 
 	void OnOpen(websocketpp::connection_hdl hWebsocketConnection);
 	void OnClose(websocketpp::connection_hdl hWebsocketConnection);
 	void OnFail(websocketpp::connection_hdl hWebsocketConnection);
+	void OnInit(websocketpp::connection_hdl hWebsocketConnection);
 
 private:
-	//std::thread	m_thread;
-	bool m_fRunning;
-	bool m_fConnectionOpen;
+	bool m_fRunning = false;
+	bool m_fConnectionOpen = false;
 
 	const std::string m_strURI;
-	OnWebsocketMessageCallback			m_fnOnWebsocketMessageCallback;
-	OnWebsocketConnectionOpenCallback	m_fnOnWebsocketConnectionOpenCallback;
-	OnWebsocketConnectionFailCallback	m_fnOnWebsocketConnectionFailCallback;
-	OnWebsocketConnectionCloseCallback	m_fnOnWebsocketConnectionCloseCallback;
 
-	HandleWebsocketMessageCallback			m_fnHandleWebsocketMessageCallback;
-	HandleWebsocketConnectionOpenCallback	m_fnHandleWebsocketConnectionOpenCallback;
-	HandleWebsocketConnectionFailCallback	m_fnHandleWebsocketConnectionFailCallback;
-	HandleWebsocketConnectionCloseCallback	m_fnHandleWebsocketConnectionCloseCallback;
+	OnWebsocketMessageCallback			m_fnOnWebsocketMessageCallback = nullptr;
+	
+	OnWebsocketConnectionOpenCallback	m_fnOnWebsocketConnectionOpenCallback = nullptr;
+	OnWebsocketConnectionFailCallback	m_fnOnWebsocketConnectionFailCallback = nullptr;
+	OnWebsocketConnectionCloseCallback	m_fnOnWebsocketConnectionCloseCallback = nullptr;
+	OnWebsocketInitCallback				m_fnOnWebsocketInitCallback = nullptr;
+
+	HandleWebsocketMessageCallback			m_fnHandleWebsocketMessageCallback = nullptr;
+	HandleWebsocketConnectionOpenCallback	m_fnHandleWebsocketConnectionOpenCallback = nullptr;
+	HandleWebsocketConnectionFailCallback	m_fnHandleWebsocketConnectionFailCallback = nullptr;
+	HandleWebsocketConnectionCloseCallback	m_fnHandleWebsocketConnectionCloseCallback = nullptr;
+	HandleWebsocketConnectionCloseCallback	m_fnHandleWebsocketInitCallback = nullptr;
 
 	WebsocketClient::connection_ptr m_pWebsocketConnection;
 	WebsocketClient m_websocketClient;
