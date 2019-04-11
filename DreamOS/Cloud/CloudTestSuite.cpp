@@ -125,7 +125,11 @@ Error:
 RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 1000.0f;
+	TestObject::TestDescriptor testDescriptor;
+
+	testDescriptor.strTestName = "switchenvsockets";
+	testDescriptor.strTestDescription = "Test switching between environment sockets";
+	testDescriptor.sDuration = 1000.0f;
 
 	// non-asynchronous methods could be set up for tests that login immediately like this
 	struct TestContext :
@@ -138,7 +142,7 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 		int testUserNum = 0;
 
 		int environmentIDs[2] = { 168, 170 };
-		int environmentIDs_n = 2;
+		int environmentIDs_n = sizeof(environmentIDs) / sizeof(environmentIDs[0]);
 		int curEnvID = 0;
 
 		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override {
@@ -273,10 +277,12 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 			return R_NOT_HANDLED;
 		}
 
-	} *pTestContext = new TestContext();
+	};
+
+	testDescriptor.pContext = (void*)(new TestContext());
 
 	// Initialize the test
-	auto fnInitialize = [&](void *pContext) {
+	testDescriptor.fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		std::string strTestValue;
@@ -332,14 +338,13 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 	};
 
 	// Update Code 
-	auto fnUpdate = [&](void *pContext) {
+	testDescriptor.fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		{
-
 			CloudController *pCloudController = pTestContext->pCloudController;
 			CN(pCloudController);
 
@@ -382,7 +387,7 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 	};
 
 	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
+	testDescriptor.fnTest = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		// Cloud Controller
@@ -397,16 +402,13 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 	};
 
 	// Reset Code 
-	auto fnReset = [&](void *pContext) {
+	testDescriptor.fnReset = [&](void *pContext) {
 		return R_PASS;
 	};
 
 	// Add the test
-	auto pNewTest = AddTest("switchenvsockets", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest(testDescriptor);
 	CN(pNewTest);
-
-	pNewTest->SetTestDescription("Test switching between environment sockets");
-	pNewTest->SetTestDuration(sTestTime);
 
 Error:
 	return r;
