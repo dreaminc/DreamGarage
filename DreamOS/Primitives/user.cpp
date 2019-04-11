@@ -157,7 +157,7 @@ RESULT user::OnModelReady(DimObj *pDimObj, void *pContext) {
 	CN(pObj);
 
 	m_pHeadModel = std::shared_ptr<model>(pObj);
-	m_pHead->AddObject(m_pHeadModel);
+	CR(m_pHead->AddObject(m_pHeadModel));
 	m_pHead->SetVisible(true);
 
 	// TODO: broken with async load, not sure why it was important
