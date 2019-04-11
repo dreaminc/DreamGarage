@@ -263,10 +263,12 @@ RESULT DNode::RenderNode(long frameID) {
 
 	// First Render input nodes
 	for (auto &pInputConnection : m_inputs) {
-		pInputConnection->RenderConnections(frameID);
+		if (pInputConnection->IsActive()) {
+			pInputConnection->RenderConnections(frameID);
 
-		if (m_fTerminate == true) {
-			return r;
+			if (m_fTerminate == true) {
+				return r;
+			}
 		}
 	}
 
