@@ -160,8 +160,6 @@ RESULT user::OnModelReady(DimObj *pDimObj, void *pContext) {
 	m_pHead->SetVisible(true);
 
 
-	m_pHeadModel->SetMaterialShininess(4.0f, true);
-
 	m_pHeadModel->SetScale(m_headScale);
 	m_pHeadModel->SetOrientationOffset(vHeadOffset);
 
@@ -665,6 +663,7 @@ RESULT user::Update() {
 
 		color modelColor = m_pHeadModel->GetChildMesh(0)->GetDiffuseColor();
 		m_pHeadModel->SetMaterialSpecularColor(modelColor, true);
+		m_pHeadModel->SetMaterialShininess(4.0f, true);
 
 		m_fLoadingModel = false;
 	}
