@@ -32,6 +32,10 @@ public:
 	bool IsPointingLeft();
 
 public:
+	RESULT Show();
+	RESULT Hide();
+
+public:
 	RESULT CreateHapticImpulse(bool fLeft, bool fIsOn);
 
 private:
