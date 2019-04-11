@@ -126,7 +126,7 @@ RESULT OGLProgramBlinnPhong::SetupConnections() {
 
 	// Inputs
 	CR(MakeInput<stereocamera>("camera", &m_pCamera));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs

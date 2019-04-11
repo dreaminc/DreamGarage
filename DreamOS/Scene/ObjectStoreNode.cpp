@@ -20,7 +20,7 @@ RESULT ObjectStoreNode::SetupConnections() {
 	// No inputs
 
 	// Outputs
-	CR(MakeOutput<ObjectStore>("objectstore", this));
+	CR(MakeOutput<ObjectStore>("objectstore", this, PIPELINE_FLAGS::PASSIVE));
 
 Error:
 	return r;

@@ -19,6 +19,8 @@ template <class objType> class DConnectionTyped;
 class DConnection : public DObject {
 	template <class objType> friend class DConnectionTyped;
 
+	friend class DNode;
+
 protected:
 	DConnection(DNode* pParentNode, CONNECTION_TYPE connType, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 	DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
@@ -47,6 +49,7 @@ public:
 
 	RESULT RenderConnections(long frameID = 0);
 	RESULT RenderParent(long frameID = 0);
+	RESULT SetConnectionsDirty(long frameID = 0);
 
 	virtual RESULT LinkInputToOutputObjects(DConnection* pInputConnection, DConnection* pOutputConnection) = 0;
 

@@ -52,7 +52,8 @@ RESULT DConnection::Disconnect(DConnection* pRemoteConnection) {
 		ConnectionTypeString(pRemoteConnection->m_connType).c_str(), pRemoteConnection->m_pParentNode->GetName().c_str(), pRemoteConnection->GetName().c_str());
 
 	if (pRemoteConnection->m_pParentNode != nullptr) {
-		CR(pRemoteConnection->m_pParentNode->Disconnect());
+		//CR(pRemoteConnection->m_pParentNode->Disconnect());
+		CR(pRemoteConnection->Disconnect());
 	}
 
 Error:
@@ -183,4 +184,16 @@ RESULT DConnection::RenderConnections(long frameID) {
 
 RESULT DConnection::RenderParent(long frameID) {
 	return m_pParentNode->RenderNode(frameID);
+}
+
+RESULT DConnection::SetConnectionsDirty(long frameID) {
+	for (auto &pConnection : m_connections) {
+		if (pConnection->IsActive()) {
+			if (pConnection->m_pParentNode->IsDirtyFlagSet() && pConnection->m_pParentNode->IsDirty() == false) {
+				pConnection->m_pParentNode->SetDirty(frameID);
+			}
+		}
+	}
+
+	return R_PASS;
 }

@@ -151,8 +151,8 @@ RESULT OGLProgramStandard::SetupConnections() {
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer_environment_cubemap", &m_pOGLInputFramebufferEnvironmentCubemap, PIPELINE_FLAGS::PASSIVE));
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer_irradiance_cubemap", &m_pOGLInputFramebufferIrradianceCubemap, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_environment_cubemap", &m_pOGLInputFramebufferEnvironmentCubemap));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_irradiance_cubemap", &m_pOGLInputFramebufferIrradianceCubemap));
 
 	// Reflection Map
 	//CR(MakeInput<OGLFramebuffer>("input_reflection_map", &m_pOGLReflectionFramebuffer));
@@ -177,6 +177,17 @@ RESULT OGLProgramStandard::SetCubemap(cubemap *pCubemap) {
 
 	return R_PASS;
 }
+
+#ifdef _DEBUG
+RESULT OGLProgramStandard::PreProcessNode(long frameID) {
+	RESULT r = R_PASS;
+
+	CR(r);
+
+Error:
+	return r;
+}
+#endif
 
 RESULT OGLProgramStandard::ProcessNode(long frameID) {
 	RESULT r = R_PASS;

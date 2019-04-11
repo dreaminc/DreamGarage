@@ -15,8 +15,8 @@ public:
 	SourceNode(std::string strName);
 	~SourceNode();
 
-	virtual RESULT SetupConnections() = 0;
-	virtual RESULT ProcessNode(long frameID = 0) = 0;
+	//virtual RESULT SetupConnections() = 0;
+	//virtual RESULT ProcessNode(long frameID = 0) = 0;
 
 private:
 	// empty

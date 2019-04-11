@@ -26,6 +26,10 @@ public:
 	virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID) override;
 
+#ifdef _DEBUG
+	virtual RESULT PreProcessNode(long frameID) override;
+#endif
+
 	virtual RESULT SetIsAugmented(bool fAugmented) override;
 
 	RESULT SetObjectTextures(OGLObj *pOGLObj);

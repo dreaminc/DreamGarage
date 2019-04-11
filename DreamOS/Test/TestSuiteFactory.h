@@ -25,6 +25,7 @@ public:
 		SOUND,
 		SANDBOX,
 		DIMENSION,
+		PIPELINE,
 		INVALID
 	} ;
 

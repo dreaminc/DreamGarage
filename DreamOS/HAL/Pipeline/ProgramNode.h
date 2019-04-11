@@ -16,8 +16,8 @@ public:
 	ProgramNode(std::string strName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 	virtual ~ProgramNode();
 
-	virtual RESULT SetupConnections() = 0;
-	virtual RESULT ProcessNode(long frameID = 0) = 0;
+	//virtual RESULT SetupConnections() = 0;
+	//virtual RESULT ProcessNode(long frameID = 0) = 0;
 };
 
 #endif	// PROGRAM_NODE_H_

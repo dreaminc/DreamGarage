@@ -3,26 +3,18 @@
 #include "DConnection.h"
 
 DNode::DNode(PIPELINE_FLAGS optFlags) :
-	m_flags(optFlags)
+	m_flags(optFlags),
+	dirty(false)
 {
-	// empty
+	// 
 }
 
 DNode::DNode(std::string strName, PIPELINE_FLAGS optFlags) :
 	m_strName(strName),
-	m_flags(optFlags)
+	m_flags(optFlags),
+	dirty(false)
 {
-	// empty
-}
-
-DNode::~DNode() {
-	RESULT r = R_PASS;
-
-	CR(r);
-	// TODO: 
-
-Error:
-	return;
+	// 
 }
 
 RESULT DNode::ClearInputConnections() {
@@ -50,6 +42,42 @@ bool DNode::IsPassthru() {
 		return true;
 	else
 		return false;
+}
+
+bool DNode::IsDirtyFlagSet() {
+	if (static_cast<int>(m_flags & PIPELINE_FLAGS::DIRTY) != 0)
+		return true;
+	else
+		return false;
+}
+
+RESULT DNode::SetDirtyFlagEnabled(bool fDirtyEnabled) {
+	if(fDirtyEnabled)
+		m_flags = m_flags | PIPELINE_FLAGS::DIRTY;
+	else
+		m_flags = m_flags & ~(PIPELINE_FLAGS::DIRTY);
+
+	return R_PASS;
+}
+
+RESULT DNode::SetDirty() {
+	return SetDirty(0);
+}
+
+RESULT DNode::SetDirty(long frameID) {
+	RESULT r = R_PASS;
+	
+	CBMCPS(IsDirtyFlagSet(), "Can't set dirty to non-dirty node");
+	
+	dirty::SetDirty();
+
+	// All dependent nodes need to be set to dirty
+	for (auto &pOutputConnection : m_outputs) {
+		pOutputConnection->SetConnectionsDirty(frameID);
+	}
+
+Error:
+	return r;
 }
 
 /*
@@ -255,7 +283,7 @@ RESULT DNode::RenderNode(long frameID) {
 	// This allows a node to process stuff before it's connections
 	// This is used often in recursive type nodes
 	// TODO: We might want to revisit this in the future
-	CR(PreProcessNode(frameID));
+	CRCP(PreProcessNode(frameID));
 
 	if (m_fTerminate == true) {
 		return r;
@@ -263,15 +291,24 @@ RESULT DNode::RenderNode(long frameID) {
 
 	// First Render input nodes
 	for (auto &pInputConnection : m_inputs) {
-		pInputConnection->RenderConnections(frameID);
+		if (pInputConnection->IsActive()) {
+			pInputConnection->RenderConnections(frameID);
 
-		if (m_fTerminate == true) {
-			return r;
+			if (m_fTerminate == true) {
+				return r;
+			}
 		}
 	}
 
 	// Pass processing over to extended node
-	CR(ProcessNode(frameID));
+	if (IsDirtyFlagSet()) {
+		if (CheckAndCleanDirty()) {
+			CRCP(ProcessNode(frameID));
+		}
+	}
+	else {
+		CRCP(ProcessNode(frameID));
+	}
 
 Error:
 	return r;
