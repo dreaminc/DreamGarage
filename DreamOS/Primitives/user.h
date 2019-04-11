@@ -176,6 +176,8 @@ private:
 	int m_numMouthStates = 4;
 	float m_headScale = HEAD_SCALE;
 	int m_currentMouthPose = 0;
+
+	bool m_fLoadingModel = false;
 };
 
 #endif	// ! PRIMITIVE_USER_H_

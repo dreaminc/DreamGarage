@@ -432,8 +432,8 @@ RESULT DreamShareView::ShowPointers() {
 	RESULT r = R_PASS;
 
 	for (auto it = m_pointingObjects.begin(); it != m_pointingObjects.end(); it++) {
-		it->second[0]->SetVisible(true, false);
-		it->second[1]->SetVisible(true, false);
+		it->second[0]->Show();
+		it->second[1]->Show();
 	}
 
 Error:
@@ -444,8 +444,8 @@ RESULT DreamShareView::HidePointers() {
 	RESULT r = R_PASS;
 
 	for (auto it = m_pointingObjects.begin(); it != m_pointingObjects.end(); it++) {
-		it->second[0]->SetVisible(false, false);
-		it->second[1]->SetVisible(false, false);
+		it->second[0]->Hide();
+		it->second[1]->Hide();
 	}
 
 Error:
@@ -839,6 +839,9 @@ RESULT DreamShareView::AllocateSpheres(long userID) {
 	userPointers.push_back(m_pointerViewPool.front());
 	m_pointerViewPool.pop();
 
+	userPointers[0]->Show();
+	userPointers[1]->Show();
+
 	m_pointingObjects[userID] = userPointers;
 
 Error:
@@ -854,6 +857,8 @@ RESULT DreamShareView::DeallocateSpheres(long userID) {
 	CBR(m_pointingObjects.count(userID) != 0, R_SKIPPED);
 
 	userPointers = m_pointingObjects[userID];
+	userPointers[0]->Hide();
+	userPointers[1]->Hide();
 
 	m_pointerViewPool.push(userPointers[0]);
 	m_pointerViewPool.push(userPointers[1]);

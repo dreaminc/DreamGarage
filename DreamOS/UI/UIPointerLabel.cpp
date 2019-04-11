@@ -414,6 +414,26 @@ bool UIPointerLabel::IsPointingLeft() {
 	return m_fPointingLeft;
 }
 
+RESULT UIPointerLabel::Show() {
+	RESULT r = R_PASS;
+
+	SetVisible(true, false);
+
+Error:
+	return r;
+}
+
+RESULT UIPointerLabel::Hide() {
+	RESULT r = R_PASS;
+
+	SetVisible(false, false);
+	m_pDotComposite->SetVisible(false, false);
+	m_fIsOn = false;
+
+Error:
+	return r;
+}
+
 RESULT UIPointerLabel::CreateHapticImpulse(bool fLeft, bool fIsOn) {
 	RESULT r = R_PASS;
 

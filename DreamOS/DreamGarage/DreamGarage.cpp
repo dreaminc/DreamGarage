@@ -1739,7 +1739,9 @@ RESULT DreamGarage::OnSwitchTeams() {
 
 	CN(m_pDreamEnvironmentApp);
 	CR(m_pDreamEnvironmentApp->FadeOut(fnOnFadeOutCallback));
+
 	CR(m_pDreamShareView->HidePointers());
+	CR(m_pDreamShareView->StopReceiving());
 
 	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
