@@ -228,8 +228,11 @@ RESULT HALTestSuite::AddTestRemoveObjects() {
 
 		SetupPipeline();
 		Initialize();
-		m_pDreamOS->AddQuad(1.0f, 1.0f)->RotateXByDeg(90.0f);
-	//Error:
+
+		auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f)->RotateXByDeg(90.0f);
+		CN(pQuad);
+
+	Error:
 		return r;
 	};
 	

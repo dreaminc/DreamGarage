@@ -27,6 +27,11 @@ public:
 	// Tests
 
 	RESULT AddTestEmptyPipeline();
+	RESULT AddTestDynamicPipe();
+
+	// TODO: 
+	// Flags (no render)
+	
 };
 
 #endif // ! PIPELINE_TEST_SUITE_H_

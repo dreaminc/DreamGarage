@@ -17,7 +17,9 @@ enum class CONNECTION_TYPE {
 enum class PIPELINE_FLAGS : int {
 	NONE			= 0,
 	PASSIVE			= 1 << 0,
-	PASSTHRU		= 1 << 1
+	PASSTHRU		= 1 << 1,
+	ONESHOT			= 1 << 2,
+	DIRTY			= 1 << 3
 };
 
 // taken from: http://stackoverflow.com/questions/12059774/c11-standard-conformant-bitmasks-using-enum-class
