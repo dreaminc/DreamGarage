@@ -353,7 +353,7 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 			static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
 
 			std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
-			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 5000) {
+			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 1500) {
 
 				lastUpdateTime = timeNow;
 
@@ -373,7 +373,7 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 					pUserController->SetUserDefaultEnvironmentID(envID);
 
 					// First off disconnect 
-					DEBUG_LINEOUT("Disconnecting from environment socket");
+					//DEBUG_LINEOUT("Disconnecting from environment socket");
 					CR(pEnvironmentController->DisconnectFromEnvironmentSocket());
 
 					//// Reconnect 

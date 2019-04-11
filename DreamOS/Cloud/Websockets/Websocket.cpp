@@ -1,6 +1,6 @@
 #include "Websocket.h"
 
-#include "DreamLogger/DreamLogger.h"
+//#include "DreamLogger/DreamLogger.h"
 
 Websocket::Websocket(const std::string& strURI, const HandleWebsocketMessageCallback& fnHandleWebsocketMessageCallback,
 					 const HandleWebsocketConnectionOpenCallback&	fnHandleWebsocketConnectionOpenCallback,
@@ -103,7 +103,7 @@ RESULT Websocket::Initialize() {
 		try {
 			ctx->set_options(asio::ssl::context::default_workarounds |
 				asio::ssl::context::no_sslv2 |
-				asio::ssl::context::no_sslv3 |
+				asio::ssl::context::no_sslv3 | 
 				asio::ssl::context::single_dh_use);
 
 			// Client verification for a server trust is not yet supported
@@ -115,7 +115,7 @@ RESULT Websocket::Initialize() {
 		catch (std::exception& e) {
 			(void) e;
 
-			DOSLOG(INFO, "set_tls_init_handler exception %v", e.what());
+			//DOSLOG(INFO, "set_tls_init_handler exception %v", e.what());
 			DEBUG_LINEOUT("%s", e.what());
 		}
 		return ctx;

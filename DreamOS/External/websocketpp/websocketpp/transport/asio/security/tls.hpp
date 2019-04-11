@@ -241,11 +241,14 @@ protected:
             // For clients on systems with a suitable OpenSSL version, set the
             // TLS SNI hostname header so connecting to TLS servers using SNI
             // will work.
-            long res = SSL_set_tlsext_host_name(
-                get_socket().native_handle(), m_uri->get_host().c_str());
-            if (!(1 == res)) {
-                callback(socket::make_error_code(socket::error::tls_failed_sni_hostname));
-            }
+
+			// IDANSEZ: this is blowing up for some reason, I think maybe because of
+			// OpenSSL (null is in there), but I've updated OpenSSL and there's still an issue
+            //long res = SSL_set_tlsext_host_name(
+            //    get_socket().native_handle(), m_uri->get_host().c_str());
+            //if (!(1 == res)) {
+            //    callback(socket::make_error_code(socket::error::tls_failed_sni_hostname));
+            //}
         }
 #endif
 
