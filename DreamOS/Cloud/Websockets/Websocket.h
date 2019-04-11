@@ -68,7 +68,7 @@ public:
 			  const HandleWebsocketConnectionFailCallback&	fnHandleWebsocketConnectionFailCallback);
 
 	Websocket(const std::string& strURI);
-	~Websocket();
+	~Websocket() = default;
 
 	RESULT Send(const std::string& strMessage);
 	RESULT Start();
@@ -85,7 +85,7 @@ public:
 	}
 
 private:
-	websocketpp::lib::shared_ptr<websocketpp::lib::thread> m_pWebsockThread;
+	websocketpp::lib::shared_ptr<websocketpp::lib::thread> m_pWebsocketThread;
 	void OnMessage(WebsocketClient* pWebsicketClient, websocketpp::connection_hdl hWebsocketConnection, message_ptr pWebsocketMessage);
 
 	void OnOpen(websocketpp::connection_hdl hWebsocketConnection);
@@ -93,11 +93,11 @@ private:
 	void OnFail(websocketpp::connection_hdl hWebsocketConnection);
 
 private:
-	//std::thread	m_thread;
-	bool m_fRunning;
-	bool m_fConnectionOpen;
+	bool m_fRunning = false;
+	bool m_fConnectionOpen = false;
 
 	const std::string m_strURI;
+
 	OnWebsocketMessageCallback			m_fnOnWebsocketMessageCallback;
 	OnWebsocketConnectionOpenCallback	m_fnOnWebsocketConnectionOpenCallback;
 	OnWebsocketConnectionFailCallback	m_fnOnWebsocketConnectionFailCallback;
