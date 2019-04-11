@@ -120,22 +120,16 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 	RESULT r = R_PASS;
 
 	color modelColor;
-	vector vHeadOffset = vector(0.0f, (float)(M_PI), 0.0f);
 
 #ifndef _DEBUG
-	if (m_pHead != nullptr) {
-		m_pHead = nullptr;
+	if (m_pHeadModel != nullptr) {
+		m_pHead->RemoveChild(m_pHeadModel);
+		m_pHeadModel = nullptr;
 	}
 
 	m_avatarModelId = avatarModelID;
 	CR(LoadHeadModelFromID());
 
-	m_pHead->SetScale(m_headScale);
-	m_pHead->SetOrientationOffset(vHeadOffset);
-
-	modelColor = m_pHead->GetChildMesh(0)->GetDiffuseColor();
-	m_pHead->SetMaterialSpecularColor(modelColor, true);
-	m_pHead->SetMaterialShininess(4.0f, true);
 
 	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[0].get());
 	m_pDreamOS->AddObjectToUIGraph(m_pMouthComposite.get(), SandboxApp::PipelineType::MAIN);
@@ -153,6 +147,32 @@ Error:
 	return r;
 }
 
+RESULT user::OnModelReady(DimObj *pDimObj, void *pContext) {
+	RESULT r = R_PASS;
+
+	color modelColor;
+	vector vHeadOffset = vector(0.0f, (float)(M_PI), 0.0f);
+
+	model *pObj = dynamic_cast<model*>(pDimObj);
+	CN(pObj);
+
+	m_pHeadModel = std::shared_ptr<model>(pObj);
+	CR(m_pHead->AddObject(m_pHeadModel));
+	m_pHead->SetVisible(true);
+
+	// TODO: broken with async load, not sure why it was important
+	//modelColor = m_pHeadModel->GetChildMesh(0)->GetDiffuseColor();
+	//m_pHeadModel->SetMaterialSpecularColor(modelColor, true);
+
+	m_pHeadModel->SetMaterialShininess(4.0f, true);
+
+	m_pHeadModel->SetScale(m_headScale);
+	m_pHeadModel->SetOrientationOffset(vHeadOffset);
+
+Error:
+	return r;
+}
+
 RESULT user::LoadHeadModelFromID() {
 	RESULT r = R_PASS;
 
@@ -161,11 +181,16 @@ RESULT user::LoadHeadModelFromID() {
 	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
 
 	//std::wstring wstrHeadModel = k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + k_wstrAvatarFileType;
-	std::wstring wstrHeadModel = wstrAssetPath + k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + L"/head.fbx";
+	std::wstring wstrHeadModel = L"dreamos:/Assets" + k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + L"/head.fbx";
 	std::wstring wstrMouthModel = wstrAssetPath + k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + L"/mouth.fbx";
 
-	m_pHead = AddModel(wstrHeadModel);
+	m_pHead = AddComposite();
 	CN(m_pHead);
+	m_pHead->InitializeOBB();
+
+	//m_pHeadModel = AddModel(wstrHeadModel);
+	//CN(m_pHeadModel)
+	CR(m_pDreamOS->MakeModel(std::bind(&user::OnModelReady, this, std::placeholders::_1, std::placeholders::_2), this, wstrHeadModel));
 
 	m_pMouth = m_pMouthComposite->AddModel(wstrMouthModel);
 	CN(m_pMouth);

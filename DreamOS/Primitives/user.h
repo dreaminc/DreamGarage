@@ -143,6 +143,7 @@ private:
 
 private:
 	RESULT LoadHeadModelFromID();
+	RESULT OnModelReady(DimObj *pDimObj, void *pContext);
 
 private:
 
@@ -151,7 +152,8 @@ private:
 
 private:
 	// Storage of models and textures for head
-	std::shared_ptr<model> m_pHead;
+	std::shared_ptr<composite> m_pHead = nullptr;;
+	std::shared_ptr<model> m_pHeadModel = nullptr; 
 	std::vector<std::shared_ptr<texture>>m_pHeadTextures;
 
 	std::shared_ptr<hand> m_pLeftHand;
