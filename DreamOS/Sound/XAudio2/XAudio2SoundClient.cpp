@@ -257,6 +257,7 @@ RESULT XAudio2SoundClient::LoopSoundFile(SoundFile *pSoundFile) {
 		xAudio2SoundBuffer.pAudioData = pByteAudioBuffer;				// Buffer containing audio data
 		xAudio2SoundBuffer.Flags = XAUDIO2_END_OF_STREAM;				// Tell the source voice not to expect any data after this buffer
 		xAudio2SoundBuffer.LoopCount = XAUDIO2_LOOP_INFINITE;			// Loop it
+		xAudio2SoundBuffer.pContext = pByteAudioBuffer;
 
 		CRM((RESULT)m_pXAudio2SourceVoiceStereoFloat32->SubmitSourceBuffer(&xAudio2SoundBuffer), "Failed to submit source buffer");
 	}
@@ -290,6 +291,7 @@ RESULT XAudio2SoundClient::PlaySoundFile(SoundFile *pSoundFile) {
 		xAudio2SoundBuffer.AudioBytes = (UINT32)pFloatAudioBuffer_n;  //size of the audio buffer in bytes
 		xAudio2SoundBuffer.pAudioData = pByteAudioBuffer;  //buffer containing audio data
 		xAudio2SoundBuffer.Flags = XAUDIO2_END_OF_STREAM; // tell the source voice not to expect any data after this buffer
+		xAudio2SoundBuffer.pContext = pByteAudioBuffer;
 
 		CRM((RESULT)m_pXAudio2SourceVoiceStereoFloat32->SubmitSourceBuffer(&xAudio2SoundBuffer), "Failed to submit source buffer");
 	}
@@ -320,7 +322,7 @@ RESULT XAudio2SoundClient::PushAudioPacket(const AudioPacket &pendingAudioPacket
 		xAudio2SoundBuffer.AudioBytes = (UINT32)pAudioBuffer_n;  //size of the audio buffer in bytes
 		xAudio2SoundBuffer.pAudioData = pByteAudioBuffer;  //buffer containing audio data
 		xAudio2SoundBuffer.Flags = XAUDIO2_END_OF_STREAM; // tell the source voice not to expect any data after this buffer
-		
+		xAudio2SoundBuffer.pContext = pByteAudioBuffer;
 	
 		//XAUDIO2_VOICE_STATE voiceState;
 		//m_pXAudio2SourceVoiceStereoSignedInt16->GetState(&voiceState, NULL);
@@ -371,6 +373,8 @@ RESULT XAudio2SoundClient::PlayAudioPacketSigned16Bit(const AudioPacket &pending
 														  //m_pXAudio2SourceVoiceStereoSignedInt16->GetState(&voiceState, NULL);
 
 														  //m_pXAudio2SourceVoiceStereoSignedInt16->FlushSourceBuffers();
+
+		xAudio2SoundBuffer.pContext = pByteAudioBuffer;
 
 		DEBUG_LINEOUT("%d frames", pendingAudioPacket.GetNumFrames());
 
