@@ -59,6 +59,12 @@ Error:
 	return r;
 }
 
+void XAudio2SoundClient::OnBufferEnd(void * pBufferContext) {
+	if (pBufferContext != nullptr) {
+		free(pBufferContext);
+		pBufferContext = nullptr;
+	}
+}
 
 // TODO:
 RESULT XAudio2SoundClient::Initialize() {
@@ -103,8 +109,18 @@ RESULT XAudio2SoundClient::Initialize() {
 	sourceFormat.nAvgBytesPerSec = sourceFormat.nBlockAlign * sourceFormat.nSamplesPerSec;
 	sourceFormat.cbSize = 0;
 
-	IXAudio2SourceVoice* pXAudio2SourceVoice;
-	CRM((RESULT)m_pXAudio2->CreateSourceVoice(&pXAudio2SourceVoice, (WAVEFORMATEX*)&sourceFormat), "Failed to create source voice");
+	IXAudio2SourceVoice* pXAudio2SourceVoice = nullptr;
+
+	CRM((RESULT)m_pXAudio2->CreateSourceVoice(
+		&pXAudio2SourceVoice, // target
+		(WAVEFORMATEX*)&sourceFormat,	// format
+		0,	// flags
+		XAUDIO2_DEFAULT_FREQ_RATIO, // max freq ratio
+		this,		// call back
+		nullptr,	// send list
+		nullptr	// fx chain
+	), "Failed to create source voice");
+
 	CNM(pXAudio2SourceVoice, "Failed to allocate source voice");
 	m_pXAudio2SourceVoiceStereoFloat32 = std::shared_ptr<IXAudio2SourceVoice>(pXAudio2SourceVoice);
 	//*/
@@ -122,7 +138,16 @@ RESULT XAudio2SoundClient::Initialize() {
 	sourceFormat.nAvgBytesPerSec = sourceFormat.nBlockAlign * sourceFormat.nSamplesPerSec;
 	sourceFormat.cbSize = 0;
 
-	CRM((RESULT)m_pXAudio2->CreateSourceVoice(&pXAudio2SourceVoice, (WAVEFORMATEX*)&sourceFormat), "Failed to create source voice");
+	CRM((RESULT)m_pXAudio2->CreateSourceVoice(
+		&pXAudio2SourceVoice, // target
+		(WAVEFORMATEX*)&sourceFormat,	// format
+		0,	// flags
+		XAUDIO2_DEFAULT_FREQ_RATIO, // max freq ratio
+		this,		// call back
+		nullptr,	// send list
+		nullptr	// fx chain
+	), "Failed to create source voice");
+
 	CNM(pXAudio2SourceVoice, "Failed to allocate source voice");
 	m_pXAudio2SourceVoiceStereoSignedInt16 = std::shared_ptr<IXAudio2SourceVoice>(pXAudio2SourceVoice);
 	//*/
@@ -141,7 +166,15 @@ RESULT XAudio2SoundClient::Initialize() {
 	sourceFormat.cbSize = 0;
 
 	for (int i = 0; i < m_numMonoChannels; i++) {
-		CRM((RESULT)m_pXAudio2->CreateSourceVoice(&pXAudio2SourceVoice, (WAVEFORMATEX*)&sourceFormat), "Failed to create source voice");
+		CRM((RESULT)m_pXAudio2->CreateSourceVoice(
+			&pXAudio2SourceVoice, // target
+			(WAVEFORMATEX*)&sourceFormat,	// format
+			0,	// flags
+			XAUDIO2_DEFAULT_FREQ_RATIO, // max freq ratio
+			this,		// call back
+			nullptr,	// send list
+			nullptr	// fx chain
+		), "Failed to create source voice");
 		CNM(pXAudio2SourceVoice, "Failed to allocate source voice");
 		m_xaudio2MonoSignedInt16Sources[i] = std::shared_ptr<IXAudio2SourceVoice>(pXAudio2SourceVoice);
 	}
@@ -157,8 +190,6 @@ RESULT XAudio2SoundClient::Initialize() {
 
 	CRM((RESULT)X3DAudioInitialize(dwChannelMask, X3DAUDIO_SPEED_OF_SOUND, m_pX3DInstance.get()),
 		"Failed to initialize XAudio 3D");
-
-
 
 Error:
 	return r;
@@ -226,6 +257,7 @@ RESULT XAudio2SoundClient::LoopSoundFile(SoundFile *pSoundFile) {
 		xAudio2SoundBuffer.pAudioData = pByteAudioBuffer;				// Buffer containing audio data
 		xAudio2SoundBuffer.Flags = XAUDIO2_END_OF_STREAM;				// Tell the source voice not to expect any data after this buffer
 		xAudio2SoundBuffer.LoopCount = XAUDIO2_LOOP_INFINITE;			// Loop it
+		xAudio2SoundBuffer.pContext = pByteAudioBuffer;
 
 		CRM((RESULT)m_pXAudio2SourceVoiceStereoFloat32->SubmitSourceBuffer(&xAudio2SoundBuffer), "Failed to submit source buffer");
 	}
@@ -259,6 +291,7 @@ RESULT XAudio2SoundClient::PlaySoundFile(SoundFile *pSoundFile) {
 		xAudio2SoundBuffer.AudioBytes = (UINT32)pFloatAudioBuffer_n;  //size of the audio buffer in bytes
 		xAudio2SoundBuffer.pAudioData = pByteAudioBuffer;  //buffer containing audio data
 		xAudio2SoundBuffer.Flags = XAUDIO2_END_OF_STREAM; // tell the source voice not to expect any data after this buffer
+		xAudio2SoundBuffer.pContext = pByteAudioBuffer;
 
 		CRM((RESULT)m_pXAudio2SourceVoiceStereoFloat32->SubmitSourceBuffer(&xAudio2SoundBuffer), "Failed to submit source buffer");
 	}
@@ -289,7 +322,7 @@ RESULT XAudio2SoundClient::PushAudioPacket(const AudioPacket &pendingAudioPacket
 		xAudio2SoundBuffer.AudioBytes = (UINT32)pAudioBuffer_n;  //size of the audio buffer in bytes
 		xAudio2SoundBuffer.pAudioData = pByteAudioBuffer;  //buffer containing audio data
 		xAudio2SoundBuffer.Flags = XAUDIO2_END_OF_STREAM; // tell the source voice not to expect any data after this buffer
-		
+		xAudio2SoundBuffer.pContext = pByteAudioBuffer;
 	
 		//XAUDIO2_VOICE_STATE voiceState;
 		//m_pXAudio2SourceVoiceStereoSignedInt16->GetState(&voiceState, NULL);
@@ -340,6 +373,8 @@ RESULT XAudio2SoundClient::PlayAudioPacketSigned16Bit(const AudioPacket &pending
 														  //m_pXAudio2SourceVoiceStereoSignedInt16->GetState(&voiceState, NULL);
 
 														  //m_pXAudio2SourceVoiceStereoSignedInt16->FlushSourceBuffers();
+
+		xAudio2SoundBuffer.pContext = pByteAudioBuffer;
 
 		DEBUG_LINEOUT("%d frames", pendingAudioPacket.GetNumFrames());
 

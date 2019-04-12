@@ -1017,6 +1017,8 @@ void WebRTCPeerConnection::OnMessage(const webrtc::DataBuffer& buffer) {
 		else {
 			DOSLOG(INFO, "WebRTCConductor::OnMessage (Binary Databuffer %d bytes)", (int)buffer.size());
 		}
+
+		delete[] pDataBuffer;
 	}
 	else {
 		int pszBufferString_n = (int)(buffer.size()) + 1;
@@ -1033,6 +1035,8 @@ void WebRTCPeerConnection::OnMessage(const webrtc::DataBuffer& buffer) {
 		else {
 			DOSLOG(INFO, "WebRTCConductor::OnMessage: %s (String Databuffer)", strData.c_str());
 		}
+
+		delete[] pszBufferString;
 	}
 Error:
 	return;

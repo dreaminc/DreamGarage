@@ -46,9 +46,6 @@ public:
 
 	// Record Sound
 	//TODO: RESULT AddTestRecordSound();
-
-private:
-	DreamOS *m_pDreamOS = nullptr;
 };
 
 #endif // ! SOUND_TEST_SUITE_H_
