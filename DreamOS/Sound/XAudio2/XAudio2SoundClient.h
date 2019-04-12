@@ -21,7 +21,10 @@
 class point;
 class vector;
 
-class XAudio2SoundClient : public SoundClient {
+class XAudio2SoundClient : 
+	public SoundClient,
+	public IXAudio2VoiceCallback
+{
 
 public:
 	XAudio2SoundClient(std::wstring *pwstrOptAudioOutputGUID = nullptr);
@@ -41,6 +44,15 @@ public:
 	virtual RESULT LoopSoundFile(SoundFile *pSoundFile) override;
 	virtual RESULT PushAudioPacket(const AudioPacket &pendingAudioPacket) override;
 	virtual RESULT PlayAudioPacketSigned16Bit(const AudioPacket &pendingAudioPacket, std::string strAudioTrackLabel, int channel) override;
+
+	// IXAudio2VoiceCallback
+	virtual void OnStreamEnd() override { }
+	virtual void OnVoiceProcessingPassEnd() override { }
+	virtual void OnVoiceProcessingPassStart(UINT32 SamplesRequired) override { }
+	virtual void OnBufferStart(void * pBufferContext) override { }
+	virtual void OnLoopEnd(void * pBufferContext) override { }
+	virtual void OnVoiceError(void * pBufferContext, HRESULT Error) override { }
+	virtual void OnBufferEnd(void * pBufferContext) override;
 
 private:
 	//RESULT InitializeRenderAudioClient();

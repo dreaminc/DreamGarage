@@ -59,6 +59,12 @@ Error:
 	return r;
 }
 
+void XAudio2SoundClient::OnBufferEnd(void * pBufferContext) {
+	if (pBufferContext != nullptr) {
+		free(pBufferContext);
+		pBufferContext = nullptr;
+	}
+}
 
 // TODO:
 RESULT XAudio2SoundClient::Initialize() {
@@ -103,8 +109,18 @@ RESULT XAudio2SoundClient::Initialize() {
 	sourceFormat.nAvgBytesPerSec = sourceFormat.nBlockAlign * sourceFormat.nSamplesPerSec;
 	sourceFormat.cbSize = 0;
 
-	IXAudio2SourceVoice* pXAudio2SourceVoice;
-	CRM((RESULT)m_pXAudio2->CreateSourceVoice(&pXAudio2SourceVoice, (WAVEFORMATEX*)&sourceFormat), "Failed to create source voice");
+	IXAudio2SourceVoice* pXAudio2SourceVoice = nullptr;
+
+	CRM((RESULT)m_pXAudio2->CreateSourceVoice(
+		&pXAudio2SourceVoice, // target
+		(WAVEFORMATEX*)&sourceFormat,	// format
+		0,	// flags
+		XAUDIO2_DEFAULT_FREQ_RATIO, // max freq ratio
+		this,		// call back
+		nullptr,	// send list
+		nullptr	// fx chain
+	), "Failed to create source voice");
+
 	CNM(pXAudio2SourceVoice, "Failed to allocate source voice");
 	m_pXAudio2SourceVoiceStereoFloat32 = std::shared_ptr<IXAudio2SourceVoice>(pXAudio2SourceVoice);
 	//*/
@@ -122,7 +138,16 @@ RESULT XAudio2SoundClient::Initialize() {
 	sourceFormat.nAvgBytesPerSec = sourceFormat.nBlockAlign * sourceFormat.nSamplesPerSec;
 	sourceFormat.cbSize = 0;
 
-	CRM((RESULT)m_pXAudio2->CreateSourceVoice(&pXAudio2SourceVoice, (WAVEFORMATEX*)&sourceFormat), "Failed to create source voice");
+	CRM((RESULT)m_pXAudio2->CreateSourceVoice(
+		&pXAudio2SourceVoice, // target
+		(WAVEFORMATEX*)&sourceFormat,	// format
+		0,	// flags
+		XAUDIO2_DEFAULT_FREQ_RATIO, // max freq ratio
+		this,		// call back
+		nullptr,	// send list
+		nullptr	// fx chain
+	), "Failed to create source voice");
+
 	CNM(pXAudio2SourceVoice, "Failed to allocate source voice");
 	m_pXAudio2SourceVoiceStereoSignedInt16 = std::shared_ptr<IXAudio2SourceVoice>(pXAudio2SourceVoice);
 	//*/
@@ -141,7 +166,15 @@ RESULT XAudio2SoundClient::Initialize() {
 	sourceFormat.cbSize = 0;
 
 	for (int i = 0; i < m_numMonoChannels; i++) {
-		CRM((RESULT)m_pXAudio2->CreateSourceVoice(&pXAudio2SourceVoice, (WAVEFORMATEX*)&sourceFormat), "Failed to create source voice");
+		CRM((RESULT)m_pXAudio2->CreateSourceVoice(
+			&pXAudio2SourceVoice, // target
+			(WAVEFORMATEX*)&sourceFormat,	// format
+			0,	// flags
+			XAUDIO2_DEFAULT_FREQ_RATIO, // max freq ratio
+			this,		// call back
+			nullptr,	// send list
+			nullptr	// fx chain
+		), "Failed to create source voice");
 		CNM(pXAudio2SourceVoice, "Failed to allocate source voice");
 		m_xaudio2MonoSignedInt16Sources[i] = std::shared_ptr<IXAudio2SourceVoice>(pXAudio2SourceVoice);
 	}
@@ -157,8 +190,6 @@ RESULT XAudio2SoundClient::Initialize() {
 
 	CRM((RESULT)X3DAudioInitialize(dwChannelMask, X3DAUDIO_SPEED_OF_SOUND, m_pX3DInstance.get()),
 		"Failed to initialize XAudio 3D");
-
-
 
 Error:
 	return r;
