@@ -506,7 +506,7 @@ RESULT DreamUIBar::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pB
 			m_pPendingIconTextureBuffer = pBufferVector;
 		}
 		else {
-			if (pObj->GetParentScope() == "" || pObj->GetParentScope() == m_pMenuNode->GetScope()) {
+			if (pObj->GetParentScope() == "" || (m_pMenuNode != nullptr && pObj->GetParentScope() == m_pMenuNode->GetScope())) {
 				m_downloadQueue.push(std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>(pObj, pBufferVector));
 			}
 		}
