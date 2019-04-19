@@ -1,7 +1,7 @@
 #include "UITestSuite.h"
+
 #include "DreamOS.h"
-#include "UI/UIMenuItem.h"
-#include "DreamGarage/DreamUIBar.h"
+
 #include "PhysicsEngine/CollisionManifold.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
 #include "InteractionEngine/AnimationCurve.h"
@@ -13,6 +13,8 @@
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 #include "Cloud/WebRequest.h"
 
+#include "UI/UIMenuItem.h"
+#include "DreamGarage/DreamUIBar.h"
 #include "UI/UIKeyboard.h"
 #include "UI/UIEvent.h"
 #include "UI/UIView.h"
@@ -33,6 +35,7 @@
 #include "Primitives/font.h"
 #include "Primitives/text.h"
 #include "Primitives/framebuffer.h"
+#include "Primitives/hand/hand.h"
 
 #include "UI/UIKeyboardLayout.h"
 

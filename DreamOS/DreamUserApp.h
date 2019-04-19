@@ -12,7 +12,7 @@
 #include "DreamAppHandle.h"
 
 #include "Primitives/Subscriber.h"
-#include "Primitives/HandType.h"
+#include "Primitives/hand/HandType.h"
 #include "Primitives/point.h"
 
 #include "DreamGarage/UICommon.h"

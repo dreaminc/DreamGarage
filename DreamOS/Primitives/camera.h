@@ -32,6 +32,8 @@
 
 #include "Primitives/viewport.h"
 
+class composite;
+
 enum EYE_TYPE {
 	EYE_LEFT,
 	EYE_RIGHT,

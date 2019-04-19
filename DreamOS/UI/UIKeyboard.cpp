@@ -12,6 +12,7 @@
 #include "Primitives/font.h"
 #include "Primitives/text.h"
 #include "Primitives/framebuffer.h"
+#include "Primitives/hand/hand.h"
 
 #include "Sound/SoundFile.h"
 

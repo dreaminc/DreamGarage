@@ -8,6 +8,8 @@
 
 #include "UI/UISurface.h"
 
+#include "Primitives/hand/hand.h"
+
 UIControlView::UIControlView(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UISurface(pHALImp, pDreamOS)
 {

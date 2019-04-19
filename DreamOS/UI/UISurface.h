@@ -2,7 +2,7 @@
 #define UI_SURFACE_H_
 
 #include "UIView.h"
-#include "Primitives/Subscriber.h"
+
 #include "InteractionEngine/InteractionObjectEvent.h"
 #include <chrono>
 
@@ -15,7 +15,7 @@ class quad;
 class UISurface : public UIView {
 public:
 	UISurface(HALImp *pHALImp, DreamOS *pDreamOS);
-	~UISurface();
+	~UISurface() = default;
 
 	RESULT InitializeSurfaceQuad(float width, float height);
 

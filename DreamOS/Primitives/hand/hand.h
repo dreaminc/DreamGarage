@@ -4,61 +4,45 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/Dimension/Primitives/composite.h
-// Composite Primitive
-// The composite object is a collection of other objects when these are constructed within the object itself 
-// this is really a convenience object that should be used to derive others rather than off of DimObj directly
+// DreamOS/Dimension/Primitives/hand/hand.h
 
-#include "composite.h"
-//#include "Leap.h"
+#include "Primitives/composite.h"
+
+// TODO: Revisit Leap support
+//#include "Leap.h" 
+
 #include "HandType.h"
+#include "HandState.h"
 
 #include <memory>
 
 #define HAND_ANIMATION_DURATION 0.25f
 
-// overlay values
+// Overlay values
 #define OVERLAY_ANIMATION_DURATION 0.5f
 #define OVERLAY_VOLUME_WIDTH 0.15f // hands seem to be rotated in an unintuitive way
 #define OVERLAY_VOLUME_HEIGHT 0.1f 
 #define OVERLAY_VOLUME_DEPTH 0.15f
 
-// oculus values
+// Oculus values
 #define OVR_OVERLAY_SCALE 0.035f
 #define OVR_OVERLAY_ASPECT_RATIO (332.0f / 671.0f)
 #define OVR_OVERLAY_POSITION_X -0.575f
 #define OVR_OVERLAY_POSITION_Y 0.0f
 #define OVR_OVERLAY_POSITION_Z -0.575f
 
-// vive values
+// Vive values
 #define VIVE_OVERLAY_SCALE 0.055f
 #define VIVE_ASPECT_RATIO (541.0f / 599.0f)
 #define VIVE_OVERLAY_POSITION_X -0.42f
 #define VIVE_OVERLAY_POSITION_Y 0.15f
 #define VIVE_OVERLAY_POSITION_Z 0.44f
 
-class SenseLeapMotionHand;
-class model;
+class SenseLeapMotionHand; 
+class model; 
 
 class hand : public composite {
-
 public:
-	struct HandState {
-
-		point ptPalm;
-		quaternion qOrientation;
-
-		HAND_TYPE handType;
-		bool fTracked;
-		unsigned int reserved0;
-		unsigned int reserved1;
-
-		RESULT PrintState() {
-			ptPalm.Print();
-			return R_PASS;
-		}
-	};
-
 	enum class ModelState {
 		HAND,
 		CONTROLLER,
@@ -76,12 +60,12 @@ public:
 
 	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
 	virtual RESULT OnLostTrack();
-	RESULT SetHandState(const hand::HandState& pHandState);
+	RESULT SetHandState(const HandState& pHandState);
 
 	RESULT SetTracked(bool fTracked);
 	bool IsTracked();
 
-	virtual hand::HandState GetHandState(); 
+	virtual HandState GetHandState(); 
 	virtual RESULT SetHandModel(HAND_TYPE type);
 
 	RESULT SetModelState(ModelState modelState);

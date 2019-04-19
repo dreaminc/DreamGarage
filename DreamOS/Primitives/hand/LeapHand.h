@@ -1,8 +1,14 @@
 #ifndef LEAP_HAND_H_
 #define LEAP_HAND_H_
 
+#include "RESULT/EHM.h"
+
+// DREAM OS
+// DreamOS/Dimension/Primitives/hand/LeapHand.h
+
+#include "Leap.h"
+
 #include "hand.h"
-#include "HandType.h"
 
 class SenseLeapMotionHand;
 class model;
@@ -85,7 +91,7 @@ public:
 class LeapHand : public hand 
 {
 public:
-	struct LeapHandState : hand::HandState {
+	struct LeapHandState : HandState {
 
 		finger::FingerState fingerIndex;
 		finger::FingerState fingerMiddle;
@@ -119,7 +125,7 @@ public:
 	bool IsSkeleton();
 	RESULT ToggleRenderType();
 
-	hand::HandState GetHandState() override;
+	HandState GetHandState() override;
 	RESULT SetHandState(const LeapHand::LeapHandState& pHandState);
 
 	RESULT SetHandModel(HAND_TYPE type) override;

@@ -19,7 +19,7 @@ class DreamOS;
 class CollisionTestSuite : public DreamTestSuite {
 public:
 	CollisionTestSuite(DreamOS *pDreamOS);
-	~CollisionTestSuite();
+	~CollisionTestSuite() = default;
 
 	virtual RESULT AddTests() override;
 

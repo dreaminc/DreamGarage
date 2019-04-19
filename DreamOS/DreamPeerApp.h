@@ -16,7 +16,7 @@
 #include "Primitives/point.h"
 #include "Primitives/quaternion.h"
 
-#include "Primitives/hand.h"
+#include "Primitives/hand/HandState.h"
 
 class User;
 class PeerConnection;
@@ -24,6 +24,7 @@ class composite;
 class UIView;
 class DreamOS;
 class user;
+class camera;
 class text;
 class font;
 class SpatialSoundObject;
@@ -136,7 +137,7 @@ public:
 	bool IsUserNameVisible();
 	RESULT SetPosition(const point& ptPosition);
 	RESULT SetOrientation(const quaternion& qOrientation);
-	RESULT UpdateHand(const hand::HandState& pHandState);
+	RESULT UpdateHand(const HandState& pHandState);
 	RESULT UpdateMouth(float mouthScale);
 	RESULT RotateByDeg(float degX, float degY, float degZ);
 	RESULT SetSeatingPosition(int seatingPosition);

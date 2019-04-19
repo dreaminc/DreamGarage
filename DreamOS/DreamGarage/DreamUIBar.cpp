@@ -17,6 +17,7 @@
 #include "DreamBrowser.h"
 
 #include "Primitives/font.h"
+#include "Primitives/hand/hand.h"
 
 #include <vector>
 
@@ -27,12 +28,7 @@
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUIBar>(pDreamOS, pContext)//,
 {
-	// empty
-}
-
-DreamUIBar::~DreamUIBar() 
-{
-	// empty
+	// 
 }
 
 RESULT DreamUIBar::RegisterEvent(InteractionEventType type, std::function<RESULT(void*)> fnCallback) {

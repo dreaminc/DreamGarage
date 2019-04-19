@@ -17,10 +17,10 @@
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
 
-#include "Primitives/hand.h"
-
 #include "Primitives/font.h"
 #include "Primitives/text.h"
+#include "Primitives/hand/hand.h"
+
 #include <string>
 #include "Sense/SenseController.h"
 

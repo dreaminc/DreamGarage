@@ -1,7 +1,10 @@
-#include "Sense/SenseLeapMotionHand.h"
-#include "Primitives/sphere.h"
-#include "Primitives/model/model.h"
 #include "LeapHand.h"
+
+#include "Sense/SenseLeapMotionHand.h"
+
+#include "Primitives/sphere.h"
+
+#include "Primitives/model/model.h"
 
 thumb::thumb(HALImp* pHALImp) :
 	finger(pHALImp)
@@ -178,9 +181,13 @@ LeapHand::LeapHand(HALImp* pHALImp, HAND_TYPE type) :
 
 	CR(Initialize(type));
 
+Success:
 	Validate();
+	return;
+
 Error:
 	Invalidate();
+	return;
 }
 
 RESULT LeapHand::Initialize(HAND_TYPE type) {
@@ -284,7 +291,7 @@ RESULT LeapHand::SetFromLeapHand(const Leap::Hand hand) {
 	return r;
 }
 
-hand::HandState LeapHand::GetHandState() {
+HandState LeapHand::GetHandState() {
 	LeapHand::LeapHandState handState;// = {
 		/*
 		m_handType,

@@ -46,10 +46,12 @@
 
 #include "Sound/AudioPacket.h"
 
+#include "Primitives/hand/hand.h"
+
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("dreamos", pDreamOS)
 {
-	// empty
+	// 
 }
 
 RESULT DreamOSTestSuite::AddTests() {

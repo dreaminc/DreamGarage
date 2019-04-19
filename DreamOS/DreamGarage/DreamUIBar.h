@@ -65,10 +65,9 @@ class DreamUIBar :	public DreamApp<DreamUIBar>,
 
 public:
 	DreamUIBar(DreamOS *pDreamOS, void *pContext = nullptr);
+	~DreamUIBar() = default;
 
 	RESULT SetFont(const std::wstring& strFont);
-
-	~DreamUIBar();
 
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;

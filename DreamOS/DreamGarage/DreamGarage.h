@@ -157,10 +157,10 @@ public:
 
 	//
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
-	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
+	RESULT SendUpdateHandMessage(long userID, HandState handState);
 
 	RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
-	RESULT BroadcastUpdateHandMessage(hand::HandState handState);
+	RESULT BroadcastUpdateHandMessage(HandState handState);
 	RESULT BroadcastUpdateMouthMessage(float mouthSize);
 
 	user* ActivateUser(long userId);

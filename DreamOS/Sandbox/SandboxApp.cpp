@@ -309,9 +309,8 @@ Error:
 	return r;
 }
 
-//hand *Windows64App::AttachHand
-
 hand *SandboxApp::GetHand(HAND_TYPE handType) {
+
 	if (m_pHMD != nullptr) {
 		return m_pHMD->GetHand(handType);
 	}

@@ -60,6 +60,7 @@ class DreamMessage;
 class DreamAppMessage;
 class DreamSettingsApp;
 class DreamLoginApp;
+class DreamFormApp;
 class OGLProgram;
 
 class NamedPipeClient;

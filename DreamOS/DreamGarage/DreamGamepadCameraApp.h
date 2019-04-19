@@ -24,7 +24,7 @@
 #include "Sense/SenseGamepadController.h"
 #include "Sense/SenseController.h"
 
-#include "Primitives/HandType.h"
+#include "Primitives/hand/HandType.h"
 
 class camera;
 class AirResistanceGenerator;

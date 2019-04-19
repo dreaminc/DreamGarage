@@ -10,6 +10,8 @@
 #include "UI/UIView.h"
 #include "UI/UIButton.h"
 
+#include "Primitives/hand/hand.h"
+
 struct TestContext : public Subscriber<InteractionObjectEvent> {
 	DreamOS *m_pDreamOS = nullptr;
 

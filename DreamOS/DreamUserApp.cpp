@@ -9,6 +9,7 @@
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
 #include "Cloud/User/UserController.h"
 
+#include "Primitives/hand/hand.h"
 #include "Primitives/camera.h"	
 #include "Primitives/point.h"
 #include "Primitives/vector.h"

@@ -13,6 +13,8 @@
 
 #include "Core/Utilities.h"
 
+#include "Primitives/hand/hand.h"
+
 OpenVRDevice::OpenVRDevice(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_pIVRHMD(nullptr),

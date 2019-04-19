@@ -53,6 +53,8 @@ light *g_pLight = nullptr;
 
 #include "Sound/AudioPacket.h"
 
+#include "Primitives/hand/hand.h"
+
 /* Comment this out to enable 3rd party camera
 #define _USE_3RD_PARTY_CAMERA
 //#define _USE_3RD_PARTY_CAMERA_HD
@@ -797,7 +799,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SendUpdateHandMessage(long userID, hand::HandState handState) {
+RESULT DreamGarage::SendUpdateHandMessage(long userID, HandState handState) {
 	RESULT r = R_PASS;
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
@@ -824,7 +826,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::BroadcastUpdateHandMessage(hand::HandState handState) {
+RESULT DreamGarage::BroadcastUpdateHandMessage(HandState handState) {
 	RESULT r = R_PASS;
 
 	uint8_t *pDatachannelBuffer = nullptr;
@@ -1456,7 +1458,7 @@ RESULT DreamGarage::HandleHandUpdateMessage(PeerConnection* pPeerConnection, Upd
 	pUser->UpdateHand(handState);
 	*/
 
-	hand::HandState handState = pUpdateHandMessage->GetHandState();
+	HandState handState = pUpdateHandMessage->GetHandState();
 
 	auto pDreamPeer = FindPeer(pPeerConnection);
 	CN(pDreamPeer);

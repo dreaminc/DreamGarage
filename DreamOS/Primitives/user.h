@@ -8,12 +8,14 @@
 // User dimension object composite
 
 #include "composite.h"
-#include "hand.h"
 #include "texture.h"
 #include "text.h"
 #include "font.h"
 
 #include "DreamGarage/UICommon.h"
+
+#include "Primitives/hand/HandState.h"
+#include "Primitives/hand/HandType.h"
 
 #include <vector>
 
@@ -52,7 +54,7 @@ public:
 	std::shared_ptr<hand> GetHand(HAND_TYPE type);
 
 	RESULT Update();
-	RESULT UpdateHand(const hand::HandState& pHandState);
+	RESULT UpdateHand(const HandState& pHandState);
 	RESULT UpdateMouth(float mouthScale);	// used for scaling the user mouth
 	
 	RESULT SetDreamOS(DreamOS *pDreamOS);
