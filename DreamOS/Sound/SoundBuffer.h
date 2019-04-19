@@ -298,7 +298,7 @@ public:
 	RESULT ReadData(CBType **ppDataBuffer, int channels, int bytesToRead, int &framesRead) {
 		RESULT r = R_PASS;
 
-		pDataBuffer = nullptr;
+		//pDataBuffer = nullptr;
 		framesRead = 0;
 
 		CB((m_channels == channels));

@@ -8,19 +8,17 @@
 // The User Controller 
 
 #include "Cloud/Controller.h"
-
 #include <string>
 
-#include "Cloud/User/User.h"
-#include "Cloud/User/TwilioNTSInformation.h"
-
 #include "Cloud/ControllerProxy.h"
-
 #include "json.hpp"
 
-class UserControllerObserver;
+#include "User.h"
+#include "TwilioNTSInformation.h"
+
 class point;
 class quaternion;
+class version;
 
 struct LoginState {
 	unsigned fFirstLaunch : 1;
@@ -44,7 +42,7 @@ public:
 	virtual RESULT RequestGetSettings(std::string& strAccessToken) = 0;
 	virtual RESULT RequestSetSettings(std::string& strAccessToken, point ptPosition, quaternion qOrientation) = 0;
 
-	// login flow api requests
+	// login flow API requests
 	virtual RESULT RequestAccessToken(std::string& strRefreshToken) = 0;
 	virtual RESULT RequestTeam(std::string& strAccessToken, std::string strTeamID = "") = 0;
 	virtual RESULT RequestUserProfile(std::string& strAccessToken) = 0;
@@ -55,7 +53,10 @@ public:
 };
 
 // TODO: This is actually a UserController - so change the name of object and file
-class UserController : public Controller, public UserControllerProxy {
+class UserController : 
+	public Controller, 
+	public UserControllerProxy 
+{
 public:
 	enum class UserMethod {
 		// old
@@ -76,7 +77,7 @@ public:
 
 public:
 	UserController(Controller* pParentController);
-	~UserController();
+	~UserController() = default;
 
 	RESULT Initialize();
 
@@ -130,13 +131,15 @@ public:
 	long GetUserDefaultEnvironmentID();
 	RESULT SetUserDefaultEnvironmentID(long environmentId);
 	RESULT SetAccessToken(std::string strAccessToken);
+	
 	User GetUser();
 	TwilioNTSInformation GetTwilioNTSInformation();
 
 	long GetUserID() { return m_user.GetUserID(); }
 	long GetUserAvatarModelID() { return m_user.GetAvatarID(); }
 
-// new login flow api calls
+// New login flow API calls
+// TODO: Generalize this arch
 public:
 
 	virtual RESULT RequestFormURL(std::string& strFormKey) override;
@@ -182,13 +185,13 @@ private:
 public:
 	class UserControllerObserver {
 	public:
-		// socket methods
+		// Socket methods
 		virtual RESULT OnLogin() = 0;
 		virtual RESULT OnLogout() = 0;
 		virtual RESULT OnPendLogout() = 0;
 		virtual RESULT OnSwitchTeams() = 0;
 
-		// api methods
+		// API methods
 		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) = 0;
 		virtual RESULT OnSetSettings() = 0;
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
@@ -202,24 +205,23 @@ public:
 
 private:
 	bool m_fLoggedIn = false;
-
 	bool m_fSwitchingTeams = false;
 
 	std::string m_strPendingTeamID = "";
 
+	long m_avatarModelId = -1;
+	long m_defaultEnvironmentId = -1; // used in the case m_user is not initialized
+
 	std::string	m_strToken;
 	std::string m_strPeerScreenName;
 	std::string m_strInitials;
-	long m_avatarModelId = -1;
 	std::string m_strProfilePhotoURL;
-
-	User m_user = User();
-	long m_defaultEnvironmentId = -1; // used in the case m_user is not initialized
 	std::string m_strAccessToken;
 
-	TwilioNTSInformation m_twilioNTSInformation = TwilioNTSInformation();
+	User m_user;
+	TwilioNTSInformation m_twilioNTSInformation;
 
-	UserControllerObserver *m_pUserControllerObserver;
+	UserControllerObserver *m_pUserControllerObserver = nullptr;;
 };
 
 #endif	// ! USER_CONTROLLER_H_

@@ -10,6 +10,9 @@
 #include "Cloud/User/UserController.h"
 
 #include "Primitives/camera.h"	
+#include "Primitives/point.h"
+#include "Primitives/vector.h"
+#include "Primitives/quaternion.h"
 
 texture *DreamUserObserver::GetOverlayTexture(HAND_TYPE type) {
 	return nullptr;

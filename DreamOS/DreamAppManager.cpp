@@ -288,3 +288,15 @@ RESULT DreamAppManager::ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBas
 Error:
 	return r;
 }
+
+RESULT DreamAppManager::InitializeDreamAppComposite(DreamAppBase* pDreamApp) {
+	RESULT r = R_PASS;
+
+	composite* pAppComposite = m_pDreamOS->MakeComposite();
+	CNM(pAppComposite, "Failed to create dream app composite");
+
+	CRM(pDreamApp->SetComposite(pAppComposite), "Failed to set Dream App composite");
+
+Error:
+	return r;
+}

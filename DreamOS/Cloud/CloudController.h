@@ -10,18 +10,15 @@
 // The base DreamCloud controller 
 
 #include "Controller.h"
+#include "ControllerProxy.h"
+
 #include "CloudImp.h"
 #include "User/UserFactory.h"
 #include "Environment/EnvironmentController.h"
+
 #include <memory>
 #include <thread>
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
-#include "Primitives/quaternion.h"
-#include "Primitives/hand.h"
-
-class ControllerProxy;
 class Message;
 class UpdateHeadMessage; 
 class UpdateHandMessage;
@@ -30,9 +27,14 @@ class AudioDataMessage;
 class MenuControllerProxy;
 class HTTPControllerProxy;
 
+class hand;
 class User;
 class TwilioNTSInformation;
 class EnvironmentAsset;
+class texture;
+class point;
+class vector;
+class quaternion;
 
 enum class CLOUD_CONTROLLER_TYPE {
 	CLOUD,

@@ -4,6 +4,7 @@
 
 //#include "DreamLogger/DreamLogger.h"
 #include "DreamAppManager.h"
+#include "DreamModuleManager.h"
 
 #include "Primitives/font.h"
 #include "Core/Utilities.h"

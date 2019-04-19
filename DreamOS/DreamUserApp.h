@@ -8,10 +8,12 @@
 // The Dream User app is the app to contain all of the 
 // relevant user information (and assets)
 
-#include "Primitives/Subscriber.h"
 #include "DreamApp.h"
 #include "DreamAppHandle.h"
+
+#include "Primitives/Subscriber.h"
 #include "Primitives/HandType.h"
+#include "Primitives/point.h"
 
 #include "DreamGarage/UICommon.h"
 
@@ -33,6 +35,7 @@ class VirtualObj;
 class UIKeyboard;
 class DimObj;
 class user;
+class quaternion;
 
 class CEFBrowserManager;
 class CameraNode;

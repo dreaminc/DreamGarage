@@ -23,6 +23,8 @@
 
 #include "DreamApp.h"
 #include "Primitives/Manager.h"
+#include "Primitives/composite.h"
+
 #include "DreamAppHandle.h"
 
 class DreamOS;
@@ -41,8 +43,8 @@ public:
 	virtual RESULT Shutdown() override;
 
 	// TODO: This is here because of template silliness - but should be 
-	// put into a .tpp file with an #include of said tpp file at the end
-	// of the header
+	// TODO: put into a .tpp file with an #include of said tpp file at the end
+	// TODO: of the header
 	template<class derivedAppType>
 	std::shared_ptr<derivedAppType> CreateRegisterAndStartApp(void *pContext = nullptr, bool fAddToScene = true) {
 		RESULT r = R_PASS;
@@ -55,14 +57,12 @@ public:
 		pDreamApp = std::shared_ptr<derivedAppType>(derivedAppType::SelfConstruct(m_pDreamOS, pContext));
 		CN(pDreamApp);
 
-		// Assign the app a composite
-		//if (fAddToScene) {
-		//	CRM(pDreamApp->SetComposite(m_pDreamOS->AddComposite()), "Failed to create Dream App composite");
-		//}
-		//else {
-		//	CRM(pDreamApp->SetComposite(m_pDreamOS->MakeComposite()), "Failed to create Dream App composite");
-		//}
-		CRM(pDreamApp->SetComposite(m_pDreamOS->MakeComposite()), "Failed to create Dream App composite");
+		{
+			DreamAppBase* pDreamAppBase = dynamic_cast<DreamAppBase*>(pDreamApp.get());
+			if (pDreamAppBase != nullptr) {
+				CRM(InitializeDreamAppComposite(pDreamAppBase), "Failed to initialize dream app composite");
+			}
+		}
 
 		if (fAddToScene)
 			pDreamApp->SetAddToSceneFlag();
@@ -73,6 +73,7 @@ public:
 		CR(pDreamApp->ResetTimeRun());
 
 		m_pendingAppQueue.push(pDreamApp);
+		
 		/*
 		// Push to priority queue
 		//m_appPriorityQueue.push_front(pDreamApp);
@@ -81,7 +82,8 @@ public:
 		//TODO: may want to use get() at a different level, keeping the map with shared_ptrs
 		m_appRegistry[pDreamApp->GetAppUID()] = pDreamApp.get();
 		//*/
-		// Success::
+	
+	Success:
 		return pDreamApp;
 
 	Error:
@@ -106,6 +108,7 @@ public:
 
 	DreamAppHandle* CaptureApp(UID uid, DreamAppBase* pRequestingApp);
 	RESULT ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pRequestingApp);
+	RESULT InitializeDreamAppComposite(DreamAppBase* pDreamApp);
 
 	RESULT SetMinFrameRate(double minFrameRate);
 	bool FindDreamAppWithName(std::string strDreamAppName);
@@ -128,7 +131,7 @@ private:
 
 	std::map<UID, std::vector<std::pair<DreamAppHandle*, DreamAppBase*>>> m_appHandleRegistry;
 	std::map<UID, std::shared_ptr<DreamAppBase>> m_appRegistry;
-	DreamOS *m_pDreamOS;
+	DreamOS *m_pDreamOS = nullptr;
 
 	double m_minFrameRate = 90.0f;
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_tBeforeLoop;

@@ -1,17 +1,21 @@
 #ifndef _DISPLAYMANAGER_H_
 #define _DISPLAYMANAGER_H_
 
+#include "RESULT/EHM.h"
+
+// Dream Desktop Duplication
+
 #include "CommonTypes.h"
 
-//
 // Handles the task of processing frames
-//
-class D3D11DesktopDuplicationDisplayManager
-{
+
+class D3D11DesktopDuplicationDisplayManager {
 public:
 	D3D11DesktopDuplicationDisplayManager();
 	~D3D11DesktopDuplicationDisplayManager();
+
 	void InitD3D(DX_RESOURCES* pDXResourcesData);
+
 	ID3D11Device* GetDevice();
 	DUPL_RETURN ProcessFrame(_In_ FRAME_DATA* pFrameData, _Inout_ ID3D11Texture2D* pSharedSurfaceTexture, INT OffsetX, INT OffsetY, _In_ DXGI_OUTPUT_DESC* pDesktopOutputDescription);
 	void CleanRefs();

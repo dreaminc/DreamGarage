@@ -81,7 +81,7 @@ public:
 	RESULT SetTracked(bool fTracked);
 	bool IsTracked();
 
-	virtual hand::HandState GetHandState();
+	virtual hand::HandState GetHandState(); 
 	virtual RESULT SetHandModel(HAND_TYPE type);
 
 	RESULT SetModelState(ModelState modelState);

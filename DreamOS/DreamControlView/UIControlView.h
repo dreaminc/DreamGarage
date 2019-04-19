@@ -122,8 +122,8 @@ private:
 
 	texture* m_pLoadingScreenTexture = nullptr;
 
-	texture* m_pOverlayLeft;
-	texture* m_pOverlayRight;
+	texture* m_pOverlayLeft = nullptr;
+	texture* m_pOverlayRight = nullptr;
 
 	texture *m_pAddressSecureTexture = nullptr;
 	texture *m_pAddressInsecureTexture = nullptr;
@@ -138,7 +138,7 @@ private:
 	std::string m_strCurrentURL;
 	std::string m_strCurrentScheme;
 
-	bool m_fMouseDown[2];
+	bool m_fMouseDown[2] = {false, false};
 	bool m_fMouseDrag = false;
 	point m_ptClick;
 
@@ -155,9 +155,9 @@ private:
 	float m_borderWidth = BORDER_WIDTH;
 	float m_borderHeight = BORDER_HEIGHT;
 
-	float m_hiddenScale; 
-	float m_visibleScale;
-	float m_keyboardAnimationDuration;	// In seconds (direct plug into PushAnimationItem)
+	float m_hiddenScale = 0.2f;
+	float m_visibleScale = 1.0f;
+	float m_keyboardAnimationDuration = KEYBOARD_ANIMATION_DURATION_SECONDS;	// In seconds (direct plug into PushAnimationItem)
 
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;	
