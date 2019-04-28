@@ -38,7 +38,7 @@
 #define VIVE_OVERLAY_POSITION_Y 0.15f
 #define VIVE_OVERLAY_POSITION_Z 0.44f
 
-class SenseLeapMotionHand; 
+class SenseLeapMotionHand;  
 class model; 
 
 class hand : public composite {
