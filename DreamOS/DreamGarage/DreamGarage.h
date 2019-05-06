@@ -1,7 +1,7 @@
 #ifndef DREAM_GARAGE_H_
 #define DREAM_GARAGE_H_
 
-#include "RESULT/EHM.h"
+#include "RESULT/RESULT.h"          // for RESULT
 
 // DREAM GARAGE
 // DreamGarage.h
@@ -9,26 +9,52 @@
 // which is the interface to the engine and platform layers for the application
 
 #include "DreamOS.h"
-#include "Sense/SenseKeyboard.h"
-#include "Sense/SenseMouse.h"
 #include "Primitives/version.h"
+#include "array"                    // for array
+#include "memory"                   // for shared_ptr
+#include "Primitives/point.h"       // for point
+#include "Primitives/quaternion.h"  // for quaternion
+#include "Primitives/vector.h"      // for vector
+#include "Sandbox/SandboxApp.h"     // for SandboxApp, SandboxApp::PipelineType
+#include "utility"                  // for pair
+#include "xstring"                  // for string, wstring
+
+#include <stddef.h>                 // for size_t
+
+class AudioDataMessage;
+class CameraNode;
+class DreamMessage;
+class DreamPeerApp;
+class EnvironmentAsset;
+class EnvironmentShare;
+class OGLProgram;
+class PeerConnection;
+class Pipeline;
+class ProgramNode;
+class UpdateHandMessage;
+class UpdateHeadMessage;
+class UserController;
+class quad;
+class texture;
+class user;
+struct HandState;
+struct SenseKeyboardEvent;
+struct SenseTypingEvent;
 
 class DreamUIBar;
 class DreamContentView;
 class DreamBrowser;
 class UIControlView;
-class DreamDesktopApp;
 class DreamUserControlArea;
-class DreamVCam;
-class DreamShareView;
-class DreamDesktopApp;
 class DreamGamepadCameraApp;
 class DreamEnvironmentApp;
 class UIStageProgram;
 class UpdateMouthMessage;
+class OGLProgramScreenFade;
+
 class SkyboxScatterProgram;
 class FogProgram;
-class OGLProgramScreenFade;
+
 
 #define MAX_PEERS 8
 

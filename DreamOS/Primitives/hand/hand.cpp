@@ -10,6 +10,8 @@
 
 #include "DreamGarage/UICommon.h"
 
+#include "Sandbox/PathManager.h"
+
 hand::hand(HALImp* pHALImp, HAND_TYPE type) :
 	composite(pHALImp)
 {

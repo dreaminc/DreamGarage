@@ -1,6 +1,10 @@
 #include "stereocamera.h"
 
 #include "Primitives/viewport.h"
+#include "camera.h"                 // for EYE_TYPE, EYE_TYPE::EYE_MONO, EYE_TYPE::EYE_LEFT, EYE_TYPE::EYE_RIGHT, camera
+#include "matrix/RotationMatrix.h"  // for RotationMatrix
+
+#include "HMD/HMD.h"
 
 stereocamera::stereocamera(point ptOrigin, viewport cameraVieport) :
 	camera(ptOrigin, cameraVieport),

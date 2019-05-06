@@ -15,6 +15,8 @@
 
 #include "Core/Utilities.h"
 
+#include "Sandbox/PathManager.h"
+
 UIPointerLabel::UIPointerLabel(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIView(pHALImp,pDreamOS)
 {

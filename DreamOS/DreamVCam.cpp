@@ -23,6 +23,8 @@
 
 #include "DreamGarage/UICommon.h"
 
+#include "Scene/CameraNode.h"
+
 DreamVCam::DreamVCam(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamVCam>(pDreamOS, pContext)
 {

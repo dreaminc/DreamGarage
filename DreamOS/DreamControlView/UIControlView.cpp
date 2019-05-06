@@ -10,6 +10,8 @@
 
 #include "Primitives/hand/hand.h"
 
+#include "Sandbox/PathManager.h"
+
 UIControlView::UIControlView(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UISurface(pHALImp, pDreamOS)
 {

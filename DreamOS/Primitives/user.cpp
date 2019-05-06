@@ -14,6 +14,8 @@
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
 
+#include "Sandbox/PathManager.h"
+
 user::user(HALImp* pHALImp) :
 	composite(pHALImp)
 {

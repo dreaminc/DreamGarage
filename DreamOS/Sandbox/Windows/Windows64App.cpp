@@ -23,6 +23,8 @@
 #include <string>
 #include <netlistmgr.h>
 
+#include "Sense/SenseLeapMotion.h"
+
 Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
 	m_pxWidth(DEFAULT_WIDTH),

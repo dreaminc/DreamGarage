@@ -15,6 +15,16 @@
 #include "HandState.h"
 
 #include <memory>
+#include "Primitives/point.h"      // for point
+#include "RESULT/RESULT.h"         // for RESULT
+#include "xstring"                 // for wstring
+
+class DreamOS;
+class HALImp;
+class quad;
+class sphere;
+class texture;
+class volume;
 
 #define HAND_ANIMATION_DURATION 0.25f
 
@@ -38,8 +48,6 @@
 #define VIVE_OVERLAY_POSITION_Y 0.15f
 #define VIVE_OVERLAY_POSITION_Z 0.44f
 
-class SenseLeapMotionHand;  
-class model; 
 
 class hand : public composite {
 public:

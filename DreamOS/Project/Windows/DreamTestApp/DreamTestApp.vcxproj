@@ -158,20 +158,17 @@
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
- /D
+ 
 xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\OfficialBuild\*" "$(TargetDir)"
- /D
+ 
 
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 	
 
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D	
-
-  
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"</Command>
@@ -206,20 +203,17 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\Fre
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
- /D
+ 
 xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\OfficialBuild\*" "$(TargetDir)"
- /D
+ 
 
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 	
 
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D	
-
-  
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"</Command>
@@ -263,22 +257,21 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\Fre
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
- /D
+      <Command>xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
 
-xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Debug\*" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Debug\*" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D		
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D	
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Debug\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeImaged.dll" "$(TargetDir)"</Command>
@@ -305,22 +298,21 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
- /D
+      <Command>xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
 
-xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Debug\*" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Debug\*" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D		
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D	
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Debug\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeImaged.dll" "$(TargetDir)"</Command>

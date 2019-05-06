@@ -1,7 +1,7 @@
 #ifndef STEREO_CAMERA_H_
 #define STEREO_CAMERA_H_
 
-#include "RESULT/EHM.h"
+#include "RESULT/RESULT.h"                       // for RESULT
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/stereocamera.h
@@ -9,6 +9,10 @@
 // The stereo camera is a dual camera with it's own orientation and position
 
 #include "camera.h"
+#include "matrix/ProjectionMatrix.h"  // for ProjectionMatrix
+#include "matrix/ViewMatrix.h"        // for ViewMatrix
+#include "point.h"                    // for point
+#include "quaternion.h"               // for quaternion
 
 #define DEFAULT_PUPILLARY_DISTANCE 55
 

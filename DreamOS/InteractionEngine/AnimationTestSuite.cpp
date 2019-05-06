@@ -9,6 +9,9 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
 
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
+
 AnimationTestSuite::AnimationTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("animation", pDreamOS)
 {

@@ -39,6 +39,9 @@
 
 #include "UI/UIKeyboardLayout.h"
 
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
+
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("ui", pDreamOS)
 {

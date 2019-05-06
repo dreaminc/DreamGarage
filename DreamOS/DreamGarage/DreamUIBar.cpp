@@ -3,27 +3,38 @@
 
 #include "Cloud/Menu/MenuController.h"
 #include "Cloud/Menu/MenuNode.h"
-#include "Cloud/Environment/EnvironmentController.h"
 
-#include "InteractionEngine/AnimationItem.h"
 
-#include "UI/UIKeyboard.h"
 #include "UI/UIButton.h"
 #include "UI/UIMenuItem.h"
-#include "UI/UISpatialScrollView.h"
 
 //#include "DreamControlView/UIControlView.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamBrowser.h"
-
-#include "Primitives/font.h"
-#include "Primitives/hand/hand.h"
-
-#include <vector>
-
-#include "Cloud/HTTP/HTTPController.h"
 
 #include "HAL/UIStageProgram.h"
+#include "Cloud/CloudController.h"                      // for CloudController, CLOUD_CONTROLLER_TYPE, CLOUD_CONTROLLER_TYPE::MENU
+#include "functional"                                   // for function
+#include "Primitives/matrix/RotationMatrix.h"           // for RotationMatrix
+#include "Primitives/vector.h"                          // for vector
+#include "RESULT/EHM.h"                                 // for CR, CN, CBR, CNR, CBM, CNM, CRM, DEBUG_LINEOUT
+#include "stdint.h"                                     // for uint8_t
+#include "vcruntime_new.h"                              // for operator new
+#include <stddef.h>                                     // for size_t
+
+#include "Cloud/Menu/MenuNode.h"
+#include "Cloud/HTTP/HTTPController.h"
+#include "Primitives/hand/hand.h"
+
+#include "InteractionEngine/InteractionEngine.h"
+#include "InteractionEngine/AnimationCurve.h"
+#include "InteractionEngine/AnimationItem.h"
+
+class DreamAppHandle;
+class InteractionEngineProxy;
+class UIKeyboard;
+class composite;
+class quad;
+struct UIEvent;
 
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUIBar>(pDreamOS, pContext)//,

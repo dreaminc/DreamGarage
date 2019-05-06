@@ -1,16 +1,11 @@
 #ifndef DREAM_UI_BAR_H_
 #define DREAM_UI_BAR_H_
 
-#include "DreamApp.h"
-#include "DreamAppHandle.h"
 
-#include "UI/UIEvent.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
 
 #include "Cloud/Menu/MenuController.h"
-#include "Cloud/Menu/MenuNode.h"
 
-#include "Primitives/Subscriber.h"
 
 #include "UI/UISpatialScrollView.h"
 
@@ -18,7 +13,20 @@
 
 #include <functional>
 #include <stack>
-#include <queue>
+
+#include "memory"                                      // for shared_ptr
+#include "Primitives/hand/HandType.h"                  // for HAND_TYPE
+#include "Primitives/point.h"                          // for point
+#include "Primitives/quaternion.h"                     // for quaternion
+#include "Primitives/Types/UID.h"                      // for UID
+#include "RESULT/RESULT.h"                             // for RESULT
+#include "xstring"                                     // for string, wstring
+
+class DreamAppHandle;
+class DreamOS;
+class MenuNode;
+class volume;
+struct UIEvent;
 
 class DreamUserControlArea;
 class UIView;

@@ -16,6 +16,8 @@
 
 #include "Sound/SoundFile.h"
 
+#include "Sandbox/PathManager.h"
+
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {

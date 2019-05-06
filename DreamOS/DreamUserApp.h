@@ -1,7 +1,6 @@
 #ifndef DREAM_USER_APP_H_
 #define DREAM_USER_APP_H_
 
-#include "RESULT/EHM.h"
 
 // DREAM OS
 // DreamOS/DreamUserApp.h
@@ -9,31 +8,32 @@
 // relevant user information (and assets)
 
 #include "DreamApp.h"
-#include "DreamAppHandle.h"
 
-#include "Primitives/Subscriber.h"
 #include "Primitives/hand/HandType.h"
 #include "Primitives/point.h"
 
+#include "Primitives/Subscriber.h"
+
 #include "DreamGarage/UICommon.h"
 
+#include "memory"                      // for shared_ptr
+#include "RESULT/RESULT.h"             // for RESULT
+#include "xstring"                     // for wstring
+
 #include <map>
-#include <vector>
-#include <stack>
+
+class DreamOS;
+class composite;
 
 struct InteractionObjectEvent;
 struct HysteresisEvent;
 
 class HysteresisObject;
-class volume;
 class quad; 
-class sphere;
 class texture;
 class hand;
 class DimRay;
 class VirtualObj;
-class UIKeyboard;
-class DimObj;
 class user;
 class quaternion;
 

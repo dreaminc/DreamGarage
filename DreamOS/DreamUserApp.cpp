@@ -1,19 +1,30 @@
 #include "DreamUserApp.h"
-#include "DreamOS.h"
-#include "UI/UIKeyboard.h"
-#include "DreamGarage/DreamUIBar.h"
-#include "DreamControlView/UIControlView.h"
 
-#include "Core/Utilities.h"
-
-#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
-#include "Cloud/User/UserController.h"
+#include "chrono"                                      // for high_resolution_clock, steady_clock::time_point
+#include "cmath"                                       // for sqrt
 
 #include "Primitives/hand/hand.h"
-#include "Primitives/camera.h"	
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
 #include "Primitives/quaternion.h"
+
+#include "DreamAppMessage.h"                           // for DreamAppMessage, DreamAppMessage::flags, operator|, DreamAppMessage::flags::SHARE_LOCAL, DreamAppMessage::flags::SHARE_NETWORK
+#include "DreamShareViewPointerMessage.h"              // for DreamShareViewPointerMessage
+#include "InteractionEngine/InteractionObjectEvent.h"  // for InteractionObjectEvent, InteractionEventType::ELEMENT_INTERSECT_BEGAN, InteractionEventType::ELEMENT_INTERSECT_ENDED, InteractionEventType::ELEMENT_INTERSECT_MOVED, InteractionEventType::INTERACTION_EVENT_MENU
+#include "Primitives/composite.h"                      // for composite
+#include "Primitives/hand/HandState.h"                 // for HandState
+#include "Primitives/HysteresisObject.h"               // for HysteresisEventType, HysteresisEvent, HysteresisEventType::OFF, HysteresisEventType::ON, HysteresisObject
+#include "Primitives/matrix/RotationMatrix.h"          // for RotationMatrix
+#include "Primitives/stereocamera.h"                   // for stereocamera
+#include "Primitives/VirtualObj.h"                     // for VirtualObj
+#include "RESULT/EHM.h"                                // for CR, CNR, CN, CBR, CB
+#include "vcruntime_new.h"                             // for operator delete, operator new
+
+#include "DreamOS.h"
+
+#include "Core/Utilities.h"
+
+#include "Scene/CameraNode.h"
 
 texture *DreamUserObserver::GetOverlayTexture(HAND_TYPE type) {
 	return nullptr;
