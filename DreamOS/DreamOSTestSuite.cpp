@@ -41,6 +41,11 @@
 #include <stddef.h>                            // for size_t
 #include <WinUser.h>                           // for SendMessage
 
+#include "HAL/SkyboxScatterProgram.h"
+#include "HAL/opengl/OGLProgramSkyboxScatter.h"
+#include  "DreamGarage/DreamEnvironmentApp.h"
+#include "DreamGarage/DreamUIBar.h"
+
 #include "Scene/ObjectStoreNode.h"
 #include "Scene/CameraNode.h"
 
@@ -70,7 +75,6 @@ class DreamEnvironmentApp;
 class DreamPeerApp;
 class DreamShareView;
 class DreamTestingApp;
-class DreamUIBar;
 class DreamUserApp;
 class DreamUserControlArea;
 class DreamVCam;
@@ -1742,11 +1746,18 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 		CR(pRenderProgramNode->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
 
 		// Reference Geometry Shader Program
-		pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");		CN(pReferenceGeometryProgram);		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));		CR(pReferenceGeometryProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
+		pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
 		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		// Skybox
-		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");		CN(pSkyboxProgram);		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));		CR(pSkyboxProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 		//*/
 
 		// Don't actually need to hook up the AUX node 

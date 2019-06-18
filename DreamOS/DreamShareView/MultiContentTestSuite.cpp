@@ -7,6 +7,8 @@
 #include "HAL/opengl/OGLProgram.h"
 #include "HAL/UIStageProgram.h"
 
+#include "Scene/ObjectStoreNode.h"
+
 #include "DreamShareView/DreamShareView.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
 #include "DreamControlView/UIControlView.h"
@@ -38,6 +40,8 @@
 
 #include "Primitives/font.h"
 #include "Primitives/text.h"
+
+#include "Scene/CameraNode.h"
 
 #include <memory>
 

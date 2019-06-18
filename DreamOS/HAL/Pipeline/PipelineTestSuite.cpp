@@ -8,6 +8,9 @@
 
 #include "HAL/SkyboxScatterProgram.h"
 
+#include "Scene/CameraNode.h"
+#include "Scene/ObjectStoreNode.h"
+
 PipelineTestSuite::PipelineTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("pipeline", pDreamOS)
 {

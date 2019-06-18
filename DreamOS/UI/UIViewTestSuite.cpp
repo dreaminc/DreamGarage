@@ -24,6 +24,11 @@
 #include <string>
 #include "Sense/SenseController.h"
 
+#include "Scene/CameraNode.h"
+#include "Scene/ObjectStoreNode.h"
+
+#include "Sandbox/CommandLineManager.h"
+
 UIViewTestSuite::UIViewTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("uiview", pDreamOS)
 {

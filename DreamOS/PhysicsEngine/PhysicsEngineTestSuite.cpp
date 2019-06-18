@@ -7,6 +7,9 @@
 
 #include "PhysicsEngine/CollisionManifold.h"
 
+#include "Scene/CameraNode.h"
+#include "Scene/ObjectStoreNode.h"
+
 PhysicsEngineTestSuite::PhysicsEngineTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("physics", pDreamOS)
 {

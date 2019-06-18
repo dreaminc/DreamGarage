@@ -21,7 +21,7 @@
 #include "OVRPlatform.h"
 
 #include "OVR_CAPI_Audio.h"
-#include "core/Utilities.h"
+#include "Core/Utilities.h"
 
 OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),

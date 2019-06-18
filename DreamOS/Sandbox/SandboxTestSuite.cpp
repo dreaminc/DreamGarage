@@ -9,6 +9,9 @@
 
 #include "DreamTestingApp.h"
 
+#include "Scene/CameraNode.h"
+#include "Scene/ObjectStoreNode.h"
+
 SandboxTestSuite::SandboxTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("sandbox", pDreamOS)
 {

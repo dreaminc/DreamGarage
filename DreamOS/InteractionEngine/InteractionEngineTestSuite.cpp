@@ -12,6 +12,9 @@
 
 #include "Primitives/hand/hand.h"
 
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
+
 struct TestContext : public Subscriber<InteractionObjectEvent> {
 	DreamOS *m_pDreamOS = nullptr;
 
