@@ -3,7 +3,9 @@
 
 #include "./RESULT/EHM.h"
 #include "DreamApp.h"
+
 #include "Primitives/point.h"
+#include "Primitives/vector.h"
 #include "Primitives/color.h"
 #include "Primitives/FogParams.h"
 
@@ -16,6 +18,8 @@ class model;
 class light;
 class SkyboxScatterProgram;
 class FogProgram;
+class quaternion;
+
 //TODO: move to proxy?
 class OGLProgramScreenFade;
 class user;

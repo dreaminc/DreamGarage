@@ -16,6 +16,8 @@
 
 #include "Scene/ObjectStoreNode.h"
 
+#include "Sandbox/PathManager.h"
+
 DreamEnvironmentApp::DreamEnvironmentApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamEnvironmentApp>(pDreamOS, pContext)
 {

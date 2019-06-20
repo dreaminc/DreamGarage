@@ -1,13 +1,16 @@
 #include "UIControlView.h"
-#include "DreamGarage/DreamBrowser.h"
+
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamShareView/DreamShareView.h"
 #include "DreamOS.h"
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
 
-#include "UI/UIButton.h"
 #include "UI/UISurface.h"
+
+#include "Primitives/hand/hand.h"
+
+#include "Sandbox/PathManager.h"
 
 UIControlView::UIControlView(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UISurface(pHALImp, pDreamOS)
@@ -27,23 +30,25 @@ RESULT UIControlView::Initialize() {
 
 	m_hiddenScale = 0.2f;
 	m_visibleScale = 1.0f;	// changing this breaks things - change height and width too / instead.
-
 	m_keyboardAnimationDuration = KEYBOARD_ANIMATION_DURATION_SECONDS;	
 
 	if (m_pDreamOS->GetHMD() != nullptr) {
 		switch (m_pDreamOS->GetHMD()->GetDeviceType()) {
-		case HMDDeviceType::OCULUS: {
-			m_pOverlayLeft = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszOculusOverlayLeft);
-			m_pOverlayRight = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszOculusOverlayRight);
-		} break;
-		case HMDDeviceType::VIVE: {
-			m_pOverlayLeft = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayLeft);
-			m_pOverlayRight = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayRight);
-		} break;
-		case HMDDeviceType::META: {
-			m_pOverlayLeft = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayLeft);
-			m_pOverlayRight = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayRight);
-		} break;
+		
+			case HMDDeviceType::OCULUS: {
+				m_pOverlayLeft = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszOculusOverlayLeft);
+				m_pOverlayRight = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszOculusOverlayRight);
+			} break;
+		
+			case HMDDeviceType::VIVE: {
+				m_pOverlayLeft = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayLeft);
+				m_pOverlayRight = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayRight);
+			} break;
+
+			case HMDDeviceType::META: {
+				m_pOverlayLeft = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayLeft);
+				m_pOverlayRight = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayRight);
+			} break;
 		}
 
 		CN(m_pOverlayLeft);

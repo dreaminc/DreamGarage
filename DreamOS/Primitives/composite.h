@@ -21,10 +21,11 @@ class DimRay;
 class user;
 //class quad;
 #include "Primitives/quad.h"
+
 class model;
 
 class hand;
-#include "HandType.h"
+#include "Primitives/hand/HandType.h"
 
 class camera;
 class FlatContext;

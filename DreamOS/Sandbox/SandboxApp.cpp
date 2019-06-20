@@ -4,33 +4,39 @@
 
 #include "Cloud/CloudController.h"
 
-#include "Cloud/Message/Message.h"
-
 #include "Primitives/ray.h"
 
 #ifndef OCULUS_PRODUCTION_BUILD
 	#include <HMD/OpenVR/OpenVRDevice.h>
 #endif
 
-#include <HMD/Oculus/OVR.h>
-
-
-// TODO: Rename to non Dream names?
-#include "DreamModuleManager.h"
-
-#include "DreamAppManager.h"
 #include "DreamAppMessage.h"
 
-#include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/ProgramNode.h"
-
 #include "Primitives/model/ModelFactory.h"
 
-#include "Primitives/HysteresisCylinder.h"
+#include "CommandLineManager.h"
+
+#include "InteractionEngine/InteractionEngine.h"
+#include "PhysicsEngine/PhysicsEngine.h"
+
+#include "Scene/CameraNode.h"
+#include "Scene/ObjectStoreNode.h"
+#include "PhysicsEngine/CollisionDetector.h"
+
+#include "Sense/SenseLeapMotion.h"
+
+#include "DreamAppManager.h"
+#include "DreamModuleManager.h"
+
+#include "HAL/Pipeline/SinkNode.h"
+
 #include "Primitives/HysteresisPlane.h"
 #include "Primitives/HysteresisSphere.h"
+#include "Primitives/HysteresisCylinder.h"
 
-#include <HMD/HMDFactory.h>
+// TODO: Fix
+#include "HAL/opengl/OGLHand.h"
 
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
@@ -265,7 +271,31 @@ Error:
 }
 
 // temp
-#include "HAL/opengl/OGLHand.h"
+#include "DreamLogger/DreamLogger.h"            // for DreamLogger
+#include "HAL/opengl/OpenGLRenderingContext.h"  // for OpenGLRenderingContext
+#include "HAL/Pipeline/Pipeline.h"              // for Pipeline
+#include "Primitives/billboard.h"               // for billboard
+#include "Primitives/composite.h"               // for composite
+#include "Primitives/cylinder.h"                // for cylinder
+#include "Primitives/DimObj.h"                  // for DimObj
+#include "Primitives/DimPlane.h"                // for DimPlane
+#include "Primitives/DimRay.h"                  // for DimRay
+#include "Primitives/FlatContext.h"             // for FlatContext
+#include "Primitives/model/mesh.h"              // for mesh
+#include "Primitives/model/model.h"             // for model
+#include "Primitives/quad.h"                    // for quad
+#include "Primitives/skybox.h"                  // for skybox
+#include "Primitives/sphere.h"                  // for sphere
+#include "Primitives/stereocamera.h"            // for stereocamera
+#include "Primitives/user.h"                    // for user
+#include "Primitives/volume.h"                  // for volume
+#include "RESULT/EHM.h"                         // for CR, CN, CNM, CRM, DOSLOG, CB, CVM, WCNM, CBM, CNR
+#include "Scene/ObjectStore.h"                  // for ObjectStore
+#include "Scene/ObjectStoreFactory.h"           // for ObjectStoreFactory, ObjectStoreFactory::TYPE, ObjectStoreFactory::TYPE::LIST
+#include "vcruntime_new.h"                      // for operator delete, operator new
+#include <synchapi.h>                           // for Sleep
+#include <WinUser.h>                            // for GetAsyncKeyState, VK_ESCAPE
+class SinkNode;
 
 // TODO: shouldn't be this way ultimately
 RESULT SandboxApp::RegisterImpLeapMotionEvents() {
@@ -309,9 +339,8 @@ Error:
 	return r;
 }
 
-//hand *Windows64App::AttachHand
-
 hand *SandboxApp::GetHand(HAND_TYPE handType) {
+
 	if (m_pHMD != nullptr) {
 		return m_pHMD->GetHand(handType);
 	}

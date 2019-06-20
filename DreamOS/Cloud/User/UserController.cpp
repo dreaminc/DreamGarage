@@ -4,6 +4,10 @@
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"
 #include "json.hpp"
+
+#include "Primitives/point.h"
+#include "Primitives/vector.h"
+#include "Primitives/quaternion.h"
 #include "Primitives/version.h"
 
 #include <fstream>
@@ -22,13 +26,10 @@
 
 UserController::UserController(Controller* pParentController) :
 	Controller(pParentController),
-	m_fLoggedIn(false)
+	m_fLoggedIn(false),
+	m_user(User()),
+	m_twilioNTSInformation(TwilioNTSInformation())
 {
-	// empty
-}
-
-
-UserController::~UserController() {
 	// 
 }
 

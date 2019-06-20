@@ -10,7 +10,8 @@
 // OGLComposite instead
 
 #include "OGLObj.h"
-#include "Primitives/hand.h"
+
+#include "Primitives/hand/hand.h"
 
 // Pyramid inheritance throws a dominance warning which needs to be suppressed 
 // until c++ adds a special keyword to deal with this issue, this is by design

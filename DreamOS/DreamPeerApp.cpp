@@ -5,6 +5,8 @@
 #include "InteractionEngine/AnimationItem.h"
 
 #include "Primitives/font.h"
+#include "Primitives/hand/hand.h"
+#include "Primitives/user.h"
 
 #include "Cloud/HTTP/HTTPController.h"
 #include "Cloud/Environment/PeerConnection.h"
@@ -424,7 +426,7 @@ Error:
 	return r;
 }
 
-RESULT DreamPeerApp::UpdateHand(const hand::HandState& handState) {
+RESULT DreamPeerApp::UpdateHand(const HandState& handState) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);

@@ -8,6 +8,9 @@
 
 #include "DreamGarage\DreamGamepadCameraApp.h"
 
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
+
 DreamTestSuite::DreamTestSuite(std::string strName, DreamOS *pParentDreamOS) :
 	TestSuite(strName),
 	m_pDreamOS(pParentDreamOS)

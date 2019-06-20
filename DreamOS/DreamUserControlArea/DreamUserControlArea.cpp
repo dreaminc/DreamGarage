@@ -25,6 +25,8 @@
 
 #include "Sound/AudioPacket.h"
 
+#include "Primitives/hand/hand.h"
+
 DreamUserControlArea::DreamUserControlArea(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUserControlArea>(pDreamOS, pContext)
 {

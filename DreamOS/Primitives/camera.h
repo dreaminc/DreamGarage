@@ -1,7 +1,6 @@
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
-#include "RESULT/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/camera.h
@@ -13,9 +12,7 @@
 #include "VirtualObj.h"
 #include "vector.h"
 #include "point.h"
-#include "color.h"
 
-#include "matrix/matrix.h"
 #include "matrix/ProjectionMatrix.h"
 #include "matrix/ViewMatrix.h"
 #include "ray.h"
@@ -26,11 +23,17 @@
 	typedef double camera_precision;
 #endif
 
-#include "Primitives/Subscriber.h"
-#include "Sense/SenseKeyboard.h"
-#include "HMD/HMD.h"
 
 #include "Primitives/viewport.h"
+#include "memory"                     // for shared_ptr
+#include "quaternion.h"    // for quaternion
+#include "RESULT/RESULT.h"            // for RESULT
+
+class DimObj;
+class HMD;
+class SenseKeyboard;
+
+class composite;
 
 enum EYE_TYPE {
 	EYE_LEFT,

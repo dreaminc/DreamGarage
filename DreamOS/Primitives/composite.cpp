@@ -2,7 +2,7 @@
 
 #include "HAL/HALImp.h"
 
-#include "Primitives/hand.h"
+#include "Primitives/hand/hand.h"
 #include "Primitives/user.h"
 
 #include "Primitives/FlatContext.h"

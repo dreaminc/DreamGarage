@@ -4,6 +4,8 @@
 
 #include "Test/TestSuiteFactory.h"
 
+#include "Sandbox/CommandLineManager.h"
+
 // TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
 //#define TESTING
 

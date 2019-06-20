@@ -40,9 +40,6 @@
 
 #include "PhysicsEngine/PhysicsEngine.h"
 
-#include "DreamAppManager.h"
-#include "DreamModuleManager.h"
-
 #include "DreamPeerApp.h"
 #include "DreamUserApp.h"
 #include "DreamAppHandle.h"
@@ -63,6 +60,7 @@ class DreamMessage;
 class DreamAppMessage;
 class DreamSettingsApp;
 class DreamLoginApp;
+class DreamFormApp;
 class OGLProgram;
 
 class NamedPipeClient;
@@ -71,6 +69,9 @@ class NamedPipeServer;
 class PeerStayAliveMessage;
 class PeerAckMessage;
 class PeerHandshakeMessage;
+
+class DreamAppManager;
+class DreamModuleManager;
 
 struct PrimParams;
 
@@ -399,7 +400,6 @@ public:
 
 	std::shared_ptr<DreamModuleBase> GetDreamModuleFromUID(UID moduleUID);
 
-//protected:
 public:
 	// Keyboard
 	RESULT InitializeKeyboard();

@@ -9,8 +9,6 @@
 
 #include "Primitives/valid.h"
 #include "Primitives/Types/UID.h"
-#include "Primitives/vector.h"
-#include "Primitives/point.h"
 
 #include <string>
 #include <memory>
@@ -27,6 +25,9 @@ class DreamAppBase {
 	friend class DreamOS;
 
 public:
+	DreamAppBase(DreamOS* pDreamOS, void* pContext = nullptr);
+	~DreamAppBase() = default;
+
 	virtual RESULT InitializeApp(void *pContext = nullptr) = 0;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) = 0;
 	virtual RESULT Update(void *pContext = nullptr) = 0;
@@ -34,13 +35,15 @@ public:
 
 	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) { return R_NOT_HANDLED; }
 
-	virtual composite *GetComposite() = 0;
+	virtual composite* GetComposite();
+	RESULT SetComposite(composite* pComposite);
+	void* GetAppContext();
+
 	virtual DreamAppHandle* GetAppHandle();
 	virtual DreamOS *GetDOS() = 0;
 	virtual unsigned int GetHandleLimit();
 
 protected:
-	virtual void *GetAppContext() = 0;
 	virtual RESULT Print() { return R_NOT_IMPLEMENTED; }
 
 	RESULT FlagShutdown(std::string strShutdownFlagSignalName = "normal");
@@ -84,6 +87,8 @@ protected:
 
 	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
 
+	RESULT Initialize();
+
 private:
 	double m_usTimeRun = 0.0;
 	int m_priority = 0;
@@ -97,6 +102,11 @@ private:
 	std::string m_strAppName;
 	std::string m_strAppDescription;
 	UID m_uid;
+
+protected:
+	DreamOS* m_pDreamOS = nullptr;
+	composite* m_pComposite = nullptr;
+	void* m_pContext = nullptr;
 };
 
 
@@ -127,46 +137,21 @@ public:
 	};
 
 	DreamApp(DreamOS *pDreamOS, void *pContext = nullptr) :
-		m_pDreamOS(pDreamOS),
-		m_pCompositeContext(nullptr),
-		m_pContext(pContext)
+		DreamAppBase(pDreamOS, pContext)
 	{
-		// Empty
+		// 
 	}
 
-	~DreamApp() {
-		// empty
-	}
-
-	RESULT Initialize();
+	~DreamApp() = default;
 
 	virtual RESULT InitializeApp(void *pContext = nullptr) = 0;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) = 0;
 	virtual RESULT Update(void *pContext = nullptr) = 0;
 
 protected:
-	vector GetCameraLookXZ();
-	RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
-	RESULT UpdateCompositeWithHands(float yPos, Axes handAxes = Axes::ALL);
-
-	//TODO: these can be moved into DreamApp.tpp
-	void *GetAppContext() {
-		return m_pContext;
-	}
-
-	virtual composite *GetComposite() override {
-		return m_pCompositeContext;
-	}
-
-	RESULT SetComposite(composite *pComposite) {
-		RESULT r = R_PASS;
-		CBM(m_pCompositeContext == nullptr, "composite is already set");
-
-		m_pCompositeContext = pComposite;
-
-	Error:
-		return r;
-	}
+	//vector GetCameraLookXZ();
+	//RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
+	//RESULT UpdateCompositeWithHands(float yPos, Axes handAxes = Axes::ALL);
 
 	static derivedAppType* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr) {
 		return derivedAppType::SelfConstruct(pDreamOS, pContext);
@@ -180,11 +165,7 @@ protected:
 		//DEBUG_LINEOUT_RETURN("%s running %fus pri: %d", (m_strAppName.length() > 0) ? m_strAppName.c_str() : "DreamApp", GetTimeRun(), GetPriority());
 		return R_PASS;
 	}
-
-private:
-	composite *m_pCompositeContext;
-	DreamOS *m_pDreamOS;
-	void *m_pContext = nullptr;
+	
 };
 
 #include "DreamApp.tpp"

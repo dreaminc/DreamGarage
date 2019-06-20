@@ -3,20 +3,21 @@
 #include "PeerConnectionController.h"
 #include "PeerConnection.h"
 
+#include "Cloud/User/User.h"
+#include "Cloud/User/TwilioNTSInformation.h"
+
 #include "Sandbox/CommandLineManager.h"
 
 std::string PeerConnectionController::GetMethodURI(PeerConnectionMethod method) {
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	
 	std::string strURI = "";
-	std::string ip = pCommandLineManager->GetParameterValue("ws.ip");
+	std::string strIP = pCommandLineManager->GetParameterValue("ws.ip");
 
-	// TODO:
 	switch (method) {
 		case PeerConnectionMethod::INVALID:
 		default: {
-			//strURI = "ws://" + strIP + ":" + std::to_string(port) + "/environment/";
-			strURI = ip;
+			strURI = strIP;
 		} break;
 	}
 
@@ -37,7 +38,6 @@ Error:
 PeerConnectionController::PeerConnectionController(Controller* pParentController) :
 	Controller(pParentController),
 	m_pWebRTCImp(nullptr)
-	//DEADBEEF: m_pPeerConnectionCurrentHandshake(nullptr)
 {
 	// empty
 }

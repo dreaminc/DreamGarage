@@ -1,12 +1,15 @@
 #include "CloudController.h"
 
+#include "Primitives/point.h"
+#include "Primitives/vector.h"
+#include "Primitives/quaternion.h"
+
+#include "Primitives/texture.h"
+
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"
 
 #include "Cloud/Message/Message.h"
-//#include "Cloud/Message/UpdateHandMessage.h"
-//#include "Cloud/Message/UpdateHeadMessage.h"
-//#include "Cloud/Message/AudioDataMessage.h"
 
 #include "User/User.h"
 #include "User/TwilioNTSInformation.h"

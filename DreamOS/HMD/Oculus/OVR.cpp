@@ -8,6 +8,7 @@
 
 #include "Primitives/stereocamera.h"
 #include "Primitives/rectangle.h"
+#include "Primitives/hand/hand.h"
 
 #include "Extras/OVR_Math.h"
 
@@ -20,7 +21,7 @@
 #include "OVRPlatform.h"
 
 #include "OVR_CAPI_Audio.h"
-#include "core/Utilities.h"
+#include "Core/Utilities.h"
 
 OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),

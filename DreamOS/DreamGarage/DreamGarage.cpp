@@ -1,49 +1,27 @@
 #include "DreamGarage.h"
 
-#include "DreamLogger/DreamLogger.h"
+#include "Core/Utilities.h"
 
 #include <string>
-#include <array>
-#include <algorithm>
 
 light *g_pLight = nullptr;
 
-#include "Cloud/CloudController.h"
 //#include "Cloud/Message/UpdateHeadMessage.h"
 //#include "Cloud/Message/UpdateHandMessage.h"
 //#include "Cloud/Message/AudioDataMessage.h"
 
-#include "DreamGarage/DreamContentView.h"
-#include "DreamGarage/DreamUIBar.h"
-#include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/DreamEnvironmentApp.h"
-#include "DreamControlView/UIControlView.h"
-#include "DreamShareView/DreamShareView.h"
-#include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
-#include "DreamGarage/DreamSettingsApp.h"
-#include "DreamGarage/DreamLoginApp.h"
 #include "DreamVCam.h"
-#include "DreamUserApp.h"
-#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
-#include "DreamGarage/DreamGamepadCameraApp.h"
 
-#include "HAL/opengl/OGLObj.h"
-#include "HAL/opengl/OGLProgramStandard.h"
 #include "HAL/opengl/OGLProgramScreenFade.h"
-#include "HAL/opengl/OGLProgramSkybox.h"
 
-#include "PhysicsEngine/CollisionManifold.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
 #include "HAL/UIStageProgram.h"
 #include "HAL/EnvironmentProgram.h"
 
-#include "Core/Utilities.h"
 
 #include "Cloud/Environment/PeerConnection.h"
-#include "Cloud/Environment/EnvironmentShare.h"
 
 #include "DreamGarageMessage.h"
 #include "UpdateHeadMessage.h"
@@ -52,6 +30,34 @@ light *g_pLight = nullptr;
 #include "AudioDataMessage.h"
 
 #include "Sound/AudioPacket.h"
+
+#include "Primitives/hand/hand.h"
+
+#include "Sandbox/CommandLineManager.h"
+#include "Sandbox/PathManager.h"
+
+#include "Primitives/camera.h"
+
+#include "HAL/Pipeline/SinkNode.h"
+#include "HAL/Pipeline/SourceNode.h"
+#include "HAL/Pipeline/ProgramNode.h"
+
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
+
+#include "HAL/SkyboxScatterProgram.h"
+#include "HAL/FogProgram.h"
+
+#include "HAL/opengl/OGLProgramReflection.h"
+#include "HAL/opengl/OGLProgramRefraction.h"
+#include "HAL/opengl/OGLProgramSkybox.h"
+#include "HAL/opengl/OGLProgramWater.h"
+
+#include "DreamSettingsApp.h"
+#include "DreamLoginApp.h"
+#include "Cloud/Environment/EnvironmentShare.h"
+
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 
 /* Comment this out to enable 3rd party camera
 #define _USE_3RD_PARTY_CAMERA
@@ -170,10 +176,32 @@ Error:
 }
 
 // Temp:
-#include "HAL/opengl/OGLProgramReflection.h"
-#include "HAL/opengl/OGLProgramRefraction.h"
-#include "HAL/opengl/OGLProgramWater.h"
-#include "HAL/opengl/OGLProgramSkyboxScatter.h"
+#include "chrono"                                       // for system_clock, system_clock::time_point
+#include "Cloud/Environment/EnvironmentController.h"    // for EnvironmentController
+#include "Cloud/User/User.h"                            // for User
+#include "Cloud/User/UserController.h"                  // for UserController
+#include "Cloud/webrtc/WebRTCPeerConnection.h"          // for WebRTCPeerConnectionProxy
+#include "DreamFormApp.h"                   // for FormType, DreamFormApp, FormType::SIGN_IN, FormType::CERTIFICATE_ERROR, FormType::LOAD_RESOURCE_ERROR, FormType::SIGN_UP_WELCOME, FormType::TEAMS_MISSING, FormType::SETTINGS, FormType::SIGN_UP
+#include "DreamMessage.h"                               // for DreamMessage
+#include "DreamPeerApp.h"                               // for DreamPeerApp
+#include "DreamSoundSystem.h"               // for DreamSoundSystem, DreamSoundSystem::MIXDOWN_TARGET
+#include "DreamUserControlArea/DreamContentSource.h"    // for SHARE_TYPE_SCREEN, SHARE_TYPE_CAMERA
+#include "DreamUserControlArea/DreamUserControlArea.h"  // for DreamUserControlArea
+#include "HAL/HALImp.h"                                 // for HALImp::HALConfiguration, HALImp
+#include "HAL/opengl/OGLProgram.h"                      // for OGLProgram
+#include "HAL/Pipeline/Pipeline.h"                      // for Pipeline
+#include "HMD/HMD.h"                                    // for HMD
+#include "HMD/HMDFactory.h"                             // for ::HMD_ANY_AVAILABLE
+#include "Primitives/hand/HandState.h"                  // for HandState
+#include "RESULT/EHM.h"                                 // for CR, CN, DOSLOG, CRM, CNM, CNR, CBRM, CB, DEBUG_LINEOUT
+#include "Sandbox/CommandLineManager.h"                 // for CommandLineManager
+#include "Sense/SenseKeyboard.h"                        // for SenseKeyboardEvent, SenseTypingEvent (ptr only)
+#include "Sound/SoundCommon.h"                          // for type, type::SIGNED_16_BIT
+#include "stdint.h"                                     // for uint8_t
+#include <corecrt_math_defines.h>                       // for M_PI
+class SinkNode;
+class light;
+class stereocamera;
 
 RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 	RESULT r = R_PASS;
@@ -797,7 +825,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SendUpdateHandMessage(long userID, hand::HandState handState) {
+RESULT DreamGarage::SendUpdateHandMessage(long userID, HandState handState) {
 	RESULT r = R_PASS;
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
@@ -824,7 +852,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::BroadcastUpdateHandMessage(hand::HandState handState) {
+RESULT DreamGarage::BroadcastUpdateHandMessage(HandState handState) {
 	RESULT r = R_PASS;
 
 	uint8_t *pDatachannelBuffer = nullptr;
@@ -1456,7 +1484,7 @@ RESULT DreamGarage::HandleHandUpdateMessage(PeerConnection* pPeerConnection, Upd
 	pUser->UpdateHand(handState);
 	*/
 
-	hand::HandState handState = pUpdateHandMessage->GetHandState();
+	HandState handState = pUpdateHandMessage->GetHandState();
 
 	auto pDreamPeer = FindPeer(pPeerConnection);
 	CN(pDreamPeer);

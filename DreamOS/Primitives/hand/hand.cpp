@@ -10,6 +10,8 @@
 
 #include "DreamGarage/UICommon.h"
 
+#include "Sandbox/PathManager.h"
+
 hand::hand(HALImp* pHALImp, HAND_TYPE type) :
 	composite(pHALImp)
 {
@@ -478,7 +480,7 @@ Error:
 	return r;
 }
 
-RESULT hand::SetHandState(const hand::HandState& pHandState) {
+RESULT hand::SetHandState(const HandState& pHandState) {
 	RESULT r = R_PASS;
 
 	SetPosition(pHandState.ptPalm);
@@ -499,8 +501,8 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	return r;
 }
 
-hand::HandState hand::GetHandState() {
-	hand::HandState handState = {
+HandState hand::GetHandState() {
+	HandState handState = {
 		GetPosition(true),
 		GetOrientation(true),
 		m_handType,

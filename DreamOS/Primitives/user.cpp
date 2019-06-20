@@ -1,7 +1,9 @@
 #include "user.h"
+
 #include "Primitives/quad.h"
 #include "Primitives/model/model.h"
 #include "Primitives/font.h"
+#include "Primitives/hand/hand.h"
 
 #include "Cloud/HTTP/HTTPController.h"
 
@@ -11,6 +13,8 @@
 
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
+
+#include "Sandbox/PathManager.h"
 
 user::user(HALImp* pHALImp) :
 	composite(pHALImp)
@@ -673,7 +677,7 @@ Error:
 }
 
 //TODO: why doesn't this use hand::SetHandState(pHandState)
-RESULT user::UpdateHand(const hand::HandState& pHandState) {
+RESULT user::UpdateHand(const HandState& pHandState) {
 	RESULT r = R_PASS;
 
 	point ptHand = pHandState.ptPalm;

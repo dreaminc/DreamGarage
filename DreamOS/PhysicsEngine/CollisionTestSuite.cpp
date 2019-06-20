@@ -9,15 +9,15 @@
 
 #include "Primitives/DimPlane.h"
 #include "Primitives/HysteresisCylinder.h"
+#include "Primitives/hand/hand.h"
+
+#include "Scene/CameraNode.h"
+#include "Scene/ObjectStoreNode.h"
 
 CollisionTestSuite::CollisionTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("collision", pDreamOS)
 {
-	// empty
-}
-
-CollisionTestSuite::~CollisionTestSuite() {
-	// empty
+	// 
 }
 
 RESULT CollisionTestSuite::AddTests() {

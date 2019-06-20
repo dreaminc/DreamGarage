@@ -2,54 +2,96 @@
 #include "DreamOS.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
 #include "HAL/UIStageProgram.h"
-#include "HAL/EnvironmentProgram.h"
 
 #include "HAL/opengl/OGLProgramScreenFade.h"
-#include "HAL/opengl/OGLProgramWater.h"
-#include "HAL/opengl/OGLProgramReflection.h"
-#include "HAL/opengl/OGLProgramRefraction.h"
-#include "HAL/opengl/OGLProgramSkyboxScatter.h"
-#include "HAL/opengl/OGLProgramSkybox.h"
 
-#include "DreamModule.h"
-
-#include "DreamTestingApp.h"
-#include "DreamUserApp.h"
-#include "UI\UIKeyboard.h"
-#include "DreamGarage\DreamUIBar.h"
-#include "DreamGarage\DreamFormApp.h"
 //#include "DreamControlView\UIControlView.h"
-#include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
-#include "DreamShareView\DreamShareView.h"
-#include "DreamGarage\DreamGamepadCameraApp.h"
-#include "DreamGarage\DreamEnvironmentApp.h"
-
-#include "DreamVCam.h"
 
 #include "DreamGarage\DreamBrowser.h"
-#include "DreamGarage\Dream2DMouseApp.h"
 #include "WebBrowser\WebBrowserController.h"
-#include "WebBrowser\CEFBrowser/CEFBrowserManager.h"
-
-#include "Sandbox/NamedPipeClient.h"
-#include "Sandbox/NamedPipeServer.h"
 
 #include <chrono>
 
-#include <windows.h>
-#include <windowsx.h>
-#include <wincred.h>
-#include "DDCIPCMessage.h"
-
 #include "Sound/AudioPacket.h"
+
+#include "Cloud/CloudController.h"             // for CloudController
+#include "DreamGarage/DreamSoundSystem.h"      // for DreamSoundSystem, DreamSoundSystem::MIXDOWN_TARGET, DreamSoundSystem::observer
+#include "HAL/EnvironmentProgram.h"  // for EnvironmentProgram
+#include "HAL/HALImp.h"                        // for HALImp
+#include "HAL/opengl/OGLProgram.h"             // for OGLProgram
+#include "HAL/Pipeline/Pipeline.h"             // for Pipeline
+#include "memory"                              // for shared_ptr
+#include "Primitives/DimObj.h"                 // for DimObj
+#include "Primitives/model/model.h"            // for model
+#include "Primitives/quad.h"                   // for quad
+#include "Primitives/quaternion.h"             // for quaternion
+#include "Primitives/ray.h"                    // for ray
+#include "Primitives/sphere.h"                 // for sphere
+#include "Primitives/texture.h"                // for texture, texture::type, texture::type::TEXTURE_2D
+#include "Primitives/vector.h"                 // for vector
+#include "Primitives/volume.h"                 // for volume
+#include "RESULT/EHM.h"                        // for CR, CN, CNM, CRM, DEBUG_LINEOUT, CBM, DOSLOG
+#include "Sandbox/CommandLineManager.h"        // for CommandLineManager
+#include "Sandbox/CredentialManager.h"         // for CredentialManager, CredentialManager::type, CredentialManager::type::CREDENTIAL_GENERIC
+#include "Sense/SenseController.h"             // for SenseControllerEvent, ControllerState, SenseControllerEventType::SENSE_CONTROLLER_MENU_UP, SenseControllerEventType::SENSE_CONTROLLER_META_CLOSED
+#include "Test/TestObject.h"                   // for TestObject::TestDescriptor, TestObject
+#include "vcruntime_new.h"                     // for operator new, operator delete
+#include "vcruntime_string.h"                  // for memcpy
+#include <stddef.h>                            // for size_t
+#include <WinUser.h>                           // for SendMessage
+
+#include "HAL/SkyboxScatterProgram.h"
+#include "HAL/opengl/OGLProgramSkyboxScatter.h"
+#include  "DreamGarage/DreamEnvironmentApp.h"
+#include "DreamGarage/DreamUIBar.h"
+
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
+
+#include "HAL/Pipeline/SinkNode.h"
+#include "HAL/Pipeline/SourceNode.h"
+#include "HAL/Pipeline/ProgramNode.h"
+
+#include "Primitives/hand/hand.h"
+
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+
+#include "DreamTestingApp.h"
+#include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
+
+#include "HAL/opengl/OGLProgramReflection.h"
+#include "HAL/opengl/OGLProgramRefraction.h"
+#include "HAL/opengl/OGLProgramSkybox.h"
+#include "HAL/opengl/OGLProgramWater.h"
+
+class CEFBrowserManager;
+class DOMNode;
+class DimRay;
+class Dream2DMouseApp;
+class DreamContentSource;
+class DreamDesktopApp;
+class DreamEnvironmentApp;
+class DreamPeerApp;
+class DreamShareView;
+class DreamTestingApp;
+class DreamUserApp;
+class DreamUserControlArea;
+class DreamVCam;
+class MenuControllerProxy;
+class NamedPipeClient;
+class NamedPipeServer;
+class SinkNode;
+class SoundBuffer;
+class UIKeyboard;
+class light;
+class user;
+struct InteractionObjectEvent;
 
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("dreamos", pDreamOS)
 {
-	// empty
+	// 
 }
 
 RESULT DreamOSTestSuite::AddTests() {
@@ -1704,11 +1746,18 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 		CR(pRenderProgramNode->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
 
 		// Reference Geometry Shader Program
-		pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");		CN(pReferenceGeometryProgram);		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));		CR(pReferenceGeometryProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
+		pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
 		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		// Skybox
-		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");		CN(pSkyboxProgram);		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));		CR(pSkyboxProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 		//*/
 
 		// Don't actually need to hook up the AUX node 

@@ -30,39 +30,39 @@
     <ProjectGuid>{E8896328-06EB-43A0-902C-59C3D2F3A3B5}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>DreamOS</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Production|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
@@ -70,7 +70,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Production|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -134,6 +134,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MinimalRebuild>false</MinimalRebuild>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -455,7 +456,8 @@ __BASE_FILE__="%(Filename)%(Extension)";%(PreprocessorDefinitions)</Preprocessor
     <ClCompile Include="..\..\..\Primitives\FogParams.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
     <ClCompile Include="..\..\..\Primitives\Framebuffer.cpp" />
-    <ClCompile Include="..\..\..\Primitives\hand.cpp" />
+    <ClCompile Include="..\..\..\Primitives\hand\hand.cpp" />
+    <ClCompile Include="..\..\..\Primitives\hand\LeapHand.cpp" />
     <ClCompile Include="..\..\..\Primitives\HysteresisCylinder.cpp" />
     <ClCompile Include="..\..\..\Primitives\HysteresisObject.cpp" />
     <ClCompile Include="..\..\..\Primitives\HysteresisPlane.cpp" />
@@ -464,7 +466,6 @@ __BASE_FILE__="%(Filename)%(Extension)";%(PreprocessorDefinitions)</Preprocessor
     <ClCompile Include="..\..\..\Primitives\image\image.cpp" />
     <ClCompile Include="..\..\..\Primitives\image\ImageFactory.cpp" />
     <ClCompile Include="..\..\..\Primitives\image\MemoryImageObj.cpp" />
-    <ClCompile Include="..\..\..\Primitives\LeapHand.cpp" />
     <ClCompile Include="..\..\..\Primitives\line.cpp" />
     <ClCompile Include="..\..\..\Primitives\material.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\BasisMatrix.cpp" />
@@ -833,8 +834,10 @@ __BASE_FILE__="%(Filename)%(Extension)";%(PreprocessorDefinitions)</Preprocessor
     <ClInclude Include="..\..\..\Primitives\FogParams.h" />
     <ClInclude Include="..\..\..\Primitives\font.h" />
     <ClInclude Include="..\..\..\Primitives\Framebuffer.h" />
-    <ClInclude Include="..\..\..\Primitives\hand.h" />
-    <ClInclude Include="..\..\..\Primitives\HandType.h" />
+    <ClInclude Include="..\..\..\Primitives\hand\hand.h" />
+    <ClInclude Include="..\..\..\Primitives\hand\HandState.h" />
+    <ClInclude Include="..\..\..\Primitives\hand\HandType.h" />
+    <ClInclude Include="..\..\..\Primitives\hand\LeapHand.h" />
     <ClInclude Include="..\..\..\Primitives\HysteresisCylinder.h" />
     <ClInclude Include="..\..\..\Primitives\HysteresisObject.h" />
     <ClInclude Include="..\..\..\Primitives\HysteresisPlane.h" />
@@ -843,7 +846,6 @@ __BASE_FILE__="%(Filename)%(Extension)";%(PreprocessorDefinitions)</Preprocessor
     <ClInclude Include="..\..\..\Primitives\image\image.h" />
     <ClInclude Include="..\..\..\Primitives\image\ImageFactory.h" />
     <ClInclude Include="..\..\..\Primitives\image\MemoryImageObj.h" />
-    <ClInclude Include="..\..\..\Primitives\LeapHand.h" />
     <ClInclude Include="..\..\..\Primitives\light.h" />
     <ClInclude Include="..\..\..\Primitives\line.h" />
     <ClInclude Include="..\..\..\Primitives\Manager.h" />

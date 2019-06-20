@@ -16,6 +16,10 @@
 
 #include "DreamGarage/DreamContentView.h"
 
+#include "Sandbox/PathManager.h"
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
+
 std::map<int, std::string> k_refreshTokens = {
 	{ 0, "NakvA43v1eVBqvvTJuqUdXHWL02CNuDqrgHMEBrIY6P5FoHZ2GtgbCVDYvHMaRTw" },
 	{ 1, "daehZbIcTcXaPh29tWQy75ZYSLrRL4prhBoBYMRQtU48NMs6svnt5CkzCA5RLKJq" },

@@ -15,37 +15,77 @@
 #include "HAL/HALImp.h"
 
 #include "Modules/TimeManagerModule.h"
-#include "Sandbox/PathManager.h"
 #include "Sandbox/CredentialManager.h"
-#include "Sandbox/CommandLineManager.h"
-#include "HAL/opengl/OpenGLRenderingContext.h"
 
-#include "Scene/ObjectStoreNode.h"
-#include "Scene/CameraNode.h"
-
-#include <functional>
-
-//class CloudController;
 #include "Cloud/CloudController.h"
 
 #include "DreamAppMessage.h"
-
-#include "PhysicsEngine/PhysicsEngine.h"
-#include "InteractionEngine/InteractionEngine.h"
 
 #include "Primitives/viewport.h"
 #include "Primitives/HysteresisObject.h"
 
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
-#include "Sense/SenseLeapMotion.h"
 #include "Sense/SenseController.h"
 #include "Sense/SenseGamepadController.h"
 
 #include "Primitives/model/ModelFactory.h"
+#include "functional"                                  // for function
+#include "HAL/Pipeline/PipelineCommon.h"               // for PIPELINE_FLAGS, PIPELINE_FLAGS::NONE
+#include "HMD/HMD.h"                                   // for HMD (ptr only), HMDEvent (ptr only), HMDEventType
+#include "InteractionEngine/InteractionObjectEvent.h"  // for InteractionObjectEvent (ptr only), InteractionEventType
+#include "memory"                                      // for shared_ptr
+#include "Primitives/color.h"                          // for color, COLOR_TYPE::COLOR_WHITE, PIXEL_FORMAT
+#include "Primitives/hand/HandType.h"                  // for HAND_TYPE
+#include "Primitives/light.h"                          // for LIGHT_TYPE, light (ptr only), light_precision
+#include "Primitives/point.h"                          // for point
+#include "Primitives/quaternion.h"                     // for quaternion
+#include "Primitives/text.h"                           // for text, text::flags, text::flags::NONE
+#include "Primitives/texture.h"                        // for texture, texture::type
+#include "Primitives/vector.h"                         // for vector
+#include "RESULT/RESULT.h"                             // for RESULT, ::R_PASS
+#include "stdint.h"                                    // for uint8_t
+#include "xstring"                                     // for string, wstring
+
+#include <stddef.h>                                    // for size_t
+
+// TODO: Should remove or use for windows only
+#include <windef.h>                                    // for HWND
+
 #include "HMD/HMDFactory.h"
 
-class light; 
+class CameraNode;
+class CommandLineManager;
+class DimObj;
+class DreamOS;
+class InteractionEngineProxy;
+class ObjectStore;
+class ObjectStoreNode;
+class OpenGLRenderingContext;
+class PathManager;
+class PeerConnection;
+class Pipeline;
+class ProgramNode;
+class VirtualObj;
+class billboard;
+class composite;
+class cubemap;
+class font;
+class hand;
+class mesh;
+class ray;
+class stereocamera;
+struct CollisionGroupEvent;
+struct CollisionObjectEvent;
+struct PrimParams;
+
+class SenseLeapMotion;
+class PhysicsEngine;
+class InteractionEngine;
+class DreamAppManager;
+
+template <typename SEventClass> class Subscriber;
+
 class quad;
 class FlatContext;
 class sphere; 
@@ -53,7 +93,6 @@ class cylinder;
 class DimRay;
 class DimPlane;
 class volume; 
-class texture; 
 class skybox;
 class model;
 class user;
@@ -61,8 +100,6 @@ class Message;
 
 class UIKeyboardLayout;
 
-class DreamAppManager;
-class DreamModuleManager;
 
 class NamedPipeClient;
 class NamedPipeServer;

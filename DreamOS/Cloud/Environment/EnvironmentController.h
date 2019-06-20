@@ -17,8 +17,8 @@
 #include "PeerConnectionController.h"
 #include "Cloud/Menu/MenuController.h"
 
-#include "Cloud/User/User.h"
-#include "Cloud/User/TwilioNTSInformation.h"
+class User;
+class TwilioNTSInformation;
 
 #include "Cloud/ControllerProxy.h"
 

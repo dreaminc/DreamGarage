@@ -19,9 +19,8 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/quaternion.h"
 #include "Primitives/point.h"
-#include "Primitives/composite.h"
-#include "Primitives/hand.h"
-#include "Primitives/HandType.h"
+
+#include "Primitives/hand/HandType.h"
 
 #include "Sense/SenseController.h"
 
@@ -30,6 +29,8 @@
 class HALImp;
 class SandboxApp;
 
+class hand;
+class composite;
 class HMDSinkNode;
 class HMDSourceNode;
 

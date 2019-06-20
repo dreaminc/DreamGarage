@@ -23,6 +23,9 @@
 #include "EnvironmentAsset.h"
 #include "EnvironmentShare.h"
 
+#include "Cloud/User/User.h"
+#include "Cloud/User/TwilioNTSInformation.h"
+
 EnvironmentController::EnvironmentController(Controller* pParentController, long environmentID) :
 	Controller(pParentController),
 	m_fConnected(false),

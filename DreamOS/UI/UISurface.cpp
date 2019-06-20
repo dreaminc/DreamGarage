@@ -2,14 +2,12 @@
 #include "DreamOS.h"
 #include "WebBrowser/WebBrowserController.h"
 
+#include "Primitives/hand/hand.h"
+
 UISurface::UISurface(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIView(pHALImp, pDreamOS)
 {
-
-}
-
-UISurface::~UISurface() {
-	//empty
+	//
 }
 
 RESULT UISurface::InitializeSurfaceQuad(float width, float height) {

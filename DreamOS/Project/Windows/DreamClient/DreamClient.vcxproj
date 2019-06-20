@@ -70,114 +70,114 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{D535A994-198C-4D89-99C9-704DA30FC0AD}</ProjectGuid>
     <RootNamespace>DreamClient</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OculusProduction|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OculusDevelopment|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Production|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLib|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OculusProduction|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OculusDevelopment|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Production|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -302,24 +302,21 @@
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
- /D
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\OfficialBuild\*" "$(TargetDir)"
- /D
+      <Command>xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
+ 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\OfficialBuild\*" "$(TargetDir)"
+ 
 
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
-xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" /D
 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" /D
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D	
-
-  
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"</Command>
@@ -359,26 +356,23 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\Fre
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
- /D
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\*" "$(TargetDir)"
- /D
+      <Command>xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
+ 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\*" "$(TargetDir)"
+ 
 
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D	
-
-  
-
-xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" 
 
 
-xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" 
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"</Command>
@@ -412,21 +406,20 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\Fre
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
- /D
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\OfficialBuild\*" "$(TargetDir)"
- /D
+      <Command>xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
+ 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\OfficialBuild\*" "$(TargetDir)"
+ 
 
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\DreamCef\src\DreamCEFExtension.js" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\DreamCef\src\DreamCEFExtension.js" "$(TargetDir)" 
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"
@@ -466,21 +459,20 @@ copy /y  "$(ProjectDir)DreamOculus.$(DREAMVERSION).nupkg" "$(ProjectDir)DreamOcu
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
- /D
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\OfficialBuild\*" "$(TargetDir)"
- /D
+      <Command>xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
+ 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\OfficialBuild\*" "$(TargetDir)"
+ 
 
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\DreamCef\src\DreamCEFExtension.js" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\DreamCef\src\DreamCEFExtension.js" "$(TargetDir)" 
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"
@@ -520,26 +512,24 @@ copy /y  "$(ProjectDir)DreamOculusDev.$(DREAMVERSION).nupkg" "$(ProjectDir)Dream
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
- /D
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\*" "$(TargetDir)"
- /D
+      <Command>xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
+ 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\*" "$(TargetDir)"
+ 
 
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" /D
 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" /D
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\DreamCef\src\DreamCEFExtension.js" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\DreamCef\src\DreamCEFExtension.js" "$(TargetDir)" 
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"
@@ -577,26 +567,24 @@ copy /y  "$(ProjectDir)Dream.$(DREAMVERSION).nupkg" "$(ProjectDir)Dream.$(DREAMV
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
- /D
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\OfficialBuild\*" "$(TargetDir)"
- /D
+      <Command>xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
+ 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\OfficialBuild\*" "$(TargetDir)"
+ 
 
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" /D
 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" /D
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\DreamCef\src\DreamCEFExtension.js" "$(TargetDir)" /D
+xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 
+xcopy /y /s /e /d "$(ProjectDir)..\DreamCef\src\DreamCEFExtension.js" "$(TargetDir)" 
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"
@@ -645,33 +633,30 @@ copy /y  "$(ProjectDir)DreamDevelopment.$(DREAMVERSION).nupkg" "$(ProjectDir)Dre
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
- /D
+      <Command>xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
+ 
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\*" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\*" "$(TargetDir)"
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\CEF\Debug\*" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Debug\*" "$(TargetDir)" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" 
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 		
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" 
 
 
-xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" 
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Debug\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeImaged.dll" "$(TargetDir)"</Command>
@@ -697,33 +682,30 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
- /D
+      <Command>xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
+ 
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\*" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\*" "$(TargetDir)"
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
 
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\CEF\Debug\*" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Debug\*" "$(TargetDir)" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" 
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 		
 
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" 
 
 
-xcopy /y "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" /D
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" 
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Debug\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeImaged.dll" "$(TargetDir)"</Command>

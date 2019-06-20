@@ -23,6 +23,11 @@
 
 #include "DreamGarage\DreamGamepadCameraApp.h"
 
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
+
+#include "Sandbox/PathManager.h"
+
 HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("hal", pDreamOS)
 {

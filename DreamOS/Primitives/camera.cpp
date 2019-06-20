@@ -1,11 +1,22 @@
 #include "camera.h"
 
-#include "DreamLogger/DreamLogger.h"
 #define DEFAULT_CAMERA_ROTATE_SPEED 0.002f
 #define DEFAULT_CAMERA_MOVE_SPEED 2.0f
-
 #define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_PERSPECTIVE
-//#define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_ORTHOGRAPHIC
+
+#include "matrix/ProjectionMatrix.h"  // for ::PROJECTION_MATRIX_PERSPECTIVE, DEFAULT_FAR_PLANE, DEFAULT_NEAR_PLANE, ProjectionMatrix
+#include "matrix/RotationMatrix.h"    // for RotationMatrix
+#include "matrix/ViewMatrix.h"        // for ViewMatrix
+#include "point.h"                    // for point
+#include "quaternion.h"               // for quaternion
+#include "ray.h"                      // for ray
+#include "RESULT/EHM.h"                          // for CN, CR, DEBUG_LINEOUT
+#include "stdint.h"                              // for uint8_t
+#include "vector.h"                   // for vector
+#include "VirtualObj.h"               // for VirtualObj
+
+#include "Sense/SenseKeyboard.h"
+#include "Primitives/composite.h"
 
 camera::camera(point ptOrigin, viewport cameraVieport) :
 	VirtualObj(ptOrigin),

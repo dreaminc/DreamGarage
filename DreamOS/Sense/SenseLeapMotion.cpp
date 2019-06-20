@@ -2,6 +2,9 @@
 
 #include "DreamLogger/DreamLogger.h"
 
+#include "Primitives/composite.h"
+#include "Primitives/hand/LeapHand.h"
+
 SenseLeapMotion::SenseLeapMotion() :
 	m_pLeapController(nullptr),
 	m_pLeftHand(nullptr),
@@ -204,4 +207,53 @@ bool SenseLeapMotion::HasFocus() {
 		return m_pLeapController->hasFocus();
 	else
 		return false;
+}
+
+RESULT SenseLeapMotion::AttachHand(LeapHand* pHand, HAND_TYPE handType) {
+	RESULT r = R_PASS;
+
+	CN(pHand);
+
+	if (handType == HAND_TYPE::HAND_LEFT) {
+		m_pLeftHand = pHand;
+	}
+	else if (handType == HAND_TYPE::HAND_RIGHT) {
+		m_pRightHand = pHand;
+	}
+	else {
+		CBM((false), "Failed to attatch invalid hand type");
+	}
+
+Error:
+	return r;
+}
+
+RESULT SenseLeapMotion::AttachModel(composite *pModel, HAND_TYPE handType) {
+	RESULT r = R_PASS;
+
+	CN(pModel);
+
+	if (handType == HAND_TYPE::HAND_LEFT) {
+		m_pLeftModel = pModel;
+	}
+	else if (handType == HAND_TYPE::HAND_RIGHT) {
+		m_pRightModel = pModel;
+	}
+	else {
+		CBM((false), "Failed to attatch model of invalid hand type");
+	}
+
+Error:
+	return r;
+}
+
+hand* SenseLeapMotion::GetHand(HAND_TYPE handType) {
+	if (handType == HAND_TYPE::HAND_LEFT) {
+		return m_pLeftHand;
+	}
+	else if (handType == HAND_TYPE::HAND_RIGHT) {
+		return m_pRightHand;
+	}
+
+	return nullptr;
 }

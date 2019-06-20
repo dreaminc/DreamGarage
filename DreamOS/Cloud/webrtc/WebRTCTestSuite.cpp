@@ -28,6 +28,9 @@
 #include "WebBrowser\WebBrowserController.h"
 #include "WebBrowser\CEFBrowser/CEFBrowserManager.h"
 
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
+
 WebRTCTestSuite::WebRTCTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("webrtc", pDreamOS)
 {

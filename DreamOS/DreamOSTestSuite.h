@@ -1,17 +1,18 @@
 #ifndef DREAM_OS_TEST_SUITE_H_
 #define DREAM_OS_TEST_SUITE_H_
 
-#include "RESULT/EHM.h"
-
 // DREAM OS
 // DreamOS/Cloud/CloudTestSuite.h
 
 #include "Test/DreamTestSuite.h"
-#include "Primitives/Subscriber.h"
-#include "InteractionEngine/InteractionEngine.h"
 
-#include <functional>
-#include <memory>
+#include "Primitives/Subscriber.h"
+
+#include "Primitives/point.h"     // for point
+#include "RESULT/RESULT.h"        // for RESULT
+#include "xstring"                // for string
+
+struct InteractionObjectEvent;
 
 class DreamOS;
 class UIStageProgram;

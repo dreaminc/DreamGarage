@@ -17,12 +17,17 @@
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
 
-#include "Primitives/hand.h"
-
 #include "Primitives/font.h"
 #include "Primitives/text.h"
+#include "Primitives/hand/hand.h"
+
 #include <string>
 #include "Sense/SenseController.h"
+
+#include "Scene/CameraNode.h"
+#include "Scene/ObjectStoreNode.h"
+
+#include "Sandbox/CommandLineManager.h"
 
 UIViewTestSuite::UIViewTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("uiview", pDreamOS)

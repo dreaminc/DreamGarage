@@ -207,7 +207,7 @@ public:
 	RESULT UnregisterSubscriber(Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 
-		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
+		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
         CNM(pSubscriber, "Subscriber cannot be NULL");
 
 		while (it != m_events.end()) {

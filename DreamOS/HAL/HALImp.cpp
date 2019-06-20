@@ -1,6 +1,6 @@
 #include "HALImp.h"
 
-#include "HAl/Pipeline/ProgramNode.h"
+#include "HAL/Pipeline/ProgramNode.h"
 
 #include "HAL/FlatProgram.h"
 

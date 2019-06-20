@@ -1,9 +1,13 @@
 #include "HMD.h"
 
+#include "Primitives/hand/hand.h"
+
 RESULT HMD::AttachHand(hand *pHand, HAND_TYPE type) {
-	hand::HandState state;
+	HandState state;
+
 	state.handType = type;
 	state.ptPalm = point(0.0f, 0.0f, 0.0f);
+
 	if (type == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;
 		//m_pLeftHand->SetHandState(state);
@@ -15,6 +19,7 @@ RESULT HMD::AttachHand(hand *pHand, HAND_TYPE type) {
 	else {
 		return R_FAIL;
 	}
+
 	return R_PASS;
 }
 

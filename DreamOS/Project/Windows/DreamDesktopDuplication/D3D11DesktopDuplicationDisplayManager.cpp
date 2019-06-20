@@ -1,5 +1,4 @@
 #include "D3D11DesktopDuplicationDisplayManager.h"
-#include "RESULT/EHM.h"
 
 //
 // Constructor

@@ -170,6 +170,9 @@
     <Filter Include="Modules">
       <UniqueIdentifier>{627c2372-0bb0-4b53-ad83-1f6c14bc7a51}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Primitives\hand">
+      <UniqueIdentifier>{3a722bf6-c605-4d06-9db2-b27d6dd9c265}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp">
@@ -312,9 +315,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp">
       <Filter>Sense</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\hand.cpp">
-      <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp">
       <Filter>Primitives</Filter>
@@ -757,9 +757,6 @@
     <ClCompile Include="..\..\..\DreamAppMessage.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\LeapHand.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp">
       <Filter>DreamLogger</Filter>
     </ClCompile>
@@ -1058,6 +1055,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\FogParams.cpp">
       <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\hand\hand.cpp">
+      <Filter>Primitives\hand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\hand\LeapHand.cpp">
+      <Filter>Primitives\hand</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1362,9 +1365,6 @@
       <Filter>Sense</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\composite.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\hand.h">
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLComposite.h">
@@ -2001,9 +2001,6 @@
     <ClInclude Include="..\..\..\DreamPeerApp.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\HandType.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DreamAppHandle.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
@@ -2033,9 +2030,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamVideoStreamSubscriber.h">
       <Filter>DreamOS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\LeapHand.h">
-      <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamLogger\DreamLogger.h">
       <Filter>DreamLogger</Filter>
@@ -2302,6 +2296,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\FogParams.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\hand\HandState.h">
+      <Filter>Primitives\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\hand\HandType.h">
+      <Filter>Primitives\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\hand\hand.h">
+      <Filter>Primitives\hand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\hand\LeapHand.h">
+      <Filter>Primitives\hand</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
