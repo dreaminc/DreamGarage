@@ -10,3 +10,4 @@ webrtc.lib filter=lfs diff=lfs merge=lfs -text
 * text=auto
 assimp-vc140-mt.ilk filter=lfs diff=lfs merge=lfs -text
 *.ilk filter=lfs diff=lfs merge=lfs -text
+src/third_party/assimp/3.3.1/bin/assimp-vc140-mt.pdb filter=lfs diff=lfs merge=lfs -text
