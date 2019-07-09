@@ -1,0 +1,78 @@
+﻿cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  autofit.c
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  ftbitmap.c
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  ftfstype.c
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  ftgasp.c
+  ftstroke.c
+  ftbbox.c
+  ftfntfmt.c
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  ftpfr.c
+  ftsynth.c
+  fttype1.c
+  ftwinfnt.c
+  ftlcdfil.c
+  ftgxval.c
+  ftotval.c
+  ftpatent.c
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  bdf.c
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  cff.c
+  ftbase.c
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  ftcache.c
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  ftglyph.c
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  ftgzip.c
+  ftinit.c
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  ftlzw.c
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\cff\cffload.c(1368): warning C4244: '=': conversion from 'FT_UInt32' to 'FT_Byte', possible loss of data (compiling source file ..\..\..\src\cff\cff.c)
+  ftsystem.c
+  smooth.c
+  ftmm.c
+  pcf.c
+  pfr.c
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\base\ftobjs.c(4995): warning C4702: unreachable code
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\base\ftobjs.c(4996): warning C4702: unreachable code
+  psaux.c
+  pshinter.c
+  psmodule.c
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\psaux\t1decode.c(1356): warning C4267: '=': conversion from 'size_t' to 'FT_Int', possible loss of data (compiling source file ..\..\..\src\psaux\psaux.c)
+  raster.c
+  sfnt.c
+  truetype.c
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\sfnt\sfdriver.c(838): warning C4267: '=': conversion from 'size_t' to 'FT_UInt', possible loss of data (compiling source file ..\..\..\src\sfnt\sfnt.c)
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\sfnt\sfdriver.c(988): warning C4244: 'function': conversion from '__int64' to 'const unsigned int', possible loss of data (compiling source file ..\..\..\src\sfnt\sfnt.c)
+  type1.c
+  type1cid.c
+  type42.c
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\truetype\ttgload.c(1711): warning C4312: 'type cast': conversion from 'unsigned long' to 'void *' of greater size (compiling source file ..\..\..\src\truetype\truetype.c)
+  winfnt.c
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\type1\t1driver.c(269): warning C4267: '=': conversion from 'size_t' to 'FT_ULong', possible loss of data (compiling source file ..\..\..\src\type1\type1.c)
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\type1\t1driver.c(289): warning C4267: '=': conversion from 'size_t' to 'FT_ULong', possible loss of data (compiling source file ..\..\..\src\type1\type1.c)
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\type1\t1driver.c(321): warning C4267: '=': conversion from 'size_t' to 'FT_ULong', possible loss of data (compiling source file ..\..\..\src\type1\type1.c)
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\type1\t1driver.c(351): warning C4267: '=': conversion from 'size_t' to 'FT_UInt', possible loss of data (compiling source file ..\..\..\src\type1\type1.c)
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\type1\t1driver.c(558): warning C4267: '=': conversion from 'size_t' to 'FT_ULong', possible loss of data (compiling source file ..\..\..\src\type1\type1.c)
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\type1\t1driver.c(564): warning C4267: '=': conversion from 'size_t' to 'FT_ULong', possible loss of data (compiling source file ..\..\..\src\type1\type1.c)
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\type1\t1driver.c(570): warning C4267: '=': conversion from 'size_t' to 'FT_ULong', possible loss of data (compiling source file ..\..\..\src\type1\type1.c)
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\type1\t1driver.c(576): warning C4267: '=': conversion from 'size_t' to 'FT_ULong', possible loss of data (compiling source file ..\..\..\src\type1\type1.c)
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\type1\t1driver.c(582): warning C4267: '=': conversion from 'size_t' to 'FT_ULong', possible loss of data (compiling source file ..\..\..\src\type1\type1.c)
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\type42\t42parse.c(821): warning C4244: '=': conversion from '__int64' to 'FT_Int', possible loss of data (compiling source file ..\..\..\src\type42\type42.c)
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\type1\t1load.c(1528): warning C4244: '=': conversion from '__int64' to 'FT_Int', possible loss of data (compiling source file ..\..\..\src\type1\type1.c)
+c:\dev\dreamgarage\dreamos\external\freetype\freetype-2.8\src\type1\t1load.c(1689): warning C4244: '=': conversion from '__int64' to 'FT_Int', possible loss of data (compiling source file ..\..\..\src\type1\type1.c)
+cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  ftdebug.c
+  freetype.vcxproj -> C:\dev\DreamGarage\DreamOS\External\Freetype\freetype-2.8\builds\windows\vc2010\.\..\..\..\objs\vc2010\x64\freetype28MT.lib

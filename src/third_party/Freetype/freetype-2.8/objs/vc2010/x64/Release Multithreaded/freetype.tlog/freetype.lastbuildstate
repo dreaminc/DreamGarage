@@ -1,0 +1,2 @@
+#TargetFrameworkVersion=v4.0:PlatformToolSet=v140:EnableManagedIncrementalBuild=false:VCToolArchitecture=Native32Bit:WindowsTargetPlatformVersion=8.1
+Release Multithreaded|x64|C:\dev\DreamGarage\DreamOS\External\Freetype\freetype-2.8\builds\windows\vc2010\|
