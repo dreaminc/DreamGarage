@@ -1,3 +1,7 @@
+" DreamOS Git Ignore
+
 *.db
 *.swp
 logs/
+
+**/build
