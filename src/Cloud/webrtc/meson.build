@@ -1,6 +1,6 @@
 # Cloud WebRTC 
 
-webrtcAudioSources = [
+webrtcAudio = [
 	'WebRTCAudioDeviceModule.h',
 	'WebRTCAudioDeviceModule.cpp',
 	'WebRTCAudioTrackSink.h',
@@ -11,20 +11,29 @@ webrtcAudioSources = [
 	'WebRTCLocalAudioTrack.cpp'
 ]
 
-sources = [
+webrtcVideo = [
+	'WebRTCCustomVideoCapturer.h',
+	'WebRTCCustomVideoCapturer.cpp',
+	'WebRTCVideoSink.h',
+	'WebRTCVideoSink.cpp'
+]
+
+webrtc = [
 	'WebRTCClient.h',
 	'WebRTCConductor.h',
 	'WebRTCConductor.cpp',
-	'WebRTCCustomVideoCapturer.h',
-	'WebRTCCustomVideoCapturer.cpp',
 	'WebRTCIceCandidate.h',
 	'WebRTCIceConnection.h',
 	'WebRTCImp.h',
 	'WebRTCImp.cpp',
 	'WebRTCPeerConnection.h',
-	'WebRTCPeerConnection.cpp',
-	'WebRTCVideoSink.h',
-	'WebRTCVideoSink.cpp'
+	'WebRTCPeerConnection.cpp'
 ]
 
-webrtc = shared_library('webrtc', [webrtcAudioSources, sources])
+sources = [
+	webrtcAudio,
+	webrtcVideo,
+	webrtc
+]
+
+webrtc = shared_library('webrtc', sources)
