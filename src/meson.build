@@ -2,7 +2,7 @@
 
 subdir('app')
 subdir('client')
-# subdir('cloud')
+subdir('cloud')
 # subdir('core')
 # subdir('dreamcef')
 # subdir('dreamdesktop')
