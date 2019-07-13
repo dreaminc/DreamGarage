@@ -1,0 +1,17 @@
+# DREAM PATHS
+# All of the Dream OS paths
+# Note - DREAMOSPATH needs to be set in environment variables
+# to the DreamOS root path so DreamOS can find this file
+
+ROOT 			./ 
+HAL 			./HAL/
+SHADERS 		./HAL/opengl/shaders/GLSL/
+SANDBOX			./Sandbox/
+RESULT 			./RESULT/
+TEXTURE			./Resources/Texture/
+CUBEMAP			./Resources/Cubemap/
+FONT			./Resources/Fonts/
+MODEL			./Resources/Models/
+ASSET			./Assets/
+SOUND			./Resources/Sounds/
+SCRIPTS			./Scripts/
