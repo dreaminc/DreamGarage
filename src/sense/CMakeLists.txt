@@ -1,0 +1,37 @@
+# src/scene/CMakeLists.txt - Dream Sense Library CMake file
+
+file(GLOB SOURCES 
+  "*.cpp"
+  "*.h"
+)
+source_group("" FILES ${SOURCES})
+
+file(GLOB WIN64_SOURCES 
+  "win64/*.cpp"
+  "win64/*.h"
+)
+source_group("win64" FILES ${WIN64_SOURCES})
+
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/LeapSDK/include)
+
+# TODO: This should not be here!!
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
+add_definitions(-DWEBRTC_WIN)
+
+# Force Include the src/core/config.h
+if(MSVC)
+    add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")
+else()
+    # GCC or Clang
+    add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
+endif()
+
+# Multithreaded 
+set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+
+add_library(sense
+    ${SOURCES}
+    ${WIN64_SOURCES}
+)
+

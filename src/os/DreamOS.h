@@ -1,7 +1,7 @@
 #ifndef DREAM_OS_H_
 #define DREAM_OS_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/DreamOS.h
@@ -12,55 +12,65 @@
 // In the short term, however, DreamOS will run in the context of an application on a given platform
 // such as Android or Windows.
 
-#include "Primitives//Types/UID.h"
-#include "Primitives/valid.h"
-#include "Primitives/version.h"
+#include "core/types/UID.h"
+#include "core/types/valid.h"
+#include "core/types/version.h"
 
-#include "Sandbox/SandboxFactory.h"
+#include "sandbox/SandboxFactory.h"
 
 #define DREAM_OS_VERSION_MAJOR 0
 #define DREAM_OS_VERSION_MINOR 1
 #define DREAM_OS_VERSION_MINOR_MINOR 0
 
-#include "Primitives/light.h"
-#include "Primitives/quad.h"
-#include "Primitives/FlatContext.h"
-#include "Primitives/sphere.h"
-#include "Primitives/cylinder.h"
-#include "Primitives/DimRay.h"
-#include "Primitives/DimPlane.h"
-#include "Primitives/volume.h"
-#include "Primitives/text.h"
-#include "Primitives/texture.h"
-#include "Primitives/skybox.h"
-#include "Primitives/user.h"
-#include "Primitives/billboard.h"
+#include "core/primitives/light.h"
+#include "core/primitives/quad.h"
+#include "core/primitives/FlatContext.h"
+#include "core/primitives/sphere.h"
+#include "core/primitives/cylinder.h"
+#include "core/primitives/volume.h"
+#include "core/primitives/texture.h"
+#include "core/primitives/skybox.h"
+#include "core/primitives/billboard.h"
 
-#include "Primitives/HysteresisObject.h"
+#include "core/user/user.h"
+#include "core/text/text.h"
+#include "core/dimension/DimRay.h"
+#include "core/dimension/DimPlane.h"
 
-#include "PhysicsEngine/PhysicsEngine.h"
+#include "core/model/ModelFactory.h"
 
-#include "DreamPeerApp.h"
-#include "DreamUserApp.h"
-#include "DreamAppHandle.h"
-#include "DreamShareView/DreamShareView.h"
+#include "core/hysteresis/HysteresisObject.h"
+
+#include "module/DreamObjectModule.h"
+
+#include "modules/PhysicsEngine/PhysicsEngine.h"
+#include "modules/DreamSoundSystem/DreamSoundSystem.h"
+
+// TODO: Remove DreamAppHandles
+#include "app/DreamAppHandle.h"
+
+// TODO: This should be removed - move to a different pattern for observers 
+#include "apps/DreamPeerApp/DreamPeerApp.h"
 
 //#include "DreamLogger/DreamLogger.h"
 
 // Dream Modules
-#include "DreamGarage/DreamSoundSystem.h"
-#include "Modules/DreamObjectModule.h"
-
-#include "Primitives/model/ModelFactory.h"
 
 #include "UI/UIKeyboard.h"
 
 class UIKeyboardLayout;
 class DreamMessage;
 class DreamAppMessage;
+
+// Apps
+// TODO: None of these should really be in here
+class DreamPeerApp;
+class DreamUserApp;
+class DreamShareViewApp;
 class DreamSettingsApp;
 class DreamLoginApp;
 class DreamFormApp;
+
 class OGLProgram;
 
 class NamedPipeClient;
@@ -82,6 +92,7 @@ public:
 	virtual RESULT HandleDOSMessage(std::string& strMessage) = 0;
 };
 
+// TODO: This should not be here 
 class Windows64Observer {
 public:
 	virtual RESULT HandleWindows64CopyData(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) = 0;
@@ -96,27 +107,7 @@ class DreamOS :
 	public DreamPeerApp::DreamPeerAppObserver,
 	public DreamSoundSystem::observer
 {
-	friend class CloudTestSuite;
 	friend class DreamAppBase;
-
-	// TODO: this needs to be revisited
-	friend class DreamTestSuite;
-	friend class UIModule;
-	friend class HALTestSuite;
-	friend class PipelineTestSuite;
-	friend class UITestSuite;
-	friend class InteractionEngineTestSuite;
-	friend class PhysicsEngineTestSuite;
-	friend class UIViewTestSuite;
-	friend class AnimationTestSuite;
-	friend class DreamOSTestSuite;
-	friend class CollisionTestSuite;
-	friend class WebRTCTestSuite;
-	friend class SoundTestSuite;
-	friend class SandboxTestSuite;
-	friend class MultiContentTestSuite;
-	friend class DimensionTestSuite;
-
 	friend class ModelFactory;
 
 public:
@@ -357,6 +348,7 @@ protected:
 
 	// TODO: This is here temporarily, should be replaced by proper sandbox
 	// related functionality
+public:
 	HALImp* GetHALImp();
 
 	// Dream Apps
@@ -380,7 +372,7 @@ public:
 
 	std::shared_ptr<DreamAppBase> GetDreamAppFromUID(UID appUID);
 
-	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) = 0;
+	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, Sandbox::PipelineType pipelineType) = 0;
 
 	//template<class derivedAppType>
 	//RESULT ReleaseApp(DreamAppHandleBase* pAppHandle, DreamAppBase* pHoldingApp);
@@ -415,14 +407,14 @@ public:
 	std::shared_ptr<NamedPipeClient> MakeNamedPipeClient(std::wstring strPipename);
 	std::shared_ptr<NamedPipeServer> MakeNamedPipeServer(std::wstring strPipename);
 	
-	RESULT AddObject(VirtualObj *pObject, SandboxApp::PipelineType pipelineType = (SandboxApp::PipelineType::MAIN | SandboxApp::PipelineType::AUX));
+	RESULT AddObject(VirtualObj *pObject, Sandbox::PipelineType pipelineType = (Sandbox::PipelineType::MAIN | Sandbox::PipelineType::AUX));
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
 	RESULT RemoveObjectFromInteractionGraph(VirtualObj *pObject);
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
-	RESULT AddObjectToUIGraph(VirtualObj *pObject, SandboxApp::PipelineType pipelineType = SandboxApp::PipelineType::MAIN);
+	RESULT AddObjectToUIGraph(VirtualObj *pObject, Sandbox::PipelineType pipelineType = Sandbox::PipelineType::MAIN);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
 
 	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
@@ -583,7 +575,8 @@ public:
 	// Dream App Messaging
 	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags = DreamAppMessage::flags::SHARE_NETWORK);
 
-protected:
+// TODO: Better architecture (request?)
+public:
 	// Sound 
 	RESULT InitializeDreamSoundSystem();
 	RESULT RegisterSoundSystemObserver(DreamSoundSystem::observer *pObserver);
@@ -630,15 +623,15 @@ protected:
 	RESULT UnregisterUpdateCallback();
 
 protected:
-	RESULT SetSandboxConfiguration(SandboxApp::configuration sandboxconf);
+	RESULT SetSandboxConfiguration(Sandbox::configuration sandboxconf);
 
 public:
-	const SandboxApp::configuration& GetSandboxConfiguration();
+	const Sandbox::configuration& GetSandboxConfiguration();
 	std::wstring GetHardwareID();
 	std::string GetHMDTypeString();
 
 private:
-	SandboxApp *m_pSandbox = nullptr;
+	Sandbox *m_pSandbox = nullptr;
 
 public:
 
@@ -671,7 +664,7 @@ protected:
 	std::shared_ptr<DreamUserApp> m_pDreamUserApp = nullptr;
 
 	// TODO: All of these should go into DreamGarage
-	std::shared_ptr<DreamShareView> m_pDreamShareView = nullptr;
+	std::shared_ptr<DreamShareViewApp> m_pDreamShareViewApp = nullptr;
 	std::shared_ptr<DreamSettingsApp> m_pDreamSettings = nullptr;
 	std::shared_ptr<DreamLoginApp> m_pDreamLoginApp = nullptr;
 	std::shared_ptr<DreamFormApp> m_pDreamGeneralForm = nullptr;

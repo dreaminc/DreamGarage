@@ -1,7 +1,8 @@
 #ifndef DREAM_CLIENT_MAIN_H_
 #define DREAM_CLIENT_MAIN_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
 #include <stdlib.h>
 
 // DREAM OS

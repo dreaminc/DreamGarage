@@ -8,6 +8,11 @@
 #ifndef _THREADMANAGER_H_
 #define _THREADMANAGER_H_
 
+#include "core/ehm/EHM.h"
+
+// Dream Desktop
+// dos/src/dreamdesktop/D3D11DesktopDuplicationThreadManager
+
 #include "CommonTypes.h"
 
 class D3D11DesktopDuplicationThreadManager {

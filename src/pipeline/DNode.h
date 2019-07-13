@@ -1,20 +1,20 @@
 #ifndef DNODE_H_
 #define DNODE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/Pipeline/DNode.h
+// Dream Pipeline
+// dos/src/pipeline/DNode.h
+
 // The Dream Node object
-
-#include "Primitives/DObject.h"
 
 #include <vector>
 
+#include "core/types/DObject.h"
+#include "core/types/dirty.h"
+
 #include "PipelineCommon.h"
 #include "DConnection.h"
-
-#include "Primitives/dirty.h"
 
 class DNode : 
 	public DObject,

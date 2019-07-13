@@ -1,10 +1,11 @@
 #include "DreamClientMain.h"
 
 #include <ctime>
-#include "RESULT/EHM.h"
-#include "DreamLogger/DreamLogger.h"
 
-#include "DreamGarage.h"
+#include "core/ehm/EHM.h"
+#include "logger/DreamLogger.h"
+
+#include "garage/DreamGarage.h"
 
 #include <string>
 
@@ -19,7 +20,7 @@
 	{
 		RESULT r = R_PASS;
 
-		// get cmdln args and put them on the stack in argc,argv format
+		// get command line args and put them on the stack in argc,argv format
 		LPWSTR *wargv = nullptr;
 		int argc = 0;
 

@@ -1,18 +1,20 @@
 #ifndef DREAM_CONTROL_BAR_H_
 #define DREAM_CONTROL_BAR_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-#include "UI/UIView.h"
-
-#include "DreamGarage/UICommon.h"
-
-#include "DreamUserControlArea/DreamContentSource.h"
+// Dream User Area Controls
+// dos/src/garage/UserAreaControls.h
 
 #include <map>
 
-//#include "DreamUserControlArea/DreamUserControlArea.h"
-class DreamUserControlArea;
+#include "ui/UIView.h"
+#include "ui/UICommon.h"
+
+// TODO: These should all be together
+#include "apps/DreamUserControlAreaApp/DreamContentSource.h"
+
+class DreamUserControlAreaApp;
 class text;
 
 //All relative to parent app
@@ -55,7 +57,7 @@ public:
 
 	// DreamApp
 public:
-	RESULT Initialize(DreamUserControlArea *pParent);
+	RESULT Initialize(DreamUserControlAreaApp *pParent);
 	RESULT InitializeText();
 	RESULT Update();
 
@@ -117,7 +119,7 @@ private:
 
 private:
 
-	DreamUserControlArea* m_pParentApp = nullptr;
+	DreamUserControlAreaApp* m_pParentApp = nullptr;
 
 	std::shared_ptr<text> m_pURLText = nullptr;
 	bool m_fUpdateTitle = false;

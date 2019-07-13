@@ -1,25 +1,28 @@
 #ifndef DREAM_GARAGE_H_
 #define DREAM_GARAGE_H_
 
-#include "RESULT/RESULT.h"          // for RESULT
+#include "core/ehm/RESULT.h"          // for RESULT
 
 // DREAM GARAGE
 // DreamGarage.h
 // This is the Dream Garage application layer which is derived from DreamOS
 // which is the interface to the engine and platform layers for the application
 
-#include "DreamOS.h"
-#include "Primitives/version.h"
+#include "os/DreamOS.h"
+
+#include "core/types/version.h"
+#include "core/primitives/point.h"       // for point
+#include "core/primitives/quaternion.h"  // for quaternion
+#include "core/primitives/vector.h"      // for vector
+
+#include "sandbox/Sandbox.h"     // for Sandbox, Sandbox::PipelineType
+
 #include "array"                    // for array
 #include "memory"                   // for shared_ptr
-#include "Primitives/point.h"       // for point
-#include "Primitives/quaternion.h"  // for quaternion
-#include "Primitives/vector.h"      // for vector
-#include "Sandbox/SandboxApp.h"     // for SandboxApp, SandboxApp::PipelineType
 #include "utility"                  // for pair
 #include "xstring"                  // for string, wstring
-
 #include <stddef.h>                 // for size_t
+
 
 class AudioDataMessage;
 class CameraNode;
@@ -41,11 +44,11 @@ struct HandState;
 struct SenseKeyboardEvent;
 struct SenseTypingEvent;
 
-class DreamUIBar;
-class DreamContentView;
+class DreamUIBarApp;
+class DreamContentViewApp;
 class DreamBrowser;
 class UIControlView;
-class DreamUserControlArea;
+class DreamUserControlAreaApp;
 class DreamGamepadCameraApp;
 class DreamEnvironmentApp;
 class UIStageProgram;
@@ -105,8 +108,9 @@ public:
 	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) override;
 	virtual RESULT Update(void) override;
 
+	// TODO: Pull pipeline type out of sandbox
 	RESULT SetupMirrorPipeline(Pipeline *pRenderPipeline);
-	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) override;
+	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, Sandbox::PipelineType pipelineType) override;
 	virtual version GetDreamVersion() override;
 
 	virtual CameraNode *GetAuxCameraNode() override;
@@ -261,9 +265,9 @@ private:
 
 	quad* m_pWaterQuad = nullptr;
 	DreamEnvironmentApp* m_pDreamEnvironmentApp = nullptr;
-	DreamUserControlArea* m_pDreamUserControlArea = nullptr;
-	DreamUIBar* m_pDreamUIBar = nullptr;
-	DreamContentView* m_pDreamContentView = nullptr;
+	DreamUserControlAreaApp* m_pDreamUserControlArea = nullptr;
+	DreamUIBarApp* m_pDreamUIBar = nullptr;
+	DreamContentViewApp* m_pDreamContentView = nullptr;
 	DreamBrowser* m_pDreamBrowser = nullptr;
 	UIControlView* m_pDreamControlView = nullptr;
 	DreamGamepadCameraApp* m_pDreamGamepadCameraApp = nullptr;

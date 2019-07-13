@@ -2,7 +2,7 @@
 #define LOGGER_H_
 #pragma once
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/DreamLogger/DreamLogger.h
@@ -12,7 +12,7 @@
 
 #include <string>
 
-#include "spdlog.h"
+#include "third_party/spdlog/spdlog.h"
 
 #define LOG_QUEUE_SIZE 1024
 

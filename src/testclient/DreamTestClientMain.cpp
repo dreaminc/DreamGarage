@@ -1,7 +1,6 @@
 #include "DreamTestClientMain.h"
 
 #include <ctime>
-#include "RESULT/EHM.h"
 
 #include "DreamTestClient.h"
 
@@ -10,6 +9,12 @@
 #ifdef _WINDOWS
 	int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 		RESULT r = R_PASS;
+
+		// Set up a console and attach to it
+		// TODO: Might want to explore this more
+		AllocConsole();
+		AttachConsole(GetCurrentProcessId());
+		freopen("CON", "w", stdout);
 
 		// Get command line args and put them on the stack in argc,argv format
 		LPWSTR *wargv = nullptr;
@@ -30,9 +35,9 @@
 		}
 		// now argc,argv are available and will get destroyed on exit
 
-		DreamTestApp dreamTestApp;
-		CRM(dreamTestApp.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
-		CRM(dreamTestApp.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
+		DreamTestClient DreamTestClient;
+		CRM(DreamTestClient.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
+		CRM(DreamTestClient.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
 
 	Success:
 		DreamLogger::instance()->Flush();
@@ -45,13 +50,15 @@
 
 		return (int)(r);
 	}
+
 #else
+
 	int main(int argc, const char *argv[]) {
 		RESULT r = R_PASS;
 
-		DreamTestApp dreamTestApp;
-		CRM(dreamTestApp.Initialize(argc, argv), "Failed to initialize Dream Test App");
-		CRM(dreamTestApp.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
+		DreamTestClient DreamTestClient;
+		CRM(DreamTestClient.Initialize(argc, argv), "Failed to initialize Dream Test App");
+		CRM(DreamTestClient.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
 
 	Success:
 		DEBUG_LINEOUT("DREAM OS Exiting");

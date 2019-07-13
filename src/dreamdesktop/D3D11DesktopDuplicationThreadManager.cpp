@@ -1,5 +1,4 @@
 #include "D3D11DesktopDuplicationThreadManager.h"
-#include "RESULT/EHM.h"
 
 DWORD WINAPI DDProc(_In_ void* Param);
 
@@ -11,9 +10,7 @@ D3D11DesktopDuplicationThreadManager::~D3D11DesktopDuplicationThreadManager() {
 	Clean();
 }
 
-//
 // Clean up resources
-//
 void D3D11DesktopDuplicationThreadManager::Clean() {
 	if (m_PtrInfo.PtrShapeBuffer) {
 		delete[] m_PtrInfo.PtrShapeBuffer;
@@ -42,9 +39,7 @@ void D3D11DesktopDuplicationThreadManager::Clean() {
 	m_ThreadCount = 0;
 }
 
-//
 // Clean up DX_RESOURCES
-//
 void D3D11DesktopDuplicationThreadManager::CleanDx(_Inout_ DX_RESOURCES* pDXResourceData) {
 	if (pDXResourceData->Device) {
 		pDXResourceData->Device->Release();
@@ -77,9 +72,7 @@ void D3D11DesktopDuplicationThreadManager::CleanDx(_Inout_ DX_RESOURCES* pDXReso
 	}
 }
 
-//
 // Start up threads for DDA
-//
 DUPL_RETURN D3D11DesktopDuplicationThreadManager::Initialize(INT outputToDuplicate, UINT OutputCount, HANDLE UnexpectedErrorEvent, HANDLE ExpectedErrorEvent, HANDLE TerminateThreadsEvent, HANDLE SharedHandle, _In_ RECT* pDesktopDim) {
 	m_ThreadCount = OutputCount;
 	m_pThreadHandles = new (std::nothrow) HANDLE[m_ThreadCount];
@@ -116,9 +109,7 @@ DUPL_RETURN D3D11DesktopDuplicationThreadManager::Initialize(INT outputToDuplica
 	return Ret;
 }
 
-//
 // Get DX_RESOURCES
-//
 DUPL_RETURN D3D11DesktopDuplicationThreadManager::InitializeDx(_Out_ DX_RESOURCES* pDXResourcesData) {
 	HRESULT r = S_OK;
 
@@ -189,16 +180,12 @@ Error:
 	return DUPL_RETURN_SUCCESS;
 }
 
-//
 // Getter for the PTR_INFO structure
-//
 PTR_INFO* D3D11DesktopDuplicationThreadManager::GetPointerInfo() {
 	return &m_PtrInfo;
 }
 
-//
 // Waits infinitely for all spawned threads to terminate
-//
 void D3D11DesktopDuplicationThreadManager::WaitForThreadTermination() {
 	if (m_ThreadCount != 0) {
 		WaitForMultipleObjectsEx(m_ThreadCount, m_pThreadHandles, TRUE, INFINITE, FALSE);

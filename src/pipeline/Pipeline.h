@@ -1,14 +1,15 @@
 #ifndef PIPELINE_H_
 #define PIPELINE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/Pipeline/Pipeline.h
+// Dream Pipeline
+// dos/src/pipeline/Pipeline.h
+
 // The Pipeline is the container class for the RenderNodes that constitute the
 // Dream rendering network.  
 
-#include "Primitives/DObject.h"
+#include "core/types/DObject.h"
 
 #include <vector>
 #include <memory>

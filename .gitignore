@@ -4,5 +4,15 @@
 *.swp
 logs/
 
-**/build
+" Meson Generated
 **/build*
+
+" CMake Generated
+**/out*
+
+" Visual Studio
+**/.vs
+
+" OSX Generated
+.DS_Store
+.DS_Store?

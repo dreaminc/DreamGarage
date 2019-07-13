@@ -1,5 +1,6 @@
-#include "DreamAppManager.h"
-#include "DreamModuleManager.h"
+#include "app/DreamAppManager.h"
+
+#include "module/DreamModuleManager.h"
 
 // Apps
 

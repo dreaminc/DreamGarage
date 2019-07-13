@@ -1,10 +1,11 @@
 #ifndef SINK_NODE_H_
 #define SINK_NODE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/Pipeline/SinkNode.h
+// Dream Pipeline
+// dos/src/pipeline/SinkNode.h
+
 // Sink nodes effectively sink sources which can either be program nodes
 // or otherwise
 

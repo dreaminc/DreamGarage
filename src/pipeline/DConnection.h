@@ -1,15 +1,16 @@
 #ifndef D_CONNECTION_H_
 #define D_CONNECTION_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/Pipeline/DNode.h
+// Dream Pipeline
+// dos/src/pipeline/DNode.h
+
 // The Dream Node object
 
-#include "Primitives/DObject.h"
-
 #include <vector>
+
+#include "core/types/DObject.h"
 
 #include "PipelineCommon.h"
 

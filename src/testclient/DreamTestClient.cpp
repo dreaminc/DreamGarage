@@ -1,5 +1,7 @@
-#include "DreamLogger/DreamLogger.h"
-#include "DreamTestApp.h"
+#include "DreamTestClient.h"
+
+#include "logger/DreamLogger.h"
+
 #include <string>
 
 #include "Test/TestSuiteFactory.h"
@@ -14,18 +16,18 @@ volume *g_pVolume = nullptr;
 volume *g_pVolume2 = nullptr;
 sphere *pSphere5 = nullptr;
 
-DreamTestApp::DreamTestApp() {
+DreamTestClient::DreamTestClient() {
 	// empty
 }
 
-DreamTestApp::~DreamTestApp() {
+DreamTestClient::~DreamTestClient() {
 	// empty
 }
 
-RESULT DreamTestApp::ConfigureSandbox() {
+RESULT DreamTestClient::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
-	SandboxApp::configuration sandboxconfig;
+	Sandbox::configuration sandboxconfig;
 	
 	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = false;
@@ -84,7 +86,7 @@ Error:
 	return r;
 }
 
-RESULT DreamTestApp::LoadScene() {
+RESULT DreamTestClient::LoadScene() {
 	RESULT r = R_PASS;
 
 	std::vector<std::string> testStringValues;
@@ -123,7 +125,7 @@ Error:
 	return r;
 }
 
-RESULT DreamTestApp::RegisterTestSuite(std::shared_ptr<TestSuite> pTestSuite) {
+RESULT DreamTestClient::RegisterTestSuite(std::shared_ptr<TestSuite> pTestSuite) {
 	RESULT r = R_PASS;
 
 	CNM(pTestSuite, "Test suite is null");
@@ -137,7 +139,7 @@ Error:
 	return r;
 }
 
-RESULT DreamTestApp::RegisterTestSuites() {
+RESULT DreamTestClient::RegisterTestSuites() {
 	RESULT r = R_PASS;
 
 	m_registeredTestSuites = std::map<std::string, std::shared_ptr<TestSuite>>();
@@ -163,7 +165,7 @@ Error:
 	return r;
 }
 
-RESULT DreamTestApp::SelectTest(std::string strTestSuiteName, std::string strTestName) {
+RESULT DreamTestClient::SelectTest(std::string strTestSuiteName, std::string strTestName) {
 	RESULT r = R_PASS;
 
 	CBM((m_registeredTestSuites.find(strTestSuiteName) != m_registeredTestSuites.end()),
@@ -177,7 +179,7 @@ Error:
 	return r;
 }
 
-RESULT DreamTestApp::Update(void) {
+RESULT DreamTestClient::Update(void) {
 	RESULT r = R_PASS;
 
 	CNM(m_pCurrentTestSuite, "No test suite selected");
@@ -188,32 +190,32 @@ Error:
 	return r;
 }
 
-version DreamTestApp::GetDreamVersion() {
+version DreamTestClient::GetDreamVersion() {
 	return version("0.0.0");		// This is... a placeholder?
 }
 
-RESULT DreamTestApp::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) {
+RESULT DreamTestClient::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, Sandbox::PipelineType pipelineType) {
 	return R_NOT_IMPLEMENTED;
 }
 
 // Cloud
-RESULT DreamTestApp::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) {
+RESULT DreamTestClient::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
+RESULT DreamTestClient::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) {
+RESULT DreamTestClient::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+RESULT DreamTestClient::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+RESULT DreamTestClient::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
 
 	CR(r);
@@ -230,19 +232,19 @@ Error:
 	return r;
 }
 
-RESULT DreamTestApp::OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+RESULT DreamTestClient::OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::OnNewSocketConnection(int seatPosition) {
+RESULT DreamTestClient::OnNewSocketConnection(int seatPosition) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::SaveCameraSettings(point ptPosition, quaternion qOrientation) {
+RESULT DreamTestClient::SaveCameraSettings(point ptPosition, quaternion qOrientation) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
+RESULT DreamTestClient::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
 	switch (kbEvent->KeyCode) {
@@ -258,7 +260,7 @@ RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 	return r;
 }
 
-RESULT DreamTestApp::Notify(CollisionObjectEvent *oEvent) {
+RESULT DreamTestClient::Notify(CollisionObjectEvent *oEvent) {
 	RESULT r = R_PASS;
 
 	dynamic_cast<DimObj*>(oEvent->m_pCollisionObject)->SetVertexColor(color(COLOR_RED));

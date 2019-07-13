@@ -1,9 +1,10 @@
 #ifndef _DISPLAYMANAGER_H_
 #define _DISPLAYMANAGER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // Dream Desktop Duplication
+// dos/src/dreamdesktop/D3D11DesktopDuplicationDisplayManager.h
 
 #include "CommonTypes.h"
 

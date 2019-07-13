@@ -1,27 +1,16 @@
 #include "DreamGarage.h"
 
-#include "Core/Utilities.h"
-
 #include <string>
+#include "chrono"                                       // for system_clock, system_clock::time_point
+#include "stdint.h"                                     // for uint8_t
+#include <corecrt_math_defines.h>                       // for M_PI
 
-light *g_pLight = nullptr;
+#include "core/Utilities.h"
+#include "core/hand/hand.h"
+#include "core/camera/camera.h"
 
-//#include "Cloud/Message/UpdateHeadMessage.h"
-//#include "Cloud/Message/UpdateHandMessage.h"
-//#include "Cloud/Message/AudioDataMessage.h"
-
-#include "DreamGarage/DreamEnvironmentApp.h"
-#include "DreamVCam.h"
-
-#include "HAL/opengl/OGLProgramScreenFade.h"
-
-
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/UIStageProgram.h"
-#include "HAL/EnvironmentProgram.h"
-
-
-#include "Cloud/Environment/PeerConnection.h"
+#include "sandbox/CommandLineManager.h"
+#include "sandbox/PathManager.h"
 
 #include "DreamGarageMessage.h"
 #include "UpdateHeadMessage.h"
@@ -29,35 +18,64 @@ light *g_pLight = nullptr;
 #include "UpdateMouthMessage.h"
 #include "AudioDataMessage.h"
 
-#include "Sound/AudioPacket.h"
+#include "os/DreamMessage.h"                               // for DreamMessage
 
-#include "Primitives/hand/hand.h"
+#include "apps/DreamEnvironmentApp/DreamEnvironmentApp.h"
+#include "apps/DreamVCamApp/DreamVCamApp.h"
+#include "apps/DreamSettingsApp/DreamSettingsApp.h"
+#include "apps/DreamLoginApp/DreamLoginApp.h"
+#include "apps/DreamFormApp/DreamFormApp.h"								// for FormType, DreamFormApp, FormType::SIGN_IN, FormType::CERTIFICATE_ERROR, FormType::LOAD_RESOURCE_ERROR, FormType::SIGN_UP_WELCOME, FormType::TEAMS_MISSING, FormType::SETTINGS, FormType::SIGN_UP
+#include "apps/DreamPeerApp/DreamPeerApp.h"                             // for DreamPeerApp
+#include "apps/DreamUserControlAreaApp/DreamUserControlAreaApp.h"  
+#include "apps/DreamUserControlAreaApp/DreamContentSource.h"    
+#include "apps/DreamShareViewApp/DreamShareViewApp.h"
 
-#include "Sandbox/CommandLineManager.h"
-#include "Sandbox/PathManager.h"
+#include "modules/DreamSoundSystem/DreamSoundSystem.h"               // for DreamSoundSystem, DreamSoundSystem::MIXDOWN_TARGET
 
-#include "Primitives/camera.h"
+// TODO: no OGL at this level
+#include "hal/ogl/OGLProgram.h"                      // for OGLProgram
+#include "hal/ogl/OGLProgramScreenFade.h"
+#include "hal/ogl/OGLProgramReflection.h"
+#include "hal/ogl/OGLProgramRefraction.h"
+#include "hal/ogl/OGLProgramSkybox.h"
+#include "hal/ogl/OGLProgramWater.h"
 
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
-#include "HAL/Pipeline/ProgramNode.h"
+#include "hal/HALImp.h"                                 // for HALImp::HALConfiguration, HALImp
+#include "hal/UIStageProgram.h"
+#include "hal/EnvironmentProgram.h"
+#include "hal/SkyboxScatterProgram.h"
+#include "hal/FogProgram.h"
 
-#include "Scene/ObjectStoreNode.h"
-#include "Scene/CameraNode.h"
+#include "cloud/Environment/PeerConnection.h"
+#include "cloud/Environment/EnvironmentShare.h"
+#include "cloud/Environment/EnvironmentController.h"    // for EnvironmentController
+#include "cloud/User/User.h"                            // for User
+#include "cloud/User/UserController.h"                  // for UserController
+#include "cloud/webrtc/WebRTCPeerConnection.h"          // for WebRTCPeerConnectionProxy
 
-#include "HAL/SkyboxScatterProgram.h"
-#include "HAL/FogProgram.h"
+#include "sound/SoundCommon.h"                          // for type, type::SIGNED_16_BIT
+#include "sound/AudioPacket.h"
 
-#include "HAL/opengl/OGLProgramReflection.h"
-#include "HAL/opengl/OGLProgramRefraction.h"
-#include "HAL/opengl/OGLProgramSkybox.h"
-#include "HAL/opengl/OGLProgramWater.h"
+#include "pipeline/Pipeline.h"                      // for Pipeline
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
+#include "pipeline/ProgramNode.h"
 
-#include "DreamSettingsApp.h"
-#include "DreamLoginApp.h"
-#include "Cloud/Environment/EnvironmentShare.h"
+#include "scene/ObjectStoreNode.h"
+#include "scene/CameraNode.h"
 
-#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+#include "webbrowser/CEFBrowser/CEFBrowserManager.h"
+
+#include "core/hand/HandState.h"                  
+
+#include "hmd/HMD.h"                                    // for HMD
+#include "hmd/HMDFactory.h"                             // for ::HMD_ANY_AVAILABLE
+
+#include "sense/SenseKeyboard.h"                        // for SenseKeyboardEvent, SenseTypingEvent (ptr only)
+
+class SinkNode;
+class light;
+class stereocamera;
 
 /* Comment this out to enable 3rd party camera
 #define _USE_3RD_PARTY_CAMERA
@@ -87,7 +105,7 @@ Error:
 RESULT DreamGarage::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
-	SandboxApp::configuration sandboxconfig;
+	Sandbox::configuration sandboxconfig;
 	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
@@ -175,33 +193,6 @@ Error:
 	return r;
 }
 
-// Temp:
-#include "chrono"                                       // for system_clock, system_clock::time_point
-#include "Cloud/Environment/EnvironmentController.h"    // for EnvironmentController
-#include "Cloud/User/User.h"                            // for User
-#include "Cloud/User/UserController.h"                  // for UserController
-#include "Cloud/webrtc/WebRTCPeerConnection.h"          // for WebRTCPeerConnectionProxy
-#include "DreamFormApp.h"                   // for FormType, DreamFormApp, FormType::SIGN_IN, FormType::CERTIFICATE_ERROR, FormType::LOAD_RESOURCE_ERROR, FormType::SIGN_UP_WELCOME, FormType::TEAMS_MISSING, FormType::SETTINGS, FormType::SIGN_UP
-#include "DreamMessage.h"                               // for DreamMessage
-#include "DreamPeerApp.h"                               // for DreamPeerApp
-#include "DreamSoundSystem.h"               // for DreamSoundSystem, DreamSoundSystem::MIXDOWN_TARGET
-#include "DreamUserControlArea/DreamContentSource.h"    // for SHARE_TYPE_SCREEN, SHARE_TYPE_CAMERA
-#include "DreamUserControlArea/DreamUserControlArea.h"  // for DreamUserControlArea
-#include "HAL/HALImp.h"                                 // for HALImp::HALConfiguration, HALImp
-#include "HAL/opengl/OGLProgram.h"                      // for OGLProgram
-#include "HAL/Pipeline/Pipeline.h"                      // for Pipeline
-#include "HMD/HMD.h"                                    // for HMD
-#include "HMD/HMDFactory.h"                             // for ::HMD_ANY_AVAILABLE
-#include "Primitives/hand/HandState.h"                  // for HandState
-#include "RESULT/EHM.h"                                 // for CR, CN, DOSLOG, CRM, CNM, CNR, CBRM, CB, DEBUG_LINEOUT
-#include "Sandbox/CommandLineManager.h"                 // for CommandLineManager
-#include "Sense/SenseKeyboard.h"                        // for SenseKeyboardEvent, SenseTypingEvent (ptr only)
-#include "Sound/SoundCommon.h"                          // for type, type::SIGNED_16_BIT
-#include "stdint.h"                                     // for uint8_t
-#include <corecrt_math_defines.h>                       // for M_PI
-class SinkNode;
-class light;
-class stereocamera;
 
 RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 	RESULT r = R_PASS;
@@ -232,7 +223,7 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 	{
 		OGLProgram* pRenderProgramNode = nullptr;
 		OGLProgram* pUIProgramNode = nullptr;
-		MakePipeline(m_pAuxCamera, pRenderProgramNode, pUIProgramNode, SandboxApp::PipelineType::MAIN);
+		MakePipeline(m_pAuxCamera, pRenderProgramNode, pUIProgramNode, Sandbox::PipelineType::MAIN);
 
 		//m_pUIMirrorProgramNode = pUIProgramNode;
 		m_pUIMirrorProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
@@ -254,7 +245,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) {
+RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, Sandbox::PipelineType pipelineType) {
 	RESULT r = R_PASS;
 
 	{
@@ -312,7 +303,7 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 		// Everything else
 		ProgramNode* pRenderProgramNode = MakeProgramNode("standard", PIPELINE_FLAGS::PASSTHRU);
 		CN(pRenderProgramNode);
-		if (static_cast<int>(pipelineType & SandboxApp::PipelineType::MAIN) != 0) {
+		if (static_cast<int>(pipelineType & Sandbox::PipelineType::MAIN) != 0) {
 			CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		}
 		else {
@@ -345,7 +336,7 @@ RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, 
 
 		ProgramNode* pUIProgramNode = MakeProgramNode("uistage", PIPELINE_FLAGS::PASSTHRU);
 		CN(pUIProgramNode);
-		if (static_cast<int>(pipelineType & SandboxApp::PipelineType::MAIN) != 0) {
+		if (static_cast<int>(pipelineType & Sandbox::PipelineType::MAIN) != 0) {
 			CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
 			CR(pUIProgramNode->ConnectToInput("clippingscenegraph", GetUIClippingSceneGraphNode()->Output("objectstore")));
 		}
@@ -445,7 +436,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 	{
 		OGLProgram* pRenderProgramNode = nullptr;
 		OGLProgram* pUIProgramNode = nullptr;
-		MakePipeline(GetCameraNode(), pRenderProgramNode, pUIProgramNode, SandboxApp::PipelineType::MAIN);
+		MakePipeline(GetCameraNode(), pRenderProgramNode, pUIProgramNode, Sandbox::PipelineType::MAIN);
 
 		// save interface for UI apps
 		m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
@@ -622,7 +613,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	//auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, GetSandboxConfiguration().f3rdPersonCamera);
 	//auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
 
-	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlArea>(this, false).get();
+	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlAreaApp>(this, false).get();
 	CN(m_pDreamUserControlArea);
 
 	m_pDreamUserControlArea->SetDreamUserApp(GetUserApp());
@@ -634,8 +625,8 @@ RESULT DreamGarage::DidFinishLoading() {
 		m_pDreamEnvironmentApp->SetFogPrograms(m_fogProgramNodes);
 	}
 
-	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this, false);
-	CN(m_pDreamShareView);
+	m_pDreamShareViewApp = LaunchDreamApp<DreamShareViewApp>(this, false);
+	CN(m_pDreamShareViewApp);
 
 	m_pDreamSettings = LaunchDreamApp<DreamSettingsApp>(this, false);
 	CN(m_pDreamSettings);
@@ -668,7 +659,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CRM(GetCloudController()->Start(false), "Failed to start cloud controller");
 
 	// UserController is initialized during CloudController::Initialize,
-	// which is in SandboxApp::Initialize while fInitCloud is true
+	// which is in Sandbox::Initialize while fInitCloud is true
 	m_pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 	CN(m_pUserController);
 
@@ -1141,7 +1132,7 @@ Error:
 RESULT DreamGarage::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) {
 	RESULT r = R_PASS;
 
-	CR(m_pDreamShareView->DeallocateSpheres(pDreamPeer->GetPeerUserID()));
+	CR(m_pDreamShareViewApp->DeallocateSpheres(pDreamPeer->GetPeerUserID()));
 
 	CR(UnallocateUserModelFromPool(pDreamPeer));
 
@@ -1171,7 +1162,7 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 		};
 
 		CR(m_pDreamEnvironmentApp->GetSharedScreenPlacement(ptScreenPosition, qScreenRotation, screenScale));
-		CR(m_pDreamShareView->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
+		CR(m_pDreamShareViewApp->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 
 		//CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr, fnOnFadeInCallback));
 		CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
@@ -1258,7 +1249,7 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 		auto pPendingShare = m_pPendingEnvironmentShares[i];
 		if (pPendingShare != nullptr && pPeerConnection->GetPeerUserID() == pPendingShare->GetUserID()) {
 			if (pPendingShare->GetShareType() == SHARE_TYPE_SCREEN) {
-				m_pDreamShareView->StartReceiving(pPeerConnection);
+				m_pDreamShareViewApp->StartReceiving(pPeerConnection);
 			}
 			if (pPendingShare->GetShareType() == SHARE_TYPE_CAMERA) {
 				m_pDreamUserControlArea->GetVCam()->StartReceiving(pPeerConnection, pPendingShare);
@@ -1394,7 +1385,7 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 	else if (strAudioTrackLabel == kChromeAudioLabel) {
 
 		// Only stream when it's the user that's currently sharing
-		PeerConnection *pStreamingPeerConnection = m_pDreamShareView->GetStreamingPeerConnection();
+		PeerConnection *pStreamingPeerConnection = m_pDreamShareViewApp->GetStreamingPeerConnection();
 
 		if (pStreamingPeerConnection != nullptr && pStreamingPeerConnection->GetPeerUserID() == pPeerConnection->GetPeerUserID()) {
 
@@ -1716,7 +1707,7 @@ RESULT DreamGarage::OnLogout() {
 
 	CR(pUserController->RequestFormURL(strFormType));
 
-	CR(m_pDreamShareView->Hide());
+	CR(m_pDreamShareViewApp->Hide());
 	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));
 
 	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
@@ -1759,7 +1750,7 @@ RESULT DreamGarage::OnSwitchTeams() {
 		//CRM(pUserController->SwitchTeam(), "switch team failed");
 		CR(PendSwitchTeams());
 
-		CR(m_pDreamShareView->Hide());
+		CR(m_pDreamShareViewApp->Hide());
 
 	Error:
 		return r;
@@ -1768,8 +1759,8 @@ RESULT DreamGarage::OnSwitchTeams() {
 	CN(m_pDreamEnvironmentApp);
 	CR(m_pDreamEnvironmentApp->FadeOut(fnOnFadeOutCallback));
 
-	CR(m_pDreamShareView->HidePointers());
-	CR(m_pDreamShareView->StopReceiving());
+	CR(m_pDreamShareViewApp->HidePointers());
+	CR(m_pDreamShareViewApp->StopReceiving());
 
 	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
@@ -1863,11 +1854,11 @@ RESULT DreamGarage::OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentS
 	CN(m_pDreamUserControlArea);
 
 	if (pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
-		CN(m_pDreamShareView);
+		CN(m_pDreamShareViewApp);
 
-		CR(m_pDreamShareView->ShowCastingTexture());
-		CR(m_pDreamShareView->BeginStream());
-		CR(m_pDreamShareView->Show());
+		CR(m_pDreamShareViewApp->ShowCastingTexture());
+		CR(m_pDreamShareViewApp->BeginStream());
+		CR(m_pDreamShareViewApp->Show());
 
 		CR(m_pDreamUserControlArea->StartSharing(pEnvironmentShare));
 	}
@@ -1944,9 +1935,9 @@ Error:
 RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
-	if (m_pDreamShareView != nullptr && pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
+	if (m_pDreamShareViewApp != nullptr && pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
 
-		m_pDreamShareView->PendReceiving();
+		m_pDreamShareViewApp->PendReceiving();
 
 		m_pDreamUserControlArea->OnReceiveAsset();
 
@@ -1981,7 +1972,7 @@ RESULT DreamGarage::OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironment
 	CN(pEnvironmentShare);
 
 	if (pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
-		CR(m_pDreamShareView->StopSending());
+		CR(m_pDreamShareViewApp->StopSending());
 		CR(m_pDreamUserControlArea->HandleStopSending());
 	}
 	else if (pEnvironmentShare->GetShareType() == SHARE_TYPE_CAMERA) {
@@ -1996,7 +1987,7 @@ RESULT DreamGarage::OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironme
 	RESULT r = R_PASS;
 
 	if (pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
-		CR(m_pDreamShareView->StopReceiving());
+		CR(m_pDreamShareViewApp->StopReceiving());
 	}
 	else if (pEnvironmentShare->GetShareType() == SHARE_TYPE_CAMERA) {
 		CR(m_pDreamUserControlArea->GetVCam()->StopReceiving());
@@ -2027,7 +2018,7 @@ RESULT DreamGarage::OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironm
 	if (pEnvironmentShare == nullptr) {
 		CNR(m_pDreamUserControlArea, R_SKIPPED);
 		m_pDreamUserControlArea->UpdateIsActive(false);
-		CR(m_pDreamUserControlArea->SetVirtualCameraSource(DreamVCam::SourceType::CAMERA));
+		CR(m_pDreamUserControlArea->SetVirtualCameraSource(DreamVCamApp::SourceType::CAMERA));
 	}
 
 Error:
