@@ -48,14 +48,21 @@ RESULT WebRTCAudioDeviceModule::WebRTCADMProcess() {
 	while (m_fRunning) {
 
 		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
-		static bool fSlept = false;
+		//static bool fSlept = false;
 
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
-		auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+		//auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+		auto usDifference = std::chrono::duration_cast<std::chrono::microseconds>(timeNow - lastUpdateTime).count();
 
-		if (m_pAudioTransport != nullptr && diffVal > 9) {
+		while (usDifference < 10000) {
+			timeNow = std::chrono::system_clock::now();
+			usDifference = std::chrono::duration_cast<std::chrono::microseconds>(timeNow - lastUpdateTime).count();
+		}
 
-			lastUpdateTime = timeNow - std::chrono::microseconds(diffVal - 10);
+		if (m_pAudioTransport != nullptr) {
+
+			//lastUpdateTime = timeNow - std::chrono::microseconds(diffVal - 10);
+			lastUpdateTime += std::chrono::microseconds(10000);
 
 			int64_t msElapsedTime = 0;
 			int64_t msNTPTime = 0;
@@ -84,20 +91,22 @@ RESULT WebRTCAudioDeviceModule::WebRTCADMProcess() {
 				&msNTPTime
 			);
 
-			if (diffVal > 10) {
-				m_msOutputDelay = diffVal - 10;
+			if (usDifference > 10000) {
+				m_msOutputDelay = (int)((usDifference - 10000)/1000.0f);
 			}
 
-			fSlept = false;
+			//fSlept = false;
 		}
+
+		Sleep(8);
 
 		//std::chrono::system_clock::time_point timeNow2 = std::chrono::system_clock::now();
 		//auto diffVal2 = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow2 - lastUpdateTime).count();
 		
-		if (!fSlept) {
-			Sleep(8);
-			fSlept = true;
-		}
+		//if (!fSlept) {
+		//	Sleep(8);
+		//	fSlept = true;
+		//}
 
 		//Sleep(1);
 	}
