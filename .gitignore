@@ -4,5 +4,9 @@
 *.swp
 logs/
 
-**/build
+// Meson Generated
 **/build*
+
+" OSX Generated
+.DS_Store
+.DS_Store?
