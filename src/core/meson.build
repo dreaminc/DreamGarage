@@ -1,8 +1,8 @@
 # DreamOS Core
 
 EHM = [
-	'EHM.h',
-	'RESULT.h'
+	'ehm/EHM.h',
+	'ehm/RESULT.h'
 ]
 
 bounding = [
