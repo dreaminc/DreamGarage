@@ -2,7 +2,7 @@
 
 subdir('GL')
 subdir('shaders')
-subdir(win64)
+subdir('win64')
 
 #TODO: This is too big, should be split up
 #TODO: Split into objects, programs, core/hal
@@ -146,8 +146,8 @@ sources = [
 	'OGLUtility.h',
 	'OGLViewportDisplay.h',
 	'OGLViewportDisplay.cpp',
-	'OGLVolume.h'
-	'OGLVolume.cpp',
+	'OGLVolume.h',
+	'OGLVolume.cpp'
 ]
 
 openglHAL = static_library('opengl_hal', sources)

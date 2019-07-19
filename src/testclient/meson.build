@@ -7,4 +7,4 @@ sources = [
 	'DreamTestClientMain.cpp'
 ]
 
-DreamTestClient = executible('dreamtestclient', sources)
+DreamTestClient = executable('dreamtestclient', sources)

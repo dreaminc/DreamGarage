@@ -1,4 +1,4 @@
-# Test Library
+# DOS Test Library
 
 subdir('suites')
 
@@ -11,4 +11,4 @@ sources = [
 	'TestSuiteFactory.cpp'
 ]
 
-test = static_library('test', sources);
+DOSTest = static_library('dos.test', sources)

@@ -26,8 +26,8 @@ sources = [
 	'PhysicsEngineTestSuite.cpp',
 	'PhysicsIntegrator.h',
 	'PhysicsIntegrator.cpp',
-	'Simplex.h'
-	'Simplex.cpp',
+	'Simplex.h',
+	'Simplex.cpp'
 ]
 
 physicsEngine = shared_module('physics_engine', sources)

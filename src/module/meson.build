@@ -11,7 +11,7 @@ sources = [
 	'DreamModule.cpp',
 	'DreamModuleManager.h',
 	'DreamModuleManager.cpp',
-	'DreamObjectModule.h'
+	'DreamObjectModule.h',
 	'DreamObjectModule.cpp'
 ]
 

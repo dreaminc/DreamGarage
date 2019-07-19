@@ -1,7 +1,7 @@
 # OS 
 
 sources = [
-	'DreamOS.h,
+	'DreamOS.h',
 	'DreamOS.cpp',
 	'DreamOS.tpp',
 	'DreamMessage.h',

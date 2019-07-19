@@ -8,8 +8,8 @@ sources = [
 	'UpdateHandMessage.h',
 	'UpdateHeadMessage.h',
 	'UpdateMouthMessage.h',
-	'UserAreaControls.h'
-	'UserAreaControls.cpp',
+	'UserAreaControls.h',
+	'UserAreaControls.cpp'
 ]
 
 garage = static_library('garage', sources)

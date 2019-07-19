@@ -8,11 +8,12 @@ sources = [
 	'OSXApplication.h',
 	'OSXApplication.mm',
 	'OSXOGLView.h',
-	'OSXOGLView.mm',
+	'OSXOGLView.m',
 	'OSXPathManager.h',
 	'OSXPathManager.cpp',
 	'OSXSandbox.h',
 	'OSXSandbox.cpp'
 ]
 
-OSXSandbox = static_library('osx_sandbox', sources)
+# TODO: Need to tackle this
+# OSXSandbox = static_library('osx_sandbox', sources)

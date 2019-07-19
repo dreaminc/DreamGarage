@@ -11,8 +11,8 @@ sources = [
 	'InteractionEngine.cpp',
 	'InteractionEngineTestSuite.h',
 	'InteractionEngineTestSuite.cpp',
-	'InteractionObjectEvent.h'
-	'InteractionObjectEvent.cpp',
+	'InteractionObjectEvent.h',
+	'InteractionObjectEvent.cpp'
 ]
 
 interactionEngineModule = shared_module('interaction_engine_module', sources)

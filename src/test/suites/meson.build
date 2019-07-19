@@ -22,7 +22,7 @@ DOSTestSuiteSources = [
 	'DOSTestSuite.cpp'
 ]
 
-DOSTestSuite = static_library('test.dos', DOSTestSuiteSource)
+DOSTestSuite = static_library('test.dos', DOSTestSuiteSources)
 
 # Dream Test Suite
 DreamTestSuiteSources = [
@@ -46,7 +46,7 @@ MathTestSuiteSources = [
 	'MathTestSuite.cpp'
 ]
 
-MathTestSuite = static_library('test.math', MathTestSuiteSources);
+MathTestSuite = static_library('test.math', MathTestSuiteSources)
 
 # Multi Content Test Suite ?? - This is unclear
 MultiContentTestSuiteSources = [

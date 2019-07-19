@@ -14,4 +14,4 @@ sources = [
 # DreamCEFExtension.js
 # DreamCef.ico
 
-dreamcef = executible('dreamcef', sources)
+dreamcef = executable('dreamcef', sources)

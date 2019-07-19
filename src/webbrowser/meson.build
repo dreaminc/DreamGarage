@@ -1,6 +1,6 @@
 # Web Browser Library
 
-subdir('cefbrowser');
+subdir('cefbrowser')
 
 sources = [
 	'DOMDocument.h',

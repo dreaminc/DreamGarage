@@ -5,4 +5,4 @@ sources = [
 	'Win64OpenGLRenderingContext.cpp'
 ]
 
-openglWin64HAL = static_lib('opengl_win64_hal', sources)
+openglWin64HAL = static_library('opengl_win64_hal', sources)

@@ -2,9 +2,9 @@
 
 sources = [
 	'CommonTypes.h',
-	'DDCIPCMessage.h'
+	'DDCIPCMessage.h',
 	'DesktopDuplication.h',
-	'DesktopDuplication.cpp'
+	'DesktopDuplication.cpp',
 	'D3D11DesktopDuplicationDisplayManager.h',
 	'D3D11DesktopDuplicationDisplayManager.cpp',
 	'D3D11DesktopDuplicationManager.h',
@@ -12,11 +12,11 @@ sources = [
 	'D3D11DesktopDuplicationOutputManager.h',
 	'D3D11DesktopDuplicationOutputManager.cpp',
 	'D3D11DesktopDuplicationThreadManager.h',
-	'D3D11DesktopDuplicationThreadManager.cpp',
+	'D3D11DesktopDuplicationThreadManager.cpp'
 ]
 
 # TODO: Add these?
 # PixelShader.hlsl
 # VertexShader.hlsl
 
-dreamdesktop = executible('dreamdesktop', sources)
+dreamdesktop = executable('dreamdesktop', sources)
