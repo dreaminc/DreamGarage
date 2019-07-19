@@ -1,9 +1,8 @@
-# CMakeList.txt : CMake project for dos, include source and define
-# project specific logic here.
-#
-cmake_minimum_required (VERSION 3.8)
+# CMakeList.txt : CMake project for dos
 
-# Add source to this project's executable.
-add_executable (dos "dos.cpp" "dos.h")
+cmake_minimum_required(3.15)
 
-# TODO: Add tests and install targets if needed.
+project(dos VERSION 1.0 LANGUAGES CXX)
+
+add_subdirectory(src)
+
