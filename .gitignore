@@ -4,8 +4,11 @@
 *.swp
 logs/
 
-// Meson Generated
+" Meson Generated
 **/build*
+
+" CMake Generated
+**/out*
 
 " Visual Studio
 **/.vs
