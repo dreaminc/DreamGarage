@@ -1,8 +1,8 @@
-# CMakeList.txt : CMake project for dos
+# /CMakeList.txt : CMake project for dos
 
-cmake_minimum_required(3.15)
+cmake_minimum_required(VERSION 3.15)
 
-project(dos VERSION 1.0 LANGUAGES CXX)
+project(dos LANGUAGES CXX)
 
 add_subdirectory(src)
 
