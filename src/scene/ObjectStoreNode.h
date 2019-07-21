@@ -1,14 +1,16 @@
 #ifndef OBJECT_STORE_NODE_H_
 #define OBJECT_STORE_NODE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Scene/ObjectStoreNode.h
+// Dream Scene
+// dos/src/scene/ObjectStoreNode.h
+
 // A Source Node extension of ObjectStore
 
-#include "HAL/Pipeline/SourceNode.h"
 #include "ObjectStore.h"
+
+#include "pipeline/SourceNode.h"
 
 class ray;
 

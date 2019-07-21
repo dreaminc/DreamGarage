@@ -1,17 +1,19 @@
 #ifndef SENSE_KEYBOARD_H_
 #define SENSE_KEYBOARD_H_
 
+#include "core/ehm/EHM.h"
+
+// Dream Sense
+// dos/src/sense/SenseKeyboard.h
+
+// Sense Keyboard Device
+
 #include <string.h>
 #include <functional>
 
-#include "RESULT/EHM.h"
-
-// DREAM OS
-// DreamOS/Sense/SenseKeyboard.h
-// Sense Keyboard Device
-
 #include "SenseDevice.h"
-#include "Primitives/Publisher.h"
+
+#include "core/types/Publisher.h"
 
 // helper functions for converting the received UTF-16 character (on windows platform) to a non-unicode string
 std::string utf16_to_utf8(std::u16string utf16_string);

@@ -1,9 +1,15 @@
 #ifndef OBJECT_STORE_FACTORY_H_
 #define OBJECT_STORE_FACTORY_H_
 
-#include "RESULT/EHM.h"
-#include "Scene/ObjectStoreImp.h"
-#include "Core/Types/Factory.h"
+#include "core/ehm/EHM.h"
+
+// Dream Scene
+// dos/src/scene/ObjectStoreFactory.h
+
+// A factory object to generate object stores
+
+#include "scene/ObjectStoreImp.h"
+#include "core/types/Factory.h"
 
 class ObjectStoreFactory : public Factory {
 public:

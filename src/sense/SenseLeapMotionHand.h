@@ -1,21 +1,22 @@
 #ifndef SENSE_LEAPMOTION_HAND_H_
 #define SENSE_LEAPMOTION_HAND_H_
 
-#include <string>
-#include <memory>
+#include "core/ehm/EHM.h"
 
-#include "RESULT/EHM.h"
+// Dream Sense
+// dos/src/sense/SenseLeapMotionHand.h
 
-// DREAM OS
-// DreamOS/Sense/SenseLeapMotionHand.h
 // Sense Leap Motion Hand Object
 // This is a representation of the Sense Leap Motion Hand object that can then be 
 // passed to the hand primitive in DreamOS
 
-#include "Leap.h"
+#include <string>
+#include <memory>
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
+#include "third_party/LeapSDK/include/Leap.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
 
 class hand;
 

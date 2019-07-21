@@ -1,12 +1,14 @@
 #ifndef SENSE_CONTROLLER_H_
 #define SENSE_CONTROLLER_H_
 
-#include "Primitives/valid.h"
+// Dream Sense
+// dos/src/sense/SenseController.h
 
-#include "Primitives/Publisher.h"
-#include "Primitives/Subscriber.h"
-#include "Primitives/point.h"
 #include "SenseDevice.h"
+
+#include "core/types/Publisher.h"
+#include "core/types/Subscriber.h"
+#include "core/primitives/point.h"
 
 typedef enum SenseControllerEventType {
 	SENSE_CONTROLLER_GRIP_DOWN,
@@ -49,7 +51,7 @@ typedef struct SenseControllerEvent : SenseDevice::SenseDeviceEvent {
 	}
 } SENSE_CONTROLLER_EVENT;
 
-class SenseController : public SenseDevice, public Publisher<SenseControllerEventType, SenseControllerEvent>, public valid {
+class SenseController : public SenseDevice, public Publisher<SenseControllerEventType, SenseControllerEvent> {
 
 public:
 	enum class HapticCurveType {

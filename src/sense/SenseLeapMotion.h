@@ -1,26 +1,26 @@
 #ifndef SENSE_LEAPMOTION_H_
 #define SENSE_LEAPMOTION_H_
 
-#include <string>
-#include <memory>
+#include "core/ehm/EHM.h"
 
-#include "RESULT/EHM.h"
+// Dream Sense
+// dos/src/sense/SenseLeapMotion.h
 
-// DREAM OS
-// DreamOS/Sense/SenseLeapMotion.h
 // Sense Leap Motion Device
 // This is a device wrapper for the Leap Motion hand tracking device
 
-#include "Leap.h"
+#include <string>
+#include <memory>
+
+#include "third_party/LeapSDK/include/Leap.h"
 
 #include "SenseDevice.h"
-#include "Primitives/Publisher.h"
 
-#include "Primitives/valid.h"
+#include "core/types/Publisher.h"
 
 #include "SenseLeapMotionHand.h"
 
-#include "Primitives/hand/HandType.h"
+#include "core/hand/HandType.h"
 
 class LeapHand;
 class composite;
@@ -45,8 +45,7 @@ typedef struct SenseLeapMotionEvent : SenseDevice::SenseDeviceEvent {
 class SenseLeapMotion : 
 	public SenseDevice, 
 	public Publisher<int, SenseLeapMotionEvent>, 
-	public Leap::Listener, 
-	public valid 
+	public Leap::Listener
 {
 public:
 	SenseLeapMotion();

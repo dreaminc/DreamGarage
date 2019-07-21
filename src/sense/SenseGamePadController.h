@@ -1,14 +1,17 @@
 #ifndef SENSE_GAMEPAD_CONTROLLER_H_
 #define SENSE_GAMEPAD_CONTROLLER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
+// Dream Sense
+// dos/src/sense/SenseGamePadController.h
 
 #include "SenseDevice.h"
-#include "Primitives/Publisher.h"
-#include "Primitives/point.h"
-#include "Primitives/point2D.h"
+
+#include "core/types/Publisher.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/point2D.h"
 
 typedef enum SenseGamepadEventType {
 	SENSE_GAMEPAD_JOYSTICK_LEFT,

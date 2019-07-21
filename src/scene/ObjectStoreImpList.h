@@ -1,16 +1,18 @@
 #ifndef SCENE_GRAPH_LIST_H_
 #define SCENE_GRAPH_LIST_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Scene/ObjectStoreImpList.h
+// Dream Scene
+// dos/src/scene/ObjectStoreImpList.h
+
 // A simple ObjectStoreImp utilizing a linked list implementation
 
 #include <list>
+
 #include "ObjectStoreImp.h"
 
-#include "Primitives/DimObj.h"
+#include "core/primitives/DimObj.h"
 
 class ObjectStoreImpList : public ObjectStoreImp {
 public:

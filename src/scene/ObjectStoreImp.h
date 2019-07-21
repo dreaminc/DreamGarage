@@ -3,8 +3,9 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Scene/ObjectStoreImp.h
+// Dream Scene
+// dos/src/scene/ObjectStoreImp.h
+
 // This abstract class simply represents 
 
 #include <vector>

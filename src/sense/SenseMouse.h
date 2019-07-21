@@ -1,16 +1,18 @@
 #ifndef SENSE_MOUSE_H_
 #define SENSE_MOUSE_H_
 
-#include <string.h>
+#include "core/ehm/EHM.h"
 
-#include "RESULT/EHM.h"
+// Dream Sense
+// dos/src/sense/SenseMouse.h
 
-// DREAM OS
-// DreamOS/Sense/SenseMouse.h
 // Sense Mouse Device
 
+#include <string.h>
+
 #include "SenseDevice.h"
-#include "Primitives/Publisher.h"
+
+#include "core/types/Publisher.h"
 
 typedef enum SenseMouseEventType {
 	SENSE_MOUSE_LEFT_BUTTON_DOWN,

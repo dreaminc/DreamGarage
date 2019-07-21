@@ -1,12 +1,11 @@
 #ifndef SENSE_DEVICE_H_
 #define SENSE_DEVICE_H_
 
-#include <time.h>       
+#include "core/ehm/EHM.h"
 
-#include "RESULT/EHM.h"
+// Dream Sense
+// dos/src/sense/SenseDevice.h
 
-// DREAM OS
-// DreamOS/Sense/SenseDevice.h
 // Base Sense Device Object
 
 // Sense is a dedicated DreamOS sub-system design to asynchronously receive input or
@@ -15,10 +14,13 @@
 // controls or otherwise.  The base SenseDevice will get filled out with shared functionality and interfaces
 // to such devices and act as a shared handle for managers or controllers as they become needed.
 
-#include "Primitives/Types/UID.h"
-#include "Primitives/Subscriber.h"
+#include <time.h>       
 
-class SenseDevice {
+#include "core/types/DObject.h"
+
+#include "core/types/Subscriber.h"
+
+class SenseDevice : public DObject {
 public:
 	SenseDevice() {
 		// empty stub
@@ -37,8 +39,6 @@ public:
 
 	} SENSE_DEVICE_EVENT;
 
-private:
-	UID m_uid;
 };
 
 #endif // ! SENSE_DEVICE_H_

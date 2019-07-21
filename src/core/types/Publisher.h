@@ -1,22 +1,24 @@
 #ifndef PUBLISHER_H_
 #define PUBLISHER_H_
 
+
+#include "core/ehm/EHM.h"
+
+// Dream Core
+// dos/src/core/types/Publisher.h
+
+// Publisher Object
+// Couples with the Subscriber object to constitute the observer-notify pattern
+
 #include <list>
 #include <map>
 #include <string>
 
 #include <math.h>
 
-#include "core/ehm/EHM.h"
-
-// DREAM OS
-// DreamOS/Dimension/Primitives/Publisher.h
-// Publisher Object
-// Couples with the Subscriber object to constitute the observer-notify pattern
-
 //class Subscriber;
 #include "Subscriber.h"
-#include "Primitives/VirtualObj.h"
+#include "core/primitives/VirtualObj.h"
 
 // TODO: Bring back the PEventClass - no more subscriber predefined event struct?
 // First lets see if this topology works at all

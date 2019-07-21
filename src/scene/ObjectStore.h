@@ -5,8 +5,9 @@
 
 #include <mutex>
 
-// DREAM OS
-// DreamOS/Dimension/Scene/ObjectStore.h
+// Dream Scene
+// dos/src/scene/ObjectStore.h
+
 // The Scene Graph contains all of the objects in a given
 // scene and manages what is dispatched to the graphics pipeline
 // or processed by the physics engine
