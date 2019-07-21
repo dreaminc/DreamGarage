@@ -1,7 +1,7 @@
 #ifndef PRIM_PARAMS_H_
 #define PRIM_PARAMS_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Primitives/PrimParams.h

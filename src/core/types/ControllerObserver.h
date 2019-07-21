@@ -1,7 +1,7 @@
 #ifndef CONTROLLER_OBSERVER_H_
 #define CONTROLLER_OBSERVER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Cloud/ControllerProxy.h

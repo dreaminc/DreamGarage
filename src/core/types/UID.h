@@ -1,8 +1,8 @@
 #ifndef UID_H_
 #define UID_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/Types/TypeObj.h"
+#include "core/ehm/EHM.h"
+#include "core/types/TypeObj.h"
 
 class UID : public TypeObj {
 public:

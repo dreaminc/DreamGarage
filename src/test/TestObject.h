@@ -7,7 +7,7 @@
 // These can be used to benchmark components, or test the system within the
 // DreamOS TEST unit testing framework
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 #include <functional>
 #include <memory>
 #include <chrono>

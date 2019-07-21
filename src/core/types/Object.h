@@ -1,8 +1,8 @@
 #ifndef OBJECT_H_
 #define OBJECT_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/Types/UID.h"
+#include "core/ehm/EHM.h"
+#include "core/types/UID.h"
 
 // DREAM OS
 // DreamOS/Core/Types/Factory.h

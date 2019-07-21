@@ -1,7 +1,7 @@
 #ifndef D_OBJECT_H_
 #define D_OBJECT_H_
 
-#include "RESULT/RESULT.h"
+#include "core/ehm/RESULT.h"
 
 // DREAM OS
 // DreamOS/Primitives/DObject.h
@@ -9,7 +9,7 @@
 // comparable to NSObject in Mac land
 
 #include "Primitives/valid.h"
-#include "Primitives/Types/UID.h"
+#include "core/types/UID.h"
 
 class DObject : public valid {
 public:

@@ -1,7 +1,7 @@
 #ifndef VERTEX_H_
 #define VERTEX_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/vertex.h

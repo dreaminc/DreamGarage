@@ -1,7 +1,7 @@
 #ifndef FRAMEBUFFER_H_
 #define FRAMEBUFFER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 #include "Primitives/texture.h"
 
 // DREAM OS
@@ -9,7 +9,7 @@
 // Framebuffer Primitve
 // The parent object for the Framebuffer 
 
-#include "Primitives/Types/UID.h"
+#include "core/types/UID.h"
 
 #define DEFAULT_FRAMEBUFFER_CHANNELS 3
 

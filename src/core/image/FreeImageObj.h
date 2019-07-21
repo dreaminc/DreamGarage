@@ -1,7 +1,7 @@
 #ifndef FREE_IMAGE_OBJ_H_
 #define FREE_IMAGE_OBJ_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // Logging is redefining macros due to CEF, Logging++ and WebRTC
 // When we solve logging we need to solve this too

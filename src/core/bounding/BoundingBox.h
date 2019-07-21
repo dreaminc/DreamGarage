@@ -1,7 +1,7 @@
 #ifndef BOUNDING_BOX_H_
 #define BOUNDING_BOX_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/BoundingBox.h

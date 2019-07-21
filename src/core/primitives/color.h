@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/color.h

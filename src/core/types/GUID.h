@@ -1,11 +1,11 @@
 #ifndef GUID_H_
 #define GUID_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/Types/TypeObj.h"
+#include "core/ehm/EHM.h"
+#include "core/types/TypeObj.h"
 
 // DREAM OS
-// DreamOS/Cloud/Primitives/Types/GUID.h
+// DreamOS/Cloud/core/types/GUID.h
 // GUID is a globally unique identifier, different than UID in that UID is only unqiue to the
 // Dream OS landscape.
 

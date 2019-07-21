@@ -1,7 +1,7 @@
 #ifndef CYLINDER_H_
 #define CYLINDER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/Cylinder.h

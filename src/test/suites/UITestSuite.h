@@ -1,7 +1,7 @@
 #ifndef UI_TEST_SUITE_H_
 #define UI_TEST_SUITE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 #include "Primitives/valid.h"
 #include "Primitives/Subscriber.h"

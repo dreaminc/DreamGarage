@@ -1,7 +1,7 @@
 #ifndef POINT_2D_H_
 #define POINT_2D_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 #include <string>
 

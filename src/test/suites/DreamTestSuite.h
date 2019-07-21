@@ -1,7 +1,7 @@
 #ifndef DREAM_TEST_SUITE_H_
 #define DREAM_TEST_SUITE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Test/DreamTestSuite.h

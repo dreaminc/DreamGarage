@@ -1,7 +1,7 @@
 #ifndef MATRIX_TEST_SUITE_H_
 #define MATRIX_TEST_SUITE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Primitices/matrix/MatrixTestSuite.h

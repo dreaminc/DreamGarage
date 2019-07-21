@@ -31,7 +31,7 @@
 #include "Primitives/texture.h"                // for texture, texture::type, texture::type::TEXTURE_2D
 #include "Primitives/vector.h"                 // for vector
 #include "Primitives/volume.h"                 // for volume
-#include "RESULT/EHM.h"                        // for CR, CN, CNM, CRM, DEBUG_LINEOUT, CBM, DOSLOG
+#include "core/ehm/EHM.h"                        // for CR, CN, CNM, CRM, DEBUG_LINEOUT, CBM, DOSLOG
 #include "Sandbox/CommandLineManager.h"        // for CommandLineManager
 #include "Sandbox/CredentialManager.h"         // for CredentialManager, CredentialManager::type, CredentialManager::type::CREDENTIAL_GENERIC
 #include "Sense/SenseController.h"             // for SenseControllerEvent, ControllerState, SenseControllerEventType::SENSE_CONTROLLER_MENU_UP, SenseControllerEventType::SENSE_CONTROLLER_META_CLOSED

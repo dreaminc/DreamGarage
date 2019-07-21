@@ -2,7 +2,7 @@
 #define RESULT_H_
 
 // DREAM OS
-// DreamOS/RESULT/RESULT.h
+// DreamOS/core/ehm/RESULT.h
 // RESULT Header File
 
 #include "core/types/STDTYPES.h"

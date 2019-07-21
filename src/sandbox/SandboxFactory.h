@@ -5,7 +5,7 @@
 // DreamOS/Sandbox/SandboxFactory
 // This allows creation of Sandbox without need of direct implementation
 
-#include "SandboxApp.h"
+#include "Sandbox.h"
 
 typedef enum {
 	SANDBOX_APP_WIN32,
@@ -19,7 +19,7 @@ class DreamOS;
 
 class SandboxFactory {
 public:
-	static SandboxApp* MakeSandbox(SANDBOX_APP_TYPE type, DreamOS *pDOSHandle);
+	static Sandbox* MakeSandbox(SANDBOX_APP_TYPE type, DreamOS *pDOSHandle);
 };
 
 #endif // ! SANDBOX_FACTORY_H_

@@ -1,7 +1,7 @@
 #ifndef DIMENSION_TEST_SUITE_H_
 #define DIMENSION_TEST_SUITE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Primitives/DimensionTestSuite.h

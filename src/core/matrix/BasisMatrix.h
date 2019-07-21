@@ -1,7 +1,7 @@
 #ifndef BASIS_MATRIX_H_
 #define BASIS_MATRIX_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/BasisMatrix.h

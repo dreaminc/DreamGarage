@@ -1,7 +1,7 @@
 #ifndef HAND_H_
 #define HAND_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/hand/hand.h
@@ -16,7 +16,7 @@
 
 #include <memory>
 #include "Primitives/point.h"      // for point
-#include "RESULT/RESULT.h"         // for RESULT
+#include "core/ehm/RESULT.h"         // for RESULT
 #include "xstring"                 // for wstring
 
 class DreamOS;

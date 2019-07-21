@@ -1,7 +1,7 @@
 #ifndef STEREO_CAMERA_H_
 #define STEREO_CAMERA_H_
 
-#include "RESULT/RESULT.h"                       // for RESULT
+#include "core/ehm/RESULT.h"                       // for RESULT
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/stereocamera.h

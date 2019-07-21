@@ -1,7 +1,7 @@
 #ifndef BOUNDING_SPHERE_H_
 #define BOUNDING_SPHERE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/BoundingSphere.h

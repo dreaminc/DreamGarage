@@ -1,7 +1,7 @@
 #ifndef PRIMITIVE_USER_H_
 #define PRIMITIVE_USER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/User/User.h

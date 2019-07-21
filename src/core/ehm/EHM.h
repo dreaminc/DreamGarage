@@ -2,7 +2,7 @@
 #define EHM_H_
 
 // DREAM OS
-// DreamOS/RESULT/EHM.h
+// DreamOS/core/ehm/EHM.h
 // Error Handling Macros
 
 #include "RESULT.h"

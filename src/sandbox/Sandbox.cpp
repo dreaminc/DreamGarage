@@ -38,7 +38,7 @@
 // TODO: Fix
 #include "HAL/opengl/OGLHand.h"
 
-SandboxApp::SandboxApp() :
+Sandbox::Sandbox() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
 	m_pOpenGLRenderingContext(nullptr),
@@ -61,7 +61,7 @@ SandboxApp::SandboxApp() :
 	// empty
 }
 
-SandboxApp::~SandboxApp() {
+Sandbox::~Sandbox() {
 	if (m_pCloudController != nullptr) {
 		delete m_pCloudController;
 		m_pCloudController = nullptr;
@@ -78,37 +78,37 @@ SandboxApp::~SandboxApp() {
 	}
 }
 
-RESULT SandboxApp::SetSandboxConfiguration(SandboxApp::configuration sandboxconf) {
+RESULT Sandbox::SetSandboxConfiguration(Sandbox::configuration sandboxconf) {
 	m_SandboxConfiguration = sandboxconf;
 	return R_PASS;
 }
 
-InteractionEngineProxy *SandboxApp::GetInteractionEngineProxy() {
+InteractionEngineProxy *Sandbox::GetInteractionEngineProxy() {
 	return m_pInteractionEngine->GetInteractionEngineProxy();
 }
 
-const SandboxApp::configuration& SandboxApp::GetSandboxConfiguration() {
+const Sandbox::configuration& Sandbox::GetSandboxConfiguration() {
 	return m_SandboxConfiguration;
 }
 
-RESULT SandboxApp::SetMouseIntersectObjects(bool fMouseIntersectObjects) {
+RESULT Sandbox::SetMouseIntersectObjects(bool fMouseIntersectObjects) {
 	m_fMouseIntersectObjects = fMouseIntersectObjects;
 	return R_PASS;
 }
 
-bool SandboxApp::IsMouseIntersectObjects() {
+bool Sandbox::IsMouseIntersectObjects() {
 	return m_fMouseIntersectObjects;
 }
 
-RESULT SandboxApp::Notify(SenseKeyboardEvent *kbEvent) {
+RESULT Sandbox::Notify(SenseKeyboardEvent *kbEvent) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT SandboxApp::Notify(SenseTypingEvent *kbEvent) {
+RESULT Sandbox::Notify(SenseTypingEvent *kbEvent) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
+RESULT Sandbox::Notify(SenseMouseEvent *mEvent) {
 	RESULT r = R_PASS;
 
 	switch (mEvent->EventType) {
@@ -160,7 +160,7 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 	return r;
 }
 
-RESULT SandboxApp::GetMouseRay(ray &rCast, double t){
+RESULT Sandbox::GetMouseRay(ray &rCast, double t){
 	RESULT r = R_PASS;
 	int mouseX = 0;
 	int mouseY = 0;
@@ -184,7 +184,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::Notify(CollisionObjectEvent *oEvent) {
+RESULT Sandbox::Notify(CollisionObjectEvent *oEvent) {
 	RESULT r = R_PASS;
 
 
@@ -193,7 +193,7 @@ RESULT SandboxApp::Notify(CollisionObjectEvent *oEvent) {
 	return r;
 }
 
-RESULT SandboxApp::Notify(CollisionGroupEvent* gEvent) {
+RESULT Sandbox::Notify(CollisionGroupEvent* gEvent) {
 	RESULT r = R_PASS;
 
 	for (auto &pObject : gEvent->m_collisionGroup) {
@@ -217,7 +217,7 @@ RESULT SandboxApp::Notify(CollisionGroupEvent* gEvent) {
 	return r;
 }
 
-RESULT SandboxApp::RegisterImpKeyboardEvents() {
+RESULT Sandbox::RegisterImpKeyboardEvents() {
 	RESULT r = R_PASS;
 
 	CR(RegisterSubscriber(SVK_TAB, this));
@@ -245,7 +245,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RegisterImpMouseEvents() {
+RESULT Sandbox::RegisterImpMouseEvents() {
 	RESULT r = R_PASS;
 
 	CR(RegisterSubscriber(SENSE_MOUSE_MOVE, this));
@@ -298,7 +298,7 @@ Error:
 class SinkNode;
 
 // TODO: shouldn't be this way ultimately
-RESULT SandboxApp::RegisterImpLeapMotionEvents() {
+RESULT Sandbox::RegisterImpLeapMotionEvents() {
 	RESULT r = R_PASS;
 
 	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_LEFT);
@@ -318,7 +318,7 @@ RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	return r;
 }
 
-RESULT SandboxApp::RegisterImpControllerEvents() {
+RESULT Sandbox::RegisterImpControllerEvents() {
 	RESULT r = R_PASS;
 
 	if (m_pHMD != nullptr) {
@@ -339,7 +339,7 @@ Error:
 	return r;
 }
 
-hand *SandboxApp::GetHand(HAND_TYPE handType) {
+hand *Sandbox::GetHand(HAND_TYPE handType) {
 
 	if (m_pHMD != nullptr) {
 		return m_pHMD->GetHand(handType);
@@ -353,33 +353,33 @@ hand *SandboxApp::GetHand(HAND_TYPE handType) {
 }
 
 
-bool SandboxApp::IsSandboxRunning() {
+bool Sandbox::IsSandboxRunning() {
 	return m_fRunning;
 }
 
-RESULT SandboxApp::SetSandboxRunning(bool fRunning) {
+RESULT Sandbox::SetSandboxRunning(bool fRunning) {
 	m_fRunning = fRunning;
 	return R_SUCCESS;
 }
 
-inline PathManager* SandboxApp::GetPathManager() {
+inline PathManager* Sandbox::GetPathManager() {
 	return m_pPathManager;
 }
 
-inline OpenGLRenderingContext * SandboxApp::GetOpenGLRenderingContext() {
+inline OpenGLRenderingContext * Sandbox::GetOpenGLRenderingContext() {
 	return m_pOpenGLRenderingContext;
 }
 
-bool SandboxApp::IsShuttingDown() {
+bool Sandbox::IsShuttingDown() {
 	return m_fPendingShutdown;
 }
 
-RESULT SandboxApp::PendShutdown() {
+RESULT Sandbox::PendShutdown() {
 	m_fPendingShutdown = true;
 	return R_PASS;
 }
 
-RESULT SandboxApp::Shutdown() {
+RESULT Sandbox::Shutdown() {
 	RESULT r = R_SUCCESS;
 
 	DOSLOG(INFO, "Begin sandbox shutdown.");
@@ -411,7 +411,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::HMDShutdown() {
+RESULT Sandbox::HMDShutdown() {
 	RESULT r = R_PASS;
 
 	//*
@@ -431,7 +431,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RunAppLoop() {
+RESULT Sandbox::RunAppLoop() {
 	RESULT r = R_PASS;
 
 	// Launch main message loop
@@ -534,7 +534,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::ResizeViewport(viewport newViewport) {
+RESULT Sandbox::ResizeViewport(viewport newViewport) {
 	RESULT r = R_PASS;
 
 	// Resize the camera
@@ -547,7 +547,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
+RESULT Sandbox::Initialize(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
 
 	// Set up command line manager
@@ -674,7 +674,7 @@ Error:
 }
 
 // TODO: Module
-RESULT SandboxApp::InitializePhysicsEngine() {
+RESULT Sandbox::InitializePhysicsEngine() {
 	RESULT r = R_PASS;
 
 	m_pPhysicsEngine = PhysicsEngine::MakePhysicsEngine();
@@ -694,7 +694,7 @@ Error:
 }
 
 // TODO: Module
-RESULT SandboxApp::InitializeInteractionEngine() {
+RESULT Sandbox::InitializeInteractionEngine() {
 	RESULT r = R_PASS;
 
 	m_pInteractionEngine = InteractionEngine::MakeEngine(this);
@@ -717,7 +717,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::InitializeTimeManagerModule() {
+RESULT Sandbox::InitializeTimeManagerModule() {
 	RESULT r = R_PASS;
 
 	CNM(m_pDreamModuleManager, "Module manager is not running");
@@ -732,7 +732,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::InitializeDreamModuleManager() {
+RESULT Sandbox::InitializeDreamModuleManager() {
 	RESULT r = R_PASS;
 
 	// Initialize Time Manager
@@ -745,7 +745,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::InitializeDreamAppManager() {
+RESULT Sandbox::InitializeDreamAppManager() {
 	RESULT r = R_PASS;
 
 	// Initialize Time Manager
@@ -758,7 +758,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::InitializeCamera() {
+RESULT Sandbox::InitializeCamera() {
 	RESULT r = R_PASS;
 
 	//m_pCamera = std::make_shared<stereocamera>(point(0.0f, 0.0f, 5.0f), m_viewport);
@@ -774,7 +774,7 @@ Error:
 }
 
 // Note: This needs to be done after GL set up
-RESULT SandboxApp::InitializeHMD() {
+RESULT Sandbox::InitializeHMD() {
 	RESULT r = R_PASS;
 
 	CN(m_pHALImp);
@@ -804,7 +804,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::InitializeHAL() {
+RESULT Sandbox::InitializeHAL() {
 	RESULT r = R_PASS;
 
 	// Setup OpenGL and Resize Windows etc
@@ -827,7 +827,7 @@ Error:
 }
 
 // TODO: Move this up to DreamOS
-RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
+RESULT Sandbox::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 	RESULT r = R_PASS;
 
 	// TODO: Get from HMD if HMD is valid
@@ -868,7 +868,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber) {
+RESULT Sandbox::RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber) {
 	RESULT r = R_PASS;
 
 	r = m_pPhysicsEngine->RegisterObjectCollisionSubscriber(pVirtualObject, pCollisionDetectorSubscriber);
@@ -878,7 +878,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+RESULT Sandbox::RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
 	RESULT r = R_PASS;
 
 	//r = m_pInteractionEngine->RegisterSubscriber(eventType, pInteractionSubscriber);
@@ -888,7 +888,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RegisterEventSubscriber(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+RESULT Sandbox::RegisterEventSubscriber(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
 	RESULT r = R_PASS;
 
 	r = m_pInteractionEngine->RegisterSubscriber(pObject, eventType, pInteractionSubscriber);
@@ -898,27 +898,27 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::UnregisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+RESULT Sandbox::UnregisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
 	return m_pInteractionEngine->UnregisterSubscriber(pObject, eventType, pInteractionSubscriber);
 }
 
-RESULT SandboxApp::UnregisterInteractionSubscriber(Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+RESULT Sandbox::UnregisterInteractionSubscriber(Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
 	return m_pInteractionEngine->UnregisterSubscriber(pInteractionSubscriber);
 }
 
-RESULT SandboxApp::UnregisterInteractionObject(VirtualObj *pObject) {
+RESULT Sandbox::UnregisterInteractionObject(VirtualObj *pObject) {
 	return m_pInteractionEngine->UnregisterSubscriber(pObject);
 }
 
-long SandboxApp::GetTickCount() {
+long Sandbox::GetTickCount() {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }
 
-RESULT SandboxApp::SetHALConfiguration(HALImp::HALConfiguration halconf) {
+RESULT Sandbox::SetHALConfiguration(HALImp::HALConfiguration halconf) {
 	return m_pHALImp->SetHALConfiguration(halconf);
 }
 
-const HALImp::HALConfiguration& SandboxApp::GetHALConfiguration() {
+const HALImp::HALConfiguration& Sandbox::GetHALConfiguration() {
 	return m_pHALImp->GetHALConfiguration();
 }
 
@@ -927,15 +927,15 @@ const HALImp::HALConfiguration& SandboxApp::GetHALConfiguration() {
 // Sandbox Factory Methods
 
 // Sandbox Objects
-std::shared_ptr<NamedPipeClient> SandboxApp::MakeNamedPipeClient(std::wstring strPipename) {
+std::shared_ptr<NamedPipeClient> Sandbox::MakeNamedPipeClient(std::wstring strPipename) {
 	return nullptr;
 }
 
-std::shared_ptr<NamedPipeServer> SandboxApp::MakeNamedPipeServer(std::wstring strPipename) {
+std::shared_ptr<NamedPipeServer> Sandbox::MakeNamedPipeServer(std::wstring strPipename) {
 	return nullptr;
 }
 
-RESULT SandboxApp::AddObject(VirtualObj *pObject, PipelineType pipelineType) {
+RESULT Sandbox::AddObject(VirtualObj *pObject, PipelineType pipelineType) {
 	RESULT r = R_PASS;
 
 	if (static_cast<int>(pipelineType & PipelineType::MAIN) != 0) {
@@ -950,7 +950,7 @@ Error:
 }
 
 // This adds the object to the physics graph (otherwise it will not get integrated / operated on)
-RESULT SandboxApp::AddPhysicsObject(VirtualObj *pObject) {
+RESULT Sandbox::AddPhysicsObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	CR(m_pPhysicsGraph->PushObject(pObject));
@@ -960,7 +960,7 @@ Error:
 }
 
 // This adds the object to the interaction graph (otherwise it will not be included in event handling)
-RESULT SandboxApp::AddObjectToInteractionGraph(VirtualObj *pObject) {
+RESULT Sandbox::AddObjectToInteractionGraph(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	CR(m_pInteractionGraph->PushObject(pObject));
@@ -969,11 +969,11 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RemoveObjectFromInteractionGraph(VirtualObj *pObject) {
+RESULT Sandbox::RemoveObjectFromInteractionGraph(VirtualObj *pObject) {
 	return m_pInteractionGraph->RemoveObject(pObject);
 }
 
-RESULT SandboxApp::AddInteractionObject(VirtualObj *pObject) {
+RESULT Sandbox::AddInteractionObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	CR(m_pInteractionEngine->AddInteractionObject(pObject));
@@ -982,7 +982,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject, PipelineType pipelineType) {
+RESULT Sandbox::AddObjectToUIGraph(VirtualObj *pObject, PipelineType pipelineType) {
 	RESULT r = R_PASS;
 
 	if (static_cast<int>(pipelineType & PipelineType::MAIN) != 0) {
@@ -996,7 +996,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::AddObjectToUIClippingGraph(VirtualObj *pObject) {
+RESULT Sandbox::AddObjectToUIClippingGraph(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	CR(m_pUIClippingSceneGraph->PushObject(pObject));
@@ -1005,15 +1005,15 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RemoveObjectFromUIGraph(VirtualObj *pObject) {
+RESULT Sandbox::RemoveObjectFromUIGraph(VirtualObj *pObject) {
 	return m_pUISceneGraph->RemoveObject(pObject);
 }
 
-RESULT SandboxApp::RemoveObjectFromUIClippingGraph(VirtualObj *pObject) {
+RESULT Sandbox::RemoveObjectFromUIClippingGraph(VirtualObj *pObject) {
 	return m_pUIClippingSceneGraph->RemoveObject(pObject);
 }
 
-RESULT SandboxApp::RemoveObjectFromAuxUIGraph(VirtualObj *pObject) {
+RESULT Sandbox::RemoveObjectFromAuxUIGraph(VirtualObj *pObject) {
 	return m_pAuxUISceneGraph->RemoveObject(pObject);
 }
 
@@ -1028,7 +1028,7 @@ Error:
 }
 */
 
-RESULT SandboxApp::RemoveObject(VirtualObj *pObject) {
+RESULT Sandbox::RemoveObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	DimObj *pObj = reinterpret_cast<DimObj*>(pObject);
@@ -1057,7 +1057,7 @@ Error:
 }
 
 // This is the nuclear option - it will flush all objects out
-RESULT SandboxApp::RemoveAllObjects() {
+RESULT Sandbox::RemoveAllObjects() {
 	RESULT r = R_PASS;
 
 	// removes all animations
@@ -1075,7 +1075,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::SetGravityAcceleration(double acceleration) {
+RESULT Sandbox::SetGravityAcceleration(double acceleration) {
 	RESULT r = R_PASS;
 
 	CR(m_pPhysicsEngine->SetGravityAccelration(acceleration));
@@ -1084,7 +1084,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::SetGravityState(bool fEnabled) {
+RESULT Sandbox::SetGravityState(bool fEnabled) {
 	RESULT r = R_PASS;
 
 	CR(m_pPhysicsEngine->SetGravityState(fEnabled));
@@ -1093,15 +1093,15 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::InitializeObject(DimObj *pDimObj) {
+RESULT Sandbox::InitializeObject(DimObj *pDimObj) {
 	return m_pHALImp->InitializeObject(pDimObj);
 }
 
-RESULT SandboxApp::InitializeTexture(texture *pTexture) {
+RESULT Sandbox::InitializeTexture(texture *pTexture) {
 	return m_pHALImp->InitializeTexture(pTexture);
 }
 
-DimObj *SandboxApp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
+DimObj *Sandbox::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 	DimObj *pDimObj = nullptr;
 
@@ -1128,7 +1128,7 @@ Error:
 	return nullptr;
 }
 
-texture *SandboxApp::MakeTexture(PrimParams *pPrimParams, bool fInitialize) {
+texture *Sandbox::MakeTexture(PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 	texture *pTexture = nullptr;
 
@@ -1147,7 +1147,7 @@ Error:
 	return nullptr;
 }
 
-FlatContext* SandboxApp::AddFlatContext(int width, int height, int channels) {
+FlatContext* Sandbox::AddFlatContext(int width, int height, int channels) {
 	RESULT r = R_PASS;
 
 	FlatContext* pFlatContext = m_pHALImp->MakeFlatContext(width, height, channels);
@@ -1167,7 +1167,7 @@ Error:
 	return nullptr;
 }
 
-RESULT SandboxApp::RenderToTexture(FlatContext* pContext) {
+RESULT Sandbox::RenderToTexture(FlatContext* pContext) {
 	RESULT r = R_PASS;
 
 	CR(m_pHALImp->RenderToTexture(pContext, m_pCamera));
@@ -1176,11 +1176,11 @@ Error:
 	return r;
 }
 
-light* SandboxApp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
+light* Sandbox::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	return m_pHALImp->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }
 
-light* SandboxApp::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
+light* Sandbox::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	RESULT r = R_PASS;
 
 	light *pLight = MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
@@ -1199,11 +1199,11 @@ Error:
 	return nullptr;
 }
 
-quad* SandboxApp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
+quad* Sandbox::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	return m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 
-quad* SandboxApp::AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) {
+quad* Sandbox::AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) {
 	RESULT r = R_PASS;
 
 	quad *pQuad = m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
@@ -1223,11 +1223,11 @@ Error:
 	return nullptr;
 }
 
-cylinder* SandboxApp::MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
+cylinder* Sandbox::MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
 	return m_pHALImp->MakeCylinder(radius, height, numAngularDivisions, numVerticalDivisions);
 }
 
-cylinder* SandboxApp::AddCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
+cylinder* Sandbox::AddCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
 	RESULT r = R_PASS;
 
 	cylinder *pCylinder = m_pHALImp->MakeCylinder(radius, height, numAngularDivisions, numVerticalDivisions);
@@ -1246,11 +1246,11 @@ Error:
 	return nullptr;
 }
 
-DimRay* SandboxApp::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+DimRay* Sandbox::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
 	return m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional);
 }
 
-DimRay* SandboxApp::AddRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+DimRay* Sandbox::AddRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
 	RESULT r = R_PASS;
 	DimRay* pRay = m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional);
 	CN(pRay);
@@ -1268,11 +1268,11 @@ Error:
 	return nullptr;
 }
 
-DimPlane* SandboxApp::MakePlane(point ptOrigin, vector vNormal) {
+DimPlane* Sandbox::MakePlane(point ptOrigin, vector vNormal) {
 	return m_pHALImp->MakePlane(ptOrigin, vNormal);
 }
 
-DimPlane* SandboxApp::AddPlane(point ptOrigin, vector vNormal) {
+DimPlane* Sandbox::AddPlane(point ptOrigin, vector vNormal) {
 	RESULT r = R_PASS;
 	DimPlane* pPlane = MakePlane(ptOrigin, vNormal);
 	CN(pPlane);
@@ -1290,11 +1290,11 @@ Error:
 	return nullptr;
 }
 
-sphere* SandboxApp::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
+sphere* Sandbox::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
 
-sphere* SandboxApp::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
+sphere* Sandbox::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	RESULT r = R_PASS;
 
 	sphere *pSphere = m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
@@ -1313,15 +1313,15 @@ Error:
 	return nullptr;
 }
 
-volume* SandboxApp::MakeVolume(double width, double length, double height, bool fTriangleBased) {
+volume* Sandbox::MakeVolume(double width, double length, double height, bool fTriangleBased) {
 	return m_pHALImp->MakeVolume(width, length, height, fTriangleBased);
 }
 
-volume* SandboxApp::MakeVolume(double side, bool fTriangleBased) {
+volume* Sandbox::MakeVolume(double side, bool fTriangleBased) {
 	return m_pHALImp->MakeVolume(side, fTriangleBased);
 }
 
-volume* SandboxApp::AddVolume(double width, double length, double height, bool fTriangleBased) {
+volume* Sandbox::AddVolume(double width, double length, double height, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
 	volume *pVolume = MakeVolume(width, length, height, fTriangleBased);
@@ -1340,11 +1340,11 @@ Error:
 	return nullptr;
 }
 
-volume* SandboxApp::AddVolume(double side, bool fTriangleBased) {
+volume* Sandbox::AddVolume(double side, bool fTriangleBased) {
 	return AddVolume(side, side, side, fTriangleBased);
 }
 
-text* SandboxApp::AddText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
+text* Sandbox::AddText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
 	RESULT r = R_PASS;
 
 	text *pText = MakeText(pFont, pLayout, margin, textFlags);
@@ -1364,7 +1364,7 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
+text* Sandbox::MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
 	RESULT r = R_PASS;
 
 	auto pText = m_pHALImp->MakeText(pFont, pLayout, margin, textFlags);
@@ -1384,7 +1384,7 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
+text* Sandbox::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
 	RESULT r = R_PASS;
 
 	text *pText = MakeText(pFont, strContent, lineHeightM, textFlags);
@@ -1404,7 +1404,7 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
+text* Sandbox::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
 	RESULT r = R_PASS;
 
 	auto pText = m_pHALImp->MakeText(pFont, strContent, lineHeightM, textFlags);
@@ -1424,7 +1424,7 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
+text* Sandbox::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
 	RESULT r = R_PASS;
 
 	text *pText = MakeText(pFont, strContent, width, height, textFlags);
@@ -1444,7 +1444,7 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
+text* Sandbox::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
 	RESULT r = R_PASS;
 
 	auto pText = m_pHALImp->MakeText(pFont, strContent, width, height, textFlags);
@@ -1468,7 +1468,7 @@ Error:
 }
 
 
-text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string &strContent, double width, double height, bool fBillboard) {
+text* Sandbox::MakeText(std::shared_ptr<font> pFont, const std::string &strContent, double width, double height, bool fBillboard) {
 	RESULT r = R_PASS;
 
 	auto pText = m_pHALImp->MakeText(pFont, strContent, width, height, true, fBillboard);
@@ -1488,7 +1488,7 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string &strContent, double width, double height, bool fBillboard) {
+text* Sandbox::AddText(std::shared_ptr<font> pFont, const std::string &strContent, double width, double height, bool fBillboard) {
 	RESULT r = R_PASS;
 
 	text *pText = MakeText(pFont, strContent, width, height, fBillboard);
@@ -1508,7 +1508,7 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string &strContent, double width, double height, bool fBillboard) {
+text* Sandbox::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string &strContent, double width, double height, bool fBillboard) {
 	RESULT r = R_PASS;
 
 	auto pText = m_pHALImp->MakeText(pFont, pFontTexture, strContent, width, height, true, fBillboard);
@@ -1528,7 +1528,7 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::AddText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string &strContent, double width, double height, bool fBillboard) {
+text* Sandbox::AddText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string &strContent, double width, double height, bool fBillboard) {
 	RESULT r = R_PASS;
 
 	text *pText = MakeText(pFont, pFontTexture, strContent, width, height, fBillboard);
@@ -1547,7 +1547,7 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::AddText(const std::wstring & fontName, const std::string &strContent, double width, double height, bool fBillboard) {
+text* Sandbox::AddText(const std::wstring & fontName, const std::string &strContent, double width, double height, bool fBillboard) {
 	RESULT r = R_PASS;
 
 	text *pText = m_pHALImp->MakeText(fontName, strContent, width, height, fBillboard);
@@ -1570,31 +1570,31 @@ Error:
 	return nullptr;
 }
 
-texture* SandboxApp::MakeTexture(const texture &srcTexture) {
+texture* Sandbox::MakeTexture(const texture &srcTexture) {
 	return m_pHALImp->MakeTexture(srcTexture);
 }
 
-texture* SandboxApp::MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
+texture* Sandbox::MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
 	return m_pHALImp->MakeTexture(type, width, height, pixelFormat, channels, pBuffer, pBuffer_n);
 }
 
-texture* SandboxApp::MakeTexture(texture::type type, const wchar_t *pszFilename) {
+texture* Sandbox::MakeTexture(texture::type type, const wchar_t *pszFilename) {
 	return m_pHALImp->MakeTexture(type, pszFilename);
 }
 
-texture* SandboxApp::MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) {
+texture* Sandbox::MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) {
 	return m_pHALImp->MakeTextureFromFileBuffer(type, pBuffer, pBuffer_n);
 }
 
-cubemap* SandboxApp::MakeCubemap(const std::wstring &wstrCubemapName) {
+cubemap* Sandbox::MakeCubemap(const std::wstring &wstrCubemapName) {
 	return m_pHALImp->MakeCubemap(wstrCubemapName);
 }
 
-skybox* SandboxApp::MakeSkybox() {
+skybox* Sandbox::MakeSkybox() {
 	return m_pHALImp->MakeSkybox();
 }
 
-skybox *SandboxApp::AddSkybox() {
+skybox *Sandbox::AddSkybox() {
 	RESULT r = R_PASS;
 
 	skybox *pSkybox = MakeSkybox();
@@ -1638,7 +1638,7 @@ Error:
 }
 */
 
-mesh* SandboxApp::MakeMesh(const std::vector<vertex>& vertices) {
+mesh* Sandbox::MakeMesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
 
 	mesh* pMesh = m_pHALImp->MakeMesh(vertices);
@@ -1654,7 +1654,7 @@ Error:
 	return nullptr;
 }
 
-mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices) {
+mesh* Sandbox::AddMesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
 
 	mesh* pMesh = MakeMesh(vertices);
@@ -1673,7 +1673,7 @@ Error:
 	return nullptr;
 }
 
-mesh* SandboxApp::MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+mesh* Sandbox::MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 	RESULT r = R_PASS;
 
 	mesh* pMesh = m_pHALImp->MakeMesh(vertices, indices);
@@ -1689,7 +1689,7 @@ Error:
 	return nullptr;
 }
 
-mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+mesh* Sandbox::AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 	RESULT r = R_PASS;
 
 	mesh* pMesh = MakeMesh(vertices, indices);
@@ -1708,7 +1708,7 @@ Error:
 	return nullptr;
 }
 
-user *SandboxApp::MakeUser() {
+user *Sandbox::MakeUser() {
 	RESULT r = R_PASS;
 
 	user* pUser = m_pHALImp->MakeUser();
@@ -1725,7 +1725,7 @@ Error:
 	return nullptr;
 }
 
-user *SandboxApp::AddUser() {
+user *Sandbox::AddUser() {
 	RESULT r = R_PASS;
 
 	user* pUser = MakeUser();
@@ -1744,7 +1744,7 @@ Error:
 	return nullptr;
 }
 
-billboard *SandboxApp::AddBillboard(point ptOrigin, float width, float height) {
+billboard *Sandbox::AddBillboard(point ptOrigin, float width, float height) {
 	RESULT r = R_PASS;
 
 	billboard *pBillboard = MakeBillboard(ptOrigin, width, height);
@@ -1763,7 +1763,7 @@ Error:
 	return nullptr;
 }
 
-billboard *SandboxApp::MakeBillboard(point ptOrigin, float width, float height) {
+billboard *Sandbox::MakeBillboard(point ptOrigin, float width, float height) {
 	RESULT r = R_PASS;
 
 	billboard *pBillboard = m_pHALImp->MakeBillboard(ptOrigin, width, height);
@@ -1779,7 +1779,7 @@ Error:
 	return nullptr;
 }
 
-ProgramNode* SandboxApp::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
+ProgramNode* Sandbox::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
 	RESULT r = R_PASS;
 
 	ProgramNode *pProgramNode = nullptr;
@@ -1800,7 +1800,7 @@ Error:
 	return nullptr;
 }
 
-HysteresisObject *SandboxApp::MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType) {
+HysteresisObject *Sandbox::MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType) {
 	RESULT r = R_PASS;
 
 	HysteresisObject *pObject = nullptr;
@@ -1829,7 +1829,7 @@ Error:
 	return nullptr;
 }
 
-model* SandboxApp::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+model* Sandbox::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture) {
 	RESULT r = R_PASS;
 
 	// TODO: Other bits (position, scale, rotation)
@@ -1849,7 +1849,7 @@ Error:
 	return nullptr;
 }
 
-model* SandboxApp::AddModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+model* Sandbox::AddModel(const std::wstring& wstrModelFilename, texture* pTexture) {
 	RESULT r = R_PASS;
 
 	model *pModel = MakeModel(wstrModelFilename, pTexture);
@@ -1869,7 +1869,7 @@ Error:
 	return nullptr;
 }
 
-model *SandboxApp::MakeModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+model *Sandbox::MakeModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
 	RESULT r = R_PASS;
 
 	// TODO: Other bits (position, scale, rotation)
@@ -1889,7 +1889,7 @@ Error:
 	return nullptr;
 }
 
-model *SandboxApp::AddModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+model *Sandbox::AddModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
 	RESULT r = R_PASS;
 
 	model *pModel = MakeModel(wstrModelFilename, modelFactoryFlags);
@@ -1909,11 +1909,11 @@ Error:
 	return nullptr;
 }
 
-composite* SandboxApp::MakeComposite() {
+composite* Sandbox::MakeComposite() {
 	return m_pHALImp->MakeComposite();
 }
 
-composite* SandboxApp::AddComposite() {
+composite* Sandbox::AddComposite() {
 	RESULT r = R_PASS;
 
 	composite* pComposite = MakeComposite();
@@ -1931,7 +1931,7 @@ Error:
 	return nullptr;
 }
 
-RESULT SandboxApp::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {
+RESULT Sandbox::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {
 	RESULT r = R_PASS;
 
 	CB((m_fnUpdateCallback == nullptr));
@@ -1941,7 +1941,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::UnregisterUpdateCallback() {
+RESULT Sandbox::UnregisterUpdateCallback() {
 	RESULT r = R_PASS;
 
 	CB((m_fnUpdateCallback != nullptr));
@@ -1951,45 +1951,45 @@ Error:
 	return r;
 }
 
-stereocamera* SandboxApp::GetCamera() {
+stereocamera* Sandbox::GetCamera() {
 	return m_pCamera;
 }
 
-point SandboxApp::GetCameraPosition() {
+point Sandbox::GetCameraPosition() {
 	return m_pHALImp->GetCamera()->GetPosition();
 }
 
-quaternion SandboxApp::GetCameraOrientation() {
+quaternion Sandbox::GetCameraOrientation() {
 	return m_pHALImp->GetCamera()->GetWorldOrientation();
 }
 
 // Cloud Controller
-RESULT SandboxApp::RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver) {
+RESULT Sandbox::RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver) {
 	return m_pCloudController->RegisterPeerConnectionObserver(pPeerConnectionObserver);
 }
 
-RESULT SandboxApp::RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver) {
+RESULT Sandbox::RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver) {
 	return m_pCloudController->RegisterEnvironmentObserver(pEnvironmentObserver);
 }
 
-RESULT SandboxApp::RegisterUserObserver(CloudController::UserObserver *pUserObserver) {
+RESULT Sandbox::RegisterUserObserver(CloudController::UserObserver *pUserObserver) {
 	return m_pCloudController->RegisterUserObserver(pUserObserver);
 }
 
-RESULT SandboxApp::BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+RESULT Sandbox::BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	return m_pCloudController->BroadcastVideoFrame(strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels);
 }
 
-RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {
+RESULT Sandbox::SendDataMessage(long userID, Message *pDataMessage) {
 	return m_pCloudController->SendDataMessage(userID, pDataMessage);
 }
 
 
-RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
+RESULT Sandbox::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pCloudController->BroadcastDataMessage(pDataMessage);
 }
 
-RESULT SandboxApp::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags) {
+RESULT Sandbox::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags) {
 	RESULT r = R_PASS;
 
 	if ((messageFlags & DreamAppMessage::flags::SHARE_NETWORK) != DreamAppMessage::flags::NONE) {
@@ -2004,7 +2004,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags) {
+RESULT Sandbox::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags) {
 	RESULT r = R_PASS;
 
 	CBM((m_pDreamAppManager->FindDreamAppWithName(pDreamAppMessage->GetDreamAppName())), "Cannot find dream app name %s", pDreamAppMessage->GetDreamAppName().c_str());
@@ -2022,7 +2022,7 @@ Error:
 }
 
 // TimeManager
-RESULT SandboxApp::RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber) {
+RESULT Sandbox::RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber) {
 	RESULT r = R_PASS;
 
 	CR(m_pTimeManagerModule->RegisterSubscriber(timeEvent, pTimeSubscriber));
@@ -2032,7 +2032,7 @@ Error:
 }
 
 // IO
-RESULT SandboxApp::RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
+RESULT Sandbox::RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
 	RESULT r = R_PASS;
 
 	CR(((Publisher<SenseVirtualKey, SenseKeyboardEvent>*)m_pSenseKeyboard)->RegisterSubscriber(keyEvent, pKeyboardSubscriber));
@@ -2041,7 +2041,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RegisterSubscriber(SenseTypingEventType typingEvent, Subscriber<SenseTypingEvent>* pTypingSubscriber) {
+RESULT Sandbox::RegisterSubscriber(SenseTypingEventType typingEvent, Subscriber<SenseTypingEvent>* pTypingSubscriber) {
 	RESULT r = R_PASS;
 
 	CR(((Publisher<SenseTypingEventType, SenseTypingEvent>*)m_pSenseKeyboard)->RegisterSubscriber(typingEvent, pTypingSubscriber));
@@ -2050,7 +2050,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber) {
+RESULT Sandbox::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber) {
 	RESULT r = R_PASS;
 
 	CNM(m_pSenseMouse, "Mouse not initialized");
@@ -2060,7 +2060,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RegisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
+RESULT Sandbox::RegisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
 	RESULT r = R_PASS;
 	if (m_pHMD != nullptr) {
 		SenseController *pSenseController = m_pHMD->GetSenseController();
@@ -2073,7 +2073,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RegisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber) {
+RESULT Sandbox::RegisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber) {
 	RESULT r = R_PASS;
 
 	CNM(m_pSenseGamepad, "Gamepad not initialized");
@@ -2083,7 +2083,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RegisterSubscriber(HMDEventType hmdEvent, Subscriber<HMDEvent>* pHMDEventSubscriber) {
+RESULT Sandbox::RegisterSubscriber(HMDEventType hmdEvent, Subscriber<HMDEvent>* pHMDEventSubscriber) {
 	RESULT r = R_PASS;
 
 	CNR(m_SandboxConfiguration.fUseHMD, R_SKIPPED);
@@ -2094,7 +2094,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::UnregisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
+RESULT Sandbox::UnregisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
 	RESULT r = R_PASS;
 	if (m_pHMD != nullptr) {
 		SenseController *pSenseController = m_pHMD->GetSenseController();
@@ -2107,7 +2107,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::UnregisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber) {
+RESULT Sandbox::UnregisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber) {
 	RESULT r = R_PASS;
 
 	CNM(m_pSenseGamepad, "Gamepad not initialized");
@@ -2117,7 +2117,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::SetDreamOSHandle(DreamOS *pDreamOSHandle) {
+RESULT Sandbox::SetDreamOSHandle(DreamOS *pDreamOSHandle) {
 	RESULT r = R_PASS;
 
 	CN(pDreamOSHandle);
@@ -2127,14 +2127,14 @@ Error:
 	return r;
 }
 
-DreamOS *SandboxApp::GetDreamOSHandle() {
+DreamOS *Sandbox::GetDreamOSHandle() {
 	return m_pDreamOSHandle;
 }
 
-std::wstring SandboxApp::GetHardwareID() {
+std::wstring Sandbox::GetHardwareID() {
 	return m_strHardwareID;
 }
 
-std::string SandboxApp::GetHMDTypeString() {
+std::string Sandbox::GetHMDTypeString() {
 	return m_pHMD->GetDeviceTypeString();
 }

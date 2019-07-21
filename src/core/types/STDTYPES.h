@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 // DREAM OS
-// DreamOS/RESULT/STDTYPES.h
+// DreamOS/core/ehm/STDTYPES.h
 // The standard types typedefs for the system
 // Ultimately, this should replace the need for stdint.h on the native platform
 

@@ -1,7 +1,7 @@
 #ifndef MODEL_FACTORY_H_
 #define MODEL_FACTORY_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Primitives/model/ModelFactory.h

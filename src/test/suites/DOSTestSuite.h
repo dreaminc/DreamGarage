@@ -9,7 +9,7 @@
 #include "Primitives/Subscriber.h"
 
 #include "Primitives/point.h"     // for point
-#include "RESULT/RESULT.h"        // for RESULT
+#include "core/ehm/RESULT.h"        // for RESULT
 #include "xstring"                // for string
 
 struct InteractionObjectEvent;

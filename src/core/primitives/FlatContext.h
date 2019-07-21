@@ -1,7 +1,7 @@
 #ifndef FLAT_CONTEXT_H_
 #define FLAT_CONTEXT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/FlatContext.h

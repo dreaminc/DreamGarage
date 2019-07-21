@@ -5,7 +5,7 @@
 // DreamOS/Test/TestSuite.h
 // A test suite is, like it sounds, a suite of tests designed to exercise a given module of the engine.
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 #include "TestObject.h"
 
 #include <vector>

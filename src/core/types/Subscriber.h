@@ -1,7 +1,7 @@
 #ifndef SUBSCRIBER_H_
 #define SUBSCRIBER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/Subscriber.h

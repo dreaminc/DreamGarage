@@ -1,7 +1,7 @@
 #ifndef HAL_TEST_SUITE_H_
 #define HAL_TEST_SUITE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/HAL/HALTestSuite.h

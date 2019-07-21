@@ -1,7 +1,7 @@
 #ifndef RAY_H_
 #define RAY_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/ray.h

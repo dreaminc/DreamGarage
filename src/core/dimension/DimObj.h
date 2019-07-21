@@ -1,18 +1,16 @@
 #ifndef DIM_OBJ_H_
 #define DIM_OBJ_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/DimObj.h
 // Dimension Base Object
 // All objects in Dimension should derive from this base class
 
-#include "RESULT/EHM.h"
-
 #include "valid.h"
 #include "dirty.h"
-#include "Primitives/Types/UID.h"
+#include "core/types/UID.h"
 
 #include "VirtualObj.h"
 #include "point.h"

@@ -1,7 +1,7 @@
 #ifndef DIRTY_H_
 #define DIRTY_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/dirty.h

@@ -1,7 +1,7 @@
 #ifndef ROTATION_MATRIX_H_
 #define ROTATION_MATRIX_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/RotationMatrix.h

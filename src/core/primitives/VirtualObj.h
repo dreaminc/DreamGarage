@@ -10,7 +10,7 @@
 #include "valid.h"
 #include "point.h"
 #include "vector.h"
-#include "Primitives/Types/UID.h"
+#include "core/types/UID.h"
 #include "quaternion.h"
 
 #include "ObjectState.h"

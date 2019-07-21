@@ -1,7 +1,6 @@
 #include "DreamTestClientMain.h"
 
 #include <ctime>
-#include "RESULT/EHM.h"
 
 #include "DreamTestClient.h"
 
@@ -30,9 +29,9 @@
 		}
 		// now argc,argv are available and will get destroyed on exit
 
-		DreamTestApp dreamTestApp;
-		CRM(dreamTestApp.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
-		CRM(dreamTestApp.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
+		DreamTestClient DreamTestClient;
+		CRM(DreamTestClient.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
+		CRM(DreamTestClient.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
 
 	Success:
 		DreamLogger::instance()->Flush();
@@ -49,9 +48,9 @@
 	int main(int argc, const char *argv[]) {
 		RESULT r = R_PASS;
 
-		DreamTestApp dreamTestApp;
-		CRM(dreamTestApp.Initialize(argc, argv), "Failed to initialize Dream Test App");
-		CRM(dreamTestApp.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
+		DreamTestClient DreamTestClient;
+		CRM(DreamTestClient.Initialize(argc, argv), "Failed to initialize Dream Test App");
+		CRM(DreamTestClient.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
 
 	Success:
 		DEBUG_LINEOUT("DREAM OS Exiting");

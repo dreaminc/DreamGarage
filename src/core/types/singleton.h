@@ -1,7 +1,7 @@
 #ifndef SINGLETON_H_
 #define SINGLETON_H_
 
-#include "RESULT/RESULT.h"
+#include "core/ehm/RESULT.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/singleton.h

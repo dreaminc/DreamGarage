@@ -9,7 +9,7 @@
 // can be useful when looking to avoid strongly typed paradigms or for scripting
 // purposes.
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 typedef enum {
     TYPE_OBJ_NUMBER,

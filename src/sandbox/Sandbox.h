@@ -1,10 +1,9 @@
 #ifndef SANDBOX_APP_H_
 #define SANDBOX_APP_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/Types/UID.h"
-
-#include "Primitives/valid.h"
+#include "core/ehm/EHM.h"
+#include "core/types/UID.h"
+#include "core/types/valid.h"
 
 // DREAM OS
 // DreamOS/SandboxApp.h
@@ -12,47 +11,45 @@
 // on a given platform.  A Sandbox implementation should effectively virtualize the host system as if it is running
 // natively on the DreamBox
 
-#include "HAL/HALImp.h"
-
-#include "Modules/TimeManagerModule.h"
-#include "Sandbox/CredentialManager.h"
-
-#include "Cloud/CloudController.h"
-
-#include "DreamAppMessage.h"
-
-#include "Primitives/viewport.h"
-#include "Primitives/HysteresisObject.h"
-
-#include "Sense/SenseKeyboard.h"
-#include "Sense/SenseMouse.h"
-#include "Sense/SenseController.h"
-#include "Sense/SenseGamepadController.h"
-
-#include "Primitives/model/ModelFactory.h"
-#include "functional"                                  // for function
-#include "HAL/Pipeline/PipelineCommon.h"               // for PIPELINE_FLAGS, PIPELINE_FLAGS::NONE
-#include "HMD/HMD.h"                                   // for HMD (ptr only), HMDEvent (ptr only), HMDEventType
-#include "InteractionEngine/InteractionObjectEvent.h"  // for InteractionObjectEvent (ptr only), InteractionEventType
 #include "memory"                                      // for shared_ptr
-#include "Primitives/color.h"                          // for color, COLOR_TYPE::COLOR_WHITE, PIXEL_FORMAT
-#include "Primitives/hand/HandType.h"                  // for HAND_TYPE
-#include "Primitives/light.h"                          // for LIGHT_TYPE, light (ptr only), light_precision
-#include "Primitives/point.h"                          // for point
-#include "Primitives/quaternion.h"                     // for quaternion
-#include "Primitives/text.h"                           // for text, text::flags, text::flags::NONE
-#include "Primitives/texture.h"                        // for texture, texture::type
-#include "Primitives/vector.h"                         // for vector
-#include "RESULT/RESULT.h"                             // for RESULT, ::R_PASS
+#include "functional"                                  // for function
 #include "stdint.h"                                    // for uint8_t
 #include "xstring"                                     // for string, wstring
-
 #include <stddef.h>                                    // for size_t
+#include <windef.h>                                    // for HWND // TODO: Should remove or use for windows only
 
-// TODO: Should remove or use for windows only
-#include <windef.h>                                    // for HWND
+#include "HAL/HALImp.h"
 
-#include "HMD/HMDFactory.h"
+#include "sandbox/CredentialManager.h"
+
+#include "app/DreamAppMessage.h"
+#include "module/TimeManager/TimeManagerModule.h"
+#include "module/InteractionEngine/InteractionObjectEvent.h"  // for InteractionObjectEvent (ptr only), InteractionEventType
+
+#include "cloud/CloudController.h"
+
+#include "sense/SenseKeyboard.h"
+#include "sense/SenseMouse.h"
+#include "sense/SenseController.h"
+#include "sense/SenseGamepadController.h"
+
+#include "hmd/HMD.h"                                   // for HMD (ptr only), HMDEvent (ptr only), HMDEventType
+#include "hmd/HMDFactory.h"
+
+#include "pipeline/PipelineCommon.h"				// for PIPELINE_FLAGS, PIPELINE_FLAGS::NONE
+
+#include "core/text/text.h"                           // for text, text::flags, text::flags::NONE
+#include "core/hand/HandType.h"							// for HAND_TYPE
+#include "core/model/ModelFactory.h"
+#include "core/hysteresis/HysteresisObject.h"
+
+#include "core/primitives/viewport.h"
+#include "core/primitives/color.h"                          // for color, COLOR_TYPE::COLOR_WHITE, PIXEL_FORMAT
+#include "core/primitives/light.h"                          // for LIGHT_TYPE, light (ptr only), light_precision
+#include "core/primitives/point.h"                          // for point
+#include "core/primitives/quaternion.h"                     // for quaternion
+#include "core/primitives/texture.h"                        // for texture, texture::type
+#include "core/primitives/vector.h"                         // for vector
 
 class CameraNode;
 class CommandLineManager;
@@ -104,7 +101,7 @@ class UIKeyboardLayout;
 class NamedPipeClient;
 class NamedPipeServer;
 
-class SandboxApp : 
+class Sandbox : 
 	public Subscriber<SenseKeyboardEvent>, 
 	public Subscriber<SenseTypingEvent>,
 	public Subscriber<SenseMouseEvent>,
@@ -139,14 +136,14 @@ public:
 	};
 
 private:
-	SandboxApp::configuration m_SandboxConfiguration;
+	Sandbox::configuration m_SandboxConfiguration;
 
 public:
-	SandboxApp();
-	~SandboxApp();
+	Sandbox();
+	~Sandbox();
 
-	RESULT SetSandboxConfiguration(SandboxApp::configuration sandboxconf);
-	const SandboxApp::configuration& GetSandboxConfiguration();
+	RESULT SetSandboxConfiguration(Sandbox::configuration sandboxconf);
+	const Sandbox::configuration& GetSandboxConfiguration();
 
 public:
 	RESULT Initialize(int argc = 0, const char *argv[] = nullptr);
@@ -575,15 +572,15 @@ protected:
 	std::wstring m_strHardwareID;
 };
 
-inline constexpr SandboxApp::PipelineType operator | (const SandboxApp::PipelineType &lhs, const SandboxApp::PipelineType &rhs) {
-	return static_cast<SandboxApp::PipelineType>(
-		static_cast<std::underlying_type<SandboxApp::PipelineType>::type>(lhs) | static_cast<std::underlying_type<SandboxApp::PipelineType>::type>(rhs)
+inline constexpr Sandbox::PipelineType operator | (const Sandbox::PipelineType &lhs, const Sandbox::PipelineType &rhs) {
+	return static_cast<Sandbox::PipelineType>(
+		static_cast<std::underlying_type<Sandbox::PipelineType>::type>(lhs) | static_cast<std::underlying_type<Sandbox::PipelineType>::type>(rhs)
 		);
 }
 
-inline constexpr SandboxApp::PipelineType operator & (const SandboxApp::PipelineType &lhs, const SandboxApp::PipelineType &rhs) {
-	return static_cast<SandboxApp::PipelineType>(
-		static_cast<std::underlying_type<SandboxApp::PipelineType>::type>(lhs) & static_cast<std::underlying_type<SandboxApp::PipelineType>::type>(rhs)
+inline constexpr Sandbox::PipelineType operator & (const Sandbox::PipelineType &lhs, const Sandbox::PipelineType &rhs) {
+	return static_cast<Sandbox::PipelineType>(
+		static_cast<std::underlying_type<Sandbox::PipelineType>::type>(lhs) & static_cast<std::underlying_type<Sandbox::PipelineType>::type>(rhs)
 		);
 }
 

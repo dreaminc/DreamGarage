@@ -4,7 +4,7 @@
 #include <math.h>
 
 // DREAM OS
-// DreamOS/Primitives/Types/Number.h
+// DreamOS/core/types/Number.h
 // Number is a general purpose dynamic class - ultimately the goal is to allow
 // Numbers to work interchangably between templates.
 

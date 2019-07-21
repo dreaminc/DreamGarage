@@ -1,7 +1,7 @@
 #ifndef TEXT_ENTRY_STRING_H_
 #define TEXT_ENTRY_STRING_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 #include <string>
 
 class TextEntryString {

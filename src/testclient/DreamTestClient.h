@@ -1,26 +1,27 @@
 #ifndef DREAM_TEST_APP_H_
 #define DREAM_TEST_APP_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM GARAGE
 // DreamGarage.h
 // This is the Dream Garage application layer which is derived from DreamOS
 // which is the interface to the engine and platform layers for the application
 
-#include "DreamOS.h"
-#include "Sense/SenseKeyboard.h"
-#include "Sense/SenseMouse.h"
+#include "os/DreamOS.h"
+
+#include "sense/SenseKeyboard.h"
+#include "sense/SenseMouse.h"
 
 class TestSuite;
 
-class DreamTestApp :
+class DreamTestClient :
 	public DreamOS,
 	public Subscriber<SenseKeyboardEvent>
 {
 public:
-	DreamTestApp();
-	~DreamTestApp();
+	DreamTestClient();
+	~DreamTestClient();
 
 	virtual RESULT ConfigureSandbox() override;
 	virtual RESULT LoadScene() override;

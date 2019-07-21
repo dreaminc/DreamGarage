@@ -1,14 +1,14 @@
 #ifndef MANAGER_H_
 #define MANAGER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Primitives\Manager.h
 // The virtual manager interface object which 
 // effectively manages things
 
-#include "Primitives/Types/UID.h"
+#include "core/types/UID.h"
 #include "Primitives/valid.h"
 
 // TODO: Could squash this with a template 

@@ -10,7 +10,7 @@
 #include "point.h"                    // for point
 #include "quaternion.h"               // for quaternion
 #include "ray.h"                      // for ray
-#include "RESULT/EHM.h"                          // for CN, CR, DEBUG_LINEOUT
+#include "core/ehm/EHM.h"                          // for CN, CR, DEBUG_LINEOUT
 #include "stdint.h"                              // for uint8_t
 #include "vector.h"                   // for vector
 #include "VirtualObj.h"               // for VirtualObj

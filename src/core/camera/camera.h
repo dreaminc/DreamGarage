@@ -27,7 +27,7 @@
 #include "Primitives/viewport.h"
 #include "memory"                     // for shared_ptr
 #include "quaternion.h"    // for quaternion
-#include "RESULT/RESULT.h"            // for RESULT
+#include "core/ehm/RESULT.h"            // for RESULT
 
 class DimObj;
 class HMD;

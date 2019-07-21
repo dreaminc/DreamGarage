@@ -1,7 +1,7 @@
 #ifndef CUBE_MAP_H_
 #define CUBE_MAP_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/cubemap.h

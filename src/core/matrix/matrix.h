@@ -5,7 +5,7 @@
 // DreamOS/Dimension/Primitives/matrix.h
 // Matrix Primitive Object
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 #include <cstring>
 #include <math.h>
 #include <stdlib.h>     

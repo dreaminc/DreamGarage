@@ -1,7 +1,7 @@
 #ifndef HAND_STATE_H_
 #define HAND_STATE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/hand/HandState.h
