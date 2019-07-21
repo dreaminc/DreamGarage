@@ -31,7 +31,7 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 
 // Logging
 
-#include "DreamLogger/DreamLogger.h"
+#include "logger/DreamLogger.h"
 
 // Logging (needs DreamLogger included)
 // This has been moved to project config, otherwise it breaks across multiple projects

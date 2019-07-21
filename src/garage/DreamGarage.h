@@ -1,25 +1,28 @@
 #ifndef DREAM_GARAGE_H_
 #define DREAM_GARAGE_H_
 
-#include "RESULT/RESULT.h"          // for RESULT
+#include "core/ehm/RESULT.h"          // for RESULT
 
 // DREAM GARAGE
 // DreamGarage.h
 // This is the Dream Garage application layer which is derived from DreamOS
 // which is the interface to the engine and platform layers for the application
 
-#include "DreamOS.h"
-#include "Primitives/version.h"
+#include "os/DreamOS.h"
+
+#include "core/types/version.h"
+#include "core/primitives/point.h"       // for point
+#include "core/primitives/quaternion.h"  // for quaternion
+#include "core/primitives/vector.h"      // for vector
+
+#include "sandbox/Sandbox.h"     // for SandboxApp, SandboxApp::PipelineType
+
 #include "array"                    // for array
 #include "memory"                   // for shared_ptr
-#include "Primitives/point.h"       // for point
-#include "Primitives/quaternion.h"  // for quaternion
-#include "Primitives/vector.h"      // for vector
-#include "Sandbox/SandboxApp.h"     // for SandboxApp, SandboxApp::PipelineType
 #include "utility"                  // for pair
 #include "xstring"                  // for string, wstring
-
 #include <stddef.h>                 // for size_t
+
 
 class AudioDataMessage;
 class CameraNode;

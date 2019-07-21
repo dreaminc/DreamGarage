@@ -1,7 +1,7 @@
 #ifndef DREAM_OS_H_
 #define DREAM_OS_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/DreamOS.h
@@ -12,31 +12,32 @@
 // In the short term, however, DreamOS will run in the context of an application on a given platform
 // such as Android or Windows.
 
-#include "Primitives//Types/UID.h"
-#include "Primitives/valid.h"
-#include "Primitives/version.h"
+#include "core/types/UID.h"
+#include "core/types/valid.h"
+#include "core/types/version.h"
 
-#include "Sandbox/SandboxFactory.h"
+#include "sandbox/SandboxFactory.h"
 
 #define DREAM_OS_VERSION_MAJOR 0
 #define DREAM_OS_VERSION_MINOR 1
 #define DREAM_OS_VERSION_MINOR_MINOR 0
 
-#include "Primitives/light.h"
-#include "Primitives/quad.h"
-#include "Primitives/FlatContext.h"
-#include "Primitives/sphere.h"
-#include "Primitives/cylinder.h"
-#include "Primitives/DimRay.h"
-#include "Primitives/DimPlane.h"
-#include "Primitives/volume.h"
-#include "Primitives/text.h"
-#include "Primitives/texture.h"
-#include "Primitives/skybox.h"
-#include "Primitives/user.h"
-#include "Primitives/billboard.h"
+#include "core/primitives/light.h"
+#include "core/primitives/quad.h"
+#include "core/primitives/FlatContext.h"
+#include "core/primitives/sphere.h"
+#include "core/primitives/cylinder.h"
+#include "core/primitives/volume.h"
+#include "core/primitives/texture.h"
+#include "core/primitives/skybox.h"
+#include "core/primitives/billboard.h"
 
-#include "Primitives/HysteresisObject.h"
+#include "core/user/user.h"
+#include "core/text/text.h"
+#include "core/dimension/DimRay.h"
+#include "core/dimension/DimPlane.h"
+
+#include "core/hysteresis/HysteresisObject.h"
 
 #include "PhysicsEngine/PhysicsEngine.h"
 

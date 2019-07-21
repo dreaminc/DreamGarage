@@ -5,7 +5,7 @@
 // DreamOS/RESULT/RESULT.h
 // RESULT Header File
 
-#include "STDTYPES.h"
+#include "core/types/STDTYPES.h"
 
 #define RESULT_START_FAIL 0x80000000
 #define RESULT_START_OK 0x00000000

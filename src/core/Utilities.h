@@ -1,7 +1,7 @@
 #ifndef UTILITIES_H_
 #define UTILITIES_H_
 
-#include "RESULT/EHM.h"
+#include "ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Core/Utilities.h
