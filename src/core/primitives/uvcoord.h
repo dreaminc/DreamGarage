@@ -3,11 +3,12 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/uvcoord.h
+// Dream Core
+// dos/src/core/primitives/uvcoord.h
+
 // UV Coordinate
 
-#include "matrix/matrix.h"
+#include "core/matrix/matrix.h"
 
 
 #ifdef FLOAT_PRECISION

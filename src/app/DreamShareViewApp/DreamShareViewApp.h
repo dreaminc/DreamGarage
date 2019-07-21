@@ -1,14 +1,21 @@
 #ifndef DREAM_SHARE_VIEW_H_
 #define DREAM_SHARE_VIEW_H_
 
-#include "RESULT/EHM.h"
+// Dream Garage Share View App
+// dos/src/app/DreamShareViewApp/DreamShareViewApp.h
 
-#include "DreamApp.h"
-#include "DreamAppHandle.h"
+// TODO: Get this back up to snuff
+
+#include "core/ehm/EHM.h"
+
+#include "app/DreamApp.h"
+#include "app/DreamAppHandle.h"
+
 #include "DreamVideoStreamSubscriber.h"
 #include "DreamShareViewShareMessage.h"
 #include "DreamShareViewPointerMessage.h"
-#include "DreamUserApp.h"
+
+#include "app/DreamUserApp/DreamUserApp.h"
 
 #include "DreamGarage/UICommon.h"
 

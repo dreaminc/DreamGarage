@@ -11,7 +11,8 @@
 #include "point.h"
 #include "vector.h"
 #include "quaternion.h"
-#include "dirty.h"
+
+#include "core/types/dirty.h"
 
 #include <list>
 #include <memory>

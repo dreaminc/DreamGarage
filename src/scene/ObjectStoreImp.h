@@ -1,17 +1,17 @@
 #ifndef SCENE_GRAPH_STORE_H_
 #define SCENE_GRAPH_STORE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
 // DreamOS/Dimension/Scene/ObjectStoreImp.h
 // This abstract class simply represents 
 
-#include "Primitives/VirtualObj.h"
-
 #include <vector>
-#include "Primitives/light.h"
-#include "Primitives/skybox.h"
+
+#include "core/primitives/VirtualObj.h"
+#include "core/primitives/light.h"
+#include "core/primitives/skybox.h"
 
 class ray;
 

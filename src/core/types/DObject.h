@@ -4,14 +4,17 @@
 #include "core/ehm/RESULT.h"
 
 // DREAM OS
-// DreamOS/Primitives/DObject.h
+// dos/src/core/types/DObject.h
+
 // The base level Dream Object to be managed by the engine
 // comparable to NSObject in Mac land
 
-#include "Primitives/valid.h"
+#include "core/types/valid.h"
 #include "core/types/UID.h"
 
-class DObject : public valid {
+class DObject : 
+	public valid
+{
 public:
 	DObject() {
 		// empty
@@ -19,6 +22,11 @@ public:
 
 	~DObject() {
 		// empty
+	}
+
+public:
+	UID getID() { 
+		return m_uid; 
 	}
 
 private:

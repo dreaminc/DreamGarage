@@ -3,11 +3,12 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/QuadIndexGroup.h
+// Dream Core
+// dos/src/core/primitives/QuadIndexGroup.h
+
 // This is a quad index group
 
-#include "matrix/matrix.h"
+#include "core/matrix/matrix.h"
 
 typedef uint32_t dimindex;
 

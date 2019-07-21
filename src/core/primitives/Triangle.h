@@ -3,17 +3,19 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/Triangle.h
+// DREAM Core
+// dos/src/core/primitives/Triangle.h
+
 // Triangle Primitive
 // Center is assumed as (0, 0, 0) so points are adjusted positive / negative as needed
 
 #define NUM_TRI_POINTS 3
 
-#include "DimObj.h"
 #include "Vertex.h"
 #include "point.h"
 #include "color.h"
+
+#include "core/dimension/DimObj.h"
 
 class triangle : public virtual DimObj {
 

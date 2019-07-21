@@ -96,6 +96,14 @@ file(GLOB USER_SOURCES
 )
 source_group("user" FILES ${USER_SOURCES})
 
+# Force Include the src/core/config.h
+if(MSVC)
+    add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")
+else()
+    # GCC or Clang
+    add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
+endif()
+
 add_library(core 
     ${CORE_SOURCES} 
     ${BOUNDING_SOURCES}

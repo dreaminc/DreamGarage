@@ -1,13 +1,15 @@
 #ifndef VIRTUAL_OBJ_H_
 #define VIRTUAL_OBJ_H_
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/VirtualObj.h
+// Dream Core
+// dos/src/core/primitives/VirtualObj.h
+
 // Virtual Base Object
 // Virtual objects are those that do not have any actual dimensional data.  
 // For example, lights and cameras may have bounds or otherwise, but no vertices 
 
-#include "valid.h"
+#include "core/types/DObject.h"
+
 #include "point.h"
 #include "vector.h"
 #include "core/types/UID.h"
@@ -16,10 +18,10 @@
 #include "ObjectState.h"
 #include "ObjectDerivative.h"
 
-#include "matrix/matrix.h"
-#include "matrix/RotationMatrix.h"
-#include "matrix/TranslationMatrix.h"
-#include "matrix/ScalingMatrix.h"
+#include "core/matrix/matrix.h"
+#include "core/matrix/RotationMatrix.h"
+#include "core/matrix/TranslationMatrix.h"
+#include "core/matrix/ScalingMatrix.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float virtual_precision;
@@ -35,7 +37,9 @@ typedef enum ObjectType {
 
 class ray;
 
-class VirtualObj : public valid {
+class VirtualObj : 
+	public DObject 
+{
 public:
 	friend class PhysicsIntegrator;		// TODO: move physics stuff into state/derivative for RK4
 
@@ -194,12 +198,6 @@ public:
 	matrix<virtual_precision, 4, 4> GetRotationMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
 	matrix<virtual_precision, 4, 4> GetTranslationMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
 	matrix<virtual_precision, 4, 4> GetModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
-
-public:
-	UID getID() { return m_uid; }
-
-private:
-	UID m_uid;
 };
 
 #endif // ! VIRTUAL_OBJ_H_

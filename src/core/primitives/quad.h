@@ -3,8 +3,9 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/quad.h
+// Dream Core
+// dos/src/core/primitives/quad.h
+
 // Quadrilateral Primitive (square, rectangle, parallelogram, trapezoid, rhombus, trapezium)
 // Center is assumed as (0, 0, 0) so points are adjusted positive / negative as needed
 
@@ -12,14 +13,14 @@
 #define NUM_QUAD_TRIS 2
 #define DEFAULT_HEIGHT_MAP_SCALE 1.0f
 
-#include "DimObj.h"
-
 #include "PrimParams.h"
 
 #include "Vertex.h"
 #include "point.h"
 #include "color.h"
 #include "texture.h"
+
+#include "core/dimension/DimObj.h"
 
 class BoundingQuad;
 class plane;

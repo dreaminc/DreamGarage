@@ -3,14 +3,15 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/light.h
+// DREAM OS Core
+// dos/src/core/primitives/light.h
+
 // Light Primitive
 // Standard light primitive
 
 #include "VirtualObj.h"
 #include "color.h"
-#include "matrix/ProjectionMatrix.h"
+#include "core/matrix/ProjectionMatrix.h"
 
 typedef float light_precision;
 

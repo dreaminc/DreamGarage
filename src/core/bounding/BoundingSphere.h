@@ -3,16 +3,18 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/BoundingSphere.h
+// Dream Core
+// dos/src/core/bounding/BoundingSphere.h
+
 // Bounding sphere
 
-#include "BoundingVolume.h"
-#include "point.h"
-#include "vector.h"
-#include "line.h"
-
 #include <memory>
+
+#include "BoundingVolume.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
+#include "core/primitives/line.h"
 
 class VirtualObj;
 

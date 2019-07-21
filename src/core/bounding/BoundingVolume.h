@@ -3,17 +3,19 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/BoundingVolume.h
+// Dream Core
+// dos/src/core/bounding/BoundingVolume.h
+
 // Bounding Volume Generic Class - this can be sub-classed by specific versions of volumes like Boxes, Spheres or otherwise
 // TODO: bounding volume suggests volume as in volume in the engine, which is a rectilinear volume - but this is more general
 
-#include "point.h"
-#include "quaternion.h"
-#include "ray.h"
-#include "dirty.h"
-
 #include <memory>
+
+#include "core/types/dirty.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/quaternion.h"
+#include "core/primitives/ray.h"
 
 class VirtualObj;
 class BoundingSphere;

@@ -3,21 +3,21 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/texture.h
+// Dream Core
+// dos/src/core/primitives/texture.h
+
 // Base type for texture
 
-#include "valid.h"
-#include "Types/UID.h"
 #include <vector>
 
 #include "PrimParams.h"
-
 #include "color.h"
+
+#include "core/types/DObject.h"
 
 class image;
 
-class texture : public valid {
+class texture : public DObject {
 	friend class model;
 
 public:
@@ -187,9 +187,6 @@ protected:
 	flags m_flags = texture::flags::NONE;
 
 	image *m_pImage = nullptr;
-
-private:
-	UID m_uid;
 };
 
 inline constexpr texture::flags operator | (const texture::flags &lhs, const texture::flags &rhs) {

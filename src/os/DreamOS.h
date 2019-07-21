@@ -37,22 +37,26 @@
 #include "core/dimension/DimRay.h"
 #include "core/dimension/DimPlane.h"
 
+#include "core/model/ModelFactory.h"
+
 #include "core/hysteresis/HysteresisObject.h"
 
-#include "PhysicsEngine/PhysicsEngine.h"
+#include "module/DreamObjectModule.h"
 
-#include "DreamPeerApp.h"
-#include "DreamUserApp.h"
-#include "DreamAppHandle.h"
-#include "DreamShareView/DreamShareView.h"
+#include "module/PhysicsEngine/PhysicsEngine.h"
+#include "module/DreamSoundSystem/DreamSoundSystem.h"
+
+// TODO: Remove DreamAppHandles
+#include "app/DreamAppHandle.h"
+
+#include "app/DreamPeerApp/DreamPeerApp.h"
+#include "app/DreamUserApp/DreamUserApp.h"
+#include "app/DreamShareViewApp/DreamShareViewApp.h"
 
 //#include "DreamLogger/DreamLogger.h"
 
 // Dream Modules
-#include "DreamGarage/DreamSoundSystem.h"
-#include "Modules/DreamObjectModule.h"
 
-#include "Primitives/model/ModelFactory.h"
 
 #include "UI/UIKeyboard.h"
 

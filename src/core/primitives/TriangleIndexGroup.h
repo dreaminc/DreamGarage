@@ -3,11 +3,12 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/TriangleIndexGroup.h
+// Dream Core
+// dos/src/core/primitives/TriangleIndexGroup.h
+
 // This is a triangle index group
 
-#include "matrix/matrix.h"
+#include "core/matrix/matrix.h"
 
 typedef uint32_t dimindex;
 

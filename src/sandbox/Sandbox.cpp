@@ -289,7 +289,7 @@ Error:
 #include "Primitives/stereocamera.h"            // for stereocamera
 #include "Primitives/user.h"                    // for user
 #include "Primitives/volume.h"                  // for volume
-#include "RESULT/EHM.h"                         // for CR, CN, CNM, CRM, DOSLOG, CB, CVM, WCNM, CBM, CNR
+#include "core/ehm/EHM.h"                         // for CR, CN, CNM, CRM, DOSLOG, CB, CVM, WCNM, CBM, CNR
 #include "Scene/ObjectStore.h"                  // for ObjectStore
 #include "Scene/ObjectStoreFactory.h"           // for ObjectStoreFactory, ObjectStoreFactory::TYPE, ObjectStoreFactory::TYPE::LIST
 #include "vcruntime_new.h"                      // for operator delete, operator new

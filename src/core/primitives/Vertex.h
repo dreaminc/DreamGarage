@@ -3,8 +3,9 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/vertex.h
+// Dream Core
+// dos/src/core/primitives/vertex.h
+
 // Vertex primitive 
 
 // TODO: Switch to using point and color primitives as needed
@@ -22,7 +23,8 @@
 #define C_B 2 
 #define C_A 3 
 
-#include "matrix/matrix.h"
+#include "core/matrix/matrix.h"
+
 #include "vector.h"
 #include "point.h"
 #include "uvcoord.h"

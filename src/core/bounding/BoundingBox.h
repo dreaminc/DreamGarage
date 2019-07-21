@@ -3,16 +3,17 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/BoundingBox.h
+// Dream Core
+// dos/src/core/bounding/BoundingBox.h
+
 // Bounding box volume
 
 #include "BoundingVolume.h"
 
-#include "point.h"
-#include "vector.h"
-#include "line.h"
-#include "quaternion.h"
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
+#include "core/primitives/line.h"
+#include "core/primitives/quaternion.h"
 
 class BoundingBox : public BoundingVolume {
 public:

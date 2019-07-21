@@ -3,13 +3,14 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/TranslationMatrix.h
+// DREAM OS Core
+// dos/src/core/matrix/TranslationMatrix.h
+
 // Translation Matrix 
 // A general purpose translation matrix
 
-#include "matrix.h"
-#include "Primitives/point.h"
+#include "core/matrix/matrix.h"
+#include "core/primitives/point.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float translate_precision;

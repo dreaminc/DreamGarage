@@ -3,26 +3,27 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/DimObj.h
+// Dream Core
+// dos/src/core/dimension/DimObj.h
+
 // Dimension Base Object
 // All objects in Dimension should derive from this base class
 
-#include "valid.h"
-#include "dirty.h"
-#include "core/types/UID.h"
-
-#include "VirtualObj.h"
-#include "point.h"
-#include "TriangleIndexGroup.h"
-#include "QuadIndexGroup.h"
-#include "Vertex.h"
-
-#include "material.h"
-#include "texture.h"
-
 #include <vector>
 #include <memory>
+
+#include "core/types/valid.h"
+#include "core/types/dirty.h"
+#include "core/types/UID.h"
+
+#include "core/primitives/VirtualObj.h"
+#include "core/primitives/point.h"
+#include "core/primitives/TriangleIndexGroup.h"
+#include "core/primitives/QuadIndexGroup.h"
+#include "core/primitives/Vertex.h"
+
+#include "core/material/material.h"
+#include "core/primitives/texture.h"
 
 class BoundingVolume;
 class CollisionManifold;

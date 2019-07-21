@@ -5,11 +5,12 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/color.h
+// DREAM OS Core
+// dos/src/core/primitives/color.h
+
 // Color Primitive Object derived from matrix
 
-#include "matrix/matrix.h"
+#include "core/matrix/matrix.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float color_precision;

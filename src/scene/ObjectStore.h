@@ -1,7 +1,7 @@
 #ifndef SCENE_GRAPH_H_
 #define SCENE_GRAPH_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 #include <mutex>
 
@@ -11,11 +11,10 @@
 // scene and manages what is dispatched to the graphics pipeline
 // or processed by the physics engine
 
-#include "Primitives/Types/UID.h"
-#include "Primitives/valid.h"
+#include "core/types/UID.h"
+#include "core/types/valid.h"
 
 #include "ObjectStoreImp.h"
-
 #include "ObjectStoreFactory.h"
 
 class ray;

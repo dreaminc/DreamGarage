@@ -1,45 +1,47 @@
 #ifndef HAL_IMP_H_
 #define HAL_IMP_H_
-#include "./RESULT/EHM.h"
-#include "Primitives/Types/UID.h"
-#include "Primitives/Subscriber.h"
+
+#include "core/ehm/EHM.h"
+
+#include "core/types/UID.h"
+#include "core/types/Subscriber.h"
 
 // Dream OS
 // DreamOS/HAL/HALImp.h
 // The HAL Implementation class  is the parent class for implementations
 // such as the OpenGL implementation and ultimately native ones as well
 
-#include "Scene/ObjectStore.h"
+#include "scene/ObjectStore.h"
+#include "sense/SenseKeyboard.h"
+#include "sense/SenseMouse.h"
 
-#include "Sense/SenseKeyboard.h"
-#include "Sense/SenseMouse.h"
+#include "core/types/valid.h"
 
-#include "Primitives/valid.h"
+#include "hmd/HMD.h"
 
-#include "HMD/HMD.h"
+#include "pipeline/Pipeline.h"
+#include "pipeline/PipelineCommon.h"
 
-#include "Primitives/stereocamera.h"
-#include "Primitives/light.h"
-#include "Primitives/quad.h"
-#include "Primitives/FlatContext.h"
-#include "Primitives/sphere.h"
-#include "Primitives/cylinder.h"
-#include "Primitives/volume.h"
-#include "Primitives/text.h"
-#include "Primitives/skybox.h"
-#include "Primitives/model/model.h"
-#include "Primitives/model/mesh.h"
-#include "Primitives/user.h"
-#include "Primitives/DimRay.h"
-#include "Primitives/DimPlane.h"
-#include "Primitives/billboard.h"
+#include "core/user/user.h"
 
-#include "Pipeline/Pipeline.h"
-#include "Pipeline/PipelineCommon.h"
+#include "core/primitives/light.h"
+#include "core/primitives/quad.h"
+#include "core/primitives/FlatContext.h"
+#include "core/primitives/sphere.h"
+#include "core/primitives/cylinder.h"
+#include "core/primitives/volume.h"
+#include "core/primitives/skybox.h"
+#include "core/primitives/billboard.h"
+#include "core/primitives/viewport.h"
 
-class SandboxApp;
+#include "core/model/model.h"
+#include "core/model/mesh.h"
+#include "core/text/text.h"
+#include "core/dimension/DimRay.h"
+#include "core/dimension/DimPlane.h"
+#include "core/camera/stereocamera.h"
 
-#include "Primitives/viewport.h"
+class Sandbox;
 
 class SinkNode;
 class SourceNode;

@@ -3,8 +3,9 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/Volume.h
+// DREAM OS Core
+// dos/src/core/primitives/Volume.h
+
 // Volume Primitive
 // Center is assumed as (0, 0, 0) so points are adjusted positive / negative as needed
 
@@ -16,14 +17,14 @@
 #define NUM_VOLUME_TRI_INDICES (NUM_VOLUME_TRIS * 3)
 #define NUM_VOLUME_QUAD_INDICES (NUM_VOLUME_QUADS * 4)
 
-#include "DimObj.h"
-
 #include "PrimParams.h"
 
 #include "Vertex.h"
 #include "point.h"
 #include "color.h"
-#include "BoundingBox.h"
+
+#include "core/dimension/DimObj.h"
+#include "core/bounding/BoundingBox.h"
 
 class volume : public virtual DimObj {
 public:
