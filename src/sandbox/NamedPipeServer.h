@@ -1,10 +1,11 @@
 #ifndef DREAM_NAMED_PIPE_SERVER_H_
 #define DREAM_NAMED_PIPE_SERVER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// Sandbox\NamedPipeServer.h
+// Dream Sandbox
+// dos/src/sandbox/NamedPipeServer.h
+
 // A named pipe server primitive for IPC
 // Currently this is only really something for Windows - so not sure whether 
 // or not to make this more general outside of a Dream side object that 

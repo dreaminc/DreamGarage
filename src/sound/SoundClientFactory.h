@@ -1,8 +1,11 @@
 #ifndef SOUND_CLIENT_FACTORY_H_
 #define SOUND_CLIENT_FACTORY_H_
 
-// DREAM OS
-// DreamOS/Sound/SoundClientFactory.h
+#include "core/ehm/EHM.h"
+
+// Dream Sound
+// dos/src/sound/SoundClientFactory.h
+
 // Allows the creation of sound clients
 
 #include "SoundClient.h"

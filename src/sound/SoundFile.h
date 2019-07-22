@@ -1,10 +1,11 @@
 #ifndef SOUND_FILE_LOADER_H_
 #define SOUND_FILE_LOADER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sound/SoundFileLoader.h
+// Dream Sound
+// dos/src/sound/SoundFileLoader.h
+
 // A loader for sound files
 
 #include <string>

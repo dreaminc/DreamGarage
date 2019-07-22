@@ -1,7 +1,13 @@
 #ifndef DREAM_APP_HANDLE_H_
 #define DREAM_APP_HANDLE_H_
 
-#include "RESULT/RESULT.h"
+#include "core/ehm/RESULT.h"
+
+// Dream App
+// dos/src/app/DreamAppHandle.h
+
+// TODO: Either get rid of this or create general interface 
+// for app-to-app communication both locally and over the mesh
 
 class DreamAppHandle {
 	friend class DreamAppManager;

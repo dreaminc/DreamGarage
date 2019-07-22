@@ -1,10 +1,11 @@
 #ifndef SOUND_FILE_WAVE_H_
 #define SOUND_FILE_WAVE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sound/SoundFileWave.h
+// Dream Sound
+// dos/src/sound/SoundFileWave.h
+
 // This is a WAVE sound file implementation
 
 #include "SoundFile.h"

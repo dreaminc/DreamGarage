@@ -2,7 +2,7 @@
 #define SOUND_COMMON_H_
 
 // DREAM OS
-// DreamOS/Sound/SoundCommon.h
+// dos/src/sound/SoundCommon.h
 
 #define DEFAULT_SAMPLING_RATE 44100
 

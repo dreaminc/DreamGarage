@@ -1,12 +1,12 @@
 #ifndef SPATIAL_SOUND_OBJECT_H_
 #define SPATIAL_SOUND_OBJECT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sound/SpataiSoundObject.h
+// Dream Sound
+// dos/src/sound/SpataiSoundObject.h
 
-#include "Primitives/VirtualObj.h"
+#include "core/primitives/VirtualObj.h"
 
 #include "Sound/SoundCommon.h"
 

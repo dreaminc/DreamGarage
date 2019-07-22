@@ -1,12 +1,10 @@
 #ifndef WASAPI_SOUND_CLIENT_H_
 #define WASAPI_SOUND_CLIENT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sound/WASAPI/WASAPISoundClient.h
-
-#include "Sound/SoundClient.h"
+// Dream Sound
+// dos/src/sound/win64/wasapi/WASAPISoundClient.h
 
 #include <Windows.h>
 #include <AudioClient.h>
@@ -19,6 +17,8 @@
 #include <functiondiscoverykeys.h>
 
 #include <wrl/client.h>
+
+#include "sound/SoundClient.h"
 
 #define REFTIMES_PER_MILLISEC  10000
 #define REFTIMES_PER_SEC (REFTIMES_PER_MILLISEC * 100)   

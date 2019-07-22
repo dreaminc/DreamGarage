@@ -2,16 +2,18 @@
 #define SOUND_BUFFER_H_
 #pragma once
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sound/SoundBuffer.h
+// Dream Sound
+// sound/SoundBuffer.h
+
 // Sound Buffer object (always PCM, simply different types
 
 #include <mutex>
 
 #include "SoundCommon.h"
-#include "Primitives/CircularBuffer.h"
+
+#include "core/datastructures/CircularBuffer.h"
 
 class AudioPacket;
 

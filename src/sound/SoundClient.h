@@ -1,10 +1,10 @@
 #ifndef SOUND_CLIENT_H_
 #define SOUND_CLIENT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sound/SoundClient.h
+// Dream Sound
+// dos/src/sound/SoundClient.h
 
 #include <thread>
 
