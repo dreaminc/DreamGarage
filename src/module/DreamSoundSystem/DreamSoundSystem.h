@@ -1,23 +1,23 @@
 #ifndef DREAM_SOUND_SYSTEM_H_
 #define DREAM_SOUND_SYSTEM_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
-// Sound/DreamSoundSystem.h
+// dos/src/module/DreamSoundSystem/DreamSoundSystem.h
+
 // The Dream Sound System module
 // Initializes, manages and maintains all things sound / audio related
 
-#include "DreamModule.h"
-#include "Sound/SoundCommon.h"
-
-#include "Sound/SoundClient.h"
-
-#include "Sound/SoundFile.h"
-
-#include "Sandbox/NamedPipeServer.h"
-
 #include <memory>
+
+#include "module/DreamModule.h"
+
+#include "sound/SoundCommon.h"
+#include "sound/SoundClient.h"
+#include "sound/SoundFile.h"
+
+#include "sandbox/NamedPipeServer.h"
 
 class SpatialSoundObject;
 class SoundFile;

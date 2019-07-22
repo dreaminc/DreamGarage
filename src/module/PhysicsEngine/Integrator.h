@@ -1,19 +1,22 @@
 #ifndef INTEGRATOR_H_
 #define INTEGRATOR_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Physics Engine Module
+// dos/src/module/PhysicsEngine/Integrator.h
 
 // Dream Physics Integrator
 // This class will integrate and take care of actual physics
 
 #include <chrono>
-
-#include "Primitives/Types/UID.h"
-#include "Primitives/valid.h"
-
-#include "ForceGenerator.h"
 #include <list>
 #include <memory>
+
+#include "core/types/UID.h"
+#include "core/types/valid.h"
+
+#include "ForceGenerator.h"
 
 #define MINIMUM_TIME_STEP 5
 #define DEFUALT_TIMESTEP_MS 20

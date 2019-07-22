@@ -1,18 +1,20 @@
 #ifndef PHYSICS_INTEGRATOR_H_
 #define PHYSICS_INTEGRATOR_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Physics Engine Module
+// dos/src/module/PhysicsEngine/PhysicsIntegrator.h
 
 // Dream Physics Integrator
 // This class will integrate and take care of actual physics
 
 #include <chrono>
-
-#include "Integrator.h"
-
-#include "ForceGenerator.h"
 #include <list>
 #include <memory>
+
+#include "Integrator.h"
+#include "ForceGenerator.h"
 
 #define DEFAULT_GRAVITY_ACCEL -9.8f
 

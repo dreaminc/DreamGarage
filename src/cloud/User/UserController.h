@@ -1,20 +1,22 @@
 #ifndef USER_CONTROLLER_H_
 #define USER_CONTROLLER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/User/UserController.h
+// Dream Cloud
+// dos/src/cloud/User/UserController.h
+
 // The User Controller 
 
-#include "Cloud/Controller.h"
 #include <string>
-
-#include "Cloud/ControllerProxy.h"
-#include "json.hpp"
 
 #include "User.h"
 #include "TwilioNTSInformation.h"
+
+#include "core/types/Controller.h"
+#include "core/types/ControllerProxy.h"
+
+#include "third_party/json/include/json.hpp"
 
 class point;
 class quaternion;

@@ -1,13 +1,14 @@
 #ifndef COLLISION_TEST_SUITE_H_
 #define COLLISION_TEST_SUITE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
+// Dream Collision Test Suite
 // DreamOS/PhysicsEngine/CollisionTestSuite.h
+
 // The Collision test suite
 
-#include "Test/DreamTestSuite.h"
+#include "test/suites/DreamTestSuite.h"
 
 #include <functional>
 #include <memory>

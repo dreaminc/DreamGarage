@@ -1,11 +1,15 @@
 #ifndef HYSTERESIS_OBJECT_H_
 #define HYSTERESIS_OBJECT_H_
 
-// DREAM OS
+#include "core/ehm/EHM.h"
+
+// Dream Core
+// dos/src/core/hysteresis/HysteresisObject.h
+
 // Hysteresis Base Object
 
-#include "DimObj.h"
-#include "Publisher.h"
+#include "core/dimension/DimObj.h"
+#include "core/types/Publisher.h"
 
 enum HysteresisEventType {
 	ON,

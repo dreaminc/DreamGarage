@@ -5,14 +5,16 @@
 
 #include <string>
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/point2D.h
+// Dream Core
+// dos/src/cre/primitives/point2D.h
+
 // 2D Point Primitive Object derived from matrix
 // based largely on point - but should be converted to interface/template
 // solution in the future
 
-#include "matrix/matrix.h"
 #include <limits>
+
+#include "core/matrix/matrix.h"
 
 class vector;
 

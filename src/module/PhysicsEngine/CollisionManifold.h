@@ -1,10 +1,11 @@
 #ifndef COLLISION_MANIFOLD_H_
 #define COLLISION_MANIFOLD_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/PhysicsEngine/CollisionManifold.h
+// Dream Physics Engine Module
+// dos/src/module/PhysicsEngine/CollisionManifold.h
+
 // The collision manifold is a container for the data associated with a 
 // given collision
 

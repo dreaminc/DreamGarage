@@ -1,17 +1,18 @@
 #ifndef DREAM_OBJECT_MODULE_H_
 #define DREAM_OBJECT_MODULE_H_
 
-// DREAM OS
-// DreamOS/Modules/DreamObjectModule.h
+// Dream Module
+// modules/DreamObjectModule.h
+
 // The Dream Object Module is responsible for async loading of assets 
 // like models, objects, and textures
 
-#include "DreamModule.h"
-
-#include "Primitives/Publisher.h"
-
 #include <vector>
 #include <chrono>
+
+#include "DreamModule.h"
+
+#include "core/types/Publisher.h"
 
 struct PrimParams;
 class DimObj;

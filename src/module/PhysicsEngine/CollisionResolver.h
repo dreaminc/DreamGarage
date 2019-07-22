@@ -1,14 +1,17 @@
 #ifndef COLLISION_RESOLVER_H_
 #define COLLISION_RESOLVER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Physics Engine Module
+// dos/src/module/PhysicsEngine/CollisionResolver.h
 
 // Dream Collision Resolver 
 // This class is responsible for resolving collisions
 
-#include "Primitives/Types/UID.h"
-#include "Primitives/valid.h"
-#include "Primitives/Subscriber.h"
+#include "core/types/UID.h"
+#include "core/types/valid.h"
+#include "core/types/Subscriber.h"
 
 struct CollisionGroupEvent;
 class ContactPoint;

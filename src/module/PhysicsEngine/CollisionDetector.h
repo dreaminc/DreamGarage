@@ -1,18 +1,22 @@
 #ifndef COLLISION_DETECTOR_H_
 #define COLLISION_DETECTOR_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Physics Engine Module
+// dos/src/module/PhysicsEngine/CollisionDetector.h
 
 // Dream Collision Detector 
 // This class is responsible for detecting and reporting collisions
 // to dependent classes or subscribers
 
-#include "Primitives/Types/UID.h"
-#include "Primitives/valid.h"
-
-#include "Primitives/VirtualObj.h"
-#include "Primitives/Publisher.h"
 #include <vector>
+
+#include "core/types/UID.h"
+#include "core/types/valid.h"
+#include "core/types/Publisher.h"
+
+#include "core/primitives/VirtualObj.h"
 
 class ObjectStore;
 

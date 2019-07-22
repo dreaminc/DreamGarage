@@ -1,7 +1,7 @@
 #ifndef PHYICS_ENGINE_H_
 #define PHYICS_ENGINE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // Dream Physics Engine 
 // This class is combines all of the modules of the physics
@@ -27,16 +27,17 @@
 
 #include <memory>
 
-#include "Primitives/Types/UID.h"
-#include "Primitives/valid.h"
-
 #include "CollisionDetector.h"
 #include "CollisionResolver.h"
 #include "PhysicsIntegrator.h"
 
+#include "core/types/UID.h"
+#include "core/types/valid.h"
+
 class ObjectStore;
 class GravityGenerator;
 
+// TODO: Turn into a module
 class PhysicsEngine : public valid {
 public:
 	static std::unique_ptr<PhysicsEngine> MakePhysicsEngine();

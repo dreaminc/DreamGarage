@@ -1,6 +1,11 @@
 #ifndef HYSTERESIS_SPHERE_H_
 #define HYSTERESIS_SPHERE_H_
 
+#include "core/ehm/EHM.h"
+
+// Dream Core
+// dos/src/core/hysteresis/HysteresisSphere.h
+
 #include "HysteresisObject.h"
 
 class HysteresisSphere : public HysteresisObject {

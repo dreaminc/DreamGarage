@@ -1,13 +1,17 @@
 #ifndef FORCE_GENERATOR_H_
 #define FORCE_GENERATOR_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Physics Engine Module
+// dos/src/module/PhysicsEngine/ForceGenerator.h
 
 // Dream Force Generator
 // The virtual class defining a force generator
 
-#include "Primitives/Types/UID.h"
-#include "Primitives/vector.h"
+#include "core/types/UID.h"
+
+#include "core/primitives/vector.h"
 
 class ObjectState;
 
