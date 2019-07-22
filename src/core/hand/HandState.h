@@ -3,12 +3,13 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/hand/HandState.h
+// Dream Core
+// dos/src/core/hand/HandState.h
 
-
-#include "Primitives/point.h"
-#include "Primitives/quaternion.h"
+// TODO: Not entirely sure this is the right way to do this 
+// as it's a little too implementation specific
+#include "core/primitives/point.h"
+#include "core/primitives/quaternion.h"
 
 #include "HandType.h"
 

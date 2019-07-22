@@ -3,19 +3,23 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/User/User.h
+// Dream Core
+// dos/src/core/use/User.h
+
+#include "core/hand/HandState.h"
+#include "core/hand/HandType.h"
+
+// TODO: This should be generalized and split off
 // User dimension object composite
 
-#include "composite.h"
-#include "texture.h"
-#include "text.h"
-#include "font.h"
+#include "core/primitives/composite.h"
+#include "core/primitives/texture.h"
 
-#include "DreamGarage/UICommon.h"
+// TODO: These shouldn't be here and represent a bad design if so
+#include "core/text/text.h"
+#include "core/text/font.h"
 
-#include "Primitives/hand/HandState.h"
-#include "Primitives/hand/HandType.h"
+#include "ui/UICommon.h"
 
 #include <vector>
 

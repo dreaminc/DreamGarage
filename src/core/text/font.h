@@ -3,17 +3,19 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/font.h
+// Dream Core
+// dos/src/core/text/font.h
+
 // Converting this to FreeType
 
 #include <string>
 #include <map>
 #include <vector>
 
-#include "Primitives/quad.h"
+#include "core/primitives/quad.h"
 
-#include <ft2build.h>
+// Freetype
+#include "third_party/Freetype/freetype-2.8/include/ft2build.h"
 #include FT_FREETYPE_H  
 
 #define DEFAULT_FONT_SIZE 32

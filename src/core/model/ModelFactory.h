@@ -3,12 +3,12 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Primitives/model/ModelFactory.h
+// Dream Core
+// dos/src/core/model/ModelFactory.h
 
 #include <string>
 
-#include "Primitives/PrimParams.h"
+#include "core/primitives/PrimParams.h"
 
 class model;
 class HALImp;

@@ -3,15 +3,17 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/BasisMatrix.h
+// Dream Core
+// dos/src/core/matrix/BasisMatrix.h
+
 // Basis Matrix 
 // A general purpose change of basis matrix
 // TODO: Not currently checking for orthogonality 
 
 #include "matrix.h"
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float basis_precision;

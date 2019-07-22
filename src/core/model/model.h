@@ -3,8 +3,8 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Primitives/model/model.h
+// Dream Core
+// dos/src/core/model/model.h
 
 //#include <vector>
 
@@ -13,9 +13,8 @@
 //#include "Primitives/point.h"
 //#include "Primitives/color.h"
 
-#include "Primitives/composite.h"
-
-#include "Primitives/PrimParams.h"
+#include "core/primitives/PrimParams.h"
+#include "core/primitives/composite.h"
 
 #include "mesh.h"
 

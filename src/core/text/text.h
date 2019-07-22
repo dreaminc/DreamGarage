@@ -3,18 +3,19 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/text.h
-// text is defined as a list of quads (per each character in the text). The quads as a whole define the "geometry" of a text.
+// Dream Core
+// dos/src/text/text.h
 
-#include "DimObj.h"
-#include "Vertex.h"
-#include "point.h"
-#include "color.h"
+// Text is defined as a list of quads (per each character in the text). The quads as a whole define the "geometry" of a text.
+
 #include <memory>
 
-#include "FlatContext.h"
-#include "quad.h"
+#include "core/dimension/DimObj.h"
+#include "core/primitives/Vertex.h"
+#include "core/primitives/point.h"
+#include "core/primitives/color.h"
+#include "core/primitives/FlatContext.h"
+#include "core/primitives/quad.h"
 
 class font;
 //class quad;

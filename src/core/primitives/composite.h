@@ -3,14 +3,16 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/composite.h
+// Dream Core
+// dos/src/core/primitives/composite.h
+
 // Composite Primitive
 // The composite object is a collection of other objects when these are constructed within the object itself 
 // this is really a convenience object that should be used to derive others rather than off of DimObj directly
 
-#include "DimObj.h"
 #include <memory>
+
+#include "core/dimension/DimObj.h"
 
 class HALImp;
 //#include "HAL/HALImp.h"
@@ -19,13 +21,12 @@ class sphere;
 class volume;
 class DimRay;
 class user;
-//class quad;
-#include "Primitives/quad.h"
+#include "core/primitives/quad.h"
 
 class model;
 
 class hand;
-#include "Primitives/hand/HandType.h"
+#include "core/hand/HandType.h"
 
 class camera;
 class FlatContext;
@@ -34,7 +35,7 @@ class stereocamera;
 
 class DreamOS;
 
-#include "Primitives/model/ModelFactory.h"
+#include "core/model/ModelFactory.h"
 
 
 class composite : public virtual DimObj {

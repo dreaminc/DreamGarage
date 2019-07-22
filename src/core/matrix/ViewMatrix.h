@@ -3,20 +3,22 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/ViewMatrix.h
+// Dream Core
+// dos/src/core/primitives/ViewMatrix.h
+
 // View Matrix 
 // This is a 4x4 matrix for purpose of converting model space into world space
 // by way of a view matrix
 
 #include "matrix.h"
-#include "Primitives/vector.h"
-#include "Primitives/point.h"
-#include "Primitives/quaternion.h"
 
 #include "RotationMatrix.h"
 #include "TranslationMatrix.h"
 #include "BasisMatrix.h"
+
+#include "core/primitives/vector.h"
+#include "core/primitives/point.h"
+#include "core/primitives/quaternion.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float view_precision;

@@ -1,10 +1,10 @@
 #ifndef PIPELINE_COMMON_H_
 #define PIPELINE_COMMON_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/Pipeline/PipelineCommon.h
+// Dream Pipeline
+// dos/src/pipeline/PipelineCommon.h
 
 #include <string>
 

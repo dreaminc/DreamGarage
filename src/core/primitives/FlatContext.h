@@ -3,11 +3,11 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/FlatContext.h
+// Dream Core
+// dos/src/core/primitives/FlatContext.h
 
-#include "Primitives/quad.h"
-#include "Primitives/composite.h"
+#include "core/primitives/quad.h"
+#include "core/primitives/composite.h"
 
 class font;
 class text;
