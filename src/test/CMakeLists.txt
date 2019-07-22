@@ -10,10 +10,7 @@ file(GLOB TEST_SUITE_SOURCES
   "suites/*.cpp"
   "suites/*.h"
 )
-
-source_group("suites" FILES 
-    ${TEST_SUITE_SOURCES}
-)
+source_group("suites" FILES ${TEST_SUITE_SOURCES})
 
 # Force Include the src/core/config.h
 if(MSVC)

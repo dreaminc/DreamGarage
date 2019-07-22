@@ -4,13 +4,13 @@
 #include "./RESULT/EHM.h"
 
 // Dream OS
-// DreamOS/HMD/HMDSinkNode.h
+// dos/src/dos/HMDSinkNode.h
+
 // The HMD Sink Node class 
 // This class should be subclassed by the various HMDs as a display
 // to unify the arch
 
-
-#include "HAL/Pipeline/SinkNode.h"
+#include "pipeline/SinkNode.h"
 
 class HMDSinkNode : public SinkNode {
 public:

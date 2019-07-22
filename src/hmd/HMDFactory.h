@@ -1,13 +1,19 @@
 #ifndef HMD_FACTORY_H_
 #define HMD_FACTORY_H_
 
-#include "RESULT/EHM.h"
-#include "HMD.h"
-#include "Core/Types/Factory.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HMD/HMDFactory.h
+// Dream HMD
+// dos/src/hmd/HMDFactory.h
+
 // Dream OS HMD Factory for the construction of HMD objects
+
+#include "HMD.h"
+
+#include "core/types/Factory.h"
+
+#include "hal/HALImp.h"
+#include "sandbox/Sandbox.h"
 
 typedef enum {
 	HMD_OVR,
@@ -16,13 +22,11 @@ typedef enum {
 	HMD_INVALID
 } HMD_TYPE;
 
-#include "HAL\HALImp.h"
-#include "Sandbox/SandboxApp.h"
 
 class HMDFactory : public Factory {
 public:
 	//static HMD* MakeHMD(HMD_TYPE type, HALImp *halimp);
-	static HMD* MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *halimp, int wndWidth = 0, int wndHeight = 0, bool fHMDMirror = true);
+	static HMD* MakeHMD(HMD_TYPE type, Sandbox *pParentSandbox, HALImp *halimp, int wndWidth = 0, int wndHeight = 0, bool fHMDMirror = true);
 };
 
 #endif // ! PATH_MANAGER_FACTORY_H_

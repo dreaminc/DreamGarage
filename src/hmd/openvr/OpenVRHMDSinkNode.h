@@ -1,20 +1,23 @@
 #ifndef OPENVR_HMD_SINK_NODE_H_
 #define OPENVR_HMD_SINK_NODE_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HMD/OpenVR/OpenVRHMDSinkNode.h
+// Dream HMD
+// dos/src/HMD/OpenVR/OpenVRHMDSinkNode.h
+
 // The Open VR HMD Sink Node class 
 
-#include "HMD/HMD.h"
-#include "HMD/HMDSinkNode.h"
+#include "hmd/HMD.h"
+#include "hmd/HMDSinkNode.h"
+
+// Include the OpenVR SDK
+#include "third_party/openvr/headers/openvr.h"
+
 #define MS_90_FPS (1.0f / 90.0f)
 
+// TODO: Remove ALL code side pragmas and push into the CMake configuration
 #ifndef OCULUS_PRODUCTION_BUILD
-
-// Include the Oculus SDK
-#include <openvr.h>
 
 class OpenGLImp;
 class OpenVRDevice;

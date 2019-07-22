@@ -10,7 +10,7 @@ file(GLOB WIN64_SOURCES
   "win64/*.cpp"
   "win64/*.h"
 )
-source_group("win64" FILES ${SOURCES})
+source_group("win64" FILES ${WIN64_SOURCES})
 
 # Force Include the src/core/config.h
 if(MSVC)

@@ -1,17 +1,18 @@
 #ifndef OVR_HMD_SINK_NODE_H_
 #define OVR_HMD_SINK_NODE_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HMD/Oculus/OVRHMDSinkNode.h
+// Dream HMD
+// dos/src/hmd/Oculus/OVRHMDSinkNode.h
+
 // The Oculus VR HMD Sink Node class 
 
-#include "HMD/HMD.h"
-#include "HMD/HMDSinkNode.h"
+#include "hmd/HMD.h"
+#include "hmd/HMDSinkNode.h"
 
 // Include the Oculus SDK
-#include "OVR_CAPI_GL.h"
+#include "third_party/OCULUS/v1.12.0/LibOVR/Include/OVR_CAPI_GL.h"
 
 #define MS_90_FPS (1.0f / 90.0f)
 

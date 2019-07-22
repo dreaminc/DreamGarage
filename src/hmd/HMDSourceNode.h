@@ -1,14 +1,15 @@
 #ifndef HMD_SOURCE_NODE_H_
 #define HMD_SOURCE_NODE_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HMD/HMDSourceNode.h
+// Dream HMD
+// dos/src/hmd/HMDSourceNode.h
+
 // The HMD Source Node class 
 // This class should be sub classed by the various HMDs as a sense source node
 
-#include "HAL/Pipeline/SourceNode.h"
+#include "pipeline/SourceNode.h"
 
 class HMDSourceNode : public SourceNode {
 public:

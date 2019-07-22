@@ -1,28 +1,30 @@
 #ifndef HMD_H_
 #define HMD_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-#include <time.h>       
+// Dream HMD
+// dos/src/hmd/HMD.h
 
-// Dream OS
-// DreamOS/HMD/HMD.h
 // The HMD parent class 
 
 // TODO: All "sense" related functionality should be woven into the Source node
 // TODO: All "sink/display" related functionality should be pushed into the Sink node
 
-#include "Primitives/Publisher.h"
+#include <time.h>       
 
-#include "Primitives/matrix/ViewMatrix.h"
-#include "Primitives/matrix/ProjectionMatrix.h"
-#include "Primitives/Types/UID.h"
-#include "Primitives/quaternion.h"
-#include "Primitives/point.h"
+#include "core/types/Publisher.h"
+#include "core/types/UID.h"
 
-#include "Primitives/hand/HandType.h"
+#include "core/matrix/ViewMatrix.h"
+#include "core/matrix/ProjectionMatrix.h"
 
-#include "Sense/SenseController.h"
+#include "core/hand/HandType.h"
+
+#include "core/primitives/quaternion.h"
+#include "core/primitives/point.h"
+
+#include "sense/SenseController.h"
 
 #define HMD_NUM_EYES 2
 
