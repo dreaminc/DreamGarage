@@ -1,6 +1,6 @@
 # src/CMakeList.txt : CMake project for DOS root source directory
 
-# add_subdirectory(app)
+add_subdirectory(app)
 # add_subdirectory(client)
 # add_subdirectory(cloud)
 add_subdirectory(core)
