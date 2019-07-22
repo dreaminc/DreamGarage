@@ -1,14 +1,16 @@
 #ifndef WIN_64_CREDENTIAL_MANAGER_H_
 #define WIN_64_CREDENTIAL_MANAGER_H_
 
-#include "RESULT/EHM.h"
-#include "Sandbox/CredentialManager.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sandbox/Windows/Win64CredentialManager.h
+// Dream Win64 Sandbox
+// dos/src/sandbox/win64/Win64CredentialManager.h
+
 // Dream OS Win64 sandbox credential manager
 
 #include <windows.h>
+
+#include "sandbox/CredentialManager.h"
 
 class Win64CredentialManager : public CredentialManager {
 public:

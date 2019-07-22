@@ -1,10 +1,11 @@
 #ifndef CREDENTIAL_MANAGER_H_
 #define CREDENTIAL_MANAGER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sandbox/CredentialManager.h
+// Dream Sandbox
+// dos/src/sandbox/CredentialManager.h
+
 // Dream OS Sandbox credential manager
 
 class CredentialManager {
