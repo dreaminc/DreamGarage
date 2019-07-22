@@ -1,7 +1,14 @@
-#ifndef _BILLBOARD_H_
-#define _BILLBOARD_H_
+#ifndef BILLBOARD_H_
+#define BILLBOARD_H_
 
-#include "DimObj.h"
+#include "core/ehm/EHM.h"
+
+// Dream Core
+// dos/src/core/primitives/billboard.h
+
+// Billboard Primitive
+
+#include "core/dimension/DimObj.h"
 
 class point;
 class texture;
@@ -25,4 +32,4 @@ private:
 	float m_height;
 };
 
-#endif // ! _BILLBOARD_H_
+#endif // ! BILLBOARD_H_

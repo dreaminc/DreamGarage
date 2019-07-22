@@ -1,11 +1,18 @@
 #ifndef DIM_PLANE_H_
 #define DIM_PLANE_H_
 
-#include "DimObj.h"
-#include "plane.h"
+#include "core/ehm/EHM.h"
 
-#include "point.h"
-#include "vector.h"
+// Dream Core
+// dos/src/core/dimension/DimPlane.h
+
+// Dimension Plane
+
+#include "DimObj.h"
+
+#include "core/primitives/plane.h"
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
 
 class CollisionManifold;
 

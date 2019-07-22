@@ -13,6 +13,7 @@ endif()
 project(dos LANGUAGES CXX)
 
 include_directories(src)
+include_directories(src/third_party/Freetype/freetype-2.8/include)
 
 add_subdirectory(src)
 

@@ -1,33 +1,32 @@
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/camera.h
+// Dream Core
+// dos/src/core/camera/camera.h
+
 // Camera Primitive
 // The camera is not a dimension object since it does not actually have any dimensions
 // instead we've defined a virtual object that it inherits from
 
-//#include "DimObj.h"
-#include "VirtualObj.h"
-#include "vector.h"
-#include "point.h"
+#include "memory"                     
 
-#include "matrix/ProjectionMatrix.h"
-#include "matrix/ViewMatrix.h"
-#include "ray.h"
+#include "core/primitives/VirtualObj.h"
+#include "core/primitives/vector.h"
+#include "core/primitives/point.h"
+#include "core/primitives/ray.h"
+#include "core/primitives/viewport.h"
+#include "core/primitives/quaternion.h"    
+
+#include "core/matrix/ProjectionMatrix.h"
+#include "core/matrix/ViewMatrix.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float camera_precision;
 #elif defined(DOUBLE_PRECISION)
 	typedef double camera_precision;
 #endif
-
-
-#include "Primitives/viewport.h"
-#include "memory"                     // for shared_ptr
-#include "quaternion.h"    // for quaternion
-#include "core/ehm/RESULT.h"            // for RESULT
 
 class DimObj;
 class HMD;
@@ -42,11 +41,7 @@ enum EYE_TYPE {
 	EYE_INVALID
 };
 
-class camera : public VirtualObj//, 
-	//public Subscriber<CmdPromptEvent>, 
-	//public Subscriber<SenseKeyboardEvent>, 
-	//public Subscriber<HMDEvent>, 
-	//public Subscriber<TimeEvent> 
+class camera : public VirtualObj
 {
 public:
 	camera(point ptOrigin, viewport cameraVieport);
@@ -81,10 +76,6 @@ public:
 	RESULT AddForwardSpeed(camera_precision speed);
 	RESULT SetUpSpeed(camera_precision speed);
 	RESULT AddUpSpeed(camera_precision speed);
-
-	//RESULT Notify(HMDEvent *hmdEvent);
-	//RESULT Notify(SenseKeyboardEvent *kbEvent);
-	//RESULT Notify(TimeEvent *event);
 
 	// Deviation vector is a vector of deviation from the origin point
 	// So resulting point = ptOrigin + vDeviation

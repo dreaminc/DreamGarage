@@ -3,16 +3,17 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/Cylinder.h
+// Dream Core
+// dos/src/core/primitives/Cylinder.h
+
 // Cylinder Primitive
 // Center is assumed as (0, 0, 0) so points are adjusted positive / negative as needed
 
-#include "DimObj.h"
+#include "core/dimension/DimObj.h"
 
-#include "Vertex.h"
-#include "point.h"
-#include "color.h"
+#include "core/primitives/Vertex.h"
+#include "core/primitives/point.h"
+#include "core/primitives/color.h"
 
 #define MIN_CYLINDER_DIVISIONS 3
 

@@ -3,15 +3,18 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Primitives/model/mesh.h
+// Dream Core
+// dos/src/core/model/mesh.h
+
+// Mesh
 
 #include <vector>
 
-#include "Primitives/DimObj.h"
-#include "Primitives/Vertex.h"
-#include "Primitives/point.h"
-#include "Primitives/color.h"
+#include "core/dimension/DimObj.h"
+
+#include "core/primitives/Vertex.h"
+#include "core/primitives/point.h"
+#include "core/primitives/color.h"
 
 class mesh : public virtual DimObj {
 public:

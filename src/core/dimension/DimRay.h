@@ -1,16 +1,22 @@
 #ifndef DIM_RAY_H_
 #define DIM_RAY_H_
 
-#include "DimObj.h"
-#include "ray.h"
+#include "core/ehm/EHM.h"
 
-#include "point.h"
-#include "vector.h"
+// Dream Core
+// dos/src/core/dimension/mesh.h
+
+// Mesh
+
+#include "DimObj.h"
+
+#include "core/primitives/ray.h"
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
 
 class volume;
 class CollisionManifold;
 
-//class DimRay : public ray, public DimObj {
 class DimRay : public ray, public virtual DimObj {
 public:
 	DimRay(point ptOrigin, vector vDirection);
