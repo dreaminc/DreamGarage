@@ -20,6 +20,8 @@
 #include "RESULT/EHM.h"                                // for CR, CNR, CN, CBR, CB
 #include "vcruntime_new.h"                             // for operator delete, operator new
 
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
+
 #include "DreamOS.h"
 
 #include "Core/Utilities.h"

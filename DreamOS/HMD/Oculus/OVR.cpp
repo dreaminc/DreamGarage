@@ -397,7 +397,7 @@ RESULT OVRHMD::UpdateHMD() {
 			auto& hand = i == 0 ? m_pLeftHand : m_pRightHand;
 			auto& pModel = i == 0 ? m_pLeftControllerModel : m_pRightControllerModel;
 
-			if (trackingState.HandStatusFlags[i] != 3) {
+			if (trackingState.HandStatusFlags[i] && 0x11 == 0) {
 				hand->SetTracked(false);
 				continue;
 			}
