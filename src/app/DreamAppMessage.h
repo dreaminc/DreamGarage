@@ -1,16 +1,18 @@
 #ifndef DREAM_APP_MESSAGE_H_
 #define DREAM_APP_MESSAGE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/DreamAppMessage.h
+// Dream App
+// app/DreamAppMessage.h
+
 // A base message for dream app messages
 
 #include <string>
-#include "DreamMessage.h"
-#include "Primitives/Types/UID.h"
 
+#include "core/types/UID.h"
+
+#include "os/DreamMessage.h"
 
 class DreamAppMessage : public DreamMessage {
 

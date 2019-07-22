@@ -1,14 +1,17 @@
 #ifndef ACTIVE_OBJECT_H_
 #define ACTIVE_OBJECT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Interaction Engine Module
+// dos/src/module/InteractionEngine/ActiveObject.h
 
 // Active Object 
 // An active object is an object that is currently being interacted with
 // and as such retains a given state
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
 
 class VirtualObj;
 class ContactPoint;

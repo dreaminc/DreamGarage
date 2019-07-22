@@ -1,16 +1,19 @@
 #ifndef TIME_MANAGER_MODULE_H_
 #define TIME_MANAGER_MODULE_H_
 
-// DREAM OS
-// DreamOS/Modules/TimeManagerModule.h
+#include "core/ehm/EHM.h"
+
+// Dream Module
+// dos/src/module/TimeManagerModule.h
+
 // Time Manager 
-
-#include "DreamModule.h"
-
-#include "Primitives/Publisher.h"
 
 #include <vector>
 #include <chrono>
+
+#include "module/DreamModule.h"
+
+#include "core/types/Publisher.h"
 
 // TODO: This should be made into a singleton
 

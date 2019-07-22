@@ -1,0 +1,55 @@
+# src/scene/CMakeLists.txt - DreamContentViewApp CMake file
+
+file(GLOB SOURCES 
+  "*.cpp"
+  "*.h"
+)
+source_group("" FILES ${SOURCES})
+
+file(GLOB ANIMATION_ENGINE_SOURCES 
+  "AnimationEngine/*.cpp"
+  "AnimationEngine*.h"
+)
+source_group("" FILES ${ANIMATION_ENGINE_SOURCES})
+
+file(GLOB DREAM_SOUND_SYSTEM_SOURCES 
+  "DreamSoundSystem/*.cpp"
+  "DreamSoundSystem/*.h"
+)
+source_group("" FILES ${DREAM_SOUND_SYSTEM_SOURCES})
+
+file(GLOB INTERACTION_ENGINE_SOURCES 
+  "InteractionEngine/*.cpp"
+  "InteractionEngine/*.h"
+)
+source_group("" FILES ${INTERACTION_ENGINE_SOURCES})
+
+file(GLOB PHYSICS_ENGINE_SOURCES 
+  "PhysicsEngine/*.cpp"
+  "PhysicsEngine/*.h"
+)
+source_group("" FILES ${PHYSICS_ENGINE_SOURCES})
+
+file(GLOB TIME_MANAGER_SOURCES 
+  "TimeManager/*.cpp"
+  "TimeManager/*.h"
+)
+source_group("" FILES ${TIME_MANAGER_SOURCES})
+
+# Force Include the src/core/config.h
+if(MSVC)
+    add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")
+else()
+    # GCC or Clang
+    add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
+endif()
+
+add_library(module
+    ${SOURCES}
+    ${ANIMATION_ENGINE_SOURCES}
+    ${DREAM_SOUND_SYSTEM_SOURCES}
+    ${INTERACTION_ENGINE_SOURCES}
+    ${PHYSICS_ENGINE_SOURCES}
+    ${TIME_MANAGER_SOURCES}
+)
+

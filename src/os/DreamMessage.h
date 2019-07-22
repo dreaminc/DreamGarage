@@ -1,14 +1,16 @@
 #ifndef DREAM_MESSAGE_H_
 #define DREAM_MESSAGE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/DreamGarage/DreamGarageMessage.h
+// Dream OS
+// os/DreamGarageMessage.h
+
 // Base Message object
 
 #include <string>
-#include "Cloud/Message/Message.h"
+
+#include "core/types/Message.h"
 
 class DreamMessage : public Message {
 public:

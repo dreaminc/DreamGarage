@@ -1,10 +1,11 @@
 #ifndef DREAM_MODULE_H_
 #define DREAM_MODULE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/DreamModule.h
+// Dream Module
+// dos/src/module/DreamModule.h
+
 // The base Dream Module object
 
 // Modules are different than apps in a number of ways.  Like apps, Modules have 
@@ -12,13 +13,14 @@
 // unlike apps - Modules also have a ModuleProcess which is a dedicated thread (managed by the module itself) 
 // that will run and execute tasks.
 
-#include "Primitives/valid.h"
-#include "Primitives/Types/UID.h"
-#include "Primitives/vector.h"
-#include "Primitives/point.h"
-
 #include <string>
 #include <memory>
+
+#include "core/types/valid.h"
+#include "core/types/UID.h"
+
+#include "core/primitives/vector.h"
+#include "core/primitives/point.h"
 
 class DreamOS;
 class composite;

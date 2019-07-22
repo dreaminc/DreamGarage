@@ -1,14 +1,18 @@
 #ifndef INTERACTION_OBJECT_EVENT_H_
 #define INTERACTION_OBJECT_EVENT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Interaction Engine Module
+// dos/src/module/InteractionEngine/InteractionObjectEvent.h
 
 // Dream Interaction Object Event
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
-#include "Primitives/ray.h"
 #include <memory>
+
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
+#include "core/primitives/ray.h"
 
 #include "ActiveObject.h"
 #include "Sense/SenseController.h"
