@@ -1,11 +1,11 @@
 #ifndef WEBRTC_CONDUCTOR_H_
 #define WEBRTC_CONDUCTOR_H_
 
-#include "RESULT/EHM.h"
-#include "Cloud/CloudImp.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/webrtc/WebRTCConductor.h
+// Dream Cloud WebRTC
+// dos/src/cloud/webrtc/WebRTCConductor.h
+
 // The WebRTC Conductor which conducts the peer connection and generally handles the WebRTC 
 // connections
 
@@ -13,6 +13,8 @@
 #include <map>
 #include <set>
 #include <string>
+
+#include "cloud/CloudImp.h"
 
 #include "api/mediastreaminterface.h"
 #include "api/peerconnectioninterface.h"

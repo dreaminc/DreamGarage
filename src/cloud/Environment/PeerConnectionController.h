@@ -1,21 +1,22 @@
 #ifndef PEER_CONNECTION_CONTROLLER_H_
 #define PEER_CONNECTION_CONTROLLER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // DREAM OS
-// DreamOS/Dimension/Cloud/Environment/PeerConnectionController.h
+// dos/src/cloud/Environment/PeerConnectionController.h
+
 // The Peer Connection Controller
 
 #include <string>
 #include <memory>
 #include <mutex>
 
-#include "Cloud/Controller.h"
+#include "core/types/Controller.h"
 
-#include "json.hpp"
+#include "third_party/json/include/json.hpp"
 
-#include "Cloud/webrtc/WebRTCImp.h"
+#include "cloud/webrtc/WebRTCImp.h"
 
 class User;
 class TwilioNTSInformation;

@@ -1,23 +1,26 @@
 #ifndef CLOUD_CONTROLLER_H_
 #define CLOUD_CONTROLLER_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/Types/UID.h"
-#include "Primitives/valid.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/CloudController.h
+// Dream Cloud
+// dos/src/cloud/CloudController.h
+
 // The base DreamCloud controller 
-
-#include "Controller.h"
-#include "ControllerProxy.h"
-
-#include "CloudImp.h"
-#include "User/UserFactory.h"
-#include "Environment/EnvironmentController.h"
 
 #include <memory>
 #include <thread>
+
+#include "CloudImp.h"
+#include "Environment/EnvironmentController.h"
+
+#include "core/types/UID.h"
+#include "core/types/valid.h"
+
+#include "core/types/Controller.h"
+#include "core/types/ControllerProxy.h"
+
+#include "user/UserFactory.h"
 
 class Message;
 class UpdateHeadMessage; 

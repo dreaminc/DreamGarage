@@ -1,11 +1,11 @@
 #ifndef WEBRTC_VIDEO_SINK_H_
 #define WEBRTC_VIDEO_SINK_H_
 
+#include "core/ehm/EHM.h"
 
-#include "RESULT/EHM.h"
+// Dream Cloud WebRTC
+// dos/src/cloud/webrtc/WebRTCVideoSink.h
 
-// DREAM OS
-// DreamOS/Cloud/webrtc/WebRTCVideoSink.h
 // The WebRTC Video Sink Interface
 
 #include "media/base/videocommon.h"

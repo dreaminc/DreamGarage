@@ -10,31 +10,31 @@ file(GLOB ANIMATION_ENGINE_SOURCES
   "AnimationEngine/*.cpp"
   "AnimationEngine*.h"
 )
-source_group("" FILES ${ANIMATION_ENGINE_SOURCES})
+source_group("AnimationEngine" FILES ${ANIMATION_ENGINE_SOURCES})
 
 file(GLOB DREAM_SOUND_SYSTEM_SOURCES 
   "DreamSoundSystem/*.cpp"
   "DreamSoundSystem/*.h"
 )
-source_group("" FILES ${DREAM_SOUND_SYSTEM_SOURCES})
+source_group("DreamSoundSystem" FILES ${DREAM_SOUND_SYSTEM_SOURCES})
 
 file(GLOB INTERACTION_ENGINE_SOURCES 
   "InteractionEngine/*.cpp"
   "InteractionEngine/*.h"
 )
-source_group("" FILES ${INTERACTION_ENGINE_SOURCES})
+source_group("InteractionEngine" FILES ${INTERACTION_ENGINE_SOURCES})
 
 file(GLOB PHYSICS_ENGINE_SOURCES 
   "PhysicsEngine/*.cpp"
   "PhysicsEngine/*.h"
 )
-source_group("" FILES ${PHYSICS_ENGINE_SOURCES})
+source_group("PhysicsEngine" FILES ${PHYSICS_ENGINE_SOURCES})
 
 file(GLOB TIME_MANAGER_SOURCES 
   "TimeManager/*.cpp"
   "TimeManager/*.h"
 )
-source_group("" FILES ${TIME_MANAGER_SOURCES})
+source_group("TimeManager" FILES ${TIME_MANAGER_SOURCES})
 
 # Force Include the src/core/config.h
 if(MSVC)

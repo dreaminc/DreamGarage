@@ -1,9 +1,9 @@
 #ifndef HMD_SINK_NODE_H_
 #define HMD_SINK_NODE_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
+// Dream HMD
 // dos/src/dos/HMDSinkNode.h
 
 // The HMD Sink Node class 

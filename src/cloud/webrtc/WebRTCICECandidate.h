@@ -1,10 +1,11 @@
 #ifndef WEBRTC_ICE_CANDIDATE_H_
 #define WEBRTC_ICE_CANDIDATE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/webrtc/WebRTCICECandidate.h
+// Dream Cloud WebRTC
+// dos/src/cloud/webrtc/WebRTCICECandidate.h
+
 // The WebRTC ICE Candidate object
 
 class WebRTCICECandidate {

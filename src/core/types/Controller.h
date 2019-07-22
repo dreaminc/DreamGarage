@@ -2,17 +2,20 @@
 #define CONTROLLER_H_
 
 #include "core/ehm/EHM.h"
-#include "core/types/UID.h"
-#include "Primitives/valid.h"
 
-// DREAM OS
-// DreamOS/Cloud/Controller.h
+// TODO: This will probably have to move to cloud (cloud message)
+// Dream Core
+// dos/src/core/types/Controller.h
+
 // The base controller object
 
 #include <map>
 #include <memory>
 #include <string>
 #include <functional>
+
+#include "core/types/UID.h"
+#include "core/types/valid.h"
 
 class CloudController;
 class CloudMessage;

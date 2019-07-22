@@ -1,15 +1,17 @@
 #ifndef USER_FACTORY_H_
 #define USER_FACTORY_H_
 
-#include "RESULT/EHM.h"
-#include "UserController.h"
-#include "Core/Types/Factory.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/User/UserFactory.h
+// Dream Cloud User
+// dos/src/cloud/User/UserFactory.h
+
 // Dream OS User factory for the creation of users across various versions
 
-#include "Primitives/version.h"
+#include "UserController.h"
+
+#include "core/types/version.h"
+#include "core/types/Factory.h"
 
 class UserFactory : public Factory {
 public:

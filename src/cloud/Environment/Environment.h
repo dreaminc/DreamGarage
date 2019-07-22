@@ -1,13 +1,16 @@
 #ifndef ENVIRONMENT_H_
 #define ENVIRONMENT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/Environment/Environment.h
+// Dream Cloud
+// dos/src/cloud/Environment/Environment.h
+
 // Base Environment object
 
 #include <string>
+
+// TODO: Is this a model?
 
 class Environment {
 public:

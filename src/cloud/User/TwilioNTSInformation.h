@@ -3,16 +3,15 @@
 
 // TODO: Rename the file and class
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/User/User.h
+// Dream Cloud User Twilio NTS Info
+// dos/src/cloud/User/TwilioNTSInformation.h
+
 // Base User object
 
-#include "Cloud/CloudModel.h"
 
 #include <string>
-#include "Primitives/version.h"
 #include <list>
 #include <vector>
 #include <algorithm>
@@ -22,6 +21,9 @@
 #include <locale>
 #include <iomanip>
 
+#include "core/types/version.h"
+
+#include "cloud/CloudModel.h"
 
 // TODO: Change naming to non-Twilio related
 class TwilioNTSInformation {

@@ -3,10 +3,11 @@
 
 // The above had to be changed due to an already existing WEBRTC_COMMON_H_ in the WebRTC code namespace
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/webrtc/WebRTCCommon.h
+// Dream Cloud WebRTC
+// dos/src/cloud/webrtc/WebRTCCommon.h
+
 // The WebRTC Common defines
 
 // Names used for a IceCandidate JSON object.

@@ -1,27 +1,27 @@
 #ifndef ENVIRONMENT_CONTROLLER_H_
 #define ENVIRONMENT_CONTROLLER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/Environment/EnvironmentController.h
+// Dream Cloud Environment 
+// dos/src/cloud/Environment/EnvironmentController.h
+
 // The Environment Controller
 
 #include <string>
 #include <memory>
 
-#include "Cloud/Controller.h"
+#include "core/types/Controller.h"
 
 #include "Environment.h"
 #include "EnvironmentPeer.h"
 #include "PeerConnectionController.h"
-#include "Cloud/Menu/MenuController.h"
+#include "cloud/Menu/MenuController.h"
+
+#include "core/types/ControllerProxy.h"
 
 class User;
 class TwilioNTSInformation;
-
-#include "Cloud/ControllerProxy.h"
-
 class Websocket;
 class CloudMessage;
 class EnvironmentAsset;

@@ -1,19 +1,22 @@
 #ifndef USER_MODEL_H_
 #define USER_MODEL_H_
 
+// TODO: This is specific to the Dream User Model
 // TODO: Rename the file and class
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/User/User.h
+// Dream Cloud User
+// dos/src/cloud/User/User.h
+
 // Base User object
 
-#include "Cloud/CloudModel.h"
-
 #include <string>
-#include "Primitives/version.h"
 #include <iostream>
+
+#include "cloud/CloudModel.h"
+
+#include "core/types/version.h"
 
 class User {
 public:

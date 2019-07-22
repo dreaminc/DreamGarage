@@ -1,13 +1,16 @@
 #ifndef CLOUD_IMP_H_
 #define CLOUD_IMP_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/Types/UID.h"
-#include "Primitives/valid.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/CloudImp.h
+// Dream Cloud
+// dos/src/cloud/CloudImp.h
+
 // The base DreamCloud Implementation interface
+
+#include "core/types/UID.h"
+#include "core/types/valid.h"
+
 
 #include <string>
 #include <functional>

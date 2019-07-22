@@ -4,10 +4,11 @@
 
 // The above had to be changed due to an already existing WEBRTC_COMMON_H_ in the WebRTC code namespace
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/webrtc/WebRTCAudioCaptureDevice.h
+// Dream Cloud WebRTC
+// dos/src/cloud/webrtc/WebRTCAudioCaptureDevice.h
+
 // A customer WebRTC Audio Capture Device
 
 #include <queue>
@@ -18,7 +19,7 @@
 
 //#include "Sound/AudioPacket.h"
 //#include "Sound/SoundBuffer.h"
-#include "Primitives/CircularBuffer.h"
+#include "core/datastructures/CircularBuffer.h"
 
 // A wrapper over AudioDeviceModule that registers itself as AudioTransport
 // callback and redirects the PCM data to AudioDeviceDataObserver callback.

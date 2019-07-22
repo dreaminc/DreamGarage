@@ -1,28 +1,31 @@
 #ifndef WEBRTC_IMP_H_
 #define WEBRTC_IMP_H_
 
-#include "RESULT/EHM.h"
-#include "Cloud/CloudImp.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/webrtc/WebRTCImp.h
+// Dream Cloud WebRTC
+// dos/src/cloud/webrtc/WebRTCImp.h
+
 // The WebRTC Implementation
 
 // TODO: CEF will need to be moved to a cross platform implementation
 // and this will be the top level
+
 //#define WIN32_LEAN_AND_MEAN
 
 #include <memory>
 
 #include "WebRTCCommon.h"
-#include "rtc_base/win32socketserver.h"
+
+#include "third_party/webrtc/include/webrtc/rtc_base/win32socketserver.h"
 
 #include "WebRTCConductor.h"
 
+#include "cloud/CloudImp.h"
 #include "Cloud/User/User.h"
 #include "Cloud/User/TwilioNTSInformation.h"
 
-#include "Primitives/Proxy.h"
+#include "core/types/Proxy.h"
 
 //class WebRTCClient;
 class WebRTCICECandidate;

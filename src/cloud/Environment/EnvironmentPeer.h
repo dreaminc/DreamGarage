@@ -1,10 +1,11 @@
 #ifndef ENVIRONMENT_PEER_H_
 #define ENVIRONMENT_PEER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/Environment/EnvironmentPeer.h
+// Dream Cloud Environment
+// dos/src/cloud/Environment/EnvironmentPeer.h
+
 // Environment Peer Object
 
 #include <string>

@@ -1,10 +1,11 @@
 #ifndef WEBRTC_AUDIO_TRACK_SINK_H_
 #define WEBRTC_AUDIO_TRACK_SINK_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/webrtc/WebRTCAudioTrackSink.h
+// Dream Cloud WebRTC
+// dos/src/cloud/webrtc/WebRTCAudioTrackSink.h
+
 // The container for the WebRTCAudioTrackSink per our implementation
 
 #include <memory>

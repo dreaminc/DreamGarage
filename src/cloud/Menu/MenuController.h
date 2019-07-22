@@ -1,17 +1,18 @@
 #ifndef MENU_CONTROLLER_H_
 #define MENU_CONTROLLER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/Menu/MenuController.h
+// Dream Cloud Menu
+// dos/src/cloud/Menu/MenuController.h
+
 // The Menu Controller 
 
-#include "Cloud/Controller.h"
-#include "Cloud/ControllerProxy.h"
-#include "Cloud/ControllerObserver.h"
-
 #include <string>
+
+#include "core/types/Controller.h"
+#include "core/types/ControllerProxy.h"
+#include "core/types/ControllerObserver.h"
 
 //#include "Cloud/Menu/Menu.h"
 

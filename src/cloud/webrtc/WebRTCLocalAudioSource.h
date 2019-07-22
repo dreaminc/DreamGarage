@@ -2,10 +2,11 @@
 #define WEBRTC_LOCAL_AUDIO_SOURCE_H_	
 #pragma once
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/webrtc/WebRTC.h
+// Dream Cloud WebRTC
+// dos/src/cloud/webrtc/WebRTC.h
+
 // A customer WebRTC Audio Capture Device
 
 #include "pc/localaudiosource.h"

@@ -3,10 +3,10 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/ControllerProxy.h
-// The Controller Proxy Object
+// Dream Core
+// dos/src/core/types/ControllerProxy.h
 
+// The Controller Proxy Object
 
 enum class CLOUD_CONTROLLER_TYPE;
 

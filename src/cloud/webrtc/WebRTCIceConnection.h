@@ -1,7 +1,10 @@
 #ifndef WEB_RTC_ICE_CONNECTION_H_
 #define WEB_RTC_ICE_CONNECTION_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Cloud Webrtc
+// dos/src/cloud/webrtc/WebRTCICEConnection.h
 
 // WebRTC Ice Connection
 // Right now a shell class, but more functionality could be added here to manipulate the ICE connection state

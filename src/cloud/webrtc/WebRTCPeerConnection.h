@@ -1,10 +1,11 @@
 #ifndef WEBRTC_PEER_CONNECTION_H_
 #define WEBRTC_PEER_CONNECTION_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/webrtc/WebRTCPeerConnection.h
+// Dream Cloud Webrtc
+// dos/src/cloud/webrtc/WebRTCPeerConnection.h
+
 // The container for the WebRTCPeerConnection per our implementation
 
 #include <memory>
@@ -12,18 +13,15 @@
 //#include "rtc_base/common.h"
 #include "api/mediastreaminterface.h"
 #include "api/peerconnectioninterface.h"
-
 #include "media/base/videocommon.h"
 #include "api/video/video_frame.h"
+#include "pc/localaudiosource.h"
 
 #include "WebRTCICECandidate.h"
 #include "WebRTCIceConnection.h"
 
-#include "Primitives/Proxy.h"
-
-#include "Primitives/color.h"
-
-#include "pc/localaudiosource.h"
+#include "core/types/Proxy.h"
+#include "core/primitives/color.h"
 
 #include "WebRTCLocalAudioSource.h"
 #include "WebRTCAudioTrackSink.h"

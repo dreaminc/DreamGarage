@@ -1,16 +1,19 @@
 #ifndef CLOUD_MODEL_H_
 #define CLOUD_MODEL_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/Types/UID.h"
-#include "Primitives/valid.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/Model.h
+// Dream Cloud
+// dos/src/cloud/CloudModel.h
+
 // The base controller object
 
-#include "Controller.h"
 #include <memory>
+
+#include "core/types/Controller.h"
+
+#include "core/types/UID.h"
+#include "core/types/valid.h"
 
 class CloudModel {
 public:

@@ -13,7 +13,13 @@ endif()
 project(dos LANGUAGES CXX)
 
 include_directories(src)
+
+# Third Party Includes
 include_directories(src/third_party/Freetype/freetype-2.8/include)
+
+# WebRTC
+include_directories(src/third_party/webrtc/include/webrtc)
+add_definitions(-DWEBRTC_WIN)
 
 add_subdirectory(src)
 
