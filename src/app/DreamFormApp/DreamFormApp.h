@@ -1,10 +1,16 @@
 #ifndef DREAM_FORM_APP_H_
 #define DREAM_FORM_APP_H_
 
-#include "DreamApp.h"
-#include "DreamOS.h"
+#include "core/ehm/EHM.h"
 
-#include "DreamGarage/DreamBrowser.h"
+// Dream Form App
+// dos/src/app/DreamFormApp/DreamFormApp.h
+
+#include "app/DreamApp.h"
+#include "os/DreamOS.h"
+
+// TODO: This should not be here
+#include "app/DreamBrowserApp/DreamBrowserApp.h"
 
 class UIControlView;
 struct UIEvent;

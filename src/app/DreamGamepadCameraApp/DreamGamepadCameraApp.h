@@ -1,6 +1,21 @@
 #ifndef DREAM_GAMEPAD_CAMERA_APP_H_
 #define DREAM_GAMEPAD_CAMERA_APP_H_
 
+#include "core/ehm/EHM.h"
+
+// Dream Gamepad Camera App
+// dos/src/GamepadCameraApp/DreamGamepadCameraApp.h
+
+#include "app/DreamApp.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/point2D.h"
+
+#include "sense/SenseGamepadController.h"
+#include "sense/SenseController.h"
+
+#include "core/hand/HandType.h"
+
 #define GAMEPAD_MOVE_SCALE 23914.0f;
 #define GAMEPAD_UP_SPEED_SCALE 100000000.0f;		// joystick values are 0-1, triggers are 0-255
 #define GAMEPAD_CAMERA_ROTATE_SCALE	0.7f		// 1.41178f;
@@ -12,19 +27,6 @@
 
 #define MOMENTUM_CAMERA_ACCELERATION_CONSTANT 0.005f;
 #define MOMENTUM_CAMERA_DECCELERATION_CONSTANT 0.002f;	// 1/500
-
-#include "RESULT/EHM.h"
-
-// DREAM OS
-// DreamOS/DreamGamepadCameraApp.h
-
-#include "DreamApp.h"
-#include "Primitives/point.h"
-#include "Primitives/point2D.h"
-#include "Sense/SenseGamepadController.h"
-#include "Sense/SenseController.h"
-
-#include "Primitives/hand/HandType.h"
 
 class camera;
 class AirResistanceGenerator;

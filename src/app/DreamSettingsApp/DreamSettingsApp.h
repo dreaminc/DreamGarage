@@ -1,9 +1,15 @@
 #ifndef DREAM_SETTINGS_APP_H_
 #define DREAM_SETTINGS_APP_H_
 
-#define SCALE_TICK 0.003f;
+#include "core/ehm/EHM.h"
 
-#include "DreamGarage/DreamFormApp.h"
+// Dream Settings App
+// dos/src/app/DreamSettingsApp/DreamSettingsApp.h
+
+// TODO: This should not be here, or should be consolidated
+#include "app/DreamFormApp/DreamFormApp.h"
+
+#define SCALE_TICK 0.003f;
 
 class UIControlView;
 

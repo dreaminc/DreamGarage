@@ -3,17 +3,17 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Primitives\Manager.h
+// Dream Core
+// dos/src/core/types/Manager.h
+
 // The virtual manager interface object which 
 // effectively manages things
 
-#include "core/types/UID.h"
-#include "Primitives/valid.h"
+#include "core/types/DObject.h"
 
 // TODO: Could squash this with a template 
 // TODO: Is this a module?
-class Manager : public valid {
+class Manager : public DObject {
 public:
 	Manager() {
 		// empty
@@ -33,11 +33,6 @@ public:
 
 	// Shutdown the manager
 	virtual RESULT Shutdown() = 0;
-
-private:
-	UID m_uid;
 };
-
-
 
 #endif	// ! MANAGER_H_

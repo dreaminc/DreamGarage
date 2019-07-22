@@ -1,22 +1,22 @@
 #ifndef DREAM_PEER_H_
 #define DREAM_PEER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM PEER
-// DreamOS/DreamPeer.h
+// Dream Peer App
+// dos/src/app/DreamPeerApp/DreamPeerApp.h
+
 // Dream Peer holds context for a given dream peer
 // and keeps track of state
 
-//#include "Primitives/DObject.h"
-#include "Primitives/Subscriber.h"
+#include "app/DreamApp.h"
 
-#include "DreamApp.h"
+#include "core/types/Subscriber.h"
 
-#include "Primitives/point.h"
-#include "Primitives/quaternion.h"
+#include "core/primitives/point.h"
+#include "core/primitives/quaternion.h"
 
-#include "Primitives/hand/HandState.h"
+#include "core/hand/HandState.h"
 
 class User;
 class PeerConnection;

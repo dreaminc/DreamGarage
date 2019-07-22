@@ -1,15 +1,20 @@
 #ifndef DREAM_ENVIRONMENT_H_
 #define DREAM_ENVIRONMENT_H_
 
-#include "./RESULT/EHM.h"
-#include "DreamApp.h"
+#include "core/ehm/EHM.h"
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
-#include "Primitives/color.h"
-#include "Primitives/FogParams.h"
+// Dream Environment App
+// dos/src/app/DreamEnvironmentApp/DreamEnvironmentApp.h
 
 #include <map>
+
+#include "app/DreamApp.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
+#include "core/primitives/color.h"
+
+#include "hal/FogParams.h"
 
 class DreamOS;
 class DreamUserApp;

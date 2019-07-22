@@ -1,13 +1,13 @@
 #ifndef FOG_PARAMS_H_
 #define FOG_PARAMS_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/material.h
-// Base type for material
+// TODO: Not sure about this being in HAL
+// Dream HAL
+// dos/src/hal/FogParams.h
 
-#include "color.h"
+#include "core/primitives/color.h"
 
 class FogParams {
 public:

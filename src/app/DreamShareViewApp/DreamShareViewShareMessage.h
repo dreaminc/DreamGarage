@@ -1,16 +1,18 @@
 #ifndef DREAM_SHARE_VIEW_SHARE_MESSAGE_H_
 #define DREAM_SHARE_VIEW_SHARE_MESSAGE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/DreamShareViewMessage.h
+// Dream Share View App
+// dos/src/DreamShareViewApp/DreamShareViewMessage.h
+
 // A base message for dream app messages
 
 #include <string>
+
 #include "DreamShareViewMessage.h"
 
-#include "Primitives/Types/UID.h"
+#include "core/types/UID.h"
 
 class DreamShareViewShareMessage : public DreamShareViewMessage {
 

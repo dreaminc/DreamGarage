@@ -1,9 +1,15 @@
 #ifndef DREAM_SHARE_VIEW_MESSAGE_H_
 #define DREAM_SHARE_VIEW_MESSAGE_H_
 
+#include "core/ehm/EHM.h"
+
+// Dream Share View App
+// dos/src/app/DreamShareViewApp/DreamShareViewMessage.h
+
+#include "app/DreamAppMessage.h"
+
 #define DREAM_SHARE_VIEW_APP_NAME "DreamShareView"
 
-#include "DreamAppMessage.h"
 
 class DreamShareViewMessage : public DreamAppMessage {
 

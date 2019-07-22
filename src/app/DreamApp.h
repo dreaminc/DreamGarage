@@ -1,14 +1,14 @@
 #ifndef DREAM_APP_H_
 #define DREAM_APP_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/DreamApp.h
+// Dream App
+// dos/src/app/DreamApp.h
+
 // The base Dream App object
 
-#include "Primitives/valid.h"
-#include "Primitives/Types/UID.h"
+#include "core/types/DObject.h"
 
 #include <string>
 #include <memory>
@@ -19,7 +19,7 @@ class DreamAppHandle;
 class PeerConnection;
 class DreamAppMessage;
 
-class DreamAppBase {
+class DreamAppBase : public DObject {
 	friend class DreamAppManager;
 	friend struct DreamAppBaseCompare;
 	friend class DreamOS;
@@ -42,6 +42,10 @@ public:
 	virtual DreamAppHandle* GetAppHandle();
 	virtual DreamOS *GetDOS() = 0;
 	virtual unsigned int GetHandleLimit();
+
+	UID GetAppUID() {
+		return getID();
+	}
 
 protected:
 	virtual RESULT Print() { return R_NOT_IMPLEMENTED; }
@@ -77,14 +81,6 @@ protected:
 		return R_PASS;
 	}
 
-	UINT64 GetUIDValue() {
-		return m_uid.GetID();
-	}
-
-	UID GetAppUID() {
-		return m_uid;
-	}
-
 	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
 
 	RESULT Initialize();
@@ -101,7 +97,6 @@ private:
 private:
 	std::string m_strAppName;
 	std::string m_strAppDescription;
-	UID m_uid;
 
 protected:
 	DreamOS* m_pDreamOS = nullptr;

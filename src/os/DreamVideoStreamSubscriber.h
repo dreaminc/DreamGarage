@@ -1,12 +1,13 @@
 #ifndef DREAM_VIDEO_STREAM_SUBSCRIBER_H_
 #define DREAM_VIDEO_STREAM_SUBSCRIBER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/DreamVideoStreamSubscriber.h
-// This is a subscriber for the OnVideoFrame event in
-// DreamOS
+// TODO: Is this really supposed to be here?
+// Dream OS
+// os/DreamVideoStreamSubscriber.h
+
+// This is a subscriber for the OnVideoFrame event in DreamOS
 
 class PeerConnection;
 

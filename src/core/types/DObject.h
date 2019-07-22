@@ -29,6 +29,10 @@ public:
 		return m_uid; 
 	}
 
+	UINT64 GetUIDValue() {
+		return m_uid.GetID();
+	}
+
 private:
 	UID m_uid;
 };

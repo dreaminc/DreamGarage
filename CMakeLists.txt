@@ -1,6 +1,6 @@
 # /CMakeList.txt : CMake project for dos
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.14)
 
 # Force Include the src/core/config.h
 if(MSVC)

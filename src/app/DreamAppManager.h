@@ -1,13 +1,12 @@
 #ifndef DREAM_APP_MANAGER_H_
 #define DREAM_APP_MANAGER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/DreamApp.h
+// Dream App Manager
+// dos/src/app/DreamAppManager.h
+
 // The base Dream App object
-
-#include "Primitives/Types/UID.h"
 
 #include <queue>
 #include <map>
@@ -15,17 +14,20 @@
 #include <memory>
 #include <chrono>
 
+#include "app/DreamApp.h"
+#include "app/DreamAppHandle.h"
+
+#include "core/types/Manager.h"
+#include "core/types/UID.h"
+
+#include "core/primitives/composite.h"
+
 // Some priority settings
 #define SYSTEM_APP_PRIORITY 0
 #define DREAM_APP_PRIORITY 2
 #define DEFAULT_APP_PRIORITY DREAM_APP_PRIORITY
 #define MAX_APP_PRIORITY 10
 
-#include "DreamApp.h"
-#include "Primitives/Manager.h"
-#include "Primitives/composite.h"
-
-#include "DreamAppHandle.h"
 
 class DreamOS;
 class PeerConnection;

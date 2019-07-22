@@ -1,14 +1,19 @@
 #ifndef DREAM_POINTER_MESSAGE_H_
 #define DREAM_POINTER_MESSAGE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Share View app
+// dos/src/app/DreamShareViewapp/DreamShareViewPointerMessage.h
 
 #include <string>
-#include "DreamShareViewMessage.h"
-#include "Primitives/Types/UID.h"
 
-#include "Primitives/point.h"
-#include "Primitives/color.h"
+#include "DreamShareViewMessage.h"
+
+#include "core/types/UID.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/color.h"
 
 class DreamShareViewPointerMessage : public DreamShareViewMessage {
 

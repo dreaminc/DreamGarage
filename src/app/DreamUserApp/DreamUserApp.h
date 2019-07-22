@@ -1,26 +1,27 @@
 #ifndef DREAM_USER_APP_H_
 #define DREAM_USER_APP_H_
 
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/DreamUserApp.h
+// Dream User App
+// dos/src/app/DreamUserApp/DreamUserApp.h
+
 // The Dream User app is the app to contain all of the 
 // relevant user information (and assets)
 
-#include "DreamApp.h"
-
-#include "Primitives/hand/HandType.h"
-#include "Primitives/point.h"
-
-#include "Primitives/Subscriber.h"
-
-#include "DreamGarage/UICommon.h"
-
 #include "memory"                      // for shared_ptr
-#include "RESULT/RESULT.h"             // for RESULT
 #include "xstring"                     // for wstring
-
 #include <map>
+
+#include "app/DreamApp.h"
+
+#include "core/types/Subscriber.h"
+
+#include "core/primitives/point.h"
+
+#include "core/hand/HandType.h"
+
+#include "ui/UICommon.h"
 
 class DreamOS;
 class composite;
@@ -40,6 +41,7 @@ class quaternion;
 class CEFBrowserManager;
 class CameraNode;
 
+// TODO: All this into a configuration file
 #define MENU_HEIGHT -0.16f
 #define MENU_DEPTH 0.0f
 #define MENU_DEPTH_MIN 0.5f

@@ -1,13 +1,13 @@
 #ifndef DREAM_2D_MOUSE_APP_H_
 #define DREAM_2D_MOUSE_APP_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dream2DMouseApp.h
+// Dream 2D Mouse App
+// app/Dream2DMouseApp/Dream2DMouseApp.h
 
-#include "DreamApp.h"
-#include "DreamAppHandle.h"
+#include "app/DreamApp.h"
+#include "app/DreamAppHandle.h"
 
 #include <map>
 #include <vector>
@@ -16,7 +16,7 @@ class DimRay;
 
 class Dream2DMouseAppHandle : public DreamAppHandle {
 public:
-//	virtual RESULT;
+	// 
 };
 
 class Dream2DMouseApp : public DreamApp<Dream2DMouseApp>, public Dream2DMouseAppHandle {

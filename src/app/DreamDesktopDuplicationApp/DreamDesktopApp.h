@@ -1,24 +1,30 @@
 #ifndef DREAM_DESKTOP_H_
 #define DREAM_DESKTOP_H_
 
-#include "RESULT/EHM.h"
-#include "DreamOS.h"
-// DREAM OS
-// DreamOS/DreamGarage/DesktopDuplicationApp
+#include "core/ehm/EHM.h"
+
+// Dream Desktop App
+// dos/src/app/DreamDesktopDuplicationApp/DreamDesktopApp.h
+
 // The Desktop duplication app starts and manages
 // the DreamDesktopCapture project, allowing us to
 // duplicate the desktop and receive a texture from
 // directx11 as a byte buffer
 
-#include "DreamApp.h"
-#include "DreamAppHandle.h"
-#include "DreamUserControlArea/DreamContentSource.h"
+#include "os/DreamOS.h"
 
-#include "DDCIPCMessage.h"
+#include "app/DreamApp.h"
+#include "app/DreamAppHandle.h"
+#include "app/DreamUserControlAreaApp/DreamContentSource.h"
 
-#include "InteractionEngine/InteractionObjectEvent.h"
-#include "Sense/SenseController.h"
-#include "Primitives/TextEntryString.h"
+// TODO: Dream Desktop App should go into the same location as this
+#include "dreamdesktop/DDCIPCMessage.h"
+
+#include "module/InteractionEngine/InteractionObjectEvent.h"
+
+#include "sense/SenseController.h"
+
+#include "core/text/TextEntryString.h"
 
 #define DESKTOP_PXWIDTH 1920; 
 #define DESKTOP_PXHEIGHT 1080;

@@ -1,8 +1,16 @@
 #ifndef DREAM_LOGIN_APP_H_
 #define DREAM_LOGIN_APP_H_
 
-#include "DreamGarage/DreamFormApp.h"
-#include "Sandbox/CredentialManager.h"
+#include "core/ehm/EHM.h"
+
+// Dream Login App
+// dos/src/app/DreamLoginApp/DreamLoginApp.h
+
+// TODO: There should be no dependencies between apps
+// or they should be unified 
+#include "app/DreamFormApp/DreamFormApp.h"
+
+#include "sandbox/CredentialManager.h"
 
 class UIControlView;
 
