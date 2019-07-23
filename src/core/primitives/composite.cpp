@@ -1,22 +1,23 @@
 #include "composite.h"
 
-#include "HAL/HALImp.h"
+#include "os/DreamOS.h"
 
-#include "Primitives/hand/hand.h"
-#include "Primitives/user.h"
+#include "hal/HALImp.h"
 
-#include "Primitives/FlatContext.h"
-#include "Primitives/camera.h"
-#include "Primitives/stereocamera.h"
+#include "core/hand/hand.h"
+#include "core/user/user.h"
 
-#include "Primitives/sphere.h"
-#include "Primitives/volume.h"
-#include "Primitives/DimRay.h"
-#include "quad.h"
+#include "core/primitives/FlatContext.h"
+#include "core/primitives/sphere.h"
+#include "core/primitives/volume.h"
+#include "core/primitives/quad.h"
 
-#include "UI/UIView.h"
+#include "core/camera/camera.h"
+#include "core/camera/stereocamera.h"
 
-#include "DreamOS.h"
+#include "core/dimension/DimRay.h"
+
+#include "ui/UIView.h"
 
 composite::composite(HALImp *pHALImp) :
 	m_pHALImp(pHALImp)

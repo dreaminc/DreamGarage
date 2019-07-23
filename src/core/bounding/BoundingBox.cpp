@@ -1,12 +1,15 @@
 #include "BoundingBox.h"
+
+#include <algorithm>
+
 #include "BoundingSphere.h"
 #include "BoundingQuad.h"
 #include "BoundingPlane.h"
-#include <algorithm>
 
-#include "VirtualObj.h"
-#include "PhysicsEngine/CollisionManifold.h"
-#include "PhysicsEngine/Simplex.h"
+#include "core/primitives/VirtualObj.h"
+
+#include "module/PhysicsEngine/CollisionManifold.h"
+#include "module/PhysicsEngine/Simplex.h"
 
 BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type) :
 	BoundingVolume(pParentObject),
@@ -33,7 +36,7 @@ BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, poin
 
 bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 
-	// TODO: Change the arch to utilize inheritence and not duplicate this code
+	// TODO: Change the arch to utilize inheritance and not duplicate this code
 	// Lets fake a sphere test for early exit
 	vector vScale = GetScale(true);
 	vector vHV = vector(m_vHalfSize.x() * vScale.x(), m_vHalfSize.y() * vScale.y(), m_vHalfSize.z() * vScale.z());

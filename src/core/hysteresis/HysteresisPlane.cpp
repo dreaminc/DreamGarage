@@ -1,5 +1,6 @@
 #include "HysteresisPlane.h"
-#include "sphere.h"
+
+#include "core/primitives/sphere.h"
 
 HysteresisPlane::HysteresisPlane(float onThreshold, float offThreshold) : 
 	HysteresisObject(onThreshold,offThreshold)

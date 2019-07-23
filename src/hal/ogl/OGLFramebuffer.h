@@ -1,16 +1,18 @@
 #ifndef OGL_FRAMEBUFFER_H_
 #define OGL_FRAMEBUFFER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/HAL/opengl/OGLFramebuffer.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLFramebuffer.h
+
 // OpenGL Framebuffer Primitve
 
-#include "OpenGLCommon.h"
-#include "Primitives/Framebuffer.h"
-
 #include <map>
+
+#include "OGLCommon.h"
+
+#include "core/primitives/Framebuffer.h"
 
 class OpenGLImp;
 class OGLTexture;

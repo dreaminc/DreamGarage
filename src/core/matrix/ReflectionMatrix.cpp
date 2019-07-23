@@ -1,8 +1,8 @@
 #include "ReflectionMatrix.h"
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
-#include "Primitives/plane.h"
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
+#include "core/primitives/plane.h"
 
 ReflectionMatrix::ReflectionMatrix(point pt, vector vNormal) {
 

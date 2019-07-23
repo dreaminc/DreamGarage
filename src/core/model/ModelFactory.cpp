@@ -2,26 +2,26 @@
 
 #include "Sandbox/PathManager.h"
 
-#include "DreamOS.h"
-
-// Add assimp
-
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
-#include "assimp/color4.h"
-
-#include "model.h"
-#include "HAL/HALImp.h"
-
-#include "Core/Utilities.h"
+#include "os/DreamOS.h"
 
 #include <vector>
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
-#include "Primitives/Vertex.h"
-#include "Primitives/color.h"
+// Add assimp
+// TODO: Is this enough?
+#include "third_party/assimp/3.3.1/include/assimp/Importer.hpp"
+#include "third_party/assimp/3.3.1/include/assimp/scene.h"
+#include "third_party/assimp/3.3.1/include/assimp/postprocess.h"
+#include "third_party/assimp/3.3.1/include/assimp/color4.h"
+
+#include "core/model/model.h"
+#include "hal/HALImp.h"
+
+#include "core/Utilities.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
+#include "core/primitives/Vertex.h"
+#include "core/primitives/color.h"
 
 std::vector<texture*> MakeTexturesFromAssetImporterMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiTextureType textureType, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
 	RESULT r = R_PASS;

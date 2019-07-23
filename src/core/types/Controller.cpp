@@ -1,5 +1,8 @@
 #include "Controller.h"
-#include "CloudMessage.h"
+
+// TODO: uhm - maybe not? maybe cloud controller needed?
+// maybe should generalize to message which is also in core?
+#include "cloud/CloudMessage.h"
 
 ControllerMethod::ControllerMethod() :
 	m_strMethodName(),

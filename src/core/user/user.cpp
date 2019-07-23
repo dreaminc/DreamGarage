@@ -1,18 +1,22 @@
 #include "user.h"
 
-#include "Primitives/quad.h"
-#include "Primitives/model/model.h"
-#include "Primitives/font.h"
-#include "Primitives/hand/hand.h"
+#include "os/DreamOS.h"
 
-#include "Cloud/HTTP/HTTPController.h"
+#include "core/primitives/quad.h"
 
-#include "Core/Utilities.h"
-#include "Sandbox/CommandLineManager.h"
-#include "DreamOS.h"
+#include "core/Utilities.h"
 
-#include "InteractionEngine/AnimationCurve.h"
-#include "InteractionEngine/AnimationItem.h"
+#include "core/model/model.h"
+
+#include "core/text/font.h"
+#include "core/hand/hand.h"
+
+#include "cloud/HTTP/HTTPController.h"
+
+#include "sandbox/CommandLineManager.h"
+
+#include "module/AnimationEngine/AnimationCurve.h"
+#include "module/AnimationEngine/AnimationItem.h"
 
 #include "Sandbox/PathManager.h"
 

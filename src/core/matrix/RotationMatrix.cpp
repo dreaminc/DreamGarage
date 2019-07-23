@@ -1,6 +1,6 @@
 #include "RotationMatrix.h"
 
-#include "Primitives/ray.h"
+#include "core/primitives/ray.h"
 
 RotationMatrix::RotationMatrix() :
 	m_type(ARBITRARY_AXIS)

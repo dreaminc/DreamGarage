@@ -1,9 +1,9 @@
 #include "model.h"
 
-#include "DreamOS.h"
-#include "HAL/HALImp.h"
+#include "os/DreamOS.h"
+#include "hal/HALImp.h"
 
-#include "Sandbox/PathManager.h"
+#include "sandbox/PathManager.h"
 
 model::model(HALImp *pParentImp) :
 	composite(pParentImp),

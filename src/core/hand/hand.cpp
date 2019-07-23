@@ -1,16 +1,24 @@
 #include "hand.h"
-#include "Sense/SenseLeapMotionHand.h"
-#include "Primitives/sphere.h"
-#include "Primitives/model/model.h"
-#include "Primitives/DimObj.h"
-#include "Primitives/model/mesh.h"
-#include "DreamOS.h"
-#include "InteractionEngine/AnimationItem.h"
-#include "Core/Utilities.h"
 
-#include "DreamGarage/UICommon.h"
+#include "os/DreamOS.h"
 
-#include "Sandbox/PathManager.h"
+#include "core/Utilities.h"
+
+#include "core/model/model.h"
+#include "core/model/mesh.h"
+
+#include "core/primitives/sphere.h"
+
+#include "core/dimension/DimObj.h"
+
+// TODO: Why is this here
+#include "ui/UICommon.h"
+
+#include "module/AnimationEngine/AnimationItem.h"
+
+#include "sense/SenseLeapMotionHand.h"
+
+#include "sandbox/PathManager.h"
 
 hand::hand(HALImp* pHALImp, HAND_TYPE type) :
 	composite(pHALImp)
@@ -109,7 +117,7 @@ RESULT hand::LoadHandModel() {
 		m_pPhantomModel = MakeModel(wstrModel);
 
 		if (m_pDreamOS != nullptr) {
-			m_pDreamOS->AddObject(m_pPhantomModel.get(), SandboxApp::PipelineType::AUX);
+			m_pDreamOS->AddObject(m_pPhantomModel.get(), Sandbox::PipelineType::AUX);
 		}
 
 		vector vLeftHandOffset = vector(0.0f, (float)(M_PI), (float)(M_PI_2));
@@ -125,7 +133,7 @@ RESULT hand::LoadHandModel() {
 		m_pPhantomModel = MakeModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
 		
 		if (m_pDreamOS != nullptr) {
-			m_pDreamOS->AddObject(m_pPhantomModel.get(), SandboxApp::PipelineType::AUX);
+			m_pDreamOS->AddObject(m_pPhantomModel.get(), Sandbox::PipelineType::AUX);
 		}
 
 		vector vRightHandOffset = vector(0.0f, (float)(M_PI), (float)(-M_PI_2));

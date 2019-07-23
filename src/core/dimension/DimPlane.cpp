@@ -1,6 +1,6 @@
 #include "DimPlane.h"
 
-#include "PhysicsEngine/CollisionManifold.h"
+#include "module/PhysicsEngine/CollisionManifold.h"
 
 DimPlane::DimPlane(point ptOrigin, vector vNormal) :
 	plane(ptOrigin, vNormal)
@@ -13,7 +13,7 @@ DimPlane::DimPlane(point ptOrigin, vector vNormal) :
 	//TODO: BoundingPlane
 	CR(InitializeBoundingPlane(GetOrigin(), GetNormal()));
 
-	//Success:
+Success:
 	Validate();
 	return;
 Error:

@@ -1,14 +1,13 @@
 #include "DimObj.h"
 
-#include "BoundingBox.h"
-#include "BoundingSphere.h"
-#include "BoundingQuad.h"
-#include "BoundingPlane.h"
+#include "core/bounding/BoundingBox.h"
+#include "core/bounding/BoundingSphere.h"
+#include "core/bounding/BoundingQuad.h"
+#include "core/bounding/BoundingPlane.h"
 
-#include "PhysicsEngine/CollisionManifold.h"
+#include "module/PhysicsEngine/CollisionManifold.h"
 
-//#include "FlatContext.h"
-#include "Primitives/FlatContext.h"
+#include "core/primitives/FlatContext.h"
 
 DimObj::DimObj() :
 	VirtualObj(),	// velocity, origin

@@ -1,10 +1,11 @@
 #ifndef CONTACT_POINT_H_
 #define CONTACT_POINT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/PhysicsEngine/ContactPoint.h
+// Dream Physics Engine Module
+// dos/src/module/PhysicsEngine/ContactPoint.h
+
 // A contact point represents a point of contact in a given collision
 
 // Generally a collision will actually have numerous contact points given 
@@ -14,8 +15,8 @@
 // In the future, to further improve the engine we might want to explore different
 // contact topologies (like lines, ellipses etc)
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
 
 class ContactPoint {
 public:

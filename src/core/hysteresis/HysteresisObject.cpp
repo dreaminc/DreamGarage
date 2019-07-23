@@ -1,5 +1,6 @@
 #include "HysteresisObject.h"
-#include "sphere.h"
+
+#include "core/primitives/sphere.h"
 
 HysteresisEvent::HysteresisEvent(HysteresisEventType eventType, VirtualObj *eventObject) :
 	m_eventType(eventType),

@@ -1,12 +1,15 @@
 #ifndef ANIMATION_STATE_H_
 #define ANIMATION_STATE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-#include "Primitives/color.h"
-#include "Primitives/point.h"
-#include "Primitives/quaternion.h"
-#include "Primitives/vector.h"
+// Dream Animation Engine
+// dos/src/module/AnimationEngine/AnimationState.h
+
+#include "core/primitives/color.h"
+#include "core/primitives/point.h"
+#include "core/primitives/quaternion.h"
+#include "core/primitives/vector.h"
 
 class DimObj;
 

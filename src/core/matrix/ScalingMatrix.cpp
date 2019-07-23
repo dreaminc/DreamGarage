@@ -1,5 +1,6 @@
 #include "ScalingMatrix.h"
-#include "Primitives/vector.h"
+
+#include "core/primitives/vector.h"
 
 ScalingMatrix::ScalingMatrix(vector vScale) {
 	this->clear();

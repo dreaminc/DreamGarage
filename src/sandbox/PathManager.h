@@ -1,25 +1,26 @@
 #ifndef PATH_MANAGER_H_
 #define PATH_MANAGER_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/Types/UID.h"
-#include "Primitives/valid.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sandbox/PathManager.h
+// Dream Sandbox (Path Manager)
+// dos/src/sandbox/PathManager.h
+
 // Dream OS Sandbox path manager - this class effectively manages the given paths of the Sandbox
 // and ultimately may or may not be used for the native implementation
+
+#include <list>
+#include <map>
+#include <vector>
+
+#include "core/types/version.h"
+#include "core/types/DObject.h""
 
 // This should be used to scrape Dream OS path
 #define DREAM_OS_PATH_ENV "DREAMOSPATH"
 #define DREAM_OS_PATHS_FILE "dreampaths.txt"	// TODO: Rename?
 #define DREAM_OS_PATH_ROOT "dreamos"
 #define DREAM_OS_PATH_WROOT L"dreamos"
-
-#include <list>
-#include <map>
-#include <vector>
-#include "Primitives/version.h"
 
 class PathManagerFactory;
 
@@ -56,7 +57,7 @@ typedef enum {
 
 class DreamOS;
 
-class PathManager : public valid {
+class PathManager : public DObject {
 	friend class PathManagerFactory;
 
 	const wchar_t *m_cszPathValues[PATH_INVALID] = {
@@ -155,7 +156,6 @@ public:
 	FILE* OpenFile(PATH_VALUE_TYPE type, wchar_t* pszFile, wchar_t* pszMode);
 
 private:
-	UID m_uid;
 	std::map<PATH_VALUE_TYPE, wchar_t*> *m_pmapNVPPaths;
 
 protected:

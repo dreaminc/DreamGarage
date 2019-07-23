@@ -1,13 +1,14 @@
 #include "FlatContext.h"
-#include "HAL/HALImp.h"
 
-#include "Primitives/text.h"
-#include "Primitives/framebuffer.h"
+#include "hal/HALImp.h"
 
-#include "Primitives/BoundingQuad.h"
+#include "core/text/text.h"
+#include "core/primitives/framebuffer.h"
 
-// cheating
-#include "HAL/opengl/OGLFramebuffer.h"
+#include "core/bounding/BoundingQuad.h"
+
+// TODO: This is cheating, this won't be portable
+#include "hal/ogl/OGLFramebuffer.h"
 
 FlatContext::FlatContext(HALImp * pHALImp) :
 	composite(pHALImp)

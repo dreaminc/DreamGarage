@@ -9,7 +9,7 @@
 #include "module/AnimationEngine/AnimationQueue.h"
 #include "module/PhysicsEngine/CollisionManifold.h"
 
-InteractionEngine::InteractionEngine(SandboxApp *pSandbox) :
+InteractionEngine::InteractionEngine(Sandbox *pSandbox) :
 	m_pSandbox(pSandbox)
 {
 	// empty
@@ -94,7 +94,7 @@ Error:
 	return r;
 }
 
-std::unique_ptr<InteractionEngine> InteractionEngine::MakeEngine(SandboxApp *pSandbox) {
+std::unique_ptr<InteractionEngine> InteractionEngine::MakeEngine(Sandbox *pSandbox) {
 	RESULT r = R_PASS;
 
 	CN(pSandbox);
@@ -493,7 +493,7 @@ VirtualObj* InteractionEngine::FindInteractionObject(VirtualObj *pInteractionObj
 	return nullptr;
 }
 
-// TODO: not quite true to the name of the function, this only sets intersection but won't un intersect
+// TODO: not quite true to the name of the function, this only sets intersection but won't un-intersect
 InteractionEventType InteractionEngine::UpdateActiveObject(ActiveObject::type activeObjectType, VirtualObj *pInteractionObject, CollisionManifold manifold, VirtualObj *pEventObject) {
 	RESULT r = R_PASS;
 

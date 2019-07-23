@@ -3,6 +3,9 @@
 
 #include "core/ehm/EHM.h"
 
+// Dream Core
+// dos/src/core/image/FreeImageObj.h
+
 // Logging is redefining macros due to CEF, Logging++ and WebRTC
 // When we solve logging we need to solve this too
 #pragma warning( disable : 4005)

@@ -1,12 +1,17 @@
 #include "ObjectState.h"
-#include "ObjectDerivative.h"
-#include "PhysicsEngine/ForceGenerator.h"
 
-#include "DimObj.h"
-#include "BoundingVolume.h"
-#include "BoundingBox.h"
-#include "BoundingSphere.h"
-#include "BoundingQuad.h"
+#include "ObjectDerivative.h"
+
+#include "module/PhysicsEngine/ForceGenerator.h"
+
+#include "core/dimension/DimObj.h"
+
+#include "core/bounding/BoundingVolume.h"
+
+// TODO: This should not be needed, should be covered by the bounding volume class!
+#include "core/bounding/BoundingBox.h"
+#include "core/bounding/BoundingSphere.h"
+#include "core/bounding/BoundingQuad.h"
 
 ObjectState::ObjectState(VirtualObj *pParentObj) :
 	m_pParentObj(pParentObj),

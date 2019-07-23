@@ -1,11 +1,14 @@
 #include "BoundingQuad.h"
+
+#include <algorithm>
+
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
 #include "BoundingPlane.h"
-#include <algorithm>
 
-#include "VirtualObj.h"
-#include "PhysicsEngine/CollisionManifold.h"
+#include "core/primitives/VirtualObj.h"
+
+#include "module/PhysicsEngine/CollisionManifold.h"
 
 BoundingQuad::BoundingQuad(VirtualObj *pParentObject) :
 	BoundingVolume(pParentObject),

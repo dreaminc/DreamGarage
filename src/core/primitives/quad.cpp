@@ -1,6 +1,8 @@
 #include "quad.h"
-#include "BoundingQuad.h"
+
 #include "plane.h"
+
+#include "core/bounding/BoundingQuad.h"
 
 // copy ctor
 quad::quad(quad& q) :

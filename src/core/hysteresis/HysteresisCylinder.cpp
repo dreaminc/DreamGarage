@@ -1,5 +1,6 @@
 #include "HysteresisCylinder.h"
-#include "sphere.h"
+
+#include "core/primitives/sphere.h"
 
 HysteresisCylinder::HysteresisCylinder(float onThreshold, float offThreshold) : 
 	HysteresisObject(onThreshold,offThreshold)

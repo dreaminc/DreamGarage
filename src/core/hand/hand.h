@@ -3,21 +3,20 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/hand/hand.h
+// Dream Core
+// dos/src/core/hand/hand.h
 
-#include "Primitives/composite.h"
+#include <memory>
+#include "xstring"                 // for wstring
+
+#include "core/primitives/composite.h"
+#include "core/primitives/point.h"      // for point
 
 // TODO: Revisit Leap support
 //#include "Leap.h" 
 
 #include "HandType.h"
 #include "HandState.h"
-
-#include <memory>
-#include "Primitives/point.h"      // for point
-#include "core/ehm/RESULT.h"         // for RESULT
-#include "xstring"                 // for wstring
 
 class DreamOS;
 class HALImp;

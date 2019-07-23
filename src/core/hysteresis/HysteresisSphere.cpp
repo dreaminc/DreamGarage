@@ -1,10 +1,11 @@
 #include "HysteresisSphere.h"
-#include "sphere.h"
+
+#include "core/primitives/sphere.h"
 
 HysteresisSphere::HysteresisSphere(float onThreshold, float offThreshold) : 
 	HysteresisObject(onThreshold,offThreshold)
 {
-
+	// empty
 }
 
 HysteresisSphere::HysteresisSphere() {

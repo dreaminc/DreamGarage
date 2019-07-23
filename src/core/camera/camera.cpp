@@ -1,22 +1,23 @@
 #include "camera.h"
 
+#include "stdint.h"                              // for uint8_t
+
+#include "core/primitives/VirtualObj.h"               // for VirtualObj
+#include "core/primitives/composite.h"
+#include "core/primitives/point.h"                    // for point
+#include "core/primitives/quaternion.h"               // for quaternion
+#include "core/primitives/ray.h"                      // for ray
+#include "core/primitives/vector.h"								// for vector
+
+#include "core/matrix/ProjectionMatrix.h"  // for ::PROJECTION_MATRIX_PERSPECTIVE, DEFAULT_FAR_PLANE, DEFAULT_NEAR_PLANE, ProjectionMatrix
+#include "core/matrix/RotationMatrix.h"    // for RotationMatrix
+#include "core/matrix/ViewMatrix.h"        // for ViewMatrix
+
+#include "sense/SenseKeyboard.h"
+
 #define DEFAULT_CAMERA_ROTATE_SPEED 0.002f
 #define DEFAULT_CAMERA_MOVE_SPEED 2.0f
 #define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_PERSPECTIVE
-
-#include "matrix/ProjectionMatrix.h"  // for ::PROJECTION_MATRIX_PERSPECTIVE, DEFAULT_FAR_PLANE, DEFAULT_NEAR_PLANE, ProjectionMatrix
-#include "matrix/RotationMatrix.h"    // for RotationMatrix
-#include "matrix/ViewMatrix.h"        // for ViewMatrix
-#include "point.h"                    // for point
-#include "quaternion.h"               // for quaternion
-#include "ray.h"                      // for ray
-#include "core/ehm/EHM.h"                          // for CN, CR, DEBUG_LINEOUT
-#include "stdint.h"                              // for uint8_t
-#include "vector.h"                   // for vector
-#include "VirtualObj.h"               // for VirtualObj
-
-#include "Sense/SenseKeyboard.h"
-#include "Primitives/composite.h"
 
 camera::camera(point ptOrigin, viewport cameraVieport) :
 	VirtualObj(ptOrigin),

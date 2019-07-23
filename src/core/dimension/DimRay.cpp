@@ -1,8 +1,9 @@
 #include "DimRay.h"
-#include "quaternion.h"
-#include "volume.h"
 
-#include "PhysicsEngine/CollisionManifold.h"
+#include "core/primitives/quaternion.h"
+#include "core/primitives/volume.h"
+
+#include "module/PhysicsEngine/CollisionManifold.h"
 
 DimRay::DimRay(point ptOrigin, vector vDirection) :
 	ray(ptOrigin, vDirection)

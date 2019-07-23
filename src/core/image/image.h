@@ -3,15 +3,17 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/image/image.h
+// Dream Core
+// dos/src/core/image/image.h
+
 // Base type for image which represents an array
 // of pixels 
 
-#include "Primitives/DObject.h"
-#include "Primitives/color.h"
-
 #include <string>
+
+#include "core/types/DObject.h"
+#include "core/primitives/color.h"
+
 
 class image : public DObject {
 public:

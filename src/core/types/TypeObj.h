@@ -25,15 +25,8 @@ protected:
     TYPE_OBJ m_type;
 
 public:
-    TypeObj(TYPE_OBJ type) :
-        m_type(type)
-    {
-        /* empty stub */
-    }
-
-    ~TypeObj() {
-        ACR(Dealloc());
-    }
+	TypeObj(TYPE_OBJ type);
+	~TypeObj();
 
 private:
 	virtual RESULT Dealloc() {

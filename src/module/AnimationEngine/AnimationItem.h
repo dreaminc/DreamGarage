@@ -1,15 +1,19 @@
 #ifndef ANIMATION_ITEM_H_
 #define ANIMATION_ITEM_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/valid.h"
-#include "Primitives/dirty.h"
+#include "core/ehm/EHM.h"
 
-#include "AnimationState.h"
-#include "AnimationCurve.h"
+// Dream Animation Engine
+// dos/src/module/AnimationEngine/AnimationItem.h
 
 #include <memory>
 #include <functional>
+
+#include "core/types/DObject.h"
+#include "core/types/dirty.h"
+
+#include "AnimationState.h"
+#include "AnimationCurve.h"
 
 class DimObj;
 
@@ -25,7 +29,7 @@ struct AnimationFlags {
 
 };
 
-class AnimationItem : public valid, public dirty {
+class AnimationItem : public DObject, public dirty {
 public:
 
 public:
