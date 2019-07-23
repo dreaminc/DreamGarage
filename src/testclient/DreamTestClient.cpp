@@ -194,7 +194,7 @@ version DreamTestClient::GetDreamVersion() {
 	return version("0.0.0");		// This is... a placeholder?
 }
 
-RESULT DreamTestClient::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) {
+RESULT DreamTestClient::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, Sandbox::PipelineType pipelineType) {
 	return R_NOT_IMPLEMENTED;
 }
 
