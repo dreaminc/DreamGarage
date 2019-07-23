@@ -1,10 +1,11 @@
 #ifndef HTTP_COMMON_H_
 #define HTTP_COMMON_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/HTTP/HTTPCommon.h
+// Dream Cloud HTTP
+// dos/src/cloud/HTTP/HTTPCommon.h
+
 // Common HTTP Decelerations for the HTTP controller and associated objects
 
 #include <functional>

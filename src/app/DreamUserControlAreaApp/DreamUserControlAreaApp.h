@@ -1,16 +1,24 @@
 #ifndef DREAM_USER_CONTROL_AREA_H_
 #define DREAM_USER_CONTROL_AREA_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-#include "DreamApp.h"
-#include "DreamGarage/UserAreaControls.h"
-#include "DreamGarage/DreamBrowser.h"
-#include "Primitives/Subscriber.h"
-#include "DreamVCam.h"
+// Dream User Control Area App
+// dos/src/app/DreamUserControlAreaApp/DreamUserControlAreaApp.h
 
 #include <vector>
 #include <map>
+
+#include "app/DreamApp.h"
+
+// TODO: wtf is this in garage?
+#include "garage/UserAreaControls.h"
+
+#include "core/types/Subscriber.h"
+
+// TODO: Neither of these should be here!
+#include "app/DreamBrowserApp/DreamBrowserApp.h"
+#include "app/DreamVCamApp/DreamVCamApp.h"
 
 class DreamUserApp;
 class UIControlView;

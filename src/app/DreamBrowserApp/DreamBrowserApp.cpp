@@ -1,33 +1,33 @@
-#include "DreamBrowser.h"
-//#include "DreamControlView/UIControlView.h"
-#include "DreamShareView/DreamShareView.h"
-#include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamFormApp.h"
-#include "DreamOS.h"
-#include "Core/Utilities.h"
+#include "DreamBrowserApp.h"
 
-#include "PhysicsEngine/CollisionManifold.h"
-
-#include "InteractionEngine/AnimationItem.h"
-
-#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
-#include "WebBrowser/WebBrowserController.h"
-
-#include "Cloud/Environment/EnvironmentAsset.h"
-
-#include "Cloud/WebRequest.h"
-
-#include "WebBrowser/DOMNode.h"
-#include "Sound/AudioPacket.h"
-
-#include "Core/Utilities.h"
-
-#include "Sound/SoundBuffer.h"
-#include "HAL\opengl\OGLTexture.h"	// necessary for the dynamic cast to enable PBO
-
-#include "Cloud/HTTP/HTTPCommon.h"
+// TODO: Should this be necessary?
+#include "os/DreamOS.h"
 
 #include <thread>
+
+// TODO: Get rid of these
+#include "app/DreamShareViewApp/DreamShareViewApp.h"
+#include "app/DreamUserControlAreaApp/DreamUserControlAreaApp.h"
+#include "app/DreamFormApp/DreamFormApp.h"
+
+#include "core/Utilities.h"
+
+#include "module/PhysicsEngine/CollisionManifold.h"
+#include "module/AnimationEngine/AnimationItem.h"
+
+#include "webbrowser/CEFBrowser/CEFBrowserManager.h"
+#include "webbrowser/WebBrowserController.h"
+#include "webbrowser/DOMNode.h"
+
+#include "cloud/HTTP/HTTPCommon.h"
+#include "cloud/WebRequest.h"
+#include "cloud/Environment/EnvironmentAsset.h"
+
+#include "sound/AudioPacket.h"
+#include "sound/SoundBuffer.h"
+
+// TODO: Should just be texture
+#include "hal\opengl\OGLTexture.h"	// necessary for the dynamic cast to enable PBO
 
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamBrowser>(pDreamOS, pContext)

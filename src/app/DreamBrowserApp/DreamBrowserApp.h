@@ -1,37 +1,40 @@
 #ifndef DREAM_BROWSER_VIEW_H_
 #define DREAM_BROWSER_VIEW_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/DreamGarage/DreamApp.h
+// Dream Browser App
+// dos/src/app/DreamBrowserApp/DreamBrowserApp.h
+
 // The Dream Content view is a rudimentary Dream application 
 // that effectively is a single quad that can load / present 
 // content of various formats 
 
-#include "DreamApp.h"
-#include "DreamAppHandle.h"
-
-#include "Primitives/Subscriber.h"
-#include "InteractionEngine/InteractionObjectEvent.h"
-#include "Cloud/Environment/EnvironmentAsset.h"
-
 #include <map>
 #include <vector>
 
-#include "WebBrowser/WebBrowserController.h"
+#include "app/DreamApp.h"
+#include "app/DreamAppHandle.h"
 
-#include "Sense/SenseController.h"
+#include "core/types/Subscriber.h"
+#include "module/InteractionEngine/InteractionObjectEvent.h"
 
-#include "Primitives/TextEntryString.h"
+#include "cloud/Environment/EnvironmentAsset.h"
 
-#include "DreamVideoStreamSubscriber.h"
+#include "webbrowser/WebBrowserController.h"
 
-#include "DreamUserControlArea/DreamContentSource.h"
+#include "sense/SenseController.h"
 
-#include "Sound/SoundCommon.h"
+#include "core/text/TextEntryString.h"
 
-#include "DreamGarage/UICommon.h"
+#include "os/DreamVideoStreamSubscriber.h"
+
+#include "app/DreamUserControlAreaApp/DreamContentSource.h"
+#include "app/DreamShareViewApp/DreamShareViewShareMessage.h"
+
+#include "sound/SoundCommon.h"
+
+#include "ui/UICommon.h"
 
 #define DEFAULT_SCROLL_FACTOR 5
 
@@ -48,7 +51,6 @@ class DreamUserControlArea;
 class AudioPacket;
 class SoundBuffer;
 
-#include "DreamShareViewShareMessage.h"
 
 // TODO: Move to the standard DreamBrowser::observer arch
 class DreamBrowserObserver {

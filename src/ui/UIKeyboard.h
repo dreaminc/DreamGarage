@@ -1,18 +1,31 @@
 #ifndef UI_KEYBOARD_H_
 #define UI_KEYBOARD_H_
 
-#include "DreamApp.h"
-#include "DreamAppHandle.h"
-#include "Primitives/TextEntryString.h"
-#include "Primitives/Publisher.h"
-#include "Sense/SenseKeyboard.h"
+#include "core/ehm/EHM.h"
 
-#include "UI/UIKeyboardLayout.h"
-#include "DreamUserApp.h"
-#include "DreamUserControlArea/DreamUserControlArea.h"
+// TODO: Move this into app
+// TODO: System level "apps" or convert this into a system module
+
+// Dream Keyboard
+// dos/src/ui/UIKeyboard.h
 
 #include <vector>
 #include <string>
+
+#include "ui/UIKeyboardLayout.h"
+
+#include "app/DreamApp.h"
+#include "app/DreamAppHandle.h"
+
+#include "core/text/TextEntryString.h"
+
+#include "core/types/Publisher.h"
+
+#include "sense/SenseKeyboard.h"
+
+// TODO: Neither of these should be here
+#include "app/DreamUserApp/DreamUserApp.h"
+#include "app/DreamUserControlAreaApp/DreamUserControlAreaApp.h"
 
 #define SURFACE_WIDTH 0.75 // surface is a quad that holds the entire keyboard layout
 #define SURFACE_HEIGHT 0.294f // 0.25f

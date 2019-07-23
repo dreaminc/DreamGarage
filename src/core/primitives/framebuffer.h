@@ -2,18 +2,20 @@
 #define FRAMEBUFFER_H_
 
 #include "core/ehm/EHM.h"
-#include "Primitives/texture.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/framebuffer.h
-// Framebuffer Primitve
+// Dream Core
+// dos/src/core/primitives/framebuffer.h
+
+// Framebuffer Primitive
 // The parent object for the Framebuffer 
 
-#include "core/types/UID.h"
+#include "core/types/DObject.h"
+
+#include "core/primitives/texture.h"
 
 #define DEFAULT_FRAMEBUFFER_CHANNELS 3
 
-class framebuffer {
+class framebuffer : public DObject {
 public:
 	framebuffer();
 	framebuffer(int width, int height, int channels);
@@ -31,12 +33,6 @@ protected:
 	int m_width;
 	int m_height;
 	int m_channels;
-
-public:
-	UID getID() { return m_uid; }
-
-private:
-	UID m_uid;
 };
 
 #endif // ! FRAMEBUFFER_H_

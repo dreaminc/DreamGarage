@@ -1,29 +1,27 @@
 #include "CloudController.h"
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
-#include "Primitives/quaternion.h"
-
-#include "Primitives/texture.h"
-
-#include "Cloud/HTTP/HTTPController.h"
-#include "Sandbox/CommandLineManager.h"
-
-#include "Cloud/Message/Message.h"
-
-#include "User/User.h"
-#include "User/TwilioNTSInformation.h"
-
-#include "ControllerProxy.h"
-
 #include <chrono>
 #include <thread>
 
-#include "Cloud/Environment/PeerConnection.h"
+#include "core/types/ControllerProxy.h"
+#include "core/types/Message.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
+#include "core/primitives/quaternion.h"
+#include "core/primitives/texture.h"
+
+#include "cloud/HTTP/HTTPController.h"
+#include "cloud/User/User.h"
+#include "cloud/User/TwilioNTSInformation.h"
+#include "cloud/Environment/PeerConnection.h"
+
+#include "sandbox/CommandLineManager.h"
 
 #if (defined(_WIN32) || defined(_WIN64))
-#include "Sandbox/Windows/Win32Helper.h"
+	#include "sandbox/win64/Win32Helper.h"
 #else
+	// ?
 #endif
 
 CloudController::CloudController() :

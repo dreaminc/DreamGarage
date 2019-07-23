@@ -1,17 +1,19 @@
 #ifndef DREAM_CONTROL_BAR_H_
 #define DREAM_CONTROL_BAR_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-#include "UI/UIView.h"
-
-#include "DreamGarage/UICommon.h"
-
-#include "DreamUserControlArea/DreamContentSource.h"
+// Dream User Area Controls
+// dos/src/garage/UserAreaControls.h
 
 #include <map>
 
-//#include "DreamUserControlArea/DreamUserControlArea.h"
+#include "ui/UIView.h"
+#include "ui/UICommon.h"
+
+// TODO: These should all be together
+#include "app/DreamUserControlAreaApp/DreamContentSource.h"
+
 class DreamUserControlArea;
 class text;
 

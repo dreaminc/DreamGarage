@@ -1,7 +1,12 @@
 #ifndef CAPTURED_OBJ_H_
 #define CAPTURED_OBJ_H_
 
-#include "plane.h"
+// Dream Interaction Engine Module
+// dos/src/module/InteractionEngine/CapturedObj.h
+
+// Captured Object for Interaction Engine
+
+#include "core/primitives/plane.h"
 
 class VirtualObj;
 class point;

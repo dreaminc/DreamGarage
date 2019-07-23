@@ -11,13 +11,14 @@
 #include "app/DreamApp.h"
 #include "app/DreamAppHandle.h"
 
-#include "DreamVideoStreamSubscriber.h"
+#include "os/DreamVideoStreamSubscriber.h"
+
 #include "DreamShareViewShareMessage.h"
 #include "DreamShareViewPointerMessage.h"
 
 #include "app/DreamUserApp/DreamUserApp.h"
 
-#include "DreamGarage/UICommon.h"
+#include "ui/UICommon.h"
 
 class quad;
 class texture;

@@ -1,20 +1,22 @@
 #ifndef DREAM_CONTENT_VIEW_H_
 #define DREAM_CONTENT_VIEW_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/DreamGarage/DreamApp.h
+// Dream Content View App
+// dos/src/app/DreamContentViewApp/DreamContentViewApp.h
+
 // The Dream Content view is a rudimentary Dream application 
 // that effectively is a single quad that can load / present 
 // content of various formats 
 
-#include "DreamApp.h"
-#include "Primitives/Subscriber.h"
-#include "InteractionEngine/InteractionObjectEvent.h"
-
 #include <map>
 #include <vector>
+
+#include "app/DreamApp.h"
+#include "core/types/Subscriber.h"
+
+#include "module/InteractionEngine/InteractionObjectEvent.h"
 
 class quad;
 class texture;

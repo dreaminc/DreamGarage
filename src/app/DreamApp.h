@@ -114,7 +114,7 @@ struct DreamAppBaseCompare {
 };
 
 template<class derivedAppType>
-class DreamApp : public DreamAppBase, public valid {
+class DreamApp : public DreamAppBase {
 	enum class UPDATE_MODEL {
 		UPDATE_ON_SIGNAL,
 		UPDATE_ON_FRAME,

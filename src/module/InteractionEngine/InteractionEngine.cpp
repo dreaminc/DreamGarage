@@ -1,12 +1,13 @@
 #include "InteractionEngine.h"
-#include "Sandbox/SandboxApp.h"
 
-#include "Scene/ObjectStore.h"
-#include "AnimationQueue.h"
+#include "core/primitives/color.h"
 
-#include "PhysicsEngine/CollisionManifold.h"
+#include "sandbox/Sandbox.h"
 
-#include "Primitives/color.h"
+#include "scene/ObjectStore.h"
+
+#include "module/AnimationEngine/AnimationQueue.h"
+#include "module/PhysicsEngine/CollisionManifold.h"
 
 InteractionEngine::InteractionEngine(SandboxApp *pSandbox) :
 	m_pSandbox(pSandbox)

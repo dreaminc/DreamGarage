@@ -1,33 +1,33 @@
 #ifndef INTERACTION_ENGINE_H_
 #define INTERACTION_ENGINE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // Dream Interaction Engine
+// dos/src/module/InteractionEngine/InteractionEngine.h
+
 // This class combines the various components required for a
 // functional interaction engine, such as collision detection and resolution as well
 // as integration of animation and the relevant queue
 
 #include <memory>
-
-#include "Primitives/Types/UID.h"
-#include "Primitives/valid.h"
-
-#include "Primitives/Subscriber.h"
-#include "Sense/SenseController.h"
-#include "Sense/SenseMouse.h"
-#include "Sense/SenseKeyboard.h"
-
 #include <vector>
 #include <functional>
-
-#include "InteractionObjectEvent.h"
-#include "ActiveObject.h"
-#include "ActiveObjectQueue.h"
 #include <chrono>
 
-#include "Primitives/Multipublisher.h"
-#include "Primitives/CapturedObj.h"
+#include "core/types/UID.h"
+#include "core/types/valid.h"
+#include "core/types/Subscriber.h"
+#include "core/types/Multipublisher.h"
+
+#include "sense/SenseController.h"
+#include "sense/SenseMouse.h"
+#include "sense/SenseKeyboard.h"
+
+#include "InteractionObjectEvent.h"
+#include "CapturedObj.h"
+#include "ActiveObject.h"
+#include "ActiveObjectQueue.h"
 
 #define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.005f
 #define FRAME_MS (1000.0/90.0)

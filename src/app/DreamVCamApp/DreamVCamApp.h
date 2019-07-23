@@ -1,20 +1,25 @@
 #ifndef DREAM_VCAM_SYSTEM_H_
 #define DREAM_VCAM_SYSTEM_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamVCam.h
+// Dream VCam App
+// dos/src/app/DreamVCamApp/DreamVCamApp.h
+
+// TODO: This is a module!!
 // The Dream Virtual Camera Module
-
-#include "DreamModule.h"
-#include "DreamUserControlArea/DreamContentSource.h"
-#include "Sandbox/NamedPipeServer.h"
-#include "DreamGarage/DreamGamepadCameraApp.h"
-#include "DreamVideoStreamSubscriber.h"
 
 #include <memory>
 #include <chrono>
+
+#include "module/DreamModule.h"
+
+#include "sandbox/NamedPipeServer.h"
+
+#include "app/DreamUserControlAreaApp/DreamContentSource.h"
+#include "app/DreamGamepadCameraApp/DreamGamepadCameraApp.h"
+
+#include "os/DreamVideoStreamSubscriber.h"
 
 class SpatialSoundObject;
 class SoundFile;

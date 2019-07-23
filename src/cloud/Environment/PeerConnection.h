@@ -1,19 +1,20 @@
 #ifndef PEER_CONNECTION_H_
 #define PEER_CONNECTION_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/Environment/EnvironmentPeer.h
+// Dream Cloud Peer Connection
+// dos/src/cloud/Environment/PeerConnection.h
+
 // Environment Peer Object
 
 #include <string>
 #include <vector>
 
 // TODO: This may result in cyclic dependency so might need to move it
-#include "Cloud/webrtc/WebRTCPeerConnection.h"
+#include "cloud/webrtc/WebRTCPeerConnection.h"
 
-#include "json.hpp"
+#include "third_party/json/include/json.hpp"
 
 class PeerConnection {
 public:

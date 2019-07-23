@@ -1,13 +1,10 @@
 #ifndef HTTP_CONTROLLER_H_
 #define HTTP_CONTROLLER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/Objects/User.h
-// Base User object
-
-#include "curl/curl.h"
+// Dream Cloud HTTP
+// dos/src/cloud/HTTP/HTTPController.h
 
 #include <string>
 #include <vector>
@@ -16,10 +13,13 @@
 #include <list>
 #include <memory>
 
+// TODO: move into CMake config unless this breaks the build anyways
+#include "third_party/libcurl/curl-7.49.1/include/curl/curl.h"
+
 #include "HTTPResponse.h"
 #include "HTTPRequest.h"
 
-#include "Cloud/ControllerProxy.h"
+#include "core/types/ControllerProxy.h"
 
 #define HTTP_DELAY_SECONDS 5
 

@@ -1,19 +1,23 @@
 #ifndef MENU_NODE_H_
 #define MENU_NODE_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/dirty.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/Menu/MenuNode.h
+// TODO: Menu should not be hard coded like this
+// Dream Cloud 
+// dos/src/cloud/Menu/MenuNode.h
+
 // Menu Node Object
 
 #include <string>
 #include <vector>
 
-#include "json.hpp"
-#include "Primitives/texture.h"
-#include "UI/UIButton.h"
+#include "core/types/dirty.h"
+#include "core/primitives/texture.h"
+
+#include "ui/UIButton.h"
+
+#include "third_party/json/include/json.hpp"
 
 class MenuNode : public dirty {
 public:

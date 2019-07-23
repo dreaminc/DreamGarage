@@ -1,16 +1,18 @@
 #ifndef HTTP_RESPONSE_H_
 #define HTTP_RESPONSE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/HTTP/HTTPResponse.h
+// Dream Cloud HTTP
+// dos/src/cloud/HTTP/HTTPResponse.h
+
 // HTTP Response object
-
-#include "curl/curl.h"
 
 #include <string>
 #include <functional>
+
+// TODO: move into CMake config unless this breaks the build anyways
+#include "third_party/libcurl/curl-7.49.1/include/curl/curl.h"
 
 class HTTPResponse {
 	friend class HTTPController;

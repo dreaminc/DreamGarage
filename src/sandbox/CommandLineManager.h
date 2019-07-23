@@ -1,9 +1,8 @@
 #ifndef COMMAND_LINE_MANAGER_H_
 #define COMMAND_LINE_MANAGER_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/Types/UID.h"
-#include "Primitives/valid.h"
+#include "core/ehm/EHM.h"
+
 
 // DREAM OS
 // DreamOS/Sandbox/CommandLineManager.h
@@ -14,7 +13,9 @@
 #include <vector>
 #include <functional>
 
-class CommandLineManager : public valid {
+#include "core/types/DObject.h"
+
+class CommandLineManager : public DObject {
 private:
 	CommandLineManager();
 	~CommandLineManager();
@@ -49,8 +50,6 @@ private:
 	std::vector<std::string> m_strCommandLineArguments;
 	
 	std::map<std::string, RegisteredParameter> m_mapRegisteredParams;	// This holds the registered params
-	
-	UID m_uid;
 
 	// TODO: Replace with Singleton pattern / manager
 	// Singleton Usage

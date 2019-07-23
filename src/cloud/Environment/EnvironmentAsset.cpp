@@ -62,12 +62,10 @@ EnvironmentAsset::EnvironmentAsset(nlohmann::json jsonMenuNode) {
 	*/
 }
 
-//EnvironmentAsset::EnvironmentAsset(long m_assetID, MenuNode::MimeType mimeType, std::string strPath, std::string strStorageProviderScope, std::string strTitle) :
 EnvironmentAsset::EnvironmentAsset(long m_assetID, std::string strPath, std::string strStorageProviderScope, std::string strTitle) :
 	m_strPath(strPath),
 	m_strStorageProviderScope(strStorageProviderScope),
 	m_strTitle(strTitle)
-	//m_mimeType(mimeType)
 {
 	// empty
 }
@@ -77,17 +75,10 @@ RESULT EnvironmentAsset::PrintEnvironmentAsset() {
 	DEBUG_LINEOUT("Asset title: %s", m_strTitle.c_str());
 	DEBUG_LINEOUT("Asset path: %s", m_strPath.c_str());
 	DEBUG_LINEOUT("Asset scope: %s", m_strStorageProviderScope.c_str());
-	//DEBUG_LINEOUT("Asset MIME type: %s", MenuNode::MimeTypeString(m_mimeType).c_str());
 	DEBUG_LINEOUT("Asset ID: %d", m_assetID);
 
 	return R_PASS;
 }
-
-/*
-const MenuNode::MimeType& EnvironmentAsset::GetMIMEType() {
-	return m_mimeType;
-}
-*/
 
 const std::string& EnvironmentAsset::GetPath() {
 	return m_strPath;

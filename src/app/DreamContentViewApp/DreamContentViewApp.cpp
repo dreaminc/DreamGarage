@@ -1,8 +1,10 @@
-#include "DreamContentView.h"
-#include "DreamOS.h"
+#include "DreamContentViewApp.h"
 
-#include "Cloud/HTTP/HTTPController.h"
-#include "Cloud/Environment/EnvironmentAsset.h"
+// TODO: Do apps need DreamOS?
+#include "os/DreamOS.h"
+
+#include "cloud/HTTP/HTTPController.h"
+#include "cloud/Environment/EnvironmentAsset.h"
 
 DreamContentView::DreamContentView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamContentView>(pDreamOS, pContext)

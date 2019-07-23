@@ -1,7 +1,10 @@
 #ifndef ACTIVE_OBJECT_QUEUE_H_
 #define ACTIVE_OBJECT_QUEUE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Interaction Engine Module
+// dos/src/module/InteractionEngine/ActiveObjectQueue.h
 
 // The Active Object Queue
 

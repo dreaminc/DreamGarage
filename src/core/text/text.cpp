@@ -1,16 +1,18 @@
 #include "text.h"
-#include "quad.h"
+
 #include <vector>
 #include <algorithm>
 #include <cctype>
 
 #include "font.h"
-#include "HAL/HALImp.h"
-#include "Framebuffer.h"
+#include "ui/UIKeyboardLayout.h"
 
-#include "UI/UIKeyboardLayout.h"
+#include "core/primitives/quad.h"
+#include "core/primitives/Framebuffer.h"
 
-#include "Core/Utilities.h"
+#include "core/Utilities.h"
+
+#include "hal/HALImp.h"
 
 text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, text::flags textFlags) :
 	FlatContext(pHALImp),

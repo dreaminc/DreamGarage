@@ -1,15 +1,22 @@
 #ifndef UI_VIEW_H_
 #define UI_VIEW_H_
 
-#include "Primitives/Publisher.h"
-#include "Primitives/Subscriber.h"
+#include "core/ehm/EHM.h"
 
-#include "InteractionEngine/InteractionEngine.h"
-#include "InteractionEngine/InteractionObjectEvent.h"
+// Dream UI
+// dos/src/ui/UIView.h
+
+// The base UI view object 
+
+#include "core/types/Publisher.h"
+#include "core/types/Subscriber.h"
+
+#include "core/primitives/composite.h"
+
+#include "module/InteractionEngine/InteractionEngine.h"
+#include "module/InteractionEngine/InteractionObjectEvent.h"
 
 #include "UIEvent.h"
-
-#include "Primitives/composite.h"
 
 class UIButton;
 class UISpatialScrollView;

@@ -3,11 +3,12 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/material.h
+// Dream Core
+// dos/src/core/primitives/material.h
+
 // Base type for material
 
-#include "color.h"
+#include "core/primitives/color.h"
 
 #define DEFAULT_MATERIAL_AMBIENT_LEVEL 0.1f
 #define DEFUALT_MATERIAL_SHINE 100.0f

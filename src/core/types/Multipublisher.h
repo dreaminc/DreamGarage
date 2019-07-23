@@ -3,20 +3,20 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/Multipublisher.h
+// Dream Core
+// dos/src/core/types/Multipublisher.h
+
 // Multi Publisher Object
 // Couples with the Subscriber object to constitute the observer-notify pattern
 // for a multiple objects - objects indexed against the PIndexClass
 
-#include "Publisher.h"
-#include "Subscriber.h"
-#include "Primitives/dirty.h"
-
 #include <string>
 #include <map>
-
 #include <math.h>
+
+#include "Publisher.h"
+#include "Subscriber.h"
+#include "dirty.h"
 
 template <typename PIndexClass, typename PKeyClass, typename PKEventClass>
 class Multipublisher : public I_Publisher<PKeyClass, PKEventClass>, public dirty {

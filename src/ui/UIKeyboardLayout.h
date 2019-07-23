@@ -1,13 +1,17 @@
 #ifndef UI_KEYBOARD_LAYOUT_H_
 #define UI_KEYBOARD_LAYOUT_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/dirty.h"
-#include "UIKey.h"
+#include "core/ehm/EHM.h"
 
-#include <memory>
+// Dream Keyboard
+// dos/src/ui/UIKeyboardLayout.h
+
 #include <vector>
 #include <map>
+#include <memory>
+
+#include "core/types/dirty.h"
+#include "UIKey.h"
 
 class quad;
 class texture;

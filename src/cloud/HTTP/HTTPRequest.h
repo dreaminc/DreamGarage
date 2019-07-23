@@ -1,13 +1,15 @@
 #ifndef HTTP_REQUEST_H_
 #define HTTP_REQUEST_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/HTTP/HTTPRequest.h
+// Dream Cloud HTTP
+// dos/src/cloud/HTTP/HTTPRequest.h
+
 // HTTP Request Object
 
-#include "curl/curl.h"
+// TODO: move into CMake config unless this breaks the build anyways
+#include "third_party/libcurl/curl-7.49.1/include/curl/curl.h"
 
 #include <string>
 #include <vector>

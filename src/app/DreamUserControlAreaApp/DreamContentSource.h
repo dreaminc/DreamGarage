@@ -1,7 +1,10 @@
 #ifndef DREAM_CONTENT_SOURCE_H_
 #define DREAM_CONTENT_SOURCE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Content Source
+// dos/src/app/DreamUserControlAreaApp/DreamContentSource.h
 
 #include <memory>
 
