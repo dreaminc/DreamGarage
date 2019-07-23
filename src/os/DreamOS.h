@@ -385,7 +385,7 @@ public:
 
 	std::shared_ptr<DreamAppBase> GetDreamAppFromUID(UID appUID);
 
-	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) = 0;
+	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, Sandbox::PipelineType pipelineType) = 0;
 
 	//template<class derivedAppType>
 	//RESULT ReleaseApp(DreamAppHandleBase* pAppHandle, DreamAppBase* pHoldingApp);
@@ -420,14 +420,14 @@ public:
 	std::shared_ptr<NamedPipeClient> MakeNamedPipeClient(std::wstring strPipename);
 	std::shared_ptr<NamedPipeServer> MakeNamedPipeServer(std::wstring strPipename);
 	
-	RESULT AddObject(VirtualObj *pObject, SandboxApp::PipelineType pipelineType = (SandboxApp::PipelineType::MAIN | SandboxApp::PipelineType::AUX));
+	RESULT AddObject(VirtualObj *pObject, Sandbox::PipelineType pipelineType = (Sandbox::PipelineType::MAIN | Sandbox::PipelineType::AUX));
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
 	RESULT RemoveObjectFromInteractionGraph(VirtualObj *pObject);
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
-	RESULT AddObjectToUIGraph(VirtualObj *pObject, SandboxApp::PipelineType pipelineType = SandboxApp::PipelineType::MAIN);
+	RESULT AddObjectToUIGraph(VirtualObj *pObject, Sandbox::PipelineType pipelineType = Sandbox::PipelineType::MAIN);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
 
 	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
@@ -635,15 +635,15 @@ protected:
 	RESULT UnregisterUpdateCallback();
 
 protected:
-	RESULT SetSandboxConfiguration(SandboxApp::configuration sandboxconf);
+	RESULT SetSandboxConfiguration(Sandbox::configuration sandboxconf);
 
 public:
-	const SandboxApp::configuration& GetSandboxConfiguration();
+	const Sandbox::configuration& GetSandboxConfiguration();
 	std::wstring GetHardwareID();
 	std::string GetHMDTypeString();
 
 private:
-	SandboxApp *m_pSandbox = nullptr;
+	Sandbox *m_pSandbox = nullptr;
 
 public:
 

@@ -1136,6 +1136,7 @@ Error:
 	return r;
 }
 
+// TODO: Why is this here at all
 RESULT DreamOS::MuteDreamVCamAudio(bool fMute) {
 	// TODO: imp this lmao
 	return R_NOT_IMPLEMENTED;
@@ -1147,7 +1148,7 @@ RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
 }
 
-RESULT DreamOS::AddObject(VirtualObj *pObject, SandboxApp::PipelineType pipelineType) {
+RESULT DreamOS::AddObject(VirtualObj *pObject, Sandbox::PipelineType pipelineType) {
 	return m_pSandbox->AddObject(pObject, pipelineType);
 }
 
@@ -1445,11 +1446,11 @@ RESULT DreamOS::UnregisterUpdateCallback() {
 	return m_pSandbox->UnregisterUpdateCallback();
 }
 
-RESULT DreamOS::SetSandboxConfiguration(SandboxApp::configuration sandboxconf) {
+RESULT DreamOS::SetSandboxConfiguration(Sandbox::configuration sandboxconf) {
 	return m_pSandbox->SetSandboxConfiguration(sandboxconf);
 }
 
-const SandboxApp::configuration& DreamOS::GetSandboxConfiguration() {
+const Sandbox::configuration& DreamOS::GetSandboxConfiguration() {
 	return m_pSandbox->GetSandboxConfiguration();
 }
 
@@ -1517,7 +1518,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject, SandboxApp::PipelineType pipelineType) {
+RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject, Sandbox::PipelineType pipelineType) {
 	return m_pSandbox->AddObjectToUIGraph(pObject, pipelineType);
 }
 

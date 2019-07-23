@@ -39,7 +39,7 @@ class AnimationQueue;
 enum class AnimationCurveType;
 class CollisionManifold;
 
-class SandboxApp;
+class Sandbox;
 
 class DimObj;
 class color;
@@ -117,10 +117,10 @@ class InteractionEngine : public valid,
 {
 
 public:
-	static std::unique_ptr<InteractionEngine> MakeEngine(SandboxApp *pSandbox);
+	static std::unique_ptr<InteractionEngine> MakeEngine(Sandbox *pSandbox);
 
 private:
-	InteractionEngine(SandboxApp *pSandbox);
+	InteractionEngine(Sandbox *pSandbox);
 
 	RESULT Initialize();
 	RESULT InitializeActiveObjectQueues();
@@ -238,7 +238,7 @@ private:
 private:
 	double m_diffThreshold = DEFAULT_INTERACTION_DIFF_THRESHOLD;
 
-	SandboxApp *m_pSandbox = nullptr;
+	Sandbox *m_pSandbox = nullptr;
 
 	double m_interactionPadAccumulator = 0.0f;
 	InteractionObjectEvent m_padInteractionEvent;

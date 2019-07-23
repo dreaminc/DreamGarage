@@ -1,9 +1,13 @@
 #ifndef AUDIO_DATA_MESSAGE_H_
 #define AUDIO_DATA_MESSAGE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Garage
+// dos/src/garage/AudioDataMessage.h
 
 #include <string>
+
 #include "DreamGarageMessage.h"
 
 class AudioDataMessage : public DreamGarageMessage {

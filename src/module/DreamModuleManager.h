@@ -1,13 +1,12 @@
 #ifndef DREAM_MODULE_MANAGER_H_
 #define DREAM_MODULE_MANAGER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
+// Dream Module
 // DreamOS/DreamModuleManager.h
-// The module manager for Dream Modules
 
-#include "Primitives/Types/UID.h"
+// The module manager for Dream Modules
 
 #include <queue>
 #include <map>
@@ -15,14 +14,15 @@
 #include <memory>
 #include <chrono>
 
+#include "core/types/Manager.h"
+
+#include "DreamModule.h"
+
 // Some priority settings
 #define SYSTEM_MODULE_PRIORITY 0
 #define DREAM_MODULE_PRIORITY 2
 #define DEFAULT_MODULE_PRIORITY DREAM_MODULE_PRIORITY
 #define MAX_MODULE_PRIORITY 10
-
-#include "DreamModule.h"
-#include "Primitives/Manager.h"
 
 class DreamOS;
 class PeerConnection;

@@ -1,6 +1,6 @@
 #include "DreamModuleManager.h"
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
 DreamModuleManager::DreamModuleManager(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)

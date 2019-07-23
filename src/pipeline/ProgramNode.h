@@ -1,10 +1,11 @@
 #ifndef PROGRAM_NODE_H_
 #define PROGRAM_NODE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/Pipeline/ProgramNode.h
+// Dream Pipeline
+// dos/src/pipeline/ProgramNode.h
+
 // A program node is a DNode that takes in a variety of sources and outputs
 // to a sink, usually along with some form of "program" that produces new output
 // data of some kind
