@@ -1,14 +1,16 @@
 #ifndef PEER_HANDSHAKE_MESSAGE_H_
 #define PEER_HANDSHAKE_MESSAGE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/PeerHandshakeMessage.h
+// Dream Peer App
+// dos/src/app/DreamPeerApp/PeerHandshakeMessage.h
+
 // Peer Handshake MEssage
 
 #include <string>
-#include "DreamMessage.h"
+
+#include "os/DreamMessage.h"
 
 class PeerHandshakeMessage : public DreamMessage {
 

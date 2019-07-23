@@ -1,8 +1,13 @@
 #ifndef UI_EVENT_H_
 #define UI_EVENT_H_
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
+// Dream UI
+// dos/src/ui/UIEvent.h
+
+// UI Event
+
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
 
 class VirtualObj;
 

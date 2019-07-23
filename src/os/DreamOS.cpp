@@ -1,30 +1,33 @@
 #include "DreamOS.h"
 
-#include "Primitives/PrimParams.h"
+#include "core/primitives/PrimParams.h"
+
+#include "core/text/font.h"
+
+#include "pipeline/ProgramNode.h"
 
 //#include "DreamLogger/DreamLogger.h"
-#include "DreamAppManager.h"
-#include "DreamModuleManager.h"
+#include "app/DreamAppManager.h"
+#include "app/DreamAppMessage.h"
+#include "app/DreamSettingsApp/DreamSettingsApp.h"
 
-#include "Primitives/font.h"
+// Messages
+#include "app/DreamPeerApp/PeerHandshakeMessage.h"
+#include "app/DreamPeerApp/PeerAckMessage.h"
+#include "app/DreamPeerApp/PeerStayAliveMessage.h"
+
+#include "module/DreamModuleManager.h"
+
 #include "Core/Utilities.h"
 
-#include "Cloud/Environment/PeerConnection.h"
+#include "cloud/Environment/PeerConnection.h"
 #include "DreamMessage.h"
 
 //#include "DreamGarage/DreamSoundSystem.h"
-#include "Sound/AudioPacket.h"
-#include "DreamGarage/AudioDataMessage.h"
+#include "sound/AudioPacket.h"
 
-#include "DreamAppMessage.h"
-#include "DreamGarage/DreamSettingsApp.h"
-
-// Messages
-#include "PeerHandshakeMessage.h"
-#include "PeerAckMessage.h"
-#include "PeerStayAliveMessage.h"
-
-#include "HAL/Pipeline/ProgramNode.h"
+// TODO: Why is it there?
+#include "garage/AudioDataMessage.h"
 
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),

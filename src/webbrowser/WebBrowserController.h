@@ -1,17 +1,16 @@
 #ifndef WEB_BROWSER_CONTROLLER_H_
 #define WEB_BROWSER_CONTROLLER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/WebBrowser/WebBrowser.h
+// Dream Web Browser
+// dos/src/webbrowser/WebBrowser.h
 
 #include <memory>
 #include <functional>
-
 #include <vector>
 
-#include "Cloud/Environment/EnvironmentAsset.h"
+#include "cloud/Environment/EnvironmentAsset.h"
 
 class DOMNode;
 class DOMDocument;

@@ -1,14 +1,16 @@
 #ifndef PEER_STAY_ALIVE_MESSAGE_H_
 #define PEER_STAY_ALIVE_MESSAGE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/PeerAckMessage.h
-// Peer ACK Message
+// Dream Peer App
+// dos/src/app/DreamPeerApp/PeerAckMessage.h
+
+// Dream Peer ACK Message
 
 #include <string>
-#include "DreamMessage.h"
+
+#include "os/DreamMessage.h"
 
 class PeerAckMessage : public DreamMessage {
 

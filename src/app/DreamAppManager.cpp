@@ -1,19 +1,20 @@
 #include "DreamAppManager.h"
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
-#include "Cloud/Environment/PeerConnection.h"
 #include "DreamAppMessage.h"
+
+#include "cloud/Environment/PeerConnection.h"
 
 DreamAppManager::DreamAppManager(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
 
-// Success:
+Success:
 	Validate();
 	return;
 
-// Error:
+Error:
 	Invalidate();
 	return;
 }
@@ -40,7 +41,6 @@ RESULT DreamAppManager::Initialize() {
 	RESULT r = R_PASS;
 
 	// TODO:
-	CR(r);
 
 Error:
 	return r;
