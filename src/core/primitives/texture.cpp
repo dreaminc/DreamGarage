@@ -1,14 +1,13 @@
 #include "texture.h"
 
-#include "Sandbox/PathManager.h"
-
-//#include <string>
 #include <locale>
 #include <codecvt>
 #include <utility>
 #include <regex>
 
-#include "Primitives/image/ImageFactory.h"
+#include "Sandbox/PathManager.h"
+
+#include "core/image/ImageFactory.h"
 
 texture::texture() :
 	m_params(texture::type::INVALID)

@@ -1,17 +1,19 @@
 #ifndef CLOUD_MESSAGE_H_
 #define CLOUD_MESSAGE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/CloudResponse.h
+// DREAM Cloud
+// dos/src/cloud/CloudResponse.h
+
 // The Cloud Response Object
 
-#include "Primitives/Types/guid.h"
-#include "Primitives/version.h"
-#include "json.hpp"
-
 #include <string>
+
+#include "core/types/guid.h"
+#include "core/types/version.h"
+
+#include "third_party/json/include/json.hpp"
 
 class CloudController;
 

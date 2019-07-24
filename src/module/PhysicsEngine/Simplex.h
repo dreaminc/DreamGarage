@@ -1,13 +1,16 @@
 #ifndef SIMPLEX_H_
 #define SIMPLEX_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/PhysicsEngine/Simplex.h
+// Dream Physics Engine 
+// dos/src/module/PhysicsEngine/Simplex.h
+
 // An object representing a 3D simplex
 
-#include "Primitives/point.h"
+// TODO: Should this be moved into core/primitives
+
+#include "core/primitives/point.h"
 
 #define MAX_SIMPLEX_POINTS 4
 
@@ -32,7 +35,6 @@ private:
 	point m_ptD;
 
 	int m_points_n = 0;
-	//int m_points_c = 0;
 };
 
 #endif	// !SIMPLEX_H_

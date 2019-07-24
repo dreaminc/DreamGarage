@@ -4,9 +4,9 @@
 #include <sstream>
 #include <memory>
 
-#include "Sandbox/PathManager.h"
+#include "core/primitives/composite.h"
 
-#include "Primitives/composite.h"
+#include "sandbox/PathManager.h"
 
 // Freetype Library Stuff
 FT_Library font::m_pFT = nullptr;

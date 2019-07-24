@@ -1,14 +1,13 @@
 #include "cubemap.h"
 
-#include "Sandbox/PathManager.h"
-
-//#include <string>
 #include <locale>
 #include <codecvt>
 #include <utility>
 #include <regex>
 
-#include "Primitives/image/ImageFactory.h"
+#include "sandbox/PathManager.h"
+
+#include "core/image/ImageFactory.h"
 
 cubemap::cubemap() :
 	texture()
