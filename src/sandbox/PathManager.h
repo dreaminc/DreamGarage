@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "core/types/version.h"
-#include "core/types/DObject.h""
+#include "core/types/DObject.h"
 
 // This should be used to scrape Dream OS path
 #define DREAM_OS_PATH_ENV "DREAMOSPATH"

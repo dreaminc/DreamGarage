@@ -15,7 +15,10 @@ project(dos LANGUAGES CXX)
 include_directories(src)
 
 # Third Party Includes
+# TODO: Switch over to pull code etc
 include_directories(src/third_party/Freetype/freetype-2.8/include)
+include_directories(src/third_party/assimp/3.3.1/include)
+include_directories(src/third_party/Freeimage/include)
 
 # WebRTC
 include_directories(src/third_party/webrtc/include/webrtc)

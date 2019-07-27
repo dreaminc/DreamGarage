@@ -7,11 +7,10 @@
 #include <vector>
 
 // Add assimp
-// TODO: Is this enough?
-#include "third_party/assimp/3.3.1/include/assimp/Importer.hpp"
-#include "third_party/assimp/3.3.1/include/assimp/scene.h"
-#include "third_party/assimp/3.3.1/include/assimp/postprocess.h"
-#include "third_party/assimp/3.3.1/include/assimp/color4.h"
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
+#include "assimp/color4.h"
 
 #include "core/model/model.h"
 #include "hal/HALImp.h"
