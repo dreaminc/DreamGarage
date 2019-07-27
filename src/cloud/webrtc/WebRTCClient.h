@@ -1,11 +1,14 @@
 #ifndef WEBRTC_CLIENT_H_
 #define WEBRTC_CLIENT_H_
 
-#include "RESULT/EHM.h"
-#include "Cloud/CloudImp.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/webrtc/WebRTCClient.h
+// TODO: Spin out WebRTC as own project potentially
+// This is a big enough piece after all
+
+// Dream Cloud WebRTC
+// dos/src/cloud/webrtc/WebRTCClient.h
+
 // The WebRTC Client that handles all WebRTC messages 
 
 // NOTE: This code is defunct - only keeping it since we may want to move over to the WebRTC Websocket implementation 
@@ -19,6 +22,8 @@
 #include "rtc_base/physicalsocketserver.h"
 #include "rtc_base/signalthread.h"
 #include "rtc_base/sigslot.h"
+
+#include "Cloud/CloudImp.h"
 
 class WebRTCImp;
 

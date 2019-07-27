@@ -1,12 +1,18 @@
 #ifndef ENVIRONMENT_SHARE_H_
 #define ENVIRONMENT_SHARE_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/dirty.h"
+#include "core/ehm/EHM.h"
+
+// Dream Cloud
+// dos/src/cloud/environment/EnvironmentShare.h
+
+// TODO: Rename or make more general
 
 #include <string>
 
 #include "json.hpp"
+
+#include "core/types/dirty.h"
 
 class EnvironmentShare : public dirty {
 public:

@@ -15,14 +15,14 @@ project(dos LANGUAGES CXX)
 include_directories(src)
 
 # Third Party Includes
-# TODO: Switch over to pull code etc
+# TODO: Switch over to pull code etc + build system for cross platform
 include_directories(src/third_party/Freetype/freetype-2.8/include)
 include_directories(src/third_party/assimp/3.3.1/include)
 include_directories(src/third_party/Freeimage/include)
+include_directories(src/third_party/CEF/CEF_BINARY_3538)
 
-# WebRTC
-include_directories(src/third_party/webrtc/include/webrtc)
-add_definitions(-DWEBRTC_WIN)
+# Header Only Includes
+include_directories(src/third_party/json/include)
 
 add_subdirectory(src)
 

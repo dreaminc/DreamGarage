@@ -1,8 +1,13 @@
 #ifndef CAMERA_CONTROLLER_H_
 #define CAMERA_CONTROLLER_H_
 
-#include "RESULT/EHM.h"
-#include "Cloud/Controller.h"
+#include "core/ehm/EHM.h"
+
+// Dream Cloud Camera Controller
+// TODO: Move this somewhere else (specific to an app?)
+// Add some functionality here 
+
+#include "core/types/Controller.h"
 
 class CameraController : public Controller {
 	friend class EnvironmentController;

@@ -1,10 +1,10 @@
 #ifndef CEF_HANDLER_H_
 #define CEF_HANDLER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/WebBrowser/CefHandler.h
+// Dream Webbrowser CEF
+// dos/src/webbrowser/cefbrowser/CefHandler.h
 
 // CEF_AUDIO_HANDLER will turn on the audio mirroring capabilities for the CEF 
 // changes we made - to switch to "native CEF" ensure this flag is not set
@@ -17,10 +17,18 @@
 #undef PLOG
 #endif
 
-#include "Primitives/singleton.h"
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
-#include "WebBrowser/WebBrowserController.h"
-#include "Cloud/Environment/EnvironmentAsset.h"
+#include <list>
+#include <future>
+
+#include "core/types/singleton.h"
+
+#include "webbrowser/WebBrowserController.h"
+#include "cloud/Environment/EnvironmentAsset.h"
+
 #include "CEFBrowserController.h"
 
 #include "include\cef_client.h"
@@ -28,13 +36,6 @@
 #include "include\internal\cef_win.h"
 
 #include "include\cef_sandbox_win.h"
-
-#include <thread>
-#include <mutex>
-#include <condition_variable>
-
-#include <list>
-#include <future>
 
 class CEFHandler : public singleton<CEFHandler>,
 	public CefClient,

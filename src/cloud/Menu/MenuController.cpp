@@ -1,16 +1,15 @@
 #include "MenuController.h"
 
-#include "Cloud/CloudController.h"
-
-#include "Sandbox/CommandLineManager.h"
-
 #include "json.hpp"
-#include "Primitives/Types/UID.h"
-#include "Primitives/Types/guid.h"
 
-#include "Cloud/CloudMessage.h"
+#include "cloud/CloudController.h"
+#include "cloud/CloudMessage.h"
+#include "cloud/Menu/MenuNode.h"
 
-#include "Cloud/Menu/MenuNode.h"
+#include "sandbox/CommandLineManager.h"
+
+#include "core/types/UID.h"
+#include "core/types/guid.h"
 
 MenuController::MenuController(Controller* pParentController) :
 	Controller(pParentController)

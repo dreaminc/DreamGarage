@@ -1,12 +1,23 @@
 #ifndef CEF_IMP_H_
 #define CEF_IMP_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// TODO: The Cloud CEF files may be old and deprecated
+// Dream Cloud CEF
+// DreamOS/Cloud/CEFImp.h
+
+// The CEF implementation
+
+// TODO: CEF will need to be moved to a cross platform implementation
+// and this will be the top level
+#include <windows.h>
+
 #include "CloudImp.h"
 
-// DREAM OS
-// DreamOS/Cloud/CEFImp.h
-// The CEF implementation
+#include "webbrowser/cefbrowser/CEFApp.h"
+// TODO: Wtf?
+#include "CEFURLRequestController.h"
 
 #include "include\cef_client.h"
 #include "include\cef_base.h"
@@ -14,13 +25,6 @@
 #include "include\internal\cef_win.h"
 
 #include "include\cef_sandbox_win.h"
-
-// TODO: CEF will need to be moved to a cross platform implementation
-// and this will be the top level
-#include <windows.h>
-
-#include "CEFApp.h"
-#include "CEFURLRequestController.h"
 
 class CEFImp : public CloudImp {
 public:

@@ -1,14 +1,4 @@
 #include "UserController.h"
-#include "DreamLogger/DreamLogger.h"
-
-#include "Cloud/HTTP/HTTPController.h"
-#include "Sandbox/CommandLineManager.h"
-#include "json.hpp"
-
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
-#include "Primitives/quaternion.h"
-#include "Primitives/version.h"
 
 #include <fstream>
 #include <sstream>
@@ -17,12 +7,27 @@
 #include <map>
 #include <algorithm>
 #include <cctype>
-
 #include <future>
 
-#include "Cloud/CloudController.h"
-#include "Cloud/CloudMessage.h"
-#include "Core/Utilities.h"
+#include "json.hpp"
+
+#include "logger/DreamLogger.h"
+
+// TODO: We should not provide access to the command line manager 
+// args/command line should be accessed some other way
+#include "sandbox/CommandLineManager.h"
+
+#include "core/Utilities.h"
+
+#include "core/types/version.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
+#include "core/primitives/quaternion.h"
+
+#include "cloud/HTTP/HTTPController.h"
+#include "cloud/CloudController.h"
+#include "cloud/CloudMessage.h"
 
 UserController::UserController(Controller* pParentController) :
 	Controller(pParentController),

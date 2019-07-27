@@ -1,19 +1,18 @@
 #include "WebRTCImp.h"
 
-#include "DreamLogger/DreamLogger.h"
+#include "logger/DreamLogger.h"
 
 #include "rtc_base/ssladapter.h"
 #include "rtc_base/win32socketinit.h"
+#include "rtc_base/arraysize.h"
 
 #include "WebRTCClient.h"
 #include "WebRTCConductor.h"
 
-#include "rtc_base/arraysize.h"
-#include "Cloud/CloudController.h"
-#include "Cloud/Environment/PeerConnection.h"
-
-#include "Cloud/User/User.h"
-#include "Cloud/User/TwilioNTSInformation.h"
+#include "cloud/CloudController.h"
+#include "cloud/Environment/PeerConnection.h"
+#include "cloud/User/User.h"
+#include "cloud/User/TwilioNTSInformation.h"
 
 WebRTCImp::WebRTCImp(CloudController *pParentCloudController) :
 	CloudImp(pParentCloudController),

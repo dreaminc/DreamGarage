@@ -1,30 +1,26 @@
 #include "EnvironmentController.h"
-#include "Cloud/CloudController.h"
+
+#include "core/types/UID.h"
+#include "core/types/guid.h"
+#include "core/Utilities.h"
 
 #include "CameraController.h"
 
-#include "DreamLogger/DreamLogger.h"
+#include "logger/DreamLogger.h"
 
-#include "Cloud/User/User.h"
-
-#include "Cloud/Websockets/Websocket.h"
-#include "Sandbox/CommandLineManager.h"
-#include "json.hpp"
-
-#include "PeerConnection.h"
-
-#include "Primitives/Types/UID.h"
-#include "Primitives/Types/guid.h"
-
-#include "Cloud/CloudMessage.h"
-
-#include "Core/Utilities.h"
+#include "cloud/CloudController.h"
+#include "cloud/Websockets/Websocket.h"
+#include "cloud/User/User.h"
+#include "cloud/User/TwilioNTSInformation.h"
+#include "cloud/CloudMessage.h"
 
 #include "EnvironmentAsset.h"
 #include "EnvironmentShare.h"
+#include "PeerConnection.h"
 
-#include "Cloud/User/User.h"
-#include "Cloud/User/TwilioNTSInformation.h"
+#include "sandbox/CommandLineManager.h"
+
+#include "json.hpp"
 
 EnvironmentController::EnvironmentController(Controller* pParentController, long environmentID) :
 	Controller(pParentController),

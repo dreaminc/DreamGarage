@@ -1,19 +1,20 @@
 #ifndef HTTP_REQUEST_HANDLER_H_
 #define HTTP_REQUEST_HANDLER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/Objects/User.h
+// Dream Cloud
+// dos/src/cloud/HTTP/HTTPRequestHandler.h
+
 // Base User object
 
 #include <vector>
 #include <functional>
+
 #include "HTTPResponse.h"
+#include "HTTPCommon.h"
 
 class HTTPRequest;
-
-#include "HTTPCommon.h"
 
 class HTTPRequestHandler {
 public:

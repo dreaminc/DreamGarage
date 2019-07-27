@@ -1,10 +1,11 @@
 #ifndef AUDIO_PACKET_H_
 #define AUDIO_PACKET_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sound/AudioPacket.h
+// Dream Sound
+// dos/src/sound/AudioPacket.h
+
 // This object represents an audio packet 
 
 #include "SoundCommon.h"

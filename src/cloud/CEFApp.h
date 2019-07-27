@@ -1,10 +1,12 @@
 #ifndef CEF_APP_H_
 #define CEF_APP_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
+// TODO: Consolidate all CEF / Chromium related stuff
+// Dream CEF
 // DreamOS/Cloud/CEFApp.h
+
 // The CEF App
 
 #include "include\cef_app.h"
@@ -13,7 +15,7 @@
 #include "include\cef_command_line.h"
 #include "include\wrapper/cef_helpers.h"
 
-#include "CEFHandler.h"
+#include "webbrowser/cefbrowser/CEFHandler.h"
 
 // TODO: Put in separate file
 class CEFApp : public CefApp, public CefBrowserProcessHandler {

@@ -1,16 +1,18 @@
 #ifndef WEB_REQUEST_H_
 #define WEB_REQUEST_H_
 
-#include <Primitives/DObject.h>
 
-// DREAM OS
-// DreamOS/Cloud/WebRequest.h
+// Dream Cloud
+// dos/src/cloud/WebRequest.h
+
 // This is the core Web Request object that should be used across the engine
 // TODO: Use this across the engine
 
 #include <string>
 #include <map>
 #include <memory>
+
+#include "core/types/DObject.h"
 
 class WebRequestPostData;
 

@@ -1,14 +1,14 @@
 #ifndef WEB_RTC_CUSTOM_VIDEO_CAPTURER_H_
 #define WEB_RTC_CUSTOM_VIDEO_CAPTURER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/webrtc/WebRTCCustomVideoCapturer.h
+// Dream Cloud WebRTC
+// dos/src/cloud/webrtc/WebRTCCustomVideoCapturer.h
+
 // Custom Video Capturer Class for Web RTC based video streaming
 
 #include "media/base/videocommon.h"
-
 #include "media/base/videocapturer.h"
 
 #include "media/engine/webrtcvideocapturerfactory.h"

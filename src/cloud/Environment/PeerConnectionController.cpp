@@ -1,12 +1,12 @@
-#include "DreamLogger/DreamLogger.h"
+#include "logger/DreamLogger.h"
+
+#include "cloud/User/User.h"
+#include "cloud/User/TwilioNTSInformation.h"
+
+#include "sandbox/CommandLineManager.h"
 
 #include "PeerConnectionController.h"
 #include "PeerConnection.h"
-
-#include "Cloud/User/User.h"
-#include "Cloud/User/TwilioNTSInformation.h"
-
-#include "Sandbox/CommandLineManager.h"
 
 std::string PeerConnectionController::GetMethodURI(PeerConnectionMethod method) {
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();

@@ -1,14 +1,15 @@
 #ifndef CLOUD_CONTROLLER_FACTORY_H_
 #define CLOUD_CONTROLLER_FACTORY_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sandbox/PathManagerFactory.h
+// Dream Cloud
+// dos/src/cloud/CloudControllerFactory.h
+
 // Dream OS Path Manager Factory for the construction of path managers within a given
 // sandbox or native implementation
 
-#include "Core/Types/Factory.h"
+#include "core/types/Factory.h"
 
 class CloudController;
 

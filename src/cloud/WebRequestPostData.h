@@ -1,10 +1,10 @@
 #ifndef WEB_REQUEST_POST_DATA_H_
 #define WEB_REQUEST_POST_DATA_H_
 
-#include <Primitives/DObject.h>
 
-// DREAM OS
-// DreamOS/Cloud/WebRequestPostData.h
+// Dream Cloud
+// dos/src/cloud/WebRequestPostData.h
+
 // The relevant WebRequest post data structure
 // NOTE: This class is intentionally sparse -
 // more functionality will fill this class over time as we need more and more capabilities 
@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 #include <memory>
+
+#include "core/types/DObject.h"
 
 class WebRequestPostDataElement;
 

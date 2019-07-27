@@ -4,24 +4,25 @@
 // When we solve logging we need to solve this too
 #pragma warning( disable : 4005)
 
-#include "DreamLogger/DreamLogger.h"
-
-#include "WebRTCConductor.h"
-
-#include "WebRTCCommon.h"
-
 #include <memory>
 #include <utility>
 #include <vector>
 
-#include "api/test/fakeconstraints.h"
+#include "logger/DreamLogger.h"
+
+#include "WebRTCConductor.h"
+
 
 //#include "base/common.h"
 #include "rtc_base/json.h"
 #include "base/logging.h"
 #include "examples/peerconnection/client/defaults.h"
 #include "media/engine/webrtcvideocapturerfactory.h"
+
 #include "api/mediastreaminterface.h"
+#include "api/test/fakeconstraints.h"
+
+#include "common_video/libyuv/include/webrtc_libyuv.h"
 
 #include "modules/video_capture/video_capture_factory.h"
 
@@ -29,16 +30,16 @@
 
 #include "p2p/base/fakeportallocator.h"
 
-#include "Cloud/User/TwilioNTSInformation.h"
+#include "cloud/User/TwilioNTSInformation.h"
 
-#include "Core/Utilities.h"
+#include "core/Utilities.h"
 
+#include "WebRTCCommon.h"
 #include "WebRTCCustomVideoCapturer.h"
 #include "WebRTCLocalAudioTrack.h"
 
-#include "Primitives/texture.h"
+#include "core/primitives/texture.h"
 
-#include "common_video/libyuv/include/webrtc_libyuv.h"
 
 // TODO: Make this more legitimate + put in different file
 class DummySetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver {

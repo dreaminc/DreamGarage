@@ -1,6 +1,6 @@
 #include "Websocket.h"
 
-#include "DreamLogger/DreamLogger.h"
+#include "logger/DreamLogger.h"
 
 Websocket::Websocket(const std::string& strURI, const HandleWebsocketMessageCallback& fnHandleWebsocketMessageCallback,
 					 const HandleWebsocketConnectionOpenCallback&	fnHandleWebsocketConnectionOpenCallback,

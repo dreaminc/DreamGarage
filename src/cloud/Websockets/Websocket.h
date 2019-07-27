@@ -1,10 +1,11 @@
 #ifndef WEBSOCKET_H_
 #define WEBSOCKET_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/Websockets/Websocket.h
+// Dream Cloud Websocket
+// dos/src/cloud/Websockets/Websocket.h
+
 // The Websocket wrapper for Websocket++
 
 #include <string>
@@ -22,7 +23,7 @@
 #define ASIO_HAS_STD_SHARED_PTR
 #define ASIO_HAS_STD_TYPE_TRAITS
 
-// remove worning for asio dev release
+// remove warning for ASIO dev release
 #pragma warning(push, 0)
 
 #include <websocketpp/config/asio_client.hpp>

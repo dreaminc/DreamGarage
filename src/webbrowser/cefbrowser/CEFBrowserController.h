@@ -1,12 +1,29 @@
 #ifndef CEF_BROWSER_CONTROLLER_H_
 #define CEF_BROWSER_CONTROLLER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/WebBrowser/CEFBrowser/CEFBrowserController.h
+// Dream Web Browser CEF
+// dos/src/webbrowser/CEFBrowser/CEFBrowserController.h
 
-#include "WebBrowser/WebBrowserController.h"
+#ifdef LOG
+#undef LOG
+#endif
+
+#ifdef PLOG
+#undef PLOG
+#endif
+
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <queue>
+#include <list>
+#include <future>
+
+#include "include/cef_base.h"
+#include "include/cef_render_handler.h"
+#include "include/cef_load_handler.h"
 
 /*
 #include "include\cef_client.h"
@@ -17,27 +34,9 @@
 #include "include\cef_sandbox_win.h"
 */
 
-#ifdef LOG
-#undef LOG
-#endif
+#include "webbrowser/WebBrowserController.h"
 
-#ifdef PLOG
-#undef PLOG
-#endif
-
-#include "include\cef_base.h"
-#include "include/cef_render_handler.h"
-#include "include/cef_load_handler.h"
-
-#include <thread>
-#include <mutex>
-#include <condition_variable>
-#include <queue>
-
-#include <list>
-#include <future>
-
-#include "Sound/AudioPacket.h"
+#include "sound/AudioPacket.h"
 
 // Theirs 
 class CefBrowser;

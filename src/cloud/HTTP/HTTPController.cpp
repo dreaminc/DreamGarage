@@ -1,8 +1,9 @@
 #include "HTTPController.h"
 
-#include <curl/curl.h>
 #include <iostream>
 #include <future>
+
+#include <curl/curl.h>
 
 #include "HTTPRequestHandler.h"
 #include "HTTPRequestFileHandler.h"

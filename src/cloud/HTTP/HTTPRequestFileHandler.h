@@ -1,10 +1,11 @@
 #ifndef HTTP_REQUEST_FILE_HANDLER_H_
 #define HTTP_REQUEST_FILE_HANDLER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/Objects/User.h
+// Dream Cloud
+// dos/src/cloud/HTTP/HTTPRequestFileHandler.h
+
 // Base User object
 
 #include <functional>

@@ -1,11 +1,16 @@
 #ifndef CEF_URL_REQUEST_CONTROLLER_H_
 #define CEF_URL_REQUEST_CONTROLLER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/CEFApp.h
+// Dream Cloud CEF
+// dos/src/cloud/CEFURLRequestController.h
+// TODO: Unify this with webbrowser/cef?
+
 // The CEF App
+
+#include <list>
+#include <string>
 
 #include "include\cef_app.h"
 
@@ -14,9 +19,6 @@
 #include "include\wrapper/cef_helpers.h"
 
 #include "include\cef_urlrequest.h"
-
-#include <list>
-#include <string>
 
 class CEFURLRequestClient : public CefURLRequestClient {
 public:
