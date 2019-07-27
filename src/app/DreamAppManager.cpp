@@ -4,8 +4,6 @@
 
 #include "DreamAppMessage.h"
 
-#include "cloud/Environment/PeerConnection.h"
-
 DreamAppManager::DreamAppManager(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {

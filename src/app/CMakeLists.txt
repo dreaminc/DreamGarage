@@ -1,5 +1,7 @@
 # src/scene/CMakeLists.txt - Dream App Library CMake file
 
+# TODO: Move all app / app manager / module manager stuff into OS
+
 file(GLOB SOURCES 
   "*.cpp"
   "*.h"
@@ -22,6 +24,10 @@ add_subdirectory(DreamUIBarApp)
 add_subdirectory(DreamUserApp)
 add_subdirectory(DreamUserControlAreaApp)
 add_subdirectory(DreamVCamApp)
+
+# TODO: Unclear why app needs to have access to webrtc headers
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
+add_definitions(-DWEBRTC_WIN)
 
 # Force Include the src/core/config.h
 if(MSVC)

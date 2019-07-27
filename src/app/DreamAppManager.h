@@ -28,7 +28,6 @@
 #define DEFAULT_APP_PRIORITY DREAM_APP_PRIORITY
 #define MAX_APP_PRIORITY 10
 
-
 class DreamOS;
 class PeerConnection;
 class DreamAppMessage;

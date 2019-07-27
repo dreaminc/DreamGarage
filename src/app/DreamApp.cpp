@@ -1,7 +1,7 @@
 #include "DreamApp.h"
 
-#include "DreamOS.h"
-#include "Primitives/composite.h"
+#include "os/DreamOS.h"
+#include "core/primitives/composite.h"
 
 // DreamAppBase
 DreamAppBase::DreamAppBase(DreamOS* pDreamOS, void* pContext) :
