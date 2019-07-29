@@ -1,11 +1,5 @@
 # src/scene/CMakeLists.txt - DreamContentViewApp CMake file
 
-file(GLOB SOURCES 
-  "*.cpp"
-  "*.h"
-)
-source_group("" FILES ${SOURCES})
-
 file(GLOB ANIMATION_ENGINE_SOURCES 
   "AnimationEngine/*.cpp"
   "AnimationEngine*.h"
@@ -45,7 +39,6 @@ else()
 endif()
 
 add_library(module
-    ${SOURCES}
     ${ANIMATION_ENGINE_SOURCES}
     ${DREAM_SOUND_SYSTEM_SOURCES}
     ${INTERACTION_ENGINE_SOURCES}
