@@ -12,7 +12,7 @@
 
 #include "core/Utilities.h"
 
-#include "module/PhysicsEngine/CollisionManifold.h"
+#include "modules/PhysicsEngine/CollisionManifold.h"
 #include "module/AnimationEngine/AnimationItem.h"
 
 #include "webbrowser/CEFBrowser/CEFBrowserManager.h"

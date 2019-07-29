@@ -4,7 +4,7 @@
 #include "core/ehm/EHM.h"
 
 // Dream Physics Engine Module
-// dos/src/module/PhysicsEngine/ForceGenerator.h
+// dos/src/modules/PhysicsEngine/ForceGenerator.h
 
 // Dream Force Generator
 // The virtual class defining a force generator

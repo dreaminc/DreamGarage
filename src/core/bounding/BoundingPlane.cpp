@@ -9,7 +9,7 @@
 #include "core/primitives/VirtualObj.h"
 #include "core/primitives/plane.h"
 
-#include "module/PhysicsEngine/CollisionManifold.h"
+#include "modules/PhysicsEngine/CollisionManifold.h"
 
 BoundingPlane::BoundingPlane(VirtualObj *pParentObject) :
 	BoundingVolume(pParentObject),

@@ -4,7 +4,7 @@
 #include "core/ehm/EHM.h"
 
 // Dream Physics Engine 
-// dos/src/module/PhysicsEngine/Simplex.h
+// dos/src/modules/PhysicsEngine/Simplex.h
 
 // An object representing a 3D simplex
 

@@ -4,7 +4,7 @@
 #include "BoundingQuad.h"
 #include "BoundingPlane.h"
 
-#include "module/PhysicsEngine/CollisionManifold.h"
+#include "modules/PhysicsEngine/CollisionManifold.h"
 
 BoundingSphere::BoundingSphere(VirtualObj *pParentObject) :
 	BoundingVolume(pParentObject),

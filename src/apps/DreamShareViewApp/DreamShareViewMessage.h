@@ -6,7 +6,7 @@
 // Dream Share View App
 // dos/src/app/DreamShareViewApp/DreamShareViewMessage.h
 
-#include "app/DreamAppMessage.h"
+#include "os/app/DreamAppMessage.h"
 
 #define DREAM_SHARE_VIEW_APP_NAME "DreamShareView"
 

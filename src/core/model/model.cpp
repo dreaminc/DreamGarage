@@ -1,6 +1,7 @@
 #include "model.h"
 
 #include "os/DreamOS.h"
+
 #include "hal/HALImp.h"
 
 #include "sandbox/PathManager.h"

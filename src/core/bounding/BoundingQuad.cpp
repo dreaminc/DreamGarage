@@ -8,7 +8,7 @@
 
 #include "core/primitives/VirtualObj.h"
 
-#include "module/PhysicsEngine/CollisionManifold.h"
+#include "modules/PhysicsEngine/CollisionManifold.h"
 
 BoundingQuad::BoundingQuad(VirtualObj *pParentObject) :
 	BoundingVolume(pParentObject),

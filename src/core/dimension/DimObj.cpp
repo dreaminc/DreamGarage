@@ -5,7 +5,7 @@
 #include "core/bounding/BoundingQuad.h"
 #include "core/bounding/BoundingPlane.h"
 
-#include "module/PhysicsEngine/CollisionManifold.h"
+#include "modules/PhysicsEngine/CollisionManifold.h"
 
 #include "core/primitives/FlatContext.h"
 

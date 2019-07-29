@@ -43,29 +43,31 @@
 
 #include "module/DreamObjectModule.h"
 
-#include "module/PhysicsEngine/PhysicsEngine.h"
-#include "module/DreamSoundSystem/DreamSoundSystem.h"
+#include "modules/PhysicsEngine/PhysicsEngine.h"
+#include "modules/DreamSoundSystem/DreamSoundSystem.h"
 
 // TODO: Remove DreamAppHandles
 #include "app/DreamAppHandle.h"
 
-#include "app/DreamPeerApp/DreamPeerApp.h"
-#include "app/DreamUserApp/DreamUserApp.h"
-#include "app/DreamShareViewApp/DreamShareViewApp.h"
-
 //#include "DreamLogger/DreamLogger.h"
 
 // Dream Modules
-
 
 #include "UI/UIKeyboard.h"
 
 class UIKeyboardLayout;
 class DreamMessage;
 class DreamAppMessage;
+
+// Apps
+// TODO: None of these should really be in here
+class DreamPeerApp;
+class DreamUserApp;
+class DreamShareViewApp;
 class DreamSettingsApp;
 class DreamLoginApp;
 class DreamFormApp;
+
 class OGLProgram;
 
 class NamedPipeClient;

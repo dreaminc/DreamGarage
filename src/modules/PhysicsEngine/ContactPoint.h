@@ -4,7 +4,7 @@
 #include "core/ehm/EHM.h"
 
 // Dream Physics Engine Module
-// dos/src/module/PhysicsEngine/ContactPoint.h
+// dos/src/modules/PhysicsEngine/ContactPoint.h
 
 // A contact point represents a point of contact in a given collision
 

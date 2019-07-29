@@ -13,7 +13,7 @@
 #include "xstring"                     // for wstring
 #include <map>
 
-#include "app/DreamApp.h"
+#include "os/app/DreamApp.h"
 
 #include "core/types/Subscriber.h"
 

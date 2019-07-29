@@ -8,8 +8,8 @@
 
 #include "core/primitives/VirtualObj.h"
 
-#include "module/PhysicsEngine/CollisionManifold.h"
-#include "module/PhysicsEngine/Simplex.h"
+#include "modules/PhysicsEngine/CollisionManifold.h"
+#include "modules/PhysicsEngine/Simplex.h"
 
 BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type) :
 	BoundingVolume(pParentObject),

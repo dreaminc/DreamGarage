@@ -3,7 +3,7 @@
 #include "core/primitives/quaternion.h"
 #include "core/primitives/volume.h"
 
-#include "module/PhysicsEngine/CollisionManifold.h"
+#include "modules/PhysicsEngine/CollisionManifold.h"
 
 DimRay::DimRay(point ptOrigin, vector vDirection) :
 	ray(ptOrigin, vDirection)

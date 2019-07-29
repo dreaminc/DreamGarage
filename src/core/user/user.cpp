@@ -15,10 +15,10 @@
 
 #include "sandbox/CommandLineManager.h"
 
-#include "module/AnimationEngine/AnimationCurve.h"
-#include "module/AnimationEngine/AnimationItem.h"
+#include "modules/AnimationEngine/AnimationCurve.h"
+#include "modules/AnimationEngine/AnimationItem.h"
 
-#include "Sandbox/PathManager.h"
+#include "sandbox/PathManager.h"
 
 user::user(HALImp* pHALImp) :
 	composite(pHALImp)

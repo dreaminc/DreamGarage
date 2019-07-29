@@ -2,7 +2,7 @@
 
 #include "ObjectDerivative.h"
 
-#include "module/PhysicsEngine/ForceGenerator.h"
+#include "modules/PhysicsEngine/ForceGenerator.h"
 
 #include "core/dimension/DimObj.h"
 

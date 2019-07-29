@@ -4,7 +4,7 @@
 #include "core/ehm/EHM.h"
 
 // Dream Physics Engine Module
-// dos/src/module/PhysicsEngine/PhysicsIntegrator.h
+// dos/src/modules/PhysicsEngine/PhysicsIntegrator.h
 
 // Dream Physics Integrator
 // This class will integrate and take care of actual physics

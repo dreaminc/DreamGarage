@@ -23,8 +23,8 @@
 #include "sandbox/CredentialManager.h"
 
 #include "app/DreamAppMessage.h"
-#include "module/TimeManager/TimeManagerModule.h"
-#include "module/InteractionEngine/InteractionObjectEvent.h"  // for InteractionObjectEvent (ptr only), InteractionEventType
+#include "modules/TimeManager/TimeManagerModule.h"
+#include "modules/InteractionEngine/InteractionObjectEvent.h"  // for InteractionObjectEvent (ptr only), InteractionEventType
 
 #include "cloud/CloudController.h"
 

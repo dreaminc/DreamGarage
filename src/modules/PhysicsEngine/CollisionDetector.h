@@ -4,7 +4,7 @@
 #include "core/ehm/EHM.h"
 
 // Dream Physics Engine Module
-// dos/src/module/PhysicsEngine/CollisionDetector.h
+// dos/src/modules/PhysicsEngine/CollisionDetector.h
 
 // Dream Collision Detector 
 // This class is responsible for detecting and reporting collisions

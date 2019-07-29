@@ -4,7 +4,7 @@
 #include "core/ehm/EHM.h"
 
 // Dream Physics Engine Module
-// dos/src/module/PhysicsEngine/CollisionManifold.h
+// dos/src/modules/PhysicsEngine/CollisionManifold.h
 
 // The collision manifold is a container for the data associated with a 
 // given collision

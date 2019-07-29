@@ -8,15 +8,15 @@
 
 #include "core/ehm/EHM.h"
 
-#include "app/DreamApp.h"
-#include "app/DreamAppHandle.h"
+#include "os/app/DreamApp.h"
+#include "os/app/DreamAppHandle.h"
 
 #include "os/DreamVideoStreamSubscriber.h"
 
 #include "DreamShareViewShareMessage.h"
 #include "DreamShareViewPointerMessage.h"
 
-#include "app/DreamUserApp/DreamUserApp.h"
+#include "apps/DreamUserApp/DreamUserApp.h"
 
 #include "ui/UICommon.h"
 

@@ -9,7 +9,7 @@
 // Dream Peer holds context for a given dream peer
 // and keeps track of state
 
-#include "app/DreamApp.h"
+#include "os/app/DreamApp.h"
 
 #include "core/types/Subscriber.h"
 

@@ -1,6 +1,6 @@
 #include "DimPlane.h"
 
-#include "module/PhysicsEngine/CollisionManifold.h"
+#include "modules/PhysicsEngine/CollisionManifold.h"
 
 DimPlane::DimPlane(point ptOrigin, vector vNormal) :
 	plane(ptOrigin, vNormal)

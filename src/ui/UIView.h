@@ -13,8 +13,8 @@
 
 #include "core/primitives/composite.h"
 
-#include "module/InteractionEngine/InteractionEngine.h"
-#include "module/InteractionEngine/InteractionObjectEvent.h"
+#include "modules/InteractionEngine/InteractionEngine.h"
+#include "modules/InteractionEngine/InteractionObjectEvent.h"
 
 #include "UIEvent.h"
 
