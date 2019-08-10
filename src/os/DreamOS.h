@@ -49,6 +49,9 @@
 // TODO: Remove DreamAppHandles
 #include "app/DreamAppHandle.h"
 
+// TODO: This should be removed - move to a different pattern for observers 
+#include "apps/DreamPeerApp/DreamPeerApp.h"
+
 //#include "DreamLogger/DreamLogger.h"
 
 // Dream Modules
@@ -678,7 +681,7 @@ protected:
 	std::shared_ptr<DreamUserApp> m_pDreamUserApp = nullptr;
 
 	// TODO: All of these should go into DreamGarage
-	std::shared_ptr<DreamShareView> m_pDreamShareView = nullptr;
+	std::shared_ptr<DreamShareViewApp> m_pDreamShareView = nullptr;
 	std::shared_ptr<DreamSettingsApp> m_pDreamSettings = nullptr;
 	std::shared_ptr<DreamLoginApp> m_pDreamLoginApp = nullptr;
 	std::shared_ptr<DreamFormApp> m_pDreamGeneralForm = nullptr;

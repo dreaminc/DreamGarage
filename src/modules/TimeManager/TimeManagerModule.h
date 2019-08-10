@@ -11,7 +11,7 @@
 #include <vector>
 #include <chrono>
 
-#include "module/DreamModule.h"
+#include "os/module/DreamModule.h"
 
 #include "core/types/Publisher.h"
 

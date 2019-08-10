@@ -14,7 +14,7 @@
 // TODO: Why is this here
 #include "ui/UICommon.h"
 
-#include "module/AnimationEngine/AnimationItem.h"
+#include "modules/AnimationEngine/AnimationItem.h"
 
 #include "sense/SenseLeapMotionHand.h"
 

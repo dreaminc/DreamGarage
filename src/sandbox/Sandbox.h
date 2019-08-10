@@ -22,7 +22,8 @@
 
 #include "sandbox/CredentialManager.h"
 
-#include "app/DreamAppMessage.h"
+#include "os/app/DreamAppMessage.h"
+
 #include "modules/TimeManager/TimeManagerModule.h"
 #include "modules/InteractionEngine/InteractionObjectEvent.h"  // for InteractionObjectEvent (ptr only), InteractionEventType
 

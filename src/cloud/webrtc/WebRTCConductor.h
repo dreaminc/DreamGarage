@@ -31,8 +31,8 @@ class AudioPacket;
 
 #include "WebRTCPeerConnection.h"
 
-#include "module/audio_device/include/audio_device.h"
-#include "module/audio_device/dummy/audio_device_dummy.h"
+#include "modules/audio_device/include/audio_device.h"
+#include "modules/audio_device/dummy/audio_device_dummy.h"
 
 #include "WebRTCAudioDeviceModule.h"
 

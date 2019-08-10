@@ -12,7 +12,7 @@
 #include "ui/UICommon.h"
 
 // TODO: These should all be together
-#include "app/DreamUserControlAreaApp/DreamContentSource.h"
+#include "apps/DreamUserControlAreaApp/DreamContentSource.h"
 
 class DreamUserControlArea;
 class text;

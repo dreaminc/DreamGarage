@@ -13,11 +13,12 @@
 #include <map>
 #include <vector>
 
-#include "app/DreamApp.h"
-#include "app/DreamAppHandle.h"
+#include "os/app/DreamApp.h"
+#include "os/app/DreamAppHandle.h"
 
 #include "core/types/Subscriber.h"
-#include "module/InteractionEngine/InteractionObjectEvent.h"
+
+#include "modules/InteractionEngine/InteractionObjectEvent.h"
 
 #include "cloud/Environment/EnvironmentAsset.h"
 
@@ -27,10 +28,11 @@
 
 #include "core/text/TextEntryString.h"
 
+// TODO: This doesn't seem to be the right place for this
 #include "os/DreamVideoStreamSubscriber.h"
 
-#include "app/DreamUserControlAreaApp/DreamContentSource.h"
-#include "app/DreamShareViewApp/DreamShareViewShareMessage.h"
+#include "apps/DreamUserControlAreaApp/DreamContentSource.h"
+#include "apps/DreamShareViewApp/DreamShareViewShareMessage.h"
 
 #include "sound/SoundCommon.h"
 

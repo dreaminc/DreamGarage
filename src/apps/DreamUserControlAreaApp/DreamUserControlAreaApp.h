@@ -9,7 +9,7 @@
 #include <vector>
 #include <map>
 
-#include "app/DreamApp.h"
+#include "os/app/DreamApp.h"
 
 // TODO: wtf is this in garage?
 #include "garage/UserAreaControls.h"
@@ -17,8 +17,8 @@
 #include "core/types/Subscriber.h"
 
 // TODO: Neither of these should be here!
-#include "app/DreamBrowserApp/DreamBrowserApp.h"
-#include "app/DreamVCamApp/DreamVCamApp.h"
+#include "apps/DreamBrowserApp/DreamBrowserApp.h"
+#include "apps/DreamVCamApp/DreamVCamApp.h"
 
 class DreamUserApp;
 class UIControlView;

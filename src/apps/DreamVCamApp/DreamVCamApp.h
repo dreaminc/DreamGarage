@@ -12,12 +12,12 @@
 #include <memory>
 #include <chrono>
 
-#include "module/DreamModule.h"
+#include "os/module/DreamModule.h"
 
 #include "sandbox/NamedPipeServer.h"
 
-#include "app/DreamUserControlAreaApp/DreamContentSource.h"
-#include "app/DreamGamepadCameraApp/DreamGamepadCameraApp.h"
+#include "apps/DreamUserControlAreaApp/DreamContentSource.h"
+#include "apps/DreamGamepadCameraApp/DreamGamepadCameraApp.h"
 
 #include "os/DreamVideoStreamSubscriber.h"
 

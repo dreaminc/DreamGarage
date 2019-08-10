@@ -14,8 +14,8 @@
 
 #include "ui/UIKeyboardLayout.h"
 
-#include "app/DreamApp.h"
-#include "app/DreamAppHandle.h"
+#include "os/app/DreamApp.h"
+#include "os/app/DreamAppHandle.h"
 
 #include "core/text/TextEntryString.h"
 
@@ -24,8 +24,9 @@
 #include "sense/SenseKeyboard.h"
 
 // TODO: Neither of these should be here
-#include "app/DreamUserApp/DreamUserApp.h"
-#include "app/DreamUserControlAreaApp/DreamUserControlAreaApp.h"
+#include "apps/DreamUserApp/DreamUserApp.h"
+
+#include "apps/DreamUserControlAreaApp/DreamUserControlAreaApp.h"
 
 #define SURFACE_WIDTH 0.75 // surface is a quad that holds the entire keyboard layout
 #define SURFACE_HEIGHT 0.294f // 0.25f
