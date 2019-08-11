@@ -7,7 +7,7 @@
 // dos/src/app/DreamSettingsApp/DreamSettingsApp.h
 
 // TODO: This should not be here, or should be consolidated
-#include "app/DreamFormApp/DreamFormApp.h"
+#include "apps/DreamFormApp/DreamFormApp.h"
 
 #define SCALE_TICK 0.003f;
 

@@ -33,16 +33,16 @@ class AudioDataMessage;
 class UIView;
 class UIPointerLabel;
 
-class DreamShareView :
-	public DreamApp<DreamShareView>,
+class DreamShareViewApp :
+	public DreamApp<DreamShareViewApp>,
 	public DreamVideoStreamSubscriber
 {
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
 
 public:
-	DreamShareView(DreamOS *pDreamOS, void *pContext = nullptr);
-	~DreamShareView();
+	DreamShareViewApp(DreamOS *pDreamOS, void *pContext = nullptr);
+	~DreamShareViewApp();
 
 	// DreamApp Interface
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;
@@ -120,7 +120,7 @@ public:
 	PendingFrame m_overflowFrame;
 
 protected:
-	static DreamShareView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+	static DreamShareViewApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
 	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768.png";

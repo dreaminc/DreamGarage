@@ -10,7 +10,7 @@
 #include "os/DreamOS.h"
 
 // TODO: This should not be here
-#include "app/DreamBrowserApp/DreamBrowserApp.h"
+#include "apps/DreamBrowserApp/DreamBrowserApp.h"
 
 class UIControlView;
 struct UIEvent;

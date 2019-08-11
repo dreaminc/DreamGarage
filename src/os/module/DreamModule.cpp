@@ -1,5 +1,6 @@
 #include "DreamModule.h"
-#include "DreamOS.h"
+
+#include "os/DreamOS.h"
 
 // DreamModuleBase
 RESULT DreamModuleBase::SetPriority(int priority) {

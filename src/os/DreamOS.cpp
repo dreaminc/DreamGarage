@@ -7,14 +7,17 @@
 #include "pipeline/ProgramNode.h"
 
 //#include "DreamLogger/DreamLogger.h"
-#include "app/DreamAppManager.h"
-#include "app/DreamAppMessage.h"
-#include "app/DreamSettingsApp/DreamSettingsApp.h"
+#include "os/app/DreamAppManager.h"
+#include "os/app/DreamAppMessage.h"
+
+// TODO: No apps in DreamOS
+#include "apps/DreamSettingsApp/DreamSettingsApp.h"
+#include "apps/DreamShareViewApp/DreamShareViewApp.h"
 
 // Messages
-#include "app/DreamPeerApp/PeerHandshakeMessage.h"
-#include "app/DreamPeerApp/PeerAckMessage.h"
-#include "app/DreamPeerApp/PeerStayAliveMessage.h"
+#include "apps/DreamPeerApp/PeerHandshakeMessage.h"
+#include "apps/DreamPeerApp/PeerAckMessage.h"
+#include "apps/DreamPeerApp/PeerStayAliveMessage.h"
 
 #include "module/DreamModuleManager.h"
 
@@ -1697,21 +1700,21 @@ Error:
 }
 
 bool DreamOS::IsSharing() {
-	return m_pDreamShareView->IsStreaming();
+	return m_pDreamShareViewApp->IsStreaming();
 }
 
 texture* DreamOS::GetSharedContentTexture() {
 
-	if (m_pDreamShareView != nullptr) {
-		return m_pDreamShareView->GetCastingTexture();
+	if (m_pDreamShareViewApp != nullptr) {
+		return m_pDreamShareViewApp->GetCastingTexture();
 	}
 	
 	return nullptr;
 }
 
 texture* DreamOS::GetSharedContentPointerTexture() {
-	if (m_pDreamShareView != nullptr) {
-		return m_pDreamShareView->GetPointingTexture();
+	if (m_pDreamShareViewApp != nullptr) {
+		return m_pDreamShareViewApp->GetPointingTexture();
 	}
 	return nullptr;
 }
@@ -1721,8 +1724,8 @@ texture* DreamOS::GetSharedCameraTexture() {
 }
 
 RESULT DreamOS::SetSharedContentTexture(texture* pSharedTexture) {
-	if (m_pDreamShareView != nullptr) {
-		m_pDreamShareView->SetCastingTexture(pSharedTexture);
+	if (m_pDreamShareViewApp != nullptr) {
+		m_pDreamShareViewApp->SetCastingTexture(pSharedTexture);
 	}
 
 	return R_PASS;
@@ -1731,8 +1734,8 @@ RESULT DreamOS::SetSharedContentTexture(texture* pSharedTexture) {
 RESULT DreamOS::BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
-	CN(m_pDreamShareView);
-	m_pDreamShareView->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight);
+	CN(m_pDreamShareViewApp);
+	m_pDreamShareViewApp->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight);
 
 Error:
 	return r;
@@ -1741,8 +1744,8 @@ Error:
 RESULT DreamOS::BroadcastSharedAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
-	CN(m_pDreamShareView);
-	CR(m_pDreamShareView->BroadcastAudioPacket(pendingAudioPacket));
+	CN(m_pDreamShareViewApp);
+	CR(m_pDreamShareViewApp->BroadcastAudioPacket(pendingAudioPacket));
 
 Error:
 	return r;

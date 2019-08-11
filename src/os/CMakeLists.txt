@@ -19,6 +19,11 @@ file(GLOB MODULE_SOURCES
 )
 source_group("app" FILES ${MODULE_SOURCES})
 
+# TODO: This is an architecture bug
+# webrtc should only be included in cloud (or it's own module in the future)
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
+add_definitions(-DWEBRTC_WIN)
+
 # Force Include the src/core/config.h
 if(MSVC)
     add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")

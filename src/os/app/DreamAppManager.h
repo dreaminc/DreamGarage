@@ -14,8 +14,8 @@
 #include <memory>
 #include <chrono>
 
-#include "app/DreamApp.h"
-#include "app/DreamAppHandle.h"
+#include "os/app/DreamApp.h"
+#include "os/app/DreamAppHandle.h"
 
 #include "core/types/Manager.h"
 #include "core/types/UID.h"

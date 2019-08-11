@@ -1,10 +1,11 @@
 #ifndef SOURCE_NODE_H_
 #define SOURCE_NODE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/Pipeline/SourceNode.h
+// Dream Pipeline
+// dos/src/pipeline/SourceNode.h
+
 // Source nodes provide inputs to other nodes such as 
 // program nodes or sink nodes
 

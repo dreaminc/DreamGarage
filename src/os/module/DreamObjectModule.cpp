@@ -1,9 +1,10 @@
 #include "DreamObjectModule.h"
 
-#include "Primitives/PrimParams.h"
+#include "os/DreamOS.h"
 
-#include "Primitives/sphere.h"
-#include "DreamOS.h"
+#include "core/primitives/PrimParams.h"
+
+#include "core/primitives/sphere.h"
 
 DreamObjectModule::PendingObject::PendingObject(PrimParams *pPrimParams, void *pContext) :
 	pPrimParams(pPrimParams),
