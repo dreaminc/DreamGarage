@@ -14,7 +14,7 @@
 
 #include "core/primitives/Framebuffer.h"
 
-class OpenGLImp;
+class OGLImp;
 class OGLTexture;
 class OGLAttachment;
 
@@ -23,8 +23,8 @@ class OGLAttachment;
 class OGLFramebuffer : public framebuffer {
 public:
 
-	OGLFramebuffer(OpenGLImp *pParentImp);
-	OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int channels);
+	OGLFramebuffer(OGLImp *pParentImp);
+	OGLFramebuffer(OGLImp *pParentImp, int width, int height, int channels);
 
 	virtual ~OGLFramebuffer() override;
 
@@ -77,9 +77,9 @@ public:
 	RESULT CheckStatus();
 
 private:
-	OpenGLImp *m_pParentImp;
+	OGLImp *m_pParentImp = nullptr;
 
-	GLenum *m_pDrawBuffers;
+	GLenum *m_pDrawBuffers = nullptr;
 	int m_pDrawBuffers_n;
 	
 	GLuint m_framebufferIndex;

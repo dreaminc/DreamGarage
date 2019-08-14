@@ -1,6 +1,6 @@
 #include "OVRTextureSwapChain.h"
 
-OVRTextureSwapChain::OVRTextureSwapChain(OpenGLImp *pParentImp, ovrSession session, int width, int height, int mipLevels, unsigned char *data, int sampleCount) :
+OVRTextureSwapChain::OVRTextureSwapChain(OGLImp *pParentImp, ovrSession session, int width, int height, int mipLevels, unsigned char *data, int sampleCount) :
 	m_ovrSession(session),
 	m_pOVRTextureSwapChain(nullptr),
 	m_width(width),

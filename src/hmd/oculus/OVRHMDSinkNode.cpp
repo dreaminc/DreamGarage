@@ -3,7 +3,7 @@
 #include "OVRTextureSwapChain.h"
 #include "OVR.h"
 
-OVRHMDSinkNode::OVRHMDSinkNode(OpenGLImp *pOGLImp, OVRHMD *pParentHMD) :
+OVRHMDSinkNode::OVRHMDSinkNode(OGLImp *pOGLImp, OVRHMD *pParentHMD) :
 	HMDSinkNode("ovrhmdsinknode"),
 	m_pParentImp(pOGLImp),
 	m_pParentHMD(pParentHMD)

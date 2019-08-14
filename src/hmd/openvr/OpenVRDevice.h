@@ -1,5 +1,6 @@
 #ifndef OPENVR_DEVICE_H_
 #define OPENVR_DEVICE_H_
+#ifndef OCULUS_PRODUCTION_BUILD
 
 #include "core/ehm/EHM.h"
 
@@ -12,12 +13,12 @@
 // of the headset being used
 
 // TODO: Get rid of this, all this should be done in the build config
-#ifndef OCULUS_PRODUCTION_BUILD
-#include <openvr.h>
-#include "third_party/Matrices/Matrices.h"
-
 #include <vector>
 #include <algorithm>
+
+#include <openvr.h>
+
+#include "third_party/Matrices/Matrices.h"
 
 // TODO: Should this go into Sense?
 #include "hmd/HMD.h"
@@ -40,7 +41,7 @@ class OpenVRDevice : public HMD {
 	friend class OpenVRHMDSinkNode;
 
 public:
-	OpenVRDevice(SandboxApp *pParentSandbox);
+	OpenVRDevice(Sandbox *pParentSandbox);
 	~OpenVRDevice();
 
 	// TODO: Do this for vive
@@ -129,5 +130,6 @@ public:
 private:
 	OpenVRHMDSinkNode *m_pOpenVRHMDSinkNode = nullptr;
 };
-#endif
+
+#endif // ! OCULUS_PRODUCTION_BUILD
 #endif // ! OPENVR_DEVICE_H_

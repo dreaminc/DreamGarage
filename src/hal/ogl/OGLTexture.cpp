@@ -1,11 +1,11 @@
 #include "OGLTexture.h"
 
-#include "Primitives/image/image.h"
-#include "Primitives/image/ImageFactory.h"
+#include "core/image/image.h"
+#include "core/image/ImageFactory.h"
 
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 
-OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::type type, GLenum textureTarget) :
+OGLTexture::OGLTexture(OGLImp *pParentImp, texture::type type, GLenum textureTarget) :
 	texture(type),
 	m_glTextureIndex(0),
 	m_glTextureTarget(textureTarget),
@@ -27,7 +27,7 @@ OGLTexture::OGLTexture(const OGLTexture &pOGLTexture) :
 	// NOTE: this will not copy buffers on either GPU or CPU side
 }
 
-OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::params *pTextureParams) :
+OGLTexture::OGLTexture(OGLImp *pParentImp, texture::params *pTextureParams) :
 	texture(pTextureParams),
 	m_glTextureIndex(0),
 	m_pParentImp(pParentImp)
@@ -316,7 +316,7 @@ Error:
 	return pTexture;
 }
 
-OGLTexture* OGLTexture::MakeTextureFromAllocatedTexture(OpenGLImp *pParentImp, texture::type type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels, int samples) {
+OGLTexture* OGLTexture::MakeTextureFromAllocatedTexture(OGLImp *pParentImp, texture::type type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels, int samples) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pTexture = nullptr;

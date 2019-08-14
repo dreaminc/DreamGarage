@@ -28,10 +28,10 @@ public:
 	}
 
 	// This is largely a redefinition
-	virtual RESULT InitializeRenderingContext() = 0;
-	virtual RESULT InitializeRenderingContext(version versionOGL) = 0;
-	virtual RESULT MakeCurrentContext() = 0;
-	virtual RESULT ReleaseCurrentContext() = 0;
+	//virtual RESULT InitializeRenderingContext() = 0;
+	//virtual RESULT InitializeRenderingContext(version versionOGL) = 0;
+	//virtual RESULT MakeCurrentContext() = 0;
+	//virtual RESULT ReleaseCurrentContext() = 0;
 };
 
 #endif // ! OPEN_GL_RENDERING_CONTEXT

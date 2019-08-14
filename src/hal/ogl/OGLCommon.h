@@ -19,6 +19,8 @@
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
 
+#include "core/primitives/color.h"
+
 GLenum GetOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int channels = 3);
 GLint GetInternalOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int bitsPerPixel = 8, int channels = 4);
 

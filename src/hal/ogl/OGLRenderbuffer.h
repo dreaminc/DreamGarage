@@ -1,15 +1,18 @@
 #ifndef OGL_RENDERBUFFER_H_
 #define OGL_RENDERBUFFER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/HAL/opengl/OGLRenderbuffer.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLRenderbuffer.h
+
 // OpenGL Renderbuffer Primitive
 
-#include "HAL/opengl/OpenGLImp.h"
+#include "OGLImp.h"
 
-class OGLRenderbuffer {
+#include "core/types/DObject.h"
+
+class OGLRenderbuffer : public DObject {
 public:
 	OGLRenderbuffer(OpenGLImp *pParentImp, int width, int height, int sampleCount);
 	~OGLRenderbuffer();

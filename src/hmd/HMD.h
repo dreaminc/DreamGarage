@@ -13,8 +13,9 @@
 
 #include <time.h>       
 
+#include "core/types/DObject.h"
+
 #include "core/types/Publisher.h"
-#include "core/types/UID.h"
 
 #include "core/matrix/ViewMatrix.h"
 #include "core/matrix/ProjectionMatrix.h"
@@ -29,7 +30,7 @@
 #define HMD_NUM_EYES 2
 
 class HALImp;
-class SandboxApp;
+class Sandbox;
 
 class hand;
 class composite;
@@ -65,9 +66,9 @@ typedef struct HMDEvent {
 	}
 } HMD_EVENT;
 
-class HMD : public Publisher<HMDEventType, HMDEvent> {
+class HMD : public DObject, public Publisher<HMDEventType, HMDEvent> {
 public:
-	HMD(SandboxApp *pParentSandbox) :
+	HMD(Sandbox *pParentSandbox) :
 		m_pHALImp(nullptr),
 		m_pParentSandbox(pParentSandbox),
 		m_eyeWidth(0),
@@ -156,17 +157,16 @@ protected:
 	uint32_t m_eyeWidth;
 	uint32_t m_eyeHeight;
 
-	HALImp *m_pHALImp;	// TODO: This may not be needed if Sandbox parent is kept
+	// TODO: This may not be needed if Sandbox parent is kept
+	HALImp *m_pHALImp = nullptr;	
 
-	SandboxApp *m_pParentSandbox;
+	Sandbox *m_pParentSandbox = nullptr;
 
-	hand* m_pLeftHand;
-	hand* m_pRightHand;
+	// TODO: fix this
+	hand* m_pLeftHand = nullptr;
+	hand* m_pRightHand = nullptr;
 
-	SenseController *m_pSenseController;
-
-private:
-	UID m_uid;
+	SenseController *m_pSenseController = nullptr;
 };
 
 #endif // ! HMD_H_

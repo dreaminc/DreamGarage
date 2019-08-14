@@ -1,23 +1,27 @@
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 
-#include "DreamLogger/DreamLogger.h"
+#include <vector>
+#include <algorithm>
+
+#include "logger/DreamLogger.h"
+
 #include "easylogging++.h"
 
 #include "OGLObj.h"
 #include "OGLFramebuffer.h"
 
-#include "Primitives/matrix/ProjectionMatrix.h"
-#include "Primitives/matrix/TranslationMatrix.h"
-#include "Primitives/matrix/RotationMatrix.h"
+#include "core/Utilities.h"
 
-#include <vector>
-#include <algorithm>
+#include "core/matrix/ProjectionMatrix.h"
+#include "core/matrix/TranslationMatrix.h"
+#include "core/matrix/RotationMatrix.h"
+
+#include "core/text/font.h"
 
 #include "OGLVolume.h"
 
 #include "OGLMesh.h"
 #include "OGLText.h"
-#include "Primitives/font.h"
 #include "OGLTriangle.h"
 #include "OGLQuad.h"
 
@@ -26,7 +30,7 @@
 #include "OGLComposite.h"
 #include "OGLFlatContext.h"
 #include "OGLModel.h"
-#include "Primitives/light.h"
+#include "core/primitives/light.h"
 #include "OGLTexture.h"
 #include "OGLCubemap.h"
 #include "OGLSkybox.h"
@@ -40,9 +44,7 @@
 #include "OGLViewportDisplay.h"
 #include "OGLCameraViewportDisplay.h"
 
-#include "Core/Utilities.h"
-
-OGLImp::OGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
+OGLImp::OGLImp(OGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
 	m_versionGLSL(0),
 	m_pOpenGLRenderingContext(pOpenGLRenderingContext)

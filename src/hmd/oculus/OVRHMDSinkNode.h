@@ -12,17 +12,17 @@
 #include "hmd/HMDSinkNode.h"
 
 // Include the Oculus SDK
-#include "third_party/OCULUS/v1.12.0/LibOVR/Include/OVR_CAPI_GL.h"
+#include "OVR_CAPI_GL.h"
 
 #define MS_90_FPS (1.0f / 90.0f)
 
-class OpenGLImp;
+class OGLImp;
 class OVRHMD;
 class OVRTextureSwapChain;
 
 class OVRHMDSinkNode : public HMDSinkNode {
 public:
-	OVRHMDSinkNode(OpenGLImp *pOGLImp, OVRHMD *pParentHMD);
+	OVRHMDSinkNode(OGLImp *pOGLImp, OVRHMD *pParentHMD);
 	~OVRHMDSinkNode();
 
 	RESULT OGLInitialize();
@@ -45,7 +45,7 @@ private:
 
 private:
 	OVRHMD *m_pParentHMD = nullptr;
-	OpenGLImp *m_pParentImp = nullptr;
+	OGLImp *m_pParentImp = nullptr;
 
 	DConnection *m_pInputConnection[HMD_NUM_EYES] = { nullptr };
 

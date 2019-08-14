@@ -1,12 +1,12 @@
 #include "OGLFramebuffer.h"
 
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 
 #include "OGLTexture.h"
 #include "OGLAttachment.h"
 #include "OGLRenderbuffer.h"
 
-OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp) :
+OGLFramebuffer::OGLFramebuffer(OGLImp *pParentImp) :
 	framebuffer(),
 	m_pParentImp(pParentImp),
 	m_pDrawBuffers(nullptr),
@@ -15,7 +15,7 @@ OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp) :
 	// empty
 }
 
-OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int channels) :
+OGLFramebuffer::OGLFramebuffer(OGLImp *pParentImp, int width, int height, int channels) :
 	framebuffer(width, height, channels),
 	m_pParentImp(pParentImp),
 	m_pDrawBuffers(nullptr),

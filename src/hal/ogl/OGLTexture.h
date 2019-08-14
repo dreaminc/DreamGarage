@@ -15,7 +15,7 @@
 #define NUM_PACK_BUFFERS 2
 #define NUM_UNPACK_BUFFERS 2
 
-class OpenGLImp;
+class OGLImp;
 
 class OGLTexture : public texture {
 public:
@@ -79,13 +79,13 @@ public:
 	static OGLTexture *MakeTexture(const texture &srcTexture);
 	static OGLTexture *MakeTexture(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, int levels = 0, int samples = 1);
 	static OGLTexture *MakeTextureWithFormat(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, GLint internalGLFormat = GL_DEPTH_COMPONENT24, GLenum glFormat = GL_DEPTH_COMPONENT, GLenum pixelDataType = GL_UNSIGNED_INT, int levels = 1, int samples = 0);
-	static OGLTexture *MakeTextureFromAllocatedTexture(OpenGLImp *pParentImp, texture::type type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels = 0, int samples = 1);
+	static OGLTexture *MakeTextureFromAllocatedTexture(OGLImp *pParentImp, texture::type type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels = 0, int samples = 1);
 	static OGLTexture *MakeTextureFromPath(OpenGLImp *pParentImp, texture::type type, std::wstring wstrFilename);
 	static OGLTexture *MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, PIXEL_FORMAT format, void *pBuffer, size_t pBuffer_n);
 	static OGLTexture *MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture::type type, void *pBuffer, size_t pBuffer_n);
 
 private:
-	OpenGLImp *m_pParentImp = nullptr;
+	OGLImp *m_pParentImp = nullptr;
 
 	GLuint m_glFramebufferIndex = 0;
 	GLuint m_glFlippedTextureIndex = 0;

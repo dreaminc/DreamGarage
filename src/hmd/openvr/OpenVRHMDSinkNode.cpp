@@ -3,11 +3,10 @@
 #include "OpenVRHMDSinkNode.h"
 #include "OpenVRDevice.h"
 
-#include "HAL/opengl/OGLFramebuffer.h"
+#include "hal/ogl/OGLFramebuffer.h"
+#include "hal/ogl/OGLTexture.h"
 
-#include "HAL/opengl/OGLTexture.h"
-
-OpenVRHMDSinkNode::OpenVRHMDSinkNode(OpenGLImp *pOGLImp, OpenVRDevice *pParentHMD) :
+OpenVRHMDSinkNode::OpenVRHMDSinkNode(OGLImp *pOGLImp, OpenVRDevice *pParentHMD) :
 	HMDSinkNode("openvrhmdsinknode"),
 	m_pParentImp(pOGLImp),
 	m_pParentHMD(pParentHMD)
@@ -50,7 +49,9 @@ RESULT OpenVRHMDSinkNode::RenderNode(long frameID) {
 	std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
 	auto pCamera = m_pParentImp->GetCamera();
+
 	double msDiff = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+	
 	if (msDiff > (MS_90_FPS * m_fpsPadding) - m_msTimeSpentOnRenderAvg) {
 		lastUpdateTime = timeNow;
 		pCamera->ResizeCamera(m_pParentHMD->GetEyeWidth(), m_pParentHMD->GetEyeHeight());
@@ -166,7 +167,8 @@ RESULT OpenVRHMDSinkNode::SubmitFrame() {
 
 	glFinish();
 
-//Error:
+Error:
 	return r;
 }
-#endif
+
+#endif // ! OCULUS_PRODUCTION_BUILD

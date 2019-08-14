@@ -1,6 +1,6 @@
 #include "HMD.h"
 
-#include "Primitives/hand/hand.h"
+#include "core/hand/hand.h"
 
 RESULT HMD::AttachHand(hand *pHand, HAND_TYPE type) {
 	HandState state;

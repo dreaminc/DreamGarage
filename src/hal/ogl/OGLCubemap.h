@@ -1,15 +1,16 @@
 #ifndef OGL_CUBE_MAP_H_
 #define OGL_CUBE_MAP_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/opengl/OGLCubemap.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLCubemap.h
+
 // Base type for cube map
 
-#include "Primitives/cubemap.h"
+#include "OGLCommon.h"
 
-#include "OpenGLCommon.h"
+#include "core/primitives/cubemap.h"
 
 class OpenGLImp;
 

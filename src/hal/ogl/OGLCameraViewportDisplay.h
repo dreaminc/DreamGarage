@@ -1,12 +1,15 @@
 #ifndef OGL_CAMERA_VIEWPORT_DISPLAY_H_
 #define OGL_CAMERA_VIEWPORT_DISPLAY_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLCameraViewportDisplay.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLCameraViewportDisplay.h
+
 // This represents a view port display and respect OGL contexts as needed
 // but uses an external camera (vs. the HAL implementation based camera)
 
-#include "HAL/Pipeline/SinkNode.h"
+#include "pipeline/SinkNode.h"
 
 class OpenGLImp;
 class OGLFramebuffer;

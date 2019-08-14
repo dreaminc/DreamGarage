@@ -1,14 +1,16 @@
 #ifndef OGL_CYLINDER_H_
 #define OGL_CYLINDER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/OpenGL/OGLCylinder.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLCylinder.h
+
 // OpenGL Sphere Object
 
 #include "OGLObj.h"
-#include "Primitives/cylinder.h"
+
+#include "core/primitives/cylinder.h"
 
 // Pyramid inheritance throws a dominance warning which needs to be suppressed 
 // until c++ adds a special keyword to deal with this issue, this is by design

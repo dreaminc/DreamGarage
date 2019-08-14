@@ -1,12 +1,11 @@
 #include "OVRMirrorTexture.h"
 
-#include "HAL/opengl/OpenGLImp.h"
-#include "HAL/opengl/OGLAttachment.h"
+#include "hal/ogl/OGLImp.h"
+#include "hal/ogl/OGLAttachment.h"
+#include "hal/ogl/OGLTexture.h"
+#include "hal/ogl/OGLFramebuffer.h"
 
-#include "HAL/opengl/OGLTexture.h"
-#include "HAL/opengl/OGLFramebuffer.h"
-
-OVRMirrorTexture::OVRMirrorTexture(OpenGLImp *pParentImp, ovrSession session, int width, int height) :
+OVRMirrorTexture::OVRMirrorTexture(OGLImp *pParentImp, ovrSession session, int width, int height) :
 	m_pParentImp(pParentImp),
 	m_ovrSession(session),
 	m_width(width),

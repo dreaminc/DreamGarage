@@ -1,29 +1,30 @@
 #include "OVR.h"
+
 #include <math.h>
 
-#include "Sandbox/SandboxApp.h"
-
-// TODO: Fix this encapsulation
-#include "HAL/opengl/OpenGLImp.h"
-
-#include "Primitives/stereocamera.h"
-#include "Primitives/rectangle.h"
-#include "Primitives/hand/hand.h"
-
 #include "Extras/OVR_Math.h"
-
-#include "DreamLogger/DreamLogger.h"
+#include "OVR_CAPI_Audio.h"
 
 #include "OVRHMDSinkNode.h"
-
 #include "OVRTouchController.h"
-
 #include "OVRPlatform.h"
 
-#include "OVR_CAPI_Audio.h"
-#include "Core/Utilities.h"
+#include "sandbox/Sandbox.h"
 
-OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
+// TODO: Fix this encapsulation
+#include "hal/ogl/OGLImp.h"
+
+#include "core/Utilities.h"
+
+#include "core/camera/stereocamera.h"
+
+#include "core/primitives/rectangle.h"
+
+#include "core/hand/hand.h"
+
+#include "logger/DreamLogger.h"
+
+OVRHMD::OVRHMD(Sandbox *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_ovrSession(nullptr),
 	m_pOVRMirrorTexture(nullptr)
@@ -42,7 +43,7 @@ RESULT OVRHMD::InitializeHMDSourceNode() {
 RESULT OVRHMD::InitializeHMDSinkNode() {
 	RESULT r = R_PASS;
 
-	OpenGLImp *pOGLImp = dynamic_cast<OpenGLImp*>(m_pHALImp);
+	OGLImp *pOGLImp = dynamic_cast<OGLImp*>(m_pHALImp);
 	CN(pOGLImp);
 
 	m_pOVRHMDSinkNode = new OVRHMDSinkNode(pOGLImp, this);
@@ -69,7 +70,7 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight, bool f
 
 	ovrGraphicsLuid luid;
 	m_pHALImp = halimp;
-	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(halimp);
+	OGLImp *oglimp = dynamic_cast<OGLImp*>(halimp);
 
 	// Initializes Oculus Platform
 	m_pOVRPlatform = new OVRPlatform();

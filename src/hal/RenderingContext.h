@@ -10,6 +10,7 @@
 // targets
 
 #include "core/types/DObject.h"
+#include "core/types/version.h"
 
 class Sandbox;
 

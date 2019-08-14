@@ -19,13 +19,13 @@
 // TODO: Remove ALL code side pragmas and push into the CMake configuration
 #ifndef OCULUS_PRODUCTION_BUILD
 
-class OpenGLImp;
+class OGLImp;
 class OpenVRDevice;
 class OGLFramebuffer;
 
 class OpenVRHMDSinkNode : public HMDSinkNode {
 public:
-	OpenVRHMDSinkNode(OpenGLImp *pOGLImp, OpenVRDevice *pParentHMD);
+	OpenVRHMDSinkNode(OGLImp *pOGLImp, OpenVRDevice *pParentHMD);
 	~OpenVRHMDSinkNode();
 
 	RESULT OGLInitialize();
@@ -42,7 +42,7 @@ private:
 
 private:
 	OpenVRDevice *m_pParentHMD = nullptr;
-	OpenGLImp *m_pParentImp = nullptr;
+	OGLImp *m_pParentImp = nullptr;
 
 	DConnection *m_pInputConnection[HMD_NUM_EYES] = { nullptr };
 

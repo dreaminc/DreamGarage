@@ -1,13 +1,14 @@
 #include "HMDFactory.h"
 
-#include "HMD\Oculus\OVR.h"
+#include "hmd\oculus\OVR.h"
 
+// TODO: Get rid of this
 #ifndef OCULUS_PRODUCTION_BUILD
-	#include "HMD\OpenVR\OpenVRDevice.h"
+	#include "hmd\openvr\OpenVRDevice.h"
 #endif
 
 // TODO: Sandbox might be enough, don't need to pass HAL as well
-HMD* HMDFactory::MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *halimp, int wndWidth, int wndHeight, bool fHMDMirror) {
+HMD* HMDFactory::MakeHMD(HMD_TYPE type, Sandbox *pParentSandbox, HALImp *halimp, int wndWidth, int wndHeight, bool fHMDMirror) {
 	RESULT r = R_PASS;
 	HMD *pHMD = nullptr;
 

@@ -1,10 +1,11 @@
 #ifndef OVR_MIRROR_TEXTURE_H_
 #define OVR_MIRROR_TEXTURE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
 // Dream OS
-// DreamOS/HMD/Oculus/OVRMirrorTexture.h
+// dos/src/hmd/oculus/OVRMirrorTexture.h
+
 // The Oculus Mirror Texture API allows for pulling out the view presented on the HMD
 // so it's possible to inspect the output of the compositor on the machine (good for debug)
 
@@ -12,13 +13,15 @@
 
 #include "OVR_CAPI_GL.h"
 
-class OpenGLImp;
+#include "core/types/DObject.h"
+
+class OGLImp;
 class OGLFramebuffer;
 class OGLTexture;
 
-class OVRMirrorTexture {
+class OVRMirrorTexture : public DObject {
 public:
-	OVRMirrorTexture(OpenGLImp *pParentImp, ovrSession session, int width, int height);
+	OVRMirrorTexture(OGLImp *pParentImp, ovrSession session, int width, int height);
 	~OVRMirrorTexture();
 
 	RESULT OVRInitialize();
@@ -26,14 +29,14 @@ public:
 	RESULT DestroyMirrorTexture();
 
 private:
-	OpenGLImp *m_pParentImp;
+	OGLImp *m_pParentImp = nullptr;
 	ovrSession m_ovrSession;
 
 	ovrMirrorTextureDesc m_ovrMirrorTextureDescription;
 	ovrMirrorTexture m_pOVRMirrorTexture;
 
-	OGLFramebuffer *m_pOGLFramebuffer;
-	OGLTexture *m_pOGLTexture;
+	OGLFramebuffer *m_pOGLFramebuffer = nullptr;
+	OGLTexture *m_pOGLTexture = nullptr;
 
 	int m_width;
 	int m_height;

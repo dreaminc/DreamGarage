@@ -13,7 +13,6 @@
 #include "core/types/Factory.h"
 
 #include "hal/HALImp.h"
-#include "sandbox/Sandbox.h"
 
 typedef enum {
 	HMD_OVR,
@@ -22,6 +21,7 @@ typedef enum {
 	HMD_INVALID
 } HMD_TYPE;
 
+class Sandbox;
 
 class HMDFactory : public Factory {
 public:

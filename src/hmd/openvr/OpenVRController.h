@@ -1,17 +1,17 @@
 #ifndef OPENVR_CONTROLLER_H_
 #define OPENVR_CONTROLLER_H_
+#ifndef OCULUS_PRODUCTION_BUILD
 
-#include <windows.h>
+#include "core/ehm/EHM.h"
 
-#include "RESULT/EHM.h"
+// Dream HMD OpenVR
+// dos/src/hm/openvr/OpenVRController.h
 
-// DREAM OS
-// DreamOS/HMD/OpenVR/OpenVRController.h
 // The OpenVR controller class
 
-#ifndef OCULUS_PRODUCTION_BUILD
 // Include the OpenVR SDK
 #include <openvr.h>
+#include <windows.h>
 
 #include "Sense/SenseController.h"
 
@@ -34,5 +34,6 @@ public:
 private:
 	vr::IVRSystem *m_pIVRHMD = nullptr;
 };
-#endif
-#endif // ! OPENVR_CONTROLLER_H_
+
+#endif	// ! OCULUS_PRODUCTION_BUILD
+#endif	// ! OPENVR_CONTROLLER_H_

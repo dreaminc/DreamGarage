@@ -1,14 +1,16 @@
 #ifndef OGL_COMPOSITE_H_
 #define OGL_COMPOSITE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/OpenGL/OGLComposite.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLComposite.h
+
 // OpenGL Composite Object
 
 #include "OGLObj.h"
-#include "Primitives/composite.h"
+
+#include "core/primitives/composite.h"
 
 // Pyramid inheritance throws a dominance warning which needs to be suppressed 
 // until c++ adds a special keyword to deal with this issue, this is by design

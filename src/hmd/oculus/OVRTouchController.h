@@ -1,20 +1,20 @@
 #ifndef OVR_TOUCH_CONTROLLER_H_
 #define OVR_TOUCH_CONTROLLER_H_
 
-#include <windows.h>
+#include "core/ehm/EHM.h"
 
-#include "RESULT/EHM.h"
+// Dream HMD
+// dos/src/hmd/oculus/OVRTouchController.h
 
-// DREAM OS
-// DreamOS/HMD/Oculus/OVRTouchController.h
 // The OVR touch controller
+
+#include <vector>
+#include <windows.h>
 
 // Include the Oculus SDK
 #include "OVR_CAPI_GL.h"
 
-#include "Sense/SenseController.h"
-
-#include <vector>
+#include "sense/SenseController.h"
 
 #define OVR_HAPTIC_FREQUENCY 320.0f
 

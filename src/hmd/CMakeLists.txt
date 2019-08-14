@@ -18,6 +18,17 @@ file(GLOB OPENVR_SOURCES
 )
 source_group("openvr" FILES ${OPENVR_SOURCES})
 
+# Oculus
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/OCULUS/v1.12.0/LibOVR/Include)
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/OCULUS/OVRPlatformSDK_v1.24.0/Include)
+
+# OpenVR
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/openvr/headers)
+
+# TODO: This should not be here!!!!
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
+add_definitions(-DWEBRTC_WIN)
+
 # Force Include the src/core/config.h
 if(MSVC)
     add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")

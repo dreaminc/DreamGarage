@@ -51,7 +51,10 @@ typedef struct SenseControllerEvent : SenseDevice::SenseDeviceEvent {
 	}
 } SENSE_CONTROLLER_EVENT;
 
-class SenseController : public SenseDevice, public Publisher<SenseControllerEventType, SenseControllerEvent> {
+class SenseController : 
+	public SenseDevice, 
+	public Publisher<SenseControllerEventType, SenseControllerEvent> 
+{
 
 public:
 	enum class HapticCurveType {

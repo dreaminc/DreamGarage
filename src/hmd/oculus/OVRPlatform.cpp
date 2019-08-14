@@ -1,14 +1,12 @@
 #include "OVRPlatform.h"
 #include "OVR_Platform.h"
 
-OVRPlatform::OVRPlatform() 
-{
-	// empty stub
+OVRPlatform::OVRPlatform() {
+	// 
 }
 
-OVRPlatform::~OVRPlatform() 
-{
-	// empty stub
+OVRPlatform::~OVRPlatform()  {
+	// 
 }
 
 RESULT OVRPlatform::InitializePlatform() {

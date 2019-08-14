@@ -2,11 +2,10 @@
 #define SANDBOX_APP_H_
 
 #include "core/ehm/EHM.h"
-#include "core/types/UID.h"
-#include "core/types/valid.h"
 
-// DREAM OS
-// DreamOS/SandboxApp.h
+// Dream Sandbox
+// sandbox/Sandbox.h
+
 // The Sandbox App is effectively a class to contain the common functions of running DreamOS in a Sandbox mode
 // on a given platform.  A Sandbox implementation should effectively virtualize the host system as if it is running
 // natively on the DreamBox
@@ -17,6 +16,8 @@
 #include "xstring"                                     // for string, wstring
 #include <stddef.h>                                    // for size_t
 #include <windef.h>                                    // for HWND // TODO: Should remove or use for windows only
+
+#include "core/types/DObject.h"
 
 #include "hal/HALImp.h"
 
@@ -34,7 +35,7 @@
 #include "sense/SenseController.h"
 #include "sense/SenseGamepadController.h"
 
-#include "hmd/HMD.h"                                   // for HMD (ptr only), HMDEvent (ptr only), HMDEventType
+#include "hmd/HMD.h"                                   
 #include "hmd/HMDFactory.h"
 
 #include "pipeline/PipelineCommon.h"				// for PIPELINE_FLAGS, PIPELINE_FLAGS::NONE
@@ -98,7 +99,6 @@ class Message;
 
 class UIKeyboardLayout;
 
-
 class NamedPipeClient;
 class NamedPipeServer;
 
@@ -108,7 +108,7 @@ class Sandbox :
 	public Subscriber<SenseMouseEvent>,
 	public Subscriber<CollisionGroupEvent>, 
 	public Subscriber<CollisionObjectEvent>,
-	public valid 
+	public DObject
 {
 	friend class DreamOS;
 
@@ -563,9 +563,6 @@ protected:
 private:
 	bool m_fRunning = false;
 	bool m_fPendingShutdown = false;
-
-private:
-	UID m_uid;
 
 public:
 	std::wstring GetHardwareID();

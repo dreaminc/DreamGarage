@@ -1,11 +1,19 @@
 #ifndef OVRPLATFORM_H_
 #define OVRPLATFORM_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream HMD Oculus
+// dos/src/hmd/oculus/OVRPlatform.h
+
+// TODO: This isn't really a HMD thing, more of an Oculus platform thing
+// and should be put into a diff spot I think
 
 #include "OVR_Platform.h"
 
-class OVRPlatform {
+#include "core/types/DObject.h"
+
+class OVRPlatform : public DObject {
 	
 public:
 	OVRPlatform();
@@ -15,7 +23,6 @@ public:
 	RESULT Update();
 
 protected:
-
 	// TODO: get from API?
 	const char* m_pszappID = "2255211697837160";
 

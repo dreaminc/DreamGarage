@@ -1,21 +1,22 @@
 #ifndef OCULUS_PRODUCTION_BUILD
-#include "OpenVRDevice.h"
 
-#include "Sandbox/SandboxApp.h"
+#include "OpenVRDevice.h"
 
 #include <stdint.h>
 
-#include "DreamLogger/DreamLogger.h"
-
 #include "OpenVRHMDSinkNode.h"
+
+#include "sandbox/Sandbox.h"
+
+#include "logger/DreamLogger.h"
 
 #include "OpenVRController.h"
 
-#include "Core/Utilities.h"
+#include "core/Utilities.h"
 
-#include "Primitives/hand/hand.h"
+#include "core/hand/hand.h"
 
-OpenVRDevice::OpenVRDevice(SandboxApp *pParentSandbox) :
+OpenVRDevice::OpenVRDevice(Sandbox *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_pIVRHMD(nullptr),
 	m_pRenderModels(nullptr),
@@ -25,6 +26,7 @@ OpenVRDevice::OpenVRDevice(SandboxApp *pParentSandbox) :
 {
 	// TODO
 }
+
 OpenVRDevice::~OpenVRDevice() {
 	if (m_pIVRHMD != nullptr) {
 		delete m_pIVRHMD;
@@ -42,7 +44,7 @@ RESULT OpenVRDevice::InitializeHMDSourceNode() {
 RESULT OpenVRDevice::InitializeHMDSinkNode() {
 	RESULT r = R_PASS;
 
-	OpenGLImp *pOGLImp = dynamic_cast<OpenGLImp*>(m_pHALImp);
+	OGLImp *pOGLImp = dynamic_cast<OGLImp*>(m_pHALImp);
 	CN(pOGLImp);
 
 	m_pOpenVRHMDSinkNode = new OpenVRHMDSinkNode(pOGLImp, this);
@@ -884,4 +886,5 @@ ViewMatrix OpenVRDevice::GetViewMatrix(EYE_TYPE eye) {
 
 	return viewMat;
 }
-#endif
+
+#endif // ! OCULUS_PRODUCTION_BUILD

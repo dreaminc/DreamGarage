@@ -1,19 +1,22 @@
 #ifndef OVR_H_
 #define OVR_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HMD/Oculus/OVR.h
+// Dream HMD Oculus
+// dos/src/hmd/oculus/OVR.h
+
+#include <vector>
+#include <algorithm>
+
 // The Oculus Rift headset class - might sub class to other rift versions over time
 
 // TODO: Should this go into Sense?
 
-#include "HMD/HMD.h"
-#include "HAL/opengl/OGLAttachment.h"
+#include "hmd/HMD.h"
 
-// TODO: Better way?
-#define HMD_OVR_USE_PREDICTED_TIMING
+#include "hal/ogl/OGLAttachment.h"
+#include "hal/ogl/OGLFramebuffer.h"
 
 //#include "External\OCULUS\v132\LibOVR\Include\OVR_CAPI.h"
 //#pragma comment(lib, "External/OCULUS/v132/LibOVR/Lib/Windows/x64/Release/VS2015/LibOVR.lib")
@@ -21,11 +24,10 @@
 // Include the Oculus SDK
 #include "OVR_CAPI_GL.h"
 
-#include <vector>
-#include <algorithm>
-
-#include "HAL/opengl/OGLFramebuffer.h"
 #include "OVRMirrorTexture.h"
+
+// TODO: Better way?
+#define HMD_OVR_USE_PREDICTED_TIMING
 
 class OGLFramebuffer;
 class OVRPlatform;
@@ -34,7 +36,7 @@ class OVRHMD : public HMD {
 	friend class OVRHMDSinkNode;
 
 public:
-	OVRHMD(SandboxApp *pParentSandbox);
+	OVRHMD(Sandbox *pParentSandbox);
 	~OVRHMD();
 
 	virtual HMDSinkNode *GetHMDSinkNode() override;

@@ -1,32 +1,35 @@
 #ifndef OVR_TEXTURE_SWAP_CHAIN_H_
 #define OVR_TEXTURE_SWAP_CHAIN_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HMD/Oculus/OVRTextureSwapChain.h
+// Dream HMD Oculus
+// dos/src/hmd/oculus/OVRTextureSwapChain.h
+
 // The Oculus uses a texture swap chain to pass images to the HMD and doesn't fit 
 // into a clear cut representation of a single texture / buffer so this class 
 // should wrap up the respective frame and depth buffers as well as the respective textures in the 
 // chain
 
-#include "HAL/opengl/OpenGLImp.h"
-#include "HAL/opengl/OGLAttachment.h"
+#include <vector>
+
 #include "OVR_CAPI_GL.h"
 
-#include "HAL/opengl/OGLTexture.h"
-#include "HAL/opengl/OGLFramebuffer.h"
+#include "core/types/DObject.h"
 
-#include <vector>
+#include "hal/ogl/OGLImp.h"
+#include "hal/ogl/OGLAttachment.h"
+#include "hal/ogl/OGLTexture.h"
+#include "hal/ogl/OGLFramebuffer.h"
 
 #define DEFAULT_TEXTURE_SWAP_CHAIN_CHANNELS 3
 #define DEFAULT_OVR_MULTI_SAMPLE 4
 
-class OVRTextureSwapChain {
+class OVRTextureSwapChain : public DObject {
 	friend class OVRHMDSinkNode;
 
 public:
-	OVRTextureSwapChain(OpenGLImp *pParentImp, ovrSession session, int width, int height, int mipLevels, unsigned char *data, int sampleCount);
+	OVRTextureSwapChain(OGLImp *pParentImp, ovrSession session, int width, int height, int mipLevels, unsigned char *data, int sampleCount);
 	~OVRTextureSwapChain();
 
 	RESULT OVRInitialize();
@@ -66,7 +69,7 @@ protected:
 
 	int m_textureSwapChainLength;
 	
-	OpenGLImp *m_pParentImp;
+	OGLImp *m_pParentImp = nullptr;
 };
 
 #endif // !OVR_TEXTURE_SWAP_CHAIN_H_
