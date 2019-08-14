@@ -1,26 +1,31 @@
 #ifndef DREAM_UI_BAR_H_
 #define DREAM_UI_BAR_H_
 
+#include "core/ehm/EHM.h"
 
-#include "InteractionEngine/InteractionObjectEvent.h"
-
-#include "Cloud/Menu/MenuController.h"
-
-
-#include "UI/UISpatialScrollView.h"
-
-#include "DreamUserApp.h"
+// Dream Apps UI Bar App
+// TODO: Review the naming / functionality here
 
 #include <functional>
 #include <stack>
-
 #include "memory"                                      // for shared_ptr
-#include "Primitives/hand/HandType.h"                  // for HAND_TYPE
-#include "Primitives/point.h"                          // for point
-#include "Primitives/quaternion.h"                     // for quaternion
-#include "Primitives/Types/UID.h"                      // for UID
-#include "RESULT/RESULT.h"                             // for RESULT
 #include "xstring"                                     // for string, wstring
+
+#include "modules/InteractionEngine/InteractionObjectEvent.h"
+
+#include "cloud/menu/MenuController.h"
+
+#include "ui/UISpatialScrollView.h"
+
+// TODO: No cross-app references
+#include "apps/DreamUserApp/DreamUserApp.h"
+
+#include "core/types/UID.h"                      // for UID
+
+#include "core/hand/HandType.h"                  // for HAND_TYPE
+
+#include "core/primitives/point.h"                          // for point
+#include "core/primitives/quaternion.h"                     // for quaternion
 
 class DreamAppHandle;
 class DreamOS;

@@ -1,17 +1,18 @@
 #ifndef OGL_TEXT_H_
 #define OGL_TEXT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/OpenGL/OGLText.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLText.h
 
 #include <memory>
 
 #include "OGLObj.h"
-#include "Primitives/font.h"
-#include "Primitives/text.h"
 #include "OGLTexture.h"
+
+#include "core/text/font.h"
+#include "core/text/text.h"
 
 class font;
 

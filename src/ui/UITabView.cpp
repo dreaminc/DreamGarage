@@ -1,14 +1,16 @@
 #include "UITabView.h"
 
-#include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamUserControlArea/DreamContentSource.h"
-
 #include "UI/UIFlatScrollView.h"
 #include "UI/UIButton.h"
-#include "Primitives/quad.h"
 
-#include "InteractionEngine/AnimationCurve.h"
-#include "InteractionEngine/AnimationItem.h"
+// TODO: No app references in the UI library brosef
+#include "apps/DreamUserControlAreaApp/DreamUserControlAreaApp.h"
+#include "apps/DreamUserControlAreaApp/DreamContentSource.h"
+
+#include "core/primitives/quad.h"
+
+#include "modules/AnimationEngine/AnimationCurve.h"
+#include "modules/AnimationEngine/AnimationItem.h"
 
 UITabView::UITabView(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIView(pHALImp, pDreamOS)

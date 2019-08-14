@@ -1,8 +1,11 @@
 #include "UISurface.h"
-#include "DreamOS.h"
+
+#include "os/DreamOS.h"
+
 #include "WebBrowser/WebBrowserController.h"
 
-#include "Primitives/hand/hand.h"
+// TODO: Get this outta here
+#include "core/hand/hand.h"
 
 UISurface::UISurface(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIView(pHALImp, pDreamOS)

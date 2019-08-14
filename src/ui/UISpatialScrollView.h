@@ -1,19 +1,27 @@
 #ifndef UI_SPATIAL_SCROLL_VIEW_H_
 #define UI_SPATIAL_SCROLL_VIEW_H_
 
-#include "UIView.h"
-#include "Primitives/Subscriber.h"
-#include "Sense/SenseController.h"
-#include "UI/UIScrollView.h"
+#include "core/ehm/EHM.h"
 
-#include "Cloud/Menu/MenuNode.h"	// replace this with a ScrollViewNode
+// Dream UI
+// dos/src/ui/UISpatialScrollView.h
 
 #include <queue>
+
+#include "UIScrollView.h"
+
+#include "core/types/Subscriber.h"
+
+#include "sense/SenseController.h"
+
+// TODO: Shouldn't refer to cloud - replace this with a ScrollViewNode
+#include "Cloud/Menu/MenuNode.h"	
 
 class UIButton;
 class DreamOS;
 class text;
 
+// TODO: time for config shits
 #define MAX_ELEMENTS 4
 #define MENU_CENTER_OFFSET -1.5f
 

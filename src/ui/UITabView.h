@@ -1,8 +1,17 @@
 #ifndef DREAM_TAB_VIEW_H_
 #define DREAM_TAB_VIEW_H_
 
-#include "DreamApp.h"
-#include "DreamOS.h"
+#include "core/ehm/EHM.h"
+
+// Dream UI
+// dos/src/ui/UITabView.h
+
+#include <vector>
+#include <map>
+
+#include "os/DreamOS.h"
+
+#include "os/app/DreamApp.h"
 
 class DreamUserControlArea;
 class DreamContentSource;
@@ -13,16 +22,12 @@ class UIButton;
 class UIView;
 class quad;
 
-#include <vector>
-#include <map>
-
 #define TAB_BORDER_WIDTH 0.2962f;
 #define TAB_BORDER_HEIGHT 0.675269f;
 #define TAB_WIDTH 0.2640f;
 #define TAB_HEIGHT 0.148387f;
 
-class UITabView : public UIView
-{
+class UITabView : public UIView {
 public:
 	UITabView(HALImp *pHALImp, DreamOS *pDreamOS);
 	~UITabView();

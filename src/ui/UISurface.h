@@ -1,14 +1,22 @@
 #ifndef UI_SURFACE_H_
 #define UI_SURFACE_H_
 
-#include "UIView.h"
+#include "core/ehm/EHM.h"
 
-#include "InteractionEngine/InteractionObjectEvent.h"
+// Dream UI
+// dos/src/ui/UISurface.h
+
+// UI Surface is a more specific implementation of UI View
+// TODO: Review this design
+
 #include <chrono>
+
+#include "UIView.h"
 
 class DreamOS;
 class hand;
 class quad;
+class InteractionObjectEvent;
 
 #define SCROLL_CONSTANT 10.0f
 

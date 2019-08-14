@@ -15,6 +15,10 @@ file(GLOB DREAM_CONTROL_VIEW_SOURCES
 )
 source_group("" FILES ${DREAM_CONTROL_VIEW_SOURCES})
 
+# TODO: This should not be here!!!
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
+add_definitions(-DWEBRTC_WIN)
+
 # DREAM_CONTROL_VIEW_Force Include the src/core/config.h
 if(MSVC)
     add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")

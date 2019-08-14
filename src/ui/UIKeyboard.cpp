@@ -1,20 +1,23 @@
 #include "UIKeyboard.h"
-#include "DreamOS.h"
-#include "Primitives/composite.h"
 
-#include "PhysicsEngine/CollisionManifold.h"
-#include "InteractionEngine/AnimationItem.h"
+#include "os/DreamOS.h"
 
 #include "UIKey.h"
+#include "UIButton.h"
 
-#include "UI/UIButton.h"
+#include "core/primitives/composite.h"
+#include "core/primitives/framebuffer.h"
 
-#include "Primitives/font.h"
-#include "Primitives/text.h"
-#include "Primitives/framebuffer.h"
-#include "Primitives/hand/hand.h"
+#include "core/text/font.h"
+#include "core/text/text.h"
 
-#include "Sound/SoundFile.h"
+// TODO: Shouldn't be here
+#include "core/hand/hand.h"
+
+#include "modules/PhysicsEngine/CollisionManifold.h"
+#include "modules/AnimationEngine/AnimationItem.h"
+
+#include "sound/SoundFile.h"
 
 #include "Sandbox/PathManager.h"
 

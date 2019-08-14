@@ -1,8 +1,11 @@
 #include "UIMenuItem.h"
-#include "Primitives/font.h"
-#include "Primitives/text.h"
-#include "Primitives/framebuffer.h"
-#include "DreamOS.h"
+
+#include "core/text/font.h"
+#include "core/text/text.h"
+
+#include "core/primitives/framebuffer.h"
+
+#include "os/DreamOS.h"
 
 UIMenuItem::UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIButton(pHALImp, pDreamOS)
@@ -11,7 +14,7 @@ UIMenuItem::UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS) :
 
 	CR(Initialize());
 
-// Success:
+Success:
 	Validate();
 	return;
 

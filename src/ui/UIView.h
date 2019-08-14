@@ -29,6 +29,7 @@ class UIControlView;
 class UIPointerLabel;
 class DreamOS;
 
+// TODO: Review if the composite is the correct choice here 
 class UIView : public composite, public Publisher<UIEventType, UIEvent>, public Subscriber<InteractionObjectEvent> {
 public:
 	UIView(HALImp *pHALImp, DreamOS *pDreamOS);

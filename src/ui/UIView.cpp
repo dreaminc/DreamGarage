@@ -1,53 +1,62 @@
 #include "UIView.h"
-#include "Primitives/ray.h"
+
+#include "os/DreamOS.h"
+
+// TODO: Unclear why we need these here
 #include "UIButton.h"
 #include "UIMenuItem.h"
 #include "UISpatialScrollView.h"
 #include "UIFlatScrollView.h"
 #include "UISurface.h"
 #include "UIPointerLabel.h"
+#include "ui/UITabView.h"
+
+// TODO: Review
+#include "ui/DreamControlView/UIControlView.h"
+
+#include "core/primitives/ray.h"
 
 // TODO: move these files to DreamOS(?)
-#include "DreamGarage/UserAreaControls.h"
-#include "DreamGarage/UITabView.h"
-#include "DreamControlView/UIControlView.h"
-
-#include "DreamOS.h"
+#include "garage/UserAreaControls.h"
 
 UIView::UIView(HALImp *pHALImp, DreamOS	*pDreamOS) :
-composite(pHALImp),
-m_pDreamOS(pDreamOS)
+	composite(pHALImp),
+	m_pDreamOS(pDreamOS)
 {
 	RESULT r = R_PASS;
 
 	CR(Initialize());
 
+Success:
 	Validate();
 	return;
+
 Error:
 	Invalidate();
 	return;
 }
 
 UIView::UIView(HALImp *pHALImp, DreamOS	*pDreamOS, float width, float height) :
-composite(pHALImp),
-m_pDreamOS(pDreamOS),
-m_width(width),
-m_height(height)
+	composite(pHALImp),
+	m_pDreamOS(pDreamOS),
+	m_width(width),
+	m_height(height)
 {
 	RESULT r = R_PASS;
 
 	CR(Initialize());
 
+Success:
 	Validate();
 	return;
+
 Error:
 	Invalidate();
 	return;
 }
 
 UIView::~UIView() {
-
+	//
 }
 
 RESULT UIView::Initialize() {

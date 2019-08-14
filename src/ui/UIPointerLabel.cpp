@@ -1,21 +1,25 @@
 #include "UIPointerLabel.h"
-#include "DreamOS.h"
 
-#include "DreamShareView/DreamShareView.h"
+#include "os/DreamOS.h"
 
-#include "Primitives/font.h"
-#include "Primitives/text.h"
-#include "Primitives/FlatContext.h"
+// TODO: Shouldn't have app referneces here
+#include "apps/DreamShareViewApp/DreamShareViewApp.h"
 
-#include "HAL/opengl/OGLText.h"
+#include "core/text/font.h"
+#include "core/text/text.h"
 
-#include "InteractionEngine/AnimationItem.h"
+// TODO: REALLY shouldn't have OGL references here
+#include "hal/ogl/OGLText.h"
 
-#include "Sound/SoundFile.h"
+#include "core/primitives/FlatContext.h"
 
-#include "Core/Utilities.h"
+#include "modules/AnimationEngine/AnimationItem.h"
 
-#include "Sandbox/PathManager.h"
+#include "sound/SoundFile.h"
+
+#include "core/Utilities.h"
+
+#include "sandbox/PathManager.h"
 
 UIPointerLabel::UIPointerLabel(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIView(pHALImp,pDreamOS)

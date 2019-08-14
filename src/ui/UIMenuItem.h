@@ -1,10 +1,10 @@
 #ifndef UI_MENU_ITEM_H_
 #define UI_MENU_ITEM_H_
 
-#include "Primitives/valid.h"
-#include "Primitives/FlatContext.h"
-#include "Primitives/composite.h"
-#include "InteractionEngine/InteractionObjectEvent.h"
+#include "core/primitives/FlatContext.h"
+#include "core/primitives/composite.h"
+
+#include "modules/InteractionEngine/InteractionObjectEvent.h"
 
 #include "UI/UIButton.h"
 

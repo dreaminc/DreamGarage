@@ -1,15 +1,16 @@
 #ifndef OGL_TEXTURE_H_
 #define OGL_TEXTURE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/opengl/OGLTexture.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLTexture.h
+
 // Base type for texture
 
-#include "Primitives/texture.h"
+#include "OGLCommon.h"
 
-#include "OpenGLCommon.h"
+#include "core/primitives/texture.h"
 
 #define NUM_PACK_BUFFERS 2
 #define NUM_UNPACK_BUFFERS 2

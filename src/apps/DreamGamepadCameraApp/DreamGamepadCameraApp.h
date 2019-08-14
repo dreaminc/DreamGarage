@@ -6,7 +6,7 @@
 // Dream Gamepad Camera App
 // dos/src/GamepadCameraApp/DreamGamepadCameraApp.h
 
-#include "app/DreamApp.h"
+#include "os/app/DreamApp.h"
 
 #include "core/primitives/point.h"
 #include "core/primitives/point2D.h"

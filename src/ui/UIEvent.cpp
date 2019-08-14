@@ -1,5 +1,6 @@
 #include "UIEvent.h"
-#include "Primitives/VirtualObj.h"
+
+#include "core/primitives/VirtualObj.h"
 
 UIEvent::UIEvent(UIEventType eventType, VirtualObj *pObj, VirtualObj *pInteractionObject, point ptEvent, vector vDelta) :
 	m_eventType(eventType),

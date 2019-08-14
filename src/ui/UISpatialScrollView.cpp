@@ -1,19 +1,23 @@
 #include "UISpatialScrollView.h"
-#include "UIButton.h"
-#include "UIMenuItem.h"
-
-#include "InteractionEngine/AnimationCurve.h"
-#include "InteractionEngine/AnimationItem.h"
-#include "Primitives/DimObj.h"
-#include "Primitives/VirtualObj.h"
-
-#include "DreamOS.h"
-#include "Primitives/font.h"
 
 #include <chrono>
 
+#include "UIButton.h"
+#include "UIMenuItem.h"
+
+#include "modules/AnimationEngine/AnimationCurve.h"
+#include "modules/AnimationEngine/AnimationItem.h"
+
+#include "core/dimension/DimObj.h"
+
+#include "core/primitives/VirtualObj.h"
+
+#include "os/DreamOS.h"
+
+#include "core/text/font.h"
+
 UISpatialScrollView::UISpatialScrollView(HALImp *pHALImp, DreamOS *pDreamOS) :
-UIView(pHALImp, pDreamOS)
+	UIView(pHALImp, pDreamOS)
 {
 	RESULT r = R_PASS;
 
@@ -21,6 +25,7 @@ UIView(pHALImp, pDreamOS)
 
 	Validate();
 	return;
+
 Error:
 	Invalidate();
 	return;
@@ -28,7 +33,7 @@ Error:
 
 UISpatialScrollView::~UISpatialScrollView() 
 {
-
+	//
 }
 
 RESULT UISpatialScrollView::Initialize() {

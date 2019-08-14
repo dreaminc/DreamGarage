@@ -1,16 +1,22 @@
 #ifndef UI_FLAT_SCROLL_VIEW_H_
 #define UI_FLAT_SCROLL_VIEW_H_
 
-#include "UIView.h"
+#include "core/ehm/EHM.h"
+
+// Dream UI
+// dos/src/ui/UIFlatScrollView.h
+
 #include "UIScrollView.h"
-#include "Primitives/Subscriber.h"
-#include "Sense/SenseController.h"
-#include "Primitives/FlatContext.h"
+
+#include "core/types/Subscriber.h"
+
+#include "core/primitives/FlatContext.h"
+
+#include "sense/SenseController.h"
 
 class UIButton;
 class DreamOS;
 class DreamContentSource;
-//class FlatContext;
 
 class UIFlatScrollView : public UIView, public UIScrollView//, public Subscriber<SenseControllerEvent>
 {

@@ -1,25 +1,25 @@
 #include "UIFlatScrollView.h"
-#include "Primitives/Framebuffer.h"
-#include "DreamOS.h"
 
-#include "DreamUserControlArea/DreamContentSource.h"
-#include "DreamGarage/UITabView.h"
+#include "UITabView.h"
+#include "UIButton.h"
 
-#include "InteractionEngine/AnimationCurve.h"
-#include "InteractionEngine/AnimationItem.h"
+#include "os/DreamOS.h"
 
-#include "UI/UIButton.h"
+#include "core/primitives/Framebuffer.h"
+
+// TODO: this shouldn't be here
+#include "apps/DreamUserControlAreaApp/DreamContentSource.h"
+
+#include "modules/AnimationEngine/AnimationCurve.h"
+#include "modules/AnimationEngine/AnimationItem.h"
 
 UIFlatScrollView::UIFlatScrollView(HALImp *pHALImp, DreamOS *pDreamOS) :
-UIView(pHALImp, pDreamOS)
+	UIView(pHALImp, pDreamOS)
 {
-	// empty
-	
 	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
 }
 
-UIFlatScrollView::~UIFlatScrollView() 
-{
+UIFlatScrollView::~UIFlatScrollView()  {
 	// empty
 }
 

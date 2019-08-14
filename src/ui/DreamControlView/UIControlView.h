@@ -1,24 +1,35 @@
 #ifndef DREAM_CONTROL_VIEW_H_
 #define DREAM_CONTROL_VIEW_H_
 
-#include "RESULT/EHM.h"
-#include "DreamApp.h"
-#include "DreamAppHandle.h"
+#include "core/ehm/EHM.h"
 
-#include "Sense/SenseController.h"
-#include "InteractionEngine/InteractionObjectEvent.h"
-#include "WebBrowser/WebBrowserController.h"
-#include "DreamUserApp.h"
+// Dream UI
+// dos/src/ui/DreamControlView/UIControlView.h
+// TODO: Review this, is this more specific
 
-#include "DreamGarage/UICommon.h"
-
-#include "DreamUserControlArea/DreamUserControlArea.h"
-#include "UI/UISurface.h"
-
-#include "Primitives/Subscriber.h"
 #include <functional>
 #include <stack>
 
+#include "core/types/Subscriber.h"
+
+#include "ui/UICommon.h"
+#include "ui/UISurface.h"
+
+#include "os/app/DreamApp.h"
+#include "os/app/DreamAppHandle.h"
+
+#include "sense/SenseController.h"
+
+#include "modules/InteractionEngine/InteractionObjectEvent.h"
+
+// TOOD: Should this be here if this is a general UI lib component
+#include "WebBrowser/WebBrowserController.h"
+
+// TODO: Obviously a problem
+#include "apps/DreamUserApp/DreamUserApp.h"
+#include "apps/DreamUserControlAreaApp/DreamUserControlAreaApp.h"
+
+// TODO: Param time
 #define BROWSER_SCROLL_CONSTANT 10.0f
 
 #define VIEW_WIDTH 0.60f // This is 1080p scaled down (2000x) - may want to use browser aspect ratio though

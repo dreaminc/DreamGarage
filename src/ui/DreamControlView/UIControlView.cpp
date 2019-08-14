@@ -1,16 +1,19 @@
 #include "UIControlView.h"
 
-#include "DreamGarage/DreamUIBar.h"
-#include "DreamShareView/DreamShareView.h"
-#include "DreamOS.h"
-#include "InteractionEngine/AnimationCurve.h"
-#include "InteractionEngine/AnimationItem.h"
+#include "os/DreamOS.h"
 
-#include "UI/UISurface.h"
+#include "ui/UISurface.h"
 
-#include "Primitives/hand/hand.h"
+// TODO: I don't know that this is right
+#include "apps/DreamUIBarApp/DreamUIBarApp.h"
+#include "apps/DreamShareViewApp/DreamShareViewApp.h"
 
-#include "Sandbox/PathManager.h"
+#include "modules/AnimationEngine/AnimationCurve.h"
+#include "modules/AnimationEngine/AnimationItem.h"
+
+#include "core/hand/hand.h"
+
+#include "sandbox/PathManager.h"
 
 UIControlView::UIControlView(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UISurface(pHALImp, pDreamOS)

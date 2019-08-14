@@ -1,13 +1,18 @@
 #include "UIKey.h"
-#include "Primitives/quad.h"
 
-UIKey::UIKey() {}
+#include "core/primitives/quad.h"
 
-UIKey::UIKey(float left, float width, unsigned int letter) 
+UIKey::UIKey() :
+	m_state(KeyState::KEY_UP)
 {
-	m_left = left;
-	m_width = width;
-	m_letter = letter;
+	// 
+}
 
-	m_state = KeyState::KEY_UP;
+UIKey::UIKey(float left, float width, unsigned int letter)  :
+	m_left(left),
+	m_width(width),
+	m_letter(letter),
+	m_state(KeyState::KEY_UP)
+{
+	//
 }

@@ -1,14 +1,19 @@
 #include "UIKeyboardLayout.h"
-#include "Sense/SenseKeyboard.h"
-#include "Primitives/quad.h"
 
-#include "Primitives/texture.h"
+#include "sense/SenseKeyboard.h"
+
+#include "core/primitives/quad.h"
+#include "core/primitives/texture.h"
 
 UIKeyboardLayout::UIKeyboardLayout(LayoutType type) :
-m_layoutType(type)
-{}
+	m_layoutType(type)
+{
+	// 
+}
 
-UIKeyboardLayout::~UIKeyboardLayout() {}
+UIKeyboardLayout::~UIKeyboardLayout() {
+	// 
+}
 
 RESULT UIKeyboardLayout::UpdateKeysWithLayout(LayoutType type) {
 	RESULT r = R_PASS;
@@ -23,6 +28,7 @@ RESULT UIKeyboardLayout::UpdateKeysWithLayout(LayoutType type) {
 	}
 
 	m_layoutType = type;
+
 Error:
 	return r;
 }
