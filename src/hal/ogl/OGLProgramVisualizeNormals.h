@@ -1,12 +1,14 @@
 #ifndef OGLPROGRAM_VISUALIZE_NORMALS_H_
 #define OGLPROGRAM_VISUALIZE_NORMALS_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramVisualizeNormals.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramVisualizeNormals.h
+
 // This is a debug program that will visualize normals in a scene
 // using a geometry shader
 
-#include "./RESULT/EHM.h"
 #include "OGLProgramMinimal.h"
 
 class ObjectStore;
@@ -14,7 +16,7 @@ class stereocamera;
 
 class OGLProgramVisualizeNormals : public OGLProgramMinimal {
 public:
-	OGLProgramVisualizeNormals(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramVisualizeNormals(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	virtual RESULT ProcessNode(long frameID) override;
 

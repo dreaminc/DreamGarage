@@ -1,6 +1,6 @@
 #include "OGLUniform.h"
 
-#include "../OpenGLImp.h"
+#include "../OGLImp.h"
 #include "../OGLProgram.h"
 
 #include "../OGLTexture.h"
@@ -21,7 +21,7 @@ RESULT OGLUniform::SetUniform4fv(GLfloat *pVal4fv) {
 	RESULT r = R_PASS;
 
 	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 
 	GLint location = -1;
 	pParentImp->glGetUniformLocation(oglProgramID, m_strUniformName.c_str(), &location);
@@ -37,7 +37,7 @@ RESULT OGLUniform::SetUniformFloat(GLfloat *pVal1fv) {
 	RESULT r = R_PASS;
 
 	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 
 	GLint location = -1;
 	pParentImp->glGetUniformLocation(oglProgramID, m_strUniformName.c_str(), &location);
@@ -55,7 +55,7 @@ RESULT OGLUniform::SetUniformInteger(GLint value) {
 	RESULT r = R_PASS;
 
 	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 
 	GLint location = -1;
 	pParentImp->glGetUniformLocation(oglProgramID, m_strUniformName.c_str(), &location);
@@ -72,7 +72,7 @@ RESULT OGLUniform::Set44MatrixUniform(matrix<float, 4, 4> mat) {
 	RESULT r = R_PASS;
 
 	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 
 	GLint location = -1;
 	pParentImp->glGetUniformLocation(oglProgramID, m_strUniformName.c_str(), &location);

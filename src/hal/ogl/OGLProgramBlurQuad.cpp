@@ -1,14 +1,14 @@
 #include "OGLProgramBlurQuad.h"
 
-#include "Primitives/stereocamera.h"
+#include "core/camera/stereocamera.h"
 
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLQuad.h"
 #include "OGLFramebuffer.h"
 #include "OGLTexture.h"
 #include "OGLAttachment.h"
 
-OGLProgramBlurQuad::OGLProgramBlurQuad(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+OGLProgramBlurQuad::OGLProgramBlurQuad(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglblurquad", optFlags)
 {
 	// empty

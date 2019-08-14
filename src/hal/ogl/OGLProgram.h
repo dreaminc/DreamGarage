@@ -34,7 +34,7 @@
 
 #include "pipeline/ProgramNode.h"
 
-class OpenGLImp;
+class OGLImp;
 class OGLVertexAttribute;
 class OGLUniform;
 class OGLFramebuffer;
@@ -43,7 +43,7 @@ class ObjectStore;
 
 class OGLProgram : public ProgramNode {
 public:
-	OGLProgram(OpenGLImp *pParentImp, std::string strName = "oglprogram", PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgram(OGLImp *pParentImp, std::string strName = "oglprogram", PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 	~OGLProgram();
 
 	// ProgramNode Interface
@@ -122,7 +122,7 @@ public:
 		return m_OGLProgramIndex;
 	}
 
-	OpenGLImp *GetOGLImp() {
+	OGLImp *GetOGLImp() {
 		return m_pParentImp;
 	}
 
@@ -163,7 +163,7 @@ public:
 	RESULT SetFrameBuffer(OGLFramebuffer* pFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 
 protected:
-	OpenGLImp *m_pParentImp;
+	OGLImp *m_pParentImp;
 	version m_versionOGL;
 	GLuint m_OGLProgramIndex;
 

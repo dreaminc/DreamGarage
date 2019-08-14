@@ -1,16 +1,16 @@
 #include "OGLProgramCubemapConvolution.h"
 
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
+#include "scene/ObjectStoreImp.h"
+#include "scene/ObjectStore.h"
 
-#include "Primitives/stereocamera.h"
+#include "core/camera/stereocamera.h"
 
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 #include "OGLCubemap.h"
 
-OGLProgramCubemapConvolution::OGLProgramCubemapConvolution(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+OGLProgramCubemapConvolution::OGLProgramCubemapConvolution(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglskybox", optFlags)
 {
 	// empty

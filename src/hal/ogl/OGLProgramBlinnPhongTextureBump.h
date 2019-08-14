@@ -1,10 +1,11 @@
 #ifndef OGLPROGRAM_BLINN_PHONG_TEXTURE_BUMP_H_
 #define OGLPROGRAM_BLINN_PHONG_TEXTURE_BUMP_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramBlinnPhongTextureBump.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramBlinnPhongTextureBump.h
+
 // Blinn Phong Texture OGL shader program - this uses the blinn phong
 // shading model along with one color texture and one bump map texture
 
@@ -14,7 +15,7 @@
 
 class OGLProgramBlinnPhongTextureBump : public OGLProgram {
 public:
-	OGLProgramBlinnPhongTextureBump(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramBlinnPhongTextureBump(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

@@ -1,18 +1,20 @@
 #ifndef OGLPROGRAM_BLUR_QUAD_H_
 #define OGLPROGRAM_BLUR_QUAD_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLBlurQuad.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLBlurQuad.h
+
 // A simple quad based blur pass program
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 
 class OGLQuad;
 
 class OGLProgramBlurQuad : public OGLProgram {
 public:
-	OGLProgramBlurQuad(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramBlurQuad(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 

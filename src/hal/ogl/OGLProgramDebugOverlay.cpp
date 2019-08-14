@@ -1,15 +1,15 @@
 #include "OGLProgramDebugOverlay.h"
 
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
+#include "scene/ObjectStoreImp.h"
+#include "scene/ObjectStore.h"
 
-#include "Primitives/stereocamera.h"
+#include "core/camera/stereocamera.h"
 
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramDebugOverlay::OGLProgramDebugOverlay(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+OGLProgramDebugOverlay::OGLProgramDebugOverlay(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgramMinimal(pParentImp, "ogldebugoverlay", optFlags)
 {
 	// empty

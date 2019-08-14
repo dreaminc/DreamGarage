@@ -1,21 +1,21 @@
 #include "OGLProgramGBuffer.h"
 
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
-
-#include "Primitives/stereocamera.h"
-
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramGBuffer::OGLProgramGBuffer(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+#include "scene/ObjectStoreImp.h"
+#include "scene/ObjectStore.h"
+
+#include "core/camera/stereocamera.h"
+
+OGLProgramGBuffer::OGLProgramGBuffer(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglgbuffer", optFlags)
 {
 	// empty
 }
 
-OGLProgramGBuffer::OGLProgramGBuffer(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
+OGLProgramGBuffer::OGLProgramGBuffer(OGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, strName, optFlags)
 {
 	// empty

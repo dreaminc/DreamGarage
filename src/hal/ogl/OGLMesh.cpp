@@ -1,20 +1,20 @@
 #include "OGLMesh.h"
 
-OGLMesh::OGLMesh(OpenGLImp *pParentImp, const std::vector<vertex>& vertices) :
+OGLMesh::OGLMesh(OGLImp *pParentImp, const std::vector<vertex>& vertices) :
 	mesh(vertices),
 	OGLObj(pParentImp)
 {
 	// 
 }
 
-OGLMesh::OGLMesh(OpenGLImp *pParentImp, const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) :
+OGLMesh::OGLMesh(OGLImp *pParentImp, const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) :
 	mesh(vertices, indices),
 	OGLObj(pParentImp)
 {
 	// 
 }
 
-OGLMesh::OGLMesh(OpenGLImp *pParentImp, mesh::params *pMeshParams) :
+OGLMesh::OGLMesh(OGLImp *pParentImp, mesh::params *pMeshParams) :
 	mesh(pMeshParams),
 	OGLObj(pParentImp)
 {
@@ -22,7 +22,7 @@ OGLMesh::OGLMesh(OpenGLImp *pParentImp, mesh::params *pMeshParams) :
 }
 
 /*
-OGLMesh::OGLMesh(OpenGLImp *pParentImp, wchar_t *pszModelName) :
+OGLMesh::OGLMesh(OGLImp *pParentImp, wchar_t *pszModelName) :
 	mesh(pszModelName),
 	OGLObj(pParentImp)
 {

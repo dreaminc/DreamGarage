@@ -4,7 +4,7 @@
 #include "core/ehm/EHM.h"
 
 // Dream HAL OGL
-// dos/src/hal/ogl/OpenGLShader.h
+// dos/src/hal/ogl/shaders/OpenGLShader.h
 
 // This is the container object for an OpenGL Shader
 // These should be accessed through the OpenGLShaderFactory object

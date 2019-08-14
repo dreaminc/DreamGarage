@@ -1,6 +1,6 @@
 #include "OGLComposite.h"
 
-OGLComposite::OGLComposite(OpenGLImp *pParentImp) :
+OGLComposite::OGLComposite(OGLImp *pParentImp) :
 	composite(pParentImp),
 	OGLObj(pParentImp)
 {

@@ -1,20 +1,19 @@
 #include "OGLProgramBillboard.h"
 
+#include "OGLAttachment.h"
+#include "OGLImp.h"
+#include "OGLFramebuffer.h"
+#include "OGLTexture.h"
+#include "OGLObj.h"
+
 #include "Scene/ObjectStoreImp.h"
 #include "Scene/ObjectStore.h"
 
-#include "Primitives/stereocamera.h"
-#include "Primitives/billboard.h"
+#include "core/camera/stereocamera.h"
 
-#include "HAL/opengl/OpenGLImp.h"
-#include "HAL/opengl/OGLFramebuffer.h"
+#include "core/primitives/billboard.h"
 
-#include "HAL/opengl/OGLTexture.h"
-#include "HAL/opengl/OGLObj.h"
-
-#include "OGLAttachment.h"
-
-OGLProgramBillboard::OGLProgramBillboard(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+OGLProgramBillboard::OGLProgramBillboard(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgramMinimal(pParentImp, optFlags)
 {
 	// empty

@@ -1,6 +1,6 @@
 #include "OGLBillboard.h"
 
-OGLBillboard::OGLBillboard(OpenGLImp *pParentImp, point ptOrigin, float width, float height) :
+OGLBillboard::OGLBillboard(OGLImp *pParentImp, point ptOrigin, float width, float height) :
 	billboard(ptOrigin,width,height),
 	OGLObj(pParentImp)
 {

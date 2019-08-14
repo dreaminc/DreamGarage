@@ -266,7 +266,7 @@ public:
 
 // OpengGL Extension Function Pointers
 private:
-	OpenGLExtensions m_OpenGLExtensions;
+	OGLExtensions m_OpenGLExtensions;
 };
 
 #endif // ! OPEN_GL_IMP_H

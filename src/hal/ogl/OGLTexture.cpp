@@ -149,7 +149,7 @@ Error:
 	return r;
 }
 
-OGLTexture* OGLTexture::MakeTextureWithFormat(OpenGLImp *pParentImp, texture::type type,
+OGLTexture* OGLTexture::MakeTextureWithFormat(OGLImp *pParentImp, texture::type type,
 											  int width, int height, int channels, 
 											  GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType, 
 											  int levels, int samples) 
@@ -288,7 +288,7 @@ Error:
 	return nullptr;
 }
 
-OGLTexture* OGLTexture::MakeTexture(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, int levels, int samples) {
+OGLTexture* OGLTexture::MakeTexture(OGLImp *pParentImp, texture::type type, int width, int height, int channels, int levels, int samples) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pTexture = nullptr;
@@ -333,7 +333,7 @@ Error:
 
 
 
-OGLTexture* OGLTexture::MakeTextureFromPath(OpenGLImp *pParentImp, texture::type type, std::wstring wstrFilename) {
+OGLTexture* OGLTexture::MakeTextureFromPath(OGLImp *pParentImp, texture::type type, std::wstring wstrFilename) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pTexture = nullptr;
@@ -362,7 +362,7 @@ Error:
 	return pTexture;
 }
 
-OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, PIXEL_FORMAT pixelFormat, void *pBuffer, size_t pBuffer_n) {
+OGLTexture* OGLTexture::MakeTextureFromBuffer(OGLImp *pParentImp, texture::type type, int width, int height, int channels, PIXEL_FORMAT pixelFormat, void *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pTexture = nullptr;
@@ -389,7 +389,7 @@ Error:
 	return pTexture;
 }
 
-OGLTexture* OGLTexture::MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture::type type, void *pBuffer, size_t pBuffer_n) {
+OGLTexture* OGLTexture::MakeTextureFromFileBuffer(OGLImp *pParentImp, texture::type type, void *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pTexture = nullptr;

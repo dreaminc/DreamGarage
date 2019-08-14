@@ -7,7 +7,7 @@
 
 #include "OGLShader.h"
 
-class OGLProgram;	// Declare OpenGLImp class
+class OGLProgram;	// Declare OGLImp class
 class OGLTexture;
 class OGLObj;
 

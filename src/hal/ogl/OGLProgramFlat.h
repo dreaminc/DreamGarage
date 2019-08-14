@@ -1,16 +1,20 @@
 #ifndef OGLPROGRAM_FLAT_H_
 #define OGLPROGRAM_FLAT_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramFlat.h
+
 #include "OGLProgram.h"
 
 #include "OGLFramebuffer.h"
 
-#include "HAL/FlatProgram.h"
+#include "hal/FlatProgram.h"
 
 class OGLProgramFlat : public OGLProgram, public FlatProgram {
 public:
-	OGLProgramFlat(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramFlat(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 

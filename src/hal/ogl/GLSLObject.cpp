@@ -1,7 +1,7 @@
 #include "GLSLObject.h"
 
 #include "OGLProgram.h"
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 
 GLSLObject::GLSLObject(OGLProgram *pParentProgram) :
 	m_pParentProgram(pParentProgram)
@@ -13,6 +13,6 @@ GLSLObject::~GLSLObject() {
 	// empty
 }
 
-OpenGLImp *GLSLObject::GetParentOGLImplementation() {
+OGLImp *GLSLObject::GetParentOGLImplementation() {
 	return m_pParentProgram->GetOGLImp();
 }

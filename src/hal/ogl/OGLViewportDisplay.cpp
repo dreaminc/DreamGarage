@@ -1,9 +1,9 @@
 #include "OGLViewportDisplay.h"
 
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 
-OGLViewportDisplay::OGLViewportDisplay(OpenGLImp *pParentImp) :
+OGLViewportDisplay::OGLViewportDisplay(OGLImp *pParentImp) :
 	SinkNode("oglviewportdisplay"),
 	m_pParentImp(pParentImp)
 {

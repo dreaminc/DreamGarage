@@ -1,9 +1,16 @@
 #ifndef SKYBOX_SCATTER_PROGRAM_H_
 #define SKYBOX_SCATTER_PROGRAM_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-class SkyboxScatterProgram {
+// Dream HAL 
+// dos/src/hal/SkyboxScatterProgram
+
+#include "core/types/DObject.h"
+
+// TODO: There might be better ways to do this now
+
+class SkyboxScatterProgram : public DObject {
 public:
 	virtual RESULT SetSunDirection(vector vSunDirection) = 0;
 };

@@ -1,10 +1,11 @@
 #ifndef OGLPROGRAM_GBUFFER_H_
 #define OGLPROGRAM_GBUFFER_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramGBuffer.h
+#include "core/ehm/EHM.h"
 
-#include "./RESULT/EHM.h"
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramGBuffer.h
+
 #include "OGLProgram.h"
 
 class ObjectStore;
@@ -12,8 +13,8 @@ class stereocamera;
 
 class OGLProgramGBuffer : public OGLProgram {
 public:
-	OGLProgramGBuffer(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
-	OGLProgramGBuffer(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramGBuffer(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramGBuffer(OGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	virtual RESULT OGLInitialize() override;
 	virtual RESULT OGLInitialize(version versionOGL) override;

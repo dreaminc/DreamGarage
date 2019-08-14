@@ -1,22 +1,22 @@
 #include "OGLProgramDepthPeel.h"
 
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
+#include "OGLProgramBlendQuad.h"
 
-#include "Primitives/stereocamera.h"
+#include "scene/ObjectStoreImp.h"
+#include "scene/ObjectStore.h"
 
-#include "OpenGLImp.h"
+#include "core/camera/stereocamera.h"
+
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLTexture.h"
 #include "OGLQuery.h"
 
-#include "HAL/opengl/GL/glext.h"
-
-#include "OGLProgramBlendQuad.h"
+#include "hal/ogl/gl/glext.h"
 
 //OGLTexture *g_pColorTexture = nullptr;
 
-OGLProgramDepthPeel::OGLProgramDepthPeel(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+OGLProgramDepthPeel::OGLProgramDepthPeel(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "ogldepthpeel", optFlags)
 {
 	// empty

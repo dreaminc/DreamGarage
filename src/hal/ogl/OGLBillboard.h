@@ -17,7 +17,7 @@
 #pragma warning(disable : 4250)
 class OGLBillboard : public billboard, public OGLObj {
 public:
-	OGLBillboard(OpenGLImp *pParentImp, point ptOrigin, float width, float height);
+	OGLBillboard(OGLImp *pParentImp, point ptOrigin, float width, float height);
 	~OGLBillboard();
 
 	// override to specify GL_POINT

@@ -14,7 +14,7 @@
 
 class OGLRenderbuffer : public DObject {
 public:
-	OGLRenderbuffer(OpenGLImp *pParentImp, int width, int height, int sampleCount);
+	OGLRenderbuffer(OGLImp *pParentImp, int width, int height, int sampleCount);
 	~OGLRenderbuffer();
 
 	RESULT OGLInitialize();
@@ -25,7 +25,7 @@ public:
 	RESULT Resize(int pxWidth, int pxHeight);
 
 private:
-	OpenGLImp *m_pParentImp;
+	OGLImp *m_pParentImp;
 
 	GLuint m_OGLRenderbufferIndex;
 

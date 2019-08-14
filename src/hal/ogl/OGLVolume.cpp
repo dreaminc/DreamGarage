@@ -1,34 +1,34 @@
 #include "OGLVolume.h"
 
-OGLVolume::OGLVolume(OpenGLImp *pParentImp, volume::params *pVolumeParams) :
+OGLVolume::OGLVolume(OGLImp *pParentImp, volume::params *pVolumeParams) :
 	volume(pVolumeParams),
 	OGLObj(pParentImp)
 {
 	//
 }
 
-OGLVolume::OGLVolume(OpenGLImp *pParentImp) :
+OGLVolume::OGLVolume(OGLImp *pParentImp) :
 	volume(1.0f),
 	OGLObj(pParentImp)
 {
 	// 
 }
 
-OGLVolume::OGLVolume(OpenGLImp *pParentImp, double width, double length, double height, bool fTriangleBased) :
+OGLVolume::OGLVolume(OGLImp *pParentImp, double width, double length, double height, bool fTriangleBased) :
 	volume(width, length, height, fTriangleBased),
 	OGLObj(pParentImp)
 {
 	// 
 }
 
-OGLVolume::OGLVolume(OpenGLImp *pParentImp, double side, bool fTriangleBased) :
+OGLVolume::OGLVolume(OGLImp *pParentImp, double side, bool fTriangleBased) :
 	volume(side, fTriangleBased),
 	OGLObj(pParentImp)
 {
 	// 
 }
 
-OGLVolume::OGLVolume(OpenGLImp *pParentImp, BoundingBox* pBoundingBox, bool fTriangleBased) :
+OGLVolume::OGLVolume(OGLImp *pParentImp, BoundingBox* pBoundingBox, bool fTriangleBased) :
 	volume(pBoundingBox, fTriangleBased),
 	OGLObj(pParentImp)
 {

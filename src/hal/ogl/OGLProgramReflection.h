@@ -1,15 +1,18 @@
 #ifndef OGLPROGRAM_REFLECTION_H_
 #define OGLPROGRAM_REFLECTION_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramReflection.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramReflection.h
+
 // This is the shader to get the reflection map for a plane
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
-#include "../FogProgram.h"
+
+#include "hal/FogProgram.h"
 
 class ObjectStore;
 class stereocamera;
@@ -17,7 +20,7 @@ class OGLFogParamsBlock;
 
 class OGLProgramReflection : public OGLProgram, public FogProgram {
 public:
-	OGLProgramReflection(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramReflection(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

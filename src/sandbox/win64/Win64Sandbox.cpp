@@ -291,7 +291,7 @@ RESULT Windows64App::InitializeHAL() {
 
 	// Create and initialize OpenGL Imp
 	// TODO: HAL factory pattern
-	m_pHALImp = new OpenGLImp(m_pOpenGLRenderingContext);
+	m_pHALImp = new OGLImp(m_pOpenGLRenderingContext);
 	CNM(m_pHALImp, "Failed to create HAL Implementation");
 	CVM(m_pHALImp, "HAL Implementation Invalid");
 

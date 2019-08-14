@@ -1,14 +1,14 @@
 #include "OGLProgramReferenceGeometry.h"
 
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
+#include "OGLImp.h"
+#include "OGLFramebuffer.h"
 
-#include "Primitives/stereocamera.h"
+#include "scene/ObjectStoreImp.h"
+#include "scene/ObjectStore.h"
 
-#include "HAL/opengl/OpenGLImp.h"
-#include "HAL/opengl/OGLFramebuffer.h"
+#include "core/camera/stereocamera.h"
 
-OGLProgramReferenceGeometry::OGLProgramReferenceGeometry(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+OGLProgramReferenceGeometry::OGLProgramReferenceGeometry(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgramMinimal(pParentImp, optFlags)
 {
 	// empty

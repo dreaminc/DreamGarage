@@ -1,6 +1,6 @@
 #include "OGLProgramScreenFade.h"
 
-OGLProgramScreenFade::OGLProgramScreenFade(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+OGLProgramScreenFade::OGLProgramScreenFade(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgramScreenQuad(pParentImp, "oglscreenfade", optFlags)
 {
 	// empty

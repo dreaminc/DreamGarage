@@ -1,23 +1,26 @@
 #ifndef FLAT_PROGRAM_H_
 #define FLAT_PROGRAM_H_
 
-// Dream OS
-// DreamOS/HAL/FlatProgram.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL
+// dos/src/hal/FlatProgram.h
+
 // Flat Program is an interface for render to texture
 // this can be done with the render network, but for purposes of performance it might
 // be smart to set these inputs directly. 
 
-#include "./RESULT/EHM.h"
+#include <string>
+
+#include "pipeline/ProgramNode.h"
+
+#include "core/types/DObject.h"
 
 class framebuffer;
 class stereocamera;
 class FlatContext;
 
-#include "HAL/Pipeline/ProgramNode.h"
-
-#include <string>
-
-class FlatProgram {
+class FlatProgram : public DObject {
 public:
 	virtual RESULT SetFlatFramebuffer(framebuffer *pFramebuffer) = 0;
 	virtual RESULT SetCamera(stereocamera *pCamera) = 0;

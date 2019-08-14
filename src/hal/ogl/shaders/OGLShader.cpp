@@ -1,9 +1,10 @@
 #include "OGLShader.h"
-#include "../OpenGLImp.h"
-#include "../OGLProgram.h"
 
-#include "Sandbox/SandboxApp.h"
-#include "Sandbox/PathManager.h"
+#include "hal/ogl/OGLImp.h"
+#include "hal/ogl/OGLProgram.h"
+
+#include "sandbox/Sandbox.h"
+#include "sandbox/PathManager.h"
 
 OGLShader::OGLShader(OGLProgram *pParentProgram) :
 	GLSLObject(pParentProgram),
@@ -179,7 +180,7 @@ RESULT OGLShader::Compile(void) {
 		i++;
 	}
 
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 	CN(pParentImp);
 
 	CR(pParentImp->ShaderSource(m_shaderID, (GLsizei)(shaderCount), ppszShaderCode, nullptr));
@@ -223,7 +224,7 @@ char* OGLShader::GetInfoLog() {
 	int pszInfoLog_n = -1;
 	int charsWritten_n = -1;
 
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 
 	CR(pParentImp->GetShaderiv(m_shaderID, GL_INFO_LOG_LENGTH, &pszInfoLog_n));
 

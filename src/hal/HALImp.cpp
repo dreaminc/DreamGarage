@@ -1,8 +1,8 @@
 #include "HALImp.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
+#include "hal/FlatProgram.h"
 
-#include "HAL/FlatProgram.h"
+#include "pipeline/ProgramNode.h"
 
 HALImp::HALImp() :
 	m_pCamera(nullptr),

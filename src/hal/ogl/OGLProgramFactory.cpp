@@ -85,7 +85,7 @@ OGLPROGRAM_TYPE OGLProgramFactory::OGLProgramTypeFromstring(std::string strProgr
 	}
 }
 
-ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL, PIPELINE_FLAGS optFlags) {
+ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OGLImp *pParentImp, version versionOGL, PIPELINE_FLAGS optFlags) {
 	OGLProgram* pOGLProgram = nullptr;
 	RESULT r = R_PASS;
 

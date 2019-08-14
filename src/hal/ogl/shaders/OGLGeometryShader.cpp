@@ -27,7 +27,7 @@ RESULT OGLGeometryShader::GetAttributeLocationsFromShader() {
 	RESULT r = R_PASS;
 
 	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 
 	//CRM(pParentImp->glGetAttribLocation(oglProgramID, GetColorAttributeName(), &m_ColorIndex), "Failed to acquire position GL location");
 	CR(r);

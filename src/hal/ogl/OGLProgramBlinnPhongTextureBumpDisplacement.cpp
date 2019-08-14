@@ -1,10 +1,10 @@
 #include "OGLProgramBlinnPhongTextureBumpDisplacement.h"
 
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramBlinnPhongTextureBumpDisplacement::OGLProgramBlinnPhongTextureBumpDisplacement(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+OGLProgramBlinnPhongTextureBumpDisplacement::OGLProgramBlinnPhongTextureBumpDisplacement(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglblinnphongtexturebumpdisplacement", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)

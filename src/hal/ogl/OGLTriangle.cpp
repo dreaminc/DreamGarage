@@ -1,6 +1,6 @@
 #include "OGLTriangle.h"
 
-OGLTriangle::OGLTriangle(OpenGLImp *pParentImp) :
+OGLTriangle::OGLTriangle(OGLImp *pParentImp) :
 	triangle(1.0f),
 	OGLObj(pParentImp)
 {
@@ -10,7 +10,7 @@ OGLTriangle::OGLTriangle(OpenGLImp *pParentImp) :
 	RESULT r = OGLInitialize();
 }
 
-OGLTriangle::OGLTriangle(OpenGLImp *pParentImp, float side) :
+OGLTriangle::OGLTriangle(OGLImp *pParentImp, float side) :
 	triangle(side),
 	OGLObj(pParentImp)
 {
@@ -20,7 +20,7 @@ OGLTriangle::OGLTriangle(OpenGLImp *pParentImp, float side) :
 	RESULT r = OGLInitialize();
 }
 
-OGLTriangle::OGLTriangle(OpenGLImp *pParentImp, float height, float width) :
+OGLTriangle::OGLTriangle(OGLImp *pParentImp, float height, float width) :
 	triangle(height, width),
 	OGLObj(pParentImp)
 {

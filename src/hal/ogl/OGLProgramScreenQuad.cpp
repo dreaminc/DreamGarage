@@ -1,20 +1,20 @@
 #include "OGLProgramScreenQuad.h"
 
-#include "Primitives/stereocamera.h"
-
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLQuad.h"
 #include "OGLFramebuffer.h"
 #include "OGLTexture.h"
 #include "OGLAttachment.h"
 
-OGLProgramScreenQuad::OGLProgramScreenQuad(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+#include "core/camera/stereocamera.h"
+
+OGLProgramScreenQuad::OGLProgramScreenQuad(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglscreenquad", optFlags)
 {
 	// empty
 }
 
-OGLProgramScreenQuad::OGLProgramScreenQuad(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
+OGLProgramScreenQuad::OGLProgramScreenQuad(OGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, strName, optFlags)
 {
 	// empty

@@ -1,12 +1,12 @@
 #include "OGLProgramEnvironment.h"
 
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
 #include "OGLFogParamsBlock.h"
 
-OGLProgramEnvironment::OGLProgramEnvironment(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+OGLProgramEnvironment::OGLProgramEnvironment(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglenvironment", optFlags)
 {
 	// empty

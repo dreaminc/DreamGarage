@@ -1,20 +1,20 @@
 #include "OGLProgramSSAO.h"
 
-#include "Primitives/stereocamera.h"
-
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLQuad.h"
 #include "OGLFramebuffer.h"
 #include "OGLTexture.h"
 #include "OGLAttachment.h"
 
-OGLProgramSSAO::OGLProgramSSAO(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+#include "core/camera/stereocamera.h"
+
+OGLProgramSSAO::OGLProgramSSAO(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglssao", optFlags)
 {
 	// empty
 }
 
-OGLProgramSSAO::OGLProgramSSAO(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
+OGLProgramSSAO::OGLProgramSSAO(OGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, strName, optFlags)
 {
 	// empty

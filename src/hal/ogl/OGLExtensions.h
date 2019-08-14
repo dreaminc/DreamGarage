@@ -12,13 +12,13 @@
 
 #include "core/types/UID.h"
 
-class OpenGLExtensions {
+class OGLExtensions {
 public:
-	OpenGLExtensions() {
+	OGLExtensions() {
 		// empty
 	}
 
-	~OpenGLExtensions() {
+	~OGLExtensions() {
 		// empty
 	}
 

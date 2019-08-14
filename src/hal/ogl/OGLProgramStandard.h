@@ -1,24 +1,27 @@
 #ifndef OGLPROGRAM_STANDARD_H_
 #define OGLPROGRAM_STANDARD_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramEnvironmentObjects.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramEnvironmentObjects.h
+
 // This is a production shader used for environment models such as head and hands
 
-#include "./RESULT/EHM.h"
+#include <chrono>
+
+#include "hal/EnvironmentProgram.h"
+
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
-#include "../EnvironmentProgram.h"
-
-#include <chrono>
 
 class ObjectStore;
 class stereocamera;
 
 class OGLProgramStandard : public OGLProgram, public EnvironmentProgram {
 public:
-	OGLProgramStandard(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramStandard(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

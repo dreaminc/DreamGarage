@@ -98,7 +98,7 @@ RESULT OGLImp::InitializeOpenGLVersion() {
 }
 
 /*
-RESULT OpenGLImp::CreateGLProgram() {
+RESULT OGLImp::CreateGLProgram() {
 	RESULT r = R_PASS;
 
 	CBM((m_idOpenGLProgram == NULL), "Cannot CreateGLProgram if program id not null");
@@ -299,7 +299,7 @@ RESULT OGLImp::SetViewTarget(EYE_TYPE eye, int pxWidth, int pxHeight) {
 }
 
 /*
-RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
+RESULT OGLImp::Notify(SenseMouseEvent *mEvent) {
 	RESULT r = R_PASS;
 
 	//SenseMouse::PrintEvent(mEvent);
@@ -702,7 +702,7 @@ Error:
 }
  
 // TODO: This is a stupid thing should be removed
-//quad* OpenGLImp::MakeQuad(double width, double height, point ptOrigin, vector vNormal) {
+//quad* OGLImp::MakeQuad(double width, double height, point ptOrigin, vector vNormal) {
 //	RESULT r = R_PASS;
 //
 //	OGLQuad* pOGLQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), 1, 1, nullptr, vNormal);
@@ -865,7 +865,7 @@ Error:
 }
 
 /*
-composite* OpenGLImp::MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
+composite* OGLImp::MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	RESULT r = R_PASS;
 
 	composite *pModel = LoadModel(nullptr, wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
@@ -1407,7 +1407,7 @@ RESULT OGLImp::FlushHALBuffers() {
 // This is critical path, so EHM is removed
 // Debug manually
 /*
-RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, EYE_TYPE eye) {
+RESULT OGLImp::Render(ObjectStore *pSceneGraph, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 
 	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();

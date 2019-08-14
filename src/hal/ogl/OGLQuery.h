@@ -1,24 +1,27 @@
 #ifndef OGL_QUERY_H_
 #define OGL_QUERY_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/HAL/opengl/OGLQuery.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLQuery.h
+
 // OpenGL Query Object
 
-#include "OpenGLCommon.h"
-#include "Primitives/Framebuffer.h"
-
+#include "OGLCommon.h"
 #include "OGLAttachment.h"
 
-class OpenGLImp;
+#include "core/types/DObject.h"
+
+#include "core/primitives/Framebuffer.h"
+
+class OGLImp;
 
 #define NUM_OGL_DRAW_BUFFERS 1
 
-class OGLQuery {
+class OGLQuery : public DObject {
 public:
-	OGLQuery(OpenGLImp *pParentImp);
+	OGLQuery(OGLImp *pParentImp);
 	~OGLQuery();
 
 	RESULT OGLInitialize();
@@ -29,7 +32,7 @@ public:
 	RESULT GetQueryObject(GLuint *pValue);
 
 private:
-	OpenGLImp *m_pParentImp = nullptr;
+	OGLImp *m_pParentImp = nullptr;
 	GLuint m_queryID;
 	bool m_fPendingQuery = false;
 };

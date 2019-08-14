@@ -1,7 +1,7 @@
 #include "OGLRenderbuffer.h"
 
 
-OGLRenderbuffer::OGLRenderbuffer(OpenGLImp *pParentImp, int width, int height, int sampleCount) :
+OGLRenderbuffer::OGLRenderbuffer(OGLImp *pParentImp, int width, int height, int sampleCount) :
 	m_pParentImp(pParentImp),
 	m_width(width),
 	m_height(height),

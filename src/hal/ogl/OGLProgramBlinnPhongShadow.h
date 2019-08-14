@@ -1,21 +1,23 @@
 #ifndef OGLPROGRAM_BLINN_PHONG_SHADOW_H_
 #define OGLPROGRAM_BLINN_PHONG_SHADOW_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramBlinnPhongShadow.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramBlinnPhongShadow.h
+
 // OGLProgramBlinnPhongShadow is an OGL Program that utilizes the Blinn Phong
 // algorithm and also employs shadow mapping
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
-
-#include "Primitives/matrix/BiasMatrix.h"
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLProgramShadowDepth.h"
+
+#include "core/matrix/BiasMatrix.h"
 
 class OGLProgramBlinnPhongShadow : public OGLProgram {
 public:
-	OGLProgramBlinnPhongShadow(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) :
+	OGLProgramBlinnPhongShadow(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) :
 		OGLProgram(pParentImp, "oglblinnphongshadow", optFlags),
 		m_pLightsBlock(nullptr),
 		m_pMaterialsBlock(nullptr)

@@ -1,16 +1,15 @@
 #include "OGLProgramVisualizeNormals.h"
 
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
-
-#include "Primitives/stereocamera.h"
-
-#include "HAL/opengl/OpenGLImp.h"
-#include "HAL/opengl/OGLFramebuffer.h"
-
+#include "OGLImp.h"
+#include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramVisualizeNormals::OGLProgramVisualizeNormals(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+#include "scene/ObjectStoreImp.h"
+#include "scene/ObjectStore.h"
+
+#include "core/camera/stereocamera.h"
+
+OGLProgramVisualizeNormals::OGLProgramVisualizeNormals(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgramMinimal(pParentImp, optFlags)
 {
 	// empty

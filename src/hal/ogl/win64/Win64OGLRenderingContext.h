@@ -1,31 +1,31 @@
 #ifndef WIN64_OPEN_GL_RENDERING_CONTEXT
 #define WIN64_OPEN_GL_RENDERING_CONTEXT
 
-// Dream OS
-// DreamOS/Sandbox/Windows/Win64OpenGLRenderingContext.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/win64/Win64OpenGLRenderingContext.h
+
 // The Windows 64 specific rendering context for OpenGL
 
-#include "RESULT/EHM.h"
+#include <windows.h>      
 
-#include "HAL/opengl/OpenGLRenderingContext.h"
+#include "hal/ogl/OGLRenderingContext.h"
 
 // Header File For Windows
-#include <windows.h>      
 
 #include <gl\gl.h>
 #include <gl\glu.h>                               // Header File For The GLu32 Library
 //#include <gl\glext.h>
 //#include <gl\wglext.h>
-#include "HAL/opengl/GL/glext.h"
-#include "HAL/opengl/GL/wglext.h"
 
+#include "hal/ogl/gl/glext.h"
+#include "hal/ogl/gl/wglext.h"
 
-#include "Sandbox/Windows/Windows64App.h"
-
-class Win64OpenGLRenderingContext : public OpenGLRenderingContext {
+class Win64OGLRenderingContext : public OGLRenderingContext {
 public:
-	Win64OpenGLRenderingContext();
-	~Win64OpenGLRenderingContext();
+	Win64OGLRenderingContext();
+	~Win64OGLRenderingContext();
 
 public:
 	RESULT InitializeRenderingContext();

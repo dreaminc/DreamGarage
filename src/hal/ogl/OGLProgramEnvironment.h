@@ -1,23 +1,26 @@
 #ifndef OGLPROGRAM_ENVIRONMENT_H_
 #define OGLPROGRAM_ENVIRONMENT_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramMinimalTexture.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramMinimalTexture.h
+
 // OGLProgramMinimalTexture  is an OGLProgram that encapsulates the OGLProgram 
 // for a minimal shader with a color texture that simply takes in a point, color, and UV coord
 // and renders it using the usual suspects of required matrices (no lights)
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
-#include "../FogProgram.h"
+
+#include "hal/FogProgram.h"
 
 class OGLFogParamsBlock;
 
 class OGLProgramEnvironment: public OGLProgram, public FogProgram {
 public:
-	OGLProgramEnvironment(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramEnvironment(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

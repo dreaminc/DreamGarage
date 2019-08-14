@@ -1,8 +1,8 @@
 #include "OGLProgramBlendQuad.h"
 
-#include "Primitives/stereocamera.h"
+#include "core/camera/stereocamera.h"
 
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLQuad.h"
 #include "OGLFramebuffer.h"
 #include "OGLTexture.h"
@@ -11,7 +11,7 @@
 OGLTexture *g_pColorTexture1 = nullptr;
 OGLTexture *g_pColorTexture2 = nullptr;
 
-OGLProgramBlendQuad::OGLProgramBlendQuad(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+OGLProgramBlendQuad::OGLProgramBlendQuad(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglblendquad", optFlags)
 {
 	// empty

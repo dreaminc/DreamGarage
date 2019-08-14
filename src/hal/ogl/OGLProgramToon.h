@@ -1,11 +1,13 @@
 #ifndef OGLPROGRAM_TOON_H_
 #define OGLPROGRAM_TOON_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramToon.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramToon.h
+
 // A toon shader for the avatars or other illustrated style media
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
@@ -15,7 +17,7 @@ class ObjectStore;
 
 class OGLProgramToon : public OGLProgram {
 public:
-	OGLProgramToon(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramToon(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

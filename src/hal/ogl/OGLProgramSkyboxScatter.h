@@ -1,22 +1,25 @@
 #ifndef OGLPROGRAM_SKYBOX_SCATTER_H_
 #define OGLPROGRAM_SKYBOX_SCATTER_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramSkybox.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramSkybox.h
+
 // OGLProgramSkybox is an OGLProgram that encapsulates the OGLProgram 
 // for a skybox shader
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
-#include "../SkyboxScatterProgram.h"
 
-#include "Primitives/matrix/RotationMatrix.h"
+#include "hal/SkyboxScatterProgram.h"
+
+#include "core/matrix/RotationMatrix.h"
 
 class cubemap;
 
 class OGLProgramSkyboxScatter : public OGLProgram, public SkyboxScatterProgram {
 public:
-	OGLProgramSkyboxScatter(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramSkyboxScatter(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

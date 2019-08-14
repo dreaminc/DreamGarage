@@ -1,14 +1,16 @@
 #ifndef OGL_FOG_PARAMS_BLOCK_H_
 #define OGL_FOG_PARAMS_BLOCK_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
+// Dream HAL OGL
 // DreamOS/HAL/OpenGL/OGLFogParamsBlock.h
+
 // OpenGL Fog Block - This is a block representing the current fog configuration
 
 #include "shaders/OGLUniformBlock.h"
-#include "Primitives/FogParams.h"
+
+#include "hal/FogParams.h"
 
 #define FOG_UNIFORM_BLOCK_BINDING_POINT 2	// Oh boy, see OGLLightsBlock
 

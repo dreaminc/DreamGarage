@@ -1,17 +1,17 @@
 #include "OGLProgramSkyboxScatter.h"
 
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
-
-#include "Primitives/stereocamera.h"
-
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-#include "Primitives/matrix/ReflectionMatrix.h"
+#include "core/camera/stereocamera.h"
 
-OGLProgramSkyboxScatter::OGLProgramSkyboxScatter(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+#include "scene/ObjectStoreImp.h"
+#include "scene/ObjectStore.h"
+
+#include "core/matrix/ReflectionMatrix.h"
+
+OGLProgramSkyboxScatter::OGLProgramSkyboxScatter(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglskyboxscatter", optFlags)
 {
 	// empty

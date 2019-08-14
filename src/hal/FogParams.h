@@ -9,7 +9,9 @@
 
 #include "core/primitives/color.h"
 
-class FogParams {
+#include "core/types/DObject.h"
+
+class FogParams : public DObject {
 public:
 	FogParams();
 	FogParams(float startDistance, float endDistance, float density, color fogColor);

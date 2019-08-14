@@ -1,6 +1,6 @@
 #include "OGLHand.h"
 
-OGLHand::OGLHand(OpenGLImp *pParentImp, HAND_TYPE type) :
+OGLHand::OGLHand(OGLImp *pParentImp, HAND_TYPE type) :
 	hand(pParentImp, type),
 	OGLObj(pParentImp)
 {
@@ -8,7 +8,7 @@ OGLHand::OGLHand(OpenGLImp *pParentImp, HAND_TYPE type) :
 	RESULT r = OGLInitialize();
 }
 
-OGLHand::OGLHand(OpenGLImp *pParentImp, HAND_TYPE type, long avatarID) :
+OGLHand::OGLHand(OGLImp *pParentImp, HAND_TYPE type, long avatarID) :
 	hand(pParentImp, type, avatarID),
 	OGLObj(pParentImp)
 {

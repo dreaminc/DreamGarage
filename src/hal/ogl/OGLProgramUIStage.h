@@ -1,18 +1,20 @@
 #ifndef OGLPROGRAM_UI_STAGE_H_
 #define OGLPROGRAM_UI_STAGE_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramUIStage.h
+#include "core/ehm/EHM.h"
 
-#include "./RESULT/EHM.h"
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramUIStage.h
+
+#include "hal/UIStageProgram.h"
+
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
-#include "../UIStageProgram.h"
 
 class OGLProgramUIStage : public OGLProgram, public UIStageProgram {
 public:
-	OGLProgramUIStage(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramUIStage(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 

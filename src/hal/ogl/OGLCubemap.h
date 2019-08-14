@@ -12,14 +12,14 @@
 
 #include "core/primitives/cubemap.h"
 
-class OpenGLImp;
+class OGLImp;
 
 class OGLCubemap : public cubemap {
 public:
 	static const GLenum kGLCubeMapEnums[NUM_CUBE_MAP_TEXTURES];
 
 public:
-	OGLCubemap(OpenGLImp *pParentImp);
+	OGLCubemap(OGLImp *pParentImp);
 	OGLCubemap(const OGLCubemap &oglCubemap);
 
 	~OGLCubemap();
@@ -42,15 +42,15 @@ public:
 
 	RESULT SetDefaultCubeMapParams();
 
-	static OGLCubemap *MakeCubemap(OpenGLImp *pParentImp, int width, int height, int channels);
-	static OGLCubemap *MakeCubemapFromName(OpenGLImp *pParentImp, const std::wstring &wstrCubemapNam);
+	static OGLCubemap *MakeCubemap(OGLImp *pParentImp, int width, int height, int channels);
+	static OGLCubemap *MakeCubemapFromName(OGLImp *pParentImp, const std::wstring &wstrCubemapNam);
 
 	static GLenum GetGLCubeMapEnums(int lookup) {
 		return (kGLCubeMapEnums[lookup]);
 	}
 
 public:
-	OpenGLImp *m_pParentImp = nullptr;
+	OGLImp *m_pParentImp = nullptr;
 
 	GLuint m_glTextureIndex = 0;
 	GLenum m_glTextureTarget = GL_TEXTURE_CUBE_MAP;

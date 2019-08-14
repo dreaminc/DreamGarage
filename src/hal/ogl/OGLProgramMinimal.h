@@ -1,13 +1,15 @@
 #ifndef OGLPROGRAM_MINIMAL_H_
 #define OGLPROGRAM_MINIMAL_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramMinimal.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramMinimal.h
+
 // OGLProgramMinimal is an OGLProgram that encapsulates the OGLProgram 
 // for a minimal shader that simply takes in a vertex point and color
 // and renders it using the usual suspects of required matrices (no lights, no textures)
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 
 class ObjectStore;
@@ -15,8 +17,8 @@ class stereocamera;
 
 class OGLProgramMinimal : public OGLProgram {
 public:
-	OGLProgramMinimal(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
-	OGLProgramMinimal(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramMinimal(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramMinimal(OGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 

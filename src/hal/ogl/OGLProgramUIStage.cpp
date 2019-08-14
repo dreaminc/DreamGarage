@@ -1,13 +1,14 @@
 #include "OGLProgramUIStage.h"
 
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-#include "Primitives/matrix/ProjectionMatrix.h"
-#include "Primitives/quad.h"
+#include "core/matrix/ProjectionMatrix.h"
 
-OGLProgramUIStage::OGLProgramUIStage(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+#include "core/primitives/quad.h"
+
+OGLProgramUIStage::OGLProgramUIStage(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "ogluistage", optFlags)
 {
 	// empty

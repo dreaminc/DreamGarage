@@ -20,8 +20,8 @@ class OGLImp;
 class OGLTexture : public texture {
 public:
 	OGLTexture(const OGLTexture &pOGLTexture);
-	OGLTexture(OpenGLImp *pParentImp, texture::params *pTextureParams);
-	OGLTexture(OpenGLImp *pParentImp, texture::type type, GLenum textureTarget = GL_TEXTURE_2D);
+	OGLTexture(OGLImp *pParentImp, texture::params *pTextureParams);
+	OGLTexture(OGLImp *pParentImp, texture::type type, GLenum textureTarget = GL_TEXTURE_2D);
 
 
 public:
@@ -77,12 +77,12 @@ private:
 
 public:
 	static OGLTexture *MakeTexture(const texture &srcTexture);
-	static OGLTexture *MakeTexture(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, int levels = 0, int samples = 1);
-	static OGLTexture *MakeTextureWithFormat(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, GLint internalGLFormat = GL_DEPTH_COMPONENT24, GLenum glFormat = GL_DEPTH_COMPONENT, GLenum pixelDataType = GL_UNSIGNED_INT, int levels = 1, int samples = 0);
+	static OGLTexture *MakeTexture(OGLImp *pParentImp, texture::type type, int width, int height, int channels, int levels = 0, int samples = 1);
+	static OGLTexture *MakeTextureWithFormat(OGLImp *pParentImp, texture::type type, int width, int height, int channels, GLint internalGLFormat = GL_DEPTH_COMPONENT24, GLenum glFormat = GL_DEPTH_COMPONENT, GLenum pixelDataType = GL_UNSIGNED_INT, int levels = 1, int samples = 0);
 	static OGLTexture *MakeTextureFromAllocatedTexture(OGLImp *pParentImp, texture::type type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels = 0, int samples = 1);
-	static OGLTexture *MakeTextureFromPath(OpenGLImp *pParentImp, texture::type type, std::wstring wstrFilename);
-	static OGLTexture *MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, PIXEL_FORMAT format, void *pBuffer, size_t pBuffer_n);
-	static OGLTexture *MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture::type type, void *pBuffer, size_t pBuffer_n);
+	static OGLTexture *MakeTextureFromPath(OGLImp *pParentImp, texture::type type, std::wstring wstrFilename);
+	static OGLTexture *MakeTextureFromBuffer(OGLImp *pParentImp, texture::type type, int width, int height, int channels, PIXEL_FORMAT format, void *pBuffer, size_t pBuffer_n);
+	static OGLTexture *MakeTextureFromFileBuffer(OGLImp *pParentImp, texture::type type, void *pBuffer, size_t pBuffer_n);
 
 private:
 	OGLImp *m_pParentImp = nullptr;

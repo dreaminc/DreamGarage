@@ -1,19 +1,21 @@
 #ifndef OGLPROGRAM_BLEND_QUAD_H_
 #define OGLPROGRAM_BLEND_QUAD_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLBlendQuad.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLBlendQuad.h
+
 // OGL Blend Quad program will allow multiple the output to be blended
 // from the inputs
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 
 class OGLQuad;
 
 class OGLProgramBlendQuad : public OGLProgram {
 public:
-	OGLProgramBlendQuad(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramBlendQuad(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 

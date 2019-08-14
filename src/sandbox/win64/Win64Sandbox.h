@@ -24,7 +24,7 @@
 
 #define DEFAULT_FULLSCREEN false
 
-class OpenGLImp;
+class OGLImp;
 class Win64Keyboard;
 class Win64Mouse;
 class Win64CredentialManager;

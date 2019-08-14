@@ -1,16 +1,16 @@
 #include "OGLProgramIrradianceMap.h"
 
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
-
-#include "Primitives/stereocamera.h"
-
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 #include "OGLCubemap.h"
 
-OGLProgramIrradianceMap::OGLProgramIrradianceMap(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+#include "scene/ObjectStoreImp.h"
+#include "scene/ObjectStore.h"
+
+#include "core/camera/stereocamera.h"
+
+OGLProgramIrradianceMap::OGLProgramIrradianceMap(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglirradiancemap", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)

@@ -1,25 +1,28 @@
 #ifndef OGLPROGRAM_WATER_H_
 #define OGLPROGRAM_WATER_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramWater.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramWater.h
+
 // This is a first pass at a water program that will include
 // reflection and refraction off of a plane
 
-#include "./RESULT/EHM.h"
+#include "hal/EnvironmentProgram.h"
+
+#include <chrono>
+
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
-#include "../EnvironmentProgram.h"
-
-#include <chrono>
 
 class ObjectStore;
 class stereocamera;
 
 class OGLProgramWater : public OGLProgram {
 public:
-	OGLProgramWater(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramWater(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

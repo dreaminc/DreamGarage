@@ -1,5 +1,5 @@
 #include "OGLFogParamsBlock.h"
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 
 OGLFogParamsBlock::OGLFogParamsBlock(OGLProgram *pParentProgram, GLint dataSize, GLint uniformLocationIndex, const char *pszName) :
 	OGLUniformBlock(pParentProgram, dataSize, uniformLocationIndex, pszName)

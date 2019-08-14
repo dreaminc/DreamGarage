@@ -1,6 +1,6 @@
 #include "OGLFlatContext.h"
 
-OGLFlatContext::OGLFlatContext(OpenGLImp *pParentImp) :
+OGLFlatContext::OGLFlatContext(OGLImp *pParentImp) :
 	FlatContext(pParentImp),
 	OGLObj(pParentImp)
 {

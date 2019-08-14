@@ -1,5 +1,5 @@
 #include "OGLProgram.h"
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLObj.h"
 
 #include "OGLFramebuffer.h"
@@ -9,7 +9,7 @@
 
 #include "Scene/ObjectStore.h"
 
-OGLProgram::OGLProgram(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
+OGLProgram::OGLProgram(OGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
 	ProgramNode(strName, optFlags),
 	m_pParentImp(pParentImp),
 	m_OGLProgramIndex(NULL),

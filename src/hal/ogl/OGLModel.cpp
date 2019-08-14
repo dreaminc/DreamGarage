@@ -1,6 +1,6 @@
 #include "OGLModel.h"
 
-OGLModel::OGLModel(OpenGLImp *pParentImp) :
+OGLModel::OGLModel(OGLImp *pParentImp) :
 	model(pParentImp),
 	OGLObj(pParentImp)
 {

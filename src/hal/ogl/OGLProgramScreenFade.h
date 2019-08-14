@@ -1,10 +1,14 @@
 #ifndef OGLPROGRAM_SCREEN_FADE_H_
 #define OGLPROGRAM_SCREEN_FADE_H_
 
-#include "./RESULT/EHM.h"
-#include "OGLProgramScreenQuad.h"
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramScreenFade.h
 
 #include <chrono>
+
+#include "OGLProgramScreenQuad.h"
 
 #define FADE_DURATION_SECONDS 0.5f
 
@@ -18,7 +22,7 @@ class OGLQuad;
 
 class OGLProgramScreenFade : public OGLProgramScreenQuad {
 public:
-	OGLProgramScreenFade(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramScreenFade(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 	
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

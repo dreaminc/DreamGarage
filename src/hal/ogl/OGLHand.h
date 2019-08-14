@@ -21,8 +21,8 @@
 #pragma warning(disable : 4250)
 class OGLHand : public hand, public OGLObj {
 public:
-	OGLHand(OpenGLImp *pParentImp, HAND_TYPE type);
-	OGLHand(OpenGLImp *pParentImp, HAND_TYPE type, long avatarID);
+	OGLHand(OGLImp *pParentImp, HAND_TYPE type);
+	OGLHand(OGLImp *pParentImp, HAND_TYPE type, long avatarID);
 };
 #pragma warning(pop)
 

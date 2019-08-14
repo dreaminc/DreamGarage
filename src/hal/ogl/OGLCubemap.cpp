@@ -1,9 +1,10 @@
 #include "OGLCubemap.h"
 
-#include "Primitives/image/image.h"
-#include "Primitives/image/ImageFactory.h"
+#include "OGLImp.h"
 
-#include "OpenGLImp.h"
+#include "core/image/image.h"
+#include "core/image/ImageFactory.h"
+
 
 const GLenum OGLCubemap::kGLCubeMapEnums[NUM_CUBE_MAP_TEXTURES] = {
 	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
@@ -14,7 +15,7 @@ const GLenum OGLCubemap::kGLCubeMapEnums[NUM_CUBE_MAP_TEXTURES] = {
 	GL_TEXTURE_CUBE_MAP_POSITIVE_Z
 };
 
-OGLCubemap::OGLCubemap(OpenGLImp *pParentImp) :
+OGLCubemap::OGLCubemap(OGLImp *pParentImp) :
 	cubemap(),
 	m_glTextureIndex(0),
 	m_pParentImp(pParentImp)
@@ -173,7 +174,7 @@ Error:
 	return r;
 }
 
-OGLCubemap* OGLCubemap::MakeCubemap(OpenGLImp *pParentImp, int width, int height, int channels) {
+OGLCubemap* OGLCubemap::MakeCubemap(OGLImp *pParentImp, int width, int height, int channels) {
 	RESULT r = R_PASS;
 	
 	OGLCubemap *pCubemap = nullptr;
@@ -192,7 +193,7 @@ Error:
 	return pCubemap;
 }
 
-OGLCubemap* OGLCubemap::MakeCubemapFromName(OpenGLImp *pParentImp, const std::wstring &wstrCubemapName) {
+OGLCubemap* OGLCubemap::MakeCubemapFromName(OGLImp *pParentImp, const std::wstring &wstrCubemapName) {
 	RESULT r = R_PASS;
 
 	OGLCubemap *pCubemap = nullptr;

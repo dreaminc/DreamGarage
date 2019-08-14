@@ -1,7 +1,7 @@
 #include "OGLRay.h"
 #include "OGLVolume.h"
 
-OGLRay::OGLRay(OpenGLImp *pParentImp, point ptOrigin, vector vDirection, float step, bool fDirectional) :
+OGLRay::OGLRay(OGLImp *pParentImp, point ptOrigin, vector vDirection, float step, bool fDirectional) :
 	DimRay(ptOrigin, vDirection, step),
 	OGLObj(pParentImp) {
 

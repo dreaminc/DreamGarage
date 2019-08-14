@@ -1,7 +1,8 @@
 #include "OGLText.h"
-#include "Primitives/font.h"
 
-OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, text::flags textFlags) :
+#include "core/text/font.h"
+
+OGLText::OGLText(OGLImp *pParentImp, std::shared_ptr<font> pFont, text::flags textFlags) :
 	text(pParentImp, pFont, textFlags),
 	OGLObj(pParentImp)
 {
@@ -9,7 +10,7 @@ OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, text::flags
 	RESULT r = OGLInitialize();
 }
 
-OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strText, double width, double height, bool fBillboard) :
+OGLText::OGLText(OGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strText, double width, double height, bool fBillboard) :
 	text(pParentImp, pFont, strText, width, height, fBillboard),
 	OGLObj(pParentImp)
 {
@@ -28,7 +29,7 @@ OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::
 	//SetColorTexture(pFont->GetTexture().get());
 }
 
-OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strText, double width, double height, bool fBillboard) :
+OGLText::OGLText(OGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strText, double width, double height, bool fBillboard) :
 	text(pParentImp, pFont, strText, width, height, fBillboard),
 	OGLObj(pParentImp)
 {
@@ -38,7 +39,7 @@ OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pF
 	SetDiffuseTexture(pFontTexture);
 }
 
-OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) :
+OGLText::OGLText(OGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) :
 	text(pParentImp, pFont, strContent, lineHeightM, textFlags),
 	OGLObj(pParentImp)
 {
@@ -48,7 +49,7 @@ OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::
 	//SetColorTexture(pFont->GetTexture().get());
 }
 
-OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) :
+OGLText::OGLText(OGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) :
 	text(pParentImp, pFont, strContent, width, height, textFlags),
 	OGLObj(pParentImp)
 {

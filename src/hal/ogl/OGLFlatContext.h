@@ -1,15 +1,17 @@
 #ifndef OGL_FLAT_CONTEXT_H_
 #define OGL_FLAT_CONTEXT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/OpenGL/OGLFlatContext.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLFlatContext.h
+
 // OpenGL Flat Context Object - in the future we will likely want to 
 // converge this with composite
 
 #include "OGLObj.h"
-#include "Primitives/FlatContext.h"
+
+#include "core/primitives/FlatContext.h"
 
 // Pyramid inheritance throws a dominance warning which needs to be suppressed 
 // until c++ adds a special keyword to deal with this issue, this is by design
@@ -17,7 +19,7 @@
 #pragma warning(disable : 4250)
 class OGLFlatContext : public FlatContext, public OGLObj {
 public:
-	OGLFlatContext(OpenGLImp *pParentImp);
+	OGLFlatContext(OGLImp *pParentImp);
 	~OGLFlatContext();
 
 public:

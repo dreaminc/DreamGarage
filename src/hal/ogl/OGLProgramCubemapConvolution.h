@@ -1,10 +1,11 @@
 #ifndef OGLPROGRAM_CUBEMAP_CONVOLUTION_H_
 #define OGLPROGRAM_CUBEMAP_CONVOLUTION_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramCubemapConvolution.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramCubemapConvolution.h
+
 // OGLProgramConvolution is an OGLProgram that takes an input 
 // cubemap and outputs a convolution cubemap
 
@@ -20,7 +21,7 @@ class cubemap;
 
 class OGLProgramCubemapConvolution : public OGLProgram {
 public:
-	OGLProgramCubemapConvolution(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramCubemapConvolution(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	virtual RESULT OGLInitialize() override;
 	virtual RESULT OGLInitialize(version versionOGL) override;

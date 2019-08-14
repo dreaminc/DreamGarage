@@ -11,17 +11,15 @@
 
 #include "OGLCommon.h"
 
-#include "core/types/DObject.h"
-
-class OpenGLImp;
+class OGLImp;
 class OGLProgram;
 
-class GLSLObject : public DObject {
+class GLSLObject {
 public:
 	GLSLObject(OGLProgram *pParentProgram);
 	~GLSLObject();
 
-	OpenGLImp *GetParentOGLImplementation();
+	OGLImp *GetParentOGLImplementation();
 
 protected:
 	OGLProgram *m_pParentProgram;

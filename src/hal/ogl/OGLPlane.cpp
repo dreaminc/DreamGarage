@@ -1,7 +1,7 @@
 #include "OGLPlane.h"
 #include "OGLVolume.h"
 
-OGLPlane::OGLPlane(OpenGLImp *pParentImp, point ptOrigin, vector vNormal) :
+OGLPlane::OGLPlane(OGLImp *pParentImp, point ptOrigin, vector vNormal) :
 	DimPlane(ptOrigin, vNormal),
 	OGLObj(pParentImp) {
 

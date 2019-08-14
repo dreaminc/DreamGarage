@@ -1,6 +1,6 @@
 #include "OGLQuery.h"
 
-OGLQuery::OGLQuery(OpenGLImp *pParentImp) :
+OGLQuery::OGLQuery(OGLImp *pParentImp) :
 	m_pParentImp(pParentImp)
 {
 	// empty

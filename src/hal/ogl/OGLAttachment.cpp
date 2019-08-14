@@ -4,7 +4,7 @@
 #include "OGLCubemap.h"
 #include "OGLRenderbuffer.h"
 
-OGLAttachment::OGLAttachment (OpenGLImp *pParentImp, int width, int height, int channels, int sampleCount) :
+OGLAttachment::OGLAttachment (OGLImp *pParentImp, int width, int height, int channels, int sampleCount) :
 	m_width(width),
 	m_height(height),
 	m_channels(channels),

@@ -1,13 +1,19 @@
 #ifndef UI_STAGE_PROGRAM_H_
 #define UI_STAGE_PROGRAM_H_
 
-// Dream OS
-// DreamOS/HAL/UIStageProgram.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/UIStageProgram.h
+
 // UI Stage Program is the interface for UI rendering
 
-#include "./RESULT/EHM.h"
+#include "core/types/DObject.h"
 
-class UIStageProgram {
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
+
+class UIStageProgram : public DObject {
 public:
 
 	virtual RESULT SetOriginPoint(point ptOrigin) = 0;

@@ -1,6 +1,6 @@
 #include "OGLProgramTextureBitBlit.h"
 
-OGLProgramTextureBitBlit::OGLProgramTextureBitBlit(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+OGLProgramTextureBitBlit::OGLProgramTextureBitBlit(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "ogltexturebitblit", optFlags)
 {
 	// empty

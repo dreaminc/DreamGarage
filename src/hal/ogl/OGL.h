@@ -7,6 +7,6 @@
 // sandboxed environments.  
 
 // The OpenGL Implementation
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 
 #endif // ! OPEN_GL_H_

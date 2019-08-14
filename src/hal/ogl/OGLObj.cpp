@@ -1,14 +1,14 @@
 #include "OGLObj.h"
 
-#include "Primitives/BoundingVolume.h"
-#include "Primitives/BoundingSphere.h"
-#include "Primitives/BoundingQuad.h"
+#include "core/bounding/BoundingVolume.h"
+#include "core/bounding/BoundingSphere.h"
+#include "core/bounding/BoundingQuad.h"
 
 #include "OGLVolume.h"
 #include "OGLSphere.h"
 #include "OGLQuad.h"
 
-OGLObj::OGLObj(OpenGLImp *pParentImp) :
+OGLObj::OGLObj(OGLImp *pParentImp) :
 	m_pParentImp(pParentImp),
 	m_pOGLBoundingVolume(nullptr),
 	m_fnOGLProgramPreCallback(nullptr),

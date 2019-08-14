@@ -1,5 +1,5 @@
 #include "OGLLightsBlock.h"
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 
 OGLLightsBlock::OGLLightsBlock(OGLProgram *pParentProgram, GLint dataSize, GLint uniformLocationIndex, const char *pszName) :
 	OGLUniformBlock(pParentProgram, dataSize, uniformLocationIndex, pszName)

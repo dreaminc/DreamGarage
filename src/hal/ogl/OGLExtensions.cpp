@@ -1,8 +1,8 @@
-#include "OpenGLExtensions.h"
+#include "OGLExtensions.h"
 
 // Initialize all of the extensions
 // TODO: Stuff this into an object?
-RESULT OpenGLExtensions::InitializeExtensions() {
+RESULT OGLExtensions::InitializeExtensions() {
 	RESULT r = R_PASS;
 
 	// TODO: WGL stuff should be else where

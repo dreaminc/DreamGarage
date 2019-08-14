@@ -1,12 +1,14 @@
 #ifndef OGLPROGRAM_REFERENCE_GEOMETRY_H_
 #define OGLPROGRAM_REFERENCE_GEOMETRY_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramReferenceGeometry.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramReferenceGeometry.h
+
 // The Reference Geometry program is identical to the Minimal program,
 // but it renders the reference geometry instead of the ObjectStore
 
-#include "./RESULT/EHM.h"
 #include "OGLProgramMinimal.h"
 
 class ObjectStore;
@@ -14,7 +16,7 @@ class stereocamera;
 
 class OGLProgramReferenceGeometry : public OGLProgramMinimal {
 public:
-	OGLProgramReferenceGeometry(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramReferenceGeometry(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	virtual RESULT ProcessNode(long frameID) override;
 

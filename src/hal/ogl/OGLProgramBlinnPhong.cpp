@@ -1,15 +1,15 @@
 #include "OGLProgramBlinnPhong.h"
 
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
+#include "scene/ObjectStoreImp.h"
+#include "scene/ObjectStore.h"
 
-#include "Primitives/stereocamera.h"
+#include "core/camera/stereocamera.h"
 
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramBlinnPhong::OGLProgramBlinnPhong(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+OGLProgramBlinnPhong::OGLProgramBlinnPhong(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglblinnphong", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)

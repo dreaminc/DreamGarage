@@ -543,7 +543,7 @@ protected:
 	std::unique_ptr<InteractionEngine> m_pInteractionEngine = nullptr;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
-	//OpenGLImp *m_pOpenGLImp;
+	//OGLImp *m_pOGLImp;
 	HALImp *m_pHALImp = nullptr;
 
 	//std::shared_ptr<stereocamera> m_pCamera = nullptr;

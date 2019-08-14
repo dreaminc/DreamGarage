@@ -1,22 +1,25 @@
 #ifndef OGLPROGRAM_SHADOW_DEPTH_H_
 #define OGLPROGRAM_SHADOW_DEPTH_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramShadowDepth.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramShadowDepth.h
+
 // OGLProgramShadowDepth is an OGLProgram that encapsulates the OGLProgram 
 // for a shader used to simply capture a depth map as set by a given light
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
-#include "Primitives/matrix/ProjectionMatrix.h"
-#include "Primitives/matrix/ViewMatrix.h"
+
+#include "core/matrix/ProjectionMatrix.h"
+#include "core/matrix/ViewMatrix.h"
 
 #define SHADOW_MAP_WIDTH 1024
 #define SHADOW_MAP_HEIGHT 1024
 
 class OGLProgramShadowDepth : public OGLProgram {
 public:
-	OGLProgramShadowDepth(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) :
+	OGLProgramShadowDepth(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) :
 		OGLProgram(pParentImp, "oglshadowdepth", optFlags),
 		m_pShadowEmitter(nullptr)
 	{

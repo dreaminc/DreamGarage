@@ -80,7 +80,7 @@ private:
 	int m_sampleCount = 0;
 
 private:
-	OpenGLImp *m_pParentImp = nullptr;
+	OGLImp *m_pParentImp = nullptr;
 
 	OGLRenderbuffer *m_pOGLRenderbuffer = nullptr;
 	OGLTexture *m_pOGLTexture = nullptr;

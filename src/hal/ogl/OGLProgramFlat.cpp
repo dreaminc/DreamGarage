@@ -1,15 +1,16 @@
 #include "OGLProgramFlat.h"
 
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
-
-#include "Primitives/stereocamera.h"
-#include "Primitives/font.h"
-
 #include "OGLObj.h"
 #include "OGLTexture.h"
 
-OGLProgramFlat::OGLProgramFlat(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+#include "scene/ObjectStoreImp.h"
+#include "scene/ObjectStore.h"
+
+#include "core/camera/stereocamera.h"
+
+#include "core/text/font.h"
+
+OGLProgramFlat::OGLProgramFlat(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglflat", optFlags)
 {
 	// empty

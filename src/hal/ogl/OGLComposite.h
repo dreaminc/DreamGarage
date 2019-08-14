@@ -18,7 +18,7 @@
 #pragma warning(disable : 4250)
 class OGLComposite : public composite, public OGLObj {
 public:
-	OGLComposite(OpenGLImp *pParentImp);
+	OGLComposite(OGLImp *pParentImp);
 
 public:
 	// TODO: Need to make this better

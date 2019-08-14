@@ -1,6 +1,6 @@
 #include "OGLCylinder.h"
 
-OGLCylinder::OGLCylinder(OpenGLImp *pParentImp, double radius, double height, int numAngularDivisions, int numVerticalDivisions) :
+OGLCylinder::OGLCylinder(OGLImp *pParentImp, double radius, double height, int numAngularDivisions, int numVerticalDivisions) :
 	cylinder(radius, height, numAngularDivisions, numVerticalDivisions),
 	OGLObj(pParentImp)
 {

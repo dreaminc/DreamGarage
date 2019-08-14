@@ -1,6 +1,6 @@
 #include "OGLUser.h"
 
-OGLUser::OGLUser(OpenGLImp *pParentImp) :
+OGLUser::OGLUser(OGLImp *pParentImp) :
 	user(pParentImp),
 	OGLObj(pParentImp)
 {

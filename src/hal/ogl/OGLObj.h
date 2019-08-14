@@ -18,7 +18,7 @@
 
 class OGLObj : public virtual DimObj {
 public:
-	OGLObj(OpenGLImp *pParentImp);
+	OGLObj(OGLImp *pParentImp);
 	virtual ~OGLObj();
 
 	RESULT ReleaseOGLBuffers();
@@ -59,7 +59,7 @@ protected:
 	GLuint m_hVBO;		// vertex buffer object
 	GLuint m_hIBO;		// index buffer object
 
-	OpenGLImp *m_pParentImp;
+	OGLImp *m_pParentImp;
 
 private:
 	OGLObj *m_pOGLBoundingVolume;

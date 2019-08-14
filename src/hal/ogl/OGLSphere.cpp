@@ -5,7 +5,7 @@
 #pragma warning(push)
 #pragma warning(disable : 4250)
 
-OGLSphere::OGLSphere(OpenGLImp *pParentImp, sphere::params *pSphereParams) :
+OGLSphere::OGLSphere(OGLImp *pParentImp, sphere::params *pSphereParams) :
 	sphere(pSphereParams),
 	OGLObj(pParentImp)
 {
@@ -13,14 +13,14 @@ OGLSphere::OGLSphere(OpenGLImp *pParentImp, sphere::params *pSphereParams) :
 }
 
 
-OGLSphere::OGLSphere(OpenGLImp *pParentImp, float radius, int numAngularDivisions, int numVerticalDivisions, color c) :
+OGLSphere::OGLSphere(OGLImp *pParentImp, float radius, int numAngularDivisions, int numVerticalDivisions, color c) :
 	sphere(radius, numAngularDivisions, numVerticalDivisions, c),
 	OGLObj(pParentImp)
 {
 	// 
 }
 
-OGLSphere::OGLSphere(OpenGLImp *pParentImp, BoundingSphere* pBoundingSphere, bool fTriangleBased) :
+OGLSphere::OGLSphere(OGLImp *pParentImp, BoundingSphere* pBoundingSphere, bool fTriangleBased) :
 	sphere(pBoundingSphere, fTriangleBased),
 	OGLObj(pParentImp)
 {

@@ -1,18 +1,18 @@
 #include "OGLProgramReflection.h"
 
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
-
-#include "Primitives/stereocamera.h"
-
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
-
-#include "Primitives/matrix/ReflectionMatrix.h"
 #include "OGLFogParamsBlock.h"
 
-OGLProgramReflection::OGLProgramReflection(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+#include "scene/ObjectStoreImp.h"
+#include "scene/ObjectStore.h"
+
+#include "core/camera/stereocamera.h"
+
+#include "core/matrix/ReflectionMatrix.h"
+
+OGLProgramReflection::OGLProgramReflection(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglreflection", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)

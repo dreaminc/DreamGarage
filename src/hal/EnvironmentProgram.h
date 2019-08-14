@@ -1,9 +1,14 @@
 #ifndef ENVIRONMENT_PROGRAM_H_
 #define ENVIRONMENT_PROGRAM_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-class EnvironmentProgram {
+// Dream HAL 
+// dos/src/hal/EnvironmentProgram.h
+
+#include "core/types/DObject.h"
+
+class EnvironmentProgram : public DObject {
 public:
 	virtual RESULT SetIsAugmented(bool fAugmented) = 0;
 

@@ -1,16 +1,15 @@
-#include "Win64OpenGLRenderingContext.h"
-#include "Windows64App.h"
+#include "Win64OGLRenderingContext.h"
 
+#include "sandbox/win64/Win64Sandbox.h"
 
-
-Win64OpenGLRenderingContext::Win64OpenGLRenderingContext() {
+Win64OGLRenderingContext::Win64OGLRenderingContext() {
 	RESULT r = R_PASS;
 
 	Validate();
 	return;
 }
 
-Win64OpenGLRenderingContext::~Win64OpenGLRenderingContext() {
+Win64OGLRenderingContext::~Win64OGLRenderingContext() {
 	wglDeleteContext(m_hglrc);
 	m_hglrc = NULL;
 }
@@ -18,16 +17,16 @@ Win64OpenGLRenderingContext::~Win64OpenGLRenderingContext() {
 
 // TODO: Might make sense to push this into the SandboxApp since the cast might
 // cost some performance
-inline RESULT Win64OpenGLRenderingContext::MakeCurrentContext() {
-	Windows64App *pWin64App = reinterpret_cast<Windows64App*>(GetParentApp());
+inline RESULT Win64OGLRenderingContext::MakeCurrentContext() {
+	Win64Sandbox *pWin64Sandbox = reinterpret_cast<Win64Sandbox*>(GetParentSandbox());
 
-	if (!wglMakeCurrent(pWin64App->GetDeviceContext(), m_hglrc))
+	if (!wglMakeCurrent(pWin64Sandbox->GetDeviceContext(), m_hglrc))
 		return R_FAIL;
 
 	return R_PASS;
 }
 
-inline RESULT Win64OpenGLRenderingContext::ReleaseCurrentContext() {
+inline RESULT Win64OGLRenderingContext::ReleaseCurrentContext() {
 	if (!wglMakeCurrent(NULL, NULL))
 		return R_FAIL;
 
@@ -35,9 +34,9 @@ inline RESULT Win64OpenGLRenderingContext::ReleaseCurrentContext() {
 }
 
 //RESULT Win64OpenGLRenderingContext::InitializeRenderingContext(int versionMajor, int versionMinor) {
-RESULT Win64OpenGLRenderingContext::InitializeRenderingContext(version versionOGL) {
+RESULT Win64OGLRenderingContext::InitializeRenderingContext(version versionOGL) {
 	RESULT r = R_PASS;
-	Windows64App *pWin64App = reinterpret_cast<Windows64App*>(GetParentApp());
+	Win64Sandbox *pWin64Sandbox = reinterpret_cast<Win64Sandbox*>(GetParentSandbox());
 
 	int attribs[] = {
 		WGL_CONTEXT_MAJOR_VERSION_ARB, versionOGL.major(),
@@ -53,7 +52,7 @@ RESULT Win64OpenGLRenderingContext::InitializeRenderingContext(version versionOG
 	CNM(wglCreateContextAttribsARB, "wglCreateContextAttribsARB cannot be NULL");
 
 	HGLRC hglrcTemp = m_hglrc;
-	m_hglrc = wglCreateContextAttribsARB(pWin64App->GetDeviceContext(), 0, attribs);
+	m_hglrc = wglCreateContextAttribsARB(pWin64Sandbox->GetDeviceContext(), 0, attribs);
 	DWORD werr = GetLastError();
 	DEBUG_LINEOUT("Created OpenGL Rendering Context 0x%x", werr);
 
@@ -85,9 +84,9 @@ Error:
 	return r;
 }
 
-RESULT Win64OpenGLRenderingContext::InitializeRenderingContext() {
+RESULT Win64OGLRenderingContext::InitializeRenderingContext() {
 	RESULT r = R_PASS;
-	Windows64App *pWin64App = reinterpret_cast<Windows64App*>(GetParentApp());
+	Win64Sandbox *pWin64Sandbox = reinterpret_cast<Win64Sandbox*>(GetParentSandbox());
 	HGLRC hglrcTemp = NULL;
 
 	
@@ -102,15 +101,15 @@ RESULT Win64OpenGLRenderingContext::InitializeRenderingContext() {
 	m_pfd.cDepthBits = 32;
 	m_pfd.iLayerType = PFD_MAIN_PLANE;
 
-	int nPixelFormat = ChoosePixelFormat(pWin64App->GetDeviceContext(), &m_pfd);
+	int nPixelFormat = ChoosePixelFormat(pWin64Sandbox->GetDeviceContext(), &m_pfd);
 
 	CBM((nPixelFormat != NULL), "nPixelFormat is NULL with error 0x%x", GetLastError());
-	CBM((SetPixelFormat(pWin64App->GetDeviceContext(), nPixelFormat, &m_pfd)), "Failed to SetPixelFormat %d", nPixelFormat);
+	CBM((SetPixelFormat(pWin64Sandbox->GetDeviceContext(), nPixelFormat, &m_pfd)), "Failed to SetPixelFormat %d", nPixelFormat);
 
-	hglrcTemp = wglCreateContext(pWin64App->GetDeviceContext());
+	hglrcTemp = wglCreateContext(pWin64Sandbox->GetDeviceContext());
 	CNM(hglrcTemp, "Failed to Create GL Context");
 
-	CBM((wglMakeCurrent(pWin64App->GetDeviceContext(), hglrcTemp)), "Failed OGL wglMakeCurrent");
+	CBM((wglMakeCurrent(pWin64Sandbox->GetDeviceContext(), hglrcTemp)), "Failed OGL wglMakeCurrent");
 	
 
 Error:
@@ -118,7 +117,7 @@ Error:
 	return r;
 }
 
-bool Win64OpenGLRenderingContext::WGLExtensionSupported(const char* extension_name)
+bool Win64OGLRenderingContext::WGLExtensionSupported(const char* extension_name)
 {
     // this is pointer to function which returns pointer to string with list of all wgl extensions
     PFNWGLGETEXTENSIONSSTRINGEXTPROC _wglGetExtensionsStringEXT = NULL;

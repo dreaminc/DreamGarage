@@ -1,21 +1,21 @@
 #include "OGLProgramSkyboxScatterCube.h"
 
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
-
-#include "Primitives/stereocamera.h"
-#include "Primitives/skybox.h"
-
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
-
 #include "OGLSkybox.h"
 #include "OGLCubemap.h"
 
-#include "Primitives/matrix/ReflectionMatrix.h"
+#include "scene/ObjectStoreImp.h"
+#include "scene/ObjectStore.h"
 
-OGLProgramSkyboxScatterCube::OGLProgramSkyboxScatterCube(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+#include "core/camera/stereocamera.h"
+
+#include "core/primitives/skybox.h"
+
+#include "core/matrix/ReflectionMatrix.h"
+
+OGLProgramSkyboxScatterCube::OGLProgramSkyboxScatterCube(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglskyboxscattercube", optFlags)
 {
 	// empty

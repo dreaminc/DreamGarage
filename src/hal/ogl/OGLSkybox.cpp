@@ -1,6 +1,6 @@
 #include "OGLSkybox.h"
 
-OGLSkybox::OGLSkybox(OpenGLImp *pParentImp) :
+OGLSkybox::OGLSkybox(OGLImp *pParentImp) :
 	skybox(),
 	OGLObj(pParentImp)
 {

@@ -1,20 +1,23 @@
 #ifndef OGL_VIEWPORT_DISPLAY_H_
 #define OGL_VIEWPORT_DISPLAY_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLViewportDisplay.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLViewportDisplay.h
+
 // This represents a view port display and respect OGL contexts as needed
 
-// TODO: Move more of the OpenGLImp stuff into here (like the context)
+// TODO: Move more of the OGLImp stuff into here (like the context)
 
-#include "HAL/Pipeline/SinkNode.h"
+#include "pipeline/SinkNode.h"
 
-class OpenGLImp;
+class OGLImp;
 class OGLFramebuffer;
 
 class OGLViewportDisplay : public SinkNode {
 public:
-	OGLViewportDisplay(OpenGLImp *pParentImp);
+	OGLViewportDisplay(OGLImp *pParentImp);
 
 	virtual RESULT SetupConnections() override;
 	virtual RESULT PreProcessNode(long frameID = 0) override;
@@ -24,7 +27,7 @@ private:
 	OGLFramebuffer *m_pOGLInputFramebuffer = nullptr;
 
 private:
-	OpenGLImp* m_pParentImp = nullptr;
+	OGLImp* m_pParentImp = nullptr;
 };
 
 #endif	// ! OGL_VIEWPORT_DISPLAY_H_

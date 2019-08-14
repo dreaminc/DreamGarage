@@ -1,10 +1,11 @@
 #ifndef OGLPROGRAM_SKYBOX_H_
 #define OGLPROGRAM_SKYBOX_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramSkybox.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramSkybox.h
+
 // OGLProgramSkybox is an OGLProgram that encapsulates the OGLProgram 
 // for a skybox shader
 
@@ -16,7 +17,7 @@ class cubemap;
 
 class OGLProgramSkybox : public OGLProgram {
 public:
-	OGLProgramSkybox(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramSkybox(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	virtual RESULT OGLInitialize() override;
 	virtual RESULT OGLInitialize(version versionOGL) override;

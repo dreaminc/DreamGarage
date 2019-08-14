@@ -1,19 +1,21 @@
 #ifndef OGLPROGRAM_SSAO_H_
 #define OGLPROGRAM_SSAO_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramSSAO.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramSSAO.h
+
 // SSAO Shader
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 
 class OGLQuad;
 
 class OGLProgramSSAO : public OGLProgram {
 public:
-	OGLProgramSSAO(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
-	OGLProgramSSAO(OpenGLImp *pParentImp, std::string strName = "oglssao", PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramSSAO(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramSSAO(OGLImp *pParentImp, std::string strName = "oglssao", PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

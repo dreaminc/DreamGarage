@@ -1,12 +1,14 @@
 #ifndef OGLPROGRAM_BLINN_PHONG_H_
 #define OGLPROGRAM_BLINN_PHONG_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramSkybox.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramSkybox.h
+
 // OGLProgramSkybox is an OGLProgram that encapsulates the OGLProgram 
 // for a skybox shader
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 
 class stereocamera;
@@ -14,7 +16,7 @@ class ObjectStore;
 
 class OGLProgramBlinnPhong : public OGLProgram {
 public:
-	OGLProgramBlinnPhong(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramBlinnPhong(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

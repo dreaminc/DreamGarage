@@ -18,7 +18,7 @@
 #pragma warning(disable : 4250)
 class OGLCylinder : public cylinder, public OGLObj {
 public:
-	OGLCylinder(OpenGLImp *pParentImp, double radius = 1.0f, double height = 1.0f, int numAngularDivisions = MIN_CYLINDER_DIVISIONS, int numVerticalDivisions = MIN_CYLINDER_DIVISIONS);
+	OGLCylinder(OGLImp *pParentImp, double radius = 1.0f, double height = 1.0f, int numAngularDivisions = MIN_CYLINDER_DIVISIONS, int numVerticalDivisions = MIN_CYLINDER_DIVISIONS);
 
 public:
 	// Override this method when necessary by a child object

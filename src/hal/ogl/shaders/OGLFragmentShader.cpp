@@ -23,7 +23,7 @@ RESULT OGLFragmentShader::GetAttributeLocationsFromShader() {
 	RESULT r = R_PASS;
 
 	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 
 	CRM(pParentImp->glGetAttribLocation(oglProgramID, GetColorAttributeName(), &m_ColorIndex), "Failed to acquire position GL location");
 
@@ -36,7 +36,7 @@ RESULT OGLFragmentShader::GetUniformLocationsFromShader() {
 	RESULT r = R_PASS;
 
 	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 
 	// Uniforms
 	WCRM(pParentImp->glGetUniformLocation(oglProgramID, GetColorTextureUniformName(), &m_uniformColorTextureIndex), "Failed to acquire color texture uniform GL location");

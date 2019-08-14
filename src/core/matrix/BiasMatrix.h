@@ -3,13 +3,15 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/BiasMatrix.h
+// Dream Core Matrix
+// dos/src/core/matrix/BiasMatrix.h
+
 // Bias Matrix 
 // A general purpose bias matrix
 
 #include "matrix.h"
-#include "Primitives/point.h"
+
+#include "core/primitives/point.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float bias_precision;

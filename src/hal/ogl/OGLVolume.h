@@ -1,14 +1,16 @@
 #ifndef OGL_VOLUME_H_
 #define OGL_VOLUME_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/OpenGL/OGLVolume.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLVolume.h
+
 // OpenGL Volume Object
 
 #include "OGLObj.h"
-#include "Primitives/volume.h"
+
+#include "core/primitives/volume.h"
 
 // Pyramid inheritance throws a dominance warning which needs to be suppressed 
 // until c++ adds a special keyword to deal with this issue, this is by design
@@ -16,11 +18,11 @@
 #pragma warning(disable : 4250)
 class OGLVolume : public volume, public OGLObj {
 public:
-	OGLVolume(OpenGLImp *pParentImp);
-	OGLVolume(OpenGLImp *pParentImp, volume::params *pVolumeParams);
-	OGLVolume(OpenGLImp *pParentImp, double width, double length, double height, bool fTriangleBased);
-	OGLVolume(OpenGLImp *pParentImp, double side, bool fTriangleBased);
-	OGLVolume(OpenGLImp *pParentImp, BoundingBox* pBoundingBox, bool fTriangleBased);
+	OGLVolume(OGLImp *pParentImp);
+	OGLVolume(OGLImp *pParentImp, volume::params *pVolumeParams);
+	OGLVolume(OGLImp *pParentImp, double width, double length, double height, bool fTriangleBased);
+	OGLVolume(OGLImp *pParentImp, double side, bool fTriangleBased);
+	OGLVolume(OGLImp *pParentImp, BoundingBox* pBoundingBox, bool fTriangleBased);
 
 public:
 	RESULT UpdateFromBoundingBox(BoundingBox* pBoundingBox);

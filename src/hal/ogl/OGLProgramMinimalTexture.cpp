@@ -1,11 +1,11 @@
 #include "OGLProgramMinimalTexture.h"
 
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 #include "OGLFogParamsBlock.h"
 
-OGLProgramMinimalTexture::OGLProgramMinimalTexture(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+OGLProgramMinimalTexture::OGLProgramMinimalTexture(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglminimaltexture", optFlags)
 {
 	// empty

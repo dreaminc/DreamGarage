@@ -1,9 +1,9 @@
 #include "OGLHMDDisplay.h"
 
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 
-OGLHMDDisplay::OGLHMDDisplay(OpenGLImp *pParentImp) :
+OGLHMDDisplay::OGLHMDDisplay(OGLImp *pParentImp) :
 	SinkNode("oglhmddisplay"),
 	m_pParentImp(pParentImp)
 {

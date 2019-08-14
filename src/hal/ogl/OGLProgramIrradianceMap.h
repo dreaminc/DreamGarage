@@ -1,12 +1,14 @@
 #ifndef OGLPROGRAM_IRRADIANCE_MAP_H_
 #define OGLPROGRAM_IRRADIANCE_MAP_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramIrradianceMap.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramIrradianceMap.h
+
 // OGLProgramIrradianceMap is an OGLProgram for developing the
 // irradiance image based lighting approach of global illumination
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 
 class stereocamera;
@@ -15,7 +17,7 @@ class cubemap;
 
 class OGLProgramIrradianceMap : public OGLProgram {
 public:
-	OGLProgramIrradianceMap(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramIrradianceMap(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

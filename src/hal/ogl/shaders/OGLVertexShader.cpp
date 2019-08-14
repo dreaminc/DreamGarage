@@ -1,6 +1,6 @@
 #include "OGLVertexShader.h"
 
-#include "../OpenGLImp.h"
+#include "../OGLImp.h"
 
 OGLVertexShader::OGLVertexShader(OGLProgram *pParentProgram) :
 	OGLShader(pParentProgram, GL_VERTEX_SHADER)
@@ -13,7 +13,7 @@ RESULT OGLVertexShader::GetAttributeLocationsFromShader() {
 	RESULT r = R_PASS;
 
 	//GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
 
 	CRM(pParentImp->glGetAttribLocation(oglProgramID, GetPositionAttributeName(), &m_PositionIndex), "Failed to acquire position GL location");
@@ -34,7 +34,7 @@ RESULT OGLVertexShader::GetUniformLocationsFromShader() {
 	RESULT r = R_PASS;
 
 	//GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
 
 	CRM(pParentImp->glGetUniformLocation(oglProgramID, GetModelMatrixUniformName(), &m_uniformModelMatrixIndex), "Failed to acquire model matrix uniform GL location");

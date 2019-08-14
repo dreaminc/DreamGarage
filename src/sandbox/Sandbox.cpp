@@ -288,7 +288,7 @@ RESULT Sandbox::RegisterImpMouseEvents() {
 	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_DRAG_MOVE, this));
 	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_UP, this));
 
-	//camera *pCamera = m_pOpenGLImp->GetCamera();
+	//camera *pCamera = m_pOGLImp->GetCamera();
 
 	// TODO: Should either be moved up to the sandbox or into the Imp itself
 	//CR(RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
@@ -310,8 +310,8 @@ Error:
 RESULT Sandbox::RegisterImpLeapMotionEvents() {
 	RESULT r = R_PASS;
 
-	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_LEFT);
-	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_RIGHT);
+	hand *pLeftHand = new OGLHand(reinterpret_cast<OGLImp*>(m_pHALImp), HAND_TYPE::HAND_LEFT);
+	hand *pRightHand = new OGLHand(reinterpret_cast<OGLImp*>(m_pHALImp), HAND_TYPE::HAND_RIGHT);
 
 	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
@@ -331,8 +331,8 @@ RESULT Sandbox::RegisterImpControllerEvents() {
 	RESULT r = R_PASS;
 
 	if (m_pHMD != nullptr) {
-		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_LEFT);
-		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_RIGHT);
+		hand *pLeftHand = new OGLHand(reinterpret_cast<OGLImp*>(m_pHALImp), HAND_TYPE::HAND_LEFT);
+		hand *pRightHand = new OGLHand(reinterpret_cast<OGLImp*>(m_pHALImp), HAND_TYPE::HAND_RIGHT);
 
 		CR(m_pHMD->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
 		CR(m_pHMD->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));
@@ -520,8 +520,8 @@ RESULT Sandbox::RunAppLoop() {
 			m_pHALImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
 		}
 
-		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
-		//m_pOpenGLImp->Render(m_pSceneGraph);
+		//m_pOGLImp->RenderStereo(m_pSceneGraph);
+		//m_pOGLImp->Render(m_pSceneGraph);
 		m_pHALImp->Render();
 
 		// Swap buffers

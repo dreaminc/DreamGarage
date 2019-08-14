@@ -1,6 +1,6 @@
 #include "OGLVertexAttribute.h"
 
-#include "../OpenGLImp.h"
+#include "../OGLImp.h"
 
 OGLVertexAttribute::OGLVertexAttribute(OGLProgram *pParentProgram, const char *pszAttributeName, GLint attributeLocationIndex, GLint GLType) :
 	GLSLObject(pParentProgram),
@@ -17,7 +17,7 @@ OGLVertexAttribute::~OGLVertexAttribute() {
 RESULT OGLVertexAttribute::EnableAttribute() {
 	RESULT r = R_PASS;
 
-	OpenGLImp *pParentImp = m_pParentProgram->GetOGLImp();
+	OGLImp *pParentImp = m_pParentProgram->GetOGLImp();
 	CRM(pParentImp->glEnableVertexAtrribArray(m_attributeIndex), "Failed to enable %s attribute", m_strAttributeName.c_str());
 
 Error:

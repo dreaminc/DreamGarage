@@ -1,6 +1,6 @@
 #include "OGLUniformBlock.h"
 
-#include "../OpenGLImp.h"
+#include "../OGLImp.h"
 
 OGLUniformBlock::OGLUniformBlock(OGLProgram *pParentProgram, GLint dataSize, GLint uniformLocationIndex, const char *pszName) :
 	GLSLObject(pParentProgram),
@@ -16,7 +16,7 @@ OGLUniformBlock::OGLUniformBlock(OGLProgram *pParentProgram, GLint dataSize, GLi
 RESULT OGLUniformBlock::OGLInitialize() {
 	RESULT r = R_PASS;
 
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 
 	//CR(pParentImp->MakeCurrentContext());
 
@@ -68,7 +68,7 @@ Error:
 RESULT OGLUniformBlock::ReleaseOGLUniformBlockBuffers() {
 	RESULT r = R_PASS;
 
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 
 	if (pParentImp != nullptr) {
 		if (m_uniformBlockBufferIndex != NULL) {
@@ -84,7 +84,7 @@ Error:
 RESULT OGLUniformBlock::UpdateOGLUniformBlockBuffers() {
 	RESULT r = R_PASS;
 
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 
 	//CR(pParentImp->MakeCurrentContext());
 
@@ -121,7 +121,7 @@ RESULT OGLUniformBlock::UpdateUniformBlockIndexFromShader(const char* pszUniform
 	RESULT r = R_PASS;
 
 	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
+	OGLImp *pParentImp = GetParentOGLImplementation();
 
 	CR(pParentImp->glGetUniformBlockIndex(oglProgramID, pszUniformBlockName, &m_uniformBlockIndex));
 

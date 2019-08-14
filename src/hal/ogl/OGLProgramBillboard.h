@@ -1,7 +1,11 @@
 #ifndef OGLPROGRAM_BILLBOARD_H_
 #define OGLPROGRAM_BILLBOARD_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramBillboard
+
 #include "OGLProgramMinimal.h"
 
 class ObjectStore;
@@ -9,7 +13,7 @@ class stereocamera;
 
 class OGLProgramBillboard : public OGLProgramMinimal {
 public:
-	OGLProgramBillboard(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramBillboard(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	virtual RESULT ProcessNode(long frameID) override;
 

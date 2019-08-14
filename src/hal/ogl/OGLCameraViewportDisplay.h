@@ -11,14 +11,14 @@
 
 #include "pipeline/SinkNode.h"
 
-class OpenGLImp;
+class OGLImp;
 class OGLFramebuffer;
 
 class stereocamera;
 
 class OGLCameraViewportDisplay : public SinkNode {
 public:
-	OGLCameraViewportDisplay(OpenGLImp *pParentImp);
+	OGLCameraViewportDisplay(OGLImp *pParentImp);
 
 	virtual RESULT SetupConnections() override;
 	virtual RESULT PreProcessNode(long frameID = 0) override;
@@ -29,7 +29,7 @@ private:
 	stereocamera *m_pCamera = nullptr;
 
 private:
-	OpenGLImp* m_pParentImp = nullptr;
+	OGLImp* m_pParentImp = nullptr;
 };
 
 #endif	// ! OGL_CAMERA_VIEWPORT_DISPLAY_H_

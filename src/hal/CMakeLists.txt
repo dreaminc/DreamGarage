@@ -49,11 +49,19 @@ file(GLOB OGL_WIN64_SOURCES
 )
 source_group("ogl//win64" FILES ${OGL_WIN64_SOURCES})
 
+# Easy Logging
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/easyloggingpp/include)
+
 # TODO: Vulkan
 
 # TODO: DirectX
 
 # TODO: Metal / MoltenVK etc
+
+
+# TODO: This should not be here!!!!!
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
+add_definitions(-DWEBRTC_WIN)
 
 # Force Include the src/core/config.h
 if(MSVC)

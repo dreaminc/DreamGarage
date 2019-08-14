@@ -10,6 +10,7 @@
 // interface for a shader class
 
 #include "core/types/DObject.h"
+#include "core/types/version.h"
 
 typedef enum ShaderType {
 	SHADER_VERTEX,

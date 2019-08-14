@@ -1,20 +1,22 @@
 #ifndef OGLPROGRAM_TEXTURE_BIT_BLIT_H_
 #define OGLPROGRAM_TEXTURE_BIT_BLIT_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramTextureBitBlit.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgramTextureBitBlit.h
+
 // OGLProgramTextureBitBlit  is an OGLProgram that encapsulates the OGLProgram 
 // for a minimal shader with a color texture that simply takes in a point, color, and UV coord
 // and renders it using the usual suspects of required matrices (no lights)
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
 
 class OGLProgramTextureBitBlit : public OGLProgram {
 public:
-	OGLProgramTextureBitBlit(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramTextureBitBlit(OGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	virtual RESULT OGLInitialize() override;
 	virtual RESULT SetupConnections() override;

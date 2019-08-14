@@ -1,19 +1,19 @@
 #include "OGLProgramWater.h"
 
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
+#include <chrono>
 
-#include "Primitives/stereocamera.h"
-
-#include "OpenGLImp.h"
+#include "OGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-#include "Primitives/matrix/ReflectionMatrix.h"
+#include "scene/ObjectStoreImp.h"
+#include "scene/ObjectStore.h"
 
-#include <chrono>
+#include "core/camera/stereocamera.h"
 
-OGLProgramWater::OGLProgramWater(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+#include "core/matrix/ReflectionMatrix.h"
+
+OGLProgramWater::OGLProgramWater(OGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
 	OGLProgram(pParentImp, "oglwater", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)

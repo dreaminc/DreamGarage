@@ -1,4 +1,4 @@
-#include "OpenGLCommon.h"
+#include "OGLCommon.h"
 
 GLenum GetOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int channels) {
 	switch (pixelFormat) {
