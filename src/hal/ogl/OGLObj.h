@@ -1,16 +1,18 @@
 #ifndef OGL_OBJ_H_
 #define OGL_OBJ_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/OpenGL/OGLOBJ.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLOBJ.h
+
 // OpenGL Base Type - This is for coupling with the open GL implementation 
 
-#include "OpenGLImp.h"
-#include "Primitives/DimObj.h"
-
 #include <functional>
+
+#include "OGLImp.h"
+
+#include "core/dimension/DimObj.h"
 
 #define NUM_VBO 2
 

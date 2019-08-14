@@ -1,11 +1,12 @@
 #ifndef OPEN_GL_RENDERING_CONTEXT_FACTORY_H_
 #define OPEN_GL_RENDERING_CONTEXT_FACTORY_H_
 
-// DREAM OS
-// DreamOS/Sandbox/SandboxFactory
+// Dream HAL OGL
+// dos/src/ogl/OGLRenderingContextFactory.h
+
 // This allows creation of Sandbox without need of direct implementation
 
-#include "OpenGLRenderingContext.h"
+#include "OGLRenderingContext.h"
 
 typedef enum {
 	OPEN_GL_RC_WIN32,
@@ -15,9 +16,9 @@ typedef enum {
 	OPEN_GL_RC_INVALID
 } OPEN_GL_RC_TYPE;
 
-class OpenGLRenderingContextFactory {
+class OGLRenderingContextFactory {
 public:
-	static OpenGLRenderingContext* MakeOpenGLRenderingContext(OPEN_GL_RC_TYPE type);
+	static OGLRenderingContext* MakeOGLRenderingContext(OPEN_GL_RC_TYPE type);
 };
 
 #endif // ! OPEN_GL_RENDERING_CONTEXT_FACTORY_H_

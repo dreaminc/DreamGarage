@@ -6,26 +6,26 @@
 		_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 	}
     #if defined(_WIN64)
-        #include "./Sandbox/Windows/Windows64App.h"
+        #include "sandbox/win64/Win64Sandbox.h"
     #else
-        #include "./Sandbox/Windows/Windows64App.h"
+        #include "sandbox/win64/Win64Sandbox.h"
     #endif
 #elif defined(__APPLE__)
-    #include "./Sandbox/OSX/OSXSandboxApp.h"
+    #include "sandbox/osx/OSXSandbox.h"
 #elif defined(__linux__)
-    #include "./Sandbox/Linux/LinuxApp.h"
+    #include "sandbox/linux/LinuxSandbox.h"
 #endif
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
-SandboxApp* SandboxFactory::MakeSandbox(SANDBOX_APP_TYPE type, DreamOS *pDOSHandle) {
+Sandbox* SandboxFactory::MakeSandbox(SANDBOX_APP_TYPE type, DreamOS *pDOSHandle) {
 	RESULT r = R_PASS;
-	SandboxApp *pSandbox = NULL;
+	Sandbox *pSandbox = NULL;
 	
 	switch (type) {
 		case SANDBOX_APP_WIN32: {
             #if defined(_WIN32)
-                pSandbox = new Windows64App(_T("DreamOSSandbox"));
+                pSandbox = new Win64Sandbox(L"DreamOSSandbox");
             #else
                 pSandbox = NULL;
                 DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
@@ -49,7 +49,7 @@ SandboxApp* SandboxFactory::MakeSandbox(SANDBOX_APP_TYPE type, DreamOS *pDOSHand
 
 	// Set up the Sandbox
 	CRM(pSandbox->InitializePathManager(pDOSHandle), "Failed to initialize Sandbox path manager");
-	CRM(pSandbox->InitializeOpenGLRenderingContext(), "Failed to initialize Sandbox OpenGL rendering context");
+	CRM(pSandbox->InitializeOGLRenderingContext(), "Failed to initialize Sandbox OpenGL rendering context");
 
 	return pSandbox;
 Error:

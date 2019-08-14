@@ -1,23 +1,26 @@
 #ifndef OGL_UNIFORM_H_
 #define OGL_UNIFORM_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLUniform.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLUniform.h
+
 // This is an OpenGL Uniform variable, owned by a OGLProgram (these are shared across shaders)
-
-#include "../OpenGLCommon.h"
-#include "../GLSLObject.h"
-
-#include "Primitives/matrix/matrix.h"
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
-#include "Primitives/quaternion.h"
 
 #include <string>
 
-class OpenGLImp;
+#include "hal/ogl/OGLCommon.h"
+#include "hal/ogl/GLSLObject.h"
+
+#include "core/matrix/matrix.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
+#include "core/primitives/quaternion.h"
+
+
+class OGLImp;
 class OGLProgram;
 class OGLTexture;
 

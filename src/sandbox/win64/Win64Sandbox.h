@@ -1,11 +1,11 @@
 #ifndef WINDOWS_64_APP_H_
 #define WINDOWS_64_APP_H_
 
-#include "RESULT/EHM.h"
-#include "Sandbox/SandboxApp.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sandbox/Windows/Windows64App.h
+// Dream Sandbox Win64
+// dos/src/sandbox/wn64/Win64Sandbox.h
+
 // Dream OS Windows 64 Sandbox
 
 #include <windows.h>
@@ -13,9 +13,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <tchar.h>
-#include <HMD/HMD.h>
 
 #include <functional>
+
+#include "sandbox/Sandbox.h"
+#include "hmd/HMD.h"
 
 #define DEFAULT_WIDTH 1920 / 2
 #define DEFAULT_HEIGHT 1080 / 2
@@ -27,15 +29,15 @@ class Win64Keyboard;
 class Win64Mouse;
 class Win64CredentialManager;
 
-class Windows64App : public SandboxApp {
+class Win64Sandbox : public Sandbox {
 public:
 	enum WindowMessages {
 		UI_THREAD_CALLBACK = WM_APP + 1
 	};
 
 public:
-	Windows64App(TCHAR* pszClassName);
-	~Windows64App();
+	Win64Sandbox(TCHAR* pszClassName);
+	~Win64Sandbox();
 
 public:	// Sandbox Interface
 	virtual RESULT InitializeSandbox() override;
@@ -65,7 +67,7 @@ public:	// Sandbox Interface
 
 public:
 	virtual RESULT InitializePathManager(DreamOS *pDOSHandle) override;	
-	RESULT InitializeOpenGLRenderingContext();
+	RESULT InitializeOGLRenderingContext();
 	RESULT InitializeCloudController();
 	//RESULT InitializeHAL();
 	RESULT InitializeKeyboard();

@@ -1,18 +1,22 @@
 #ifndef OSX_PATH_MANAGER_H_
 #define OSX_PATH_MANAGER_H_
 
-#include "RESULT/EHM.h"
-#include "Sandbox/PathManager.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sandbox/OSX/OSXPathManager.h
+// Dream Sandbox OSX
+// dos/src/sandbox/osx/OSXPathManager.h
+
 // Dream OS OSX sandbox path manager
 
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 
-#define MAX_PATH_LENGTH_PM PATH_MAX
+#include "Sandbox/PathManager.h"
+
+#ifndef MAX_PATH_LENGTH
+	#define MAX_PATH_LENGTH_PM PATH_MAX
+#endif
 
 class OSXPathManager : public PathManager {
 public:

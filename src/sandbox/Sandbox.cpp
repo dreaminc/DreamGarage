@@ -1,47 +1,83 @@
-#include "SandboxApp.h"
-
-#include "Primitives/PrimParams.h"
-
-#include "Cloud/CloudController.h"
-
-#include "Primitives/ray.h"
-
-#ifndef OCULUS_PRODUCTION_BUILD
-	#include <HMD/OpenVR/OpenVRDevice.h>
-#endif
-
-#include "DreamAppMessage.h"
-
-#include "HAL/Pipeline/ProgramNode.h"
-#include "Primitives/model/ModelFactory.h"
+#include "Sandbox.h"
+\
+#include <synchapi.h>                           // for Sleep
+#include <WinUser.h>                            // for GetAsyncKeyState, VK_ESCAPE
 
 #include "CommandLineManager.h"
 
-#include "InteractionEngine/InteractionEngine.h"
-#include "PhysicsEngine/PhysicsEngine.h"
+#include "cloud/CloudController.h"
 
-#include "Scene/CameraNode.h"
-#include "Scene/ObjectStoreNode.h"
-#include "PhysicsEngine/CollisionDetector.h"
+#include "core/primitives/ray.h"
+#include "core/primitives/PrimParams.h"
 
-#include "Sense/SenseLeapMotion.h"
+#include "core/model/ModelFactory.h"
 
-#include "DreamAppManager.h"
-#include "DreamModuleManager.h"
+#include "core/hysteresis/HysteresisPlane.h"
+#include "core/hysteresis/HysteresisSphere.h"
+#include "core/hysteresis/HysteresisCylinder.h"
 
-#include "HAL/Pipeline/SinkNode.h"
+#include "scene/CameraNode.h"
+#include "scene/ObjectStoreNode.h"
 
-#include "Primitives/HysteresisPlane.h"
-#include "Primitives/HysteresisSphere.h"
-#include "Primitives/HysteresisCylinder.h"
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
 
-// TODO: Fix
-#include "HAL/opengl/OGLHand.h"
+// TODO: This needs to be resolved in the build system 
+// or the configuration 
+#ifndef OCULUS_PRODUCTION_BUILD
+	#include <hmd/openvr/OpenVRDevice.h>
+#endif
+
+#include "os/app/DreamAppMessage.h"
+#include "os/app/DreamAppManager.h"
+
+#include "os/module/DreamModuleManager.h"
+
+#include "modules/InteractionEngine/InteractionEngine.h"
+#include "modules/PhysicsEngine/PhysicsEngine.h"
+#include "modules/PhysicsEngine/CollisionDetector.h"
+
+#include "sense/SenseLeapMotion.h"
+
+// TODO: Fix, no OGL allowed at this level 
+#include "hal/ogl/OGLHand.h"
+
+// TODO:
+#include "logger/DreamLogger.h"            // for DreamLogger
+
+#include "hal/ogl/OGLRenderingContext.h"  // for OpenGLRenderingContext
+
+#include "pipeline/Pipeline.h"              // for Pipeline
+
+#include "core/primitives/billboard.h"               // for billboard
+#include "core/primitives/composite.h"               // for composite
+#include "core/primitives/cylinder.h"                // for cylinder
+#include "core/primitives/FlatContext.h"             // for FlatContext
+#include "core/primitives/quad.h"                    // for quad
+#include "core/primitives/skybox.h"                  // for skybox
+#include "core/primitives/sphere.h"                  // for sphere
+#include "core/primitives/volume.h"                  // for volume
+
+#include "core/dimension/DimObj.h"                  // for DimObj
+#include "core/dimension/DimPlane.h"                // for DimPlane
+#include "core/dimension/DimRay.h"                  // for DimRay
+
+#include "core/model/model.h"             // for model
+#include "core/model/mesh.h"              // for mesh
+
+#include "core/user/user.h"                    // for user
+
+#include "core/camera/stereocamera.h"            // for stereocamera
+
+#include "scene/ObjectStore.h"                  // for ObjectStore
+#include "scene/ObjectStoreFactory.h"           // for ObjectStoreFactory, ObjectStoreFactory::TYPE, ObjectStoreFactory::TYPE::LIST
+
+class SinkNode;
 
 Sandbox::Sandbox() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
-	m_pOpenGLRenderingContext(nullptr),
+	m_pOGLRenderingContext(nullptr),
 	m_pSceneGraph(nullptr),
 	m_pAuxSceneGraph(nullptr),
 	m_pUISceneGraph(nullptr),
@@ -72,9 +108,9 @@ Sandbox::~Sandbox() {
 		m_pHALImp = nullptr;
 	}
 
-	if (m_pOpenGLRenderingContext != nullptr) {
-		delete m_pOpenGLRenderingContext;
-		m_pOpenGLRenderingContext = nullptr;
+	if (m_pOGLRenderingContext != nullptr) {
+		delete m_pOGLRenderingContext;
+		m_pOGLRenderingContext = nullptr;
 	}
 }
 
@@ -270,33 +306,6 @@ Error:
 	return r;
 }
 
-// temp
-#include "DreamLogger/DreamLogger.h"            // for DreamLogger
-#include "HAL/opengl/OpenGLRenderingContext.h"  // for OpenGLRenderingContext
-#include "HAL/Pipeline/Pipeline.h"              // for Pipeline
-#include "Primitives/billboard.h"               // for billboard
-#include "Primitives/composite.h"               // for composite
-#include "Primitives/cylinder.h"                // for cylinder
-#include "Primitives/DimObj.h"                  // for DimObj
-#include "Primitives/DimPlane.h"                // for DimPlane
-#include "Primitives/DimRay.h"                  // for DimRay
-#include "Primitives/FlatContext.h"             // for FlatContext
-#include "Primitives/model/mesh.h"              // for mesh
-#include "Primitives/model/model.h"             // for model
-#include "Primitives/quad.h"                    // for quad
-#include "Primitives/skybox.h"                  // for skybox
-#include "Primitives/sphere.h"                  // for sphere
-#include "Primitives/stereocamera.h"            // for stereocamera
-#include "Primitives/user.h"                    // for user
-#include "Primitives/volume.h"                  // for volume
-#include "core/ehm/EHM.h"                         // for CR, CN, CNM, CRM, DOSLOG, CB, CVM, WCNM, CBM, CNR
-#include "Scene/ObjectStore.h"                  // for ObjectStore
-#include "Scene/ObjectStoreFactory.h"           // for ObjectStoreFactory, ObjectStoreFactory::TYPE, ObjectStoreFactory::TYPE::LIST
-#include "vcruntime_new.h"                      // for operator delete, operator new
-#include <synchapi.h>                           // for Sleep
-#include <WinUser.h>                            // for GetAsyncKeyState, VK_ESCAPE
-class SinkNode;
-
 // TODO: shouldn't be this way ultimately
 RESULT Sandbox::RegisterImpLeapMotionEvents() {
 	RESULT r = R_PASS;
@@ -366,8 +375,8 @@ inline PathManager* Sandbox::GetPathManager() {
 	return m_pPathManager;
 }
 
-inline OpenGLRenderingContext * Sandbox::GetOpenGLRenderingContext() {
-	return m_pOpenGLRenderingContext;
+inline OGLRenderingContext *Sandbox::GetOGLRenderingContext() {
+	return m_pOGLRenderingContext;
 }
 
 bool Sandbox::IsShuttingDown() {
@@ -813,7 +822,7 @@ RESULT Sandbox::InitializeHAL() {
 
 	// Create and initialize OpenGL Imp
 	// TODO: HAL factory pattern
-	m_pHALImp = new OpenGLImp(m_pOpenGLRenderingContext);
+	m_pHALImp = new OGLImp(m_pOGLRenderingContext);
 	CNM(m_pHALImp, "Failed to create HAL Implementation");
 	CVM(m_pHALImp, "HAL Implementation Invalid");
 

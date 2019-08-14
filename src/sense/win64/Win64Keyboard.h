@@ -1,27 +1,31 @@
 #ifndef WIN64_KEYBOARD_H_
 #define WIN64_KEYBOARD_H_
 
-#include <windows.h>
+#include "core/ehm/EHM.h"
 
-#include "RESULT/EHM.h"
+// Dream Sense Win64
+// dos/src/sense/win64/Win64Keyboard.h
 
-// DREAM OS
-// DreamOS/Sandbox/Windows/Win64Keyboard.h
 // Sense Windows 64 Keyboard Device
 
-#include "Sense/SenseKeyboard.h"
+#include <windows.h>
 
-class Windows64App;
+#include "sense/SenseKeyboard.h"
+
+class Win64Sandbox;
 
 class Win64Keyboard : public SenseKeyboard {
 public:
-	Win64Keyboard(Windows64App *pWin64AppParent);
+	Win64Keyboard(Win64Sandbox *pParentWin64Sandbox);
+
 	RESULT UpdateKeyStates();
+	
 	virtual RESULT UpdateKeyState(SenseVirtualKey key, uint8_t keyState) override;
+	
 	RESULT CheckKeyState(SenseVirtualKey key);
 
 private:
-	Windows64App *m_pWin64AppParent;
+	Windows64App *m_pParentWin64Sandbox = nullptr;
 };
 
 #endif // ! WIN64_KEYBOARD_H_

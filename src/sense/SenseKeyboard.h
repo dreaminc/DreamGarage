@@ -88,7 +88,11 @@ typedef struct SenseTypingEvent : SenseDevice::SenseDeviceEvent {
 
 } SENSE_TYPING_EVENT;
 
-class SenseKeyboard : public SenseDevice, public Publisher<SenseVirtualKey, SenseKeyboardEvent>, public Publisher<SenseTypingEventType, SenseTypingEvent> {
+class SenseKeyboard : 
+	public SenseDevice, 
+	public Publisher<SenseVirtualKey, SenseKeyboardEvent>, 
+	public Publisher<SenseTypingEventType, SenseTypingEvent> 
+{
 public:
 	SenseKeyboard();
 
@@ -96,6 +100,7 @@ public:
 
 	// raw keyboard event
 	virtual RESULT UpdateKeyState(SenseVirtualKey key, uint8_t keyState) = 0;
+	
 	// text typing event
 	// this event is separated than the raw event as it in Windows OS
 	// and represents a character being typed in a UTF-16 format

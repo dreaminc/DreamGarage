@@ -1,14 +1,17 @@
 #ifndef PATH_MANAGER_FACTORY_H_
 #define PATH_MANAGER_FACTORY_H_
 
-#include "RESULT/EHM.h"
-#include "Sandbox/PathManager.h"
-#include "Core/Types/Factory.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sandbox/PathManagerFactory.h
+
+// Dream Sandbox
+// dos/src/andbox/PathManagerFactory.h
+
 // Dream OS Path Manager Factory for the construction of path managers within a given
 // sandbox or native implementation
+
+#include "Sandbox/PathManager.h"
+#include "Core/Types/Factory.h"
 
 class DreamOS;
 

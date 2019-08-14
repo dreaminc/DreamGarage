@@ -1,19 +1,22 @@
 #ifndef GLSL_OBJECT_H_
 #define GLSL_OBJECT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HAL/opengl/GLSLObject.h
+// Dream HAL OGL
+// dos/src/hal/ogl/GLSLObject.h
+
 // GLSL Objects are objects that are owned by a parent OGL Program
 // and used within it.  These include Vertex Attributes, Uniform Variables / Blocks etc
 
-#include "OpenGLCommon.h"
+#include "OGLCommon.h"
+
+#include "core/types/DObject.h"
 
 class OpenGLImp;
 class OGLProgram;
 
-class GLSLObject {
+class GLSLObject : public DObject {
 public:
 	GLSLObject(OGLProgram *pParentProgram);
 	~GLSLObject();

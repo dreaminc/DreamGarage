@@ -1,17 +1,19 @@
 #ifndef OGL_HAND_H_
 #define OGL_HAND_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/OpenGL/OGLHand.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLHand.h
+
 // OpenGL Hand Object
 // TODO: Find a way to not have to do this for every kind of primitive and push off
 // OGLComposite instead
+// TODO: Fuck this hand class
 
 #include "OGLObj.h"
 
-#include "Primitives/hand/hand.h"
+#include "core/hand/hand.h"
 
 // Pyramid inheritance throws a dominance warning which needs to be suppressed 
 // until c++ adds a special keyword to deal with this issue, this is by design

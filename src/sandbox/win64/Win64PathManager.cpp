@@ -1,10 +1,10 @@
 #include "Win64PathManager.h"
+
 #include <stdlib.h>
 #include <cstring>
-
 #include <ShlObj.h>	// For SHGetKnownFolderPath()
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
 Win64PathManager::Win64PathManager() :
 	PathManager()	// Call super
@@ -55,12 +55,12 @@ RESULT Win64PathManager::OpenDreamPathsFile() {
 
 	while(fgetws(szLine, MAX_PATH, pFile) != NULL) {
 		wchar_t *pszContext = NULL;
-		wchar_t *pszName = wcstok_s(szLine, _T(" \t\n\v\f\r"), &pszContext);
+		wchar_t *pszName = wcstok_s(szLine, L" \t\n\v\f\r", &pszContext);
 		
 		if (pszName == NULL || pszName[0] == '#')
 			continue;
 		
-		wchar_t *pszValue = wcstok_s(NULL, _T(" \t\n\v\f\r"), &pszContext);
+		wchar_t *pszValue = wcstok_s(NULL, L" \t\n\v\f\r", &pszContext);
 		CRM(RegisterPath(pszName, pszValue), "Failed to register value %S", pszName);
 	}
 		

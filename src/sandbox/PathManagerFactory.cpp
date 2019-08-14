@@ -2,14 +2,14 @@
 
 #if defined(_WIN32)
     #if defined(_WIN64)
-        #include "Sandbox/Windows/Win64PathManager.h"
+        #include "sandbox/win64/Win64PathManager.h"
     #else
-        #include "Sandbox/Windows/Win64PathManager.h"
+        #include "sandbox/win64/Win64PathManager.h"
     #endif
 #elif defined(__APPLE__)
-    #include "Sandbox/OSX/OSXPathManager.h"
+    #include "sandbox/osx/OSXPathManager.h"
 #elif defined(__linux__)
-    #include "Sandbox/Linux/LinuxPathManager.h"
+    #include "sandbox/linux/LinuxPathManager.h"
 #endif
 
 PathManager* PathManagerFactory::MakePathManager(PATH_MANAGER_TYPE type, DreamOS *pDOSHandle) {

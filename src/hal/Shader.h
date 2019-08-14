@@ -1,15 +1,15 @@
 #ifndef SHADER_H_
 #define SHADER_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/Types/UID.h"
-#include "Primitives/valid.h"
-#include "Primitives/version.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/Shader.h
+// Dream HAL OGL
+// dos/src/hal/Shader.h
+
 // The Shader super class is a pure virtual class to capture the general
 // interface for a shader class
+
+#include "core/types/DObject.h"
 
 typedef enum ShaderType {
 	SHADER_VERTEX,
@@ -21,7 +21,7 @@ typedef enum ShaderType {
 	SHADER_INVALID
 } SHADER_TYPE;
 
-class Shader : public valid {
+class Shader : public DObject {
 public:
 	//virtual RESULT Enable() = 0;
 	//virtual RESULT Disable() = 0;
@@ -31,19 +31,8 @@ public:
 
 	virtual RESULT Compile(void) = 0;
 
-	/*
-	virtual RESULT LoadFromString(const char* pszSource) = 0;
-	virtual RESULT CreateAndLinkProgram() = 0;
-	virtual RESULT AddAttribute(const char *pszAttribute) = 0;
-	virtual RESULT AddUniform(const char *pszUniform) = 0;
-	virtual RESULT DeleteShader() = 0;
-	*/
-
 protected:
 	SHADER_TYPE m_shaderType;
-
-private:
-	UID m_uid;
 };
 
 #endif // ! SHADER_H_

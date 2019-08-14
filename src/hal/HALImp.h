@@ -15,7 +15,7 @@
 #include "sense/SenseKeyboard.h"
 #include "sense/SenseMouse.h"
 
-#include "core/types/valid.h"
+#include "core/types/DObject.h"
 
 #include "hmd/HMD.h"
 
@@ -36,9 +36,12 @@
 
 #include "core/model/model.h"
 #include "core/model/mesh.h"
+
 #include "core/text/text.h"
+
 #include "core/dimension/DimRay.h"
 #include "core/dimension/DimPlane.h"
+
 #include "core/camera/stereocamera.h"
 
 class Sandbox;
@@ -54,7 +57,7 @@ class UIKeyboardLayout;
 
 class FlatProgram;	// This one is special for render to texture
 
-class HALImp : public valid 
+class HALImp : public DObject
 {
 	friend class SandboxApp;
 
@@ -123,7 +126,7 @@ public:
 	virtual RESULT ConfigureHAL() = 0;
 	virtual RESULT FlushHALBuffers() = 0;
 
-private:
+public:
 	RESULT Render();
 
 protected:
@@ -249,9 +252,6 @@ protected:
 	ProgramNode* m_pFlatProgram = nullptr;
 
 	bool m_fCurrentContext = false;
-
-private:
-	UID m_uid;
 };
 
 template<>

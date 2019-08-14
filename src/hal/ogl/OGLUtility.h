@@ -1,14 +1,15 @@
 #ifndef OPEN_GL_UTILITY_H_
 #define OPEN_GL_UTILITY_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HAL/opengl/OpenGLUtility.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLUtility.h
+
 // OpenGL Utility functions
 // Generally state-less so should be static
 
-#include "OpenGLCommon.h"
+#include "OGLCommon.h"
 
 class OpenGLUtility {
 

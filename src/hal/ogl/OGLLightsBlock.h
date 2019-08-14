@@ -1,16 +1,20 @@
 #ifndef OGL_LIGHTS_BLOCK_H_
 #define OGL_LIGHTS_BLOCK_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/OpenGL/OGLLightsBlock.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLLightsBlock.h
+
 // OpenGL Lights Block - effectively responsible for passing the light data block to the OGLImp
+
+// TODO: This should not be at the HAL level, but rather at the program / app / module layer
+
+#include <vector>
 
 #include "shaders/OGLUniformBlock.h"
 
-#include "Primitives/light.h"
-#include <vector>
+#include "core/primitives/light.h"
 
 #define MAX_TOTAL_LIGHTS 10
 #define LIGHTS_UNIFORM_BLOCK_BINDING_POINT	0	// TODO: This should come from the OpenGL program

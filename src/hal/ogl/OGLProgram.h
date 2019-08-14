@@ -1,21 +1,24 @@
 #ifndef OGL_PROGRAM_H_
 #define OGL_PROGRAM_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/opengl/OGLProgram.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLProgram.h
+
 // OpenGL Program class
 
 #include <functional>
 #include <vector>
 #include <map>
 
-#include "OpenGLCommon.h"
+#include "OGLCommon.h"
 
-#include "Primitives/DimObj.h"
-#include "Primitives/light.h"
-#include "Primitives/stereocamera.h"
+#include "core/dimension/DimObj.h"
+
+#include "core/primitives/light.h"
+
+#include "core/camera/stereocamera.h"
 
 #include "shaders/OGLShader.h"
 #include "shaders/OGLVertexShader.h"
@@ -29,7 +32,7 @@
 #include "OGLLightsBlock.h"
 #include "OGLMaterialBlock.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
+#include "pipeline/ProgramNode.h"
 
 class OpenGLImp;
 class OGLVertexAttribute;

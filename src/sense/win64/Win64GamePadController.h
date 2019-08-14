@@ -1,21 +1,23 @@
 #ifndef WIN64_GAMEPAD_CONTROLLER_H_
 #define WIN64_GAMEPAD_CONTROLLER_H_
 
-#include <windows.h>
-#include <Xinput.h>
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sandbox/Windows/Win64Mouse.h
+// Dream Sense Win64
+// dos/src/sense/win64/Win64Mouse.h
+
 // Sense Windows 64 Mouse Device
 
-#include "Sense/SenseGamepadController.h"
+#include <windows.h>
+#include <Xinput.h>
 
-class Windows64App;
+#include "sense/SenseGamepadController.h"
+
+class Win64Sandbox;
 
 class Win64GamepadController : public SenseGamepadController {
 public:
-	Win64GamepadController(Windows64App *pWin64AppParent);
+	Win64GamepadController(Win64Sandbox *pParentWin64Sandbox);
 
 	virtual RESULT UpdateGamepad() override;
 
@@ -24,7 +26,7 @@ private:
 	RESULT ProcessGamepadState(XINPUT_GAMEPAD xInputGamepad);
 
 private:
-	Windows64App* m_pWin64AppParent = nullptr;
+	Windows64App* m_pParentWin64Sandbox = nullptr;
 
 	point2D m_leftJoystick;
 	point2D m_rightJoystick;

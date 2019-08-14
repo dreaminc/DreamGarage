@@ -1,16 +1,19 @@
 #ifndef DREAM_NAMED_PIPE_CLIENT_H_
 #define DREAM_NAMED_PIPE_CLIENT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// Sandbox\NamedPipeClient.h
+// Dream Sandbox
+// dos/src/sandbox/NamedPipeClient.h
+
 // A named pipe client primitive for IPC
 // Currently this is only really something for Windows - so not sure whether 
 // or not to make this more general outside of a Dream side object that 
 // wraps up the functionality. 
 
-class NamedPipeClient {
+#include "core/types/DObject.h"
+
+class NamedPipeClient : public DObject {
 public:
 	NamedPipeClient(std::wstring wstrPipename);
 	~NamedPipeClient();

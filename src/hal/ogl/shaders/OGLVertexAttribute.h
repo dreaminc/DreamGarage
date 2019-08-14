@@ -1,16 +1,17 @@
 #ifndef OGL_VERTEX_ATTRIBUTE_H_
 #define OGL_VERTEX_ATTRIBUTE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HAL/opengl/OGLVertexAttribute.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLVertexAttribute.h
+
 // This is an OpenGL Vertex Attribute and should be owned by an OGLShader
 
-#include "HAL/opengl/OpenGLCommon.h"
-#include "HAL/opengl/GLSLObject.h"
-
 #include <string>
+
+#include "hal/ogl/OGLCommon.h"
+#include "hal/ogl/GLSLObject.h"
 
 class OGLVertexAttribute : public GLSLObject {
 public:

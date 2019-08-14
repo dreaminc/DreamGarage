@@ -1,13 +1,14 @@
 #ifndef OGL_DEPTHBUFFER_H_
 #define OGL_DEPTHBUFFER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/HAL/opengl/OGLDepthbuffer.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLDepthbuffer.h
+
 // OpenGL Depthbuffer Primitive
 
-#include "HAL/opengl/OpenGLImp.h"
+#include "hal/ogl/OGLImp.h"
 //#include "Primitives/Framebuffer.h"
 
 class OGLRenderbuffer;
@@ -16,7 +17,7 @@ class OGLCubemap;
 
 class OGLAttachment {
 public:
-	OGLAttachment(OpenGLImp *pParentImp, int width, int height, int channels = 3, int sampleCount = 1);
+	OGLAttachment(OGLImp *pParentImp, int width, int height, int channels = 3, int sampleCount = 1);
 	~OGLAttachment ();
 
 	// TODO: This is a temporary approach

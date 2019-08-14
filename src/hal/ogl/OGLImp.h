@@ -1,27 +1,25 @@
 #ifndef OPEN_GL_IMP_H_
 #define OPEN_GL_IMP_H_
 
-#include "RESULT/EHM.h"
-#include "OpenGLCommon.h"
-#include "OpenGLUtility.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HAL/opengl/OpenGLImp.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLImp.h
+
 // This is the top level header for OpenGL for either native or
 
-#include "HAL/HALImp.h"
+#include "hal/HALImp.h"
 
-#include "OpenGLRenderingContext.h"
+#include "OGLCommon.h"
+#include "OGLUtility.h"
+#include "OGLRenderingContext.h"
+#include "OGLExtensions.h"
 
-//#include "Primitives/camera.h"
-#include "Primitives/version.h"
+#include "core/types/version.h"
 
+#include "core/dimension/DimObj.h"
+#include "core/material/material.h"
 
-#include "OpenGLExtensions.h"
-#include "Primitives/DimObj.h"
-#include "Primitives/material.h"
-
-//#include "OGLProgram.h"
 #include "OGLProgramFactory.h"
 
 #include <memory>
@@ -38,17 +36,17 @@ class OGLQuad;
 class OGLModel;
 class OGLMesh;
 
-class OpenGLImp : public HALImp {
+class OGLImp : public HALImp {
 private:
 	// TODO: Fix this architecture 
-	OpenGLRenderingContext *m_pOpenGLRenderingContext;
+	OGLRenderingContext *m_pOpenGLRenderingContext;
 
 	version m_versionOGL;
 	version m_versionGLSL;
 
 public:
-	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
-	~OpenGLImp();
+	OGLImp(OGLRenderingContext *pOpenGLRenderingContext);
+	~OGLImp();
 
 	// Object Factory Methods
 public:

@@ -1,6 +1,9 @@
 #ifndef _DDCIPCMSG_H_
 #define _DDCIPCMSG_H_
 
+// Dream Desktop
+// dos/src/dreamdesktop/DDCIPMessage.h
+
 class DDCIPCMessage {
 
 public:
@@ -36,4 +39,4 @@ public:
 
 };
 
-#endif
+#endif  // ! _DDCIPCMSG_H_

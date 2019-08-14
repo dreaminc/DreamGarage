@@ -1,31 +1,35 @@
-#include "Windows64App.h"
-
-#include "DreamLogger/DreamLogger.h"
-
-#include "Project/Windows/DreamOS/resource.h"
-#include "Sandbox/PathManagerFactory.h"
-#include "HAL/opengl/OpenGLRenderingContextFactory.h"
-#include "Cloud/CloudControllerFactory.h"
-
-#include "./HAL/opengl/OpenGLImp.h"
-
-#include "DreamOS.h"
-#include "DDCIPCMessage.h"
-
-#include "Win64Keyboard.h"
-#include "Win64Mouse.h"
-#include "Win64GamepadController.h"
-#include "Win64CredentialManager.h"
-
-#include "Win64NamedPipeClient.h"
-#include "Win64NamedPipeServer.h"
+#include "Win64Sandbox.h"
 
 #include <string>
 #include <netlistmgr.h>
 
-#include "Sense/SenseLeapMotion.h"
+#include "logger/DreamLogger.h"
 
-Windows64App::Windows64App(TCHAR* pszClassName) :
+#include "sandbox/win64/resource.h"
+
+#include "sandbox/PathManagerFactory.h"
+
+// TODO: Shouldn't be here (no OGL)
+#include "hal/ogl/OGLRenderingContextFactory.h"
+#include "hal/ogl/OGLImp.h"
+
+#include "cloud/CloudControllerFactory.h"
+
+#include "os/DreamOS.h"
+
+#include "dreamdesktop/DDCIPCMessage.h"
+
+#include "sense/SenseLeapMotion.h"
+
+#include "sense/win64/Win64Keyboard.h"
+#include "sense/win64/Win64Mouse.h"
+#include "sense/win64/Win64GamepadController.h"
+
+#include "Win64CredentialManager.h"
+#include "Win64NamedPipeClient.h"
+#include "Win64NamedPipeServer.h"
+
+Win64Sandbox::Win64Sandbox(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
 	m_pxWidth(DEFAULT_WIDTH),
 	m_pxHeight(DEFAULT_HEIGHT),
@@ -66,7 +70,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_wndclassex.hIconSm = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_ICON1));
 
 	if (!RegisterClassEx(&m_wndclassex)) {
-		MessageBox(nullptr, _T("Failed to register sandbox window class"), _T("Dream OS Sandbox Error"), NULL);
+		MessageBox(nullptr, L"Failed to register sandbox window class", L"Dream OS Sandbox Error", NULL);
 		return; // TODO: Use assert EHM
 	}
 
@@ -121,11 +125,11 @@ Error:
 	return;
 }
 
-Windows64App::~Windows64App() {
+Win64Sandbox::~Win64Sandbox() {
 	// empty
 }
 
-RESULT Windows64App::InitializeKeyboard() {
+RESULT Win64Sandbox::InitializeKeyboard() {
 	RESULT r = R_PASS;
 
 	m_pSenseKeyboard = new Win64Keyboard(this);
@@ -135,7 +139,7 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::InitializeMouse() {
+RESULT Win64Sandbox::InitializeMouse() {
 	RESULT r = R_PASS;
 
 	m_pSenseMouse = new Win64Mouse(this);
@@ -151,7 +155,7 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::InitializeGamepad() {
+RESULT Win64Sandbox::InitializeGamepad() {
 	RESULT r = R_PASS;
 
 	m_pSenseGamepad = new Win64GamepadController(this);
@@ -161,7 +165,7 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::InitializeLeapMotion() {
+RESULT Win64Sandbox::InitializeLeapMotion() {
 	RESULT r = R_PASS;
 
 	m_pSenseLeapMotion = std::unique_ptr<SenseLeapMotion>(new SenseLeapMotion());
@@ -176,7 +180,7 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::InitializeCredentialManager() {
+RESULT Win64Sandbox::InitializeCredentialManager() {
 	RESULT r = R_PASS;
 
 	m_pCredentialManager = std::unique_ptr<Win64CredentialManager>(new Win64CredentialManager());
@@ -186,7 +190,7 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::SetKeyValue(std::wstring wstrKey, std::string strCred, CredentialManager::type credType, bool fOverwrite) {
+RESULT Win64Sandbox::SetKeyValue(std::wstring wstrKey, std::string strCred, CredentialManager::type credType, bool fOverwrite) {
 	RESULT r = R_PASS;
 
 	CR(m_pCredentialManager->SetKeyValue(wstrKey, strCred, credType, fOverwrite));
@@ -195,7 +199,7 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::GetKeyValue(std::wstring wstrKey, std::string& strOut, CredentialManager::type credType) {
+RESULT Win64Sandbox::GetKeyValue(std::wstring wstrKey, std::string& strOut, CredentialManager::type credType) {
 	RESULT r = R_PASS;
 
 	CR(m_pCredentialManager->GetKeyValue(wstrKey, strOut, credType));
@@ -204,7 +208,7 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::RemoveKeyValue(std::wstring wstrKey, CredentialManager::type credType) {
+RESULT Win64Sandbox::RemoveKeyValue(std::wstring wstrKey, CredentialManager::type credType) {
 	RESULT r = R_PASS;
 
 	CR(m_pCredentialManager->RemoveKeyValue(wstrKey, credType));
@@ -213,7 +217,7 @@ Error:
 	return r;
 }
 
-bool Windows64App::IsSandboxInternetConnectionValid() {
+bool Win64Sandbox::IsSandboxInternetConnectionValid() {
 	INetworkListManager* pNetworkListManager = nullptr;
 	if (SUCCEEDED(CoCreateInstance(CLSID_NetworkListManager, NULL, CLSCTX_ALL, IID_INetworkListManager, (LPVOID*)&pNetworkListManager))) {
 		// Creating the object was successful.	
@@ -236,7 +240,7 @@ bool Windows64App::IsSandboxInternetConnectionValid() {
 }
 
 // Sandbox Objects
-std::shared_ptr<NamedPipeClient> Windows64App::MakeNamedPipeClient(std::wstring strPipename) {
+std::shared_ptr<NamedPipeClient> Win64Sandbox::MakeNamedPipeClient(std::wstring strPipename) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<NamedPipeClient> pRetPipeClient = nullptr;
@@ -256,7 +260,7 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<NamedPipeServer> Windows64App::MakeNamedPipeServer(std::wstring strPipename) {
+std::shared_ptr<NamedPipeServer> Win64Sandbox::MakeNamedPipeServer(std::wstring strPipename) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<NamedPipeServer> pRetPipeServer = nullptr;
@@ -301,7 +305,7 @@ Error:
 }
 */
 
-RESULT Windows64App::SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) {
+RESULT Win64Sandbox::SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) {
 	RESULT r = R_PASS;
 
 	switch (sandboxWindowPosition) {
@@ -337,7 +341,7 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::InitializeCloudController() {
+RESULT Win64Sandbox::InitializeCloudController() {
 	RESULT r = R_PASS;
 
 	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, (void*)(m_hInstance));
@@ -350,15 +354,15 @@ Error:
 	return r;
 }
 
-HDC Windows64App::GetDeviceContext() {
+HDC Win64Sandbox::GetDeviceContext() {
 	return m_hDC;
 }
 
-HWND Windows64App::GetWindowHandle() {
+HWND Win64Sandbox::GetWindowHandle() {
 	return m_hwndWindow;
 }
 
-RESULT Windows64App::InitializePathManager(DreamOS *pDOSHandle) {
+RESULT Win64Sandbox::InitializePathManager(DreamOS *pDOSHandle) {
 	RESULT r = R_PASS;
 
 	// Initialize Path Manager
@@ -376,25 +380,26 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::InitializeOpenGLRenderingContext() {
+// TODO: Should not be implementation specific 
+RESULT Win64Sandbox::InitializeOGLRenderingContext() {
 	RESULT r = R_PASS;
 
-	m_pOpenGLRenderingContext = OpenGLRenderingContextFactory::MakeOpenGLRenderingContext(OPEN_GL_RC_WIN32);
-	CVM(m_pOpenGLRenderingContext, "Failed to initialize OpenGL Rendering Context");
+	m_pOGLRenderingContext = OGLRenderingContextFactory::MakeOGLRenderingContext(OPEN_GL_RC_WIN32);
+	CVM(m_pOGLRenderingContext, "Failed to initialize OpenGL Rendering Context");
 
-	m_pOpenGLRenderingContext->SetParentApp(this);
+	m_pOGLRenderingContext->SetParentApp(this);
 
 Error:
 	return r;
 }
 
 // This also kicks off the OpenGL implementation
-RESULT Windows64App::SetDeviceContext(HDC hDC) {
+RESULT Win64Sandbox::SetDeviceContext(HDC hDC) {
 	m_hDC = hDC;
 	return R_PASS;
 }
 
-RESULT Windows64App::SetDimensions(int pxWidth, int pxHeight) {
+RESULT Win64Sandbox::SetDimensions(int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	m_pxWidth = pxWidth;
@@ -406,19 +411,19 @@ Error:
 	return r;
 }
 
-LRESULT __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
-	Windows64App *pApp = nullptr;
+LRESULT __stdcall Win64Sandbox::StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
+	Win64Sandbox *pApp = nullptr;
 
 	// Get pointer to window
 	if (msg == WM_CREATE) {
-		pApp = (Windows64App*)((LPCREATESTRUCT)lp)->lpCreateParams;
+		pApp = (Win64Sandbox*)((LPCREATESTRUCT)lp)->lpCreateParams;
 		//SetWindowLongPtr(hWindow, GWL_USERDATA, (LONG_PTR)pApp);
 		SetWindowLongPtr(hWindow, GWLP_USERDATA, (LONG_PTR)pApp);
 	}
 
 	else {
 		//pApp = (Windows64App *)GetWindowLongPtr(hWindow, GWL_USERDATA);
-		pApp = (Windows64App *)GetWindowLongPtr(hWindow, GWLP_USERDATA);
+		pApp = (Win64Sandbox *)GetWindowLongPtr(hWindow, GWLP_USERDATA);
 		if (!pApp)
 			return DefWindowProc(hWindow, msg, wp, lp);
 	}
@@ -427,7 +432,7 @@ LRESULT __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WP
 	return pApp->WndProc(hWindow, msg, wp, lp);
 }
 
-LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
+LRESULT __stdcall Win64Sandbox::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
 	RESULT r = R_PASS;
 	switch (msg) {
 	case WM_CREATE: {
@@ -491,7 +496,7 @@ Error:
 	return DefWindowProc(hWindow, msg, wp, lp);
 }
 
-RESULT Windows64App::RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> fnUIThreadCallback) {
+RESULT Win64Sandbox::RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> fnUIThreadCallback) {
 	RESULT r = R_PASS;
 
 	CB((m_fnUIThreadCallback == nullptr));
@@ -501,7 +506,7 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::UnregisterUIThreadCallback() {
+RESULT Win64Sandbox::UnregisterUIThreadCallback() {
 	RESULT r = R_PASS;
 
 	CN(m_fnUIThreadCallback);
@@ -511,30 +516,27 @@ Error:
 	return r;
 }
 
-long Windows64App::GetTickCount() {
+long Win64Sandbox::GetTickCount() {
 	return static_cast<long>(GetTickCount());
 }
 
-RESULT Windows64App::GetStackTrace() {
+RESULT Win64Sandbox::GetStackTrace() {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT Windows64App::GetSandboxWindowSize(int &width, int &height) {
+RESULT Win64Sandbox::GetSandboxWindowSize(int &width, int &height) {
 	width = m_pxWidth;
 	height = m_pxHeight;
 
 	return R_PASS;
 }
 
-RESULT Windows64App::InitializeSandbox() {
+RESULT Win64Sandbox::InitializeSandbox() {
 	RESULT r = R_PASS;
-
-	// TODO: remove
-	std::shared_ptr<DimObj> pSphere = nullptr;
 
 	// TODO: Use EHM for this
 	if (!m_hwndWindow) {
-		MessageBox(NULL, _T("Failed to create windows sandbox"), _T("Dream OS Sandbox"), NULL);
+		MessageBox(NULL, L"Failed to create windows sandbox", L"Dream OS Sandbox", NULL);
 		return R_FAIL;
 	}
 
@@ -549,6 +551,7 @@ RESULT Windows64App::InitializeSandbox() {
 	CN(m_pHALImp);
 	CR(m_pHALImp->MakeCurrentContext());
 
+	// TODO: Is this still needed here?
 	composite *pCameraFrameOfReferenceComposite = m_pHALImp->MakeComposite();
 	GetCamera()->SetFrameOfReferenceComposite(pCameraFrameOfReferenceComposite);
 	CRM(AddObject(pCameraFrameOfReferenceComposite), "Failed to add composite camera frame of reference");
@@ -579,7 +582,7 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::HandleMessages() {
+RESULT Win64Sandbox::HandleMessages() {
 	RESULT r = R_PASS;
 
 	MSG msg;
@@ -610,7 +613,7 @@ Error:
 
 // Note this call will never return and will actually run the event loop
 // TODO: Thread it?
-RESULT Windows64App::Show() {
+RESULT Win64Sandbox::Show() {
 	RESULT r = R_PASS;
 
 	// Show the window
@@ -642,14 +645,14 @@ RESULT Windows64App::Show() {
 	return r;
 }
 
-inline RESULT Windows64App::SwapDisplayBuffers() {
+inline RESULT Win64Sandbox::SwapDisplayBuffers() {
 	if (SwapBuffers(m_hDC))
 		return R_PASS;
 	else
 		return R_FAIL;
 }
 
-bool Windows64App::HandleMouseEvent(const MSG&  windowMessage) {
+bool Win64Sandbox::HandleMouseEvent(const MSG&  windowMessage) {
 	bool fHandled = false;
 
 	LPARAM lp = windowMessage.lParam;
@@ -731,7 +734,7 @@ bool Windows64App::HandleMouseEvent(const MSG&  windowMessage) {
 	return fHandled;
 }
 
-bool Windows64App::HandleKeyEvent(const MSG& windowMessage) {
+bool Win64Sandbox::HandleKeyEvent(const MSG& windowMessage) {
 	bool fHandled = false;
 
 	LPARAM lp = windowMessage.lParam;
@@ -760,7 +763,7 @@ bool Windows64App::HandleKeyEvent(const MSG& windowMessage) {
 	return fHandled;
 }
 
-RESULT Windows64App::ShutdownSandbox() {
+RESULT Win64Sandbox::ShutdownSandbox() {
 	RESULT r = R_PASS;
 
 	CR(SetSandboxRunning(false));
@@ -796,7 +799,7 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::RecoverDisplayMode() {
+RESULT Win64Sandbox::RecoverDisplayMode() {
 	RESULT r = R_PASS;
 
 	// TODO: What the hell is this?

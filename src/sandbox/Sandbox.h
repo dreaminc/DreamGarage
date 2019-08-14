@@ -18,7 +18,7 @@
 #include <stddef.h>                                    // for size_t
 #include <windef.h>                                    // for HWND // TODO: Should remove or use for windows only
 
-#include "HAL/HALImp.h"
+#include "hal/HALImp.h"
 
 #include "sandbox/CredentialManager.h"
 
@@ -59,7 +59,7 @@ class DreamOS;
 class InteractionEngineProxy;
 class ObjectStore;
 class ObjectStoreNode;
-class OpenGLRenderingContext;
+class OGLRenderingContext;	// TODO: no no no 
 class PathManager;
 class PeerConnection;
 class Pipeline;
@@ -196,7 +196,7 @@ public:
 public:
 	virtual RESULT InitializePathManager(DreamOS *pDOSHandle) = 0;
 	virtual RESULT InitializeCredentialManager() = 0;
-	virtual RESULT InitializeOpenGLRenderingContext() = 0;
+	virtual RESULT InitializeOGLRenderingContext() = 0;
 	virtual RESULT InitializeCloudController() = 0;
 	virtual RESULT InitializeKeyboard() = 0;
 	virtual RESULT InitializeMouse() = 0;
@@ -470,7 +470,7 @@ public:
 
 public:
 	PathManager *GetPathManager();
-	OpenGLRenderingContext *GetOpenGLRenderingContext();
+	OGLRenderingContext *GetOGLRenderingContext();		// TODO: Should operate on higher level object, no OGL at this level
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
 	RESULT UnregisterUpdateCallback();
 	RESULT ResizeViewport(viewport newViewport);
@@ -504,7 +504,9 @@ protected:
 	// TODO: Move to unique_ptr
 	CommandLineManager *m_pCommandLineManager = nullptr;
 	PathManager *m_pPathManager = nullptr;
-	OpenGLRenderingContext *m_pOpenGLRenderingContext = nullptr;		// TODO: fix it!
+
+	// TODO: ruh roh - no OGL HERE!
+	OGLRenderingContext *m_pOGLRenderingContext = nullptr;		
 
 	// TODO: Should these be in their respective "engine" objects?
 	ObjectStore *m_pPhysicsGraph = nullptr;	

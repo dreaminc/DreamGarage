@@ -42,7 +42,7 @@
 
 #include "Core/Utilities.h"
 
-OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
+OGLImp::OGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
 	m_versionGLSL(0),
 	m_pOpenGLRenderingContext(pOpenGLRenderingContext)
@@ -58,11 +58,11 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	return;
 }
 
-OpenGLImp::~OpenGLImp() {
+OGLImp::~OGLImp() {
 	// empty
 }
 
-RESULT OpenGLImp::InitializeOpenGLVersion() {
+RESULT OGLImp::InitializeOpenGLVersion() {
 	// For all versions
 	char* pszVersion = (char*)glGetString(GL_VERSION); // Ver = "3.2.0"
 	int vMajor = 0, vMinor = 0, vDblMinor = 0;	// TODO: use minor?
@@ -116,7 +116,7 @@ Error:
 }
 */
 
-RESULT OpenGLImp::InitializeGLContext() {
+RESULT OGLImp::InitializeGLContext() {
 	RESULT r = R_PASS;
 
 	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(), "Failed to initialize oglrc");
@@ -136,7 +136,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::CheckGLError() {
+RESULT OGLImp::CheckGLError() {
 	RESULT r = R_PASS;
 
 	GLenum glerr = glGetError();
@@ -174,7 +174,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::BindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
+RESULT OGLImp::BindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
 	RESULT r = R_PASS;
 //	GLenum glerr;
 	DWORD werr;
@@ -188,7 +188,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::MakeCurrentContext() {
+RESULT OGLImp::MakeCurrentContext() {
 	if (m_fCurrentContext == false) {
 		m_fCurrentContext = true;
 		return m_pOpenGLRenderingContext->MakeCurrentContext();
@@ -198,7 +198,7 @@ RESULT OpenGLImp::MakeCurrentContext() {
 	}
 }
 
-RESULT OpenGLImp::ReleaseCurrentContext() {
+RESULT OGLImp::ReleaseCurrentContext() {
 	if (m_fCurrentContext == true) {
 		m_fCurrentContext = false;
 		return m_pOpenGLRenderingContext->ReleaseCurrentContext();
@@ -208,7 +208,7 @@ RESULT OpenGLImp::ReleaseCurrentContext() {
 	}
 }
 
-RESULT OpenGLImp::InitializeHAL() {
+RESULT OGLImp::InitializeHAL() {
 	RESULT r = R_PASS;
 
 	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
@@ -248,7 +248,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::Resize(viewport newViewport) {
+RESULT OGLImp::Resize(viewport newViewport) {
 	RESULT r = R_PASS;
 
 	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
@@ -265,7 +265,7 @@ Error:
 
 // Assumes Context Current
 // TODO: This should move to a sink node
-RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye, int pxWidth, int pxHeight) {
+RESULT OGLImp::SetViewTarget(EYE_TYPE eye, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	// Render to screen
@@ -323,7 +323,7 @@ Error:
 
 // This allows for separate HAL initialization of objects
 // Note, this will clobber the dim object on failure
-RESULT OpenGLImp::InitializeObject(DimObj *pDimObj) {
+RESULT OGLImp::InitializeObject(DimObj *pDimObj) {
 	RESULT r = R_PASS;
 
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
@@ -343,7 +343,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::InitializeTexture(texture *pTexture) {
+RESULT OGLImp::InitializeTexture(texture *pTexture) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTexture);
@@ -363,7 +363,7 @@ Error:
 	return r;
 }
 
-DimObj* OpenGLImp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
+DimObj* OGLImp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 	OGLObj *pOGLObj = nullptr;
 
@@ -406,7 +406,7 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTexture(PrimParams *pPrimParams, bool fInitialize) {
+texture* OGLImp::MakeTexture(PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pOGLTexture = nullptr;
@@ -444,7 +444,7 @@ Error:
 
 }
 
-OGLMesh* OpenGLImp::MakeMesh(PrimParams *pPrimParams, bool fInitialize) {
+OGLMesh* OGLImp::MakeMesh(PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 
 	OGLMesh *pOGLMesh = nullptr;
@@ -471,7 +471,7 @@ Error:
 	return nullptr;
 }
 
-mesh *OpenGLImp::MakeMesh(const std::vector<vertex>& vertices) {
+mesh *OGLImp::MakeMesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
 
 	OGLMesh *pOGLMesh = new OGLMesh(this, vertices);
@@ -490,7 +490,7 @@ Error:
 	return nullptr;
 }
 
-mesh *OpenGLImp::MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+mesh *OGLImp::MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 	RESULT r = R_PASS;
 
 	// Not implemented yet, until size_t <-> dimindex conflict is resolved.
@@ -510,7 +510,7 @@ Error:
 	return nullptr;
 }
 
-model* OpenGLImp::MakeModel() {
+model* OGLImp::MakeModel() {
 	RESULT r = R_PASS;
 
 	model *pModel = new OGLModel(this);
@@ -527,7 +527,7 @@ Error:
 	return nullptr;
 }
 
-composite *OpenGLImp::MakeComposite() {
+composite *OGLImp::MakeComposite() {
 	RESULT r = R_PASS;
 
 	composite *pComposite = new OGLComposite(this);
@@ -544,7 +544,7 @@ Error:
 	return nullptr;
 }
 
-FlatContext *OpenGLImp::MakeFlatContext(int pxFBWidth, int pxFBHeight, int fbChannels) {
+FlatContext *OGLImp::MakeFlatContext(int pxFBWidth, int pxFBHeight, int fbChannels) {
 	RESULT r = R_PASS;
 
 	FlatContext *pFlatContext = new OGLFlatContext(this);
@@ -573,7 +573,7 @@ Error:
 	return nullptr;
 }
 
-user *OpenGLImp::MakeUser() {
+user *OGLImp::MakeUser() {
 	RESULT r = R_PASS;
 
 	user *pUser = new OGLUser(this);
@@ -590,7 +590,7 @@ Error:
 	return nullptr;
 }
 
-billboard *OpenGLImp::MakeBillboard(point ptOrigin, float width, float height) {
+billboard *OGLImp::MakeBillboard(point ptOrigin, float width, float height) {
 	RESULT r = R_PASS;
 
 	billboard *pBillboard = new OGLBillboard(this, ptOrigin, width, height);
@@ -606,7 +606,7 @@ Error:
 }
 
 // TODO: Other approach 
-light* OpenGLImp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
+light* OGLImp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	RESULT r = R_PASS;
 
 	light *pLight = new light(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
@@ -626,7 +626,7 @@ Error:
 
 // Quad
 
-OGLQuad* OpenGLImp::MakeQuad(PrimParams *pPrimParams, bool fInitialize) {
+OGLQuad* OGLImp::MakeQuad(PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 
 	OGLQuad *pOGLQuad = nullptr;
@@ -653,7 +653,7 @@ Error:
 	return nullptr;
 }
 
-OGLModel* OpenGLImp::MakeModel(PrimParams *pPrimParams, bool fInitialize) {
+OGLModel* OGLImp::MakeModel(PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 
 	OGLModel *pOGLModel = nullptr;
@@ -680,7 +680,7 @@ Error:
 	return nullptr;
 }
 
-quad* OpenGLImp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
+quad* OGLImp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	RESULT r = R_PASS;
 
 	OGLQuad *pOGLQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
@@ -724,7 +724,7 @@ Error:
 //}
 
 // TODO: Origin should not be baked into these calls (done at client)
-quad* OpenGLImp::MakeQuad(double width, double height, point ptCenter, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal) {
+quad* OGLImp::MakeQuad(double width, double height, point ptCenter, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal) {
 	RESULT r = R_PASS;
 
 	OGLQuad* pOGLQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), ptCenter, uvTopLeft, uvBottomRight, vNormal);
@@ -744,7 +744,7 @@ Error:
 	return nullptr;
 }
 
-quad* OpenGLImp::MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType, vector vNormal) {
+quad* OGLImp::MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType, vector vNormal) {
 	RESULT r = R_PASS;
 
 	OGLQuad* pOGLQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, uvTopLeft, uvBottomRight, curveType, vNormal);
@@ -764,7 +764,7 @@ Error:
 	return nullptr;
 }
 
-cylinder* OpenGLImp::MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
+cylinder* OGLImp::MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
 	RESULT r = R_PASS;
 
 	OGLCylinder *pOGLCylinder = new OGLCylinder(this, radius, height, numAngularDivisions, numVerticalDivisions);
@@ -781,7 +781,7 @@ Error:
 	return nullptr;
 }
 
-DimRay* OpenGLImp::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+DimRay* OGLImp::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
 	RESULT r = R_PASS;
 
 	OGLRay *pOGLRay = new OGLRay(this, ptOrigin, vDirection, step, fDirectional);
@@ -798,7 +798,7 @@ Error:
 	return nullptr;
 }
 
-DimPlane* OpenGLImp::MakePlane(point ptOrigin, vector vNormal) {
+DimPlane* OGLImp::MakePlane(point ptOrigin, vector vNormal) {
 	RESULT r = R_PASS;
 
 	DimPlane *pPlane = new OGLPlane(this, ptOrigin, vNormal);
@@ -815,7 +815,7 @@ Error:
 	return nullptr;
 }
 
-OGLSphere* OpenGLImp::MakeSphere(PrimParams *pPrimParams, bool fInitialize) {
+OGLSphere* OGLImp::MakeSphere(PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 
 	OGLSphere *pOGLSphere = nullptr;
@@ -842,7 +842,7 @@ Error:
 	return nullptr;
 }
 
-sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 10, int numVerticalDivisions = 10, color c = color(COLOR_WHITE)) {
+sphere* OGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 10, int numVerticalDivisions = 10, color c = color(COLOR_WHITE)) {
 	RESULT r = R_PASS;
 
 	OGLSphere *pOGLSphere = new OGLSphere(this, radius, numAngularDivisions, numVerticalDivisions, c);
@@ -881,7 +881,7 @@ Error:
 }
 */
 
-hand* OpenGLImp::MakeHand(HAND_TYPE type) {
+hand* OGLImp::MakeHand(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
 	hand *pHand = new OGLHand(this, type);
@@ -898,7 +898,7 @@ Error:
 	return nullptr;
 }
 
-hand* OpenGLImp::MakeHand(HAND_TYPE type, long avatarID) {
+hand* OGLImp::MakeHand(HAND_TYPE type, long avatarID) {
 	RESULT r = R_PASS;
 
 	hand *pHand = new OGLHand(this, type, avatarID);
@@ -916,7 +916,7 @@ Error:
 
 }
 
-volume* OpenGLImp::MakeVolume(double width, double length, double height, bool fTriangleBased) {
+volume* OGLImp::MakeVolume(double width, double length, double height, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
 	OGLVolume *pOGLVolume = new OGLVolume(this, width, length, height, fTriangleBased);
@@ -935,7 +935,7 @@ Error:
 	return nullptr;
 }
 
-OGLVolume* OpenGLImp::MakeVolume(PrimParams *pPrimParams, bool fInitialize) {
+OGLVolume* OGLImp::MakeVolume(PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 
 	OGLVolume *pOGLVolume = nullptr;
@@ -962,13 +962,13 @@ Error:
 	return nullptr;
 }
 
-volume* OpenGLImp::MakeVolume(double side, bool fTriangleBased) {
+volume* OGLImp::MakeVolume(double side, bool fTriangleBased) {
 	return MakeVolume(side, side, side, fTriangleBased);
 }
 
 //TODO: the texture could be stored in the font already, but having this pathway
 // avoids conflicts with parts of the code that use fonts without setting the texture
-text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
+text* OGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
 	RESULT r = R_PASS;
 
 	text *pText = new OGLText(this, pFont, pFontTexture, strContent, width, height, fBillboard);
@@ -1013,7 +1013,7 @@ Error:
 	return nullptr;
 }
 
-text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
+text* OGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
 	RESULT r = R_PASS;
 
 	text *pText = new OGLText(this, pFont, strContent, width, height, fBillboard);
@@ -1058,7 +1058,7 @@ Error:
 	return nullptr;
 }
 
-text* OpenGLImp::MakeText(const std::wstring& strFontFileName, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
+text* OGLImp::MakeText(const std::wstring& strFontFileName, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
 	RESULT r = R_PASS;
 
 	text *pText = new OGLText(this, std::make_shared<font>(strFontFileName, fDistanceMap), strContent, width, height, fBillboard);
@@ -1102,7 +1102,7 @@ Error:
 	return nullptr;
 }
 
-text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
+text* OGLImp::MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
 	RESULT r = R_PASS;
 
 	text *pText = new OGLText(this, pFont, textFlags);
@@ -1149,7 +1149,7 @@ Error:
 	return nullptr;
 }
 
-text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
+text* OGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
 	RESULT r = R_PASS;
 
 	text *pText = new OGLText(this, pFont, strContent, lineHeightM, textFlags);
@@ -1195,7 +1195,7 @@ Error:
 	return nullptr;
 }
 
-text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
+text* OGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
 	RESULT r = R_PASS;
 
 	text *pText = new OGLText(this, pFont, strContent, width, height, textFlags);
@@ -1243,7 +1243,7 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTexture(texture::type type, const wchar_t *pszFilename) {
+texture* OGLImp::MakeTexture(texture::type type, const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
 	texture *pTexture = OGLTexture::MakeTextureFromPath(this, type, std::wstring(pszFilename));
@@ -1261,7 +1261,7 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTexture(const texture &srcTexture) {
+texture* OGLImp::MakeTexture(const texture &srcTexture) {
 	RESULT r = R_PASS;
 
 	texture *pTexture = OGLTexture::MakeTexture(srcTexture);
@@ -1279,7 +1279,7 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
+texture* OGLImp::MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
 	RESULT r = R_PASS;
 
 	texture *pTexture = OGLTexture::MakeTextureFromBuffer(this, type, width, height, channels, pixelFormat, pBuffer, pBuffer_n);
@@ -1297,7 +1297,7 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) {
+texture* OGLImp::MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
 	texture *pTexture = OGLTexture::MakeTextureFromFileBuffer(this, type, pBuffer, pBuffer_n);
@@ -1315,7 +1315,7 @@ Error:
 	return nullptr;
 }
 
-cubemap* OpenGLImp::MakeCubemap(const std::wstring &wstrCubemapName) {
+cubemap* OGLImp::MakeCubemap(const std::wstring &wstrCubemapName) {
 	RESULT r = R_PASS;
 
 	cubemap *pCubemap = OGLCubemap::MakeCubemapFromName(this, wstrCubemapName);
@@ -1333,7 +1333,7 @@ Error:
 	return nullptr;
 }
 
-skybox *OpenGLImp::MakeSkybox() {
+skybox *OGLImp::MakeSkybox() {
 	RESULT r = R_PASS;
 
 	skybox *pSkybox = new OGLSkybox(this);
@@ -1350,7 +1350,7 @@ Error:
 	return nullptr;
 }
 
-SinkNode* OpenGLImp::MakeSinkNode(std::string strNodeName) {
+SinkNode* OGLImp::MakeSinkNode(std::string strNodeName) {
 	SinkNode* pSinkNode = nullptr;
 		
 	if (strNodeName == "display") {
@@ -1363,7 +1363,7 @@ SinkNode* OpenGLImp::MakeSinkNode(std::string strNodeName) {
 	return pSinkNode;
 }
 
-SourceNode* OpenGLImp::MakeSourceNode(std::string strNodeName) {
+SourceNode* OGLImp::MakeSourceNode(std::string strNodeName) {
 	SourceNode* pSourceNode = nullptr;
 
 	// TODO: ? will there be HAL backed Source Nodes?
@@ -1371,7 +1371,7 @@ SourceNode* OpenGLImp::MakeSourceNode(std::string strNodeName) {
 	return pSourceNode;
 }
 
-ProgramNode* OpenGLImp::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
+ProgramNode* OGLImp::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
 	ProgramNode* pProgramNode = nullptr;
 
 	pProgramNode = OGLProgramFactory::MakeOGLProgram(OGLProgramFactory::OGLProgramTypeFromstring(strNodeName), this, m_versionGLSL, optFlags);
@@ -1379,12 +1379,12 @@ ProgramNode* OpenGLImp::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS 
 	return pProgramNode;
 }
 
-RESULT OpenGLImp::ClearHALBuffers() {
+RESULT OGLImp::ClearHALBuffers() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	return R_PASS;
 }
 
-RESULT OpenGLImp::ConfigureHAL() {
+RESULT OGLImp::ConfigureHAL() {
 
 	if (m_HALConfiguration.fDrawWireframe) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -1397,7 +1397,7 @@ RESULT OpenGLImp::ConfigureHAL() {
 	return R_PASS;
 }
 
-RESULT OpenGLImp::FlushHALBuffers() {
+RESULT OGLImp::FlushHALBuffers() {
 	glFlush();
 	return R_PASS;
 }
@@ -1484,7 +1484,7 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, EYE_TYPE eye) {
 }
 */
 
-RESULT OpenGLImp::Shutdown() {
+RESULT OGLImp::Shutdown() {
 	RESULT r = R_PASS;
 
 	if (m_pOpenGLRenderingContext != NULL) {
@@ -1500,7 +1500,7 @@ RESULT OpenGLImp::Shutdown() {
 
 // OpenGL Program
 
-RESULT OpenGLImp::CreateProgram(GLuint *pOGLProgramIndex) {
+RESULT OGLImp::CreateProgram(GLuint *pOGLProgramIndex) {
 	RESULT r = R_PASS;
 
 	*pOGLProgramIndex = m_OpenGLExtensions.glCreateProgram();
@@ -1510,7 +1510,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::DeleteProgram(GLuint OGLProgramIndex) {
+RESULT OGLImp::DeleteProgram(GLuint OGLProgramIndex) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glDeleteProgram(OGLProgramIndex);
@@ -1520,7 +1520,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::UseProgram(GLuint OGLProgramIndex) {
+RESULT OGLImp::UseProgram(GLuint OGLProgramIndex) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUseProgram(OGLProgramIndex);
@@ -1530,7 +1530,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::LinkProgram(GLuint OGLProgramIndex) {
+RESULT OGLImp::LinkProgram(GLuint OGLProgramIndex) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glLinkProgram(OGLProgramIndex);
@@ -1540,7 +1540,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGetProgramInfoLog(GLuint programID, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
+RESULT OGLImp::glGetProgramInfoLog(GLuint programID, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetProgramInfoLog(programID, bufSize, length, infoLog);
@@ -1550,7 +1550,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::IsProgram(GLuint m_OGLProgramIndex) {
+RESULT OGLImp::IsProgram(GLuint m_OGLProgramIndex) {
 	RESULT r = R_PASS;
 
 	CB((m_OpenGLExtensions.glIsProgram(m_OGLProgramIndex)));
@@ -1560,7 +1560,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGetProgramiv(GLuint programID, GLenum pname, GLint *params) {
+RESULT OGLImp::glGetProgramiv(GLuint programID, GLenum pname, GLint *params) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetProgramiv(programID, pname, params);
@@ -1570,7 +1570,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params) {
+RESULT OGLImp::glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetProgramInterfaceiv(program, programInterface, pname, params);  
@@ -1580,7 +1580,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glDrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const void *indices) {
+RESULT OGLImp::glDrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const void *indices) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glDrawRangeElements(mode, start, end, count, type, indices);
@@ -1590,7 +1590,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGetProgramResourceiv(GLuint program, GLenum programInterface, GLuint index, GLsizei propCount, const GLenum *props, GLsizei bufSize, GLsizei *length, GLint *params) {
+RESULT OGLImp::glGetProgramResourceiv(GLuint program, GLenum programInterface, GLuint index, GLsizei propCount, const GLenum *props, GLsizei bufSize, GLsizei *length, GLint *params) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetProgramResourceiv(program, programInterface, index, propCount, props, bufSize, length, params);
@@ -1600,7 +1600,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGetProgramResourceName(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name) {
+RESULT OGLImp::glGetProgramResourceName(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetProgramResourceName(program, programInterface, index, bufSize, length, name);
@@ -1610,7 +1610,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGenVertexArrays(GLsizei n, GLuint *arrays) {
+RESULT OGLImp::glGenVertexArrays(GLsizei n, GLuint *arrays) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGenVertexArrays(n, arrays);  //create VAO container and get ID for it
@@ -1621,7 +1621,7 @@ Error:
 }
 
 // Bind Array to OpenGL context
-RESULT OpenGLImp::glBindVertexArray(GLuint gluiArray) {
+RESULT OGLImp::glBindVertexArray(GLuint gluiArray) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBindVertexArray(gluiArray);
@@ -1632,7 +1632,7 @@ Error:
 }
 
 // FBO
-RESULT OpenGLImp::glGenFramebuffers(GLsizei n, GLuint *framebuffers) {
+RESULT OGLImp::glGenFramebuffers(GLsizei n, GLuint *framebuffers) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGenFramebuffers(n, framebuffers);
@@ -1642,7 +1642,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glBindFramebuffer(GLenum target, GLuint gluiFramebuffer) {
+RESULT OGLImp::glBindFramebuffer(GLenum target, GLuint gluiFramebuffer) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBindFramebuffer(target, gluiFramebuffer);
@@ -1652,7 +1652,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glDeleteFramebuffers(GLsizei n, const GLuint *gluiFramebuffer) {
+RESULT OGLImp::glDeleteFramebuffers(GLsizei n, const GLuint *gluiFramebuffer) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glDeleteFramebuffers(n, gluiFramebuffer);
@@ -1663,11 +1663,11 @@ Error:
 }
 
 // PBO
-void *OpenGLImp::glMapBuffer(GLenum target, GLenum access) {
+void *OGLImp::glMapBuffer(GLenum target, GLenum access) {
 	return m_OpenGLExtensions.glMapBuffer(target, access);
 }
 
-RESULT OpenGLImp::glUnmapBuffer(GLenum target) {
+RESULT OGLImp::glUnmapBuffer(GLenum target) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUnmapBuffer(target);
@@ -1678,7 +1678,7 @@ Error:
 }
 
 // Render Buffers
-RESULT OpenGLImp::glGenRenderbuffers(GLsizei n, GLuint *renderbuffers) {
+RESULT OGLImp::glGenRenderbuffers(GLsizei n, GLuint *renderbuffers) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGenRenderbuffers(n, renderbuffers);
@@ -1688,7 +1688,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glDeleteRenderbuffers(GLsizei n, GLuint *renderbuffers) {
+RESULT OGLImp::glDeleteRenderbuffers(GLsizei n, GLuint *renderbuffers) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glDeleteRenderbuffers(n, renderbuffers);
@@ -1698,7 +1698,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glBindRenderbuffer(GLenum target, GLuint renderbuffer) {
+RESULT OGLImp::glBindRenderbuffer(GLenum target, GLuint renderbuffer) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBindRenderbuffer(target, renderbuffer);
@@ -1708,7 +1708,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glRenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height) {
+RESULT OGLImp::glRenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glRenderbufferStorage(target, internalformat, width, height);
@@ -1718,7 +1718,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glRenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height) {
+RESULT OGLImp::glRenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glRenderbufferStorageMultisample(target, samples, internalformat, width, height);
@@ -1728,7 +1728,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) {
+RESULT OGLImp::glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
@@ -1738,7 +1738,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::CheckFramebufferStatus(GLenum target) {
+RESULT OGLImp::CheckFramebufferStatus(GLenum target) {
 	RESULT r = R_PASS;
 
 	GLenum glenumCheckFramebufferStatus = m_OpenGLExtensions.glCheckFramebufferStatus(target);
@@ -1749,7 +1749,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level) {
+RESULT OGLImp::glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glFramebufferTexture2D(target, attachment, textarget, texture, level);
@@ -1759,7 +1759,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glBlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter) {
+RESULT OGLImp::glBlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
@@ -1769,7 +1769,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glDrawBuffers(GLsizei n, const GLenum *bufs) {
+RESULT OGLImp::glDrawBuffers(GLsizei n, const GLenum *bufs) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glDrawBuffers(n, bufs);
@@ -1779,7 +1779,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glFramebufferTexture(GLenum target, GLenum attachment, GLuint texture, GLint level) {
+RESULT OGLImp::glFramebufferTexture(GLenum target, GLenum attachment, GLuint texture, GLint level) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glFramebufferTexture(target, attachment, texture, level);
@@ -1790,7 +1790,7 @@ Error:
 }
 
 // VBO
-RESULT OpenGLImp::glGenBuffers(GLsizei n, GLuint *buffers) {
+RESULT OGLImp::glGenBuffers(GLsizei n, GLuint *buffers) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGenBuffers(n, buffers);
@@ -1800,7 +1800,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glBindBuffer(GLenum target, GLuint gluiBuffer) {
+RESULT OGLImp::glBindBuffer(GLenum target, GLuint gluiBuffer) {
 	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBindBuffer(target, gluiBuffer);
@@ -1812,7 +1812,7 @@ RESULT OpenGLImp::glBindBuffer(GLenum target, GLuint gluiBuffer) {
 //	return r;
 }
 
-RESULT OpenGLImp::glDeleteBuffers(GLsizei n, const GLuint *buffers) {
+RESULT OGLImp::glDeleteBuffers(GLsizei n, const GLuint *buffers) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glDeleteBuffers(n, buffers);
@@ -1822,7 +1822,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glDeleteVertexArrays(GLsizei n, const GLuint *arrays) {
+RESULT OGLImp::glDeleteVertexArrays(GLsizei n, const GLuint *arrays) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glDeleteVertexArrays(n, arrays);
@@ -1832,7 +1832,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glBindAttribLocation(GLuint program, GLuint index, const GLchar *name) {
+RESULT OGLImp::glBindAttribLocation(GLuint program, GLuint index, const GLchar *name) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBindAttribLocation(program, index, name);
@@ -1842,7 +1842,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGetAttribLocation(GLuint programID, const GLchar *pszName, GLint *pLocation) {
+RESULT OGLImp::glGetAttribLocation(GLuint programID, const GLchar *pszName, GLint *pLocation) {
 	RESULT r = R_PASS;
 
 	*pLocation = m_OpenGLExtensions.glGetAttribLocation(programID, pszName);
@@ -1856,7 +1856,7 @@ Error:
 
 // Blending 
 
-RESULT OpenGLImp::glBlendEquation(GLenum mode) {
+RESULT OGLImp::glBlendEquation(GLenum mode) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBlendEquation(mode);
@@ -1866,7 +1866,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glBlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha) {
+RESULT OGLImp::glBlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
@@ -1876,7 +1876,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGetUniformBlockIndex(GLuint programID, const GLchar *pszName, GLint *pLocation) {
+RESULT OGLImp::glGetUniformBlockIndex(GLuint programID, const GLchar *pszName, GLint *pLocation) {
 	RESULT r = R_PASS;
 
 	*pLocation = m_OpenGLExtensions.glGetUniformBlockIndex(programID, pszName);
@@ -1888,7 +1888,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glUniformBlockBinding(GLuint programID, GLint uniformBlockIndex, GLint uniformBlockBindingPoint) {
+RESULT OGLImp::glUniformBlockBinding(GLuint programID, GLint uniformBlockIndex, GLint uniformBlockBindingPoint) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUniformBlockBinding(programID, uniformBlockIndex, uniformBlockBindingPoint);
@@ -1898,7 +1898,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glBindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
+RESULT OGLImp::glBindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
 	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBindBufferBase(target, bindingPointIndex, bufferIndex);
@@ -1911,7 +1911,7 @@ RESULT OpenGLImp::glBindBufferBase(GLenum target, GLuint bindingPointIndex, GLui
 //	return r;
 }
 
-RESULT OpenGLImp::glGetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar *const*uniformNames, GLuint *uniformIndices) {
+RESULT OGLImp::glGetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar *const*uniformNames, GLuint *uniformIndices) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetUniformIndices(program, uniformCount, uniformNames, uniformIndices);
@@ -1921,7 +1921,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation) {
+RESULT OGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation) {
 	//RESULT r = R_PASS;
 
 	*pLocation = m_OpenGLExtensions.glGetUniformLocation(program, name);
@@ -1935,7 +1935,7 @@ RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLint
 //	return r;
 }
 
-RESULT OpenGLImp::glUniform1i(GLint location, GLint v0) {
+RESULT OGLImp::glUniform1i(GLint location, GLint v0) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUniform1i(location, v0);
@@ -1946,7 +1946,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glUniform1fv(GLint location, GLsizei count, const GLfloat *value) {
+RESULT OGLImp::glUniform1fv(GLint location, GLsizei count, const GLfloat *value) {
 	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUniform1fv(location, count, value);
@@ -1959,7 +1959,7 @@ RESULT OpenGLImp::glUniform1fv(GLint location, GLsizei count, const GLfloat *val
 //	return r;
 }
 
-RESULT OpenGLImp::glUniform4fv(GLint location, GLsizei count, const GLfloat *value) {
+RESULT OGLImp::glUniform4fv(GLint location, GLsizei count, const GLfloat *value) {
 	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUniform4fv(location, count, value);
@@ -1972,7 +1972,7 @@ RESULT OpenGLImp::glUniform4fv(GLint location, GLsizei count, const GLfloat *val
 //	return r;
 }
 
-RESULT OpenGLImp::glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
+RESULT OGLImp::glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
 	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUniformMatrix4fv(location, count, transpose, value);
@@ -1986,7 +1986,7 @@ RESULT OpenGLImp::glUniformMatrix4fv(GLint location, GLsizei count, GLboolean tr
 }
 
 // OpenGL Shaders
-RESULT OpenGLImp::CreateShader(GLenum type, GLuint *shaderID) {
+RESULT OGLImp::CreateShader(GLenum type, GLuint *shaderID) {
 	RESULT r = R_PASS;
 
 	*shaderID = m_OpenGLExtensions.glCreateShader(type);
@@ -1998,7 +1998,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::CreateShaderObject(GLenum type, GLuint *shaderID) {
+RESULT OGLImp::CreateShaderObject(GLenum type, GLuint *shaderID) {
 	RESULT r = R_PASS;
 
 	*shaderID = m_OpenGLExtensions.glCreateShaderObject(type);
@@ -2010,7 +2010,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::GetShaderiv(GLuint programID, GLenum pname, GLint *params) {
+RESULT OGLImp::GetShaderiv(GLuint programID, GLenum pname, GLint *params) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetShaderiv(programID, pname, params);
@@ -2020,7 +2020,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
+RESULT OGLImp::GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetShaderInfoLog(shader, bufSize, length, infoLog);
@@ -2030,7 +2030,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glAttachShader(GLuint program, GLuint shader) {
+RESULT OGLImp::glAttachShader(GLuint program, GLuint shader) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glAttachShader(program, shader);
@@ -2040,7 +2040,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::ShaderSource(GLuint shaderID, GLsizei count, const GLchar *const*string, const GLint *length) {
+RESULT OGLImp::ShaderSource(GLuint shaderID, GLsizei count, const GLchar *const*string, const GLint *length) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glShaderSource(shaderID, count, string, length);
@@ -2050,7 +2050,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::CompileShader(GLuint shaderID) {
+RESULT OGLImp::CompileShader(GLuint shaderID) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glCompileShader(shaderID);
@@ -2060,7 +2060,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage) {
+RESULT OGLImp::glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage) {
 	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBufferData(target, size, data, usage);
@@ -2072,7 +2072,7 @@ RESULT OpenGLImp::glBufferData(GLenum target, GLsizeiptr size, const void *data,
 //	return r;
 }
 
-RESULT OpenGLImp::glBufferSubData(GLenum target, GLsizeiptr offset, GLsizeiptr size, const void *data) {
+RESULT OGLImp::glBufferSubData(GLenum target, GLsizeiptr offset, GLsizeiptr size, const void *data) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBufferSubData(target, offset, size, data);
@@ -2082,7 +2082,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glEnableVertexAtrribArray(GLuint index) {
+RESULT OGLImp::glEnableVertexAtrribArray(GLuint index) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glEnableVertexAttribArray(index);
@@ -2092,7 +2092,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer) {
+RESULT OGLImp::glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glVertexAttribPointer(index, size, type, normalized, stride, pointer);
@@ -2103,7 +2103,7 @@ Error:
 }
 
 // Textures
-RESULT OpenGLImp::GenerateTextures(GLsizei n, GLuint *pTextures) {
+RESULT OGLImp::GenerateTextures(GLsizei n, GLuint *pTextures) {
 	RESULT r = R_PASS;
 
 	glGenTextures(n, pTextures);
@@ -2113,7 +2113,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::DeleteTextures(GLsizei n, GLuint *pTextures) {
+RESULT OGLImp::DeleteTextures(GLsizei n, GLuint *pTextures) {
 	RESULT r = R_PASS;
 
 	glDeleteTextures(n, pTextures);
@@ -2123,7 +2123,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glActiveTexture(GLenum texture) {
+RESULT OGLImp::glActiveTexture(GLenum texture) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glActiveTexture(texture);
@@ -2133,7 +2133,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glBindTextures(GLuint first, GLsizei count, const GLuint *textures) {
+RESULT OGLImp::glBindTextures(GLuint first, GLsizei count, const GLuint *textures) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBindTextures(first, count, textures);
@@ -2143,7 +2143,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::BindTexture(GLenum target, GLuint texture) {
+RESULT OGLImp::BindTexture(GLenum target, GLuint texture) {
 	RESULT r = R_PASS;
 
 	glBindTexture(target, texture);
@@ -2153,7 +2153,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glTexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) {
+RESULT OGLImp::glTexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glTextStorage2D(target, levels, internalformat, width, height);
@@ -2163,7 +2163,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glTexImage2DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations) {
+RESULT OGLImp::glTexImage2DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glTexImage2DMultisample(target, samples, internalformat, width, height, fixedsamplelocations);
@@ -2173,7 +2173,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::TexParameteri(GLenum target, GLenum pname, GLint param) {
+RESULT OGLImp::TexParameteri(GLenum target, GLenum pname, GLint param) {
 	RESULT r = R_PASS;
 
 	//m_OpenGLExtensions.glTexParamteri(target, pname, param);
@@ -2184,7 +2184,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels) {
+RESULT OGLImp::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels) {
 	RESULT r = R_PASS;
 
 	// fix alightment for odd value width size
@@ -2201,7 +2201,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels) {
+RESULT OGLImp::TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels) {
 	RESULT r = R_PASS;
 
 	// fix alightment for odd value width size
@@ -2217,7 +2217,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGenerateMipmap(GLenum target) {
+RESULT OGLImp::glGenerateMipmap(GLenum target) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGenerateMipmap(target);
@@ -2227,7 +2227,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels) {
+RESULT OGLImp::GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels) {
 	RESULT r = R_PASS;
 
 	glGetTexImage(target, level, format, type, pixels);
@@ -2237,7 +2237,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::GetTextureImage(GLuint texture, GLint level, GLenum format, GLenum type, GLsizei bufSize, GLvoid *pixels) {
+RESULT OGLImp::GetTextureImage(GLuint texture, GLint level, GLenum format, GLenum type, GLsizei bufSize, GLvoid *pixels) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetTextureImage(texture, level, format, type, bufSize, pixels);
@@ -2247,7 +2247,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::GetnTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLsizei bufSize, void *pixels) {
+RESULT OGLImp::GetnTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLsizei bufSize, void *pixels) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetnTexImage(target, level, format, type, bufSize, pixels);
@@ -2258,7 +2258,7 @@ Error:
 }
 
 // Queries
-RESULT OpenGLImp::glGenQueries(GLsizei n, GLuint *ids) {
+RESULT OGLImp::glGenQueries(GLsizei n, GLuint *ids) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGenQueries(n, ids);
@@ -2268,7 +2268,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glDeleteQueries(GLsizei n, const GLuint *ids) {
+RESULT OGLImp::glDeleteQueries(GLsizei n, const GLuint *ids) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glDeleteQueries(n, ids);
@@ -2278,11 +2278,11 @@ Error:
 	return r;
 }
 
-bool OpenGLImp::glIsQuery(GLuint id) {
+bool OGLImp::glIsQuery(GLuint id) {
 	return (m_OpenGLExtensions.glIsQuery(id) != 0);
 }
 
-RESULT OpenGLImp::glBeginQuery(GLenum target, GLuint id) {
+RESULT OGLImp::glBeginQuery(GLenum target, GLuint id) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBeginQuery(target, id);
@@ -2292,7 +2292,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glEndQuery(GLenum target) {
+RESULT OGLImp::glEndQuery(GLenum target) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glEndQuery(target);
@@ -2302,7 +2302,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGetQueryiv(GLenum target, GLenum pname, GLint *params) {
+RESULT OGLImp::glGetQueryiv(GLenum target, GLenum pname, GLint *params) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetQueryiv(target, pname, params);
@@ -2312,7 +2312,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGetQueryObjectiv(GLuint id, GLenum pname, GLint *params) {
+RESULT OGLImp::glGetQueryObjectiv(GLuint id, GLenum pname, GLint *params) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetQueryObjectiv(id, pname, params);
@@ -2322,7 +2322,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params) {
+RESULT OGLImp::glGetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetQueryObjectuiv(id, pname, params);
@@ -2333,7 +2333,7 @@ Error:
 }
 
 
-RESULT OpenGLImp::wglSwapIntervalEXT(int interval) {
+RESULT OGLImp::wglSwapIntervalEXT(int interval) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.wglSwapIntervalEXT(interval);

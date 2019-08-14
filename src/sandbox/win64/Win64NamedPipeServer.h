@@ -1,23 +1,26 @@
 #ifndef WIN_64_NAMED_PIPE_H_
 #define WIN_64_NAMED_PIPE_H_
 
+#include "core/ehm/EHM.h"
 
-#include "RESULT/EHM.h"
+// Dream Sandbox Win64
+// dos/src/sandbox/win64/Win64NamedPipe.h
 
-// DREAM OS
-// Sandbox/Windows/Win64NamedPipe.h
 // Named pipe capability in windows 
 
-#include "Sandbox/NamedPipeServer.h"
-
 #include <windows.h> 
+
+#include "core/types/DObject.h"
+
+#include "Sandbox/NamedPipeServer.h"
 
 #define DEFAULT_NAMED_PIPE_SERVER_BUFFER_SIZE 1280 * 720 * 4
 #define DEFAULT_NAMED_PIPE_TIMEOUT 0
 
 class Win64NamedPipeServer;
 
-class Win64NamedPipeConnection {
+// TODO: Top level object abstraction 
+class Win64NamedPipeConnection : public DObject {
 	friend class Win64NamedPipeServer;
 public:
 	Win64NamedPipeConnection(Win64NamedPipeServer *pParentServer, HANDLE handleNamedPipe, LPOVERLAPPED pOverlapped, int connectionID);

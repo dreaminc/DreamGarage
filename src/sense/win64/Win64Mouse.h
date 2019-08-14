@@ -1,21 +1,22 @@
 #ifndef WIN64_MOUSE_H_
 #define WIN64_MOUSE_H_
 
-#include <windows.h>
+#include "core/ehm/EHM.h"
 
-#include "RESULT/EHM.h"
+// Dream Sense Win64
+// dos/src/sense/win64/Win64Mouse.h
 
-// DREAM OS
-// DreamOS/Sandbox/Windows/Win64Mouse.h
 // Sense Windows 64 Mouse Device
+
+#include <windows.h>
 
 #include "Sense/SenseMouse.h"
 
-class Windows64App;
+class Win64Sandbox;
 
 class Win64Mouse : public SenseMouse {
 public:
-	Win64Mouse(Windows64App *pWin64AppParent);
+	Win64Mouse(Win64Sandbox *pParentWin64Sandbox);
 
 	virtual RESULT UpdateMouseState(SenseMouseEventType eventType, int newX, int newY, int state) override;
 
@@ -30,7 +31,7 @@ public:
 	RESULT UpdateMousePosition();
 
 private:
-	Windows64App *m_pWin64AppParent;
+	Win64Sandbox *m_pParentWin64Sandbox = nullptr;
 };
 
 #endif // ! WIN64_KEYBOARD_H_

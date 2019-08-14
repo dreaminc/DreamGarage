@@ -114,12 +114,11 @@ public:
 	RESULT SetMinFrameRate(double minFrameRate);
 	bool FindDreamAppWithName(std::string strDreamAppName);
 
-//private:
 public:
 	std::vector<DreamAppBase*> GetDreamApp(std::string strDreamAppName);
 	std::shared_ptr<DreamAppBase> GetDreamAppFromUID(UID appUID);
 
-protected:
+public:
 	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
 
 private:

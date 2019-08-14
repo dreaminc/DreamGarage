@@ -1,5 +1,6 @@
 #include "PathManager.h"
-#include "Primitives/Types/Number.h"
+
+#include "core/types/Number.h"
 
 #include "Core/Utilities.h"
 

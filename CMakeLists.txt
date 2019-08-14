@@ -24,6 +24,8 @@ include_directories(src/third_party/CEF/CEF_BINARY_3538)
 # Header Only Includes
 include_directories(src/third_party/json/include)
 
+add_definitions(-DUNICODE)
+
 add_subdirectory(src)
 
 # This is how you set the start up project 

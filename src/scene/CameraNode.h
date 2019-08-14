@@ -1,14 +1,16 @@
 #ifndef CAMERA_NODE_H_
 #define CAMERA_NODE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Scene/CameraNode.h
+// Dream Sandbox
+// dos/src/scene/CameraNode.h
+
 // A Source node extension of stereo camera (for now)
 
-#include "HAL/Pipeline/SourceNode.h"
-#include "Primitives/stereocamera.h"
+#include "core/camera/stereocamera.h"
+
+#include "pipeline/SourceNode.h"
 
 class ray;
 

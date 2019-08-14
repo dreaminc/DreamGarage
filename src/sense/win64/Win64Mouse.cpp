@@ -1,9 +1,9 @@
 #include "Win64Mouse.h"
 #include "Windows64App.h"
 
-Win64Mouse::Win64Mouse(Windows64App *pWin64AppParent) :
+Win64Mouse::Win64Mouse(Win64Sandbox *pParentWin64Sandbox) :
 	SenseMouse(),
-	m_pWin64AppParent(pWin64AppParent)
+	m_pParentWin64Sandbox(pParentWin64Sandbox)
 {
 	// empty for now
 }
@@ -11,9 +11,9 @@ Win64Mouse::Win64Mouse(Windows64App *pWin64AppParent) :
 RESULT Win64Mouse::CaptureMouse() {
 	RESULT r = R_PASS;
 
-	CN(m_pWin64AppParent);
+	CN(m_pParentWin64Sandbox);
 
-	HWND hwnd = m_pWin64AppParent->GetWindowHandle();
+	HWND hwnd = m_pParentWin64Sandbox->GetWindowHandle();
 	CN(hwnd);
 
 	if (m_fMouseCaptured == false) {
@@ -30,9 +30,9 @@ Error:
 RESULT Win64Mouse::ReleaseMouse() {
 	RESULT r = R_PASS;
 
-	CN(m_pWin64AppParent);
+	CN(m_pParentWin64Sandbox);
 
-	HWND hwnd = m_pWin64AppParent->GetWindowHandle();
+	HWND hwnd = m_pParentWin64Sandbox->GetWindowHandle();
 	CN(hwnd);
 
 	if (m_fMouseCaptured) {
@@ -65,8 +65,8 @@ RESULT Win64Mouse::SetMousePosition(int x, int y) {
 
 	// Need to convert to screen coordinates
 
-	CN(m_pWin64AppParent);
-	HWND hwnd = m_pWin64AppParent->GetWindowHandle();
+	CN(m_pParentWin64Sandbox);
+	HWND hwnd = m_pParentWin64Sandbox->GetWindowHandle();
 	CN(hwnd);
 
 	GetClientRect(hwnd, &rect);
@@ -87,9 +87,9 @@ RESULT Win64Mouse::GetMousePosition(int& x, int& y) {
 
 	// need to convert to window coordinates
 
-	CN(m_pWin64AppParent);
+	CN(m_pParentWin64Sandbox);
 	
-	hwnd = m_pWin64AppParent->GetWindowHandle();
+	hwnd = m_pParentWin64Sandbox->GetWindowHandle();
 	CN(hwnd);
 
 	GetClientRect(hwnd, &clientRect);
@@ -111,9 +111,9 @@ RESULT Win64Mouse::CenterMousePosition() {
 	POINT ptCenterScreen;
 	HWND hwnd = nullptr;
 
-	CN(m_pWin64AppParent);
+	CN(m_pParentWin64Sandbox);
 
-	hwnd = m_pWin64AppParent->GetWindowHandle();
+	hwnd = m_pParentWin64Sandbox->GetWindowHandle();
 	CN(hwnd);
 /*
 	RECT wndRect;
@@ -141,9 +141,9 @@ RESULT Win64Mouse::GetCenterPosition(int& x, int& y) {
 	RECT clientRect{ 0 };
 	HWND hwnd = nullptr;
 
-	CN(m_pWin64AppParent);
+	CN(m_pParentWin64Sandbox);
 
-	hwnd = m_pWin64AppParent->GetWindowHandle();
+	hwnd = m_pParentWin64Sandbox->GetWindowHandle();
 	CN(hwnd);
 	/*
 	RECT wndRect;

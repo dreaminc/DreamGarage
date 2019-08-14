@@ -44,12 +44,35 @@ else()
     add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
 endif()
 
-add_library(sandbox
-    ${SOURCES}
-    ${ANDROID_SOURCES}
-    ${IOS_SOURCES}
-    ${LINUX_SOURCES}
-    ${OSX_SOURCES}
-    ${WIN64_SOURCES}
+# TODO: This should not be here
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
+add_definitions(-DWEBRTC_WIN)
+
+# TODO: This should not be here (only in HMD yo)
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/openvr/headers)
+
+IF(APPLE
+   # Mac OS X specific code
+   # TODO: Add OSX vs. iOS
+   #add_library(sandbox
+   # ${SOURCES}
+   # ${OSX_SOURCES}
+   #)
+#
+   #add_library(sandbox
+   # ${SOURCES}
+   # ${IOS_SOURCES}
+   #)
 )
+ELSEIF(UNIX AND NOT APPLE)
+  #add_library(sandbox
+  #  ${SOURCES}
+  #  ${LINUX_SOURCES}
+  #)
+ELSEIF(WIN32)
+   add_library(sandbox
+    ${SOURCES}
+    ${WIN64_SOURCES}
+   )
+ENDIF()
 

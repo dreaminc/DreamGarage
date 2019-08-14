@@ -1,4 +1,5 @@
 #include "OSXPathManager.h"
+
 #include <stdlib.h>
 #include <cstring>
 #include <limits.h>

@@ -1,17 +1,19 @@
 #ifndef WIN_64_PATH_MANAGER_H_
 #define WIN_64_PATH_MANAGER_H_
 
-#include "RESULT/EHM.h"
-#include "Sandbox/PathManager.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sandbox/Windows/Win64PathManager.h
+// Dream Sandbox Win64
+// dos/src/sandbox/win64/Win64PathManager.h
+
 // Dream OS Win64 sandbox path manager
 
 #include <windows.h>
 #include <stdlib.h>
 #include <string.h>
 #include <tchar.h>
+
+#include "Sandbox/PathManager.h"
 
 class DreamOS;
 

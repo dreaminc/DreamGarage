@@ -1,33 +1,35 @@
 #ifndef OPENVR_DEVICE_H_
 #define OPENVR_DEVICE_H_
 
-#include "./RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HMD/OpenVR/OpenVRDevice.h
+// Dream HMD OpenVR
+// dos/src/hmd/OpenVR/OpenVRDevice.h
+
 // OpenVR device encapsulates the OpenVR device which can be any HMD apparently.  
 // Personally not a fan of this architecture, as it plugs into the SteamVR eco-system only, so it's not possible
 // to use the headset stand alone - but it allows maxiumum flexibility in using Dream across Oculus/Steam regardless
 // of the headset being used
+
+// TODO: Get rid of this, all this should be done in the build config
 #ifndef OCULUS_PRODUCTION_BUILD
 #include <openvr.h>
-
-// TODO: Should this go into Sense?
-
-#include "HMD/HMD.h"
-#include "HAL/opengl/OGLAttachment.h"
-
-#define DEFAULT_OPENVR_RENDER_CHANNELS 3
-#define DEFAULT_OPENVR_RESOLVE_CHANNELS 4
-#define DEFAULT_OPENVR_MULTISAMPLE 4
+#include "third_party/Matrices/Matrices.h"
 
 #include <vector>
 #include <algorithm>
 
-// TODO: Temp for testing
-#include "External/Matrices/Matrices.h"
+// TODO: Should this go into Sense?
+#include "hmd/HMD.h"
+#include "hal/ogl/OGLAttachment.h"
 
-#include "Sense/SenseController.h"
+// TODO: Temp for testing
+
+#include "sense/SenseController.h"
+
+#define DEFAULT_OPENVR_RENDER_CHANNELS 3
+#define DEFAULT_OPENVR_RESOLVE_CHANNELS 4
+#define DEFAULT_OPENVR_MULTISAMPLE 4
 
 // IVR EHM extension
 

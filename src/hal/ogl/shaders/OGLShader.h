@@ -1,24 +1,26 @@
 #ifndef OGL_SHADER_H_
 #define OGL_SHADER_H_
 
-// Dream OS
-// DreamOS/HAL/opengl/OpenGLShader.h
+#include "core/ehm/EHM.h"
+
+// Dream HAL OGL
+// dos/src/hal/ogl/OpenGLShader.h
+
 // This is the container object for an OpenGL Shader
 // These should be accessed through the OpenGLShaderFactory object
 
-#include "./RESULT/EHM.h"
-#include "./HAL/Shader.h"
+#include "hal/shader.h"
 
-#include "../OpenGLCommon.h"
-#include "Primitives/version.h"
-#include "Primitives/matrix/matrix.h"
+#include "hal/ogl/OGLCommon.h"
+#include "hal/ogl/GLSLObject.h"
 
-#include "../GLSLObject.h"
+#include "core/types/version.h"
+
+#include "core/matrix/matrix.h"
 
 class point;
 class quaternion;
 class vector;
-//class OpenGLImp;	// Declare OpenGLImp class
 class OGLProgram;
 
 class OGLShader : public Shader, public GLSLObject {
@@ -42,7 +44,6 @@ public:
 	GLuint GetShaderID();
 	GLenum GetShaderType();
 
-	//const char *GetShaderCode();
 	std::vector<std::string> GetShaderCode();
 	RESULT AddShaderCode(const char *pszShaderCode);
 	RESULT AddShaderCode(const std::string &strShaderCode);
@@ -55,7 +56,6 @@ protected:
 	GLenum	m_shaderType;		// GL_VERTEX_SHADER or GL_FRAGMENT_SHADER
 	GLuint	m_shaderID;
 
-	//char*	m_pszShaderCode = nullptr;
 	std::vector<std::string> m_shaderCode;
 };
 

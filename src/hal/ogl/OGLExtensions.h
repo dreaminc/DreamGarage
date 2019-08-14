@@ -1,14 +1,16 @@
 #ifndef OPEN_GL_EXTENSION_H_
 #define OPEN_GL_EXTENSION_H_
 
-#include "RESULT/EHM.h"
-#include "Primitives/Types/UID.h"
+#include "core/ehm/EHM.h"
 
-// Dream OS
-// DreamOS/HAL/opengl/OpenGLExtensions.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OpenGLExtensions.h
+
 // This encapsulates all of the OpenGL Extensions
 
-#include "OpenGLCommon.h"
+#include "OGLCommon.h"
+
+#include "core/types/UID.h"
 
 class OpenGLExtensions {
 public:

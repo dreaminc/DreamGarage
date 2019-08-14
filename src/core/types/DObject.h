@@ -12,6 +12,8 @@
 #include "core/types/valid.h"
 #include "core/types/UID.h"
 
+// TODO: ACTUALLY MAKE THIS UNIQUE AND NOT STUPID
+
 class DObject : 
 	public valid
 {

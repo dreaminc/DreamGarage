@@ -1,18 +1,18 @@
 #ifndef OGL_UNIFORM_BLOCK_H_
 #define OGL_UNIFORM_BLOCK_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/OpenGL/OGLUniformBlock.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLUniformBlock.h
+
 // OpenGL Uniform Block - Represents a contiguous section of memory passed into the shader through GL uniform blocks
-
-#include "../OpenGLCommon.h"
-#include "../GLSLObject.h"
 
 #include <string>
 
-//class OpenGLImp;
+#include "hal/ogl/OGLCommon.h"
+#include "hal/ogl/GLSLObject.h"
+
 class OGLProgram;
 
 class OGLUniformBlock : public GLSLObject {

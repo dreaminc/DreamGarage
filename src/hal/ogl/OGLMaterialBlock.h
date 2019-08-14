@@ -1,16 +1,20 @@
 #ifndef OGL_MATERIAL_BLOCK_H_
 #define OGL_MATERIAL_BLOCK_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/OpenGL/OGLMaterialBlock.h
+// Dream HAL OGL
+// dos/src/hal/ogl/OGLMaterialBlock.h
+
 // OpenGL Material Block - This is a block representing the current material
+
+// TODO: This should not be at the HAL layer, but rather at the program/app/module
+
+#include <vector>
 
 #include "shaders/OGLUniformBlock.h"
 
-#include "Primitives/material.h"
-#include <vector>
+#include "core/material/material.h"
 
 #define MATERIAL_UNIFORM_BLOCK_BINDING_POINT 1
 
