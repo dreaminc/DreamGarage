@@ -1,6 +1,6 @@
 #include "Win64GamepadController.h"
 
-#include "Win64Sandbox.h"
+#include "sandbox/win64/Win64Sandbox.h"
 
 Win64GamepadController::Win64GamepadController(Win64Sandbox *pParentWin64Sandbox) :
 	SenseGamepadController(),

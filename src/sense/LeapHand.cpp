@@ -2,9 +2,9 @@
 
 #include "Sense/SenseLeapMotionHand.h"
 
-#include "Primitives/sphere.h"
+#include "core/primitives/sphere.h"
 
-#include "Primitives/model/model.h"
+#include "core/model/model.h"
 
 thumb::thumb(HALImp* pHALImp) :
 	finger(pHALImp)
@@ -43,7 +43,7 @@ RESULT thumb::Initialize() {
 	m_pPIP = AddSphere(jointRadius, 10, 10);
 	//m_pMCP = AddSphere(jointRadius, 10, 10);
 
-//Error:
+Error:
 	return r;
 }
 

@@ -1,7 +1,7 @@
 #include "ObjectStore.h"
 #include "ObjectStoreImpList.h"
 
-#include "Primitives/ray.h"
+#include "core/primitives/ray.h"
 
 ObjectStore::ObjectStore(ObjectStoreFactory::TYPE type) {
 	RESULT r = R_PASS;

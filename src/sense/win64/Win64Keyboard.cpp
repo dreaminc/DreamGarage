@@ -1,6 +1,6 @@
 #include "Win64Keyboard.h"
 
-#include "Win64Sandbox.h"
+#include "sandbox/win64/Win64Sandbox.h"
 
 Win64Keyboard::Win64Keyboard(Win64Sandbox *pParentWin64Sandbox) :
 	SenseKeyboard(),

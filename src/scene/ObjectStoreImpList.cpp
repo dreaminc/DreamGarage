@@ -1,5 +1,6 @@
 #include "ObjectStoreImpList.h"
-#include "Primitives/ray.h"
+
+#include "core/primitives/ray.h"
 
 ObjectStoreImpList::ObjectStoreImpList() :
 	m_pSkybox(nullptr)

@@ -1,5 +1,6 @@
 #include "Win64Mouse.h"
-#include "Windows64App.h"
+
+#include "sandbox/win64/Win64Sandbox.h"
 
 Win64Mouse::Win64Mouse(Win64Sandbox *pParentWin64Sandbox) :
 	SenseMouse(),

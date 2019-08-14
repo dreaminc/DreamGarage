@@ -1,5 +1,6 @@
 #include "SenseMouse.h"
-#include "DreamLogger/DreamLogger.h"
+
+#include "logger/DreamLogger.h"
 
 SenseMouse::SenseMouse() :
 		m_LeftButtonState(0),

@@ -1,9 +1,10 @@
 #include "SenseLeapMotion.h"
 
-#include "DreamLogger/DreamLogger.h"
+#include "logger/DreamLogger.h"
 
-#include "Primitives/composite.h"
-#include "Primitives/hand/LeapHand.h"
+#include "core/primitives/composite.h"
+
+#include "LeapHand.h"
 
 SenseLeapMotion::SenseLeapMotion() :
 	m_pLeapController(nullptr),

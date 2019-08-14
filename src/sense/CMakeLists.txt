@@ -12,6 +12,8 @@ file(GLOB WIN64_SOURCES
 )
 source_group("win64" FILES ${WIN64_SOURCES})
 
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/LeapSDK/include)
+
 # Force Include the src/core/config.h
 if(MSVC)
     add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")

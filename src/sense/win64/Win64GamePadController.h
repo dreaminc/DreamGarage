@@ -26,7 +26,7 @@ private:
 	RESULT ProcessGamepadState(XINPUT_GAMEPAD xInputGamepad);
 
 private:
-	Windows64App* m_pParentWin64Sandbox = nullptr;
+	Win64Sandbox* m_pParentWin64Sandbox = nullptr;
 
 	point2D m_leftJoystick;
 	point2D m_rightJoystick;

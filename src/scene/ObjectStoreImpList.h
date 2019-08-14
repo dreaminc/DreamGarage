@@ -12,7 +12,7 @@
 
 #include "ObjectStoreImp.h"
 
-#include "core/primitives/DimObj.h"
+#include "core/dimension/DimObj.h"
 
 class ObjectStoreImpList : public ObjectStoreImp {
 public:

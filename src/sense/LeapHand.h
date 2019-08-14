@@ -1,14 +1,14 @@
 #ifndef LEAP_HAND_H_
 #define LEAP_HAND_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/hand/LeapHand.h
+// Dream Sense Leap Motion
+// dos/src/sense/LeapHand.h
 
 #include "Leap.h"
 
-#include "hand.h"
+#include "core/hand/hand.h"
 
 class SenseLeapMotionHand;
 class model;

@@ -1,20 +1,9 @@
 #include "SenseKeyboard.h"
 
-#include <string.h>
-#include <functional>
-
-#include "RESULT/EHM.h"
-
-// DREAM OS
-// DreamOS/Sense/SenseKeyboard.h
-// Sense Keyboard Device
-
-#include "SenseDevice.h"
-#include "Primitives/Publisher.h"
-
 #include <locale>
 #include <codecvt>
 
+// TODO: This should go into util
 #if _MSC_VER >= 1900
 	std::string utf16_to_utf8(std::u16string utf16_string) {
 		std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
@@ -27,7 +16,6 @@
 		return convert.to_bytes(utf16_string);
 	}
 #endif
-
 
 SenseKeyboard::SenseKeyboard() {
 	memset(m_KeyStates, 0, sizeof(uint8_t) * NUM_SENSE_KEYBOARD_KEYS);

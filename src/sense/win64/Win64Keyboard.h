@@ -25,7 +25,7 @@ public:
 	RESULT CheckKeyState(SenseVirtualKey key);
 
 private:
-	Windows64App *m_pParentWin64Sandbox = nullptr;
+	Win64Sandbox *m_pParentWin64Sandbox = nullptr;
 };
 
 #endif // ! WIN64_KEYBOARD_H_
