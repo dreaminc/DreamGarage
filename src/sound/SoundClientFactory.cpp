@@ -1,23 +1,19 @@
 #include "SoundClientFactory.h"
 
 #if defined(_WIN32) 
-// 'Add an optimus prime comment' - Idan
-//extern "C" {
-//	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-//}
 	#if defined(_WIN64)
-		#include "./Sandbox/Windows/Windows64App.h"
+		#include "sandbox/win64/Win64Sandbox.h"
 	#else
-		#include "./Sandbox/Windows/Windows64App.h"
+		#include "sandbox/win64/Win64Sandbox.h"
 	#endif
 #elif defined(__APPLE__)
-	#include "./Sandbox/OSX/OSXSandboxApp.h"
+	#include "sandbox/osx/OSXSandbox.h"
 #elif defined(__linux__)
-	#include "./Sandbox/Linux/LinuxApp.h"
+	#include "sandbox/linux/LinuxSandbox.h"
 #endif
 
-#include "WASAPI/WASAPISoundClient.h"
-#include "XAudio2/XAudio2SoundClient.h"
+#include "sound/win64/wasapi/WASAPISoundClient.h"
+#include "sound/win64/xaudio2/XAudio2SoundClient.h"
 
 SoundClient* SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE type, std::wstring *pwstrOptAudioOutputGUID) {
 	RESULT r = R_PASS;

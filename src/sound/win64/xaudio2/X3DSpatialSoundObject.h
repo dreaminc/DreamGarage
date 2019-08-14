@@ -1,12 +1,10 @@
 #ifndef X3D_SPATIAL_SOUND_OBJECT_H_
 #define X3D_SPATIAL_SOUND_OBJECT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sound/SpataiSoundObject.h
-
-#include "Sound/SpatialSoundObject.h"
+// Dream Sound XAudio2
+// dos/src/sound/win64/xaudio2/X3DSpatialSoundObject.h
 
 #include <Windows.h>
 #include <XAudio2.h>
@@ -15,6 +13,8 @@
 #include <hrtfapoapi.h>
 
 #include <wrl/client.h>
+
+#include "sound/SpatialSoundObject.h"
 
 class SoundFile;
 

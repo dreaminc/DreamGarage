@@ -1,11 +1,11 @@
 #include "X3DSpatialSoundObject.h"
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
 
-#include "Sound/SoundFile.h"
+#include "core/camera/camera.h"
 
-#include "Primitives/camera.h"
+#include "sound/SoundFile.h"
 
 X3DSpatialSoundObject::X3DSpatialSoundObject(int samplingRate, point ptOrigin, vector vEmitterDirection, vector vListenerDirection, std::shared_ptr<IXAudio2> pXAudio2, std::shared_ptr<IXAudio2MasteringVoice> pXAudio2MasterVoice) :
 	SpatialSoundObject(samplingRate, ptOrigin, vEmitterDirection, vListenerDirection),
@@ -31,7 +31,7 @@ RESULT X3DSpatialSoundObject::Kill() {
 		m_hBufferEndEvent = nullptr;
 	}
 
-//Error:
+Error:
 	return r;
 }
 

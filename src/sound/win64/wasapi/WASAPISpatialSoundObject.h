@@ -1,17 +1,17 @@
 #ifndef WASAPI_SPATIAL_SOUND_OBJECT_H_
 #define WASAPI_SPATIAL_SOUND_OBJECT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sound/SpataiSoundObject.h
+// Dream Sound WASAPI
+// dos/src/sound/win64/wasapi/WASAPISpatialSoundObject.h
 
-#include "Sound/SpatialSoundObject.h"
+#include <wrl/client.h>
 
 #include <SpatialAudioClient.h>
 #include <SpatialAudioHrtf.h>
 
-#include <wrl/client.h>
+#include "sound/SpatialSoundObject.h"
 
 class WASAPISpatialSoundObject : public SpatialSoundObject {
 public:

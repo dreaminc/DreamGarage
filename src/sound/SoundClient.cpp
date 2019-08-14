@@ -1,10 +1,11 @@
 #include "SoundClient.h"
 
 #include "SoundFile.h"
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
 
 #include "AudioPacket.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
 
 SoundClient::SoundClient(std::wstring *pwstrOptAudioOutputGUID) {
 	if (pwstrOptAudioOutputGUID != nullptr) {

@@ -2,11 +2,11 @@
 
 #include <string>
 
-#include "Sound/SoundFile.h"
-#include "Sound/AudioPacket.h"
+#include "sound/SoundFile.h"
+#include "sound/AudioPacket.h"
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
 
 #include "X3DSpatialSoundObject.h"
 

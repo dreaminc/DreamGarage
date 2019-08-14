@@ -1,18 +1,18 @@
 #ifndef XAUDIO2_SOUND_CLIENT_H_
 #define XAUDIO2_SOUND_CLIENT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Sound/XAudio2SoundClient.h
+// Dream Sound XAudio2
+// dos/src/sound/win64/xaudio2/XAudio2SoundClient.h
 
-#include "Sound/SoundClient.h"
+#include <map>
 
 #include <Windows.h>
 #include <XAudio2.h>
 #include <x3daudio.h>
 
-#include <map>
+#include "Sound/SoundClient.h"
 
 #define REFTIMES_PER_MILLISEC  10000
 #define REFTIMES_PER_SEC (REFTIMES_PER_MILLISEC * 100)   
