@@ -1,16 +1,10 @@
-#include "RESULT/EHM.h"
-#include <limits.h>
-#include <vector>
-#include <chrono>
+#include "DesktopDuplication.h"
 
-#include "D3D11DesktopDuplicationDisplayManager.h"
 #include "D3D11DesktopDuplicationManager.h"
+#include "D3D11DesktopDuplicationDisplayManager.h"
 #include "D3D11DesktopDuplicationOutputManager.h"
 #include "D3D11DesktopDuplicationThreadManager.h"
 #include "DDCIPCMessage.h"
-
-#include <windows.h>
-#include <windowsx.h>
 
 // Below are lists of errors expect from Dxgi API calls when a transition event like mode change, PnpStop, PnpStart
 // desktop switch, TDR or session disconnect/reconnect. In all these cases we want the application to clean up the threads that process
@@ -18,9 +12,9 @@
 // If we get an error that is not on the appropriate list then we exit the application
 
 // Globals
-D3D11DesktopDuplicationOutputManager OutMgr;
-HWND pWindowHandle;		// These can go to the .h if we want
-HWND g_pDreamHandle;
+D3D11DesktopDuplicationOutputManager g_d3dDesktopDuplicationOutputManager;
+HWND pWindowHandle = nullptr;		
+HWND g_pDreamHandle = nullptr;
 bool g_fStartSending = false;
 float g_msTimeDelay = 1000 / 24.0f; // fps
 
@@ -55,17 +49,13 @@ HRESULT EnumOutputsExpectedErrors[] = {
 };
 
 
-//
 // Forward Declarations
-//
 DWORD WINAPI DDProc(_In_ void* Param);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 bool ProcessCmdline(_Out_ INT* outputToDuplicate);
 void ShowHelp();
 
-//
 // Class for progressive waits
-//
 typedef struct {
 	UINT    WaitTime;
 	UINT    WaitCount;
@@ -138,9 +128,8 @@ void DynamicWait::Wait() {
 	m_WaitCountInCurrentBand++;
 }
 
-//
 // Program entry point
-//
+// TODO: This is the only function that should be in this file
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ INT nCmdShow) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
@@ -169,8 +158,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	// Window
 	pWindowHandle = nullptr;
 
-	bool CmdResult = ProcessCmdline(&outputToDuplicate);
-	if (!CmdResult) {
+	bool fCmdResult = ProcessCmdline(&outputToDuplicate);
+	if (!fCmdResult) {
 		ShowHelp();
 		return 0;
 	}
@@ -253,7 +242,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 				// Clean up
 				ThreadMgr.Clean();
-				OutMgr.CleanRefs();
+				g_d3dDesktopDuplicationOutputManager.CleanRefs();
 
 				// As we have encountered an error due to a system transition we wait before trying again, using this dynamic wait
 				// the wait periods will get progressively long to avoid wasting too much system resource if this state lasts a long time
@@ -266,9 +255,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			}
 
 			// Re-initialize
-			Ret = OutMgr.InitOutput(pWindowHandle, outputToDuplicate, &OutputCount, &DeskBounds);
+			Ret = g_d3dDesktopDuplicationOutputManager.InitOutput(pWindowHandle, outputToDuplicate, &OutputCount, &DeskBounds);
 			if (Ret == DUPL_RETURN_SUCCESS) {
-				HANDLE SharedHandle = OutMgr.GetSharedHandle();
+				HANDLE SharedHandle = g_d3dDesktopDuplicationOutputManager.GetSharedHandle();
 				if (SharedHandle) {
 					Ret = ThreadMgr.Initialize(outputToDuplicate, OutputCount, UnexpectedErrorEvent, ExpectedErrorEvent, TerminateThreadsEvent, SharedHandle, &DeskBounds);
 				}
@@ -289,7 +278,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 				msLastSent = msTimeNow; 
 				// Nothing else to do, so try to present to write out to window if not occluded
 				if (!fOccluded) {
-					Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &fOccluded, &pBuffer, pxWidth, pxHeight);
+					Ret = g_d3dDesktopDuplicationOutputManager.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &fOccluded, &pBuffer, pxWidth, pxHeight);
 				}
 
 				//if((pBuffer != nullptr) && (pBuffer[0] != '\0')) {
@@ -369,17 +358,13 @@ Error:
 	return 0;
 }
 
-//
 // Shows help
-//
 void ShowHelp() {
 	DisplayMsg(L"The following optional parameters can be used -\n  /output [all | n]\t\tto duplicate all outputs or the nth output\n  /?\t\t\tto display this help section",
 		L"Proper usage", S_OK);
 }
 
-//
 // Process command line parameters
-//
 bool ProcessCmdline(_Out_ INT* outputToDuplicate) {
 	*outputToDuplicate = -1;
 	// __argv and __argc are global vars set by system
@@ -449,9 +434,7 @@ BOOL OnCopyData(HWND hWnd, WPARAM wParam, LPARAM lParam) {
 	}
 }
 
-//
 // Window message processor
-//
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 	case WM_DESTROY: {
@@ -462,7 +445,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 	} break;
 	case WM_SIZE: {
 		// Tell output manager that window size has changed
-		OutMgr.WindowResize();
+		g_d3dDesktopDuplicationOutputManager.WindowResize();
 	} break;
 	case WM_COPYDATA: {
 		OnCopyData(hWnd, wParam, lParam);
@@ -473,9 +456,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 	return 0;
 }
 
-//
 // Entry point for new duplication threads
-//
 DWORD WINAPI DDProc(_In_ void* Param) {
 	HRESULT r = S_OK;
 	// Classes
@@ -669,9 +650,7 @@ DUPL_RETURN ProcessFailure(_In_opt_ ID3D11Device* pDevice, _In_ LPCWSTR Str, _In
 	return DUPL_RETURN_ERROR_UNEXPECTED;
 }
 
-//
 // Displays a message
-//
 void DisplayMsg(_In_ LPCWSTR Str, _In_ LPCWSTR Title, HRESULT hr) {
 	if (SUCCEEDED(hr)) {
 		MessageBoxW(nullptr, Str, Title, MB_OK);

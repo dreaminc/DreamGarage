@@ -1,32 +1,24 @@
 #include "D3D11DesktopDuplicationOutputManager.h"
-#include <vector>
-#include "RESULT/EHM.h"
 
-//
+#include <vector>
+
 // Constructor NULLs out all pointers & sets appropriate var vals
-//
 D3D11DesktopDuplicationOutputManager::D3D11DesktopDuplicationOutputManager()
 {
 	// empty
 }
 
-//
 // Destructor which calls CleanRefs to release all references and memory.
-//
 D3D11DesktopDuplicationOutputManager::~D3D11DesktopDuplicationOutputManager() {
 	CleanRefs();
 }
 
-//
 // Indicates that window has been resized.
-//
 void D3D11DesktopDuplicationOutputManager::WindowResize() {
 	m_fNeedsResize = true;
 }
 
-//
 // Initialize all state
-//
 DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT outputToDuplicate, _Out_ UINT* OutCount, _Out_ RECT* DeskBounds) {
 	HRESULT r = S_OK;
 
@@ -194,9 +186,7 @@ Error:
 	return Return;
 }
 
-//
 // Recreate shared texture
-//
 DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT outputToDuplicate, _Out_ UINT* pOutCount, _Out_ RECT* pDeskBounds) {
 	HRESULT r = S_OK;
 
@@ -419,9 +409,7 @@ Error:
 	return r;
 }
 
-//
 // Present to the application window
-//
 DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ PTR_INFO* PointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer, UINT &pxWidth, UINT &pxHeight) {
 	// In a typical desktop duplication application there would be an application running on one system collecting the desktop images
 	// and another application running on a different system that receives the desktop images via a network and display the image. This
@@ -578,20 +566,19 @@ Error:
 	return DUPL_RETURN_SUCCESS;
 }
 
-//
 // Process both masked and monochrome pointers
-//
 DUPL_RETURN D3D11DesktopDuplicationOutputManager::ProcessMonoMask(bool IsMono, _Inout_ PTR_INFO* pPtrInfo, _Out_ INT* pPtrWidth, _Out_ INT* pPtrHeight, _Out_ INT* pPtrLeft, _Out_ INT* pPtrTop, _Outptr_result_bytebuffer_(*pPtrHeight * *pPtrWidth * BPP) BYTE** pInitBuffer, _Out_ D3D11_BOX* Box) {
 	HRESULT r = S_OK;
+
 	// Desktop dimensions
 	D3D11_TEXTURE2D_DESC sharedSurfaceTextureDescription;
 	m_pSharedSurf->GetDesc(&sharedSurfaceTextureDescription);
-	INT DesktopWidth = sharedSurfaceTextureDescription.Width;
-	INT DesktopHeight = sharedSurfaceTextureDescription.Height;
+	int DesktopWidth = sharedSurfaceTextureDescription.Width;
+	int DesktopHeight = sharedSurfaceTextureDescription.Height;
 
 	// Pointer position
-	INT GivenLeft = pPtrInfo->Position.x;
-	INT GivenTop = pPtrInfo->Position.y;
+	int GivenLeft = pPtrInfo->Position.x;
+	int GivenTop = pPtrInfo->Position.y;
 
 	// Vars
 	UINT* InitBuffer32;
@@ -739,9 +726,7 @@ Error:
 	return DUPL_RETURN_SUCCESS;
 }
 
-//
 // Draw mouse provided in buffer to backbuffer
-//
 DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawMouse(_In_ PTR_INFO* pPtrInfo) {
 	HRESULT r = S_OK;
 
@@ -910,9 +895,7 @@ Error:
 	return DUPL_RETURN_SUCCESS;
 }
 
-//
 // Initialize shaders for drawing to screen
-//
 DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitShaders() {
 	HRESULT r = S_OK;
 
@@ -938,9 +921,7 @@ Error:
 	return DUPL_RETURN_SUCCESS;
 }
 
-//
 // Reset render target view
-//
 DUPL_RETURN D3D11DesktopDuplicationOutputManager::MakeRTV() {
 	HRESULT r = S_OK;
 
@@ -962,9 +943,7 @@ Error:
 	return DUPL_RETURN_SUCCESS;
 }
 
-//
 // Set new viewport
-//
 void D3D11DesktopDuplicationOutputManager::SetViewPort(UINT Width, UINT Height) {
 	D3D11_VIEWPORT VP;
 	VP.Width = static_cast<FLOAT>(Width);
@@ -976,9 +955,7 @@ void D3D11DesktopDuplicationOutputManager::SetViewPort(UINT Width, UINT Height) 
 	m_pDeviceContext->RSSetViewports(1, &VP);
 }
 
-//
 // Resize swapchain
-//
 DUPL_RETURN D3D11DesktopDuplicationOutputManager::ResizeSwapChain() {
 	HRESULT r = S_OK;
 	DUPL_RETURN Ret;
@@ -1022,9 +999,7 @@ Error:
 	return Ret;
 }
 
-//
 // Releases all references
-//
 void D3D11DesktopDuplicationOutputManager::CleanRefs() {
 	if (m_pVertexShader) {
 		m_pVertexShader->Release();

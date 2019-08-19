@@ -1,16 +1,11 @@
 #include "D3D11DesktopDuplicationManager.h"
-#include "RESULT/EHM.h"
 
-//
 // Constructor sets up references / variables
-//
 D3D11DesktopDuplicationManager::D3D11DesktopDuplicationManager() {
 	RtlZeroMemory(&m_OutputDesc, sizeof(m_OutputDesc));
 }
 
-//
 // Destructor simply calls CleanRefs to destroy everything
-//
 D3D11DesktopDuplicationManager::~D3D11DesktopDuplicationManager() {
 	if (m_pDeskDupl) {
 		m_pDeskDupl->Release();
@@ -33,9 +28,7 @@ D3D11DesktopDuplicationManager::~D3D11DesktopDuplicationManager() {
 	}
 }
 
-//
 // Initialize duplication interfaces
-//
 DUPL_RETURN D3D11DesktopDuplicationManager::InitDupl(_In_ ID3D11Device* pDevice, UINT Output) {
 	HRESULT r = S_OK;
 	m_OutputNumber = Output;
@@ -84,9 +77,7 @@ Error:
 	return DUPL_RETURN_SUCCESS;
 }
 
-//
 // Retrieves mouse info and write it into PtrInfo
-//
 DUPL_RETURN D3D11DesktopDuplicationManager::GetMouse(_Inout_ PTR_INFO* PtrInfo, _In_ DXGI_OUTDUPL_FRAME_INFO* pFrameInfo, INT OffsetX, INT OffsetY) {
 	// A non-zero mouse update timestamp indicates that there is a mouse position update and optionally a shape change
 	if (pFrameInfo->LastMouseUpdateTime.QuadPart == 0) {
@@ -153,10 +144,7 @@ Error:
 	return DUPL_RETURN_SUCCESS;
 }
 
-
-//
 // Get next frame and write it into pFrameData
-//
 _Success_(*Timeout == false && return == DUPL_RETURN_SUCCESS)
 DUPL_RETURN D3D11DesktopDuplicationManager::GetFrame(_Out_ FRAME_DATA* pFrameData, _Out_ bool* Timeout) {
 	HRESULT r = S_OK;
@@ -232,9 +220,7 @@ Error:
 	return DUPL_RETURN_SUCCESS;
 }
 
-//
 // Release frame
-//
 DUPL_RETURN D3D11DesktopDuplicationManager::DoneWithFrame() {
 	HRESULT r = S_OK;
 
@@ -251,9 +237,7 @@ Error:
 	return DUPL_RETURN_SUCCESS;
 }
 
-//
 // Gets output desc into DescPtr
-//
 void D3D11DesktopDuplicationManager::GetOutputDesc(_Out_ DXGI_OUTPUT_DESC* pOutputDescription) {
 	*pOutputDescription = m_OutputDesc;
 }

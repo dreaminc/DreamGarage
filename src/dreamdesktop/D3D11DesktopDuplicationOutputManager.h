@@ -1,15 +1,19 @@
 #ifndef _OUTPUTMANAGER_H_
 #define _OUTPUTMANAGER_H_
 
+#include "core/ehm/EHM.h"
+
+// Dream Desktop
+// dos/src/dreamdesktop/D3D11DesktopDuplicationOutputManager.h
+
+// Handles the task of drawing into a window.
+// Has the functionality to draw the mouse given a mouse shape buffer and position
+
 #include <stdio.h>
 
 #include "CommonTypes.h"
 #include "warning.h"
 
-//
-// Handles the task of drawing into a window.
-// Has the functionality to draw the mouse given a mouse shape buffer and position
-//
 class D3D11DesktopDuplicationOutputManager {
 public:
 	D3D11DesktopDuplicationOutputManager();

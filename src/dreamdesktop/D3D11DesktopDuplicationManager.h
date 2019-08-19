@@ -1,11 +1,14 @@
 #ifndef _DUPLICATIONMANAGER_H_
 #define _DUPLICATIONMANAGER_H_
 
+#include "core/ehm/EHM.h"
+
+// Dream Desktop
+// dos/src/dreamdesktop/D3D11DesktopDuplicationManager.h
+
 #include "CommonTypes.h"
-//#include "RESULT/EHM.h"
-//
+
 // Handles the task of duplicating an output.
-//
 class D3D11DesktopDuplicationManager //: public D3D11DesktopController
 {
 
