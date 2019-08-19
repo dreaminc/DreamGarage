@@ -1,6 +1,6 @@
 #include "AnimationState.h"
 
-#include "Primitives/DimObj.h"
+#include "core/dimension/DimObj.h"
 
 RESULT AnimationState::Compose(AnimationState state) {
 	ptPosition += state.ptPosition;

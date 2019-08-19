@@ -1,6 +1,6 @@
 #include "Simplex.h"
 
-#include "Primitives/vector.h"
+#include "core/primitives/vector.h"
 
 Simplex::Simplex() :
 	m_points_n(0)

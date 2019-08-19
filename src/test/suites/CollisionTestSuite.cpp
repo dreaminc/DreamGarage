@@ -1,18 +1,21 @@
 #include "CollisionTestSuite.h"
-#include "DreamOS.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
+#include "os/DreamOS.h"
+
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
 
 #include "PhysicsEngine/CollisionManifold.h"
 
-#include "Primitives/DimPlane.h"
-#include "Primitives/HysteresisCylinder.h"
-#include "Primitives/hand/hand.h"
+#include "core/dimension/DimPlane.h"
 
-#include "Scene/CameraNode.h"
-#include "Scene/ObjectStoreNode.h"
+#include "core/hysteresis/HysteresisCylinder.h"
+
+#include "core/hand/hand.h"
+
+#include "scene/CameraNode.h"
+#include "scene/ObjectStoreNode.h"
 
 CollisionTestSuite::CollisionTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("collision", pDreamOS)

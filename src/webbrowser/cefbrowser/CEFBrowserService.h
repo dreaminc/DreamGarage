@@ -1,16 +1,16 @@
 #ifndef CEF_BROWSER_SERVICE_H_
 #define CEF_BROWSER_SERVICE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/WebBrowser/CEFBrowser/CEFBrowserService.h
-
-#include "WebBrowser/WebBrowserService.h"
+// Dream Web Browser
+// dos/src/webbrowser/CEFBrowser/CEFBrowser/CEFBrowserService.h
 
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+
+#include "WebBrowser/WebBrowserService.h"
 
 #define CEF_PROCESS_NAME_DEFAULT "DreamCef.exe"
 

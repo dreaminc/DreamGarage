@@ -1,7 +1,10 @@
 #ifndef AIR_RESISTANCE_GENERATOR_H_
 #define AIR_RESISTANCE_GENERATOR_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Physics Engine
+// dos/src/modules/PhysicsEngine/AirResistanceGenerator.h
 
 // Dream Force Generator
 // The virtual class defining a force generator

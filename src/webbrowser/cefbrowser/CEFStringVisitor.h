@@ -1,13 +1,16 @@
 #ifndef CEF_STRING_VISITOR_H
 #define CEF_STRING_VISITOR_H
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
+
+// Dream Web Browser
+// dos/src/webbrowser/cefbrowser/CEFStringVisitor.h
+
 #include <regex>
+
 #include "include\cef_string_visitor.h"
 
-///
 // Implement this interface to receive string values asynchronously.
-///
 /*--cef(source=client)--*/
 class CEFStringVisitor : 
 	public CefStringVisitor 

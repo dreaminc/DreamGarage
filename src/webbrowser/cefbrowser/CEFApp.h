@@ -1,15 +1,15 @@
 #ifndef CEF_APP_H_
 #define CEF_APP_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/WebBrowser/CEFBrowser/CEFApp.h
-
-#include "Primitives/singleton.h"
+// Dream Web Browser
+// dos/src/webbrowser/CEFBrowser/CEFBrowser/CEFApp.h
 
 #include <memory>
 #include <list>
+
+#include "core/types/singleton.h"
 
 #ifdef LOG
 #undef LOG

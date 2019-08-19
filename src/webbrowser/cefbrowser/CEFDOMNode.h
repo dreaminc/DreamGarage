@@ -1,15 +1,16 @@
 #ifndef CEF_DOM_NODE_H_
 #define CEF_DOM_NODE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-#include "include/cef_dom.h"
-// DREAM OS
-// DreamOS/WebBrowser/CEFBrowser/CEFDOMNode.h
+// Dream Web Browser CEF
+// dos/src/webbrowser/cefbrowser/CEFDOMNode.h
 
 #include <string>
 
-#include "WebBrowser/DOMNode.h"
+#include "webbrowser/DOMNode.h"
+
+#include "include/cef_dom.h"
 
 class CEFDOMNode : public DOMNode {
 public:

@@ -1,10 +1,10 @@
 #ifndef WEB_BROWSER_SERVICE_H_
 #define WEB_BROWSER_SERVICE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/WebBrowser/WebBrowserService.h
+// Dream Web Browser
+// dos/src/webbrowser/WebBrowserService.h
 
 #include <string>
 

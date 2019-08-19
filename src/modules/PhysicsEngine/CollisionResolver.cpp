@@ -1,11 +1,13 @@
 #include "CollisionResolver.h"
-#include "CollisionDetector.h"
-#include "Primitives/DimObj.h"
-
-#include "CollisionManifold.h"
-#include "Primitives/BoundingVolume.h"
 
 #include <algorithm>
+
+#include "CollisionDetector.h"
+
+#include "core/dimension/DimObj.h"
+#include "core/bounding/BoundingVolume.h"
+
+#include "CollisionManifold.h"
 
 CollisionResolver::CollisionResolver() {
 	// empty

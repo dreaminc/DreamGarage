@@ -1,5 +1,6 @@
 #include "CapturedObj.h"
-#include "VirtualObj.h"
+
+#include "core/primitives/VirtualObj.h"
 
 CapturedObj::CapturedObj(VirtualObj *pObj, float threshold, plane planeContext, point ptOffset, point ptOrigin, vector vSurface) :
 	m_pObj(pObj),

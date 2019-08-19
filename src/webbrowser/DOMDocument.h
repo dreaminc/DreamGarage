@@ -1,10 +1,11 @@
 #ifndef DOM_DOCUMENT_H_
 #define DOM_DOCUMENT_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/WebBrowser/DOMDocument.h
+// Dream Web Browser
+// dos/src/webbrowser/DOMDocument.h
+
 // A representative DOM document class
 
 #include <memory>

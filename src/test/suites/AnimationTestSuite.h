@@ -1,14 +1,20 @@
 #ifndef ANIMATION_TEST_SUITE_H_
 #define ANIMATION_TEST_SUITE_H_
 
-#include "RESULT/EHM.h"
-#include "Test/DreamTestSuite.h"
+#include "core/ehm/EHM.h"
 
-#include "Primitives/Subscriber.h"
-#include "Sense/SenseKeyboard.h"
+// TODO: Move to tests
+// Dream Animation Test Suite
+// dos/src/modules/AnimationEngine/AnimationTestSuite.h
 
 #include <memory>
 #include <chrono>
+
+#include "DreamTestSuite.h"
+
+#include "core/types/Subscriber.h"
+
+#include "sense/SenseKeyboard.h"
 
 class DreamOS;
 class composite;

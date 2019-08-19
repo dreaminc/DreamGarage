@@ -1,10 +1,10 @@
 #ifndef CEF_RESOURCE_HANDLER_H_
 #define CEF_RESOURCE_HANDLER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/WebBrowser/CEFResourceHandler.h
+// Dream Web Browser
+// dos/src/webbrowser/CEFBrowser/CEFResourceHandler.h
 
 #include "include\cef_resource_handler.h"
 #include "include\cef_urlrequest.h"

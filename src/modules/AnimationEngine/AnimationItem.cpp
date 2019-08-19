@@ -1,5 +1,6 @@
 #include "AnimationItem.h"
-#include "Primitives/DimObj.h"
+
+#include "core/dimension/DimObj.h"
 
 AnimationItem::AnimationItem(AnimationState startState, AnimationState endState, double startTime, double duration) {
 	RESULT r = R_PASS;

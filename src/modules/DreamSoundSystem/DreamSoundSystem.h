@@ -3,7 +3,7 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
+// Dream Sound System Module
 // dos/src/module/DreamSoundSystem/DreamSoundSystem.h
 
 // The Dream Sound System module
@@ -11,7 +11,7 @@
 
 #include <memory>
 
-#include "module/DreamModule.h"
+#include "os/module/DreamModule.h"
 
 #include "sound/SoundCommon.h"
 #include "sound/SoundClient.h"

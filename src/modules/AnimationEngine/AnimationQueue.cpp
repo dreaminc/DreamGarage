@@ -1,6 +1,7 @@
 #include "AnimationQueue.h"
 #include "AnimationItem.h"
-#include "Primitives/DimObj.h"
+
+#include "core/dimension/DimObj.h"
 
 AnimationQueue::AnimationQueue() {
 	m_objectQueue = {};

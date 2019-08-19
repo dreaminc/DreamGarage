@@ -1,5 +1,6 @@
 #include "AirResistanceGenerator.h"
-#include "Primitives/ObjectState.h"
+
+#include "core/primitives/ObjectState.h"
 
 RESULT AirResistanceGenerator::Update() {
 	RESULT r = R_SUCCESS;

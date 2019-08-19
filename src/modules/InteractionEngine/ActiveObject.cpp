@@ -1,5 +1,6 @@
 #include "ActiveObject.h"
-#include "PhysicsEngine/ContactPoint.h"
+
+#include "modules/PhysicsEngine/ContactPoint.h"
 
 ActiveObject::ActiveObject(VirtualObj *pObject) :
 	m_pObject(pObject),

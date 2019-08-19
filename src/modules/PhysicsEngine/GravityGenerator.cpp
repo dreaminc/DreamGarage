@@ -1,5 +1,6 @@
 #include "GravityGenerator.h"
-#include "Primitives/ObjectState.h"
+
+#include "core/primitives/ObjectState.h"
 
 RESULT GravityGenerator::Update() {
 	RESULT r = R_SUCCESS;

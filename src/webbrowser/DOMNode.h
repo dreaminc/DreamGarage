@@ -1,10 +1,11 @@
 #ifndef DOM_NODE_H_
 #define DOM_NODE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/WebBrowser/DOMNode.h
+// Dream Webbrowser
+// dos/src/webbrowser/DOMNode.h
+
 // A representative DOMNode class to be used within the Web Browser 
 // classes 
 

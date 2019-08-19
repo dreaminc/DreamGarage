@@ -1,10 +1,10 @@
 #ifndef WEB_BROWSER_FACTORY_H_
 #define WEB_BROWSER_FACTORY_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/CEFBrowser/WebBrowserControllerFactory.h
+// Dream Webbrowser
+// dos/src/webbrowser/WebBrowserControllerFactory.h
 
 enum class WEB_BROWSER_TYPE {
 	CEF,

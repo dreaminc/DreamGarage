@@ -6,7 +6,7 @@
 
 #include "scene/ObjectStore.h"
 
-#include "module/AnimationEngine/AnimationQueue.h"
+#include "modules/AnimationEngine/AnimationQueue.h"
 #include "modules/PhysicsEngine/CollisionManifold.h"
 
 InteractionEngine::InteractionEngine(Sandbox *pSandbox) :

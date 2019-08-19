@@ -1,6 +1,6 @@
 #include "InteractionObjectEvent.h"
 
-#include "PhysicsEngine/ContactPoint.h"
+#include "modules/PhysicsEngine/ContactPoint.h"
 
 InteractionObjectEvent::InteractionObjectEvent() :
 	m_eventType(InteractionEventType::INTERACTION_EVENT_INVALID),

@@ -1,14 +1,13 @@
 #include "DreamSoundSystem.h"
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
-#include "Scene/ObjectStoreNode.h"
+#include "scene/ObjectStoreNode.h"
 
-#include "Sound/SoundClientFactory.h"
-#include "Sound/SoundFile.h"
-#include "Sound/SpatialSoundObject.h"
-
-#include "Sound/AudioPacket.h"
+#include "sound/SoundClientFactory.h"
+#include "sound/SoundFile.h"
+#include "sound/SpatialSoundObject.h"
+#include "sound/AudioPacket.h"
 
 DreamSoundSystem::DreamSoundSystem(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamSoundSystem>(pDreamOS, pContext)
