@@ -1,14 +1,17 @@
 #include "UserAreaControls.h"
-#include "DreamOS.h"
-#include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamGarage/DreamBrowser.h"
 
-#include "UI/UIButton.h"
+#include "os/DreamOS.h"
 
-#include "InteractionEngine/AnimationCurve.h"
-#include "InteractionEngine/AnimationItem.h"
+// TODO: Explore this
+#include "apps/DreamUserControlAreaApp/DreamUserControlAreaApp.h"
+#include "apps/DreamBrowserApp/DreamBrowserApp.h"
 
-#include "Primitives/font.h"
+#include "ui/UIButton.h"
+
+#include "modules/AnimationEngine/AnimationCurve.h"
+#include "modules/AnimationEngine/AnimationItem.h"
+
+#include "core/text/font.h"
 
 UserAreaControls::UserAreaControls(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIView(pHALImp,pDreamOS)

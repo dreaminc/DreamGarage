@@ -1,10 +1,10 @@
 #ifndef CEF_APP_OBSERVER_H_
 #define CEF_APP_OBSERVER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/WebBrowser/CEFBrowser/CEFApp.h
+// Dream WebBrowser CEF
+// dos/src/WebBrowser/CEFBrowser/CEFApp.h
 
 #ifdef LOG
 #undef LOG
@@ -21,7 +21,7 @@
 #include "include/cef_ssl_info.h"
 #include "include/cef_request_handler.h"
 
-#include "Cloud/Environment/EnvironmentAsset.h"
+#include "cloud/Environment/EnvironmentAsset.h"
 
 class CEFBrowserController;
 class CEFDOMNode;

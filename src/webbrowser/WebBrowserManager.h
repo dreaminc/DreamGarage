@@ -1,22 +1,21 @@
 #ifndef WEB_BROWSER_MANAGER_H_
 #define WEB_BROWSER_MANAGER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
+// Dream WebBrowser
 // DreamOS/WebBrowser/WebBrowserManager.h
 
 #include <list>
 #include <string>
 #include <memory>
 
-#include "Primitives/Types/UID.h"
-#include "Primitives/valid.h"
+#include "core/types/DObject.h"
 
 class WebBrowserController;
 class CEFApp;
 
-class WebBrowserManager : public valid {
+class WebBrowserManager : public DObject {
 public:
 	WebBrowserManager();
 	~WebBrowserManager();

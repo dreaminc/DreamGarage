@@ -34,7 +34,7 @@ Sandbox* SandboxFactory::MakeSandbox(SANDBOX_APP_TYPE type, DreamOS *pDOSHandle)
 
         case SANDBOX_APP_OSX: {
             #if defined(__APPLE__)
-                pSandbox = new OSXSandboxApp("DreamOSSandbox");
+                pSandbox = new OSXSandbox("DreamOSSandbox");
             #else
                 pSandbox = NULL;
                 DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);

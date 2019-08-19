@@ -1,13 +1,16 @@
 #ifndef UPDATE_MOUTH_MESSAGE_H_
 #define UPDATE_MOUTH_MESSAGE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/DreamGarage/UpdateMouthMessage.h
+// Dream Garage
+// dos/src/garage/UpdateMouthMessage.h
+
+// TODO: Belong here?
 // A useful user update mouth message
 
 #include <string>
+
 #include "DreamGarageMessage.h"
 
 // TODO: We might want to switch this out with other messages

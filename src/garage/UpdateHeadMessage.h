@@ -1,18 +1,20 @@
 #ifndef UPDATE_HEAD_MESSAGE_H_
 #define UPDATE_HEAD_MESSAGE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/Message/Message.h
-// Base Message object
+// Dream Garage
+// dos/src/garage/UpdateHeadMessage.h
+
+// TODO: Should this be here?
 
 #include <string>
+
 #include "DreamGarageMessage.h"
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
-#include "Primitives/quaternion.h"
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
+#include "core/primitives/quaternion.h"
 
 class UpdateHeadMessage : public DreamGarageMessage {
 

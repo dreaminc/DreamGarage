@@ -1,18 +1,20 @@
 #ifndef UPDATE_HAND_MESSAGE_H_
 #define UPDATE_HAND_MESSAGE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Dimension/Cloud/Message/Message.h
-// Base Message object
+// Dream Garage
+// dos/src/garage/UpdateHandMessage.h
+
+// TODO: Does this belong here?
 
 #include <string>
+
 #include "DreamGarageMessage.h"
 
 class hand;
 
-#include "Primitives/hand/HandState.h"
+#include "core/hand/HandState.h"
 
 // TODO: We might want to switch this out with other messages
 

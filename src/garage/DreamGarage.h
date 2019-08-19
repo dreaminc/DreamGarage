@@ -15,7 +15,7 @@
 #include "core/primitives/quaternion.h"  // for quaternion
 #include "core/primitives/vector.h"      // for vector
 
-#include "sandbox/Sandbox.h"     // for SandboxApp, SandboxApp::PipelineType
+#include "sandbox/Sandbox.h"     // for Sandbox, Sandbox::PipelineType
 
 #include "array"                    // for array
 #include "memory"                   // for shared_ptr
@@ -108,8 +108,9 @@ public:
 	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) override;
 	virtual RESULT Update(void) override;
 
+	// TODO: Pull pipeline type out of sandbox
 	RESULT SetupMirrorPipeline(Pipeline *pRenderPipeline);
-	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) override;
+	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, Sandbox::PipelineType pipelineType) override;
 	virtual version GetDreamVersion() override;
 
 	virtual CameraNode *GetAuxCameraNode() override;

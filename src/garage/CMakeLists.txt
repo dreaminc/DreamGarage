@@ -9,6 +9,10 @@ file(GLOB SOURCES
 )
 source_group("" FILES ${SOURCES})
 
+# TODO: This should not be here!!!!!!
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
+add_definitions(-DWEBRTC_WIN)
+
 # Force Include the src/core/config.h
 if(MSVC)
     add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")

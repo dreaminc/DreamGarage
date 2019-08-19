@@ -1,10 +1,11 @@
 #ifndef CEF_BROWSER_MANAGER_H_
 #define CEF_BROWSER_MANAGER_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/WebBrowser/CEFBrowser/CEFBrowserManager.h
+// Dream Webbrowser CEF 
+// dos/src/webbrowser/CEFBrowser/CEFBrowserManager.h
+
 // The CEF implementation of browser manager
 
 #define CEF_PROCESS_NAME_DEFAULT "DreamCef.exe"
@@ -21,9 +22,10 @@
 #include <mutex>
 #include <condition_variable>
 #include <string>
-#include "WebBrowser/WebBrowserManager.h"
 
-#include "Cloud/Environment/EnvironmentAsset.h"
+#include "webbrowser/WebBrowserManager.h"
+
+#include "cloud/Environment/EnvironmentAsset.h"
 
 #include "CEFAppObserver.h"
 

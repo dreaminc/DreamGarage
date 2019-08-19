@@ -24,7 +24,7 @@
 
 #include <memory>
 
-class SandboxApp; 
+class Sandbox; 
 class Windows64App;
 class OGLDreamConsole;
 class font;

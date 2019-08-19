@@ -15,7 +15,7 @@ Win64OGLRenderingContext::~Win64OGLRenderingContext() {
 }
 
 
-// TODO: Might make sense to push this into the SandboxApp since the cast might
+// TODO: Might make sense to push this into the Sandbox since the cast might
 // cost some performance
 inline RESULT Win64OGLRenderingContext::MakeCurrentContext() {
 	Win64Sandbox *pWin64Sandbox = reinterpret_cast<Win64Sandbox*>(GetParentSandbox());

@@ -6,8 +6,9 @@
 // Dream Form App
 // dos/src/app/DreamFormApp/DreamFormApp.h
 
-#include "app/DreamApp.h"
 #include "os/DreamOS.h"
+
+#include "os/app/DreamApp.h"
 
 // TODO: This should not be here
 #include "apps/DreamBrowserApp/DreamBrowserApp.h"

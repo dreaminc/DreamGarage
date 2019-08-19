@@ -2,6 +2,8 @@
 
 cmake_minimum_required(VERSION 3.14)
 
+set(DREAM_VERSION 1.1.0)
+
 # Force Include the src/core/config.h
 if(MSVC)
     add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")
@@ -25,6 +27,8 @@ include_directories(src/third_party/CEF/CEF_BINARY_3538)
 include_directories(src/third_party/json/include)
 
 add_definitions(-DUNICODE)
+
+configure_file(${CMAKE_SOURCE_DIR}/src/core/config.h.in ${CMAKE_SOURCE_DIR}/src/core/config.h)
 
 add_subdirectory(src)
 

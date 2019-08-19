@@ -8,7 +8,7 @@
 
 // TODO: There should be no dependencies between apps
 // or they should be unified 
-#include "app/DreamFormApp/DreamFormApp.h"
+#include "apps/DreamFormApp/DreamFormApp.h"
 
 #include "sandbox/CredentialManager.h"
 

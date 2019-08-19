@@ -19,6 +19,8 @@
 
 //#define USE_LOCALHOST
 
+#define DREAM_VERSION "@DREAM_VERSION@"
+
 // Comment out to use production
 //#define _USE_TEST_APP	
 //#define _UNIT_TESTING

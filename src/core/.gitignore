@@ -1,0 +1,3 @@
+# Ignore config.h since CMAKE is now generating it
+# from config.h.in
+config.h
