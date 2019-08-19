@@ -1,7 +1,7 @@
 # src/CMakeList.txt : CMake project for DOS root source directory
 
 add_subdirectory(apps)
-# add_subdirectory(client)
+add_subdirectory(client)
 add_subdirectory(cloud)
 add_subdirectory(core)
 add_subdirectory(dreamcef)
@@ -18,7 +18,7 @@ add_subdirectory(scene)
 add_subdirectory(sense)
 add_subdirectory(sound)
 add_subdirectory(test)
-# add_subdirectory(testclient)
+add_subdirectory(testclient)
 # # add_subdirectory(third_party)
 add_subdirectory(ui)
 add_subdirectory(webbrowser)
