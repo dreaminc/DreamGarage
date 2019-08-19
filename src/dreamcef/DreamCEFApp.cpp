@@ -1,11 +1,11 @@
 #include "DreamCEFApp.h"
 
+#include <functional>
+
 #include "CEFExtension.h"
 #include "CEFV8Handler.h"
 
-#include <functional>
-
-#include "DreamLogger/DreamLogger.h"
+#include "logger/DreamLogger.h"
 
 DreamCEFApp::DreamCEFApp() {
 	// empty

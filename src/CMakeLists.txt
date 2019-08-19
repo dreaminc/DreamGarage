@@ -4,7 +4,7 @@
 # add_subdirectory(client)
 add_subdirectory(cloud)
 add_subdirectory(core)
-# add_subdirectory(dreamcef)
+add_subdirectory(dreamcef)
 # add_subdirectory(dreamdesktop)
 add_subdirectory(garage)
 add_subdirectory(hal)
