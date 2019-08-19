@@ -1,34 +1,40 @@
-#include "DreamShareView.h" 
-#include "DreamOS.h"
+#include "DreamShareViewApp.h" 
 
-#include "Primitives/quad.h"
-#include "Primitives/texture.h"
-#include "Primitives/color.h"
-#include "Primitives/font.h"
-#include "Primitives/Framebuffer.h"
+#include "os/DreamOS.h"
+
+#include "core/primitives/quad.h"
+#include "core/primitives/texture.h"
+#include "core/primitives/color.h"
+#include "core/primitives/Framebuffer.h"
+
+#include "core/text/font.h"
 
 // TODO: make enabling PBO (un)pack more portable
-#include "HAL/opengl/OGLTexture.h"
-#include "HAL/opengl/OGLText.h"
+#include "hal/ogl/OGLTexture.h"
+#include "hal/ogl/OGLText.h"
 
 #include "DreamShareViewShareMessage.h"
-#include "DreamControlView/UIControlView.h"
-#include "DreamUserApp.h"
 
-#include "Sound/AudioPacket.h"
-#include "DreamGarage/AudioDataMessage.h"
-#include "Sound/SpatialSoundObject.h"
+// TODO: Fix
+#include "apps/DreamUserApp/DreamUserApp.h"
 
-#include "UI/UIView.h"
-#include "UI/UIPointerLabel.h"
+#include "sound/AudioPacket.h"
+#include "garage/AudioDataMessage.h"
 
-DreamShareView::DreamShareView(DreamOS *pDreamOS, void *pContext) :
-	DreamApp<DreamShareView>(pDreamOS, pContext)
+#include "sound/SpatialSoundObject.h"
+
+// TODO: Fix
+#include "ui/DreamControlView/UIControlView.h"
+#include "ui/UIView.h"
+#include "ui/UIPointerLabel.h"
+
+DreamShareViewApp::DreamShareViewApp(DreamOS *pDreamOS, void *pContext) :
+	DreamApp<DreamShareViewApp>(pDreamOS, pContext)
 {
 	// Empty
 }
 
-DreamShareView::~DreamShareView() {
+DreamShareViewApp::~DreamShareViewApp() {
 	RESULT r = R_PASS;
 
 	CR(Shutdown());
@@ -37,7 +43,7 @@ Error:
 	return;
 }
 
-RESULT DreamShareView::InitializeApp(void *pContext) {
+RESULT DreamShareViewApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
 	SetAppName("DreamShareView");
@@ -106,7 +112,7 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	m_pMirrorQuad->RotateXByDeg(90.0f);
 	m_pMirrorQuad->SetVisible(false);
 
-	GetDOS()->AddObjectToUIGraph(GetComposite(), (SandboxApp::PipelineType::AUX | SandboxApp::PipelineType::MAIN));
+	GetDOS()->AddObjectToUIGraph(GetComposite(), (Sandbox::PipelineType::AUX | Sandbox::PipelineType::MAIN));
 
 	{
 		auto pView = GetComposite()->AddUIView(pDreamOS);
@@ -114,7 +120,7 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 
 			auto pLabel = pView->AddUIPointerLabel();
 			m_pointerViewPool.push(pLabel);
-			GetDOS()->AddObjectToUIGraph(pLabel.get(), (SandboxApp::PipelineType::AUX | SandboxApp::PipelineType::MAIN));
+			GetDOS()->AddObjectToUIGraph(pLabel.get(), (Sandbox::PipelineType::AUX | Sandbox::PipelineType::MAIN));
 
 		}
 	}
@@ -123,11 +129,11 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::OnAppDidFinishInitializing(void *pContext) {
+RESULT DreamShareViewApp::OnAppDidFinishInitializing(void *pContext) {
 	return R_PASS;
 }
 
-RESULT DreamShareView::Update(void *pContext) {
+RESULT DreamShareViewApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 	
 	if (m_fReceivingStream && m_pendingFrame.fPending) {
@@ -164,11 +170,11 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::Shutdown(void *pContext) {
+RESULT DreamShareViewApp::Shutdown(void *pContext) {
 	return R_PASS;
 }
 
-RESULT DreamShareView::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+RESULT DreamShareViewApp::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
 	DreamShareViewMessage *pDreamShareViewMessage = (DreamShareViewMessage*)(pDreamAppMessage);
@@ -194,7 +200,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::HandleShareMessage(PeerConnection* pPeerConnection, DreamShareViewShareMessage *pShareMessage) {
+RESULT DreamShareViewApp::HandleShareMessage(PeerConnection* pPeerConnection, DreamShareViewShareMessage *pShareMessage) {
 	RESULT r = R_PASS;
 
 	CN(pShareMessage);
@@ -230,7 +236,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, DreamShareViewPointerMessage *pUpdatePointerMessage) {
+RESULT DreamShareViewApp::HandlePointerMessage(PeerConnection* pPeerConnection, DreamShareViewPointerMessage *pUpdatePointerMessage) {
 	RESULT r = R_PASS;
 
 	CN(pUpdatePointerMessage);
@@ -259,40 +265,39 @@ Error:
 	return r;
 }
 
-DreamShareView* DreamShareView::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
-	DreamShareView *pDreamApp = new DreamShareView(pDreamOS, pContext);
+DreamShareViewApp* DreamShareViewApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
+	DreamShareViewApp *pDreamApp = new DreamShareViewApp(pDreamOS, pContext);
 	return pDreamApp;
 }
 
-RESULT DreamShareView::ShowLoadingTexture() {
+RESULT DreamShareViewApp::ShowLoadingTexture() {
 	m_pCastQuad->SetDiffuseTexture(m_pLoadingTexture.get());
 	return R_PASS;
 }
 
-RESULT DreamShareView::ShowCastingTexture() {
+RESULT DreamShareViewApp::ShowCastingTexture() {
 	m_pCastQuad->SetDiffuseTexture(m_pCastTexture);
 	return R_PASS;
 }
 
-RESULT DreamShareView::SetCastingTexture(texture* pNewCastTexture) {
+RESULT DreamShareViewApp::SetCastingTexture(texture* pNewCastTexture) {
 	RESULT r = R_PASS;
 
 	m_pCastTexture = pNewCastTexture;
 
-//Error:
+Error:
 	return r;
 }
 
-texture* DreamShareView::GetCastingTexture() {
-//	return m_pCastTexture;
+texture* DreamShareViewApp::GetCastingTexture() {
 	return m_pCastQuad->GetTextureDiffuse();
 }
 
-texture* DreamShareView::GetPointingTexture() {
+texture* DreamShareViewApp::GetPointingTexture() {
 	return m_pPointerContext->GetFramebuffer()->GetColorTexture();
 }
 
-RESULT DreamShareView::Show() {
+RESULT DreamShareViewApp::Show() {
 	RESULT r = R_PASS;
 	//CR(GetComposite()->SetVisible(true));
 	m_pCastQuad->SetVisible(true);
@@ -304,7 +309,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::Hide() {
+RESULT DreamShareViewApp::Hide() {
 	RESULT r = R_PASS;
 	//CR(GetComposite()->SetVisible(false));
 	m_pCastQuad->SetVisible(false);
@@ -316,7 +321,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
+RESULT DreamShareViewApp::StartReceiving(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
 	m_pStreamerPeerConnection = pPeerConnection;
@@ -356,7 +361,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::PendReceiving() {
+RESULT DreamShareViewApp::PendReceiving() {
 	RESULT r = R_PASS;
 
 	//ShowCastingTexture();
@@ -368,7 +373,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::StopReceiving() {
+RESULT DreamShareViewApp::StopReceiving() {
 	RESULT r = R_PASS;
 
 	m_pStreamerPeerConnection = nullptr;
@@ -390,7 +395,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::StopSending() {
+RESULT DreamShareViewApp::StopSending() {
 	RESULT r = R_PASS;
 
 	CR(SetStreamingState(false));
@@ -412,12 +417,12 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::IsReceivingStream(bool &fReceivingStream) {
+RESULT DreamShareViewApp::IsReceivingStream(bool &fReceivingStream) {
 	fReceivingStream = m_fReceivingStream;
 	return R_PASS;
 }
 
-RESULT DreamShareView::HandleStopEvent() {
+RESULT DreamShareViewApp::HandleStopEvent() {
 	RESULT r = R_PASS;
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
@@ -428,7 +433,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::ShowPointers() {
+RESULT DreamShareViewApp::ShowPointers() {
 	RESULT r = R_PASS;
 
 	for (auto it = m_pointingObjects.begin(); it != m_pointingObjects.end(); it++) {
@@ -440,7 +445,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::HidePointers() {
+RESULT DreamShareViewApp::HidePointers() {
 	RESULT r = R_PASS;
 
 	for (auto it = m_pointingObjects.begin(); it != m_pointingObjects.end(); it++) {
@@ -452,7 +457,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::BeginStream() {
+RESULT DreamShareViewApp::BeginStream() {
 	RESULT r = R_PASS;
 
 	m_pCastQuad->SetVisible(true);
@@ -478,7 +483,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::SetStreamingState(bool fStreaming) {
+RESULT DreamShareViewApp::SetStreamingState(bool fStreaming) {
 	RESULT r = R_PASS;
 
 	m_fStreaming = fStreaming;
@@ -495,7 +500,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::SetReceivingState(bool fReceiving) {
+RESULT DreamShareViewApp::SetReceivingState(bool fReceiving) {
 	RESULT r = R_PASS;
 
 	m_fReceivingStream = fReceiving;
@@ -509,11 +514,11 @@ Error:
 	return r;
 }
 
-bool DreamShareView::IsStreaming() {
+bool DreamShareViewApp::IsStreaming() {
 	return m_fStreaming;
 }
 
-RESULT DreamShareView::SendDOSMessage() {
+RESULT DreamShareViewApp::SendDOSMessage() {
 	RESULT r = R_PASS;
 
 	if (m_fIsActive) {
@@ -529,7 +534,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType) {
+RESULT DreamShareViewApp::BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType) {
 	RESULT r = R_PASS;
 
 	DreamShareViewShareMessage *pDreamBrowserMessage = new DreamShareViewShareMessage(0, 0, GetAppUID(), msgType, ackType);
@@ -541,7 +546,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::BroadcastVideoFrame(const void *pBuffer, int width, int height) {
+RESULT DreamShareViewApp::BroadcastVideoFrame(const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
 	if (!m_fReceivingStream) {
@@ -564,11 +569,11 @@ Error:
 	return r;
 }
 
-PeerConnection *DreamShareView::GetStreamingPeerConnection() {
+PeerConnection *DreamShareViewApp::GetStreamingPeerConnection() {
 	return m_pStreamerPeerConnection;
 }
 
-RESULT DreamShareView::BroadcastAudioPacket(const AudioPacket &pendingAudioPacket) {
+RESULT DreamShareViewApp::BroadcastAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	// TODO: this
@@ -585,7 +590,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT DreamShareViewApp::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	// TODO: Create a pending frame thing
@@ -636,7 +641,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT DreamShareViewApp::SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	// TODO: programmatic 
@@ -665,7 +670,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::HandleChromeAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) {
+RESULT DreamShareViewApp::HandleChromeAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) {
 	RESULT r = R_PASS;
 
 	// TODO: Handle channels?
@@ -692,7 +697,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::UpdateFromPendingVideoFrame() {
+RESULT DreamShareViewApp::UpdateFromPendingVideoFrame() {
 	RESULT r = R_PASS;
 
 	int castBufferSize = m_castpxWidth * m_castpxHeight * 4;
@@ -754,7 +759,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::UpdateScreenPosition(point ptPosition, quaternion qOrientation, float scale) {
+RESULT DreamShareViewApp::UpdateScreenPosition(point ptPosition, quaternion qOrientation, float scale) {
 	RESULT r = R_PASS;
 
 	m_pCastQuadComposite->SetPosition(ptPosition);
@@ -777,7 +782,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::AllocateSpheres(long userID, std::string strInitials) {
+RESULT DreamShareViewApp::AllocateSpheres(long userID, std::string strInitials) {
 	RESULT r = R_PASS;
 	std::vector<std::shared_ptr<UIPointerLabel>> userPointers;
 
@@ -802,7 +807,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::AllocatePointers(long userID, int seatPosition) {
+RESULT DreamShareViewApp::AllocatePointers(long userID, int seatPosition) {
 	RESULT r = R_PASS;
 
 	std::vector<std::shared_ptr<UIPointerLabel>> userPointers;
@@ -826,7 +831,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::AllocateSpheres(long userID) {
+RESULT DreamShareViewApp::AllocateSpheres(long userID) {
 	RESULT r = R_PASS;
 
 	std::vector<std::shared_ptr<UIPointerLabel>> userPointers;
@@ -848,7 +853,7 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::DeallocateSpheres(long userID) {
+RESULT DreamShareViewApp::DeallocateSpheres(long userID) {
 	RESULT r = R_PASS;
 
 	std::vector<std::shared_ptr<UIPointerLabel>> userPointers;

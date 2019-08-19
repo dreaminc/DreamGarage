@@ -1,46 +1,48 @@
 #include "UITestSuite.h"
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
-#include "PhysicsEngine/CollisionManifold.h"
-#include "InteractionEngine/InteractionObjectEvent.h"
-#include "InteractionEngine/AnimationCurve.h"
-#include "InteractionEngine/AnimationItem.h"
+#include "modules/PhysicsEngine/CollisionManifold.h"
+#include "modules/InteractionEngine/InteractionObjectEvent.h"
 
-#include "DreamGarage/DreamContentView.h"
-#include "DreamGarage/DreamBrowser.h"
+#include "modules/AnimationEngine/AnimationCurve.h"
+#include "modules/AnimationEngine/AnimationItem.h"
 
-#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
-#include "Cloud/WebRequest.h"
+#include "apps/DreamContentViewApp/DreamContentViewApp.h"
+#include "apps/DreamBrowserApp/DreamBrowserApp.h"
+#include "apps/DreamUIBarApp/DreamUIBarApp.h"
 
-#include "UI/UIMenuItem.h"
-#include "DreamGarage/DreamUIBar.h"
-#include "UI/UIKeyboard.h"
-#include "UI/UIEvent.h"
-#include "UI/UIView.h"
-#include "UI/UIButton.h"
+#include "webbrowser/CEFBrowser/CEFBrowserManager.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
+#include "cloud/WebRequest.h"
+#include "cloud/Environment/EnvironmentAsset.h"
+#include "cloud/Menu/MenuNode.h"
+#include "cloud/HTTP/HTTPController.h"
+#include "cloud/WebRequest.h"
 
-#include "Sandbox/CommandLineManager.h"
-#include "Cloud/Environment/EnvironmentAsset.h"
-#include "Cloud/Menu/MenuNode.h"
-#include "Cloud/HTTP/HTTPController.h"
-#include "Cloud/WebRequest.h"
+#include "ui/UIMenuItem.h"
+#include "ui/UIKeyboard.h"	// TODO: Keyboard should be a module
+#include "ui/UIKeyboardLayout.h"
+#include "ui/UIEvent.h"
+#include "ui/UIView.h"
+#include "ui/UIButton.h"
+
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
+
+#include "sandbox/CommandLineManager.h"
 
 #include "Core/Utilities.h"
 
-#include "Primitives/font.h"
-#include "Primitives/text.h"
-#include "Primitives/framebuffer.h"
-#include "Primitives/hand/hand.h"
+#include "core/text/font.h"
+#include "core/text/text.h"
 
-#include "UI/UIKeyboardLayout.h"
+#include "core/primitives/framebuffer.h"
+#include "core/hand/hand.h"
 
-#include "Scene/ObjectStoreNode.h"
-#include "Scene/CameraNode.h"
+#include "scene/ObjectStoreNode.h"
+#include "scene/CameraNode.h"
 
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("ui", pDreamOS)

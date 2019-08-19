@@ -6,14 +6,14 @@
 #include <thread>
 
 // TODO: Get rid of these
-#include "app/DreamShareViewApp/DreamShareViewApp.h"
-#include "app/DreamUserControlAreaApp/DreamUserControlAreaApp.h"
-#include "app/DreamFormApp/DreamFormApp.h"
+#include "apps/DreamShareViewApp/DreamShareViewApp.h"
+#include "apps/DreamUserControlAreaApp/DreamUserControlAreaApp.h"
+#include "apps/DreamFormApp/DreamFormApp.h"
 
 #include "core/Utilities.h"
 
 #include "modules/PhysicsEngine/CollisionManifold.h"
-#include "module/AnimationEngine/AnimationItem.h"
+#include "modules/AnimationEngine/AnimationItem.h"
 
 #include "webbrowser/CEFBrowser/CEFBrowserManager.h"
 #include "webbrowser/WebBrowserController.h"
@@ -26,8 +26,8 @@
 #include "sound/AudioPacket.h"
 #include "sound/SoundBuffer.h"
 
-// TODO: Should just be texture
-#include "hal\opengl\OGLTexture.h"	// necessary for the dynamic cast to enable PBO
+// TODO: Should just be texture (no OGL)
+#include "hal\ogl\OGLTexture.h"	// necessary for the dynamic cast to enable PBO
 
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamBrowser>(pDreamOS, pContext)

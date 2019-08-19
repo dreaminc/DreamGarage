@@ -1,69 +1,71 @@
-#include "DreamOSTestSuite.h"
-#include "DreamOS.h"
-
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/UIStageProgram.h"
-
-#include "HAL/opengl/OGLProgramScreenFade.h"
-
-//#include "DreamControlView\UIControlView.h"
-
-#include "DreamGarage\DreamBrowser.h"
-#include "WebBrowser\WebBrowserController.h"
+#include "DOSTestSuite.h"
 
 #include <chrono>
-
-#include "Sound/AudioPacket.h"
-
-#include "Cloud/CloudController.h"             // for CloudController
-#include "DreamGarage/DreamSoundSystem.h"      // for DreamSoundSystem, DreamSoundSystem::MIXDOWN_TARGET, DreamSoundSystem::observer
-#include "HAL/EnvironmentProgram.h"  // for EnvironmentProgram
-#include "HAL/HALImp.h"                        // for HALImp
-#include "HAL/opengl/OGLProgram.h"             // for OGLProgram
-#include "HAL/Pipeline/Pipeline.h"             // for Pipeline
 #include "memory"                              // for shared_ptr
-#include "Primitives/DimObj.h"                 // for DimObj
-#include "Primitives/model/model.h"            // for model
-#include "Primitives/quad.h"                   // for quad
-#include "Primitives/quaternion.h"             // for quaternion
-#include "Primitives/ray.h"                    // for ray
-#include "Primitives/sphere.h"                 // for sphere
-#include "Primitives/texture.h"                // for texture, texture::type, texture::type::TEXTURE_2D
-#include "Primitives/vector.h"                 // for vector
-#include "Primitives/volume.h"                 // for volume
-#include "core/ehm/EHM.h"                        // for CR, CN, CNM, CRM, DEBUG_LINEOUT, CBM, DOSLOG
-#include "Sandbox/CommandLineManager.h"        // for CommandLineManager
-#include "Sandbox/CredentialManager.h"         // for CredentialManager, CredentialManager::type, CredentialManager::type::CREDENTIAL_GENERIC
-#include "Sense/SenseController.h"             // for SenseControllerEvent, ControllerState, SenseControllerEventType::SENSE_CONTROLLER_MENU_UP, SenseControllerEventType::SENSE_CONTROLLER_META_CLOSED
-#include "Test/TestObject.h"                   // for TestObject::TestDescriptor, TestObject
 #include "vcruntime_new.h"                     // for operator new, operator delete
 #include "vcruntime_string.h"                  // for memcpy
 #include <stddef.h>                            // for size_t
 #include <WinUser.h>                           // for SendMessage
 
+#include "os/DreamOS.h"
+
+#include "pipeline/ProgramNode.h"
+#include "pipeline/Pipeline.h"             // for Pipeline
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
+
+#include "sandbox/CommandLineManager.h"        // for CommandLineManager
+#include "sandbox/CredentialManager.h"         // for CredentialManager, CredentialManager::type, CredentialManager::type::CREDENTIAL_GENERIC
+
+#include "test/TestObject.h"                   // for TestObject::TestDescriptor, TestObject
+
+#include "hal/UIStageProgram.h"
+
+// TODO: NO OGL at this level
+#include "hal/ogl/OGLProgramReflection.h"
+#include "hal/ogl/OGLProgramRefraction.h"
+#include "hal/ogl/OGLProgramSkybox.h"
+#include "hal/ogl/OGLProgramWater.h"
+#include "HAL/ogl/OGLProgramSkyboxScatter.h"
+#include "HAL/ogl/OGLProgramScreenFade.h"
+#include "hal/ogl/OGLProgram.h"             // for OGLProgram
+#include "hal/EnvironmentProgram.h"  // for EnvironmentProgram
+#include "hal/HALImp.h"                        // for HALImp
 #include "HAL/SkyboxScatterProgram.h"
-#include "HAL/opengl/OGLProgramSkyboxScatter.h"
-#include  "DreamGarage/DreamEnvironmentApp.h"
-#include "DreamGarage/DreamUIBar.h"
 
-#include "Scene/ObjectStoreNode.h"
-#include "Scene/CameraNode.h"
+#include "core/dimension/DimObj.h"                 // for DimObj
 
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
-#include "HAL/Pipeline/ProgramNode.h"
+#include "core/model/model.h"            // for model
+#include "core/hand/hand.h"
 
-#include "Primitives/hand/hand.h"
+#include "core/primitives/quad.h"                   // for quad
+#include "core/primitives/quaternion.h"             // for quaternion
+#include "core/primitives/ray.h"                    // for ray
+#include "core/primitives/sphere.h"                 // for sphere
+#include "core/primitives/texture.h"                // for texture, texture::type, texture::type::TEXTURE_2D
+#include "core/primitives/vector.h"                 // for vector
+#include "core/primitives/volume.h"                 // for volume
 
-#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+#include "scene/ObjectStoreNode.h"
+#include "scene/CameraNode.h"
 
-#include "DreamTestingApp.h"
-#include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
+#include "apps/DreamBrowserApp/DreamBrowserApp.h"
+#include "apps/DreamEnvironmentApp/DreamEnvironmentApp.h"
+#include "apps/DreamUIBarApp/DreamUIBarApp.h"
+#include "apps/DreamTestingApp/DreamTestingApp.h"
+#include "apps/DreamDesktopDuplicationApp/DreamDesktopApp.h"
+#include "apps/DreamShareViewApp/DreamShareViewApp.h"
 
-#include "HAL/opengl/OGLProgramReflection.h"
-#include "HAL/opengl/OGLProgramRefraction.h"
-#include "HAL/opengl/OGLProgramSkybox.h"
-#include "HAL/opengl/OGLProgramWater.h"
+#include "modules/DreamSoundSystem/DreamSoundSystem.h"      // for DreamSoundSystem, DreamSoundSystem::MIXDOWN_TARGET, DreamSoundSystem::observer
+
+#include "webbrowser/WebBrowserController.h"
+#include "webbrowser/CEFBrowser/CEFBrowserManager.h"
+
+#include "sound/AudioPacket.h"
+
+#include "cloud/CloudController.h"             // for CloudController
+
+#include "sense/SenseController.h"             // for SenseControllerEvent, ControllerState, SenseControllerEventType::SENSE_CONTROLLER_MENU_UP, SenseControllerEventType::SENSE_CONTROLLER_META_CLOSED
 
 class CEFBrowserManager;
 class DOMNode;
@@ -88,13 +90,13 @@ class light;
 class user;
 struct InteractionObjectEvent;
 
-DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
+DOSTestSuite::DOSTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("dreamos", pDreamOS)
 {
 	// 
 }
 
-RESULT DreamOSTestSuite::AddTests() {
+RESULT DOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 	CR(AddTestDreamObjectModule());
@@ -143,7 +145,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::SetupTestSuite() {
+RESULT DOSTestSuite::SetupTestSuite() {
 	RESULT r = R_PASS;
 
 	CNM(m_pDreamOS, "DreamOS handle is not set");
@@ -152,7 +154,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::SetupPipeline(std::string strRenderProgramName) {
+RESULT DOSTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	RESULT r = R_PASS;
 
 	ProgramNode* pRenderProgramNode = nullptr;
@@ -291,7 +293,7 @@ Error:
 }
 */
 
-WebBrowserPoint DreamOSTestSuite::GetRelativeBrowserPointFromContact(point ptIntersectionContact) {
+WebBrowserPoint DOSTestSuite::GetRelativeBrowserPointFromContact(point ptIntersectionContact) {
 	WebBrowserPoint webPt;
 	webPt.x = 0;
 	webPt.y = 0;
@@ -335,7 +337,7 @@ WebBrowserPoint DreamOSTestSuite::GetRelativeBrowserPointFromContact(point ptInt
 // InteractionObjectEvent
 // Note that all of this will only occur if we're in testing mode
 //*
-RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
+RESULT DOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 	/*
 #ifdef _USE_TEST_APP
@@ -512,7 +514,7 @@ Error:
 
 // TODO: Do we need this anymore? 
 // TODO: Should we create a VR/AR HMD test suite
-RESULT DreamOSTestSuite::AddTestMeta() {
+RESULT DOSTestSuite::AddTestMeta() {
 	RESULT r = R_PASS;
 
 	struct TestContext : public Subscriber<SenseControllerEvent> {
@@ -630,7 +632,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestDreamUIBar() {
+RESULT DOSTestSuite::AddTestDreamUIBar() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 6000.0f;
@@ -687,7 +689,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestDreamBrowser() {
+RESULT DOSTestSuite::AddTestDreamBrowser() {
 	RESULT r = R_PASS;
 
 	TestObject::TestDescriptor testDescriptor;
@@ -790,7 +792,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestCaptureApp() {
+RESULT DOSTestSuite::AddTestCaptureApp() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 3000.0f;
@@ -862,7 +864,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestUIKeyboard() {
+RESULT DOSTestSuite::AddTestUIKeyboard() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 10000.0;
@@ -936,7 +938,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestDreamLogger() {
+RESULT DOSTestSuite::AddTestDreamLogger() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 3000.0f;
@@ -1016,7 +1018,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestNamedPipes() {
+RESULT DOSTestSuite::AddTestNamedPipes() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 5000.0f;
@@ -1181,7 +1183,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestDreamObjectModule() {
+RESULT DOSTestSuite::AddTestDreamObjectModule() {
 	RESULT r = R_PASS;
 
 	TestObject::TestDescriptor testDescriptor;
@@ -1421,7 +1423,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestDreamSoundSystem() {
+RESULT DOSTestSuite::AddTestDreamSoundSystem() {
 	RESULT r = R_PASS;
 
 	std::string strTestName = "dreamsoundsystem";
@@ -1655,7 +1657,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestDreamVCam() {
+RESULT DOSTestSuite::AddTestDreamVCam() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 500000.0f;
@@ -1932,7 +1934,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestModuleManager() {
+RESULT DOSTestSuite::AddTestModuleManager() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 3000.0f;
@@ -2072,7 +2074,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestDreamApps() {
+RESULT DOSTestSuite::AddTestDreamApps() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 3000.0f;
@@ -2144,7 +2146,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestUserApp() {
+RESULT DOSTestSuite::AddTestUserApp() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 3000.0f;
@@ -2289,7 +2291,7 @@ Error:
 
 // A test that includes all the basic UI apps in a functional state.
 // User, ControlView, Keyboard, Browser, UIBar
-RESULT DreamOSTestSuite::AddTestDreamOS() {
+RESULT DOSTestSuite::AddTestDreamOS() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 10000.0;
@@ -2396,7 +2398,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestDreamShareView() {
+RESULT DOSTestSuite::AddTestDreamShareView() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 6000.0f;
@@ -2406,7 +2408,7 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 
 	struct TestTimingContext {
 		double m_msStart;
-		std::shared_ptr<DreamShareView> pDreamShareView;
+		std::shared_ptr<DreamShareViewApp> pDreamShareViewApp;
 	};
 
 	TestTimingContext *pTestContext = new TestTimingContext();
@@ -2421,17 +2423,17 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 		CR(SetupPipeline());
 
 		{
-			std::shared_ptr<DreamShareView> pDreamShareView = nullptr;
+			std::shared_ptr<DreamShareViewApp> pDreamShareViewApp = nullptr;
 
 			auto pTestContext = reinterpret_cast<TestTimingContext*>(pContext);
-			pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this);
-			pDreamShareView->Show();
+			pDreamShareViewApp = m_pDreamOS->LaunchDreamApp<DreamShareViewApp>(this);
+			pDreamShareViewApp->Show();
 
 			auto pCastTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"website.png");
 			//pDreamShareView->SetCastingTexture(std::shared_ptr<texture>(pCastTexture));
-			pDreamShareView->SetCastingTexture(pCastTexture);
+			pDreamShareViewApp->SetCastingTexture(pCastTexture);
 
-			pTestContext->pDreamShareView = pDreamShareView;
+			pTestContext->pDreamShareViewApp = pDreamShareViewApp;
 		}
 
 	Error:
@@ -2453,10 +2455,10 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 		double diff = msNow - pTestContext->m_msStart;
 		int mod = ((int)diff / 500) % 2;
 		if (mod == 0) {
-			pTestContext->pDreamShareView->ShowLoadingTexture();
+			pTestContext->pDreamShareViewApp->ShowLoadingTexture();
 		}
 		else {
-			pTestContext->pDreamShareView->ShowCastingTexture();
+			pTestContext->pDreamShareViewApp->ShowCastingTexture();
 		}
 
 		//m_pDreamOS->RequestReleaseAppUnique(pDreamShareViewHandle, this);
@@ -2486,7 +2488,7 @@ Error:
 }
 
 // TODO: What does this test do?
-RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
+RESULT DOSTestSuite::AddTestBasicBrowserCast() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 6000.0f;
@@ -2496,7 +2498,7 @@ RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
 
 	struct TestTimingContext {
 		double m_msStart;
-		std::shared_ptr<DreamShareView> pDreamShareView;
+		std::shared_ptr<DreamShareViewApp> pDreamShareViewApp;
 	};
 
 	TestTimingContext *pTestContext = new TestTimingContext();
@@ -2519,17 +2521,17 @@ RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
 		CR(SetupPipeline());
 
 		{
-			std::shared_ptr<DreamShareView> pDreamShareView = nullptr;
+			std::shared_ptr<DreamShareViewApp> pDreamShareViewApp = nullptr;
 
 			auto pTestContext = reinterpret_cast<TestTimingContext*>(pContext);
-			pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this);
-			pDreamShareView->Show();
+			pDreamShareViewApp = m_pDreamOS->LaunchDreamApp<DreamShareViewApp>(this);
+			pDreamShareViewApp->Show();
 
 			auto pCastTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"website.png");
 			//pDreamShareView->SetCastingTexture(std::shared_ptr<texture>(pCastTexture));
-			pDreamShareView->SetCastingTexture(pCastTexture);
+			pDreamShareViewApp->SetCastingTexture(pCastTexture);
 
-			pTestContext->pDreamShareView = pDreamShareView;
+			pTestContext->pDreamShareViewApp = pDreamShareViewApp;
 
 			// Create the Shared View App
 			pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
@@ -2601,7 +2603,7 @@ Error:
 }
 
 
-RESULT DreamOSTestSuite::AddTestDreamDesktop() {
+RESULT DOSTestSuite::AddTestDreamDesktop() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 10000.0;
@@ -2712,7 +2714,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestGamepadCamera() {
+RESULT DOSTestSuite::AddTestGamepadCamera() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 30000.0f;
@@ -2828,7 +2830,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestEnvironmentSwitching() {
+RESULT DOSTestSuite::AddTestEnvironmentSwitching() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 300.0f;
@@ -3055,7 +3057,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
+RESULT DOSTestSuite::AddTestEnvironmentSeating() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 300.0f;
@@ -3345,7 +3347,7 @@ Error:
 }
 
 // TODO: Should move this to the sandbox test suite
-RESULT DreamOSTestSuite::AddTestCredentialStorage() {
+RESULT DOSTestSuite::AddTestCredentialStorage() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 3000.0f;

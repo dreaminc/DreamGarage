@@ -92,6 +92,7 @@ public:
 	virtual RESULT HandleDOSMessage(std::string& strMessage) = 0;
 };
 
+// TODO: This should not be here 
 class Windows64Observer {
 public:
 	virtual RESULT HandleWindows64CopyData(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) = 0;
@@ -106,27 +107,7 @@ class DreamOS :
 	public DreamPeerApp::DreamPeerAppObserver,
 	public DreamSoundSystem::observer
 {
-	friend class CloudTestSuite;
 	friend class DreamAppBase;
-
-	// TODO: this needs to be revisited
-	friend class DreamTestSuite;
-	friend class UIModule;
-	friend class HALTestSuite;
-	friend class PipelineTestSuite;
-	friend class UITestSuite;
-	friend class InteractionEngineTestSuite;
-	friend class PhysicsEngineTestSuite;
-	friend class UIViewTestSuite;
-	friend class AnimationTestSuite;
-	friend class DreamOSTestSuite;
-	friend class CollisionTestSuite;
-	friend class WebRTCTestSuite;
-	friend class SoundTestSuite;
-	friend class SandboxTestSuite;
-	friend class MultiContentTestSuite;
-	friend class DimensionTestSuite;
-
 	friend class ModelFactory;
 
 public:
@@ -367,6 +348,7 @@ protected:
 
 	// TODO: This is here temporarily, should be replaced by proper sandbox
 	// related functionality
+public:
 	HALImp* GetHALImp();
 
 	// Dream Apps
@@ -593,7 +575,8 @@ public:
 	// Dream App Messaging
 	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags = DreamAppMessage::flags::SHARE_NETWORK);
 
-protected:
+// TODO: Better architecture (request?)
+public:
 	// Sound 
 	RESULT InitializeDreamSoundSystem();
 	RESULT RegisterSoundSystemObserver(DreamSoundSystem::observer *pObserver);

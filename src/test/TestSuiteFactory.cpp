@@ -1,20 +1,22 @@
 #include "TestSuiteFactory.h"
 
-#include "PhysicsEngine/PhysicsEngineTestSuite.h"
-#include "PhysicsEngine/CollisionTestSuite.h"
-#include "InteractionEngine/InteractionEngineTestSuite.h"
-#include "InteractionEngine/AnimationTestSuite.h"
-#include "UI/UITestSuite.h"
-#include "UI/UIViewTestSuite.h"
-#include "Cloud/CloudTestSuite.h"
-#include "Cloud/webrtc/WebRTCTestSuite.h"
-#include "HAL/HALTestSuite.h"
-#include "HAL/Pipeline/PipelineTestSuite.h"
-#include "DreamOSTestSuite.h"
-#include "DreamShareView/MultiContentTestSuite.h"
-#include "Sound/SoundTestSuite.h"
-#include "Sandbox/SandboxTestSuite.h"
-#include "Primitives/DimensionTestSuite.h"
+// TODO: Maybe revisit this approach 
+
+#include "suites/PhysicsEngineTestSuite.h"
+#include "suites/CollisionTestSuite.h"
+#include "suites/InteractionEngineTestSuite.h"
+#include "suites/AnimationTestSuite.h"
+#include "suites/UITestSuite.h"
+#include "suites/UIViewTestSuite.h"
+#include "suites/CloudTestSuite.h"
+#include "suites/WebRTCTestSuite.h"
+#include "suites/HALTestSuite.h"
+#include "suites/PipelineTestSuite.h"
+#include "suites/DOSTestSuite.h"
+#include "suites/MultiContentTestSuite.h"
+#include "suites/SoundTestSuite.h"
+#include "suites/SandboxTestSuite.h"
+#include "suites/DimensionTestSuite.h"
 
 std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pContext) {
 	RESULT r = R_PASS;
@@ -63,7 +65,7 @@ std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pC
 
 		case TEST_SUITE_TYPE::OS: {
 			CNM(pContext, "This test suite requires DreamOS to be passed as context");
-			pTestSuite = std::make_shared<DreamOSTestSuite>((DreamOS*)pContext);
+			pTestSuite = std::make_shared<DOSTestSuite>((DreamOS*)pContext);
 		} break;
 
 		case TEST_SUITE_TYPE::SOUND: {

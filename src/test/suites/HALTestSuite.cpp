@@ -1,32 +1,34 @@
 #include "HALTestSuite.h"
-#include "DreamOS.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
+#include "os/DreamOS.h"
 
-#include "Primitives/font.h"
-#include "Primitives/text.h"
-#include "Primitives/framebuffer.h"
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
 
-#include "Primitives/HysteresisCylinder.h"
+#include "core/text/font.h"
+#include "core/text/text.h"
 
-#include "PhysicsEngine/CollisionManifold.h"
+#include "core/primitives/framebuffer.h"
 
-#include "HAL/opengl/OGLProgramReflection.h"
-#include "HAL/opengl/OGLProgramRefraction.h"
-#include "HAL/opengl/OGLProgramWater.h"
-#include "HAL/opengl/OGLProgramSkyboxScatter.h"
-#include "HAL/opengl/OGLProgramScreenFade.h"
-#include "HAL/opengl/OGLProgramSkybox.h"
-#include "HAL/opengl/OGLProgramStandard.h"
+#include "core/hysteresis/HysteresisCylinder.h"
 
-#include "DreamGarage\DreamGamepadCameraApp.h"
+#include "modules/PhysicsEngine/CollisionManifold.h"
 
-#include "Scene/ObjectStoreNode.h"
-#include "Scene/CameraNode.h"
+#include "hal/ogl/OGLProgramReflection.h"
+#include "hal/ogl/OGLProgramRefraction.h"
+#include "hal/ogl/OGLProgramWater.h"
+#include "hal/ogl/OGLProgramSkyboxScatter.h"
+#include "hal/ogl/OGLProgramScreenFade.h"
+#include "hal/ogl/OGLProgramSkybox.h"
+#include "hal/ogl/OGLProgramStandard.h"
 
-#include "Sandbox/PathManager.h"
+#include "apps/DreamGamepadCameraApp/DreamGamepadCameraApp.h"
+
+#include "scene/ObjectStoreNode.h"
+#include "scene/CameraNode.h"
+
+#include "sandbox/PathManager.h"
 
 HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("hal", pDreamOS)

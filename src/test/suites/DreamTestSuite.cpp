@@ -1,15 +1,15 @@
 #include "DreamTestSuite.h"
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
 
-#include "DreamGarage\DreamGamepadCameraApp.h"
+#include "scene/ObjectStoreNode.h"
+#include "scene/CameraNode.h"
 
-#include "Scene/ObjectStoreNode.h"
-#include "Scene/CameraNode.h"
+#include "apps/DreamGamepadCameraApp/DreamGamepadCameraApp.h"
 
 DreamTestSuite::DreamTestSuite(std::string strName, DreamOS *pParentDreamOS) :
 	TestSuite(strName),

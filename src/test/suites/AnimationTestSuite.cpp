@@ -1,16 +1,18 @@
 #include "AnimationTestSuite.h"
-#include "AnimationQueue.h"
 
-#include "DreamOS.h"
-#include "Primitives/composite.h"
-#include "Primitives/sphere.h"
+#include "os/DreamOS.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
+#include "modules/AnimationEngine/AnimationQueue.h"
 
-#include "Scene/ObjectStoreNode.h"
-#include "Scene/CameraNode.h"
+#include "core/primitives/composite.h"
+#include "core/primitives/sphere.h"
+
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
+
+#include "scene/ObjectStoreNode.h"
+#include "scene/CameraNode.h"
 
 AnimationTestSuite::AnimationTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("animation", pDreamOS)

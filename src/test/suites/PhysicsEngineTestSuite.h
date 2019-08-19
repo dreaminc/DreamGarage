@@ -1,17 +1,17 @@
 #ifndef PHYSICS_ENGINE_TEST_SUITE_H_
 #define PHYSICS_ENGINE_TEST_SUITE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/PhysicsEngine/PhysicsEngineTestSutie.h
-
-#include "Test/DreamTestSuite.h"
+// Dream Physics Engine Test Suite
+// dos/src/test/suites/PhysicsEngineTestSutie.h
 
 #include <functional>
 #include <memory>
 
-#include "Scene/ObjectStoreNode.h"
+#include "DreamTestSuite.h"
+
+#include "scene/ObjectStoreNode.h"
 
 class DreamOS;
 

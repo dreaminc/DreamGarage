@@ -1,12 +1,20 @@
 #ifndef MULTI_CONTENT_TEST_SUITE_H_
 #define MULTI_CONTENT_TEST_SUITE_H_
 
-#include "Test/DreamTestSuite.h"
-#include "InteractionEngine/InteractionEngine.h"
-#include "Primitives/Subscriber.h"
+#include "core/ehm/EHM.h"
+
+// TODO: Merge this with the other tests (in other words do a real test plan)
+// Dream Multi Content Test Suite
+// dos/src/test/suites/MultiContentTestSuite.h
+
+#include "DreamTestSuite.h"
+
+#include "core/types/Subscriber.h"
+
+#include "modules/InteractionEngine/InteractionEngine.h"
 
 class DreamOS;
-class DreamShareView; 
+class DreamShareViewApp; 
 class DreamBrowser;
 class CloudController;
 class EnvironmentAsset;
@@ -18,7 +26,7 @@ class composite;
 class texture;
 class UIStageProgram;
 
-class MultiContentTestSuite : public DreamTestSuite, public Subscriber<InteractionObjectEvent>, public valid
+class MultiContentTestSuite : public DreamTestSuite, public Subscriber<InteractionObjectEvent>
 {
 public:
 	MultiContentTestSuite(DreamOS *pDreamOS);
@@ -81,7 +89,7 @@ private:
 	DreamOS *m_pDreamOS;
 
 	// members used with interaction engine events
-	std::shared_ptr<DreamShareView> m_pDreamShareView = nullptr;
+	std::shared_ptr<DreamShareViewApp> m_pDreamShareViewApp = nullptr;
 	std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
 	std::shared_ptr<quad> m_pTestQuad = nullptr;
 	std::shared_ptr<composite> m_pPointerCursor = nullptr;

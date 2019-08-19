@@ -1,15 +1,15 @@
 #include "PipelineTestSuite.h"
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
 
-#include "HAL/SkyboxScatterProgram.h"
+#include "hal/SkyboxScatterProgram.h"
 
-#include "Scene/CameraNode.h"
-#include "Scene/ObjectStoreNode.h"
+#include "scene/CameraNode.h"
+#include "scene/ObjectStoreNode.h"
 
 PipelineTestSuite::PipelineTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("pipeline", pDreamOS)

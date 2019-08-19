@@ -1,33 +1,31 @@
-#include "DreamUIBar.h"
-#include "DreamOS.h"
+#include "DreamUIBarApp.h"
 
-#include "Cloud/Menu/MenuController.h"
-#include "Cloud/Menu/MenuNode.h"
-
-
-#include "UI/UIButton.h"
-#include "UI/UIMenuItem.h"
-
-//#include "DreamControlView/UIControlView.h"
-#include "DreamUserControlArea/DreamUserControlArea.h"
-
-#include "HAL/UIStageProgram.h"
-#include "Cloud/CloudController.h"                      // for CloudController, CLOUD_CONTROLLER_TYPE, CLOUD_CONTROLLER_TYPE::MENU
 #include "functional"                                   // for function
-#include "Primitives/matrix/RotationMatrix.h"           // for RotationMatrix
-#include "Primitives/vector.h"                          // for vector
-#include "RESULT/EHM.h"                                 // for CR, CN, CBR, CNR, CBM, CNM, CRM, DEBUG_LINEOUT
 #include "stdint.h"                                     // for uint8_t
 #include "vcruntime_new.h"                              // for operator new
 #include <stddef.h>                                     // for size_t
 
-#include "Cloud/Menu/MenuNode.h"
-#include "Cloud/HTTP/HTTPController.h"
-#include "Primitives/hand/hand.h"
+#include "os/DreamOS.h"
 
-#include "InteractionEngine/InteractionEngine.h"
-#include "InteractionEngine/AnimationCurve.h"
-#include "InteractionEngine/AnimationItem.h"
+#include "cloud/CloudController.h"                      // for CloudController, CLOUD_CONTROLLER_TYPE, CLOUD_CONTROLLER_TYPE::MENU
+#include "cloud/Menu/MenuController.h"
+#include "cloud/Menu/MenuNode.h"
+#include "cloud/HTTP/HTTPController.h"
+
+#include "UI/UIButton.h"
+#include "UI/UIMenuItem.h"
+
+#include "apps/DreamUserControlAreaApp/DreamUserControlAreaApp.h"
+
+#include "hal/UIStageProgram.h"
+
+#include "core/matrix/RotationMatrix.h"           
+#include "core/primitives/vector.h"               
+#include "core/hand/hand.h"
+
+#include "modules/InteractionEngine/InteractionEngine.h"
+#include "modules/AnimationEngine/AnimationCurve.h"
+#include "modules/AnimationEngine/AnimationItem.h"
 
 class DreamAppHandle;
 class InteractionEngineProxy;

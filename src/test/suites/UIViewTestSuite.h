@@ -1,11 +1,15 @@
 #ifndef UI_VIEW_TEST_SUITE_H_
+#define UI_VIEW_TEST_SUITE_H_
 
 #include "core/ehm/EHM.h"
 
-#include "Primitives/valid.h"
-#include "Primitives/Subscriber.h"
-#include "Test/DreamTestSuite.h"
+// TODO: Merge with the UI Test Suite
+// Dream UI View Test Suite
+// dos/src/test/suites/UIViewTestSuite.h
 
+#include "DreamTestSuite.h"
+
+#include "core/types/Subscriber.h"
 
 class DreamOS;
 class UIView;
@@ -13,7 +17,7 @@ class UIButton;
 class UIStageProgram;
 struct UIEvent;
 
-class UIViewTestSuite : public valid, public DreamTestSuite, public Subscriber<UIEvent>
+class UIViewTestSuite : public DreamTestSuite, public Subscriber<UIEvent>
 {
 public:
 	UIViewTestSuite(DreamOS *pDreamOS);
@@ -61,8 +65,7 @@ public:
 	virtual RESULT Notify(UIEvent *pEvent) override;
 
 private:
-	DreamOS *m_pDreamOS;
+	DreamOS *m_pDreamOS = nullptr;
 };
 
-#define UI_VIEW_TEST_SUITE_H_
 #endif // ! UI_VIEW_TEST_SUITE_H_

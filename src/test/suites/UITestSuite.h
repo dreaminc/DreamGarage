@@ -3,9 +3,8 @@
 
 #include "core/ehm/EHM.h"
 
-#include "Primitives/valid.h"
-#include "Primitives/Subscriber.h"
-#include "Test/DreamTestSuite.h"
+// Dream UI Test Suite
+// dos/src/test/suites/UITestSuite.h
 
 #include <string>
 #include <vector>
@@ -13,8 +12,12 @@
 #include <stack>
 #include <memory>
 
-#include "Cloud/CloudController.h"
-#include "Cloud/Menu/MenuController.h"
+#include "core/types/Subscriber.h"
+
+#include "DreamTestSuite.h"
+
+#include "cloud/CloudController.h"
+#include "cloud/Menu/MenuController.h"
 
 class DreamOS;
 class DreamUIBar;
@@ -37,7 +40,7 @@ struct KeyboardTestContext {
 	quad* pQuad = nullptr;
 };
 
-class UITestSuite : public valid, public DreamTestSuite, 
+class UITestSuite : public DreamTestSuite, 
 					public Subscriber<SenseControllerEvent>, public Subscriber<SenseKeyboardEvent>, 
 					public Subscriber<SenseMouseEvent>,
 					public Subscriber<UIEvent>,

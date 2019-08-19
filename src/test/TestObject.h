@@ -1,21 +1,25 @@
 #ifndef TEST_OBJECT_H_
 #define TEST_OBJECT_H_
 
-// DREAM OS
-// DreamOS/Test/TestObject.h
+#include "core/ehm/EHM.h"
+
+// Dream Test
+// dos/src/test/TestObject.h
+
 // TestObject is the base class for a given test to be run
 // These can be used to benchmark components, or test the system within the
 // DreamOS TEST unit testing framework
 
-#include "core/ehm/EHM.h"
 #include <functional>
 #include <memory>
 #include <chrono>
 
+#include "core/types/DObject.h"
+
 // TODO: Add test name
 // TODO: Add test description
 
-class TestObject {
+class TestObject : public DObject {
 public:
 	friend class TestSuite;
 

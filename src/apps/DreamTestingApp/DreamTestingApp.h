@@ -1,19 +1,20 @@
 #ifndef DREAM_TEST_APP_H_
 #define DREAM_TEST_APP_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/DreamTestingApp.h
+// Dream Testing App
+// dos/src/apps/DreamTestingApp/DreamTestingApp.h
+
 // Dream Test App for the purpose of testing out both
 // the OS based queue of apps as well as things like 
 // system level apps and priority levels 
 
-#include "DreamApp.h"
-#include "DreamAppHandle.h"
-
 #include <map>
 #include <vector>
+
+#include "os/app/DreamApp.h"
+#include "os/app/DreamAppHandle.h"
 
 class DreamTestingAppHandle : public DreamAppHandle {
 public:

@@ -1,22 +1,24 @@
 #include "DreamPeerApp.h"
-#include "DreamOS.h"
 
-#include "InteractionEngine/AnimationCurve.h"
-#include "InteractionEngine/AnimationItem.h"
+#include "os/DreamOS.h"
 
-#include "Primitives/font.h"
-#include "Primitives/hand/hand.h"
-#include "Primitives/user.h"
+#include "modules/AnimationEngine/AnimationCurve.h"
+#include "modules/AnimationEngine/AnimationItem.h"
 
-#include "Cloud/HTTP/HTTPController.h"
-#include "Cloud/Environment/PeerConnection.h"
+#include "core/Utilities.h"
+#include "core/camera/camera.h"
+#include "core/text/font.h"
+#include "core/hand/hand.h"
+#include "core/user/user.h"
+
+#include "cloud/HTTP/HTTPController.h"
+#include "cloud/Environment/PeerConnection.h"
+
 #include "UI/UIView.h"
 
-#include "Sound/SpatialSoundObject.h"
-#include "DreamGarage/AudioDataMessage.h"
+#include "sound/SpatialSoundObject.h"
 
-#include "Core/Utilities.h"
-#include "Primitives/camera.h"
+#include "garage/AudioDataMessage.h"
 
 DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext) :
 	DreamApp<DreamPeerApp>(pDOS, pContext),
@@ -242,7 +244,7 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 	CR(m_pUserModel->UpdateAvatarModelWithID(m_avatarModelId));
 
 	m_pUserModel->InitializeObject();
-	GetDOS()->AddObjectToUIGraph(m_pUserModel->GetUserObjectComposite().get(), SandboxApp::PipelineType::MAIN | SandboxApp::PipelineType::AUX);
+	GetDOS()->AddObjectToUIGraph(m_pUserModel->GetUserObjectComposite().get(), Sandbox::PipelineType::MAIN | Sandbox::PipelineType::AUX);
 
 	m_pUserModel->SetScreenName(m_strScreenName);
 	m_pUserModel->SetProfilePhoto(m_strProfilePhotoURL);
@@ -251,7 +253,7 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 	m_pUserModel->GetUserLabelComposite()->SetVisible(true);
 	//CR(ShowUserNameField());
 
-	GetDOS()->AddObjectToUIGraph(m_pUserModel->GetMouth().get(), SandboxApp::PipelineType::AUX);
+	GetDOS()->AddObjectToUIGraph(m_pUserModel->GetMouth().get(), Sandbox::PipelineType::AUX);
 
 Error:
 	return r;

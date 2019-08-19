@@ -1,19 +1,20 @@
 #include "InteractionEngineTestSuite.h"
-#include "DreamOS.h"
 
-#include "PhysicsEngine/CollisionManifold.h"
+#include "os/DreamOS.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
+#include "modules/PhysicsEngine/CollisionManifold.h"
 
-#include "UI/UIView.h"
-#include "UI/UIButton.h"
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
 
-#include "Primitives/hand/hand.h"
+#include "ui/UIView.h"
+#include "ui/UIButton.h"
 
-#include "Scene/ObjectStoreNode.h"
-#include "Scene/CameraNode.h"
+#include "core/hand/hand.h"
+
+#include "scene/ObjectStoreNode.h"
+#include "scene/CameraNode.h"
 
 struct TestContext : public Subscriber<InteractionObjectEvent> {
 	DreamOS *m_pDreamOS = nullptr;
@@ -123,7 +124,7 @@ InteractionEngineTestSuite::InteractionEngineTestSuite(DreamOS *pDreamOS) :
 
 	CR(r);
 
-//Success:
+Success:
 	Validate();
 	return;
 

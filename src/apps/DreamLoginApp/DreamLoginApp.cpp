@@ -1,6 +1,9 @@
 #include "DreamLoginApp.h"
-#include "DreamControlView/UIControlView.h"
+
 #include <chrono>
+
+// TODO: Untangle this
+#include "ui/DreamControlView/UIControlView.h"
 
 DreamLoginApp::DreamLoginApp(DreamOS *pDreamOS, void *pContext) :
 	DreamFormApp(pDreamOS, pContext)

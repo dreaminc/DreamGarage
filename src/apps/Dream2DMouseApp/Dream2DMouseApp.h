@@ -4,10 +4,10 @@
 #include "core/ehm/EHM.h"
 
 // Dream 2D Mouse App
-// app/Dream2DMouseApp/Dream2DMouseApp.h
+// dos/src/apps/Dream2DMouseApp/Dream2DMouseApp.h
 
-#include "app/DreamApp.h"
-#include "app/DreamAppHandle.h"
+#include "os/app/DreamApp.h"
+#include "os/app/DreamAppHandle.h"
 
 #include <map>
 #include <vector>

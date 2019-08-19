@@ -20,6 +20,10 @@ else()
     add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
 endif()
 
+# TODO: This should not be here!!!!!!!!!!
+include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
+add_definitions(-DWEBRTC_WIN)
+
 add_library(test
     ${SOURCES}
     ${TEST_SUITE_SOURCES}

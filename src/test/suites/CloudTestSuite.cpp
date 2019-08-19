@@ -1,25 +1,28 @@
 #include "CloudTestSuite.h"
-#include "DreamOS.h"
 
-#include "Sandbox/CommandLineManager.h"
-#include "Cloud/Menu/MenuNode.h"
-#include "Cloud/HTTP/HTTPController.h"
+#include "os/DreamOS.h"
 
-#include "Cloud/CloudControllerFactory.h"
+#include "sandbox/CommandLineManager.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
-#include "HAL/opengl/OGLProgram.h"
+#include "cloud/Menu/MenuNode.h"
+#include "cloud/HTTP/HTTPController.h"
+#include "cloud/CloudControllerFactory.h"
+#include "cloud/Environment/EnvironmentAsset.h"
 
-#include "Cloud/Environment/EnvironmentAsset.h"
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
 
-#include "DreamGarage/DreamContentView.h"
+#include "hal/ogl/OGLProgram.h"
 
-#include "Sandbox/PathManager.h"
-#include "Scene/ObjectStoreNode.h"
-#include "Scene/CameraNode.h"
+#include "apps/DreamContentViewApp/DreamContentViewApp.h"
 
+#include "sandbox/PathManager.h"
+
+#include "scene/ObjectStoreNode.h"
+#include "scene/CameraNode.h"
+
+// TODO: External config
 std::map<int, std::string> k_refreshTokens = {
 	{ 0, "NakvA43v1eVBqvvTJuqUdXHWL02CNuDqrgHMEBrIY6P5FoHZ2GtgbCVDYvHMaRTw" },
 	{ 1, "daehZbIcTcXaPh29tWQy75ZYSLrRL4prhBoBYMRQtU48NMs6svnt5CkzCA5RLKJq" },

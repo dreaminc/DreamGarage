@@ -1,21 +1,22 @@
 #include "SoundTestSuite.h"
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
 
-#include "SoundClientFactory.h"
-#include "SoundFile.h"
-#include "SpatialSoundObject.h"
+#include "sound/SoundClientFactory.h"
+#include "sound/SoundFile.h"
+#include "sound/SpatialSoundObject.h"
 
 // Browser
-#include "DreamGarage\DreamBrowser.h"
-#include "WebBrowser\WebBrowserController.h"
-#include "WebBrowser\CEFBrowser/CEFBrowserManager.h"
+#include "apps/DreamBrowserApp/DreamBrowserApp.h"
 
-#include "DreamGarage\DreamGamepadCameraApp.h"
+#include "webbrowser/WebBrowserController.h"
+#include "webbrowser/CEFBrowser/CEFBrowserManager.h"
+
+#include "apps/DreamGamepadCameraApp/DreamGamepadCameraApp.h"
 
 SoundTestSuite::SoundTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("sound", pDreamOS)

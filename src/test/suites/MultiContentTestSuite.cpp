@@ -1,49 +1,58 @@
 #include "MultiContentTestSuite.h"
-#include "DreamOS.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
-#include "HAL/opengl/OGLProgram.h"
-#include "HAL/UIStageProgram.h"
+#include <memory>
 
-#include "Scene/ObjectStoreNode.h"
+#include "os/DreamOS.h"
 
-#include "DreamShareView/DreamShareView.h"
-#include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamControlView/UIControlView.h"
-#include "DreamGarage/Dream2DMouseApp.h"
-#include "DreamGarage/DreamBrowser.h"
-#include "DreamGarage/UITabView.h"
-#include "DreamGarage/DreamUIBar.h"
-#include "DreamGarage/DreamSettingsApp.h"
-#include "DreamGarage/DreamLoginApp.h"
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
 
-#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
-#include "WebBrowser/WebBrowserController.h"
+// TODO: Shouldn't have access to this here
+#include "hal/ogl/OGLProgram.h"
 
-#include "Cloud/CloudController.h"
-#include "Cloud/CloudControllerFactory.h"
-#include "Cloud/HTTP/HTTPController.h"
-#include "Cloud/WebRequest.h"
-#include "Core/Utilities.h" 
+#include "hal/UIStageProgram.h"
 
-#include "UI/UIFlatScrollView.h"
-#include "UI/UIButton.h"
-#include "UI/UIMenuItem.h"
-#include "UI/UISpatialScrollView.h"
+#include "scene/ObjectStoreNode.h"
+#include "scene/CameraNode.h"
+
+// TODO: Untangle this
+#include "ui/DreamControlView/UIControlView.h"
+#include "ui/UITabView.h"
+#include "ui/UIFlatScrollView.h"
+#include "ui/UIButton.h"
+#include "ui/UIMenuItem.h"
+#include "ui/UISpatialScrollView.h"
+
+#include "apps/DreamUserControlAreaApp/DreamUserControlAreaApp.h"
+#include "apps/DreamShareViewApp/DreamShareViewApp.h"
+#include "apps/Dream2dMouseApp/Dream2DMouseApp.h"
+#include "apps/DreamBrowserApp/DreamBrowserApp.h"
+#include "apps/DreamUIBarApp/DreamUIBarApp.h"
+#include "apps/DreamShareViewApp/DreamShareViewApp.h"
+
+// TODO: Settings app is deprecated
+// TODO: Login / Settings etc should be native
+#include "apps/DreamSettingsApp/DreamSettingsApp.h"
+#include "apps/DreamLoginApp/DreamLoginApp.h"
+
+#include "webbrowser/CEFBrowser/CEFBrowserManager.h"
+#include "webbrowser/WebBrowserController.h"
+
+#include "cloud/CloudController.h"
+#include "cloud/CloudControllerFactory.h"
+#include "cloud/HTTP/HTTPController.h"
+#include "cloud/WebRequest.h"
+
+#include "core/Utilities.h" 
 
 #include "Sandbox/CommandLineManager.h"
 
-#include "InteractionEngine/AnimationCurve.h"
-#include "InteractionEngine/AnimationItem.h"
+#include "modules/AnimationEngine/AnimationCurve.h"
+#include "modules/AnimationEngine/AnimationItem.h"
 
-#include "Primitives/font.h"
-#include "Primitives/text.h"
-
-#include "Scene/CameraNode.h"
-
-#include <memory>
+#include "core/text/font.h"
+#include "core/text/text.h"
 
 MultiContentTestSuite::MultiContentTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("multicontent", pDreamOS)
@@ -2385,8 +2394,8 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBasic() {
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		m_pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this, true);
-		m_pDreamShareView->Show();
+		m_pDreamShareViewApp = m_pDreamOS->LaunchDreamApp<DreamShareViewApp>(this, true);
+		m_pDreamShareViewApp->Show();
 
 		m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
 		//m_pDreamShareView->ShowCast
@@ -2433,8 +2442,8 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBasic() {
 			}
 
 			//m_pDreamShareView->SetCastingTexture(m_pTestTexture);
-			m_pDreamShareView->SetCastingTexture(m_pTestTexture.get());
-			m_pDreamShareView->ShowCastingTexture();
+			m_pDreamShareViewApp->SetCastingTexture(m_pTestTexture.get());
+			m_pDreamShareViewApp->ShowCastingTexture();
 		}
 
 	Error:
@@ -2571,8 +2580,8 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBrowser() {
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		m_pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this, true);
-		m_pDreamShareView->Show();
+		m_pDreamShareViewApp = m_pDreamOS->LaunchDreamApp<DreamShareViewApp>(this, true);
+		m_pDreamShareViewApp->Show();
 
 		m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
 
@@ -2687,11 +2696,11 @@ RESULT MultiContentTestSuite::Notify(InteractionObjectEvent *pEvent) {
 			} break;
 
 			case INTERACTION_EVENT_SELECT_DOWN: {
-				if (!m_pDreamShareView->IsStreaming()) {
-					if (m_pDreamShareView->m_fReceivingStream) {
-						CR(m_pDreamOS->UnregisterVideoStreamSubscriber(m_pDreamShareView.get()));
+				if (!m_pDreamShareViewApp->IsStreaming()) {
+					if (m_pDreamShareViewApp->m_fReceivingStream) {
+						CR(m_pDreamOS->UnregisterVideoStreamSubscriber(m_pDreamShareViewApp.get()));
 					}
-					m_pDreamShareView->m_fReceivingStream = false;
+					m_pDreamShareViewApp->m_fReceivingStream = false;
 					/*
 					if (m_strID == "1") {
 						m_pTestTextureUser1 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"website.png"));
@@ -2704,12 +2713,12 @@ RESULT MultiContentTestSuite::Notify(InteractionObjectEvent *pEvent) {
 					//*/
 					m_pDreamBrowser->SetURI(m_strURL);
 					//m_pDreamShareView->SetCastingTexture(m_pTestTexture);
-					m_pDreamShareView->SetCastingTexture(m_pTestTexture.get());
-					m_pDreamShareView->ShowCastingTexture();
+					m_pDreamShareViewApp->SetCastingTexture(m_pTestTexture.get());
+					m_pDreamShareViewApp->ShowCastingTexture();
 
-					m_pDreamShareView->SetStreamingState(false);
-					CR(m_pDreamShareView->BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type::REQUEST_STREAMING_START));
-					m_pDreamShareView->SetStreamingState(true);
+					m_pDreamShareViewApp->SetStreamingState(false);
+					CR(m_pDreamShareViewApp->BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type::REQUEST_STREAMING_START));
+					m_pDreamShareViewApp->SetStreamingState(true);
 				}
 
 			} break;

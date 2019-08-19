@@ -13,14 +13,16 @@
 
 #include "os/DreamOS.h"
 
-#include "app/DreamApp.h"
-#include "app/DreamAppHandle.h"
-#include "app/DreamUserControlAreaApp/DreamContentSource.h"
+#include "os/app/DreamApp.h"
+#include "os/app/DreamAppHandle.h"
+
+// TODO: No inter-app references
+#include "apps/DreamUserControlAreaApp/DreamContentSource.h"
 
 // TODO: Dream Desktop App should go into the same location as this
 #include "dreamdesktop/DDCIPCMessage.h"
 
-#include "module/InteractionEngine/InteractionObjectEvent.h"
+#include "modules/InteractionEngine/InteractionObjectEvent.h"
 
 #include "sense/SenseController.h"
 

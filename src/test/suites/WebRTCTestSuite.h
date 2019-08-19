@@ -3,14 +3,15 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/webrtc/WebRTCTestSuite.h
-
-#include "Test/DreamTestSuite.h"
+// Dream WebRTC Test Suite
+// dos/src/test/suites/WebRTCTestSuite.h
 
 #include <functional>
 #include <memory>
-#include "InteractionEngine/InteractionEngine.h"
+
+#include "DreamTestSuite.h"
+
+#include "modules/InteractionEngine/InteractionEngine.h"
 
 class DreamOS;
 class CloudController;

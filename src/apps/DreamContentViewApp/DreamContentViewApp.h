@@ -13,10 +13,11 @@
 #include <map>
 #include <vector>
 
-#include "app/DreamApp.h"
+#include "os/app/DreamApp.h"
+
 #include "core/types/Subscriber.h"
 
-#include "module/InteractionEngine/InteractionObjectEvent.h"
+#include "modules/InteractionEngine/InteractionObjectEvent.h"
 
 class quad;
 class texture;

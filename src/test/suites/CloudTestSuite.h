@@ -3,13 +3,13 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Cloud/CloudTestSuite.h
-
-#include "Test/DreamTestSuite.h"
+// Dream Cloud Test Suite
+// dos/src/test/suites/CloudTestSuite.h
 
 #include <functional>
 #include <memory>
+
+#include "DreamTestSuite.h"
 
 #include "Cloud/CloudController.h"
 #include "Cloud/Menu/MenuController.h"

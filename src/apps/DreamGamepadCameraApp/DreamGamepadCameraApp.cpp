@@ -1,12 +1,13 @@
 #include "DreamGamepadCameraApp.h"
 
-#include "DreamOS.h"
-#include "Core/Utilities.h"
+#include "os/DreamOS.h"
 
-#include "Primitives/camera.h"
+#include "core/Utilities.h"
 
-#include "PhysicsEngine/ForceGeneratorFactory.h"
-#include "PhysicsEngine/AirResistanceGenerator.h"
+#include "core/camera/camera.h"
+
+#include "modules/PhysicsEngine/ForceGeneratorFactory.h"
+#include "modules/PhysicsEngine/AirResistanceGenerator.h"
 
 DreamGamepadCameraApp::DreamGamepadCameraApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamGamepadCameraApp>(pDreamOS, pContext)

@@ -1,35 +1,37 @@
 #include "WebRTCTestSuite.h"
-#include "DreamOS.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
+#include "os/DreamOS.h"
 
-#include "Sandbox/CommandLineManager.h"
-#include "Cloud/HTTP/HTTPController.h"
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
 
-#include "Cloud/CloudControllerFactory.h"
+#include "sandbox/CommandLineManager.h"
 
-#include "HAL/opengl/OGLProgram.h"
-#include "HAL\opengl\OGLTexture.h"
+#include "cloud/HTTP/HTTPController.h"
+#include "cloud/CloudControllerFactory.h"
 
-#include "DreamGarage/DreamBrowser.h"
-#include "DreamGarage/Dream2DMouseApp.h"
-#include "DreamShareView/DreamShareView.h"
+#include "test/suites/CloudTestSuite.h"
 
-#include "DreamLogger/DreamLogger.h"
-#include "Sound/SoundClientFactory.h"
-#include "Sound/SpatialSoundObject.h"
+#include "hal/ogl/OGLProgram.h"
+#include "hal/ogl/OGLTexture.h"
 
-#include "Cloud/CloudTestSuite.h"
+#include "apps/DreamBrowserApp/DreamBrowserApp.h"
+#include "apps/Dream2DMouseApp/Dream2DMouseApp.h"
+#include "apps/DreamShareViewApp/DreamShareViewApp.h"
+
+#include "logger/DreamLogger.h"
+
+#include "sound/SoundClientFactory.h"
+#include "sound/SpatialSoundObject.h"
+
 #include "Sound/AudioPacket.h"
 
-#include "DreamGarage\DreamBrowser.h"
-#include "WebBrowser\WebBrowserController.h"
-#include "WebBrowser\CEFBrowser/CEFBrowserManager.h"
+#include "webbrowser/WebBrowserController.h"
+#include "webbrowser/CEFBrowser/CEFBrowserManager.h"
 
-#include "Scene/ObjectStoreNode.h"
-#include "Scene/CameraNode.h"
+#include "scene/ObjectStoreNode.h"
+#include "scene/CameraNode.h"
 
 WebRTCTestSuite::WebRTCTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("webrtc", pDreamOS)
@@ -2274,7 +2276,7 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
 		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
-		std::shared_ptr<DreamShareView>	pDreamShareView = nullptr;
+		std::shared_ptr<DreamShareViewApp>	pDreamShareViewApp = nullptr;
 
 		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
 		std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
@@ -2335,8 +2337,8 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 			CRM(pTestContext->pCloudController->Start(strUsername, strPassword, environmentID), "Failed to log in");
 		}
 
-		pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this);
-		CNM(pDreamShareView, "Failed to create dream share view");
+		pDreamShareViewApp = m_pDreamOS->LaunchDreamApp<DreamShareViewApp>(this);
+		CNM(pDreamShareViewApp, "Failed to create dream share view");
 
 		// Create the 2D Mouse App
 		pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
@@ -2353,7 +2355,7 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 
 		pDreamBrowser->SetURI(strURL);
 
-		pDreamShareView->Show();
+		pDreamShareViewApp->Show();
 
 		composite *pComposite;		
 		pComposite = m_pDreamOS->AddComposite();

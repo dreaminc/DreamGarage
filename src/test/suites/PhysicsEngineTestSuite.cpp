@@ -1,14 +1,15 @@
 #include "PhysicsEngineTestSuite.h"
-#include "DreamOS.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
+#include "os/DreamOS.h"
 
-#include "PhysicsEngine/CollisionManifold.h"
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
 
-#include "Scene/CameraNode.h"
-#include "Scene/ObjectStoreNode.h"
+#include "modules/PhysicsEngine/CollisionManifold.h"
+
+#include "scene/CameraNode.h"
+#include "scene/ObjectStoreNode.h"
 
 PhysicsEngineTestSuite::PhysicsEngineTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("physics", pDreamOS)

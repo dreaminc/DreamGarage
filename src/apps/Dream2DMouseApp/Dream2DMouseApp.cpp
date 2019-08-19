@@ -1,6 +1,6 @@
 #include "Dream2DMouseApp.h"
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
 Dream2DMouseApp::Dream2DMouseApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<Dream2DMouseApp>(pDreamOS, pContext)

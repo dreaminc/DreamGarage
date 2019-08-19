@@ -1,12 +1,12 @@
 #include "DimensionTestSuite.h"
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
 
-#include "DreamGarage\DreamGamepadCameraApp.h"
+#include "apps/DreamGamepadCameraApp/DreamGamepadCameraApp.h"
 
 DimensionTestSuite::DimensionTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("dimension", pDreamOS)

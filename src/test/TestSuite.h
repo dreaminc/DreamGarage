@@ -6,11 +6,17 @@
 // A test suite is, like it sounds, a suite of tests designed to exercise a given module of the engine.
 
 #include "core/ehm/EHM.h"
-#include "TestObject.h"
+
+// Dream Test
+// dos/src/test/TestSuite.h
 
 #include <vector>
 
-class TestSuite {
+#include "core/types/DObject.h"
+
+#include "TestObject.h"
+
+class TestSuite : public DObject {
 
 
 public:

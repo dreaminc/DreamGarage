@@ -3,18 +3,18 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/HAL/HALTestSuite.h
+// Dream HAL Test Suite
+// dos/src/test/suites/HALTestSuite.h
 
 // This test suite should cover testing all functionality related to the
 // HAL (graphics) layer and interfaces.
 
-#include "Test/DreamTestSuite.h"
-
 #include <functional>
 #include <memory>
 
-#include "DreamOS.h"
+#include "DreamTestSuite.h"
+
+#include "os/DreamOS.h"
 
 class HALImp;
 

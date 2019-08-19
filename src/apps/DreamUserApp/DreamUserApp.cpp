@@ -2,29 +2,33 @@
 
 #include "chrono"                                      // for high_resolution_clock, steady_clock::time_point
 #include "cmath"                                       // for sqrt
-
-#include "Primitives/hand/hand.h"
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
-#include "Primitives/quaternion.h"
-
-#include "DreamAppMessage.h"                           // for DreamAppMessage, DreamAppMessage::flags, operator|, DreamAppMessage::flags::SHARE_LOCAL, DreamAppMessage::flags::SHARE_NETWORK
-#include "DreamShareViewPointerMessage.h"              // for DreamShareViewPointerMessage
-#include "InteractionEngine/InteractionObjectEvent.h"  // for InteractionObjectEvent, InteractionEventType::ELEMENT_INTERSECT_BEGAN, InteractionEventType::ELEMENT_INTERSECT_ENDED, InteractionEventType::ELEMENT_INTERSECT_MOVED, InteractionEventType::INTERACTION_EVENT_MENU
-#include "Primitives/composite.h"                      // for composite
-#include "Primitives/hand/HandState.h"                 // for HandState
-#include "Primitives/HysteresisObject.h"               // for HysteresisEventType, HysteresisEvent, HysteresisEventType::OFF, HysteresisEventType::ON, HysteresisObject
-#include "Primitives/matrix/RotationMatrix.h"          // for RotationMatrix
-#include "Primitives/stereocamera.h"                   // for stereocamera
-#include "Primitives/VirtualObj.h"                     // for VirtualObj
-#include "RESULT/EHM.h"                                // for CR, CNR, CN, CBR, CB
 #include "vcruntime_new.h"                             // for operator delete, operator new
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
+
+#include "core/hand/hand.h"
+
+#include "core/primitives/point.h"
+#include "core/primitives/vector.h"
+#include "core/primitives/quaternion.h"
+
+#include "os/app/DreamAppMessage.h"									// for DreamAppMessage, DreamAppMessage::flags, operator|, DreamAppMessage::flags::SHARE_LOCAL, DreamAppMessage::flags::SHARE_NETWORK
+#include "apps/DreamShareViewApp/DreamShareViewPointerMessage.h"    // for DreamShareViewPointerMessage
+#include "modules/InteractionEngine/InteractionObjectEvent.h"				// for InteractionObjectEvent, InteractionEventType::ELEMENT_INTERSECT_BEGAN, InteractionEventType::ELEMENT_INTERSECT_ENDED, InteractionEventType::ELEMENT_INTERSECT_MOVED, InteractionEventType::INTERACTION_EVENT_MENU
+
+#include "core/primitives/composite.h"                      // for composite
+#include "core/primitives/VirtualObj.h"                     // for VirtualObj
+
+#include "core/hand/HandState.h"                 // for HandState
+#include "core/hysteresis/HysteresisObject.h"               // for HysteresisEventType, HysteresisEvent, HysteresisEventType::OFF, HysteresisEventType::ON, HysteresisObject
+#include "core/matrix/RotationMatrix.h"          // for RotationMatrix
+#include "core/camera/stereocamera.h"                   // for stereocamera
 
 #include "Core/Utilities.h"
 
 #include "Scene/CameraNode.h"
+
+#include "webbrowser/cefbrowser/CEFBrowserManager.h"
 
 texture *DreamUserObserver::GetOverlayTexture(HAND_TYPE type) {
 	return nullptr;
@@ -312,9 +316,9 @@ RESULT DreamUserApp::Update(void *pContext) {
 				m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT)->SetVisible(false);
 			}
 			// Doing this here for now, it's possible we want to just have AddUser add to both pipes though.
-			GetDOS()->AddObject(m_pUserModel.get(), SandboxApp::PipelineType::AUX);
-			GetDOS()->AddObjectToUIGraph(m_pUserModel->GetMouth().get(), SandboxApp::PipelineType::AUX);
-			GetDOS()->AddObjectToUIGraph(m_pUserModel->GetUserObjectComposite().get(), SandboxApp::PipelineType::AUX);
+			GetDOS()->AddObject(m_pUserModel.get(), Sandbox::PipelineType::AUX);
+			GetDOS()->AddObjectToUIGraph(m_pUserModel->GetMouth().get(), Sandbox::PipelineType::AUX);
+			GetDOS()->AddObjectToUIGraph(m_pUserModel->GetUserObjectComposite().get(), Sandbox::PipelineType::AUX);
 		}
 	}
 	
@@ -742,10 +746,10 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 	type = pHand->GetHandState().handType;
 	CBR(type == HAND_TYPE::HAND_LEFT || type == HAND_TYPE::HAND_RIGHT, R_SKIPPED);
 
-	//pDreamOS->AddObject(pHand->GetModel().get(), SandboxApp::PipelineType::MAIN);
-	//pDreamOS->AddObject(pHand->GetMalletHead(), SandboxApp::PipelineType::MAIN);
-	pDreamOS->AddObject(pHand, SandboxApp::PipelineType::MAIN);
-	//pDreamOS->AddObject(pHand->m_pHMDComposite.get(), SandboxApp::PipelineType::MAIN);
+	//pDreamOS->AddObject(pHand->GetModel().get(), Sandbox::PipelineType::MAIN);
+	//pDreamOS->AddObject(pHand->GetMalletHead(), Sandbox::PipelineType::MAIN);
+	pDreamOS->AddObject(pHand, Sandbox::PipelineType::MAIN);
+	//pDreamOS->AddObject(pHand->m_pHMDComposite.get(), Sandbox::PipelineType::MAIN);
 
 	CR(pHand->InitializeWithContext(pDreamOS));
 

@@ -1,12 +1,16 @@
 #include "DreamFormApp.h"
-#include "DreamControlView/UIControlView.h"
 
-#include "WebBrowser/DOMNode.h"
-#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
-#include "Cloud/WebRequest.h"
-#include "Core/Utilities.h"
+// TODO: you know what to do 
+#include "ui/DreamControlView/UIControlView.h"
 
-#include "UI/UISurface.h"
+#include "webbrowser/DOMNode.h"
+#include "webbrowser/CEFBrowser/CEFBrowserManager.h"
+
+#include "cloud/WebRequest.h"
+
+#include "core/Utilities.h"
+
+#include "ui/UISurface.h"
 
 DreamFormApp::DreamFormApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamFormApp>(pDreamOS, pContext)

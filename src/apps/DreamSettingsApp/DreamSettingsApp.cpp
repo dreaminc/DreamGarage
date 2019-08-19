@@ -1,13 +1,13 @@
 #include "DreamSettingsApp.h"
 
-#include "RESULT/EHM.h"
+// TODO: No app references 
+#include "apps/DreamUserControlAreaApp/DreamUserControlAreaApp.h"
+#include "apps/DreamUserControlAreaApp/DreamContentSource.h"
+#include "apps/DreamBrowserApp/DreamBrowserApp.h"
+#include "apps/DreamUserApp/DreamUserApp.h"
 
-#include "DreamUserControlArea/DreamContentSource.h"
-#include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamControlView/UIControlView.h"
-
-#include "DreamBrowser.h"
-#include "DreamUserApp.h"
+// TODO: Untangle this
+#include "ui/DreamControlView/UIControlView.h"
 
 
 DreamSettingsApp::DreamSettingsApp(DreamOS *pDreamOS, void *pContext) :

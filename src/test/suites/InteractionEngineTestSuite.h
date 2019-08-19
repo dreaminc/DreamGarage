@@ -1,17 +1,17 @@
 #ifndef INTERACTION_ENGINE_TEST_SUITE_H_
 #define INTERACTION_ENGINE_TEST_SUITE_H_
 
-#include "RESULT/EHM.h"
+#include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Primitives/matrix/MatrixTestSuite.h
-
-#include "Primitives/valid.h"
-#include "Primitives/Subscriber.h"
-#include "Test/DreamTestSuite.h"
+// Dream Interaction Engine Test Suite
+// dos/src/test/suites/InteractionEngineTestSuite.h
 
 #include <functional>
 #include <memory>
+
+#include "core/types/Subscriber.h"
+
+#include "DreamTestSuite.h"
 
 class DreamOS;
 class composite;
@@ -29,7 +29,7 @@ struct RayCompositeTestContext : public Subscriber<InteractionObjectEvent> {
 };
 
 // TODO: Consider moving valid up to TestSuite
-class InteractionEngineTestSuite : public valid, public DreamTestSuite  {
+class InteractionEngineTestSuite : public DreamTestSuite  {
 public:
 	InteractionEngineTestSuite(DreamOS *pDreamOS);
 	~InteractionEngineTestSuite();

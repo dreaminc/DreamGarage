@@ -1,22 +1,26 @@
 #include "DreamEnvironmentApp.h"
-#include "DreamOS.h"
 
-#include "HAL/opengl/OGLObj.h"
-#include "HAL/opengl/OGLProgramStandard.h"
-#include "HAL/opengl/OGLProgramScreenFade.h"
-#include "HAL/SkyboxScatterProgram.h"
-#include "HAL/FogProgram.h"
+#include "os/DreamOS.h"
 
-#include "Primitives/user.h"
+// TODO: No OGL here (ideally no hal either)
+#include "hal/ogl/OGLObj.h"
+#include "hal/ogl/OGLProgramStandard.h"
+#include "hal/ogl/OGLProgramScreenFade.h"
+
+#include "hal/SkyboxScatterProgram.h"
+#include "hal/FogProgram.h"
+
+#include "core/user/user.h"
+#include "core/Utilities.h"
 
 #include "Sandbox/CommandLineManager.h"
-#include "Core/Utilities.h"
 
-#include "DreamUserApp.h"
+// TODO: Can't ensure an app header
+#include "apps/DreamUSerApp/DreamUserApp.h"
 
-#include "Scene/ObjectStoreNode.h"
+#include "scene/ObjectStoreNode.h"
 
-#include "Sandbox/PathManager.h"
+#include "sandbox/PathManager.h"
 
 DreamEnvironmentApp::DreamEnvironmentApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamEnvironmentApp>(pDreamOS, pContext)

@@ -3,13 +3,13 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
+// Dream Sound Test Suite
 // DreamOS/Sound/SoundTestSuite.h
-
-#include "Test/DreamTestSuite.h"
 
 #include <functional>
 #include <memory>
+
+#include "DreamTestSuite.h"
 
 class DreamOS;
 

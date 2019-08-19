@@ -1,6 +1,6 @@
 #include "DreamTestingApp.h"
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
 DreamTestingApp::DreamTestingApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamTestingApp>(pDreamOS, pContext)

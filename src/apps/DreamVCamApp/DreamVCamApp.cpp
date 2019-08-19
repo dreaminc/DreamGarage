@@ -1,29 +1,29 @@
-#include "DreamVCam.h"
+#include "DreamVCamApp.h"
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
-#include "Scene/ObjectStoreNode.h"
+#include "ui/UICommon.h"
 
+#include "scene/ObjectStoreNode.h"
+#include "scene/CameraNode.h"
+
+// TODO: get rid of OGL at this level
 // Think about a more portable way to do this
 // but VCam will fail right now outside of OGL anyways
-#include "HAL/opengl/OGLTexture.h"
+#include "hal/ogl/OGLTexture.h"
+#include "hal/ogl/OGLProgram.h"
+#include "hal/ogl/OGLProgramReflection.h"
+#include "hal/ogl/OGLProgramRefraction.h"
+#include "hal/ogl/OGLProgramWater.h"
+#include "hal/ogl/OGLProgramSkybox.h"
 
-#include "Sandbox/NamedPipeServer.h"
+#include "sandbox/NamedPipeServer.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/opengl/OGLProgram.h"
-#include "DreamGarage/DreamGamepadCameraApp.h"
+#include "pipeline/ProgramNode.h"
 
-#include "HAL/opengl/OGLProgramReflection.h"
-#include "HAL/opengl/OGLProgramRefraction.h"
-#include "HAL/opengl/OGLProgramWater.h"
-#include "HAL/opengl/OGLProgramSkybox.h"
+#include "apps/DreamGamepadCameraApp/DreamGamepadCameraApp.h"
 
 #include "DreamUpdateVCamMessage.h"
-
-#include "DreamGarage/UICommon.h"
-
-#include "Scene/CameraNode.h"
 
 DreamVCam::DreamVCam(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamVCam>(pDreamOS, pContext)
@@ -143,7 +143,7 @@ RESULT DreamVCam::InitializePipeline() {
 	// Set up the aux camera and local pipeline
 
 
-	r = GetDOS()->MakePipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode, SandboxApp::PipelineType::AUX);
+	r = GetDOS()->MakePipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode, Sandbox::PipelineType::AUX);
 	if (r != R_NOT_IMPLEMENTED) {
 		CR(r);
 	}

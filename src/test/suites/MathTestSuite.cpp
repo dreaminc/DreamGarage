@@ -1,32 +1,32 @@
-#include "MatrixTestSuite.h"
+#include "MathTestSuite.h"
 
-#include "Primitives/matrix/matrix.h"
-#include "Primitives/matrix/TranslationMatrix.h"
+#include "core/matrix/matrix.h"
+#include "core/matrix/TranslationMatrix.h"
 
-MatrixTestSuite::MatrixTestSuite() :
+MathTestSuite::MathTestSuite() :
 	TestSuite("matrix")
 {
 	// empty 
 }
 
-MatrixTestSuite::~MatrixTestSuite() {
+MathTestSuite::~MathTestSuite() {
 	// empty
 }
 
-RESULT MatrixTestSuite::AddTests() {
+RESULT MathTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	auto pNewTest = AddTest("creatematrix", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixCreate, this));
-	pNewTest = AddTest("matrixmultiply", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixMultiply, this));
-	pNewTest = AddTest("matrixdeterminant", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixDeterminant, this));
-	pNewTest = AddTest("matrixminor", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixMinor, this));
-	pNewTest = AddTest("matrixinverse", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixInverse, this));
+	auto pNewTest = AddTest("creatematrix", (std::function<RESULT()>)std::bind(&MathTestSuite::TestMatrixCreate, this));
+	pNewTest = AddTest("matrixmultiply", (std::function<RESULT()>)std::bind(&MathTestSuite::TestMatrixMultiply, this));
+	pNewTest = AddTest("matrixdeterminant", (std::function<RESULT()>)std::bind(&MathTestSuite::TestMatrixDeterminant, this));
+	pNewTest = AddTest("matrixminor", (std::function<RESULT()>)std::bind(&MathTestSuite::TestMatrixMinor, this));
+	pNewTest = AddTest("matrixinverse", (std::function<RESULT()>)std::bind(&MathTestSuite::TestMatrixInverse, this));
 
-	pNewTest = AddTest("translatematrix", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestTranslateMatrix, this));
-	pNewTest = AddTest("rotatematrix", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestRotateMatrix, this));
-	pNewTest = AddTest("viewmatrix", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestViewMatrix, this));
-	pNewTest = AddTest("projectionmatrix", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestProjectionMatrix, this));
-	pNewTest = AddTest("scalematrix", (std::function<RESULT()>)std::bind(&MatrixTestSuite::TestScaleMatrix, this));
+	pNewTest = AddTest("translatematrix", (std::function<RESULT()>)std::bind(&MathTestSuite::TestTranslateMatrix, this));
+	pNewTest = AddTest("rotatematrix", (std::function<RESULT()>)std::bind(&MathTestSuite::TestRotateMatrix, this));
+	pNewTest = AddTest("viewmatrix", (std::function<RESULT()>)std::bind(&MathTestSuite::TestViewMatrix, this));
+	pNewTest = AddTest("projectionmatrix", (std::function<RESULT()>)std::bind(&MathTestSuite::TestProjectionMatrix, this));
+	pNewTest = AddTest("scalematrix", (std::function<RESULT()>)std::bind(&MathTestSuite::TestScaleMatrix, this));
 
 Error:
 	return r;
@@ -73,7 +73,7 @@ Error:
 
 // This will simply create a bunch of matrices of various
 // sizes and confirm parameters 
-RESULT MatrixTestSuite::TestMatrixCreate() {
+RESULT MathTestSuite::TestMatrixCreate() {
 	RESULT r = R_PASS;
 
 	int numIterations = 5;
@@ -173,7 +173,7 @@ Error:
 }
 
 // TODO: Add the N x M variants
-RESULT MatrixTestSuite::TestMatrixMultiply() {
+RESULT MathTestSuite::TestMatrixMultiply() {
 	RESULT r = R_PASS;
 
 	int numIterations = 5;
@@ -212,7 +212,7 @@ Error:
 	return r;
 }
 
-RESULT MatrixTestSuite::TestMatrixDeterminant() {
+RESULT MathTestSuite::TestMatrixDeterminant() {
 	RESULT r = R_PASS;
 
 	int numIterations = 5;
@@ -249,7 +249,7 @@ RESULT TestMatrixMinors() {
 	return r;
 }
 
-RESULT MatrixTestSuite::TestMatrixMinor() {
+RESULT MathTestSuite::TestMatrixMinor() {
 	RESULT r = R_PASS;
 
 	CRM((TestMatrixMinors<float, 3, 3>()), "Test Matrix Minor failed for float 3x3");
@@ -294,7 +294,7 @@ Error:
 	return r;
 }
 
-RESULT MatrixTestSuite::TestMatrixInverse() {
+RESULT MathTestSuite::TestMatrixInverse() {
 	RESULT r = R_PASS;
 
 	int numIterations = 5;
@@ -307,7 +307,7 @@ Error:
 	return r;
 }
 
-RESULT MatrixTestSuite::TestTranslateMatrix() {
+RESULT MathTestSuite::TestTranslateMatrix() {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("TEST TRANSLATION MATRIX");
@@ -327,22 +327,22 @@ RESULT MatrixTestSuite::TestTranslateMatrix() {
 	return r;
 }
 
-RESULT MatrixTestSuite::TestRotateMatrix() {
+RESULT MathTestSuite::TestRotateMatrix() {
 	// TODO:
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT MatrixTestSuite::TestScaleMatrix() {
+RESULT MathTestSuite::TestScaleMatrix() {
 	// TODO:
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT MatrixTestSuite::TestViewMatrix() {
+RESULT MathTestSuite::TestViewMatrix() {
 	// TODO:
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT MatrixTestSuite::TestProjectionMatrix() {
+RESULT MathTestSuite::TestProjectionMatrix() {
 	// TODO:
 	return R_NOT_IMPLEMENTED;
 }

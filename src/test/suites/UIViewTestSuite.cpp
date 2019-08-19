@@ -1,33 +1,38 @@
 #include "UIViewTestSuite.h"
 
-#include "DreamOS.h"
-#include "DreamGarage/DreamUIBar.h"
-#include "DreamGarage/DreamBrowser.h"
+#include <string>
+
+#include "os/DreamOS.h"
+
+#include "apps/DreamUIBarApp/DreamUIBarApp.h"
+#include "apps/DreamBrowserApp/DreamBrowserApp.h"
+
 //#include "DreamControlView/UIControlView.h"
 
-#include "UIView.h"
-#include "UIButton.h"
-#include "UISpatialScrollView.h"
+#include "ui/UIView.h"
+#include "ui/UIButton.h"
+#include "ui/UISpatialScrollView.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
-#include "HAL/UIStageProgram.h"
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
 
-#include "InteractionEngine/AnimationCurve.h"
-#include "InteractionEngine/AnimationItem.h"
+#include "hal/UIStageProgram.h"
 
-#include "Primitives/font.h"
-#include "Primitives/text.h"
-#include "Primitives/hand/hand.h"
+#include "modules/AnimationEngine/AnimationCurve.h"
+#include "modules/AnimationEngine/AnimationItem.h"
 
-#include <string>
-#include "Sense/SenseController.h"
+#include "core/text/font.h"
+#include "core/text/text.h"
 
-#include "Scene/CameraNode.h"
-#include "Scene/ObjectStoreNode.h"
+#include "core/hand/hand.h"
 
-#include "Sandbox/CommandLineManager.h"
+#include "sense/SenseController.h"
+
+#include "scene/CameraNode.h"
+#include "scene/ObjectStoreNode.h"
+
+#include "sandbox/CommandLineManager.h"
 
 UIViewTestSuite::UIViewTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("uiview", pDreamOS)

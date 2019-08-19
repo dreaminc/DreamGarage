@@ -1,16 +1,18 @@
 #ifndef DREAM_OS_TEST_SUITE_H_
 #define DREAM_OS_TEST_SUITE_H_
 
-// DREAM OS
-// DreamOS/Cloud/CloudTestSuite.h
+#include "core/ehm/EHM.h"        // for RESULT
 
-#include "Test/DreamTestSuite.h"
+// Dream OS Test Suite
+// dos/src/test/suites/DOSTestSuite.h
 
-#include "Primitives/Subscriber.h"
-
-#include "Primitives/point.h"     // for point
-#include "core/ehm/RESULT.h"        // for RESULT
 #include "xstring"                // for string
+
+#include "DreamTestSuite.h"
+
+#include "core/types/Subscriber.h"
+
+#include "core/primitives/point.h"     // for point
 
 struct InteractionObjectEvent;
 
@@ -18,13 +20,13 @@ class DreamOS;
 class UIStageProgram;
 struct WebBrowserPoint;
 
-class DreamOSTestSuite : 
+class DOSTestSuite : 
 	public DreamTestSuite, 
 	public Subscriber<InteractionObjectEvent>
 {
 public:
-	DreamOSTestSuite(DreamOS *pDreamOS);
-	~DreamOSTestSuite() = default;
+	DOSTestSuite(DreamOS *pDreamOS);
+	~DOSTestSuite() = default;
 
 	virtual RESULT AddTests() override;
 

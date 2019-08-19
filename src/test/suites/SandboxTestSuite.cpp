@@ -1,16 +1,17 @@
 #include "SandboxTestSuite.h"
 
-#include "DreamOS.h"
+#include "os/DreamOS.h"
 
-#include "HAL/Pipeline/ProgramNode.h"
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/SourceNode.h"
-#include "HAL/UIStageProgram.h"
+#include "pipeline/ProgramNode.h"
+#include "pipeline/SinkNode.h"
+#include "pipeline/SourceNode.h"
 
-#include "DreamTestingApp.h"
+#include "hal/UIStageProgram.h"
 
-#include "Scene/CameraNode.h"
-#include "Scene/ObjectStoreNode.h"
+#include "apps/DreamTestingApp/DreamTestingApp.h"
+
+#include "scene/CameraNode.h"
+#include "scene/ObjectStoreNode.h"
 
 SandboxTestSuite::SandboxTestSuite(DreamOS *pDreamOS) :
 	DreamTestSuite("sandbox", pDreamOS)

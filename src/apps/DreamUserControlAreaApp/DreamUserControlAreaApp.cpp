@@ -1,31 +1,36 @@
-#include "DreamUserControlArea.h"
+#include "DreamUserControlAreaApp.h"
+
 #include "DreamContentSource.h"
 
-#include "DreamOS.h"
-#include "DreamUserApp.h"
-#include "DreamGarage/DreamUIBar.h"
-#include "DreamGarage/DreamBrowser.h"
-#include "DreamGarage/UITabView.h"
-#include "DreamControlView/UIControlView.h"
-#include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
-#include "DreamVCam.h"
+#include "os/DreamOS.h"
+
+// TODO: No app references should be here after all
+#include "apps/DreamUserApp/DreamUserApp.h"
+#include "apps/DreamUIBarApp/DreamUIBarApp.h"
+#include "apps/DreamBrowserApp/DreamBrowserApp.h"
+#include "apps/DreamVCamApp/DreamVCamApp.h"
+#include "apps/DreamDesktopDuplicationApp/DreamDesktopApp.h"
+
+// TODO: What is the difference? 
+#include "ui/UITabView.h"
+#include "ui/DreamControlView/UIControlView.h"
+#include "ui/UIButton.h"
+#include "ui/UIFlatScrollView.h"
+#include "ui/UISurface.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
 #include "WebBrowser/DOMNode.h"
-#include "Cloud/Environment/EnvironmentAsset.h"	
-#include "Cloud/Environment/EnvironmentShare.h"	
 
-#include "InteractionEngine/InteractionObjectEvent.h"
-#include "InteractionEngine/AnimationCurve.h"
-#include "InteractionEngine/AnimationItem.h"
+#include "cloud/Environment/EnvironmentAsset.h"	
+#include "cloud/Environment/EnvironmentShare.h"	
 
-#include "UI/UIButton.h"
-#include "UI/UIFlatScrollView.h"
-#include "UI/UISurface.h"
+#include "modules/InteractionEngine/InteractionObjectEvent.h"
+#include "modules/AnimationEngine/AnimationCurve.h"
+#include "modules/AnimationEngine/AnimationItem.h"
 
-#include "Sound/AudioPacket.h"
+#include "sound/AudioPacket.h"
 
-#include "Primitives/hand/hand.h"
+#include "core/hand/hand.h"
 
 DreamUserControlArea::DreamUserControlArea(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUserControlArea>(pDreamOS, pContext)

@@ -1,14 +1,20 @@
 #include "DreamDesktopApp.h"
-#include "DreamOS.h"
-#include "Core/Utilities.h"
-#include "DreamUserControlArea/DreamUserControlArea.h"
-#include "Cloud/Environment/EnvironmentAsset.h"
 
-#include "DDCIPCMessage.h"
 #include <windows.h>
 #include <windowsx.h>
-#include "HAL\opengl\OGLTexture.h"
 
+#include "os/DreamOS.h"
+
+#include "core/Utilities.h"
+
+#include "apps/DreamUserControlAreaApp/DreamUserControlAreaApp.h"
+
+#include "cloud/Environment/EnvironmentAsset.h"
+
+#include "dreamdesktop/DDCIPCMessage.h"
+
+// TODO: No OGL
+#include "hal/ogl/OGLTexture.h"
 
 DreamDesktopApp::DreamDesktopApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamDesktopApp>(pDreamOS, pContext)

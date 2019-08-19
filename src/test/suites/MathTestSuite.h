@@ -3,18 +3,19 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Primitices/matrix/MatrixTestSuite.h
-
-#include "Test/TestSuite.h"
+// Dream Math Test Suite
+// dos/src/test/suites/MathTestSuite.h
 
 #include <functional>
 #include <memory>
 
-class MatrixTestSuite : public TestSuite {
+#include "test/TestSuite.h"
+
+// TODO: Move to DreamTestSuite and port to DOS or find a way to run "headless"
+class MathTestSuite : public TestSuite {
 public:
-	MatrixTestSuite();
-	~MatrixTestSuite();
+	MathTestSuite();
+	~MathTestSuite();
 
 	// TODO: Needed tests
 	// element() vs operator () and operator []

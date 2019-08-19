@@ -6,7 +6,7 @@
 #include "pipeline/SinkNode.h"
 #include "pipeline/SourceNode.h"
 
-#include "PhysicsEngine/CollisionManifold.h"
+#include "modules/PhysicsEngine/CollisionManifold.h"
 
 #include "core/dimension/DimPlane.h"
 

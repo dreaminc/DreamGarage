@@ -3,13 +3,13 @@
 
 #include "core/ehm/EHM.h"
 
-// DREAM OS
-// DreamOS/Primitives/DimensionTestSuite.h
-
-#include "Test/DreamTestSuite.h"
+// Dream Dimension Test Suite
+// dos/src/test/suites/DimensionTestSuite.h
 
 #include <functional>
 #include <memory>
+
+#include "DreamTestSuite.h"
 
 class DreamOS;
 
