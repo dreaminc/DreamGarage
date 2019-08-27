@@ -18,6 +18,12 @@ file(GLOB OPENVR_SOURCES
 )
 source_group("openvr" FILES ${OPENVR_SOURCES})
 
+file(GLOB OPENVR_MATRICES_SOURCES
+  "${CMAKE_SOURCE_DIR}/src/third_party/Matrices/*.cpp"
+  "${CMAKE_SOURCE_DIR}/src/third_party/Matrices/*.h"
+)
+source_group("openvr\\Matrices" FILES ${OPENVR_MATRICES_SOURCES})
+
 # Oculus
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/OCULUS/v1.12.0/LibOVR/Include)
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/OCULUS/OVRPlatformSDK_v1.24.0/Include)
@@ -45,5 +51,6 @@ add_library(hmd
     ${SOURCES}
     ${OCULUS_SOURCES}
     ${OPENVR_SOURCES}
+    ${OPENVR_MATRICES_SOURCES}
 )
 

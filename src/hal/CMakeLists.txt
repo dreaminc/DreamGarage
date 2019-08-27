@@ -23,7 +23,7 @@ file(GLOB OGL_GL_SOURCES
     "olg/gl/*.tpp"
     "ogl/gl/*.h"
 )
-source_group("ogl//gl" FILES ${OGL_GL_SOURCES})
+source_group("ogl\\gl" FILES ${OGL_GL_SOURCES})
 
 # Shaders Folder
 file(GLOB OGL_SHADERS_SOURCES 
@@ -31,7 +31,7 @@ file(GLOB OGL_SHADERS_SOURCES
     "ogl/shaders/*.tpp"
     "ogl/shaders/*.h"
 )
-source_group("ogl//shaders" FILES ${OGL_SHADERS_SOURCES})
+source_group("ogl\\shaders" FILES ${OGL_SHADERS_SOURCES})
 
 # GLSL 
 file(GLOB OGL_SHADERS_GLSL 
@@ -39,7 +39,7 @@ file(GLOB OGL_SHADERS_GLSL
     "ogl/shaders/glsl/v440/*.vert"
     "ogl/shaders/glsl/v440/*.frag"
 )
-source_group("ogl//shaders//glsl//v440" FILES ${OGL_SHADERS_GLSL})
+source_group("ogl\\shaders\\glsl\\v440" FILES ${OGL_SHADERS_GLSL})
 
 # Win64 
 file(GLOB OGL_WIN64_SOURCES 
@@ -47,7 +47,7 @@ file(GLOB OGL_WIN64_SOURCES
     "ogl/win64/*.tpp"
     "ogl/win64/*.h"
 )
-source_group("ogl//win64" FILES ${OGL_WIN64_SOURCES})
+source_group("ogl\\win64" FILES ${OGL_WIN64_SOURCES})
 
 # Easy Logging
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/easyloggingpp/include)
