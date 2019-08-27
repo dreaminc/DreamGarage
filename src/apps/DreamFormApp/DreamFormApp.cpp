@@ -87,11 +87,11 @@ RESULT DreamFormApp::Update(void *pContext) {
 		m_fInitBrowser = false;
 		m_fBrowserFinishedLoading = false;
 
-		m_pDreamBrowserForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
-		CN(m_pDreamBrowserForm);
-		CR(m_pDreamBrowserForm->RegisterObserver(this));
+		m_pDreamBrowserAppForm = GetDOS()->LaunchDreamApp<DreamBrowserApp>(this);
+		CN(m_pDreamBrowserAppForm);
+		CR(m_pDreamBrowserAppForm->RegisterObserver(this));
 
-		CR(m_pDreamBrowserForm->InitializeWithBrowserManager(GetDOS()->GetUserApp()->GetBrowserManager(), m_strURL));
+		CR(m_pDreamBrowserAppForm->InitializeWithBrowserManager(GetDOS()->GetUserApp()->GetBrowserManager(), m_strURL));
 
 		DOSLOG(INFO, "Created browser app for form: %s", m_strURL);
 
@@ -119,7 +119,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 		//*/
 
 //		m_pDreamBrowserForm->LoadRequest(webRequest);
-		m_pDreamBrowserForm->SetURI(m_strURL);
+		m_pDreamBrowserAppForm->SetURI(m_strURL);
 	}
 
 	if (m_fSetAsActive) {
@@ -139,10 +139,10 @@ Error:
 
 RESULT DreamFormApp::Shutdown(void *pContext) {
 
-	if (m_pDreamBrowserForm != nullptr) {
-		m_pDreamBrowserForm->CloseSource();
-		GetDOS()->ShutdownDreamApp<DreamBrowser>(m_pDreamBrowserForm);
-		m_pDreamBrowserForm = nullptr;
+	if (m_pDreamBrowserAppForm != nullptr) {
+		m_pDreamBrowserAppForm->CloseSource();
+		GetDOS()->ShutdownDreamApp<DreamBrowserApp>(m_pDreamBrowserAppForm);
+		m_pDreamBrowserAppForm = nullptr;
 	}
 
 	return R_PASS;
@@ -222,7 +222,7 @@ RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 
 #ifndef _DEBUG
 	m_strURL = strURL;
-	if (m_pDreamBrowserForm == nullptr) {
+	if (m_pDreamBrowserAppForm == nullptr) {
 		m_fInitBrowser = true;
 		DOSLOG(INFO, "Create browser for form: %s", m_strURL);
 	}
@@ -237,13 +237,13 @@ RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 RESULT DreamFormApp::ResetForm() {
 	RESULT r = R_PASS;
 
-	m_pDreamBrowserForm->CloseSource();
-	CRM(GetDOS()->ShutdownDreamApp<DreamBrowser>(m_pDreamBrowserForm), "Browser shutdown failed");
+	m_pDreamBrowserAppForm->CloseSource();
+	CRM(GetDOS()->ShutdownDreamApp<DreamBrowserApp>(m_pDreamBrowserAppForm), "Browser shutdown failed");
 
 	m_fInitBrowser = true;
 
 Error:
-	m_pDreamBrowserForm = nullptr;
+	m_pDreamBrowserAppForm = nullptr;
 	return r;
 }
 
@@ -339,7 +339,7 @@ RESULT DreamFormApp::HandleIsInputFocused(bool fIsFocused, DreamContentSource *p
 	else if (!fIsFocused && m_fTyping) {
 		m_fTyping = false;
 
-		CR(m_pDreamBrowserForm->HandleUnfocusEvent());
+		CR(m_pDreamBrowserAppForm->HandleUnfocusEvent());
 		CR(m_pFormView->HandleKeyboardDown());
 	}
 
@@ -371,7 +371,7 @@ RESULT DreamFormApp::HandleDreamFormCancel() {
 	RESULT r = R_PASS;
 
 	m_pFormView->HandleKeyboardDown();
-	m_pDreamBrowserForm->HandleUnfocusEvent();
+	m_pDreamBrowserAppForm->HandleUnfocusEvent();
 
 Error:
 	return r;
@@ -433,7 +433,7 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 	case INTERACTION_EVENT_MENU: {
 		auto pCloudController = GetDOS()->GetCloudController();
 		if (GetDOS()->GetKeyboardApp()->IsVisible()) {
-			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
+			CR(m_pDreamBrowserAppForm->HandleUnfocusEvent());
 			CR(m_pFormView->HandleKeyboardDown());
 		}
 		else if (pCloudController != nullptr && 
@@ -457,24 +457,24 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 
 		char chkey = (char)(pEvent->m_value);
 		CBR(chkey != 0x00, R_SKIPPED);	
-		CNR(m_pDreamBrowserForm, R_SKIPPED);
+		CNR(m_pDreamBrowserAppForm, R_SKIPPED);
 
 
 		if (chkey == SVK_RETURN) {
-			CR(m_pDreamBrowserForm->OnKeyPress(chkey, true));
+			CR(m_pDreamBrowserAppForm->OnKeyPress(chkey, true));
 		}
 		else if (chkey == SVK_TAB) {
-			CR(m_pDreamBrowserForm->HandleTabEvent());
+			CR(m_pDreamBrowserAppForm->HandleTabEvent());
 		}
 		else if (chkey == SVK_SHIFTTAB) {
-			CR(m_pDreamBrowserForm->HandleBackTabEvent());
+			CR(m_pDreamBrowserAppForm->HandleBackTabEvent());
 		}
 		else if (chkey == SVK_CLOSE) {
-			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
+			CR(m_pDreamBrowserAppForm->HandleUnfocusEvent());
 			CR(m_pFormView->HandleKeyboardDown());
 		}
 		else {
-			CR(m_pDreamBrowserForm->OnKeyPress(chkey, true));
+			CR(m_pDreamBrowserAppForm->OnKeyPress(chkey, true));
 		}
 
 	} break;
@@ -507,8 +507,8 @@ WebBrowserPoint DreamFormApp::GetRelativePointofContact(point ptContact) {
 	posX = (posX + 1.0f) / 2.0f;	// flip it
 	posY = (posY + 1.0f) / 2.0f;  
 	
-	ptRelative.x = posX * m_pDreamBrowserForm->GetWidth();
-	ptRelative.y = posY * m_pDreamBrowserForm->GetHeight();
+	ptRelative.x = posX * m_pDreamBrowserAppForm->GetWidth();
+	ptRelative.y = posY * m_pDreamBrowserAppForm->GetHeight();
 
 	return ptRelative;
 }
@@ -521,7 +521,7 @@ RESULT DreamFormApp::Notify(UIEvent *pUIEvent) {
 
 	CNR(m_pFormView, R_SKIPPED);
 	CBR(pUIEvent->m_pObj == m_pFormView->GetViewQuad().get(), R_SKIPPED);
-	CNR(m_pDreamBrowserForm, R_SKIPPED);
+	CNR(m_pDreamBrowserAppForm, R_SKIPPED);
 
 	wptContact = GetRelativePointofContact(pUIEvent->m_ptEvent);
 	ptContact = point(wptContact.x, wptContact.y, 0.0f);
@@ -529,22 +529,22 @@ RESULT DreamFormApp::Notify(UIEvent *pUIEvent) {
 	switch (pUIEvent->m_eventType) {
 	case UI_SELECT_BEGIN: {
 		if (GetDOS()->GetKeyboardApp()->IsVisible()) {
-			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
+			CR(m_pDreamBrowserAppForm->HandleUnfocusEvent());
 			CR(m_pFormView->HandleKeyboardDown());
 		}
-		CR(m_pDreamBrowserForm->OnClick(ptContact, true));
+		CR(m_pDreamBrowserAppForm->OnClick(ptContact, true));
 	} break;
 
 	case UI_SELECT_ENDED: {
-		CR(m_pDreamBrowserForm->OnClick(ptContact, false));
+		CR(m_pDreamBrowserAppForm->OnClick(ptContact, false));
 	} break;
 
 	case UI_SELECT_MOVED: {
-		CR(m_pDreamBrowserForm->OnMouseMove(ptContact));
+		CR(m_pDreamBrowserAppForm->OnMouseMove(ptContact));
 	} break;
 
 	case UI_SCROLL: {
-		CR(m_pDreamBrowserForm->OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
+		CR(m_pDreamBrowserAppForm->OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
 	} break;
 	};
 
@@ -563,7 +563,7 @@ RESULT DreamFormApp::Notify(HMDEvent *pHMDEvent) {
 	pEventApp = pDreamUserApp->m_pEventApp;
 	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
 	CNR(m_pFormView, R_SKIPPED);
-	CNR(m_pDreamBrowserForm, R_SKIPPED);
+	CNR(m_pDreamBrowserAppForm, R_SKIPPED);
 
 	switch (pHMDEvent->m_eventType) {
 	
@@ -630,7 +630,7 @@ RESULT DreamFormApp::Hide() {
 	RESULT r = R_PASS;
 
 	CNR(m_pFormView, R_SKIPPED);
-	CNR(m_pDreamBrowserForm, R_SKIPPED);
+	CNR(m_pDreamBrowserAppForm, R_SKIPPED);
 
 	CR(m_pFormView->Hide());
 	m_fFormVisible = false;
@@ -638,9 +638,9 @@ RESULT DreamFormApp::Hide() {
 	CR(GetDOS()->GetUserApp()->SetEventApp(nullptr));
 
 //	m_pDreamBrowserForm->Shutdown();
-	m_pDreamBrowserForm->CloseSource();
-	GetDOS()->ShutdownDreamApp<DreamBrowser>(m_pDreamBrowserForm);
-	m_pDreamBrowserForm = nullptr;
+	m_pDreamBrowserAppForm->CloseSource();
+	GetDOS()->ShutdownDreamApp<DreamBrowserApp>(m_pDreamBrowserAppForm);
+	m_pDreamBrowserAppForm = nullptr;
 
 Error:
 	return r;

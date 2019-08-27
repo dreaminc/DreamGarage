@@ -64,7 +64,7 @@ class SoundFile;
 class UIKeyboard : public DreamApp<UIKeyboard>,
 	public SenseKeyboard {
 	friend class DreamAppManager;
-	friend class DreamUserControlArea;
+	friend class DreamUserControlAreaApp;
 
 public:
 	UIKeyboard(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -75,7 +75,7 @@ private:
 	RESULT InitializeKeyboardControls();
 
 public:
-	RESULT InitializeWithParent(DreamUserControlArea *pParent);
+	RESULT InitializeWithParent(DreamUserControlAreaApp *pParent);
 
 	//DreamApp
 public:
@@ -239,7 +239,7 @@ private:
 	LayoutType m_currentLayout;
 	UIKeyboardLayout *m_pLayout;
 
-	DreamUserControlArea *m_pParentApp = nullptr;
+	DreamUserControlAreaApp *m_pParentApp = nullptr;
 };
 
 #endif // ! UI_KEYBOARD_H_

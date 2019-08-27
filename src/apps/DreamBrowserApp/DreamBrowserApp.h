@@ -49,7 +49,7 @@ class texture;
 class EnvironmentAsset;
 class WebBrowserManager;
 class DOMNode;
-class DreamUserControlArea;
+class DreamUserControlAreaApp;
 class AudioPacket;
 class SoundBuffer;
 
@@ -82,16 +82,16 @@ public:
 	virtual std::string GetLoadErrorURL() { return std::string(""); };
 };
 
-class DreamBrowser : 
-	public DreamApp<DreamBrowser>, 
+class DreamBrowserApp : 
+	public DreamApp<DreamBrowserApp>, 
 	public DreamContentSource,
 	public WebBrowserController::observer
 {
 	friend class DreamAppManager;
 
 public:
-	DreamBrowser(DreamOS *pDreamOS, void *pContext = nullptr);
-	~DreamBrowser();
+	DreamBrowserApp(DreamOS *pDreamOS, void *pContext = nullptr);
+	~DreamBrowserApp();
 
 	// DreamApp Interface
 	virtual RESULT InitializeApp(void *pContext = nullptr);
@@ -222,7 +222,7 @@ private:
 	DreamBrowserObserver *m_pObserver = nullptr;
 
 protected:
-	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+	static DreamBrowserApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
 	std::shared_ptr<texture> m_pBrowserTexture = nullptr;

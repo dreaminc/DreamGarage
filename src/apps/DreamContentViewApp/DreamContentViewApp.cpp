@@ -6,18 +6,18 @@
 #include "cloud/HTTP/HTTPController.h"
 #include "cloud/Environment/EnvironmentAsset.h"
 
-DreamContentView::DreamContentView(DreamOS *pDreamOS, void *pContext) :
-	DreamApp<DreamContentView>(pDreamOS, pContext)
+DreamContentViewApp::DreamContentViewApp(DreamOS *pDreamOS, void *pContext) :
+	DreamApp<DreamContentViewApp>(pDreamOS, pContext)
 {
 	// Empty - initialization by factory
 }
 
-DreamContentView* DreamContentView::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
-	DreamContentView *pDreamApp = new DreamContentView(pDreamOS, pContext);
+DreamContentViewApp* DreamContentViewApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
+	DreamContentViewApp *pDreamApp = new DreamContentViewApp(pDreamOS, pContext);
 	return pDreamApp;
 }
 
-RESULT DreamContentView::InitializeApp(void *pContext) {
+RESULT DreamContentViewApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
 	// Subscribers (children)
@@ -39,7 +39,7 @@ Error:
 	return r;
 }
 
-RESULT DreamContentView::OnAppDidFinishInitializing(void *pContext) {
+RESULT DreamContentViewApp::OnAppDidFinishInitializing(void *pContext) {
 	RESULT r = R_PASS;
 
 	CR(r);
@@ -48,7 +48,7 @@ Error:
 	return r;
 }
 
-RESULT DreamContentView::Shutdown(void *pContext) {
+RESULT DreamContentViewApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
 	CR(r);
@@ -57,7 +57,7 @@ Error:
 	return r;
 }
 
-RESULT DreamContentView::Update(void *pContext) {
+RESULT DreamContentViewApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	if (m_pPendingBufferVector != nullptr) {
@@ -79,15 +79,15 @@ Error:
 	return r;
 }
 
-float DreamContentView::GetWidth() {
+float DreamContentViewApp::GetWidth() {
 	return std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
 
-float DreamContentView::GetHeight() {
+float DreamContentViewApp::GetHeight() {
 	return GetWidth() / m_aspectRatio;
 }
 
-RESULT DreamContentView::UpdateViewQuad() {
+RESULT DreamContentViewApp::UpdateViewQuad() {
 	RESULT r = R_PASS;
 
 	CR(m_pScreenQuad->UpdateParams(GetWidth(), GetHeight(), GetNormal()));
@@ -99,7 +99,7 @@ Error:
 	return r;
 }
 
-RESULT DreamContentView::SetScreenTexture(texture *pTexture) {
+RESULT DreamContentViewApp::SetScreenTexture(texture *pTexture) {
 	if (m_fFitTextureAspectRatio) {
 		m_aspectRatio = (float)pTexture->GetWidth() / (float)pTexture->GetHeight();
 		SetParams(GetOrigin(), m_diagonalSize, m_aspectRatio, m_vNormal);
@@ -108,7 +108,7 @@ RESULT DreamContentView::SetScreenTexture(texture *pTexture) {
 	return m_pScreenQuad->SetDiffuseTexture(pTexture);
 }
 
-RESULT DreamContentView::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector) {
+RESULT DreamContentViewApp::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector) {
 	RESULT r = R_PASS;
 
 	CN(pBufferVector);
@@ -122,7 +122,7 @@ Error:
 	return r;
 }
 
-RESULT DreamContentView::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT DreamContentViewApp::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
 	if (pEnvironmentAsset != nullptr) {
@@ -134,16 +134,16 @@ Error:
 	return r;
 }
 
-RESULT DreamContentView::SetFitTextureAspectRatio(bool fFitTextureAspectRatio) {
+RESULT DreamContentViewApp::SetFitTextureAspectRatio(bool fFitTextureAspectRatio) {
 	m_fFitTextureAspectRatio = fFitTextureAspectRatio;
 	return R_PASS;
 }
 
-RESULT DreamContentView::SetVisible(bool fVisible) {
+RESULT DreamContentViewApp::SetVisible(bool fVisible) {
 	return m_pScreenQuad->SetVisible(fVisible);
 }
 
-RESULT DreamContentView::SetScreenURI(const std::string &strURI) {
+RESULT DreamContentViewApp::SetScreenURI(const std::string &strURI) {
 	RESULT r = R_PASS;
 
 	// Cloud Controller
@@ -162,14 +162,14 @@ RESULT DreamContentView::SetScreenURI(const std::string &strURI) {
 		//std::string strAuthorizationToken = "Authorization: Bearer " + pUserControllerProxy->GetUserToken();
 		//strHeaders.push_back(strAuthorizationToken);
 
-		CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamContentView::HandleOnFileResponse, this, std::placeholders::_1)));
+		CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamContentViewApp::HandleOnFileResponse, this, std::placeholders::_1)));
 	}
 
 Error:
 	return r;
 }
 
-RESULT DreamContentView::SetScreenTexture(const std::wstring &wstrTextureFilename) {
+RESULT DreamContentViewApp::SetScreenTexture(const std::wstring &wstrTextureFilename) {
 	RESULT r = R_PASS;
 
 	texture *pTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, const_cast<wchar_t*>(wstrTextureFilename.c_str()));
@@ -181,7 +181,7 @@ Error:
 	return r;
 }
 	   
-RESULT DreamContentView::Notify(InteractionObjectEvent *event) {
+RESULT DreamContentViewApp::Notify(InteractionObjectEvent *event) {
 	RESULT r = R_PASS;
 
 	/*
@@ -203,7 +203,7 @@ Error:
 	return r;
 }
 
-RESULT DreamContentView::SetAspectRatio(float aspectRatio) {
+RESULT DreamContentViewApp::SetAspectRatio(float aspectRatio) {
 	m_aspectRatio = aspectRatio;
 
 	if (m_pScreenQuad != nullptr)
@@ -212,7 +212,7 @@ RESULT DreamContentView::SetAspectRatio(float aspectRatio) {
 	return R_PASS;
 }
 
-RESULT DreamContentView::SetDiagonalSize(float diagonalSize) {
+RESULT DreamContentViewApp::SetDiagonalSize(float diagonalSize) {
 	m_diagonalSize = diagonalSize;
 
 	if (m_pScreenQuad != nullptr)
@@ -221,7 +221,7 @@ RESULT DreamContentView::SetDiagonalSize(float diagonalSize) {
 	return R_PASS;
 }
 
-RESULT DreamContentView::SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal) {
+RESULT DreamContentViewApp::SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal) {
 	GetComposite()->SetPosition(ptPosition);
 	m_diagonalSize = diagonal;
 	m_aspectRatio = aspectRatio;
@@ -233,11 +233,11 @@ RESULT DreamContentView::SetParams(point ptPosition, float diagonal, float aspec
 	return R_PASS;
 }
 
-RESULT DreamContentView::SetParams(point ptPosition, float diagonal, AspectRatio aspectRatio, vector vNormal) {
+RESULT DreamContentViewApp::SetParams(point ptPosition, float diagonal, AspectRatio aspectRatio, vector vNormal) {
 	return SetParams(ptPosition, diagonal, k_aspectRatios[aspectRatio], vNormal);
 }
 
-RESULT DreamContentView::SetNormalVector(vector vNormal) {
+RESULT DreamContentViewApp::SetNormalVector(vector vNormal) {
 	m_vNormal = vNormal.Normal();
 
 	if(m_pScreenQuad != nullptr)
@@ -246,10 +246,10 @@ RESULT DreamContentView::SetNormalVector(vector vNormal) {
 	return R_PASS;
 }
 
-vector DreamContentView::GetNormal() {
+vector DreamContentViewApp::GetNormal() {
 	return m_vNormal;
 }
 
-point DreamContentView::GetOrigin() {
+point DreamContentViewApp::GetOrigin() {
 	return GetComposite()->GetOrigin();
 }

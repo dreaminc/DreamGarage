@@ -29,7 +29,7 @@ class texture;
 
 class EnvironmentAsset;
 
-class DreamContentView : public DreamApp<DreamContentView>, public Subscriber<InteractionObjectEvent> {
+class DreamContentViewApp : public DreamApp<DreamContentViewApp>, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
 
 public:
@@ -45,7 +45,7 @@ public:
 	};
 
 public:
-	DreamContentView(DreamOS *pDreamOS, void *pContext = nullptr);
+	DreamContentViewApp(DreamOS *pDreamOS, void *pContext = nullptr);
 
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
@@ -81,7 +81,7 @@ private:
 	RESULT HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector);
 
 protected:
-	static DreamContentView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+	static DreamContentViewApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
 	std::shared_ptr<quad> m_pScreenQuad = nullptr;

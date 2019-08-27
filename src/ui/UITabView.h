@@ -13,7 +13,7 @@
 
 #include "os/app/DreamApp.h"
 
-class DreamUserControlArea;
+class DreamUserControlAreaApp;
 class DreamContentSource;
 class DreamBrowser;
 
@@ -32,7 +32,7 @@ public:
 	UITabView(HALImp *pHALImp, DreamOS *pDreamOS);
 	~UITabView();
 
-	RESULT Initialize(DreamUserControlArea *pParent);
+	RESULT Initialize(DreamUserControlAreaApp *pParent);
 	RESULT Update();
 
 public:
@@ -82,7 +82,7 @@ private:
 	RESULT TranslateTabUp(DimObj *pTabButton);
 	
 private:
-	DreamUserControlArea* m_pParentApp = nullptr;
+	DreamUserControlAreaApp* m_pParentApp = nullptr;
 
 	std::shared_ptr<quad> m_pBackgroundQuad = nullptr;
 	std::shared_ptr<quad> m_pRenderQuad = nullptr;

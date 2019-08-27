@@ -423,7 +423,7 @@ Error:
 	return r;
 }
 
-RESULT DreamDesktopApp::InitializeWithParent(DreamUserControlArea *pParentApp) {
+RESULT DreamDesktopApp::InitializeWithParent(DreamUserControlAreaApp *pParentApp) {
 	RESULT r = R_PASS;
 	
 	m_pParentApp = pParentApp;

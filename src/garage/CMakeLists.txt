@@ -21,6 +21,10 @@ else()
     add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
 endif()
 
+# Multithreaded 
+set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+
 add_library(garage
     ${SOURCES}
 )

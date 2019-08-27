@@ -37,11 +37,11 @@ class quad;
 
 //class SoundBuffer;
 
-class DreamUserControlArea;
+class DreamUserControlAreaApp;
 class EnvironmentAsset;
 
-class DreamVCam : 
-	public DreamModule<DreamVCam>,
+class DreamVCamApp : 
+	public DreamModule<DreamVCamApp>,
 	public DreamContentSource,
 	public NamedPipeServer::observer,
 	public DreamGamepadCameraApp::observer,
@@ -59,8 +59,8 @@ public:
 	};
 
 public:
-	DreamVCam(DreamOS *pDreamOS, void *pContext = nullptr);
-	~DreamVCam();
+	DreamVCamApp(DreamOS *pDreamOS, void *pContext = nullptr);
+	~DreamVCamApp();
 
 	virtual RESULT InitializeModule(void *pContext = nullptr) override;
 	virtual RESULT OnDidFinishInitializing(void *pContext = nullptr) override;
@@ -79,7 +79,7 @@ public:
 	CameraNode *GetCameraNode();
 
 	// Menu integration
-	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
+	RESULT InitializeWithParent(DreamUserControlAreaApp *pParentApp);
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 
 	// DreamContentSource
@@ -150,7 +150,7 @@ public:
 		size_t pDataBuffer_n = 0;
 	} m_pendingFrame;
 
-	RESULT SetSourceType(DreamVCam::SourceType sourceType);
+	RESULT SetSourceType(DreamVCamApp::SourceType sourceType);
 	RESULT Mute(bool fMute);
 
 private:
@@ -166,7 +166,7 @@ private:
 	std::wstring k_wstrClosed = L"camera/messages-closed.png";
 
 protected:
-	static DreamVCam* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+	static DreamVCamApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
 	std::shared_ptr<NamedPipeServer> m_pNamedPipeServer = nullptr;
@@ -203,14 +203,14 @@ private:
 	bool m_fIsRunning = false;
 	bool m_fPendDisconnectPipes = false;
 	bool m_fIsMuted = false;
-	DreamVCam::SourceType m_sourceType = SourceType::INVALID;
+	DreamVCamApp::SourceType m_sourceType = SourceType::INVALID;
 
 	long m_assetID = -1;
 	std::string m_strPath;
 	std::string m_strScope;
 	std::string m_strContentType;
 	std::string m_strTitle = "Dream Virtual Camera";
-	DreamUserControlArea* m_pParentApp = nullptr;
+	DreamUserControlAreaApp* m_pParentApp = nullptr;
 
 	// flags for sending/receiving data
 	bool m_fSendingCameraPlacement = false;

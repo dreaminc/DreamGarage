@@ -92,7 +92,7 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
+RESULT UIKeyboard::InitializeWithParent(DreamUserControlAreaApp *pParent) {
 	RESULT r = R_PASS;
 
 	CBR(m_pParentApp == nullptr, R_SKIPPED);

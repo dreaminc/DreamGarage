@@ -215,7 +215,7 @@ RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
 		std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObject = nullptr;
 
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
-		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+		std::shared_ptr<DreamBrowserApp> m_pDreamBrowserApp = nullptr;
 
 		// SoundClient::observer
 		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
@@ -306,12 +306,12 @@ RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
 			pTestContext->m_pBrowserQuad->SetPosition(ptPosition);
 
 			// Create the Shared View App
-			pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-			pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
-			CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
-			CRM(pTestContext->m_pDreamBrowser->RegisterObserver(pTestContext), "Failed to register browser observer");
+			pTestContext->m_pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
+			pTestContext->m_pDreamBrowserApp->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+			CNM(pTestContext->m_pDreamBrowserApp, "Failed to create dream browser");
+			CRM(pTestContext->m_pDreamBrowserApp->RegisterObserver(pTestContext), "Failed to register browser observer");
 
-			pTestContext->m_pDreamBrowser->SetURI(strURL);
+			pTestContext->m_pDreamBrowserApp->SetURI(strURL);
 
 			// Create the capture client
 			pTestContext->pWASAPISoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
@@ -356,8 +356,8 @@ RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		if (pTestContext->m_pBrowserQuad != nullptr && pTestContext->m_pDreamBrowser != nullptr) {
-			pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture());
+		if (pTestContext->m_pBrowserQuad != nullptr && pTestContext->m_pDreamBrowserApp != nullptr) {
+			pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowserApp->GetSourceTexture());
 		}
 
 		{

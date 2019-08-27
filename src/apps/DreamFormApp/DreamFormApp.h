@@ -107,7 +107,7 @@ public:
 	RESULT Hide();
 
 protected:
-	std::shared_ptr<DreamBrowser> m_pDreamBrowserForm = nullptr;
+	std::shared_ptr<DreamBrowserApp> m_pDreamBrowserAppForm = nullptr;
 	std::shared_ptr<UIControlView> m_pFormView = nullptr;
 
 //private:

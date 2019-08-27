@@ -66,7 +66,7 @@ Error:
 	return r;
 }
 
-RESULT UITabView::Initialize(DreamUserControlArea *pParent) {
+RESULT UITabView::Initialize(DreamUserControlAreaApp *pParent) {
 	RESULT r = R_PASS;
 
 	m_pParentApp = pParent;

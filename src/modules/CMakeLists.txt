@@ -42,7 +42,11 @@ else()
     add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
 endif()
 
-add_library(module
+# Multithreaded 
+set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+
+add_library(modules
     ${ANIMATION_ENGINE_SOURCES}
     ${DREAM_SOUND_SYSTEM_SOURCES}
     ${INTERACTION_ENGINE_SOURCES}

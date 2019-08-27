@@ -34,24 +34,24 @@ class composite;
 class quad;
 struct UIEvent;
 
-DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
-	DreamApp<DreamUIBar>(pDreamOS, pContext)//,
+DreamUIBarApp::DreamUIBarApp(DreamOS *pDreamOS, void *pContext) :
+	DreamApp<DreamUIBarApp>(pDreamOS, pContext)//,
 {
 	// 
 }
 
-RESULT DreamUIBar::RegisterEvent(InteractionEventType type, std::function<RESULT(void*)> fnCallback) {
+RESULT DreamUIBarApp::RegisterEvent(InteractionEventType type, std::function<RESULT(void*)> fnCallback) {
 	m_callbacks[type] = fnCallback;
 	return R_PASS;
 }
 
-RESULT DreamUIBar::SetFont(const std::wstring& strFile) {
+RESULT DreamUIBarApp::SetFont(const std::wstring& strFile) {
 	m_pFont = GetDOS()->MakeFont(strFile, true);
 	//m_pFont->SetLineHeight()
 	return R_PASS;
 }
 
-RESULT DreamUIBar::InitializeApp(void *pContext) {
+RESULT DreamUIBarApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
 	DreamOS *pDreamOS = GetDOS();
@@ -114,11 +114,11 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::OnAppDidFinishInitializing(void *pContext) {
+RESULT DreamUIBarApp::OnAppDidFinishInitializing(void *pContext) {
 	return R_PASS;
 }
 
-RESULT DreamUIBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
+RESULT DreamUIBarApp::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<quad> pSurface = nullptr;
@@ -168,17 +168,17 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::HandleTouchMove(void* pContext) {
+RESULT DreamUIBarApp::HandleTouchMove(void* pContext) {
 	return R_PASS;
 }
 
-RESULT DreamUIBar::HandleTouchEnd(void* pContext) {
+RESULT DreamUIBarApp::HandleTouchEnd(void* pContext) {
 	RESULT r = R_PASS;
 
 	return r;
 }
 
-RESULT DreamUIBar::PopPath() {
+RESULT DreamUIBarApp::PopPath() {
 
 	RESULT r = R_PASS;
 
@@ -208,7 +208,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::ResetAppComposite() {
+RESULT DreamUIBarApp::ResetAppComposite() {
 	RESULT r = R_PASS;
 
 	point ptOrigin;
@@ -253,7 +253,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::ShowMenuLevel(MenuLevel menuLevel, bool fResetComposite) {
+RESULT DreamUIBarApp::ShowMenuLevel(MenuLevel menuLevel, bool fResetComposite) {
 	RESULT r = R_PASS;
 
 	CBR(!m_fWaitingForMenuResponse, R_SKIPPED);
@@ -285,7 +285,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
+RESULT DreamUIBarApp::HandleEvent(UserObserverEventType type) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
@@ -351,7 +351,7 @@ Error:
 	return r;
 }
 
-texture *DreamUIBar::GetOverlayTexture(HAND_TYPE type) {
+texture *DreamUIBarApp::GetOverlayTexture(HAND_TYPE type) {
 	texture *pTexture = nullptr;
 
 	if (type == HAND_TYPE::HAND_LEFT) {
@@ -364,7 +364,7 @@ texture *DreamUIBar::GetOverlayTexture(HAND_TYPE type) {
 	return pTexture;
 }
 
-RESULT DreamUIBar::RequestIconFile(std::shared_ptr<MenuNode> pMenuNode) {
+RESULT DreamUIBarApp::RequestIconFile(std::shared_ptr<MenuNode> pMenuNode) {
 	RESULT r = R_PASS;
 
 	if (pMenuNode->GetTitle() == "Menu") {
@@ -379,7 +379,7 @@ RESULT DreamUIBar::RequestIconFile(std::shared_ptr<MenuNode> pMenuNode) {
 		if (strURI != "") {
 			MenuNode* pTempMenuNode = new MenuNode();
 			pTempMenuNode->SetName(m_strIconTitle);
-			CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
+			CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBarApp::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
 		}
 	}
 
@@ -387,7 +387,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
+RESULT DreamUIBarApp::HandleSelect(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<DreamUserApp> pDreamUserApp = nullptr;
@@ -437,8 +437,8 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 			m_fWaitingForMenuResponse = true;
 			if (pSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
 				CR(SelectMenuItem(pSelected,
-					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
-					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
+					std::bind(&DreamUIBarApp::SetMenuStateAnimated, this, std::placeholders::_1),
+					std::bind(&DreamUIBarApp::ClearMenuState, this, std::placeholders::_1)));
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::FILE) {
@@ -448,13 +448,13 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				}
 
 				CR(SelectMenuItem(pSelected,
-					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
-					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
+					std::bind(&DreamUIBarApp::SetMenuStateAnimated, this, std::placeholders::_1),
+					std::bind(&DreamUIBarApp::ClearMenuState, this, std::placeholders::_1)));
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
 				CR(SelectMenuItem(pSelected,
-					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
-					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
+					std::bind(&DreamUIBarApp::SetMenuStateAnimated, this, std::placeholders::_1),
+					std::bind(&DreamUIBarApp::ClearMenuState, this, std::placeholders::_1)));
 
 				if (strScope == SCOPE_DESKTOP || strScope == SCOPE_CAMERA) {
 					if (m_pParentApp != nullptr) {
@@ -501,7 +501,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext) {
+RESULT DreamUIBarApp::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext) {
 	RESULT r = R_PASS;
 
 	if (pContext != nullptr) {
@@ -521,10 +521,10 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::UpdateMenu(void *pContext) {
+RESULT DreamUIBarApp::UpdateMenu(void *pContext) {
 	RESULT r = R_PASS;
 
-	DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
+	DreamUIBarApp *pDreamUIBar = reinterpret_cast<DreamUIBarApp*>(pContext);
 	CN(pDreamUIBar);
 
 	GetComposite()->SetVisible(true, false);
@@ -538,7 +538,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::Update(void *pContext) {
+RESULT DreamUIBarApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	DreamOS *pDreamOS = GetDOS();
@@ -630,7 +630,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::MakeMenuItems() {
+RESULT DreamUIBarApp::MakeMenuItems() {
 	RESULT r = R_PASS;	
 
 	CNR(m_pMenuNode, R_SKIPPED);
@@ -656,9 +656,9 @@ RESULT DreamUIBar::MakeMenuItems() {
 
 			//CR(pUIMenuItem->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 			CR(pUIMenuItem->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
-				std::bind(&DreamUIBar::HandleTouchStart, this, std::placeholders::_1, std::placeholders::_2)));
+				std::bind(&DreamUIBarApp::HandleTouchStart, this, std::placeholders::_1, std::placeholders::_2)));
 			CR(pUIMenuItem->RegisterEvent(UIEventType::UI_SELECT_TRIGGER,
-				std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1, std::placeholders::_2)));	
+				std::bind(&DreamUIBarApp::HandleSelect, this, std::placeholders::_1, std::placeholders::_2)));	
 			//CR(pUIMenuItem->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 			//	std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
 
@@ -684,7 +684,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::RequestMenuItemTexture() {
+RESULT DreamUIBarApp::RequestMenuItemTexture() {
 	RESULT r = R_PASS;
 
 	if (m_pMenuNode->NumSubMenuNodes() > 0) {
@@ -694,7 +694,7 @@ RESULT DreamUIBar::RequestMenuItemTexture() {
 		for (int i = 0; i < elements; i++) {
 			auto strURI = m_requestQueue.front()->GetThumbnailURL();
 			if (strURI != "") {
-				CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_requestQueue.front().get()));
+				CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBarApp::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_requestQueue.front().get()));
 				m_pendingRequests++;
 			}
 			m_requestQueue.pop();
@@ -706,7 +706,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::ProcessDownloadMenuItemTexture() {
+RESULT DreamUIBarApp::ProcessDownloadMenuItemTexture() {
 	RESULT r = R_PASS;
 
 	int elements = (m_downloadQueue.size() > m_concurrentRequestLimit ? m_concurrentRequestLimit : (int)m_downloadQueue.size());
@@ -741,7 +741,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::GetNextPageItems() {
+RESULT DreamUIBarApp::GetNextPageItems() {
 	RESULT r = R_PASS;
 
 	if (!m_fWaitingForMenuResponse) {
@@ -755,7 +755,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::SelectMenuItem(UIButton *pPushButton, std::function<RESULT(void*)> fnStartCallback, std::function<RESULT(void*)> fnEndCallback) {
+RESULT DreamUIBarApp::SelectMenuItem(UIButton *pPushButton, std::function<RESULT(void*)> fnStartCallback, std::function<RESULT(void*)> fnEndCallback) {
 	RESULT r = R_PASS;
 
 	CR(m_pScrollView->HideAllButtons(pPushButton));
@@ -764,24 +764,24 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::SetMenuStateAnimated(void *pContext) {
+RESULT DreamUIBarApp::SetMenuStateAnimated(void *pContext) {
 	RESULT r = R_PASS;
 	m_menuState = MenuState::ANIMATING;
 	return r;
 }
 
-RESULT DreamUIBar::ClearMenuState(void* pContext) {
+RESULT DreamUIBarApp::ClearMenuState(void* pContext) {
 	RESULT r = R_PASS;
 	m_menuState = MenuState::NONE;
 	return r;
 }
 
-RESULT DreamUIBar::ClearMenuWaitingFlag() {
+RESULT DreamUIBarApp::ClearMenuWaitingFlag() {
 	m_fWaitingForMenuResponse = false;
 	return R_PASS;
 }
 
-RESULT DreamUIBar::HideApp() {
+RESULT DreamUIBarApp::HideApp() {
 	RESULT r = R_PASS;
 
 	composite *pComposite = m_pScrollView.get();
@@ -796,7 +796,7 @@ RESULT DreamUIBar::HideApp() {
 		RESULT r = R_PASS;
 
 		std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
-		DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
+		DreamUIBarApp *pDreamUIBar = reinterpret_cast<DreamUIBarApp*>(pContext);
 		CN(pDreamUIBar);
 		CN(pKeyboardApp);
 
@@ -829,7 +829,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::ShowApp() {
+RESULT DreamUIBarApp::ShowApp() {
 	RESULT r = R_PASS;
 
 	// "Website" is a folder type, we want the "ACTION" one that prompts the url search
@@ -848,7 +848,7 @@ RESULT DreamUIBar::ShowApp() {
 		auto fnStartCallback = [&](void *pContext) {
 			RESULT r = R_PASS;
 
-			DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
+			DreamUIBarApp *pDreamUIBar = reinterpret_cast<DreamUIBarApp*>(pContext);
 			CN(pDreamUIBar);
 
 			CR(pDreamUIBar->UpdateMenu(pContext));
@@ -859,7 +859,7 @@ RESULT DreamUIBar::ShowApp() {
 		auto fnEndCallback = [&](void *pContext) {
 			RESULT r = R_PASS;
 
-			DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
+			DreamUIBarApp *pDreamUIBar = reinterpret_cast<DreamUIBarApp*>(pContext);
 			CN(pDreamUIBar);
 
 			CR(pDreamUIBar->ClearMenuState(pContext));
@@ -887,11 +887,11 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::Shutdown(void *pContext) {
+RESULT DreamUIBarApp::Shutdown(void *pContext) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
+RESULT DreamUIBarApp::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 	RESULT r = R_PASS;
 
 	CNR(pMenuNode, R_OBJECT_NOT_FOUND);
@@ -909,7 +909,7 @@ Error:
 	return r;
 }
 
-std::vector<std::string> DreamUIBar::GetStringHeaders() {
+std::vector<std::string> DreamUIBarApp::GetStringHeaders() {
 
 	std::string strAuthorizationToken = "Authorization: Bearer " + m_pUserControllerProxy->GetUserToken();
 
@@ -919,21 +919,21 @@ std::vector<std::string> DreamUIBar::GetStringHeaders() {
 	return strHeaders;
 }
 
-RESULT DreamUIBar::Notify(UIEvent *pEvent) {
+RESULT DreamUIBarApp::Notify(UIEvent *pEvent) {
 	return R_PASS;
 }
 
-DreamUIBar* DreamUIBar::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
-	DreamUIBar *pDreamApp = new DreamUIBar(pDreamOS, pContext);
+DreamUIBarApp* DreamUIBarApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
+	DreamUIBarApp *pDreamApp = new DreamUIBarApp(pDreamOS, pContext);
 	return pDreamApp;
 }
 
-RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
+RESULT DreamUIBarApp::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 	m_pUIStageProgram = pUIStageProgram;
 	return R_PASS;
 }
 
-RESULT DreamUIBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
+RESULT DreamUIBarApp::InitializeWithParent(DreamUserControlAreaApp *pParentApp) {
 	RESULT r = R_PASS;
 
 	m_pParentApp = pParentApp;
@@ -963,7 +963,7 @@ Error:
 	return r;
 }
 
-bool DreamUIBar::IsEmpty() {
+bool DreamUIBarApp::IsEmpty() {
 	bool fEmpty = false;
 	if (m_pathStack.empty() && !m_fWaitingForMenuResponse) {
 		fEmpty = true;
@@ -971,11 +971,11 @@ bool DreamUIBar::IsEmpty() {
 	return fEmpty;
 }
 
-RESULT DreamUIBar::ShouldUpdateMenuShader() {
+RESULT DreamUIBarApp::ShouldUpdateMenuShader() {
 	m_fShouldResetShader = true;
 	return R_PASS;
 }
 
-DreamAppHandle* DreamUIBar::GetAppHandle() {
+DreamAppHandle* DreamUIBarApp::GetAppHandle() {
 	return (DreamAppHandle*)(this);
 }

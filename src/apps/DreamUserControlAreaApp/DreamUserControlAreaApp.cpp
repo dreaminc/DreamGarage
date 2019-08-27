@@ -32,17 +32,17 @@
 
 #include "core/hand/hand.h"
 
-DreamUserControlArea::DreamUserControlArea(DreamOS *pDreamOS, void *pContext) :
-	DreamApp<DreamUserControlArea>(pDreamOS, pContext)
+DreamUserControlAreaApp::DreamUserControlAreaApp(DreamOS *pDreamOS, void *pContext) :
+	DreamApp<DreamUserControlAreaApp>(pDreamOS, pContext)
 {
 	// empty
 }
 
-DreamUserControlArea::~DreamUserControlArea()  {
+DreamUserControlAreaApp::~DreamUserControlAreaApp()  {
 	// empty
 }
 
-RESULT DreamUserControlArea::InitializeApp(void *pContext) {
+RESULT DreamUserControlAreaApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
 	m_fCanPressButton[0] = false;
@@ -54,11 +54,11 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::OnAppDidFinishInitializing(void *pContext) {
+RESULT DreamUserControlAreaApp::OnAppDidFinishInitializing(void *pContext) {
 	return R_PASS;
 }
 
-RESULT DreamUserControlArea::Update(void *pContext) {
+RESULT DreamUserControlAreaApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	point ptOrigin;
@@ -66,10 +66,10 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 	if (m_pDreamUserApp != nullptr && m_pDreamUIBar == nullptr) {
 
-		m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBar>(this, false);
+		m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBarApp>(this, false);
 		CN(m_pDreamUIBar);
 
-		m_pDreamVCam = GetDOS()->LaunchDreamModule<DreamVCam>(this);
+		m_pDreamVCam = GetDOS()->LaunchDreamModule<DreamVCamApp>(this);
 		CN(m_pDreamVCam);
 
 		if (GetDOS()->GetSandboxConfiguration().fInitNamedPipe) {
@@ -222,7 +222,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::Shutdown(void *pContext) {
+RESULT DreamUserControlAreaApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
 	CR(r);
@@ -231,16 +231,16 @@ Error:
 	return r;
 }
 
-DreamUserControlArea* DreamUserControlArea::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
-	DreamUserControlArea *pDreamApp = new DreamUserControlArea(pDreamOS, pContext);
+DreamUserControlAreaApp* DreamUserControlAreaApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
+	DreamUserControlAreaApp *pDreamApp = new DreamUserControlAreaApp(pDreamOS, pContext);
 	return pDreamApp;
 }
 
-float DreamUserControlArea::GetBaseWidth() {
+float DreamUserControlAreaApp::GetBaseWidth() {
 	return m_pDreamUserApp->GetBaseWidth();
 }
 
-RESULT DreamUserControlArea::SetViewHeight(float height) {
+RESULT DreamUserControlAreaApp::SetViewHeight(float height) {
 
 	point ptOrigin = m_pDreamUserApp->m_pAppBasis->GetPosition();
 	//point ptOrigin = m_pDreamUserApp->GetComposite()->GetPosition();//
@@ -250,35 +250,35 @@ RESULT DreamUserControlArea::SetViewHeight(float height) {
 	return R_PASS;
 }
 
-float DreamUserControlArea::GetBaseHeight() {
+float DreamUserControlAreaApp::GetBaseHeight() {
 	return m_pDreamUserApp->GetBaseHeight();
 }
 
-float DreamUserControlArea::GetSpacingSize() {
+float DreamUserControlAreaApp::GetSpacingSize() {
 	return m_pDreamUserApp->GetSpacingSize();
 }
 
-float DreamUserControlArea::GetViewAngle() {
+float DreamUserControlAreaApp::GetViewAngle() {
 	return m_pDreamUserApp->GetViewAngle();
 }
 
-point DreamUserControlArea::GetCenter() {
+point DreamUserControlAreaApp::GetCenter() {
 	return point(0.0f, 0.0f, m_pDreamTabView->GetPosition().z());
 }
 
-float DreamUserControlArea::GetCenterOffset() {
+float DreamUserControlAreaApp::GetCenterOffset() {
 	return m_centerOffset;
 }
 
-float DreamUserControlArea::GetTotalWidth() {
+float DreamUserControlAreaApp::GetTotalWidth() {
 	return m_pControlView->GetViewQuad()->GetWidth() + m_pDreamTabView->GetBorderWidth() + m_pDreamUserApp->GetSpacingSize()/2.0f;
 }
 
-float DreamUserControlArea::GetTotalHeight() {
+float DreamUserControlAreaApp::GetTotalHeight() {
 	return m_pDreamTabView->GetBorderHeight();
 }
 
-RESULT DreamUserControlArea::Show() {
+RESULT DreamUserControlAreaApp::Show() {
 	RESULT r = R_PASS;
 
 	m_pDreamUIBar->ClearMenuWaitingFlag();
@@ -293,7 +293,7 @@ RESULT DreamUserControlArea::Show() {
 	return r;
 }
 
-RESULT DreamUserControlArea::Hide() {
+RESULT DreamUserControlAreaApp::Hide() {
 	RESULT r = R_PASS;
 
 	//m_pControlView->GetComposite()->SetVisible(false);
@@ -306,7 +306,7 @@ RESULT DreamUserControlArea::Hide() {
 	return r;
 }
 
-RESULT DreamUserControlArea::ShowDesktopKeyboard() {
+RESULT DreamUserControlAreaApp::ShowDesktopKeyboard() {
 	RESULT r = R_PASS;
 
 	CN(m_pControlView);
@@ -317,7 +317,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::Open() {
+RESULT DreamUserControlAreaApp::Open() {
 	RESULT r = R_PASS;
 
 	CR(Hide());
@@ -328,7 +328,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::Minimize() {
+RESULT DreamUserControlAreaApp::Minimize() {
 	RESULT r = R_PASS;
 
 	CR(m_pControlView->Hide());
@@ -338,7 +338,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::Maximize() {
+RESULT DreamUserControlAreaApp::Maximize() {
 	RESULT r = R_PASS;
 
 	CR(m_pControlView->Show());
@@ -348,7 +348,7 @@ Error:
 	return r;
 }
 
-bool DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
+bool DreamUserControlAreaApp::CanPressButton(UIButton *pButtonContext) {
 	RESULT r = R_PASS;
 
 	auto pDreamOS = GetDOS();
@@ -386,15 +386,15 @@ Error:
 	return false;
 }
 
-std::shared_ptr<DreamContentSource> DreamUserControlArea::GetActiveSource() {
+std::shared_ptr<DreamContentSource> DreamUserControlAreaApp::GetActiveSource() {
 	return m_pActiveSource;
 }
 
-std::shared_ptr<DreamContentSource> DreamUserControlArea::GetActiveCameraSource() {
+std::shared_ptr<DreamContentSource> DreamUserControlAreaApp::GetActiveCameraSource() {
 	return m_pActiveCameraSource;
 }
 
-RESULT DreamUserControlArea::ShowControlView() {
+RESULT DreamUserControlAreaApp::ShowControlView() {
 	RESULT r = R_PASS;
 
 	auto pView = m_pControlView->GetViewQuad();
@@ -421,7 +421,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource> pNewContent) {
+RESULT DreamUserControlAreaApp::SetActiveSource(std::shared_ptr<DreamContentSource> pNewContent) {
 	RESULT r = R_PASS;
 
 	m_pActiveSource = pNewContent;
@@ -479,7 +479,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) {
+RESULT DreamUserControlAreaApp::UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) {
 	if (pContext == m_pActiveSource) {
 		m_pControlView->SetViewQuadTexture(pTexture);
 	}
@@ -489,7 +489,7 @@ RESULT DreamUserControlArea::UpdateContentSourceTexture(texture* pTexture, std::
 	return R_PASS;
 }
 
-RESULT DreamUserControlArea::UpdateControlBarText(std::string& strTitle) {
+RESULT DreamUserControlAreaApp::UpdateControlBarText(std::string& strTitle) {
 	RESULT r = R_PASS;
 
 	CR(m_pUserControls->SetTitleText(strTitle));
@@ -498,7 +498,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) {
+RESULT DreamUserControlAreaApp::UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) {
 	RESULT r = R_PASS;
 
 	CR(m_pUserControls->UpdateNavigationButtons(fCanGoBack, fCanGoForward));
@@ -507,7 +507,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::UpdateAddressBarSecurity(bool fSecure) {
+RESULT DreamUserControlAreaApp::UpdateAddressBarSecurity(bool fSecure) {
 	RESULT r = R_PASS;
 
 	CR(m_pControlView->SetURLSecurity(fSecure));
@@ -516,7 +516,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::UpdateAddressBarText(std::string& strURL) {
+RESULT DreamUserControlAreaApp::UpdateAddressBarText(std::string& strURL) {
 	RESULT r = R_PASS;
 
 	CR(m_pControlView->SetURLText(strURL));
@@ -525,7 +525,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) {
+RESULT DreamUserControlAreaApp::HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) {
 	RESULT r = R_PASS;
 
 	// if the content source that received an audio packet is the active piece of content, 
@@ -557,7 +557,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) {
+RESULT DreamUserControlAreaApp::HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) {
 	RESULT r = R_PASS;
 
 	bool fMaskPasswordEnabled = false;
@@ -589,7 +589,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::HandleIsInputFocused(bool fIsFocused, DreamContentSource *pContext) {
+RESULT DreamUserControlAreaApp::HandleIsInputFocused(bool fIsFocused, DreamContentSource *pContext) {
 	RESULT r = R_PASS;
 
 	CBR(pContext == m_pActiveSource.get(), R_SKIPPED);
@@ -612,23 +612,23 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::HandleLoadEnd() {
+RESULT DreamUserControlAreaApp::HandleLoadEnd() {
 	return R_NOT_IMPLEMENTED;
 }
 
-bool DreamUserControlArea::IsContentVisible() {
+bool DreamUserControlAreaApp::IsContentVisible() {
 	return m_pControlView != nullptr && m_pControlView->IsVisible();
 }
 
-RESULT DreamUserControlArea::HandleDreamFormSuccess() {
+RESULT DreamUserControlAreaApp::HandleDreamFormSuccess() {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamUserControlArea::HandleDreamFormCancel() {
+RESULT DreamUserControlAreaApp::HandleDreamFormCancel() {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamUserControlArea::HandleCanTabNext(bool fCanNext) {
+RESULT DreamUserControlAreaApp::HandleCanTabNext(bool fCanNext) {
 	RESULT r = R_PASS;
 	auto pKeyboard = GetDOS()->GetKeyboardApp();
 	CN(pKeyboard);
@@ -637,7 +637,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::HandleCanTabPrevious(bool fCanPrevious) {
+RESULT DreamUserControlAreaApp::HandleCanTabPrevious(bool fCanPrevious) {
 	RESULT r = R_PASS;
 	auto pKeyboard = GetDOS()->GetKeyboardApp();
 	CN(pKeyboard);
@@ -646,15 +646,15 @@ Error:
 	return r;
 }
 
-std::string DreamUserControlArea::GetCertificateErrorURL() {
+std::string DreamUserControlAreaApp::GetCertificateErrorURL() {
 	return m_strCertificateErrorURL;
 }
 
-std::string DreamUserControlArea::GetLoadErrorURL() {
+std::string DreamUserControlAreaApp::GetLoadErrorURL() {
 	return m_strLoadErrorURL;
 }
 
-RESULT DreamUserControlArea::OnVirtualCameraCaptured() {
+RESULT DreamUserControlAreaApp::OnVirtualCameraCaptured() {
 	RESULT r = R_PASS;
 
 	m_pActiveCameraSource = m_pActiveSource;
@@ -664,7 +664,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::OnVirtualCameraReleased() {
+RESULT DreamUserControlAreaApp::OnVirtualCameraReleased() {
 	RESULT r = R_PASS;
 
 	m_pActiveCameraSource = nullptr;
@@ -676,7 +676,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::OnVirtualCameraSettings(point ptPosition, quaternion qOrientation) {
+RESULT DreamUserControlAreaApp::OnVirtualCameraSettings(point ptPosition, quaternion qOrientation) {
 	RESULT r = R_PASS;
 
 	CNM(m_pDreamVCam, "Received vcam settings but vcam was null?!");
@@ -686,7 +686,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::SetVirtualCameraSource(DreamVCam::SourceType sourceType) {
+RESULT DreamUserControlAreaApp::SetVirtualCameraSource(DreamVCamApp::SourceType sourceType) {
 	RESULT r = R_PASS;
 
 	CR(m_pDreamVCam->SetSourceType(sourceType));
@@ -695,7 +695,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::MuteVirtualCamera(bool fMute) {
+RESULT DreamUserControlAreaApp::MuteVirtualCamera(bool fMute) {
 	RESULT r = R_PASS;
 
 	CR(m_pDreamVCam->Mute(fMute));
@@ -704,7 +704,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::ResetVirtualCamera() {
+RESULT DreamUserControlAreaApp::ResetVirtualCamera() {
 	RESULT r = R_PASS;
 
 	point ptPosition;
@@ -721,15 +721,15 @@ Error:
 	return r;
 }
 
-int DreamUserControlArea::GetWidth() {
+int DreamUserControlAreaApp::GetWidth() {
 	return m_pActiveSource->GetWidth();
 }
 
-int DreamUserControlArea::GetHeight() {
+int DreamUserControlAreaApp::GetHeight() {
 	return m_pActiveSource->GetHeight();
 }
 
-RESULT DreamUserControlArea::OnClick(point ptContact, bool fMouseDown) {
+RESULT DreamUserControlAreaApp::OnClick(point ptContact, bool fMouseDown) {
 	RESULT r = R_PASS;
 
 	CNR(m_pActiveSource, R_SKIPPED);
@@ -739,7 +739,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::OnKeyPress(char chkey, bool fKeyDown) {
+RESULT DreamUserControlAreaApp::OnKeyPress(char chkey, bool fKeyDown) {
 	RESULT r = R_PASS;
 
 	CNR(m_pActiveSource, R_SKIPPED);
@@ -749,7 +749,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::OnMouseMove(point mousePoint) {
+RESULT DreamUserControlAreaApp::OnMouseMove(point mousePoint) {
 	RESULT r = R_PASS;
 
 	CNR(m_pActiveSource, R_SKIPPED);
@@ -759,7 +759,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) {
+RESULT DreamUserControlAreaApp::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) {
 	RESULT r = R_PASS;
 
 	CNR(m_pActiveSource, R_OBJECT_NOT_FOUND);
@@ -769,7 +769,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::SetScope(std::string strScope) {
+RESULT DreamUserControlAreaApp::SetScope(std::string strScope) {
 	RESULT r = R_PASS;
 	
 	CNR(m_pActiveSource, R_SKIPPED);
@@ -779,7 +779,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::SetPath(std::string strPath) {
+RESULT DreamUserControlAreaApp::SetPath(std::string strPath) {
 	RESULT r = R_PASS;
 	
 	CNR(m_pActiveSource, R_SKIPPED);
@@ -789,7 +789,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string strPath, std::string strTitle) {
+RESULT DreamUserControlAreaApp::RequestOpenAsset(std::string strScope, std::string strPath, std::string strTitle) {
 	RESULT r = R_PASS;
 
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
@@ -817,7 +817,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::CreateBrowserSource(std::string strScope) {
+RESULT DreamUserControlAreaApp::CreateBrowserSource(std::string strScope) {
 	RESULT r = R_PASS;
 
 	std::string strTitle = "Website";
@@ -834,7 +834,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::HideWebsiteTyping() {
+RESULT DreamUserControlAreaApp::HideWebsiteTyping() {
 	RESULT r = R_PASS;
 
 	if (m_fKeyboardUp) {
@@ -843,16 +843,16 @@ RESULT DreamUserControlArea::HideWebsiteTyping() {
 		CR(m_pControlView->HandleKeyboardDown());
 		m_pUserControls->Show();
 		m_pDreamTabView->Show();
-		auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
-		CNR(pBrowser, R_SKIPPED);
-		CR(pBrowser->HandleUnfocusEvent());
+		auto pBrowserApp = dynamic_cast<DreamBrowserApp*>(m_pActiveSource.get());
+		CNR(pBrowserApp, R_SKIPPED);
+		CR(pBrowserApp->HandleUnfocusEvent());
 	}
 
 Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::OnCameraInMotion() {
+RESULT DreamUserControlAreaApp::OnCameraInMotion() {
 	RESULT r = R_PASS;
 
 	/*
@@ -864,7 +864,7 @@ RESULT DreamUserControlArea::OnCameraInMotion() {
 	return r;
 }
 
-RESULT DreamUserControlArea::OnCameraAtRest() {
+RESULT DreamUserControlAreaApp::OnCameraAtRest() {
 	RESULT r = R_PASS;
 
 	/*
@@ -876,7 +876,7 @@ RESULT DreamUserControlArea::OnCameraAtRest() {
 	return r;
 }
 
-RESULT DreamUserControlArea::ResetAppComposite() {
+RESULT DreamUserControlAreaApp::ResetAppComposite() {
 	RESULT r = R_PASS;
 
 	CN(m_pDreamUserApp);
@@ -901,12 +901,12 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT DreamUserControlAreaApp::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	m_pPendingEnvironmentAsset = pEnvironmentAsset;
 	return R_PASS;
 }
 
-RESULT DreamUserControlArea::PendCameraEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT DreamUserControlAreaApp::PendCameraEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 	CN(m_pDreamVCam);
 
@@ -917,13 +917,13 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::AddEnvironmentCameraAsset() {
+RESULT DreamUserControlAreaApp::AddEnvironmentCameraAsset() {
 	DOSLOG(INFO, "adding environment camera asset");
 	m_pPendingEnvironmentAsset = m_pPendingEnvironmentCameraAsset;
 	return R_PASS;
 }
 
-RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT DreamUserControlAreaApp::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 	
 	if (m_pActiveSource != nullptr) {													// If content is already open
@@ -965,18 +965,18 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 		m_pDreamDesktop->SetEnvironmentAsset(pEnvironmentAsset);
 	}
 	else {
-		std::shared_ptr<DreamBrowser> pBrowser = nullptr;
-		pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+		std::shared_ptr<DreamBrowserApp> pBrowserApp = nullptr;
+		pBrowserApp = GetDOS()->LaunchDreamApp<DreamBrowserApp>(this);
 
-		m_pActiveSource = pBrowser;
+		m_pActiveSource = pBrowserApp;
 
-		pBrowser->SetScope(pEnvironmentAsset->GetScope());
-		pBrowser->SetPath(pEnvironmentAsset->GetPath());
-		pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
+		pBrowserApp->SetScope(pEnvironmentAsset->GetScope());
+		pBrowserApp->SetPath(pEnvironmentAsset->GetPath());
+		pBrowserApp->SetEnvironmentAsset(pEnvironmentAsset);
 
-		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset->GetURL());
-		pBrowser->RegisterObserver(this);
-		m_pUserControls->SetTitleText(pBrowser->GetTitle());
+		pBrowserApp->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset->GetURL());
+		pBrowserApp->RegisterObserver(this);
+		m_pUserControls->SetTitleText(pBrowserApp->GetTitle());
 
 		if (pEnvironmentAsset->GetTitle() != "website") {
 			std::string strTitle = pEnvironmentAsset->GetTitle();
@@ -997,7 +997,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::OnReceiveAsset() {
+RESULT DreamUserControlAreaApp::OnReceiveAsset() {
 	RESULT r = R_PASS;
 	
 	// new browser can't be the current content
@@ -1006,7 +1006,7 @@ RESULT DreamUserControlArea::OnReceiveAsset() {
 	return r;
 }
 
-RESULT DreamUserControlArea::StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+RESULT DreamUserControlAreaApp::StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	CN(pEnvironmentShare);
@@ -1023,7 +1023,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::SendFirstFrame() {
+RESULT DreamUserControlAreaApp::SendFirstFrame() {
 	RESULT r = R_PASS;
 
 	// It's impossible to be sharing AND have a nullptr active source
@@ -1044,7 +1044,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::ForceStopSharing() {
+RESULT DreamUserControlAreaApp::ForceStopSharing() {
 	RESULT r = R_PASS;
 
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
@@ -1069,7 +1069,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::HandleStopSending() {
+RESULT DreamUserControlAreaApp::HandleStopSending() {
 	RESULT r = R_PASS;
 
 	m_pCurrentScreenShare = nullptr;
@@ -1078,15 +1078,15 @@ Error:
 	return r;
 }
 
-std::shared_ptr<EnvironmentShare> DreamUserControlArea::GetCurrentScreenShare() {
+std::shared_ptr<EnvironmentShare> DreamUserControlAreaApp::GetCurrentScreenShare() {
 	return m_pCurrentScreenShare;
 }
 
-bool DreamUserControlArea::IsSharingScreen() {
+bool DreamUserControlAreaApp::IsSharingScreen() {
 	return (m_pCurrentScreenShare != nullptr);
 }
 
-bool DreamUserControlArea::IsScrollingTabs(HAND_TYPE handType) {
+bool DreamUserControlAreaApp::IsScrollingTabs(HAND_TYPE handType) {
 
 	if (handType == HAND_TYPE::HAND_LEFT) {
 		return m_fMalletInTabView[0];
@@ -1099,7 +1099,7 @@ bool DreamUserControlArea::IsScrollingTabs(HAND_TYPE handType) {
 	//return (m_fMalletInTabView[0] || m_fMalletInTabView[1]);
 }
 
-RESULT DreamUserControlArea::UpdateIsActive(bool fIsActive) {
+RESULT DreamUserControlAreaApp::UpdateIsActive(bool fIsActive) {
 	RESULT r = R_PASS;
 
 	CR(m_pUserControls->UpdateIsActive(fIsActive));
@@ -1108,7 +1108,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::HandleCameraClosed() {
+RESULT DreamUserControlAreaApp::HandleCameraClosed() {
 	RESULT r = R_PASS;
 
 	CR(m_pUserControls->HandleCameraClose());
@@ -1117,17 +1117,17 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::SetCertificateErrorURL(std::string strURL) {
+RESULT DreamUserControlAreaApp::SetCertificateErrorURL(std::string strURL) {
 	m_strCertificateErrorURL = strURL;
 	return R_PASS;
 }
 
-RESULT DreamUserControlArea::SetLoadErrorURL(std::string strURL) {
+RESULT DreamUserControlAreaApp::SetLoadErrorURL(std::string strURL) {
 	m_strLoadErrorURL = strURL;
 	return R_PASS;
 }
 
-RESULT DreamUserControlArea::ShutdownSource() {
+RESULT DreamUserControlAreaApp::ShutdownSource() {
 	RESULT r = R_PASS;
 
 	CNR(m_pActiveSource, R_SKIPPED);
@@ -1143,11 +1143,11 @@ RESULT DreamUserControlArea::ShutdownSource() {
 		m_pDreamDesktop = nullptr;
 	}
 	else if (m_pDreamVCam == m_pActiveSource) {
-		// empty (avoid calling ShutdownDreamApp<DreamBrowser>)
+		// empty (avoid calling ShutdownDreamApp<DreamBrowserApp>)
 	}
 	else {	
-		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
-		GetDOS()->ShutdownDreamApp<DreamBrowser>(pBrowser);
+		auto pBrowserApp = std::dynamic_pointer_cast<DreamBrowserApp>(m_pActiveSource);
+		GetDOS()->ShutdownDreamApp<DreamBrowserApp>(pBrowserApp);
 		//TODO: should set pBrowser to nullptr?
 	}
 
@@ -1155,7 +1155,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::ShutdownAllSources() {
+RESULT DreamUserControlAreaApp::ShutdownAllSources() {
 	RESULT r = R_PASS;
 
 	//GetDOS()->OnStopReceivingCameraPlacement();
@@ -1196,7 +1196,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::CloseActiveAsset() {
+RESULT DreamUserControlAreaApp::CloseActiveAsset() {
 	RESULT r = R_PASS;
 
 	// close active browser
@@ -1265,7 +1265,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::CloseCameraTab() {
+RESULT DreamUserControlAreaApp::CloseCameraTab() {
 	RESULT r = R_PASS;
 
 	CR(m_pDreamTabView->RemoveTab(m_pDreamVCam));
@@ -1275,29 +1275,29 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::SetUIProgramNode(UIStageProgram *pUIProgramNode) {
+RESULT DreamUserControlAreaApp::SetUIProgramNode(UIStageProgram *pUIProgramNode) {
 	m_pUIStageProgram = pUIProgramNode;
 	return R_PASS;
 }
 
-float DreamUserControlArea::GetAnimationDuration() {
+float DreamUserControlAreaApp::GetAnimationDuration() {
 	return m_pDreamUserApp->GetAnimationDuration();
 }
 
-float DreamUserControlArea::GetAnimationScale() {
+float DreamUserControlAreaApp::GetAnimationScale() {
 	return m_animationScale;
 }
 
-bool DreamUserControlArea::IsAnimating() {
+bool DreamUserControlAreaApp::IsAnimating() {
 	return m_fIsAnimating;
 }
 
-RESULT DreamUserControlArea::SetIsAnimating(bool fIsAnimating) {
+RESULT DreamUserControlAreaApp::SetIsAnimating(bool fIsAnimating) {
 	m_fIsAnimating = fIsAnimating;
 	return R_PASS;
 }
 
-RESULT DreamUserControlArea::OnDreamFormSuccess() {
+RESULT DreamUserControlAreaApp::OnDreamFormSuccess() {
 	RESULT r = R_PASS;
 	
 	if (!m_pDreamUIBar->IsEmpty()) {
@@ -1315,7 +1315,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
+RESULT DreamUserControlAreaApp::Notify(InteractionObjectEvent *pSubscriberEvent) {
 	RESULT r = R_PASS;
 
 	DreamUserObserver *pEventApp = m_pDreamUserApp->m_pEventApp;
@@ -1374,16 +1374,17 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			// CBR(chkey != SVK_RETURN, R_SKIPPED);		// might be necessary to prevent dupe returns being sent to browser.
 			
 			bool fIsSpecialKey = (chkey == SVK_TAB || chkey == SVK_SHIFTTAB || chkey == SVK_CLOSE);	// These are keys not actually on our keyboard that we send manually
-			auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
+			auto pBrowserApp = dynamic_cast<DreamBrowserApp*>(m_pActiveSource.get());
+
 			if (!fIsSpecialKey) {
 				CR(m_pActiveSource->OnKeyPress(chkey, fKeyDown));
 			}
 			else if (fKeyDown) {
 				if (chkey == SVK_TAB) {
-					CR(pBrowser->HandleTabEvent());
+					CR(pBrowserApp->HandleTabEvent());
 				}
 				else if (chkey == SVK_SHIFTTAB) {
-					CR(pBrowser->HandleBackTabEvent());
+					CR(pBrowserApp->HandleBackTabEvent());
 				}
 				else if (chkey == SVK_CLOSE) {
 					//CR(pBrowser->HandleUnfocusEvent());
@@ -1400,7 +1401,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::Notify(HMDEvent *pEvent) {
+RESULT DreamUserControlAreaApp::Notify(HMDEvent *pEvent) {
 	RESULT r = R_PASS;
 
 	DreamUserObserver *pEventApp = m_pDreamUserApp->m_pEventApp;
@@ -1471,7 +1472,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
+RESULT DreamUserControlAreaApp::Notify(UIEvent *pUIEvent) {
 	RESULT r = R_PASS;
 	
 	WebBrowserPoint wptContact;
@@ -1523,7 +1524,7 @@ Error:
 	return r;
 }
 
-WebBrowserPoint DreamUserControlArea::GetRelativePointofContact(point ptContact) {
+WebBrowserPoint DreamUserControlAreaApp::GetRelativePointofContact(point ptContact) {
 	point ptIntersectionContact = ptContact;
 	ptIntersectionContact.w() = 1.0f;
 	WebBrowserPoint ptRelative;
@@ -1549,12 +1550,12 @@ WebBrowserPoint DreamUserControlArea::GetRelativePointofContact(point ptContact)
 	return ptRelative;
 }
 
-RESULT DreamUserControlArea::SetDreamUserApp(std::shared_ptr<DreamUserApp> pDreamUserApp) {
+RESULT DreamUserControlAreaApp::SetDreamUserApp(std::shared_ptr<DreamUserApp> pDreamUserApp) {
 	m_pDreamUserApp = pDreamUserApp;
 	return R_PASS;
 }
 
-RESULT DreamUserControlArea::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
+RESULT DreamUserControlAreaApp::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
 	CR(DreamAppBase::BroadcastDreamAppMessage(pDreamAppMessage));
@@ -1563,7 +1564,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::HandleDreamAppMessage(PeerConnection *pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+RESULT DreamUserControlAreaApp::HandleDreamAppMessage(PeerConnection *pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
 	// DreamModule doesn't have access to these, so UserControlArea is acting as a passthrough
@@ -1575,6 +1576,6 @@ Error:
 	return r;
 }
 
-std::shared_ptr<DreamVCam> DreamUserControlArea::GetVCam() {
+std::shared_ptr<DreamVCamApp> DreamUserControlAreaApp::GetVCam() {
 	return m_pDreamVCam;
 }

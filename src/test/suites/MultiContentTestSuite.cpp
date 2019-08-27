@@ -573,7 +573,7 @@ RESULT MultiContentTestSuite::AddTestRemoveObjects2() {
 		std::shared_ptr<UIMenuItem> pButton = nullptr;
 		std::shared_ptr<text> pLabel = nullptr;
 		DreamOS *pDreamOS = nullptr; 
-		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+		std::shared_ptr<DreamUserControlAreaApp> pUserControlArea;
 
 		double msLastSent = 0.0;
 		double msTimeDelay = 500.0;
@@ -626,7 +626,7 @@ RESULT MultiContentTestSuite::AddTestRemoveObjects2() {
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 
-		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlAreaApp>(this, false);
 		pTestContext->pUserControlArea = pControlArea;
 
 		pTestContext->pComposite = m_pDreamOS->AddComposite();
@@ -705,7 +705,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		std::shared_ptr<DreamLoginApp> pLoginApp = nullptr;
 		std::shared_ptr<DreamSettingsApp> pSettingsApp = nullptr;
 		std::shared_ptr<DreamUserApp> pUserApp = nullptr;
-		std::shared_ptr<DreamUserControlArea> pUserControlArea = nullptr;
+		std::shared_ptr<DreamUserControlAreaApp> pUserControlArea = nullptr;
 
 		UserController *pUserController;
 		bool fFirst = true;
@@ -865,7 +865,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		//*
 		if (pTestContext->pUserControlArea == nullptr) {
 			pTestContext->pUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
-			pTestContext->pUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
+			pTestContext->pUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlAreaApp>(this);
 			pTestContext->pUserControlArea->SetDreamUserApp(pTestContext->pUserApp);
 
 			pTestContext->pLoginApp = m_pDreamOS->LaunchDreamApp<DreamLoginApp>(this, false);
@@ -948,7 +948,7 @@ RESULT MultiContentTestSuite::AddTestMenuShader() {
 	int nRepeats = 1;
 
 	struct TestContext {
-		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+		std::shared_ptr<DreamUserControlAreaApp> pUserControlArea;
 		bool fFirst = true;
 	} *pTestContext = new TestContext();
 
@@ -961,7 +961,7 @@ RESULT MultiContentTestSuite::AddTestMenuShader() {
 		std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
-		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlAreaApp>(this, false);
 		pTestContext->pUserControlArea = pControlArea;
 		CN(pControlArea);
 
@@ -1042,7 +1042,7 @@ RESULT MultiContentTestSuite::AddTestDreamSettingsApp() {
 	{
 		std::shared_ptr<DreamUserApp> pUserApp = nullptr;
 		std::shared_ptr<DreamSettingsApp> pSettingsApp = nullptr;
-		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp = nullptr;
 
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager = nullptr;
 		std::shared_ptr<texture> pTestTexture = nullptr;
@@ -1070,15 +1070,15 @@ RESULT MultiContentTestSuite::AddTestDreamSettingsApp() {
 		//*/
 
 
-		pTestContext->pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->pDreamBrowser->InitializeWithBrowserManager(pTestContext->pUserApp->GetBrowserManager(), strURL);
+		pTestContext->pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
+		pTestContext->pDreamBrowserApp->InitializeWithBrowserManager(pTestContext->pUserApp->GetBrowserManager(), strURL);
 		//pTestContext->pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
-		CNM(pTestContext->pDreamBrowser, "Failed to create dream browser");
+		CNM(pTestContext->pDreamBrowserApp, "Failed to create dream browser");
 
-		pTestContext->pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		pTestContext->pDreamBrowser->SetDiagonalSize(10.0f);
+		pTestContext->pDreamBrowserApp->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		pTestContext->pDreamBrowserApp->SetDiagonalSize(10.0f);
 
-		pTestContext->pDreamBrowser->SetURI(strURL);
+		pTestContext->pDreamBrowserApp->SetURI(strURL);
 
 
 		pTestContext->pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f * 9.0f / 16.0f);
@@ -1099,7 +1099,7 @@ RESULT MultiContentTestSuite::AddTestDreamSettingsApp() {
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 
-		auto pTexture = pTestContext->pDreamBrowser->GetSourceTexture();
+		auto pTexture = pTestContext->pDreamBrowserApp->GetSourceTexture();
 		auto pFormView = pTestContext->pSettingsApp->m_pFormView;
 		//pFormView->SetViewQuadTexture(pTexture);
 		//pFormView->SetViewQuadTexture(pTestContext->pTestTexture);
@@ -1280,7 +1280,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 	struct TestContext : public Subscriber<SenseControllerEvent>,
 		public CloudController::UserObserver
 	{
-		std::shared_ptr<DreamUserControlArea> pUserControlArea = nullptr;
+		std::shared_ptr<DreamUserControlAreaApp> pUserControlArea = nullptr;
 		UserController* pUserControllerProxy = nullptr;
 		CloudController *pCloudController = nullptr;
 
@@ -1434,7 +1434,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		SetupPipeline();
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
-		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlAreaApp>(this, false);
 		pTestContext->pCamera = m_pDreamOS->GetCamera();
 		pControlArea->SetUIProgramNode(m_pUIProgramNode);
 
@@ -1513,10 +1513,10 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 
 	struct TestContext {
 		std::vector<std::string> strURIs;
-		std::shared_ptr<DreamUserControlArea> pUserControlArea;
-		std::shared_ptr<DreamBrowser> pBrowser1;
-		std::shared_ptr <DreamBrowser> pBrowser2;
-		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+		std::shared_ptr<DreamUserControlAreaApp> pUserControlArea;
+		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp1;
+		std::shared_ptr <DreamBrowserApp> pDreamBrowserApp2;
+		std::vector<std::shared_ptr<DreamBrowserApp>> pDreamBrowserApps;
 		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
 		bool fFirst = true;
 	} *pTestContext = new TestContext();
@@ -1529,23 +1529,23 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 		std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
-		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlAreaApp>(this, false);
 		pTestContext->pUserControlArea = pControlArea;
 		CN(pControlArea);
 		
 		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
 
 		///*
-		pTestContext->pBrowser1 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->pDreamBrowserApp1 = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
 		//pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "https://www.develop.dreamos.com/forms/settings");
 		//pTestContext->pBrowser1->SetURI("https://www.develop.dreamos.com/forms/settings");
 //		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "twitch.tv");
-		pTestContext->pBrowser1->SetURI("twitch.tv");
+		pTestContext->pDreamBrowserApp1->SetURI("twitch.tv");
 		//pTestContext->pBrowser1->InitializeWithParent(pControlArea.get());
 
-		pTestContext->pBrowser2 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->pDreamBrowserApp2 = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
 //		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.nyt.com");
-		pTestContext->pBrowser2->SetURI("www.nyt.com");
+		pTestContext->pDreamBrowserApp2->SetURI("www.nyt.com");
 		//pTestContext->pBrowser2->InitializeWithParent(pControlArea.get());
 
 		//pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
@@ -1566,7 +1566,7 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 		} ;
 
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
-			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
+			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this));
 			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, pTestContext->strURIs[i]);
 			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
 		}
@@ -1587,8 +1587,8 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 		auto pControlArea = pTestContext->pUserControlArea;
 
 		if (pTestContext->fFirst) {
-			pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
-			pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
+			pTestContext->pUserControlArea->SetActiveSource(pTestContext->pDreamBrowserApp1);
+			pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pDreamBrowserApp2);
 			
 			//for (auto pBrowser : pTestContext->pDreamBrowsers) {
 			//	pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pBrowser);
@@ -1659,7 +1659,7 @@ RESULT MultiContentTestSuite::AddTestMenuMemory() {
 
 	struct TestContext {
 		std::vector<std::string> strURIs;
-		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+		std::shared_ptr<DreamUserControlAreaApp> pUserControlArea;
 		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
 
 		bool fFirst = true;
@@ -1708,7 +1708,7 @@ RESULT MultiContentTestSuite::AddTestMenuMemory() {
 		std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
-		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlAreaApp>(this, false);
 		pTestContext->pUserControlArea = pControlArea;
 		CN(pControlArea);
 		
@@ -1771,10 +1771,10 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 
 	struct TestContext {
 		std::vector<std::string> strURIs;
-		std::shared_ptr<DreamUserControlArea> pUserControlArea;
-		std::shared_ptr<DreamBrowser> pBrowser1;
-		std::shared_ptr <DreamBrowser> pBrowser2;
-		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+		std::shared_ptr<DreamUserControlAreaApp> pUserControlArea;
+		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp1;
+		std::shared_ptr <DreamBrowserApp> pDreamBrowserApp2;
+		std::vector<std::shared_ptr<DreamBrowserApp>> pDreamBrowserApps;
 		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
 		double msLastSent = 0.0;
 		double msTimeDelay = 5000.0;
@@ -1790,24 +1790,24 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
-		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlAreaApp>(this, false);
 		pTestContext->pUserControlArea = pControlArea;
 		CN(pControlArea);
 		
 		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
 
-		pTestContext->pBrowser1 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->pDreamBrowserApp1 = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
 //		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "https://www.youtube.com/watch?v=OPV3D7f3bHY&t=340s");
-		pTestContext->pBrowser1->SetURI("https://www.youtube.com/watch?v=OPV3D7f3bHY&t=340s");
+		pTestContext->pDreamBrowserApp1->SetURI("https://www.youtube.com/watch?v=OPV3D7f3bHY&t=340s");
 		//pTestContext->pBrowser2->InitializeWithParent(pControlArea.get());
 
-		pTestContext->pBrowser2 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->pDreamBrowserApp2 = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
 		
 		//pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.twitch.tv");
 		//pTestContext->pBrowser2->SetURI("www.twitch.tv");
 
 //		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "https://www.youtube.com/watch?v=IP-iKQn8hWw");
-		pTestContext->pBrowser2->SetURI("https://www.youtube.com/watch?v=IP-iKQn8hWw");
+		pTestContext->pDreamBrowserApp2->SetURI("https://www.youtube.com/watch?v=IP-iKQn8hWw");
 
 		////pTestContext->pBrowser1->InitializeWithParent(pControlArea.get());
 
@@ -1837,7 +1837,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		/*
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
 
-			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
+			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this));
 			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, pTestContext->strURIs[i]);
 			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
 			//pTestContext->pDreamBrowsers[i]->InitializeWithParent(pControlArea.get());
@@ -1854,8 +1854,8 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 
 
 		if (pTestContext->fFirst) {
-			pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
-			pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
+			pTestContext->pUserControlArea->SetActiveSource(pTestContext->pDreamBrowserApp1);
+			pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pDreamBrowserApp2);
 			
 			/*
 			for (auto pBrowser : pTestContext->pDreamBrowsers) {
@@ -1898,7 +1898,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 					DEBUG_LINEOUT("OPEN");
 					int randIndex = std::rand() % pTestContext->strURIs.size();
 
-					auto pNewBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+					auto pNewBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
 					pNewBrowser->InitializeWithBrowserManager(pTestContext->pUserControlArea->m_pWebBrowserManager, pTestContext->strURIs[randIndex]);
 					pNewBrowser->SetURI(pTestContext->strURIs[randIndex]);
 					pNewBrowser->InitializeWithParent(pTestContext->pUserControlArea.get());
@@ -1948,9 +1948,9 @@ RESULT MultiContentTestSuite::AddTestUserControlArea() {
 
 	struct TestContext {
 		std::vector<std::string> strURIs;
-	//	std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+	//	std::vector<std::shared_ptr<DreamBrowserApp>> pDreamBrowserApps;
 	//	std::vector<std::shared_ptr<quad>> pBrowserQuads;
-		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+		std::shared_ptr<DreamUserControlAreaApp> pUserControlArea;
 	} *pTestContext = new TestContext();
 
 	auto fnInitialize = [&](void *pContext) {
@@ -1959,7 +1959,7 @@ RESULT MultiContentTestSuite::AddTestUserControlArea() {
 		SetupPipeline();
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
-		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlAreaApp>(this, false);
 		pTestContext->pUserControlArea = pControlArea;
 		CN(pControlArea);
 
@@ -2010,9 +2010,9 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 
 	struct TestContext {
 		std::vector<std::string> strURIs;
-		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+		std::vector<std::shared_ptr<DreamBrowserApp>> pDreamBrowserApps;
 		std::vector<std::shared_ptr<quad>> pBrowserQuads;
-		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+		std::shared_ptr<DreamUserControlAreaApp> pUserControlArea;
 	} *pTestContext = new TestContext();
 	
 	auto fnInitialize = [&](void *pContext) {
@@ -2145,9 +2145,9 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
 
-			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
-			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pWebBrowserManager, "about:blank");
-			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
+			pTestContext->pDreamBrowserApps.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this));
+			pTestContext->pDreamBrowserApps[i]->InitializeWithBrowserManager(pWebBrowserManager, "about:blank");
+			pTestContext->pDreamBrowserApps[i]->SetURI(pTestContext->strURIs[i]);
 
 			if (i == 0) {
 				pTestContext->pBrowserQuads.emplace_back(m_pDreamOS->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal));
@@ -2173,7 +2173,7 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 		//pTestContext->pUserControlArea->Update();
 
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
-			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetSourceTexture());
+			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowserApps[i]->GetSourceTexture());
 		}
 		return R_PASS;
 	};
@@ -2203,7 +2203,7 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 
 	struct TestContext {
 		std::vector<std::string> strURIs;
-		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+		std::vector<std::shared_ptr<DreamBrowserApp>> pDreamBrowserApps;
 		std::vector<std::shared_ptr<quad>> pBrowserQuads;
 		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
 	} *pTestContext = new TestContext();
@@ -2254,9 +2254,9 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
 
-			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
-			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pTestContext->pWebBrowserManager, "about:blank");
-			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
+			pTestContext->pDreamBrowserApps.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this));
+			pTestContext->pDreamBrowserApps[i]->InitializeWithBrowserManager(pTestContext->pWebBrowserManager, "about:blank");
+			pTestContext->pDreamBrowserApps[i]->SetURI(pTestContext->strURIs[i]);
 		}
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
 			/*
@@ -2285,7 +2285,7 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 
 		//pTestContext->pWebBrowserManager->Update();
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
-			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetSourceTexture());
+			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowserApps[i]->GetSourceTexture());
 		}
 		return R_PASS;
 	};
@@ -2585,7 +2585,7 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBrowser() {
 
 		m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
 
-		m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		m_pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
 		//m_pDreamShareView->ShowCast
 
 		// Command Line Manager
@@ -2711,7 +2711,7 @@ RESULT MultiContentTestSuite::Notify(InteractionObjectEvent *pEvent) {
 						m_pTestTexture = m_pTestTextureUser2;
 					}
 					//*/
-					m_pDreamBrowser->SetURI(m_strURL);
+					m_pDreamBrowserApp->SetURI(m_strURL);
 					//m_pDreamShareView->SetCastingTexture(m_pTestTexture);
 					m_pDreamShareViewApp->SetCastingTexture(m_pTestTexture.get());
 					m_pDreamShareViewApp->ShowCastingTexture();

@@ -18,7 +18,7 @@ class DreamOS;
 class CloudController;
 class EnvironmentAsset;
 
-class DreamContentView;
+class DreamContentViewApp;
 
 // Test Users login (refresh) tokens for users test<key>@dreamos.com
 extern std::map<int, std::string> k_refreshTokens;
@@ -116,7 +116,7 @@ private:
 	DreamOS *m_pDreamOS = nullptr;
 	CloudController *m_pCloudController = nullptr;
 	UserController *m_pUserController = nullptr;
-	std::shared_ptr<DreamContentView> m_pDreamContentView = nullptr;
+	std::shared_ptr<DreamContentViewApp> m_pDreamContentView = nullptr;
 
 public:
 	static std::string GetTestUserRefreshToken(int testUserID) {

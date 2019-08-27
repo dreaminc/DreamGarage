@@ -60,7 +60,7 @@ enum class ContentType {
 
 class UIControlView : public UISurface, 
 						 public DreamUserObserver {
-	friend class DreamUserControlArea;
+	friend class DreamUserControlAreaApp;
 	friend class MultiContentTestSuite;
 	friend class DreamSettingsApp;
 	friend class DreamFormApp;

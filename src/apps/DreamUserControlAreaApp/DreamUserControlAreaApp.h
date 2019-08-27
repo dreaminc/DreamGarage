@@ -22,7 +22,7 @@
 
 class DreamUserApp;
 class UIControlView;
-class DreamUIBar;
+class DreamUIBarApp;
 class UITabView;
 class DreamContentSource;
 class DreamDesktopApp;
@@ -52,7 +52,7 @@ class quad;
 
 #define CAMERA_CONTENT_CONTROL_TYPE "ContentControlType.Camera"
  
-class DreamUserControlArea : public DreamApp<DreamUserControlArea>, 
+class DreamUserControlAreaApp : public DreamApp<DreamUserControlAreaApp>, 
 	public Subscriber<InteractionObjectEvent>,
 	public Subscriber<UIEvent>,
 	public Subscriber<HMDEvent>,
@@ -61,11 +61,11 @@ class DreamUserControlArea : public DreamApp<DreamUserControlArea>,
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
 	friend class DreamOSTestSuite;
-	friend class DreamUIBar;
+	friend class DreamUIBarApp;
 
 public:
-	DreamUserControlArea(DreamOS *pDreamOS, void *pContext = nullptr);
-	~DreamUserControlArea();
+	DreamUserControlAreaApp(DreamOS *pDreamOS, void *pContext = nullptr);
+	~DreamUserControlAreaApp();
 
 // DreamApp
 public:
@@ -75,7 +75,7 @@ public:
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
 protected:
-	static DreamUserControlArea* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+	static DreamUserControlAreaApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 // Expose size variables
 public:
@@ -171,7 +171,7 @@ public:
 
 	RESULT OnVirtualCameraSettings(point ptPosition, quaternion qOrientation);
 
-	RESULT SetVirtualCameraSource(DreamVCam::SourceType sourceType);
+	RESULT SetVirtualCameraSource(DreamVCamApp::SourceType sourceType);
 	RESULT MuteVirtualCamera(bool fMute);
 	RESULT ResetVirtualCamera();
 
@@ -233,7 +233,7 @@ public:
 	// DreamModule doesn't have access to these, so UserControlArea is acting as a passthrough, since is it the parent app
 	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
 	virtual RESULT HandleDreamAppMessage(PeerConnection *pPeerConnection, DreamAppMessage *pDreamAppMessage) override;
-	std::shared_ptr<DreamVCam> GetVCam();
+	std::shared_ptr<DreamVCamApp> GetVCam();
 
 private:
 
@@ -241,7 +241,7 @@ private:
 	std::shared_ptr<DreamUserApp> m_pDreamUserApp;
 
 	// App used for opening content
-	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
+	std::shared_ptr<DreamUIBarApp> m_pDreamUIBar;
 
 	// UI in control area
 	std::shared_ptr<UIView> m_pView = nullptr;
@@ -280,7 +280,7 @@ private:
 	float m_centerOffset;
 
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
-	std::shared_ptr<DreamVCam> m_pDreamVCam = nullptr;
+	std::shared_ptr<DreamVCamApp> m_pDreamVCam = nullptr;
 
 	std::shared_ptr<EnvironmentShare> m_pCurrentScreenShare = nullptr;
 

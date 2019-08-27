@@ -20,6 +20,9 @@ else()
     add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
 endif()
 
+set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+
 # TODO: This should not be here!!!!!!!!!!
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
 add_definitions(-DWEBRTC_WIN)

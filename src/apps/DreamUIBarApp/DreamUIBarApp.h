@@ -33,7 +33,7 @@ class MenuNode;
 class volume;
 struct UIEvent;
 
-class DreamUserControlArea;
+class DreamUserControlAreaApp;
 class UIView;
 
 class CloudController;
@@ -65,7 +65,7 @@ enum class MenuLevel {
 	INVALID
 };
 
-class DreamUIBar :	public DreamApp<DreamUIBar>, 
+class DreamUIBarApp :	public DreamApp<DreamUIBarApp>, 
 					public DreamUserObserver,
 					public MenuController::observer, 
 					public UISpatialScrollViewObserver,
@@ -73,12 +73,12 @@ class DreamUIBar :	public DreamApp<DreamUIBar>,
 {
 
 	friend class DreamAppManager;
-	friend class DreamUserControlArea;
+	friend class DreamUserControlAreaApp;
 	friend class MultiContentTestSuite;
 
 public:
-	DreamUIBar(DreamOS *pDreamOS, void *pContext = nullptr);
-	~DreamUIBar() = default;
+	DreamUIBarApp(DreamOS *pDreamOS, void *pContext = nullptr);
+	~DreamUIBarApp() = default;
 
 	RESULT SetFont(const std::wstring& strFont);
 
@@ -139,13 +139,13 @@ public:
 	RESULT Notify(UIEvent *pEvent);
 
 	RESULT SetUIStageProgram(UIStageProgram *pUIStageProgram);
-	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
+	RESULT InitializeWithParent(DreamUserControlAreaApp *pParentApp);
 	bool IsEmpty();
 
 	RESULT ShouldUpdateMenuShader();
 
 protected:
-	static DreamUIBar* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+	static DreamUIBarApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
 
@@ -205,7 +205,7 @@ private:
 	UID m_browserUID;
 	UID m_userUID;
 
-	DreamUserControlArea *m_pParentApp = nullptr;
+	DreamUserControlAreaApp *m_pParentApp = nullptr;
 	std::shared_ptr<volume> m_pVolume = nullptr;
 };
 

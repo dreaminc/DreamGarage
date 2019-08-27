@@ -280,7 +280,7 @@ RESULT UITestSuite::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 
 	//https://api.develop.dreamos.com/environment-asset/{id}/file
 	
-	if (m_pDreamBrowser != nullptr) {
+	if (m_pDreamBrowserApp != nullptr) {
 		//CR(m_pDreamContentView->SetEnvironmentAsset(pEnvironmentAsset));
 		//m_pDreamContentView->SetEnvironmentAsset(pEnvironmentAsset);
 		WebRequest webRequest;
@@ -305,7 +305,7 @@ RESULT UITestSuite::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 		// TODO: Break this out into a separate UI suite (Browser/CEF)
 		//CR(webRequest.AddPostDataElement(L"post data element"));
 
-		CR(m_pDreamBrowser->LoadRequest(webRequest));
+		CR(m_pDreamBrowserApp->LoadRequest(webRequest));
 	}
 	
 
@@ -817,15 +817,15 @@ RESULT UITestSuite::AddTestBrowserRequestWithMenuAPI() {
 		CN(m_pDreamOS);
 
 		// Create the Browser
-		m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		CNM(m_pDreamBrowser, "Failed to create dream browser");
+		m_pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
+		CNM(m_pDreamBrowserApp, "Failed to create dream browser");
 
 		// Set up the view
 		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-		m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		m_pDreamBrowser->SetDiagonalSize(10.0f);
+		m_pDreamBrowserApp->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		m_pDreamBrowserApp->SetDiagonalSize(10.0f);
 
-		m_pDreamBrowser->SetPosition(point(0.0f, 1.0f, 0.0f));
+		m_pDreamBrowserApp->SetPosition(point(0.0f, 1.0f, 0.0f));
 
 		// Cloud Controller
 		CNM(m_pDreamOS->GetCloudController(), "CloudController is not initialzed, check config flags");
@@ -916,7 +916,7 @@ RESULT UITestSuite::AddTestBrowserURL() {
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp = nullptr;
 		//std::string strURL = "http://www.youtube.com";
 		std::string strURL = "https://www.youtube.com/watch?v=K0igLdIH-Zc";
 
@@ -925,15 +925,15 @@ RESULT UITestSuite::AddTestBrowserURL() {
 		CN(m_pDreamOS);		
 
 		// Create the Shared View App
-		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		CNM(pDreamBrowser, "Failed to create dream browser");
+		pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
+		CNM(pDreamBrowserApp, "Failed to create dream browser");
 
 		// Set up the view
 		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetDiagonalSize(10.0f);
+		pDreamBrowserApp->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowserApp->SetDiagonalSize(10.0f);
 		
-		pDreamBrowser->SetURI(strURL);
+		pDreamBrowserApp->SetURI(strURL);
 
 	Error:
 		return R_PASS;
@@ -985,7 +985,7 @@ RESULT UITestSuite::AddTestBrowserRequest() {
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp = nullptr;
 		std::string strURL = "http://www.youtube.com";
 
 		WebRequest webRequest;
@@ -993,13 +993,13 @@ RESULT UITestSuite::AddTestBrowserRequest() {
 		CN(m_pDreamOS);
 
 		// Create the Shared View App
-		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		CNM(pDreamBrowser, "Failed to create dream browser");
+		pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
+		CNM(pDreamBrowserApp, "Failed to create dream browser");
 
 		// Set up the view
 		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetDiagonalSize(10.0f);
+		pDreamBrowserApp->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowserApp->SetDiagonalSize(10.0f);
 
 		//pDreamContentView->SetScreenTexture(L"crate_color.png");
 		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
@@ -1166,18 +1166,18 @@ RESULT UITestSuite::AddTestSharedContentView() {
 	// Initialize Code
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		std::shared_ptr<DreamContentView> pDreamContentView = nullptr;
+		std::shared_ptr<DreamContentViewApp> pDreamContentView = nullptr;
 
 		CN(m_pDreamOS);
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Create the Shared View App
-		pDreamContentView = m_pDreamOS->LaunchDreamApp<DreamContentView>(this);
+		pDreamContentView = m_pDreamOS->LaunchDreamApp<DreamContentViewApp>(this);
 		CNM(pDreamContentView, "Failed to create dream content view");
 
 		// Set up the view
-		pDreamContentView->SetParams(point(0.0f), 5.0f, DreamContentView::AspectRatio::ASPECT_16_9, vector(0.0f, 0.0f, 1.0f));
+		pDreamContentView->SetParams(point(0.0f), 5.0f, DreamContentViewApp::AspectRatio::ASPECT_16_9, vector(0.0f, 0.0f, 1.0f));
 
 		//pDreamContentView->SetScreenTexture(L"crate_color.png");
 		pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");

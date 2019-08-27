@@ -24,7 +24,7 @@ UserAreaControls::~UserAreaControls() {
 }
 
 // DreamApp
-RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
+RESULT UserAreaControls::Initialize(DreamUserControlAreaApp *pParent) {
 	RESULT r = R_PASS;
 
 	m_pParentApp = pParent;
@@ -220,7 +220,7 @@ RESULT UserAreaControls::SetTitleText(const std::string& strTitle) {
 // ControlBarObserver
 RESULT UserAreaControls::HandleBackPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pParentApp->GetActiveSource());
+	auto pBrowser = std::dynamic_pointer_cast<DreamBrowserApp>(m_pParentApp->GetActiveSource());
 	CNR(pBrowser, R_SKIPPED);
 
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
@@ -233,7 +233,7 @@ Error:
 RESULT UserAreaControls::HandleForwardPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
-	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pParentApp->GetActiveSource());
+	auto pBrowser = std::dynamic_pointer_cast<DreamBrowserApp>(m_pParentApp->GetActiveSource());
 	CNR(pBrowser, R_SKIPPED);
 
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
@@ -350,10 +350,10 @@ RESULT UserAreaControls::HandleSourceTogglePressed(UIButton* pButtonContext, voi
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	CR(pButtonContext->Toggle());
 	if (pButtonContext->IsToggled()) {
-		CR(m_pParentApp->SetVirtualCameraSource(DreamVCam::SourceType::SHARE_SCREEN));
+		CR(m_pParentApp->SetVirtualCameraSource(DreamVCamApp::SourceType::SHARE_SCREEN));
 	}
 	else {
-		CR(m_pParentApp->SetVirtualCameraSource(DreamVCam::SourceType::CAMERA));
+		CR(m_pParentApp->SetVirtualCameraSource(DreamVCamApp::SourceType::CAMERA));
 	}
 
 Error:
@@ -400,7 +400,7 @@ RESULT UserAreaControls::UpdateControlBarButtonsWithType(std::string strContentT
 
 		CR(SetSharingFlag(fIsSharing));
 
-		auto pBrowser = dynamic_cast<DreamBrowser*>(m_pParentApp->GetActiveSource().get());
+		auto pBrowser = dynamic_cast<DreamBrowserApp*>(m_pParentApp->GetActiveSource().get());
 		if (pBrowser != nullptr) {
 			CR(pBrowser->UpdateNavigationFlags());
 		}

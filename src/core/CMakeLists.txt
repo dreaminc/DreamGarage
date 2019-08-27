@@ -109,6 +109,9 @@ else()
     add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
 endif()
 
+set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+
 add_library(core 
     ${CORE_SOURCES} 
     ${BOUNDING_SOURCES}

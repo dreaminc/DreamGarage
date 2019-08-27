@@ -91,7 +91,7 @@ RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
 			pCloudController->IsEnvironmentConnected()) {
 
 			if (GetDOS()->GetKeyboardApp()->IsVisible()) {
-				CR(m_pDreamBrowserForm->HandleUnfocusEvent());
+				CR(m_pDreamBrowserAppForm->HandleUnfocusEvent());
 				CR(m_pFormView->HandleKeyboardDown());
 			}
 			else {

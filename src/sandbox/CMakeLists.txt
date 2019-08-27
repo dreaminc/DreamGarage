@@ -51,6 +51,10 @@ add_definitions(-DWEBRTC_WIN)
 # TODO: This should not be here (only in HMD yo)
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/openvr/headers)
 
+# Multithreaded 
+set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+
 IF(APPLE
    # Mac OS X specific code
    # TODO: Add OSX vs. iOS

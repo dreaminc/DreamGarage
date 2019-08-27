@@ -20,13 +20,13 @@
 #include "cloud/Menu/MenuController.h"
 
 class DreamOS;
-class DreamUIBar;
+class DreamUIBarApp;
 class UIKeyboard;
 class VirtualObj;
 class sphere;
 class quad;
 
-class DreamBrowser;
+class DreamBrowserApp;
 
 struct SenseControllerEvent;
 struct SenseKeyboardEvent;
@@ -137,9 +137,9 @@ private:
 
 private:
 	
-	std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+	std::shared_ptr<DreamBrowserApp> m_pDreamBrowserApp = nullptr;
 	CloudController *m_pCloudController = nullptr;
-	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
+	std::shared_ptr<DreamUIBarApp> m_pDreamUIBar;
 
 	VirtualObj* m_pPrevSelected;
 

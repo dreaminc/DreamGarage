@@ -35,7 +35,7 @@
 
 class quad;
 class texture;
-class DreamUserControlArea;
+class DreamUserControlAreaApp;
 class AudioPacket;
 class EnvironmentAsset;
 
@@ -97,7 +97,7 @@ public:
 
 	virtual RESULT HandleWindows64CopyData(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) override;
 
-	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
+	RESULT InitializeWithParent(DreamUserControlAreaApp *pParentApp);
 
 	float GetWidthFromAspectDiagonal();
 	float GetHeightFromAspectDiagonal();
@@ -140,7 +140,7 @@ private:
 	bool m_fShiftKey = false;
 
 	bool m_fDesktopDuplicationIsRunning = false;
-	DreamUserControlArea *m_pParentApp = nullptr;
+	DreamUserControlAreaApp *m_pParentApp = nullptr;
 
 	// Window
 	HWND m_hwndDreamHandle = nullptr;

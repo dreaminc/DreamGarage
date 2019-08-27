@@ -15,7 +15,7 @@
 
 class DreamOS;
 class DreamShareViewApp; 
-class DreamBrowser;
+class DreamBrowserApp;
 class CloudController;
 class EnvironmentAsset;
 class CEFBrowserManager;
@@ -90,7 +90,10 @@ private:
 
 	// members used with interaction engine events
 	std::shared_ptr<DreamShareViewApp> m_pDreamShareViewApp = nullptr;
-	std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+	
+	// TODO: Remove members maybe?
+	std::shared_ptr<DreamBrowserApp> m_pDreamBrowserApp = nullptr;
+
 	std::shared_ptr<quad> m_pTestQuad = nullptr;
 	std::shared_ptr<composite> m_pPointerCursor = nullptr;
 	std::string m_strID;

@@ -749,11 +749,11 @@ RESULT CloudTestSuite::LaunchDreamView() {
 	CN(m_pDreamOS);
 
 	// Create the Shared View App
-	m_pDreamContentView = m_pDreamOS->LaunchDreamApp<DreamContentView>(this);
+	m_pDreamContentView = m_pDreamOS->LaunchDreamApp<DreamContentViewApp>(this);
 	CNM(m_pDreamContentView, "Failed to create dream content view");
 
 	// Set up the view
-	m_pDreamContentView->SetParams(point(0.0f), 5.0f, DreamContentView::AspectRatio::ASPECT_16_9, vector(0.0f, 0.0f, 1.0f));
+	m_pDreamContentView->SetParams(point(0.0f), 5.0f, DreamContentViewApp::AspectRatio::ASPECT_16_9, vector(0.0f, 0.0f, 1.0f));
 	//m_pDreamContentView->SetFitTextureAspectRatio(true);
 
 	//pDreamContentView->SetScreenTexture(L"crate_color.png");

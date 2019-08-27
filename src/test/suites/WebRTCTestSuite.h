@@ -17,7 +17,7 @@ class DreamOS;
 class CloudController;
 class EnvironmentAsset;
 
-class DreamContentView;
+class DreamContentViewApp;
 
 class sphere;
 class quad;

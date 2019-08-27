@@ -78,8 +78,8 @@ class DreamPeerApp;
 class DreamShareView;
 class DreamTestingApp;
 class DreamUserApp;
-class DreamUserControlArea;
-class DreamVCam;
+class DreamUserControlAreaApp;
+class DreamVCamApp;
 class MenuControllerProxy;
 class NamedPipeClient;
 class NamedPipeServer;
@@ -648,7 +648,7 @@ RESULT DOSTestSuite::AddTestDreamUIBar() {
 
 
 		{
-			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this);
+			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBarApp>(this);
 			//CN(pDreamUIBar);	// still fails because it needs a user
 		}
 
@@ -701,7 +701,7 @@ RESULT DOSTestSuite::AddTestDreamBrowser() {
 
 	struct TestContext {
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
-		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+		std::shared_ptr<DreamBrowserApp> m_pDreamBrowserApp = nullptr;
 		std::shared_ptr<Dream2DMouseApp> m_pDream2DMouse = nullptr;
 		quad *m_pBrowserQuad = nullptr;
 	};
@@ -745,16 +745,16 @@ RESULT DOSTestSuite::AddTestDreamBrowser() {
 		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
 	
 		// Create the Shared View App
-		pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
-		CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
+		pTestContext->m_pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
+		pTestContext->m_pDreamBrowserApp->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+		CNM(pTestContext->m_pDreamBrowserApp, "Failed to create dream browser");
 		
 		// Set up the view
 		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
 		//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 		//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
 		
-		pTestContext->m_pDreamBrowser->SetURI(strURL);
+		pTestContext->m_pDreamBrowserApp->SetURI(strURL);
 
 	Error:
 		return R_PASS;
@@ -767,7 +767,7 @@ RESULT DOSTestSuite::AddTestDreamBrowser() {
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture());
+		pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowserApp->GetSourceTexture());
 
 	Error:
 		return r;
@@ -1500,10 +1500,10 @@ RESULT DOSTestSuite::AddTestDreamSoundSystem() {
 		// Browser
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
 		
-		std::shared_ptr<DreamBrowser> m_pDreamBrowserSource = nullptr;
+		std::shared_ptr<DreamBrowserApp> m_pDreamBrowserSource = nullptr;
 		quad *m_pBrowserSourceQuad = nullptr;
 
-		std::shared_ptr<DreamBrowser> m_pDreamBrowserDest = nullptr;
+		std::shared_ptr<DreamBrowserApp> m_pDreamBrowserDest = nullptr;
 		quad *m_pBrowserDestQuad = nullptr;
 		
 		DreamOS *m_pParentDOS = nullptr;
@@ -1567,7 +1567,7 @@ RESULT DOSTestSuite::AddTestDreamSoundSystem() {
 			pTestContext->m_pBrowserSourceQuad->SetMaterialAmbient(1.0f);
 
 			// Create the Shared View App
-			pTestContext->m_pDreamBrowserSource = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+			pTestContext->m_pDreamBrowserSource = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
 			pTestContext->m_pDreamBrowserSource->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURLSource);
 			CNM(pTestContext->m_pDreamBrowserSource, "Failed to create source dream browser");
 			CR(pTestContext->m_pDreamBrowserSource->SetForceObserverAudio(true));
@@ -1668,14 +1668,14 @@ RESULT DOSTestSuite::AddTestDreamVCam() {
 		// VCam
 		texture *pTexture = nullptr;
 		unsigned char *pBuffer = nullptr;
-		std::shared_ptr<DreamVCam> pDreamVCam = nullptr;
+		std::shared_ptr<DreamVCamApp> pDreamVCam = nullptr;
 		ProgramNode* pRenderNode = nullptr;
 		ProgramNode* pEndAuxNode = nullptr;
 		std::shared_ptr<quad> pQuad = nullptr;
 
 		// Browser
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
-		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+		std::shared_ptr<DreamBrowserApp> m_pDreamBrowser = nullptr;
 		quad *m_pBrowserQuad = nullptr;
 	} *pTestContext = new TestContext();
 
@@ -1807,7 +1807,7 @@ RESULT DOSTestSuite::AddTestDreamVCam() {
 			CN(pSphere);
 
 			// Create the VCam		
-			pTestContext->pDreamVCam = m_pDreamOS->LaunchDreamModule<DreamVCam>(this);
+			pTestContext->pDreamVCam = m_pDreamOS->LaunchDreamModule<DreamVCamApp>(this);
 			CNM(pTestContext->pDreamVCam, "Failed to create dream virtual camera");
 			pTestContext->pDreamVCam->InitializePipeline();
 
@@ -2298,15 +2298,15 @@ RESULT DOSTestSuite::AddTestDreamOS() {
 
 	struct TestContext {
 		std::shared_ptr<DreamUserApp> pUser = nullptr;
-		std::shared_ptr<DreamUserControlArea> pUserControlArea = nullptr;
+		std::shared_ptr<DreamUserControlAreaApp> pUserControlArea = nullptr;
 	};
 	TestContext *pTestContext = new TestContext();
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
-		std::shared_ptr<DreamUIBar> pDreamUIBar = nullptr;
+		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp = nullptr;
+		std::shared_ptr<DreamUIBarApp> pDreamUIBar = nullptr;
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
@@ -2350,7 +2350,7 @@ RESULT DOSTestSuite::AddTestDreamOS() {
 		pTestContext->pUser = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
 		CN(pTestContext->pUser);
 
-		pTestContext->pUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
+		pTestContext->pUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlAreaApp>(this);
 		CN(pTestContext->pUserControlArea);
 
 		pTestContext->pUserControlArea->SetDreamUserApp(pTestContext->pUser);
@@ -2507,7 +2507,7 @@ RESULT DOSTestSuite::AddTestBasicBrowserCast() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp = nullptr;
 		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
 
 		std::string strURL = "http://www.youtube.com";
@@ -2534,17 +2534,17 @@ RESULT DOSTestSuite::AddTestBasicBrowserCast() {
 			pTestContext->pDreamShareViewApp = pDreamShareViewApp;
 
 			// Create the Shared View App
-			pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-			CNM(pDreamBrowser, "Failed to create dream browser");
+			pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
+			CNM(pDreamBrowserApp, "Failed to create dream browser");
 
 			// Set up the view
 			//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-			pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-			pDreamBrowser->SetDiagonalSize(10.0f);
-			pDreamBrowser->SetPosition(point(4.0f, 0.0f, 0.0f));
+			pDreamBrowserApp->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+			pDreamBrowserApp->SetDiagonalSize(10.0f);
+			pDreamBrowserApp->SetPosition(point(4.0f, 0.0f, 0.0f));
 		}
 
-		pDreamBrowser->SetURI(strURL);
+		pDreamBrowserApp->SetURI(strURL);
 
 	Error:
 		return r;
@@ -2610,7 +2610,7 @@ RESULT DOSTestSuite::AddTestDreamDesktop() {
 
 	struct TestContext {
 		std::shared_ptr<DreamDesktopApp> pDreamDesktop = nullptr;
-		std::shared_ptr<DreamUserControlArea> pDreamUserControlArea = nullptr;
+		std::shared_ptr<DreamUserControlAreaApp> pDreamUserControlArea = nullptr;
 		std::shared_ptr<quad> pQuad = nullptr;
 		texture* pTexture = nullptr;
 		bool once = false;

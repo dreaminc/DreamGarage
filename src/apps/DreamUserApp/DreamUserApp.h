@@ -79,7 +79,7 @@ class DreamUserApp : public DreamApp<DreamUserApp>,
 					public Subscriber<HysteresisEvent> {
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
-	friend class DreamUserControlArea;
+	friend class DreamUserControlAreaApp;
 	friend class DreamSettingsApp;
 	friend class DreamFormApp;
 

@@ -464,8 +464,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		SoundClient *pXAudio2AudioClient = nullptr;
 
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
-		std::shared_ptr<DreamBrowser> m_pDreamBrowserChrome = nullptr;
-		std::shared_ptr<DreamBrowser> m_pDreamBrowserVCam = nullptr;
+		std::shared_ptr<DreamBrowserApp> m_pDreamBrowserAppChrome = nullptr;
+		std::shared_ptr<DreamBrowserApp> m_pDreamBrowserAppVCam = nullptr;
 
 
 		sphere *pSphere = nullptr;
@@ -793,7 +793,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp = nullptr;
 		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
 
 		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
@@ -856,34 +856,34 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 			CR(pTestContext->m_pWebBrowserManager->Initialize());
 
 			// Create the Dream Browser Chrome
-			pTestContext->m_pDreamBrowserChrome = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-			pTestContext->m_pDreamBrowserChrome->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURLChrome);
-			CNM(pTestContext->m_pDreamBrowserChrome, "Failed to create dream browser chrome");
+			pTestContext->m_pDreamBrowserAppChrome = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
+			pTestContext->m_pDreamBrowserAppChrome->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURLChrome);
+			CNM(pTestContext->m_pDreamBrowserAppChrome, "Failed to create dream browser chrome");
 
 			pTestContext->pDreamBrowserObserverChrome = new TestContext::DreamBrowserObserverChrome();
 			CN(pTestContext->pDreamBrowserObserverChrome);
 			pTestContext->pDreamBrowserObserverChrome->pDreamOS = pTestContext->pDreamOS;
 
-			CRM(pTestContext->m_pDreamBrowserChrome->RegisterObserver(pTestContext->pDreamBrowserObserverChrome), 
+			CRM(pTestContext->m_pDreamBrowserAppChrome->RegisterObserver(pTestContext->pDreamBrowserObserverChrome), 
 				"Failed to register browser observer chrome");
-			pTestContext->m_pDreamBrowserChrome->SetForceObserverAudio(true);
+			pTestContext->m_pDreamBrowserAppChrome->SetForceObserverAudio(true);
 
-			pTestContext->m_pDreamBrowserChrome->SetURI(strURLChrome);
+			pTestContext->m_pDreamBrowserAppChrome->SetURI(strURLChrome);
 
 
-			pTestContext->m_pDreamBrowserVCam = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-			pTestContext->m_pDreamBrowserVCam->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURLVCam);
-			CNM(pTestContext->m_pDreamBrowserVCam, "Failed to create dream browser vcam");
+			pTestContext->m_pDreamBrowserAppVCam = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
+			pTestContext->m_pDreamBrowserAppVCam->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURLVCam);
+			CNM(pTestContext->m_pDreamBrowserAppVCam, "Failed to create dream browser vcam");
 
 			pTestContext->pDreamBrowserObserverVCam = new TestContext::DreamBrowserObserverVCam();
 			CN(pTestContext->pDreamBrowserObserverVCam);
 			pTestContext->pDreamBrowserObserverVCam->pDreamOS = pTestContext->pDreamOS;
 
-			CRM(pTestContext->m_pDreamBrowserVCam->RegisterObserver(pTestContext->pDreamBrowserObserverVCam), 
+			CRM(pTestContext->m_pDreamBrowserAppVCam->RegisterObserver(pTestContext->pDreamBrowserObserverVCam), 
 				"Failed to register browser observer vcam");
-			pTestContext->m_pDreamBrowserVCam->SetForceObserverAudio(true);
+			pTestContext->m_pDreamBrowserAppVCam->SetForceObserverAudio(true);
 
-			pTestContext->m_pDreamBrowserVCam->SetURI(strURLVCam);
+			pTestContext->m_pDreamBrowserAppVCam->SetURI(strURLVCam);
 
 			//*/
 		}
@@ -1008,8 +1008,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 		if (pTestContext->m_pBrowserQuadChrome != nullptr) {
 
 			// Chrome Browser
-			if (pTestContext->m_pDreamBrowserChrome != nullptr) {
-				auto pSourceTexture = pTestContext->m_pDreamBrowserChrome->GetSourceTexture();
+			if (pTestContext->m_pDreamBrowserAppChrome != nullptr) {
+				auto pSourceTexture = pTestContext->m_pDreamBrowserAppChrome->GetSourceTexture();
 
 				pTestContext->m_pBrowserQuadChrome->SetDiffuseTexture(pSourceTexture);
 
@@ -1035,8 +1035,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCVCamAudioRelay() {
 
 
 			// VCam Browser
-			if (pTestContext->m_pDreamBrowserVCam != nullptr) {
-				auto pSourceTexture = pTestContext->m_pDreamBrowserVCam->GetSourceTexture();
+			if (pTestContext->m_pDreamBrowserAppVCam != nullptr) {
+				auto pSourceTexture = pTestContext->m_pDreamBrowserAppVCam->GetSourceTexture();
 
 				pTestContext->m_pBrowserQuadVCam->SetDiffuseTexture(pSourceTexture);
 
@@ -1152,7 +1152,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		SoundClient *pXAudio2AudioClient = nullptr;
 
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
-		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+		std::shared_ptr<DreamBrowserApp> m_pDreamBrowserApp = nullptr;
 
 		int testUserNum = 0;
 
@@ -1437,7 +1437,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp = nullptr;
 		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
 
 		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
@@ -1487,18 +1487,18 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			CR(pTestContext->m_pWebBrowserManager->Initialize());
 
 			// Create the Shared View App
-			pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-			pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
-			CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
-			CRM(pTestContext->m_pDreamBrowser->RegisterObserver(pTestContext), "Failed to register browser observer");
-			pTestContext->m_pDreamBrowser->SetForceObserverAudio(true);
+			pTestContext->m_pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
+			pTestContext->m_pDreamBrowserApp->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+			CNM(pTestContext->m_pDreamBrowserApp, "Failed to create dream browser");
+			CRM(pTestContext->m_pDreamBrowserApp->RegisterObserver(pTestContext), "Failed to register browser observer");
+			pTestContext->m_pDreamBrowserApp->SetForceObserverAudio(true);
 
 			// Set up the view
 			//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
 			//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 			//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
 
-			pTestContext->m_pDreamBrowser->SetURI(strURL);
+			pTestContext->m_pDreamBrowserApp->SetURI(strURL);
 		}
 		else {
 			// temp
@@ -1616,8 +1616,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 		if (pTestContext->m_pBrowserQuad != nullptr) {
 
-			if (pTestContext->m_pDreamBrowser != nullptr) {
-				auto pSourceTexture = pTestContext->m_pDreamBrowser->GetSourceTexture();
+			if (pTestContext->m_pDreamBrowserApp != nullptr) {
+				auto pSourceTexture = pTestContext->m_pDreamBrowserApp->GetSourceTexture();
 
 				pTestContext->m_pBrowserQuad->SetDiffuseTexture(pSourceTexture);
 
@@ -2274,7 +2274,7 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp = nullptr;
 		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
 		std::shared_ptr<DreamShareViewApp>	pDreamShareViewApp = nullptr;
 
@@ -2345,15 +2345,15 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 		CNM(pDream2DMouse, "Failed to create dream 2D mouse app");
 
 		// Create the Browser App
-		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		CNM(pDreamBrowser, "Failed to create dream browser");
+		pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
+		CNM(pDreamBrowserApp, "Failed to create dream browser");
 
 		// Set up the view
 		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetDiagonalSize(10.0f);
+		pDreamBrowserApp->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowserApp->SetDiagonalSize(10.0f);
 
-		pDreamBrowser->SetURI(strURL);
+		pDreamBrowserApp->SetURI(strURL);
 
 		pDreamShareViewApp->Show();
 
@@ -2361,10 +2361,10 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 		pComposite = m_pDreamOS->AddComposite();
 		CN(pComposite);
 
-		pComposite->SetPosition(pDreamBrowser->GetOrigin());
+		pComposite->SetPosition(pDreamBrowserApp->GetOrigin());
 		m_pTestQuad = pComposite->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f));
 		CN(m_pTestQuad);
-		m_pTestQuad->translateX(pDreamBrowser->GetWidthFromAspectDiagonal() + 0.5f + 0.1f);
+		m_pTestQuad->translateX(pDreamBrowserApp->GetWidthFromAspectDiagonal() + 0.5f + 0.1f);
 
 		m_pPointerCursor = pComposite->AddModel(L"\\mouse-cursor\\mouse-cursor.obj");
 		CN(m_pPointerCursor);

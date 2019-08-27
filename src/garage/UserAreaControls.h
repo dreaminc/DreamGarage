@@ -14,7 +14,7 @@
 // TODO: These should all be together
 #include "apps/DreamUserControlAreaApp/DreamContentSource.h"
 
-class DreamUserControlArea;
+class DreamUserControlAreaApp;
 class text;
 
 //All relative to parent app
@@ -57,7 +57,7 @@ public:
 
 	// DreamApp
 public:
-	RESULT Initialize(DreamUserControlArea *pParent);
+	RESULT Initialize(DreamUserControlAreaApp *pParent);
 	RESULT InitializeText();
 	RESULT Update();
 
@@ -119,7 +119,7 @@ private:
 
 private:
 
-	DreamUserControlArea* m_pParentApp = nullptr;
+	DreamUserControlAreaApp* m_pParentApp = nullptr;
 
 	std::shared_ptr<text> m_pURLText = nullptr;
 	bool m_fUpdateTitle = false;

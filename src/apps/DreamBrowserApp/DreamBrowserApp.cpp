@@ -29,13 +29,13 @@
 // TODO: Should just be texture (no OGL)
 #include "hal\ogl\OGLTexture.h"	// necessary for the dynamic cast to enable PBO
 
-DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
-	DreamApp<DreamBrowser>(pDreamOS, pContext)
+DreamBrowserApp::DreamBrowserApp(DreamOS *pDreamOS, void *pContext) :
+	DreamApp<DreamBrowserApp>(pDreamOS, pContext)
 {
 	// Empty - initialization by factory
 }
 
-DreamBrowser::~DreamBrowser(){
+DreamBrowserApp::~DreamBrowserApp(){
 	/*
 	RESULT r = R_PASS;
 
@@ -46,7 +46,7 @@ Error:
 	//*/
 }
 
-RESULT DreamBrowser::Shutdown(void *pContext) {
+RESULT DreamBrowserApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
 	m_soundState = sound::state::STOPPED;
@@ -69,7 +69,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::ScrollBrowserToPoint(int pxXScroll, int pxYScroll) {
+RESULT DreamBrowserApp::ScrollBrowserToPoint(int pxXScroll, int pxYScroll) {
 	RESULT r = R_PASS;
 	
 	CNR(m_pWebBrowserController, R_SKIPPED);
@@ -102,7 +102,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::ScrollBrowserToX(int pxXScroll) {
+RESULT DreamBrowserApp::ScrollBrowserToX(int pxXScroll) {
 	RESULT r = R_PASS;
 	
 	CNR(m_pWebBrowserController, R_SKIPPED);
@@ -127,7 +127,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::ScrollBrowserToY(int pxYScroll) {
+RESULT DreamBrowserApp::ScrollBrowserToY(int pxYScroll) {
 	RESULT r = R_PASS;
 	
 	CNR(m_pWebBrowserController, R_SKIPPED);
@@ -152,7 +152,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) {
+RESULT DreamBrowserApp::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) {
 	RESULT r = R_PASS;
 	
 	CNR(m_pWebBrowserController, R_SKIPPED);
@@ -181,7 +181,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::ScrollBrowserXByDiff(int pxXDiff) {
+RESULT DreamBrowserApp::ScrollBrowserXByDiff(int pxXDiff) {
 	RESULT r = R_PASS;
 
 	CNR(m_pWebBrowserController, R_SKIPPED);
@@ -197,7 +197,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::ScrollBrowserYByDiff(int pxYDiff) {
+RESULT DreamBrowserApp::ScrollBrowserYByDiff(int pxYDiff) {
 	RESULT r = R_PASS;
 	
 	CNR(m_pWebBrowserController, R_SKIPPED);
@@ -213,31 +213,31 @@ Error:
 	return r;
 }
 
-int DreamBrowser::GetPageHeight() {	// This is incomplete, should be entire page- from CEF
+int DreamBrowserApp::GetPageHeight() {	// This is incomplete, should be entire page- from CEF
 	return -1;
 }
 
-int DreamBrowser::GetPageWidth() {
+int DreamBrowserApp::GetPageWidth() {
 	return -1;
 }
 
-int DreamBrowser::GetScrollX() {
+int DreamBrowserApp::GetScrollX() {
 	return m_pxXPosition;
 }
 
-int DreamBrowser::GetScrollY() {
+int DreamBrowserApp::GetScrollY() {
 	return m_pxYPosition;
 }
 
-int DreamBrowser::GetBrowserHeight() {
+int DreamBrowserApp::GetBrowserHeight() {
 	return m_browserHeight;
 }
 
-int DreamBrowser::GetBrowserWidth() {
+int DreamBrowserApp::GetBrowserWidth() {
 	return m_browserWidth;
 }
 
-RESULT DreamBrowser::OnKeyPress(char chKey, bool fkeyDown) {
+RESULT DreamBrowserApp::OnKeyPress(char chKey, bool fkeyDown) {
 	RESULT r = R_PASS;
 	CBR(chKey != SVK_SHIFT, R_SKIPPED);		// don't send these key codes to browser (capital letters and such have different values already)
 	CBR(chKey != 0, R_SKIPPED);
@@ -250,7 +250,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::CreateBrowserSource(std::string strURL) {
+RESULT DreamBrowserApp::CreateBrowserSource(std::string strURL) {
 	RESULT r = R_PASS;
 
 //	SetVisible(true);
@@ -266,7 +266,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnMouseMove(point mousePoint) {
+RESULT DreamBrowserApp::OnMouseMove(point mousePoint) {
 	RESULT r = R_PASS;
 
 	m_mouseDragEvent.pt.x = (int)mousePoint.x();
@@ -278,7 +278,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnClick(point ptContact, bool fMouseDown) {
+RESULT DreamBrowserApp::OnClick(point ptContact, bool fMouseDown) {
 	RESULT r = R_PASS;
 
 	CNR(m_pWebBrowserController, R_SKIPPED);
@@ -299,13 +299,13 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnAfterCreated() {
+RESULT DreamBrowserApp::OnAfterCreated() {
 	RESULT r = R_PASS;
 
 	return r;
 }
 
-RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
+RESULT DreamBrowserApp::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
 	if (!fLoading) {
@@ -320,13 +320,13 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnLoadStart() {
+RESULT DreamBrowserApp::OnLoadStart() {
 	RESULT r = R_PASS;	
 
 	return r;
 }
 
-RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
+RESULT DreamBrowserApp::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 	
 	//m_strCurrentURL = strCurrentURL;
@@ -340,7 +340,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnLoadError(int errorCode, std::string strError, std::string strFailedURL) {
+RESULT DreamBrowserApp::OnLoadError(int errorCode, std::string strError, std::string strFailedURL) {
 	RESULT r = R_PASS;
 
 	// currently our handling of OnCertificateError causes an abort(-3)
@@ -356,7 +356,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
+RESULT DreamBrowserApp::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
 	if (m_pObserver != nullptr) {
@@ -374,7 +374,7 @@ Error:
 	return r;
 }
 
-bool DreamBrowser::OnCertificateError(std::string strURL, unsigned int certError) {
+bool DreamBrowserApp::OnCertificateError(std::string strURL, unsigned int certError) {
 	RESULT r = R_PASS;
 
 	CN(m_pObserver);
@@ -386,7 +386,7 @@ Error:
 	return false;
 }
 
-RESULT DreamBrowser::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, std::string strURL) {
+RESULT DreamBrowserApp::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, std::string strURL) {
 	RESULT r = R_PASS;
 	
 	std::map<std::string, ResourceHandlerType>::iterator it;
@@ -405,7 +405,7 @@ RESULT DreamBrowser::GetResourceHandlerType(ResourceHandlerType &resourceHandler
 	return r;
 }
 
-RESULT DreamBrowser::CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) {
+RESULT DreamBrowserApp::CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) {
 	RESULT r = R_PASS;
 
 	std::map<std::string, std::multimap<std::string, std::string>>::iterator it;
@@ -440,7 +440,7 @@ RESULT DreamBrowser::CheckForHeaders(std::multimap<std::string, std::string> &he
 	return r;
 }
 
-RESULT DreamBrowser::HandleDreamFormSuccess() {
+RESULT DreamBrowserApp::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
 	CNR(m_pObserver, R_SKIPPED);
@@ -450,7 +450,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::HandleDreamFormCancel() {
+RESULT DreamBrowserApp::HandleDreamFormCancel() {
 	RESULT r = R_PASS;
 
 	CNR(m_pObserver, R_SKIPPED);
@@ -460,7 +460,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& strAccessToken) {
+RESULT DreamBrowserApp::HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& strAccessToken) {
 	RESULT r = R_PASS;
 
 	CNR(m_pObserver, R_SKIPPED);
@@ -470,7 +470,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::HandleDreamFormSetEnvironmentId(int environmentId) {
+RESULT DreamBrowserApp::HandleDreamFormSetEnvironmentId(int environmentId) {
 	RESULT r = R_PASS;
 
 	CNR(m_pObserver, R_SKIPPED);
@@ -480,7 +480,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::HandleIsInputFocused(bool fInputFocused) {
+RESULT DreamBrowserApp::HandleIsInputFocused(bool fInputFocused) {
 	RESULT r = R_PASS;
 
 	CNR(m_pObserver, R_SKIPPED);
@@ -491,7 +491,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::HandleCanTabNext(bool fCanNext) {
+RESULT DreamBrowserApp::HandleCanTabNext(bool fCanNext) {
 	RESULT r = R_PASS;
 
 	CNR(m_pObserver, R_SKIPPED);
@@ -502,7 +502,7 @@ Error:
 
 }
 
-RESULT DreamBrowser::HandleCanTabPrevious(bool fCanPrevious) {
+RESULT DreamBrowserApp::HandleCanTabPrevious(bool fCanPrevious) {
 	RESULT r = R_PASS;
 
 	CNR(m_pObserver, R_SKIPPED);
@@ -512,7 +512,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::HandleBackEvent() {
+RESULT DreamBrowserApp::HandleBackEvent() {
 	RESULT r = R_PASS;
 
 	CBR(m_pWebBrowserController->CanGoBack(), R_SKIPPED);
@@ -522,7 +522,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::HandleForwardEvent() {
+RESULT DreamBrowserApp::HandleForwardEvent() {
 	RESULT r = R_PASS;
 
 	CBR(m_pWebBrowserController->CanGoForward(), R_SKIPPED);
@@ -532,33 +532,33 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::HandleStopEvent() {
+RESULT DreamBrowserApp::HandleStopEvent() {
 	RESULT r = R_PASS;
 
 	return r;
 }
 
-RESULT DreamBrowser::SetForceObserverAudio(bool fForceObserverAudio) {
+RESULT DreamBrowserApp::SetForceObserverAudio(bool fForceObserverAudio) {
 	
 	m_fForceObserverAudio = fForceObserverAudio;
 
 	return R_PASS;
 }
 
-RESULT DreamBrowser::HandleTabEvent() {
+RESULT DreamBrowserApp::HandleTabEvent() {
 	return m_pWebBrowserController->TabNext();
 }
 
-RESULT DreamBrowser::HandleBackTabEvent() {
+RESULT DreamBrowserApp::HandleBackTabEvent() {
 	return m_pWebBrowserController->TabPrevious();
 }
 
-RESULT DreamBrowser::HandleUnfocusEvent() {
+RESULT DreamBrowserApp::HandleUnfocusEvent() {
 	return m_pWebBrowserController->UnfocusInput();
 }
 
 // DreamApp Interface
-RESULT DreamBrowser::InitializeApp(void *pContext) {
+RESULT DreamBrowserApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
 	CommandLineManager *pCommandLineManager = nullptr;
@@ -619,7 +619,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnAppDidFinishInitializing(void *pContext) {
+RESULT DreamBrowserApp::OnAppDidFinishInitializing(void *pContext) {
 	RESULT r = R_PASS;
 
 	CR(r);
@@ -628,7 +628,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::Update(void *pContext) {
+RESULT DreamBrowserApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	auto tCurrent = std::chrono::high_resolution_clock::now();
@@ -693,7 +693,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL) {
+RESULT DreamBrowserApp::InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL) {
 	RESULT r = R_PASS;
 
 	int pxWidth = m_browserWidth;
@@ -716,20 +716,20 @@ Error:
 	return r;
 }
 
-texture* DreamBrowser::GetSourceTexture() {
+texture* DreamBrowserApp::GetSourceTexture() {
 	return m_pBrowserTexture.get();
 }
 
-long DreamBrowser::GetCurrentAssetID() {
+long DreamBrowserApp::GetCurrentAssetID() {
 	return m_assetID;
 }
 
-RESULT DreamBrowser::SetCurrentAssetID(long assetID) {
+RESULT DreamBrowserApp::SetCurrentAssetID(long assetID) {
 	m_assetID = assetID;
 	return R_PASS;
 }
 
-RESULT DreamBrowser::CloseSource() {
+RESULT DreamBrowserApp::CloseSource() {
 	RESULT r = R_PASS;
 
 	CNR(m_pWebBrowserController, R_SKIPPED);
@@ -741,7 +741,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::SendFirstFrame() {
+RESULT DreamBrowserApp::SendFirstFrame() {
 	RESULT r = R_PASS;
 	
 	// This'll send an OnPaint which will refresh the frame and broadcast it
@@ -751,16 +751,16 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::PendUpdateObjectTextures() {
+RESULT DreamBrowserApp::PendUpdateObjectTextures() {
 	m_fUpdateObjectTextures = true;
 	return R_PASS;
 }
 
-bool DreamBrowser::ShouldUpdateObjectTextures() {
+bool DreamBrowserApp::ShouldUpdateObjectTextures() {
 	return m_fUpdateObjectTextures;
 }
 
-RESULT DreamBrowser::UpdateObjectTextures() {
+RESULT DreamBrowserApp::UpdateObjectTextures() {
 	RESULT r = R_PASS;
 
 	if (m_pObserver != nullptr) {
@@ -775,7 +775,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::UpdateNavigationFlags() {
+RESULT DreamBrowserApp::UpdateNavigationFlags() {
 	RESULT r = R_PASS;
 
 	if (m_pWebBrowserController != nullptr) {
@@ -791,7 +791,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::RegisterObserver(DreamBrowserObserver *pObserver) {
+RESULT DreamBrowserApp::RegisterObserver(DreamBrowserObserver *pObserver) {
 	RESULT r = R_PASS;
 
 	CNM((pObserver), "Observer cannot be nullptr");
@@ -804,7 +804,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::UnregisterObserver(DreamBrowserObserver *pObserver) {
+RESULT DreamBrowserApp::UnregisterObserver(DreamBrowserObserver *pObserver) {
 	RESULT r = R_PASS;
 
 	CN(pObserver);
@@ -818,7 +818,7 @@ Error:
 
 // TODO: Only update the rect
 // TODO: Turn off CEF when we're not using it
-RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrowserController::PAINT_ELEMENT_TYPE type, WebBrowserRect rect) {
+RESULT DreamBrowserApp::OnPaint(const void *pBuffer, int width, int height, WebBrowserController::PAINT_ELEMENT_TYPE type, WebBrowserRect rect) {
 	RESULT r = R_PASS;
 
 	m_fFirstFrameIsReady = true;
@@ -885,7 +885,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::InitializeDreamBrowserSoundSystem() {
+RESULT DreamBrowserApp::InitializeDreamBrowserSoundSystem() {
 	RESULT r = R_PASS;
 
 	int numChannels = 2;
@@ -897,7 +897,7 @@ RESULT DreamBrowser::InitializeDreamBrowserSoundSystem() {
 	//	"Failed to initialize dream browser render sound buffer");
 
 	m_soundState = sound::state::RUNNING;
-	m_browserAudioProcessingThread = std::thread(&DreamBrowser::AudioProcess, this);
+	m_browserAudioProcessingThread = std::thread(&DreamBrowserApp::AudioProcess, this);
 
 Error:
 	return r;
@@ -919,7 +919,7 @@ Error:
 }
 */
 
-RESULT DreamBrowser::TeardownAudioBusSoundBuffers() {
+RESULT DreamBrowserApp::TeardownAudioBusSoundBuffers() {
 	RESULT r = R_PASS;
 
 	for (auto &pRenderBus : m_renderAudioBuses) {
@@ -935,7 +935,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::InitializeNewRenderBusSoundBuffer(const AudioPacket& pendingAudioPacket) {
+RESULT DreamBrowserApp::InitializeNewRenderBusSoundBuffer(const AudioPacket& pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	SoundBuffer *pRenderSoundBuffer = nullptr;
@@ -961,7 +961,7 @@ Error:
 	return r;
 }
 
-int DreamBrowser::GetPendingAudioFrames() {
+int DreamBrowserApp::GetPendingAudioFrames() {
 	int maxPendingFrames = 0;
 	int pendingFrames = 0;
 
@@ -974,7 +974,7 @@ int DreamBrowser::GetPendingAudioFrames() {
 	return maxPendingFrames;
 }
 
-AudioPacket DreamBrowser::GetPendingRenderAudioPacket(int numFrames) {
+AudioPacket DreamBrowserApp::GetPendingRenderAudioPacket(int numFrames) {
 	RESULT r = R_PASS;
 	
 	// Create a sink audio packet to mix into
@@ -1021,7 +1021,7 @@ Error:
 // in there
 #include <avrt.h>
 
-RESULT DreamBrowser::AudioProcess() {
+RESULT DreamBrowserApp::AudioProcess() {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("Dream Browser Audio Process Started");
@@ -1098,7 +1098,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
+RESULT DreamBrowserApp::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	// Handle different audio buses here
@@ -1158,7 +1158,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+RESULT DreamBrowserApp::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
 	CR(r);
@@ -1167,7 +1167,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::BroadcastDreamBrowserMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType) {
+RESULT DreamBrowserApp::BroadcastDreamBrowserMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType) {
 	RESULT r = R_PASS;
 
 	DreamShareViewShareMessage *pDreamBrowserMessage = new DreamShareViewShareMessage(0, 0, GetAppUID(), msgType, ackType);
@@ -1180,30 +1180,30 @@ Error:
 }
 
 
-RESULT DreamBrowser::SetPosition(point ptPosition) {
+RESULT DreamBrowserApp::SetPosition(point ptPosition) {
 	GetComposite()->SetPosition(ptPosition);
 	return R_PASS;
 }
 
-RESULT DreamBrowser::SetAspectRatio(float aspectRatio) {
+RESULT DreamBrowserApp::SetAspectRatio(float aspectRatio) {
 	m_aspectRatio = aspectRatio;
 
 	return R_PASS;
 }
 
-RESULT DreamBrowser::SetDiagonalSize(float diagonalSize) {
+RESULT DreamBrowserApp::SetDiagonalSize(float diagonalSize) {
 	m_diagonalSize = diagonalSize;
 
 	return R_PASS;
 }
 
-RESULT DreamBrowser::SetNormalVector(vector vNormal) {
+RESULT DreamBrowserApp::SetNormalVector(vector vNormal) {
 	m_vNormal = vNormal.Normal();
 
 	return R_PASS;
 }
 
-RESULT DreamBrowser::SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal) {
+RESULT DreamBrowserApp::SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal) {
 	GetComposite()->SetPosition(ptPosition);
 	m_diagonalSize = diagonal;
 	m_aspectRatio = aspectRatio;
@@ -1212,23 +1212,23 @@ RESULT DreamBrowser::SetParams(point ptPosition, float diagonal, float aspectRat
 	return R_PASS;
 }
 
-float DreamBrowser::GetHeightFromAspectDiagonal() {
+float DreamBrowserApp::GetHeightFromAspectDiagonal() {
 	return std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
 
-float DreamBrowser::GetWidthFromAspectDiagonal() {
+float DreamBrowserApp::GetWidthFromAspectDiagonal() {
 	return std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
 
-int DreamBrowser::GetWidth() {
+int DreamBrowserApp::GetWidth() {
 	return m_browserWidth;
 }
 
-int DreamBrowser::GetHeight() {
+int DreamBrowserApp::GetHeight() {
 	return m_browserHeight;
 }
 
-RESULT DreamBrowser::SetTitle(std::string strTitle) {
+RESULT DreamBrowserApp::SetTitle(std::string strTitle) {
 	RESULT r = R_PASS;
 	CNR(m_pObserver, R_SKIPPED);
 	if (strTitle != "") {
@@ -1242,7 +1242,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::SetIsSecureConnection(bool fSecure) {
+RESULT DreamBrowserApp::SetIsSecureConnection(bool fSecure) {
 	RESULT r = R_PASS;
 
 	m_fSecure = fSecure;
@@ -1254,7 +1254,7 @@ Error:
 	return r;
 }
 
-std::string DreamBrowser::GetTitle() {
+std::string DreamBrowserApp::GetTitle() {
 	std::string strValidTitle;
 	if (m_strCurrentTitle == "") {
 		strValidTitle = m_strCurrentURL;
@@ -1265,31 +1265,31 @@ std::string DreamBrowser::GetTitle() {
 	return strValidTitle;
 }
 
-std::string DreamBrowser::GetScheme() {
+std::string DreamBrowserApp::GetScheme() {
 	return m_strCurrentURL;
 }
 
-std::string DreamBrowser::GetURL() {
+std::string DreamBrowserApp::GetURL() {
 	return "";
 }
 
-std::string DreamBrowser::GetContentType() {
+std::string DreamBrowserApp::GetContentType() {
 	return m_strContentType;
 }
 
-vector DreamBrowser::GetNormal() {
+vector DreamBrowserApp::GetNormal() {
 	return m_vNormal;
 }
 
-point DreamBrowser::GetOrigin() {
+point DreamBrowserApp::GetOrigin() {
 	return GetComposite()->GetOrigin();
 }
 
-bool DreamBrowser::IsVisible() {
+bool DreamBrowserApp::IsVisible() {
 	return GetComposite()->IsVisible();
 }
 
-RESULT DreamBrowser::SetVisible(bool fVisible) {
+RESULT DreamBrowserApp::SetVisible(bool fVisible) {
 	RESULT r = R_PASS;
 		
 	CR(GetComposite()->SetVisible(fVisible));
@@ -1297,17 +1297,17 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::SetScope(std::string strScope) {
+RESULT DreamBrowserApp::SetScope(std::string strScope) {
 	m_strScope = strScope;
 	return R_PASS;
 }
 
-RESULT DreamBrowser::SetPath(std::string strPath) {
+RESULT DreamBrowserApp::SetPath(std::string strPath) {
 	m_strPath = strPath;
 	return R_PASS;
 }
 
-RESULT DreamBrowser::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT DreamBrowserApp::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	if (m_fCanLoadRequest) {
 		SetEnvironmentAsset(pEnvironmentAsset);
 	}
@@ -1322,7 +1322,7 @@ RESULT DreamBrowser::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnv
 	return R_PASS;
 }
 
-RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT DreamBrowserApp::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;	
 
 	if (pEnvironmentAsset != nullptr) {
@@ -1350,7 +1350,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::SetURI(std::string strURI) {
+RESULT DreamBrowserApp::SetURI(std::string strURI) {
 	RESULT r = R_PASS;
 
 	CN(m_pWebBrowserController);
@@ -1360,7 +1360,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::LoadRequest(const WebRequest &webRequest) {
+RESULT DreamBrowserApp::LoadRequest(const WebRequest &webRequest) {
 	RESULT r = R_PASS;
 
 	CN(m_pWebBrowserController);
@@ -1370,13 +1370,13 @@ Error:
 	return r;
 }
 
-DreamBrowser* DreamBrowser::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
-	DreamBrowser *pDreamApp = new DreamBrowser(pDreamOS, pContext);
+DreamBrowserApp* DreamBrowserApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
+	DreamBrowserApp *pDreamApp = new DreamBrowserApp(pDreamOS, pContext);
 	return pDreamApp;
 }
 
 
-RESULT DreamBrowser::SetScrollFactor(int scrollFactor) {
+RESULT DreamBrowserApp::SetScrollFactor(int scrollFactor) {
 	m_scrollFactor = scrollFactor;
 	return R_PASS;
 }

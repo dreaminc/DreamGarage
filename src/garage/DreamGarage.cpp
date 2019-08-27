@@ -613,7 +613,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	//auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, GetSandboxConfiguration().f3rdPersonCamera);
 	//auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
 
-	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlArea>(this, false).get();
+	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlAreaApp>(this, false).get();
 	CN(m_pDreamUserControlArea);
 
 	m_pDreamUserControlArea->SetDreamUserApp(GetUserApp());
@@ -2018,7 +2018,7 @@ RESULT DreamGarage::OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironm
 	if (pEnvironmentShare == nullptr) {
 		CNR(m_pDreamUserControlArea, R_SKIPPED);
 		m_pDreamUserControlArea->UpdateIsActive(false);
-		CR(m_pDreamUserControlArea->SetVirtualCameraSource(DreamVCam::SourceType::CAMERA));
+		CR(m_pDreamUserControlArea->SetVirtualCameraSource(DreamVCamApp::SourceType::CAMERA));
 	}
 
 Error:

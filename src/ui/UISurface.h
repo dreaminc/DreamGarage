@@ -16,7 +16,8 @@
 class DreamOS;
 class hand;
 class quad;
-class InteractionObjectEvent;
+
+struct InteractionObjectEvent;
 
 #define SCROLL_CONSTANT 10.0f
 

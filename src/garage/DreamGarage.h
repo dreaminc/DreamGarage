@@ -44,11 +44,11 @@ struct HandState;
 struct SenseKeyboardEvent;
 struct SenseTypingEvent;
 
-class DreamUIBar;
-class DreamContentView;
+class DreamUIBarApp;
+class DreamContentViewApp;
 class DreamBrowser;
 class UIControlView;
-class DreamUserControlArea;
+class DreamUserControlAreaApp;
 class DreamGamepadCameraApp;
 class DreamEnvironmentApp;
 class UIStageProgram;
@@ -265,9 +265,9 @@ private:
 
 	quad* m_pWaterQuad = nullptr;
 	DreamEnvironmentApp* m_pDreamEnvironmentApp = nullptr;
-	DreamUserControlArea* m_pDreamUserControlArea = nullptr;
-	DreamUIBar* m_pDreamUIBar = nullptr;
-	DreamContentView* m_pDreamContentView = nullptr;
+	DreamUserControlAreaApp* m_pDreamUserControlArea = nullptr;
+	DreamUIBarApp* m_pDreamUIBar = nullptr;
+	DreamContentViewApp* m_pDreamContentView = nullptr;
 	DreamBrowser* m_pDreamBrowser = nullptr;
 	UIControlView* m_pDreamControlView = nullptr;
 	DreamGamepadCameraApp* m_pDreamGamepadCameraApp = nullptr;

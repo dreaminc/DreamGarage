@@ -654,7 +654,7 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 		{
 			auto pDreamUser = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
 			CN(pDreamUser);
-			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this);
+			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBarApp>(this);
 			CN(pDreamUIBar);
 		}
 
@@ -678,7 +678,7 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 
 			auto pDreamUser = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
 			CN(pDreamUser);
-			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
+			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBarApp>(this, false);
 			CN(pDreamUIBar);
 			
 
@@ -1044,7 +1044,7 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp = nullptr;
 		std::string strURL = "http://www.youtube.com";
 
 		std::shared_ptr<UIKeyboard> pUIKeyboard = nullptr;
@@ -1067,17 +1067,17 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
 			}
 
-			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
+			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBarApp>(this, false);
 			CN(pDreamUIBar);
 			pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
 			pDreamUIBar->SetUIStageProgram(pUIStageProgram);
 
 			//CR(m_pDreamOS->InitializeKeyboard());
 	
-			pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);	// setup browser
-			pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-			pDreamBrowser->SetDiagonalSize(10.0f);
-			pDreamBrowser->SetURI(strURL);
+			pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);	// setup browser
+			pDreamBrowserApp->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+			pDreamBrowserApp->SetDiagonalSize(10.0f);
+			pDreamBrowserApp->SetURI(strURL);
 
 			pUIKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
 			pUIKeyboard->SetVisible(true);

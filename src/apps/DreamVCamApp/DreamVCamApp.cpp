@@ -25,17 +25,17 @@
 
 #include "DreamUpdateVCamMessage.h"
 
-DreamVCam::DreamVCam(DreamOS *pDreamOS, void *pContext) :
-	DreamModule<DreamVCam>(pDreamOS, pContext)
+DreamVCamApp::DreamVCamApp(DreamOS *pDreamOS, void *pContext) :
+	DreamModule<DreamVCamApp>(pDreamOS, pContext)
 {
 	// Empty - initialization by factory
 }
 
-DreamVCam::~DreamVCam() {
+DreamVCamApp::~DreamVCamApp() {
 	Shutdown();
 }
 
-RESULT DreamVCam::InitializeModule(void *pContext) {
+RESULT DreamVCamApp::InitializeModule(void *pContext) {
 	RESULT r = R_PASS;
 
 	float cameraScale = 0.0004f;
@@ -114,14 +114,14 @@ Error:
 
 const wchar_t kDreamVCamNamedPipeServerName[] = L"dreamvcampipe";
 
-RESULT DreamVCam::InitializePipeline() {
+RESULT DreamVCamApp::InitializePipeline() {
 	RESULT r = R_PASS;	
 	
 	// Set up named pipe server
 	m_pNamedPipeServer = GetDOS()->MakeNamedPipeServer(kDreamVCamNamedPipeServerName);
 	CN(m_pNamedPipeServer);
 
-	CRM(m_pNamedPipeServer->RegisterMessageHandler(std::bind(&DreamVCam::HandleServerPipeMessage, this, std::placeholders::_1, std::placeholders::_2)),
+	CRM(m_pNamedPipeServer->RegisterMessageHandler(std::bind(&DreamVCamApp::HandleServerPipeMessage, this, std::placeholders::_1, std::placeholders::_2)),
 		"Failed to register message handler");
 
 	CRM(m_pNamedPipeServer->Start(), "Failed to start server");
@@ -192,11 +192,11 @@ Error:
 	return r;
 }
 
-CameraNode *DreamVCam::GetCameraNode() {
+CameraNode *DreamVCamApp::GetCameraNode() {
 	return m_pCamera;
 }
 
-RESULT DreamVCam::HandleServerPipeMessage(void *pBuffer, size_t pBuffer_n) {
+RESULT DreamVCamApp::HandleServerPipeMessage(void *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
 	char *pszMessage = (char *)(pBuffer);
@@ -208,7 +208,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::Update(void *pContext) {
+RESULT DreamVCamApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	static int count = 0;
@@ -267,11 +267,11 @@ RESULT DreamVCam::Update(void *pContext) {
 			}
 			else {
 				switch (m_sourceType) {
-				case(DreamVCam::SourceType::CAMERA): {	
+				case(DreamVCamApp::SourceType::CAMERA): {	
 					m_pStreamingTexture = m_pSourceTexture;
 				} break;
 
-				case(DreamVCam::SourceType::SHARE_SCREEN): {
+				case(DreamVCamApp::SourceType::SHARE_SCREEN): {
 					if (GetDOS()->GetSharedContentPointerTexture() != nullptr) {
 						m_pStreamingTexture = GetDOS()->GetSharedContentPointerTexture();
 					}
@@ -385,7 +385,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::OnDidFinishInitializing(void *pContext) {
+RESULT DreamVCamApp::OnDidFinishInitializing(void *pContext) {
 	RESULT r = R_PASS;
 
 	// TODO: 
@@ -394,7 +394,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::Shutdown(void *pContext) {
+RESULT DreamVCamApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
 	// TODO: 
@@ -404,13 +404,13 @@ Error:
 }
 
 // The Self Construct
-DreamVCam* DreamVCam::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
-	DreamVCam *pDreamModule = new DreamVCam(pDreamOS, pContext);
+DreamVCamApp* DreamVCamApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
+	DreamVCamApp *pDreamModule = new DreamVCamApp(pDreamOS, pContext);
 	return pDreamModule;
 }
 
 // NOTE: This is not currently used, update is used to render VCam pipeline
-RESULT DreamVCam::ModuleProcess(void *pContext) {
+RESULT DreamVCamApp::ModuleProcess(void *pContext) {
 	RESULT r = R_PASS;
 
 	int stayAliveCount = 0;
@@ -448,7 +448,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::SetSourceTexture(texture* pTexture) {
+RESULT DreamVCamApp::SetSourceTexture(texture* pTexture) {
 	RESULT r = R_PASS;
 
 	CBM((m_pSourceTexture == nullptr), "Source texture already set");
@@ -456,7 +456,7 @@ RESULT DreamVCam::SetSourceTexture(texture* pTexture) {
 	m_pSourceTexture = pTexture;
 	m_pSourceTexture->SetFormat(PIXEL_FORMAT::BGRA);
 	
-	if (m_sourceType == DreamVCam::SourceType::CAMERA) {
+	if (m_sourceType == DreamVCamApp::SourceType::CAMERA) {
 		if (!m_pSourceTexture->IsUVVerticalFlipped()) {
 			m_pSourceTexture->SetUVVerticalFlipped();
 		}
@@ -480,12 +480,12 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::UnsetSourceTexture() {
+RESULT DreamVCamApp::UnsetSourceTexture() {
 	m_pSourceTexture = nullptr;
 	return R_PASS;
 }
 
-RESULT DreamVCam::InitializeWithParent(DreamUserControlArea *pParentApp) {
+RESULT DreamVCamApp::InitializeWithParent(DreamUserControlAreaApp *pParentApp) {
 	RESULT r = R_PASS;
 
 	CN(pParentApp);
@@ -501,51 +501,51 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT DreamVCamApp::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	m_assetID = pEnvironmentAsset->GetAssetID();
 	m_strContentType = pEnvironmentAsset->GetContentType();
 	return R_PASS;
 }
 
-RESULT DreamVCam::OnClick(point ptDiff, bool fMouseDown) { 
+RESULT DreamVCamApp::OnClick(point ptDiff, bool fMouseDown) { 
 	return R_NOT_IMPLEMENTED; 
 }
 
-RESULT DreamVCam::OnMouseMove(point mousePoint) { 
+RESULT DreamVCamApp::OnMouseMove(point mousePoint) { 
 	return R_NOT_IMPLEMENTED; 
 }
 
-RESULT DreamVCam::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) { 
+RESULT DreamVCamApp::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) { 
 	return R_NOT_IMPLEMENTED; 
 }
 
-RESULT DreamVCam::OnKeyPress(char chkey, bool fkeyDown) { 
+RESULT DreamVCamApp::OnKeyPress(char chkey, bool fkeyDown) { 
 	return R_NOT_IMPLEMENTED; 
 }
 
-texture* DreamVCam::GetSourceTexture() {
+texture* DreamVCamApp::GetSourceTexture() {
 	return m_pSourceTexture;
 }
 
-RESULT DreamVCam::SetScope(std::string strScope) {
+RESULT DreamVCamApp::SetScope(std::string strScope) {
 	m_strScope = strScope;
 	return R_PASS;
 }
 
-RESULT DreamVCam::SetPath(std::string strPath) {
+RESULT DreamVCamApp::SetPath(std::string strPath) {
 	m_strPath = strPath;
 	return R_PASS;
 }
 
-long DreamVCam::GetCurrentAssetID() {
+long DreamVCamApp::GetCurrentAssetID() {
 	return m_assetID;
 }
 
-RESULT DreamVCam::SendFirstFrame() {
+RESULT DreamVCamApp::SendFirstFrame() {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamVCam::CloseSource() {
+RESULT DreamVCamApp::CloseSource() {
 	RESULT r = R_PASS;
 
 	DOSLOG(INFO, "Camera Coordinates: x: %0.3f, y: %0.3f, z: %0.3f", m_pCamera->GetPosition(true).x(), m_pCamera->GetPosition(true).y(), m_pCamera->GetPosition(true).z());
@@ -567,31 +567,31 @@ Error:
 	return r;
 }
 
-int DreamVCam::GetWidth() {
+int DreamVCamApp::GetWidth() {
 	return 0;
 }
 
-int DreamVCam::GetHeight() {
+int DreamVCamApp::GetHeight() {
 	return 0;
 }
 
-std::string DreamVCam::GetTitle() {
+std::string DreamVCamApp::GetTitle() {
 	return m_strTitle;
 }
 
-std::string DreamVCam::GetContentType() {
+std::string DreamVCamApp::GetContentType() {
 	return m_strContentType;
 }
 
-std::string DreamVCam::GetScheme() {
+std::string DreamVCamApp::GetScheme() {
 	return "";
 }
 
-std::string DreamVCam::GetURL() {
+std::string DreamVCamApp::GetURL() {
 	return "";
 }
 
-RESULT DreamVCam::OnClientConnect() {
+RESULT DreamVCamApp::OnClientConnect() {
 	RESULT r = R_PASS;
 
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
@@ -611,7 +611,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::OnClientDisconnect() {
+RESULT DreamVCamApp::OnClientDisconnect() {
 	RESULT r = R_PASS;
 
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
@@ -627,7 +627,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::OnCameraInMotion() {
+RESULT DreamVCamApp::OnCameraInMotion() {
 	RESULT r = R_PASS;
 
 	CNR(m_pParentApp, R_SKIPPED);
@@ -637,7 +637,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::OnCameraAtRest() {
+RESULT DreamVCamApp::OnCameraAtRest() {
 	RESULT r = R_PASS;
 
 	CBR(m_fHasReceivedSettings, R_SKIPPED);
@@ -652,7 +652,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::HandleSettings(point ptPosition, quaternion qOrientation) {
+RESULT DreamVCamApp::HandleSettings(point ptPosition, quaternion qOrientation) {
 	RESULT r = R_PASS;
 
 	m_fHasReceivedSettings = true;
@@ -665,7 +665,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::SetIsSendingCameraPlacement(bool fSendingCameraPlacement) {
+RESULT DreamVCamApp::SetIsSendingCameraPlacement(bool fSendingCameraPlacement) {
 	RESULT r = R_PASS;
 
 	m_fSendingCameraPlacement = fSendingCameraPlacement;
@@ -679,22 +679,22 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::SetIsReceivingCameraPlacement(bool fReceivingCameraPlacement) {
+RESULT DreamVCamApp::SetIsReceivingCameraPlacement(bool fReceivingCameraPlacement) {
 	m_fReceivingCameraPlacement = fReceivingCameraPlacement;
 	m_pCameraComposite->SetVisible(m_fReceivingCameraPlacement, false);
 	m_pCameraModel->SetVisible(m_fReceivingCameraPlacement);
 	return R_PASS;
 }
 
-bool DreamVCam::IsSendingCameraPlacement() {
+bool DreamVCamApp::IsSendingCameraPlacement() {
 	return m_fSendingCameraPlacement;
 }
 
-bool DreamVCam::IsReceivingCameraPlacement() {
+bool DreamVCamApp::IsReceivingCameraPlacement() {
 	return m_fReceivingCameraPlacement;
 }
 
-RESULT DreamVCam::HideCameraSource() {
+RESULT DreamVCamApp::HideCameraSource() {
 	RESULT r = R_PASS;
 	
 	m_pCameraQuad->SetVisible(false);
@@ -704,7 +704,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::ShareCameraSource() {
+RESULT DreamVCamApp::ShareCameraSource() {
 	RESULT r = R_PASS;
 
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
@@ -716,7 +716,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::BroadcastVCamMessage() {
+RESULT DreamVCamApp::BroadcastVCamMessage() {
 	RESULT r = R_PASS;
 
 	DreamUpdateVCamMessage *pMessage = nullptr;
@@ -739,7 +739,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+RESULT DreamVCamApp::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
 	DreamUpdateVCamMessage* pMessage = (DreamUpdateVCamMessage*)(pDreamAppMessage);
@@ -755,7 +755,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+RESULT DreamVCamApp::StartSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	CN(pEnvironmentShare);
@@ -778,7 +778,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::StopSharing() {
+RESULT DreamVCamApp::StopSharing() {
 	RESULT r = R_PASS;
 
 	m_pCurrentCameraShare = nullptr;
@@ -797,7 +797,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::StartReceiving(PeerConnection *pPeerConnection, std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+RESULT DreamVCamApp::StartReceiving(PeerConnection *pPeerConnection, std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	if (GetDOS()->IsRegisteredCameraVideoStreamSubscriber(this)) {
@@ -815,7 +815,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::StopReceiving() {
+RESULT DreamVCamApp::StopReceiving() {
 	RESULT r = R_PASS;
 
 	m_pCameraQuad->SetVisible(false);
@@ -829,7 +829,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT DreamVCamApp::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	CBR(strVideoTrackLabel == kVCamVideoLabel, R_SKIPPED);
@@ -858,7 +858,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT DreamVCamApp::SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 
 	RESULT r = R_PASS;
 
@@ -888,7 +888,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::UpdateFromPendingVideoFrame() {
+RESULT DreamVCamApp::UpdateFromPendingVideoFrame() {
 	RESULT r = R_PASS;
 
 	if (m_pCameraQuadTexture == nullptr ||
@@ -928,11 +928,11 @@ Error:
 	return r;
 }
 
-texture* DreamVCam::GetCameraQuadTexture() {
+texture* DreamVCamApp::GetCameraQuadTexture() {
 	return m_pCameraQuadTexture;
 }
 
-RESULT DreamVCam::SetSourceType(DreamVCam::SourceType sourceType) {
+RESULT DreamVCamApp::SetSourceType(DreamVCamApp::SourceType sourceType) {
 	RESULT r = R_PASS;
 	
 	DOSLOG(INFO, "Switching camera source to %d", (int)sourceType);
@@ -942,7 +942,7 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::Mute(bool fMute) {
+RESULT DreamVCamApp::Mute(bool fMute) {
 	RESULT r = R_PASS;
 
 	m_fIsMuted = fMute;
