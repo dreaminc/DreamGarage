@@ -6,9 +6,12 @@ file(GLOB SOURCES
 )
 source_group("" FILES ${SOURCES})
 
+# TODO: Might want to split off platform
 file(GLOB OCULUS_SOURCES 
   "oculus/*.cpp"
   "oculus/*.h"
+  # We need one file from the platform code to not miss a given external symbol 
+  "${CMAKE_SOURCE_DIR}/src/third_party/OCULUS/OVRPlatformSDK_v1.24.0/Windows/*.cpp"
 )
 source_group("oculus" FILES ${OCULUS_SOURCES})
 

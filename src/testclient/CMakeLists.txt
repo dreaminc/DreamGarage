@@ -193,3 +193,46 @@ target_link_libraries(testclient
     Strmiids.lib
 )
 
+# Post Build Copy Stuff Over
+#add_custom_command(TARGET testclient POST_BUILD 
+#  COMMAND "${CMAKE_COMMAND}" -E copy 
+#     "$<TARGET_FILE:testclient>"
+#     "my_target_path/$<CONFIGURATION>/$<TARGET_FILE_NAME:testclient>" 
+#  COMMENT "Copying to output directory"
+#  )
+
+#add_custom_command(TARGET MyTest POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_directory
+#        "${PROJECT_SOURCE_DIR}/libs"
+#        $<TARGET_FILE_DIR:MyTest>)
+#
+#add_custom_command(TARGET MyTest POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_directory
+#        "${PROJECT_SOURCE_DIR}/libs/$<CONFIGURATION>"
+#        $<TARGET_FILE_DIR:MyTest>)
+
+file(GLOB CEF_BINARY_FILES
+  "${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/OfficialBuild/*"
+)
+
+#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+
+add_custom_command(TARGET testclient POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ${CEF_BINARY_FILES}
+    $<TARGET_FILE_DIR:testclient>
+)
+
+#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
+#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
+#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" 
+#
+#
+#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" 
+#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 
+#
+#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 
+#
+#xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
+#xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"</Command>
