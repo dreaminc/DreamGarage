@@ -211,28 +211,33 @@ target_link_libraries(testclient
 #        "${PROJECT_SOURCE_DIR}/libs/$<CONFIGURATION>"
 #        $<TARGET_FILE_DIR:MyTest>)
 
-file(GLOB CEF_BINARY_FILES
-  "${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/OfficialBuild/*"
+# TODO: Configure this for either configuration
+file(GLOB CEF_BINARY_FILES              "${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/OfficialBuild/*")
+file(GLOB CURL_BINARY_FILES             "${CMAKE_SOURCE_DIR}/src/third_party/libcurl/curl-7.49.1/lib/Windows/x64/Release/*.dll")
+file(GLOB LEAP_BINARY_FILES             "${CMAKE_SOURCE_DIR}/src/third_party/leapSDK/lib/x64/Leap.dll")
+file(GLOB OPENVR_BINARY_FILES           "${CMAKE_SOURCE_DIR}/src/third_party/openvr/bin/win64/openvr_api.dll")
+file(GLOB OCULUS_BINARY_FILES  
+    "${CMAKE_SOURCE_DIR}/src/third_party/OCULUS/runtime/LibOVRPlatform64_1.dll"
+    "${CMAKE_SOURCE_DIR}/src/third_party/OCULUS/runtime/LibOVRP2P64_1.dll"
 )
 
-#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+file(GLOB OPENSSL_BINARY_FILES  
+    "${CMAKE_SOURCE_DIR}/src/third_party/openssl/openssl-1.0.2/x64/Release/libssl-1_1-x64.dll"
+    "${CMAKE_SOURCE_DIR}/src/third_party/openssl/openssl-1.0.2/x64/Release/libcrypto-1_1-x64.dll"
+)
+file(GLOB ASSIMP_BINARY_FILES  "${CMAKE_SOURCE_DIR}/src/third_party/assimp/3.3.1/bin/Release/assimp-vc140-mt.dll")
+file(GLOB FREEIMAGE_BINARY_FILES  "${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/release/FreeImage.dll")
+
 
 add_custom_command(TARGET testclient POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     ${CEF_BINARY_FILES}
+    ${CURL_BINARY_FILES}
+    ${LEAP_BINARY_FILES}
+    ${OPENVR_BINARY_FILES}
+    ${OCULUS_BINARY_FILES}
+    ${OPENSSL_BINARY_FILES}
+    ${ASSIMP_BINARY_FILES}
+    ${FREEIMAGE_BINARY_FILES}
     $<TARGET_FILE_DIR:testclient>
 )
-
-#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
-#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" 
-#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" 
-#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRPlatform64_1.dll" "$(TargetDir)" 
-#
-#
-#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\OCULUS\runtime\LibOVRP2P64_1.dll" "$(TargetDir)" 
-#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 
-#
-#xcopy /y /s /e /d "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 
-#
-#xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
-#xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"</Command>
