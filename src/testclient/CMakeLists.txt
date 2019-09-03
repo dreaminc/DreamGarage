@@ -26,7 +26,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "/MT")
 set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 
 # Windows Subsystem vs Console
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+# Set the entry point
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:WinMain")
 
 add_executable(testclient
     ${SOURCES}
@@ -71,6 +72,52 @@ target_link_libraries(testclient
 
 # External
 target_link_libraries(testclient
+    # Optimized Configuration
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/OfficialBuild/libcef_dll_wrapper.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/OfficialBuild/libcef.dll.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/libcurl/curl-7.49.1/lib/Windows/x64/Release/libcurl_imp.lib
+    
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/webrtc.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/webrtc_common.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/builtin_audio_decoder_factory.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/builtin_audio_encoder_factory.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/g711/audio_decoder_g711.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/g722/audio_decoder_g722.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/ilbc/audio_decoder_ilbc.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/isac/audio_decoder_isac_fix.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/isac/audio_decoder_isac_float.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/L16/audio_decoder_L16.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/opus/audio_decoder_opus.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/media/rtc_audio_video.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/modules/audio_processing/audio_processing.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/pc/peerconnection.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/rtc_base/rtc_base.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/p2p/rtc_p2p.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/system_wrappers/system_wrappers.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/third_party/boringssl/boringssl.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/third_party/boringssl/boringssl_asm.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/jsoncpp/json_reader.obj
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/jsoncpp/json_writer.obj
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/jsoncpp/json_value.obj
+    #DreamOS.lib
+
+    # HMD Binaries
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/OCULUS/v1.12.0/LibOVR/Lib/Windows/x64/Release/VS2015/LibOVR.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/OCULUS/OVRPlatformSDK_v1.24.0/Windows/LibOVRPlatform64_1.lib
+
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/openvr/lib/win64/openvr_api.lib
+
+    # These already linked by webrtc ?
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/openssl/openssl-1.0.2/x64/Release/libssl.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/openssl/openssl-1.0.2/x64/Release/libcrypto.lib
+
+    # Freetype, freeimg, assimp
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/Freetype/freetype-2.8/objs/vc2010/x64/freetype28MT.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/assimp/3.3.1/bin/Release/assimp-vc140-mt.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/release/FreeImage.lib
+    optimized ${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/release/FreeImagePlus.lib
+
+    # Debug Configuration
     debug ${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/Debug/libcef_dll_wrapper.lib
     debug ${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/Debug/libcef.dll.lib
     debug ${CMAKE_SOURCE_DIR}/src/third_party/libcurl/curl-7.49.1/lib/Windows/x64/Debug/libcurl_imp.lib
@@ -101,56 +148,29 @@ target_link_libraries(testclient
     debug ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Debug/jsoncpp/json_value.obj
     #DreamOS.lib
 
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/OfficialBuild/libcef_dll_wrapper.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/OfficialBuild/libcef.dll.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/libcurl/curl-7.49.1/lib/Windows/x64/Release/libcurl_imp.lib
-    
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/webrtc.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/webrtc_common.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/builtin_audio_decoder_factory.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/builtin_audio_encoder_factory.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/g711/audio_decoder_g711.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/g722/audio_decoder_g722.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/ilbc/audio_decoder_ilbc.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/isac/audio_decoder_isac_fix.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/isac/audio_decoder_isac_float.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/L16/audio_decoder_L16.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/api/audio_codecs/opus/audio_decoder_opus.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/media/rtc_audio_video.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/modules/audio_processing/audio_processing.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/pc/peerconnection.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/rtc_base/rtc_base.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/p2p/rtc_p2p.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/system_wrappers/system_wrappers.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/third_party/boringssl/boringssl.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/obj/third_party/boringssl/boringssl_asm.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/jsoncpp/json_reader.obj
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/jsoncpp/json_writer.obj
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/webrtc/lib/x64/Release/jsoncpp/json_value.obj
-
     # HMD Binaries
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/OCULUS/v1.12.0/LibOVR/Lib/Windows/x64/Release/VS2015/LibOVR.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/OCULUS/OVRPlatformSDK_v1.24.0/Windows/LibOVRPlatform64_1.lib
+    debug ${CMAKE_SOURCE_DIR}/src/third_party/OCULUS/v1.12.0/LibOVR/Lib/Windows/x64/Debug/VS2015/LibOVR.lib
+    debug ${CMAKE_SOURCE_DIR}/src/third_party/OCULUS/OVRPlatformSDK_v1.24.0/Windows/LibOVRPlatform64_1.lib
 
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/openvr/lib/win64/openvr_api.lib
+    debug ${CMAKE_SOURCE_DIR}/src/third_party/openvr/lib/win64/openvr_api.lib
 
     # These already linked by webrtc ?
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/openssl/openssl-1.0.2/x64/Release/libssl.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/openssl/openssl-1.0.2/x64/Release/libcrypto.lib
+    #debug ${CMAKE_SOURCE_DIR}/src/third_party/openssl/openssl-1.0.2/x64/Debug/libssl.lib
+    #debug ${CMAKE_SOURCE_DIR}/src/third_party/openssl/openssl-1.0.2/x64/Debug/libcrypto.lib
+    debug ${CMAKE_SOURCE_DIR}/src/third_party/openssl/openssl-1.0.2/x64/Release/libssl.lib
+    debug ${CMAKE_SOURCE_DIR}/src/third_party/openssl/openssl-1.0.2/x64/Release/libcrypto.lib
 
     # Freetype, freeimg, assimp
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/Freetype/freetype-2.8/objs/vc2010/x64/freetype28MT.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/assimp/3.3.1/bin/Release/assimp-vc140-mt.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/release/FreeImage.lib
-    optimized ${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/release/FreeImagePlus.lib
-
+    debug ${CMAKE_SOURCE_DIR}/src/third_party/Freetype/freetype-2.8/objs/vc2010/x64/freetype28MT.lib
+    debug ${CMAKE_SOURCE_DIR}/src/third_party/assimp/3.3.1/bin/Debug/assimp-vc140-mt.lib
+    debug ${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/debug/FreeImaged.lib
+    debug ${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/debug/FreeImagePlusd.lib
     #DreamOS.lib
 
+    # Common (optimized and debug)
     # Leap
     # TODO: Add a config flag to enable / disable
     ${CMAKE_SOURCE_DIR}/src/third_party/LeapSDK/lib/x64/Leap.lib
-
-    
 
     # TODO: Make this into a windows dependent list 
     Xinput.lib
@@ -191,6 +211,9 @@ target_link_libraries(testclient
     iphlpapi.lib
     secur32.lib
     Strmiids.lib
+    libcmt.lib 
+    msvcrt.lib 
+    msvcrtd.lib
 )
 
 # Post Build Copy Stuff Over
@@ -226,7 +249,13 @@ file(GLOB OPENSSL_BINARY_FILES
     "${CMAKE_SOURCE_DIR}/src/third_party/openssl/openssl-1.0.2/x64/Release/libcrypto-1_1-x64.dll"
 )
 file(GLOB ASSIMP_BINARY_FILES  "${CMAKE_SOURCE_DIR}/src/third_party/assimp/3.3.1/bin/Release/assimp-vc140-mt.dll")
-file(GLOB FREEIMAGE_BINARY_FILES  "${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/release/FreeImage.dll")
+
+file(GLOB FREEIMAGE_BINARY_FILES  
+    "${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/release/FreeImage.dll"
+    "${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/debug/FreeImaged.dll"
+    "${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/release/FreeImagePlus.dll"
+    "${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/debug/FreeImagePlusd.dll"
+)
 
 
 add_custom_command(TARGET testclient POST_BUILD
