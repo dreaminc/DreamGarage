@@ -116,7 +116,7 @@ Win64Sandbox::Win64Sandbox(TCHAR* pszClassName) :
 	SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);	// High priority is where things like Task List reside, ignoring load on the operating system.
 																		// Use extreme care when using the high-priority class, because a high-priority class application can use nearly all available CPU time.
 	//TODO: use this label
-	//Success:
+Success:
 	Validate();
 	return;
 

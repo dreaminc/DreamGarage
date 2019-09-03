@@ -36,24 +36,11 @@ file(GLOB WIN64_SOURCES
 )
 source_group("win64" FILES ${WIN64_SOURCES})
 
-# Force Include the src/core/config.h
-if(MSVC)
-    add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")
-else()
-    # GCC or Clang
-    add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
-endif()
-
 # TODO: This should not be here
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
-add_definitions(-DWEBRTC_WIN)
 
 # TODO: This should not be here (only in HMD yo)
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/openvr/headers)
-
-# Multithreaded 
-set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 
 IF(APPLE
    # Mac OS X specific code

@@ -10,6 +10,12 @@
 	int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 		RESULT r = R_PASS;
 
+		// Set up a console and attach to it
+		// TODO: Might want to explore this more
+		AllocConsole();
+		AttachConsole(GetCurrentProcessId());
+		freopen("CON", "w", stdout);
+
 		// Get command line args and put them on the stack in argc,argv format
 		LPWSTR *wargv = nullptr;
 		int argc = 0;
@@ -44,7 +50,9 @@
 
 		return (int)(r);
 	}
+
 #else
+
 	int main(int argc, const char *argv[]) {
 		RESULT r = R_PASS;
 

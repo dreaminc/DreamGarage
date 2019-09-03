@@ -4,14 +4,6 @@ cmake_minimum_required(VERSION 3.14)
 
 set(DREAM_VERSION 1.1.0)
 
-# Force Include the src/core/config.h
-if(MSVC)
-    add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")
-else()
-    # GCC or Clang
-    add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
-endif()
-
 project(dos LANGUAGES CXX)
 
 include_directories(src)
