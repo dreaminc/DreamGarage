@@ -27,7 +27,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 
 # Windows Subsystem vs Console
 # Set the entry point
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:WinMain")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE /ENTRY:WinMain")
 
 add_executable(testclient
     ${SOURCES}
@@ -69,6 +69,48 @@ target_link_libraries(testclient
     dreamsettingsapp
     dreamloginapp
 )
+
+# Release Configuration
+add_definitions(
+    -DNDEBUG
+    -D_WINDOWS
+    -D_CRT_SECURE_NO_WARNINGS
+    -DNOMINMAX
+    -DWEBRTC_WIN
+    -DCEF_AUDIO_MIRROR
+    #-DSTAGING_BUILD
+    
+    # TODO: Fix logging
+    # -D_ENABLE_LOGGING
+    # -D__BASE_FILE__="%(Filename)%(Extension)"
+)
+
+# Debug Configuration
+#add_definitions( 
+#    -D_DEBUG
+#    -D_CONSOLE
+#    -D__STD_C
+#    -D_CRT_SECURE_NO_DEPRECATE
+#    -D_SCL_SECURE_NO_DEPRECATE
+#    -D__STDC_CONSTANT_MACROS
+#    -D__STDC_FORMAT_MACROS
+#    -DWEBRTC_WIN
+#    -D_WIN32_WINNT=0x0A00
+#    -DWINVER=0x0A00
+#    -DWIN32
+#    -D_CRT_SECURE_NO_WARNINGS
+#    -DWIN32_LEAN_AND_MEAN
+#    -DNOMINMAX
+#    -DENABLE_WEBRTC=1
+#    -DENABLE_MEDIA_ROUTER=1
+#    -DENABLE_PEPPER_CDMS
+#    -DENABLE_SRTP=0
+#    -D_WINSOCK_DEPRECATED_NO_WARNINGS
+#    -D_USE_MATH_DEFINES
+#    -DCEF_AUDIO_MIRROR
+#    #-D__BASE_FILE__="%(Filename)%(Extension)"
+#    #-DDREAM_VERSION="$(DREAMVERSION)"
+#)
 
 # External
 target_link_libraries(testclient
@@ -205,15 +247,21 @@ target_link_libraries(testclient
     credui.lib
     dmoguids.lib
     wmcodecdspuuid.lib
-    amstrmid.lib
     msdmo.lib
     crypt32.lib
     iphlpapi.lib
     secur32.lib
     Strmiids.lib
     libcmt.lib 
+    amstrmid.lib
+    
     msvcrt.lib 
-    msvcrtd.lib
+    vcruntime.lib
+    ucrt.lib
+
+    #msvcrtd.lib
+    #vcruntimed.lib
+    #ucrtd.lib
 )
 
 # Post Build Copy Stuff Over
