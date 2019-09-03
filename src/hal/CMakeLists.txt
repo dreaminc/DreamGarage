@@ -58,22 +58,8 @@ include_directories(${CMAKE_SOURCE_DIR}/src/third_party/easyloggingpp/include)
 
 # TODO: Metal / MoltenVK etc
 
-
 # TODO: This should not be here!!!!!
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
-add_definitions(-DWEBRTC_WIN)
-
-# Force Include the src/core/config.h
-if(MSVC)
-    add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")
-else()
-    # GCC or Clang
-    add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
-endif()
-
-# Multithreaded 
-set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 
 add_library(hal
     ${SOURCES}

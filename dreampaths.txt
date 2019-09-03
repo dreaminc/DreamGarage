@@ -5,7 +5,7 @@
 
 ROOT 			./ 
 HAL 			./HAL/
-SHADERS 		./HAL/opengl/shaders/GLSL/
+SHADERS 		./src/hal/ogl/shaders/GLSL/
 SANDBOX			./Sandbox/
 RESULT 			./RESULT/
 TEXTURE			./Resources/Texture/

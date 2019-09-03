@@ -50,7 +50,7 @@ RESULT Win64PathManager::OpenDreamPathsFile() {
 	wchar_t szLine[MAX_PATH];
 
 	errno_t err = fopen_s(&pFile, DREAM_OS_PATHS_FILE, "r");
-	CNM(pFile, "OpenDreamPathsFile failed to open file %S%s", m_pszCurDirectiory, DREAM_OS_PATHS_FILE);
+	CNM(pFile, "OpenDreamPathsFile failed to open file %S\\%s", m_pszCurDirectiory, DREAM_OS_PATHS_FILE);
 	rewind(pFile);
 
 	while(fgetws(szLine, MAX_PATH, pFile) != NULL) {
