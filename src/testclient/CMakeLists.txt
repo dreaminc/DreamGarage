@@ -21,18 +21,23 @@ else()
     add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
 endif()
 
-# Compiler Flags
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /W3 /sdl /MP")      # General
+# Compiler Flags Release
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /W3 /WX /sdl /MP")      # General
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox /Ob2 /Oi /Ot /Oy")  # Optimization
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /EHsc /MT /Gy")         # Code Generation
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /permissive-")          # Language
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /permissive-")          # Language
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /FC")                   # Advanced
 
-set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+# Compiler Flags Debug
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi /JMC /W3 /WX /sdl /MP")      # General
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Od")  # Optimization
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Gm- /EHsc /RTC1 /MTd /GS /fp:precise")         # Code Generation
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /permissive-")          # Language
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /FC")                   # Advanced
 
 # Linker flags (Release)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /INCREMENTAL")            # General
+# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB")           # Input
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST")               # Manifest File
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG:FASTLINK")         # Debugging
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")      # System
@@ -79,46 +84,40 @@ target_link_libraries(testclient
 )
 
 # Release Configuration
-add_definitions(
-    -DNDEBUG
-    -D_WINDOWS
-    -D_CRT_SECURE_NO_WARNINGS
-    -DNOMINMAX
-    -DWEBRTC_WIN
-    -DCEF_AUDIO_MIRROR
-    #-DSTAGING_BUILD
-    
-    # TODO: Fix logging
-    # -D_ENABLE_LOGGING
-    # -D__BASE_FILE__="%(Filename)%(Extension)"
-)
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D_WINDOWS")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D_CRT_SECURE_NO_WARNINGS")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNOMINMAX")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DWEBRTC_WIN")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DCEF_AUDIO_MIRROR")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DSTAGING_BUILD")
+# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D_ENABLE_LOGGING")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D__BASE_FILE__=\"%(Filename)%(Extension)\"")
 
 # Debug Configuration
-#add_definitions( 
-#    -D_DEBUG
-#    -D_CONSOLE
-#    -D__STD_C
-#    -D_CRT_SECURE_NO_DEPRECATE
-#    -D_SCL_SECURE_NO_DEPRECATE
-#    -D__STDC_CONSTANT_MACROS
-#    -D__STDC_FORMAT_MACROS
-#    -DWEBRTC_WIN
-#    -D_WIN32_WINNT=0x0A00
-#    -DWINVER=0x0A00
-#    -DWIN32
-#    -D_CRT_SECURE_NO_WARNINGS
-#    -DWIN32_LEAN_AND_MEAN
-#    -DNOMINMAX
-#    -DENABLE_WEBRTC=1
-#    -DENABLE_MEDIA_ROUTER=1
-#    -DENABLE_PEPPER_CDMS
-#    -DENABLE_SRTP=0
-#    -D_WINSOCK_DEPRECATED_NO_WARNINGS
-#    -D_USE_MATH_DEFINES
-#    -DCEF_AUDIO_MIRROR
-#    #-D__BASE_FILE__="%(Filename)%(Extension)"
-#    #-DDREAM_VERSION="$(DREAMVERSION)"
-#)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_CONSOLE")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D__STD_C")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_CRT_SECURE_NO_DEPRECATE")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_SCL_SECURE_NO_DEPRECATE")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D__STDC_CONSTANT_MACROS")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D__STDC_FORMAT_MACROS")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DWEBRTC_WIN")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_WIN32_WINNT=0x0A00")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DWINVER=0x0A00")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DWIN32")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_CRT_SECURE_NO_WARNINGS")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DWIN32_LEAN_AND_MEAN")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DNOMINMAX")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DENABLE_WEBRTC=1")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DENABLE_MEDIA_ROUTER=1")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DENABLE_PEPPER_CDMS")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DENABLE_SRTP=0")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_WINSOCK_DEPRECATED_NO_WARNINGS")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_USE_MATH_DEFINES")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCEF_AUDIO_MIRROR")
+# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D_ENABLE_LOGGING")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D__BASE_FILE__=\"%(Filename)%(Extension)\"")
 
 # External
 target_link_libraries(testclient
@@ -166,6 +165,11 @@ target_link_libraries(testclient
     optimized ${CMAKE_SOURCE_DIR}/src/third_party/assimp/3.3.1/bin/Release/assimp-vc140-mt.lib
     optimized ${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/release/FreeImage.lib
     optimized ${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/release/FreeImagePlus.lib
+
+    # optimized msvcrt.lib 
+    # optimized vcruntime.lib
+    # optimized ucrt.lib
+    optimized libcmt.lib 
 
     # Debug Configuration
     debug ${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/Debug/libcef_dll_wrapper.lib
@@ -217,7 +221,12 @@ target_link_libraries(testclient
     debug ${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/debug/FreeImagePlusd.lib
     #DreamOS.lib
 
+    debug msvcrtd.lib
+    debug vcruntimed.lib
+    # debug ucrtd.lib
+    debug libcmtd.lib 
     # Common (optimized and debug)
+
     # Leap
     # TODO: Add a config flag to enable / disable
     ${CMAKE_SOURCE_DIR}/src/third_party/LeapSDK/lib/x64/Leap.lib
@@ -260,16 +269,8 @@ target_link_libraries(testclient
     iphlpapi.lib
     secur32.lib
     Strmiids.lib
-    libcmt.lib 
-    amstrmid.lib
     
-    # msvcrt.lib 
-    # vcruntime.lib
-    # ucrt.lib
-
-    #msvcrtd.lib
-    #vcruntimed.lib
-    #ucrtd.lib
+    amstrmid.lib
 )
 
 # Post Build Copy Stuff Over
