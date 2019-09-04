@@ -11,21 +11,9 @@ source_group("" FILES ${SOURCES})
 # Add CEF binaries 
 link_directories(${CMAKE_BINARY_DIR})
 
-# Force Include the src/core/config.h
-if(MSVC)
-    add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")
-else()
-    # GCC or Clang
-    add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
-endif()
-
 add_executable(dreamcef
     ${SOURCES}
 )
-
-# Multithreaded 
-set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 
 # Windows Subsystem vs Console
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")

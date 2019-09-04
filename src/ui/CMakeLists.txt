@@ -13,26 +13,21 @@ file(GLOB DREAM_CONTROL_VIEW_SOURCES
   "DreamControlView/*.tpp"
   "DreamControlView/*.h"
 )
-source_group("" FILES ${DREAM_CONTROL_VIEW_SOURCES})
+source_group("DreamControlView" FILES ${DREAM_CONTROL_VIEW_SOURCES})
+
+# TODO: Revisit this
+file(GLOB USER_AREA_CONTROLS_SOURCES 
+  "UserAreaControls/*.cpp"
+  "UserAreaControls/*.h"
+)
+source_group("UserAreaControls" FILES ${USER_AREA_CONTROLS_SOURCES})
 
 # TODO: This should not be here!!!
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
-add_definitions(-DWEBRTC_WIN)
-
-# DREAM_CONTROL_VIEW_Force Include the src/core/config.h
-if(MSVC)
-    add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")
-else()
-    # GCC or Clang
-    add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
-endif()
-
-# Multithreaded 
-set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 
 add_library(ui
     ${SOURCES}
     ${DREAM_CONTROL_VIEW_SOURCES}
+    ${USER_AREA_CONTROLS_SOURCES}
 )
 

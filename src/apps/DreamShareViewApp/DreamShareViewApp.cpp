@@ -19,7 +19,7 @@
 #include "apps/DreamUserApp/DreamUserApp.h"
 
 #include "sound/AudioPacket.h"
-#include "garage/AudioDataMessage.h"
+#include "meetclient/AudioDataMessage.h"
 
 #include "sound/SpatialSoundObject.h"
 

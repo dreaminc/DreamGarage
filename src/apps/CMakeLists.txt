@@ -2,7 +2,6 @@
 
 # TODO: This should not be here!!!!!!!
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
-add_definitions(-DWEBRTC_WIN)
 
 add_subdirectory(Dream2DMouseApp)
 add_subdirectory(DreamBrowserApp)

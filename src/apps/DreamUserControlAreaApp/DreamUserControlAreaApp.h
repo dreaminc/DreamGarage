@@ -11,8 +11,7 @@
 
 #include "os/app/DreamApp.h"
 
-// TODO: wtf is this in garage?
-#include "garage/UserAreaControls.h"
+#include "ui/UserAreaControls/UserAreaControls.h"
 
 #include "core/types/Subscriber.h"
 

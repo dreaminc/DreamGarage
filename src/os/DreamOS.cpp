@@ -30,7 +30,7 @@
 #include "sound/AudioPacket.h"
 
 // TODO: Why is it there?
-#include "garage/AudioDataMessage.h"
+#include "meetclient/AudioDataMessage.h"
 
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
