@@ -9,7 +9,7 @@
 // Personally not a fan of this architecture, as it plugs into the SteamVR eco-system only, so it's not possible
 // to use the headset stand alone - but it allows maxiumum flexibility in using Dream across Oculus/Steam regardless
 // of the headset being used
-
+#ifndef OCULUS_PRODUCTION_BUILD
 #include <openvr.h>
 
 // TODO: Should this go into Sense?
@@ -32,7 +32,7 @@
 // IVR EHM extension
 
 #define CIVR(ivrr) do{ivrResult=(ivrr);if(ivrResult != vr::VRInitError_None){goto Error;}}while(0);
-#define CIVRM(ivrr, msg, ...) do{ivrResult=(ivrr);if(ivrResult != vr::VRInitError_None){DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__);DEBUG_OUT("Error: %s\n",vr::VR_GetVRInitErrorAsEnglishDescription(ivrResult));goto Error;}}while(0);
+#define CIVRM(ivrr, msg, ...) do{ivrResult=(ivrr);if(ivrResult != vr::VRInitError_None){DEBUG_OUT(CurrentFileLine);DOSLogErrorMessage("CIVRM", ivrResult, msg, ##__VA_ARGS__);DEBUG_OUT("Error: %s\n",vr::VR_GetVRInitErrorAsEnglishDescription(ivrResult));goto Error;}}while(0);
 
 class OpenVRDevice : public HMD {
 	friend class OpenVRHMDSinkNode;
@@ -47,7 +47,7 @@ public:
 	virtual RESULT InitializeHMDSourceNode() override;
 	virtual RESULT InitializeHMDSinkNode() override;
 
-	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0) override;
+	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0, bool fHMDMirror = true) override;
 	virtual RESULT UpdateHMD() override;
 	virtual RESULT ReleaseHMD() override;
 
@@ -60,12 +60,22 @@ public:
 	virtual RESULT UnsetRenderSurface(EYE_TYPE eye) override;
 
 	virtual RESULT RenderHMDMirror() override;
+	virtual RESULT RecenterHMD() override;
 
 	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) override;
 	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) override;
 
 	virtual composite *GetSenseControllerObject(ControllerType controllerType) override;
 	virtual HMDDeviceType GetDeviceType() override;
+	virtual bool IsARHMD() override;
+	virtual std::string GetDeviceTypeString() override;
+
+	virtual bool IsHMDTracked() {
+		return true;
+	}
+
+	virtual RESULT GetAudioDeviceOutID(std::wstring &wstrAudioDeviceOutGUID) override;
+	virtual RESULT GetAudioDeviceInGUID(std::wstring &wstrAudioDeviceInGUID) override;
 
 private:
 	std::string GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL);
@@ -73,6 +83,8 @@ private:
 	//float PredictSecondsToPhotons(float secondOffset = 0.0f);
 	Matrix4 ConvertSteamVRMatrixToMatrix4(const vr::HmdMatrix34_t &matPose);
 	ViewMatrix ConvertSteamVRMatrixToViewMatrix(const vr::HmdMatrix34_t &matPose);
+
+	RESULT InitializeDeviceType();
 
 	// Models
 	RESULT InitializeRenderModels();								// This sets up the models
@@ -86,6 +98,8 @@ public:
 
 	std::string m_strDriver;
 	std::string m_strDisplay;
+	std::string m_strName;
+	HMDDeviceType m_deviceType;
 
 	// Pose / device tracking
 	int m_trackedControllerCount;
@@ -113,5 +127,5 @@ public:
 private:
 	OpenVRHMDSinkNode *m_pOpenVRHMDSinkNode = nullptr;
 };
-
+#endif
 #endif // ! OPENVR_DEVICE_H_

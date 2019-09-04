@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 
-#include "rtc_base/basictypes.h"
 #include "rtc_base/constructormagic.h"
 #include "rtc_base/refcount.h"
 #include "rtc_base/scoped_ref_ptr.h"
@@ -129,6 +128,10 @@ class StatsReport {
     kStatsValueNameSentPingResponses,
     kStatsValueNameRecvPingRequests,
     kStatsValueNameRecvPingResponses,
+    kStatsValueNameSentStunKeepaliveRequests,
+    kStatsValueNameRecvStunKeepaliveResponses,
+    kStatsValueNameStunKeepaliveRttTotal,
+    kStatsValueNameStunKeepaliveRttSquaredTotal,
 
     // Internal StatsValue names.
     kStatsValueNameAccelerateRate,
@@ -163,7 +166,6 @@ class StatsReport {
     kStatsValueNameDecodingPLCCNG,
     kStatsValueNameDer,
     kStatsValueNameDtlsCipher,
-    kStatsValueNameEchoCancellationQualityMin,
     kStatsValueNameEchoDelayMedian,
     kStatsValueNameEchoDelayStdDev,
     kStatsValueNameEchoReturnLoss,
@@ -186,6 +188,7 @@ class StatsReport {
     kStatsValueNameFrameWidthReceived,
     kStatsValueNameFrameWidthSent,
     kStatsValueNameHasEnteredLowResolution,
+    kStatsValueNameHugeFramesSent,
     kStatsValueNameInitiator,
     kStatsValueNameInterframeDelayMaxMs,  // Max over last 10 seconds.
     kStatsValueNameIssuerId,
@@ -338,7 +341,7 @@ class StatsReport {
 
    private:
     rtc::ThreadChecker thread_checker_;
-    mutable int ref_count_ RTC_ACCESS_ON(thread_checker_) = 0;
+    mutable int ref_count_ RTC_GUARDED_BY(thread_checker_) = 0;
 
     const Type type_;
     // TODO(tommi): Use C++ 11 union and make value_ const.

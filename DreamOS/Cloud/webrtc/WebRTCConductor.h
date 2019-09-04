@@ -35,8 +35,8 @@ class AudioPacket;
 #include "WebRTCAudioDeviceModule.h"
 
 class WebRTCConductor : 
-	public WebRTCPeerConnection::WebRTCPeerConnectionObserver,
-	public AudioDeviceDataCapturer
+	public WebRTCPeerConnection::WebRTCPeerConnectionObserver//,
+	//public AudioDeviceDataCapturer
 {
 public:
 	class WebRTCConductorObserver {
@@ -46,6 +46,7 @@ public:
 		virtual RESULT OnSDPOfferSuccess(long peerConnectionID) = 0;		// TODO: Consolidate with below
 		virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) = 0;	// TODO: Consolidate with below
 		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
+		virtual RESULT OnICECandidateGathered(WebRTCICECandidate *pICECandidate, long peerConnectionID) = 0;
 		virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
@@ -58,7 +59,7 @@ public:
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
 		
 		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
-		virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
+		virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 	};
 
 	friend class WebRTCImp;
@@ -69,10 +70,13 @@ public:
 	
 	RESULT Initialize();
 	RESULT InitializeNewPeerConnection(long peerConnectionID, long userID, long peerUserID, bool fCreateOffer, bool fAddDataChannel);
+	RESULT CloseAllPeerConnections();
+	RESULT CloseWebRTCPeerConnection(PeerConnection *pPeerConnection);
 
 	RESULT Shutdown();
 
 	friend class WebRTCImp;
+	friend class WebRTCPeerConnection;
 
 public:
 	// WebRTCPeerConnectionObserver Interface
@@ -83,6 +87,7 @@ public:
 	virtual RESULT OnSDPSuccess(long peerConnectionID, bool fOffer) override;
 	virtual RESULT OnSDPFailure(long peerConnectionID, bool fOffer) override;
 	virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) override;
+	virtual RESULT OnICECandidateGathered(WebRTCICECandidate *pICECandidate, long peerConnectionID) override;
 	virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) override;
 	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
@@ -96,7 +101,7 @@ public:
 	virtual TwilioNTSInformation GetTwilioNTSInformation() override;
 
 	virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
-	virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
+	virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 
 	// TODO: AudioDeviceCapturer
 
@@ -137,10 +142,10 @@ public:
 	RESULT SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage);
 	RESULT SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
-	RESULT SendVideoFrame(long peerConnectionID, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
-	RESULT StartVideoStreaming(long peerConnectionID, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
-	RESULT StopVideoStreaming(long peerConnectionID);
-	bool IsVideoStreamingRunning(long peerConnectionID);
+	RESULT SendVideoFrame(long peerConnectionID, const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT StartVideoStreaming(long peerConnectionID, const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
+	RESULT StopVideoStreaming(long peerConnectionID, const std::string &strVideoTrackLabel);
+	bool IsVideoStreamingRunning(long peerConnectionID, const std::string &strVideoTrackLabel);
 
 	RESULT SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket);
 	float GetRunTimeMicAverage();
@@ -153,15 +158,17 @@ private:
 
 	std::vector<rtc::scoped_refptr<WebRTCPeerConnection>> m_webRTCPeerConnections;
 
+
+	// Audio Device Module
+	rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceModule = nullptr;
+	//rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceDummyModule = nullptr;
+
+protected:
 	// Worker and Network Threads
 	// TODO: Might need to close these down on exit
 	std::unique_ptr<rtc::Thread> m_networkThread = nullptr;
 	std::unique_ptr<rtc::Thread> m_workerThread = nullptr;
 	std::unique_ptr<rtc::Thread> m_signalingThread = nullptr;
-
-	// Audio Device Module
-	rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceModule = nullptr;
-	//rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceDummyModule = nullptr;
 };
 
 #endif	// ! WEBRTC_CONDUCTOR_H_

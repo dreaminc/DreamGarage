@@ -21,6 +21,8 @@ public:
 public:
 	// TODO: Need to make this better
 	virtual RESULT UpdateBuffers() override;
+
+	virtual RESULT OGLInitialize() override;
 };
 #pragma warning(pop)
 

@@ -97,7 +97,7 @@ public:
 	RESULT SetOffset(float xOffset, float yOffset);
 	RESULT SetRows(int rows);
 
-	RESULT SetScaleToFit(bool fScaleToFit = true);
+	virtual RESULT SetScaleToFit(bool fScaleToFit = true) override;
 	RESULT SetWrap(bool fWrap = true);
 	RESULT SetFitToSize(bool fFitToSize = true);
 	RESULT SetBillboard(bool fBillboard = true);
@@ -130,7 +130,7 @@ private:
 	RESULT AddTrailingEllipsisQuads(float posX, float posY, float posXM, float posYM, std::vector<std::shared_ptr<quad>> curLineQuads);
 
 private:
-	bool m_fScaleToFit = false;
+	//bool m_fScaleToFit = false;
 	flags m_flags = text::flags::NONE;
 
 	float m_scaleFactor = 1.0f;

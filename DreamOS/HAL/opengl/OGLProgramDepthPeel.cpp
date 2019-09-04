@@ -16,8 +16,8 @@
 
 //OGLTexture *g_pColorTexture = nullptr;
 
-OGLProgramDepthPeel::OGLProgramDepthPeel(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "ogldepthpeel")
+OGLProgramDepthPeel::OGLProgramDepthPeel(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "ogldepthpeel", optFlags)
 {
 	// empty
 }
@@ -47,12 +47,12 @@ RESULT OGLProgramDepthPeel::OGLInitialize() {
 
 	// Color attachment
 	CR(m_pOGLFramebufferOutputA->MakeColorAttachment());
-	CR(m_pOGLFramebufferOutputA->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(m_pOGLFramebufferOutputA->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(m_pOGLFramebufferOutputA->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	// Depth attachment 
 	CR(m_pOGLFramebufferOutputA->MakeDepthAttachment());
-	CR(m_pOGLFramebufferOutputA->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT32F, GL_FLOAT, texture::TEXTURE_TYPE::TEXTURE_RECTANGLE));
+	CR(m_pOGLFramebufferOutputA->GetDepthAttachment()->MakeOGLDepthTexture(texture::type::RECTANGLE, GL_DEPTH_COMPONENT32F, GL_FLOAT));
 	CR(m_pOGLFramebufferOutputA->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 
 	CR(m_pOGLFramebufferOutputA->InitializeOGLDrawBuffers(1));
@@ -67,19 +67,19 @@ RESULT OGLProgramDepthPeel::OGLInitialize() {
 
 	// Color attachment
 	CR(m_pOGLFramebufferOutputB->MakeColorAttachment());
-	CR(m_pOGLFramebufferOutputB->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(m_pOGLFramebufferOutputB->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(m_pOGLFramebufferOutputB->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	// Depth attachment 
 	CR(m_pOGLFramebufferOutputB->MakeDepthAttachment());
-	CR(m_pOGLFramebufferOutputB->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT32F, GL_FLOAT, texture::TEXTURE_TYPE::TEXTURE_RECTANGLE));
+	CR(m_pOGLFramebufferOutputB->GetDepthAttachment()->MakeOGLDepthTexture(texture::type::RECTANGLE, GL_DEPTH_COMPONENT32F, GL_FLOAT));
 	CR(m_pOGLFramebufferOutputB->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 
 	CR(m_pOGLFramebufferOutputB->InitializeOGLDrawBuffers(1));
 
 	//InitializeFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 4);
 
-	//g_pColorTexture = (OGLTexture *)m_pParentImp->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_RECTANGLE);
+	//g_pColorTexture = (OGLTexture *)m_pParentImp->MakeTexture(texture::type::TEXTURE_RECTANGLE, L"brickwall_color.jpg");
 
 	m_pOGLQuery = new OGLQuery(m_pParentImp);
 	CN(m_pOGLQuery);
@@ -115,8 +115,8 @@ RESULT OGLProgramDepthPeel::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
 	CR(MakeInput<OGLFramebuffer>("input_framebufferA", &m_pOGLFramebufferInputA));

@@ -12,37 +12,35 @@
 
 class plane {
 public:
-	plane() :
-		m_ptPosition(),
-		m_vNormal(vector::jVector(1.0f))
-	{
-		// Empty
-	}
 
-	plane(point ptPosition, vector vNormal) :
-		m_ptPosition(ptPosition),
-		m_vNormal(vNormal)
-	{
-		// Empty
-	}
+	enum class type {
+		XY,
+		XZ,
+		YZ,
+		INVALID
+	};
+
+public:
+	plane();
+
+	plane(plane::type planeType);
+
+	plane(point ptPosition, vector vNormal);
 
 	// Distance of point from plane
-	point_precision Distance(point pt) {
-		return m_vNormal.Normal().dot(m_ptPosition - pt);
-	}
+	point_precision Distance(point pt);
 
-	vector GetNormal() const {
-		return m_vNormal;
-	}
+	vector GetNormal() const;
 
-	RESULT SetNormal(vector vNormal) {
-		m_vNormal = vNormal.Normal();
-		return R_PASS;
-	}
+	RESULT SetNormal(vector vNormal);
 
-	point GetPosition() const {
-		return m_ptPosition;
-	}
+	RESULT SetPlanePosition(point ptPosition);
+
+	point GetPosition() const;
+
+	point_precision GetDValue() const;
+
+	static point_precision GetDValue(point ptOrigin, vector vNormal);
 
 // Utilities for axes
 	static plane iPlane() { return plane(point(0.0f, 0.0f, 0.0f), vector::iVector(1.0f)); }

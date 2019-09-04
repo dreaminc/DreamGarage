@@ -24,17 +24,21 @@
 #include "OGLSphere.h"
 #include "OGLCylinder.h"
 #include "OGLComposite.h"
+#include "OGLFlatContext.h"
 #include "OGLModel.h"
 #include "Primitives/light.h"
 #include "OGLTexture.h"
+#include "OGLCubemap.h"
 #include "OGLSkybox.h"
 #include "OGLUser.h"
 #include "OGLHand.h"
 #include "OGLRay.h"
 #include "OGLPlane.h"
 #include "OGLAttachment.h"
+#include "OGLBillboard.h"
 
 #include "OGLViewportDisplay.h"
+#include "OGLCameraViewportDisplay.h"
 
 #include "Core/Utilities.h"
 
@@ -137,13 +141,33 @@ RESULT OpenGLImp::CheckGLError() {
 
 	GLenum glerr = glGetError();
 	switch (glerr) {
-		case GL_NO_ERROR: return R_PASS; break;
-		case GL_INVALID_ENUM: CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_ENUM"); break;
-		case GL_INVALID_VALUE: CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_VALUE"); break;
-		case GL_INVALID_OPERATION: CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_OPERATION"); break;
-		case GL_STACK_OVERFLOW: CBRM(false, R_FAIL, "CheckGLError: GL_STACK_OVERFLOW"); break;
-		case GL_STACK_UNDERFLOW: CBRM(false, R_FAIL, "CheckGLError: GL_STACK_UNDERFLOW"); break;
-		case GL_OUT_OF_MEMORY: CBRM(false, R_FAIL, "CheckGLError: GL_OUT_OF_MEMORY"); break;
+		case GL_NO_ERROR: {
+			return R_PASS;
+		} break;
+
+		case GL_INVALID_ENUM: {
+			CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_ENUM");
+		} break;
+
+		case GL_INVALID_VALUE: {
+			CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_VALUE");
+		} break;
+
+		case GL_INVALID_OPERATION: {
+			CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_OPERATION");
+		} break;
+
+		case GL_STACK_OVERFLOW: {
+			CBRM(false, R_FAIL, "CheckGLError: GL_STACK_OVERFLOW");
+		} break;
+
+		case GL_STACK_UNDERFLOW: {
+			CBRM(false, R_FAIL, "CheckGLError: GL_STACK_UNDERFLOW");
+		} break;
+
+		case GL_OUT_OF_MEMORY: {
+			CBRM(false, R_FAIL, "CheckGLError: GL_OUT_OF_MEMORY");
+		} break;
 	}
 
 Error:
@@ -297,20 +321,171 @@ Error:
 }
 */
 
+// This allows for separate HAL initialization of objects
+// Note, this will clobber the dim object on failure
+RESULT OpenGLImp::InitializeObject(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+	CN(pOGLObj);
+
+	CR(pOGLObj->OGLInitialize());
+
+Success:
+	return r;
+
+Error:
+	if (pDimObj != nullptr) {
+		delete pDimObj;
+		pDimObj = nullptr;
+	}
+
+	return r;
+}
+
+RESULT OpenGLImp::InitializeTexture(texture *pTexture) {
+	RESULT r = R_PASS;
+
+	OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTexture);
+	CN(pOGLTexture);
+
+	CR(pOGLTexture->OGLInitialize());
+
+Success:
+	return r;
+
+Error:
+	if (pOGLTexture != nullptr) {
+		delete pOGLTexture;
+		pOGLTexture = nullptr;
+	}
+
+	return r;
+}
+
+DimObj* OpenGLImp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+	OGLObj *pOGLObj = nullptr;
+
+	switch (pPrimParams->GetPrimitiveType()) {
+		case PRIMITIVE_TYPE::SPHERE: {
+			pOGLObj = MakeSphere(pPrimParams, fInitialize);
+			CN(pOGLObj);
+		} break;
+
+		case PRIMITIVE_TYPE::VOLUME: {
+			pOGLObj = MakeVolume(pPrimParams, fInitialize);
+			CN(pOGLObj);
+		} break;
+
+		case PRIMITIVE_TYPE::QUAD: {
+			pOGLObj = MakeQuad(pPrimParams, fInitialize);
+			CN(pOGLObj);
+		} break;
+
+		//case PRIMITIVE_TYPE::MODEL: {
+		//	pOGLObj = MakeModel(pPrimParams, fInitialize);
+		//	CN(pOGLObj);
+		//} break;
+
+		case PRIMITIVE_TYPE::MESH: {
+			pOGLObj = MakeMesh(pPrimParams, fInitialize);
+			CN(pOGLObj);
+		} break;
+	}
+
+Success:
+	return pOGLObj;
+
+Error:
+	if (pOGLObj != nullptr) {
+		delete pOGLObj;
+		pOGLObj = nullptr;
+	}
+
+	return nullptr;
+}
+
+texture* OpenGLImp::MakeTexture(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLTexture *pOGLTexture = nullptr;
+	texture::params *pTextureParams = nullptr;
+
+	CBM((pPrimParams->GetPrimitiveType() == PRIMITIVE_TYPE::TEXTURE), "Invalid Texture Params");
+
+	pTextureParams = dynamic_cast<texture::params*>(pPrimParams);
+	CN(pTextureParams);
+
+	pOGLTexture = new OGLTexture(this, pTextureParams);
+	CN(pOGLTexture);
+
+	if (pTextureParams->pszFilename != nullptr) {
+		CR(pOGLTexture->LoadTextureFromFile(pTextureParams->pszFilename));
+	}
+	else {
+		CBM((false), "Currently MakeTexture PrimParam path only supports path based textures")
+	}
+
+	if (fInitialize) {
+		CR(pOGLTexture->OGLInitialize());
+	}
+
+Success:
+	return pOGLTexture;
+
+Error:
+	if (pOGLTexture != nullptr) {
+		delete pOGLTexture;
+		pOGLTexture = nullptr;
+	}
+
+	return nullptr;
+
+}
+
+OGLMesh* OpenGLImp::MakeMesh(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLMesh *pOGLMesh = nullptr;
+
+	mesh::params *pMeshParams = dynamic_cast<mesh::params*>(pPrimParams);
+	CN(pMeshParams);
+
+	pOGLMesh = new OGLMesh(this, pMeshParams);
+	CN(pOGLMesh);
+
+	if (fInitialize) {
+		CR(pOGLMesh->OGLInitialize());
+	}
+
+Success:
+	return pOGLMesh;
+
+Error:
+	if (pOGLMesh != nullptr) {
+		delete pOGLMesh;
+		pOGLMesh = nullptr;
+	}
+
+	return nullptr;
+}
 
 mesh *OpenGLImp::MakeMesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
 
-	mesh *pMesh = new OGLMesh(this, vertices);
-	CN(pMesh);
+	OGLMesh *pOGLMesh = new OGLMesh(this, vertices);
+	CN(pOGLMesh);
 
-	//Success:
-	return pMesh;
+	CR(pOGLMesh->OGLInitialize());
+
+Success:
+	return pOGLMesh;
 
 Error:
-	if (pMesh != nullptr) {
-		delete pMesh;
-		pMesh = nullptr;
+	if (pOGLMesh != nullptr) {
+		delete pOGLMesh;
+		pOGLMesh = nullptr;
 	}
 	return nullptr;
 }
@@ -319,16 +494,18 @@ mesh *OpenGLImp::MakeMesh(const std::vector<vertex>& vertices, const std::vector
 	RESULT r = R_PASS;
 
 	// Not implemented yet, until size_t <-> dimindex conflict is resolved.
-	mesh *pMesh = new OGLMesh(this, vertices, indices);
-	CN(pMesh);
+	OGLMesh *pOGLMesh = new OGLMesh(this, vertices, indices);
+	CN(pOGLMesh);
 
-	//Success:
-	return pMesh;
+	CR(pOGLMesh->OGLInitialize());
+
+Success:
+	return pOGLMesh;
 
 Error:
-	if (pMesh != nullptr) {
-		delete pMesh;
-		pMesh = nullptr;
+	if (pOGLMesh != nullptr) {
+		delete pOGLMesh;
+		pOGLMesh = nullptr;
 	}
 	return nullptr;
 }
@@ -339,7 +516,7 @@ model* OpenGLImp::MakeModel() {
 	model *pModel = new OGLModel(this);
 	CN(pModel);
 
-	//Success:
+Success:
 	return pModel;
 
 Error:
@@ -356,7 +533,7 @@ composite *OpenGLImp::MakeComposite() {
 	composite *pComposite = new OGLComposite(this);
 	CN(pComposite);
 
-//Success:
+Success:
 	return pComposite;
 
 Error:
@@ -370,7 +547,7 @@ Error:
 FlatContext *OpenGLImp::MakeFlatContext(int pxFBWidth, int pxFBHeight, int fbChannels) {
 	RESULT r = R_PASS;
 
-	FlatContext *pFlatContext = new FlatContext(this);
+	FlatContext *pFlatContext = new OGLFlatContext(this);
 	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, pxFBWidth, pxFBHeight, fbChannels);
 	CN(pOGLFramebuffer);
 
@@ -379,7 +556,7 @@ FlatContext *OpenGLImp::MakeFlatContext(int pxFBWidth, int pxFBHeight, int fbCha
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
@@ -413,6 +590,21 @@ Error:
 	return nullptr;
 }
 
+billboard *OpenGLImp::MakeBillboard(point ptOrigin, float width, float height) {
+	RESULT r = R_PASS;
+
+	billboard *pBillboard = new OGLBillboard(this, ptOrigin, width, height);
+	CN(pBillboard);
+
+	return pBillboard;
+Error:
+	if (pBillboard != nullptr) {
+		delete pBillboard;
+		pBillboard = nullptr;
+	}
+	return nullptr;
+}
+
 // TODO: Other approach 
 light* OpenGLImp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	RESULT r = R_PASS;
@@ -434,59 +626,119 @@ Error:
 
 // Quad
 
+OGLQuad* OpenGLImp::MakeQuad(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLQuad *pOGLQuad = nullptr;
+
+	quad::params *pQuadParams = dynamic_cast<quad::params*>(pPrimParams);
+	CN(pQuadParams);
+
+	pOGLQuad = new OGLQuad(this, pQuadParams);
+	CN(pOGLQuad);
+
+	if (fInitialize) {
+		CR(pOGLQuad->OGLInitialize());
+	}
+
+Success:
+	return pOGLQuad;
+
+Error:
+	if (pOGLQuad != nullptr) {
+		delete pOGLQuad;
+		pOGLQuad = nullptr;
+	}
+
+	return nullptr;
+}
+
+OGLModel* OpenGLImp::MakeModel(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLModel *pOGLModel = nullptr;
+
+	model::params *pQuadParams = dynamic_cast<model::params*>(pPrimParams);
+	CN(pQuadParams);
+
+	pOGLModel = new OGLModel(this);
+	CN(pOGLModel);
+
+	if (fInitialize) {
+		CR(pOGLModel->OGLInitialize());
+	}
+
+Success:
+	return pOGLModel;
+
+Error:
+	if (pOGLModel != nullptr) {
+		delete pOGLModel;
+		pOGLModel = nullptr;
+	}
+
+	return nullptr;
+}
+
 quad* OpenGLImp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	RESULT r = R_PASS;
 
-	quad *pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
-	CN(pQuad);
+	OGLQuad *pOGLQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
+	CN(pOGLQuad);
 
-//Success:
-	return pQuad;
+	CR(pOGLQuad->OGLInitialize());
+
+Success:
+	return pOGLQuad;
 
 Error:
-	if (pQuad != nullptr) {
-		delete pQuad;
-		pQuad = nullptr;
+	if (pOGLQuad != nullptr) {
+		delete pOGLQuad;
+		pOGLQuad = nullptr;
 	}
 	return nullptr;
 }
  
-quad* OpenGLImp::MakeQuad(double width, double height, point ptOrigin, vector vNormal) {
-	RESULT r = R_PASS;
-
-	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), 1, 1, nullptr, vNormal);
-	//pQuad->RotateXByDeg(90.0f);
-	pQuad->MoveTo(ptOrigin);
-
-	CN(pQuad);
-
+// TODO: This is a stupid thing should be removed
+//quad* OpenGLImp::MakeQuad(double width, double height, point ptOrigin, vector vNormal) {
+//	RESULT r = R_PASS;
+//
+//	OGLQuad* pOGLQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), 1, 1, nullptr, vNormal);
+//	
+//	CR(pOGLQuad->OGLInitialize());
+//	
+//	//pQuad->RotateXByDeg(90.0f);
+//	pOGLQuad->MoveTo(ptOrigin);
+//
+//	CN(pOGLQuad);
+//
 //Success:
-	return pQuad;
+//	return pOGLQuad;
+//
+//Error:
+//	if (pOGLQuad != nullptr) {
+//		delete pOGLQuad;
+//		pOGLQuad = nullptr;
+//	}
+//	return nullptr;
+//}
 
-Error:
-	if (pQuad != nullptr) {
-		delete pQuad;
-		pQuad = nullptr;
-	}
-	return nullptr;
-}
-
-quad* OpenGLImp::MakeQuad(double width, double height, point ptOrigin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal) {
+// TODO: Origin should not be baked into these calls (done at client)
+quad* OpenGLImp::MakeQuad(double width, double height, point ptCenter, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal) {
 	RESULT r = R_PASS;
 
-	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), ptOrigin, uvTopLeft, uvBottomRight, vNormal);
-	//pQuad->RotateXByDeg(90.0f);
-	pQuad->MoveTo(ptOrigin);
+	OGLQuad* pOGLQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), ptCenter, uvTopLeft, uvBottomRight, vNormal);
+	CN(pOGLQuad);
 
-	CN(pQuad);
+	CR(pOGLQuad->OGLInitialize());
 
-	//Success:
-	return pQuad;
+Success:
+	return pOGLQuad;
 
 Error:
-	if (pQuad != nullptr) {
-		delete pQuad;
-		pQuad = nullptr;
+	if (pOGLQuad != nullptr) {
+		delete pOGLQuad;
+		pOGLQuad = nullptr;
 	}
 
 	return nullptr;
@@ -495,16 +747,18 @@ Error:
 quad* OpenGLImp::MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType, vector vNormal) {
 	RESULT r = R_PASS;
 
-	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, uvTopLeft, uvBottomRight, curveType, vNormal);
-	CN(pQuad);	
+	OGLQuad* pOGLQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, uvTopLeft, uvBottomRight, curveType, vNormal);
+	CN(pOGLQuad);	
 
-	//Success:
-	return pQuad;
+	CR(pOGLQuad->OGLInitialize());
+
+Success:
+	return pOGLQuad;
 
 Error:
-	if (pQuad != nullptr) {
-		delete pQuad;
-		pQuad = nullptr;
+	if (pOGLQuad != nullptr) {
+		delete pOGLQuad;
+		pOGLQuad = nullptr;
 	}
 
 	return nullptr;
@@ -513,16 +767,16 @@ Error:
 cylinder* OpenGLImp::MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
 	RESULT r = R_PASS;
 
-	cylinder *pCylinder = new OGLCylinder(this, radius, height, numAngularDivisions, numVerticalDivisions);
-	CN(pCylinder);
+	OGLCylinder *pOGLCylinder = new OGLCylinder(this, radius, height, numAngularDivisions, numVerticalDivisions);
+	CN(pOGLCylinder);
 
-	//Success:
-	return pCylinder;
+Success:
+	return pOGLCylinder;
 
 Error:
-	if (pCylinder != nullptr) {
-		delete pCylinder;
-		pCylinder = nullptr;
+	if (pOGLCylinder != nullptr) {
+		delete pOGLCylinder;
+		pOGLCylinder = nullptr;
 	}
 	return nullptr;
 }
@@ -530,16 +784,16 @@ Error:
 DimRay* OpenGLImp::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
 	RESULT r = R_PASS;
 
-	DimRay *pRay = new OGLRay(this, ptOrigin, vDirection, step, fDirectional);
-	CN(pRay);
+	OGLRay *pOGLRay = new OGLRay(this, ptOrigin, vDirection, step, fDirectional);
+	CN(pOGLRay);
 
-	//Success:
-	return pRay;
+Success:
+	return pOGLRay;
 
 Error:
-	if (pRay != nullptr) {
-			delete pRay;
-			pRay = nullptr;
+	if (pOGLRay != nullptr) {
+			delete pOGLRay;
+			pOGLRay = nullptr;
 		}
 	return nullptr;
 }
@@ -550,7 +804,7 @@ DimPlane* OpenGLImp::MakePlane(point ptOrigin, vector vNormal) {
 	DimPlane *pPlane = new OGLPlane(this, ptOrigin, vNormal);
 	CN(pPlane);
 
-	//Success:
+Success:
 	return pPlane;
 
 Error:
@@ -561,20 +815,50 @@ Error:
 	return nullptr;
 }
 
-sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) {
+OGLSphere* OpenGLImp::MakeSphere(PrimParams *pPrimParams, bool fInitialize) {
 	RESULT r = R_PASS;
 
-	sphere *pSphere = new OGLSphere(this, radius, numAngularDivisions, numVerticalDivisions, c);
-	CN(pSphere);
+	OGLSphere *pOGLSphere = nullptr;
 
-//Success:
-	return pSphere;
+	sphere::params *pSphereParams = dynamic_cast<sphere::params*>(pPrimParams);
+	CN(pSphereParams);
+
+	pOGLSphere = new OGLSphere(this, pSphereParams);
+	CN(pOGLSphere);
+
+	if (fInitialize) {
+		CR(pOGLSphere->OGLInitialize());
+	}
+
+Success:
+	return pOGLSphere;
 
 Error:
-	if (pSphere != nullptr) {
-		delete pSphere;
-		pSphere = nullptr;
+	if (pOGLSphere != nullptr) {
+		delete pOGLSphere;
+		pOGLSphere = nullptr;
 	}
+
+	return nullptr;
+}
+
+sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 10, int numVerticalDivisions = 10, color c = color(COLOR_WHITE)) {
+	RESULT r = R_PASS;
+
+	OGLSphere *pOGLSphere = new OGLSphere(this, radius, numAngularDivisions, numVerticalDivisions, c);
+	CN(pOGLSphere);
+
+	CR(pOGLSphere->OGLInitialize());
+
+Success:
+	return pOGLSphere;
+
+Error:
+	if (pOGLSphere != nullptr) {
+		delete pOGLSphere;
+		pOGLSphere = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -614,20 +898,67 @@ Error:
 	return nullptr;
 }
 
+hand* OpenGLImp::MakeHand(HAND_TYPE type, long avatarID) {
+	RESULT r = R_PASS;
+
+	hand *pHand = new OGLHand(this, type, avatarID);
+	CN(pHand);
+
+	//Success:
+	return pHand;
+
+Error:
+	if (pHand != nullptr) {
+		delete pHand;
+		pHand = nullptr;
+	}
+	return nullptr;
+
+}
+
 volume* OpenGLImp::MakeVolume(double width, double length, double height, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = new OGLVolume(this, width, length, height, fTriangleBased);
-	CN(pVolume);
+	OGLVolume *pOGLVolume = new OGLVolume(this, width, length, height, fTriangleBased);
+	CN(pOGLVolume);
 
-//Success:
-	return pVolume;
+	CR(pOGLVolume->OGLInitialize());
+
+Success:
+	return pOGLVolume;
 
 Error:
-	if (pVolume != nullptr) {
-		delete pVolume;
-		pVolume = nullptr;
+	if (pOGLVolume != nullptr) {
+		delete pOGLVolume;
+		pOGLVolume = nullptr;
 	}
+	return nullptr;
+}
+
+OGLVolume* OpenGLImp::MakeVolume(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+
+	OGLVolume *pOGLVolume = nullptr;
+
+	volume::params *pVolumeParams = dynamic_cast<volume::params*>(pPrimParams);
+	CN(pVolumeParams);
+
+	pOGLVolume = new OGLVolume(this, pVolumeParams);
+	CN(pOGLVolume);
+
+	if (fInitialize) {
+		CR(pOGLVolume->OGLInitialize());
+	}
+
+Success:
+	return pOGLVolume;
+
+Error:
+	if (pOGLVolume != nullptr) {
+		delete pOGLVolume;
+		pOGLVolume = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -664,7 +995,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, co
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -709,7 +1040,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -754,7 +1085,7 @@ text* OpenGLImp::MakeText(const std::wstring& strFontFileName, const std::string
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -799,7 +1130,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -845,7 +1176,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -879,6 +1210,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	//std::clamp(fbWidth, 32, 2048);
 	//std::clamp(fbHeight, 32, 2048);
 
+//*
 	util::Clamp(fbWidth, 32, 2048);
 	util::Clamp(fbHeight, 32, 2048);
 
@@ -891,10 +1223,11 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+	//*/
 	
 	CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
 
@@ -910,13 +1243,13 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+texture* OpenGLImp::MakeTexture(texture::type type, const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
 	texture *pTexture = OGLTexture::MakeTextureFromPath(this, type, std::wstring(pszFilename));
 	CN(pTexture);
 
-//Success:
+Success:
 	return pTexture;
 
 Error:
@@ -946,7 +1279,7 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
+texture* OpenGLImp::MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
 	RESULT r = R_PASS;
 
 	texture *pTexture = OGLTexture::MakeTextureFromBuffer(this, type, width, height, channels, pixelFormat, pBuffer, pBuffer_n);
@@ -964,7 +1297,7 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
+texture* OpenGLImp::MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
 	texture *pTexture = OGLTexture::MakeTextureFromFileBuffer(this, type, pBuffer, pBuffer_n);
@@ -977,6 +1310,24 @@ Error:
 	if (pTexture != nullptr) {
 		delete pTexture;
 		pTexture = nullptr;
+	}
+
+	return nullptr;
+}
+
+cubemap* OpenGLImp::MakeCubemap(const std::wstring &wstrCubemapName) {
+	RESULT r = R_PASS;
+
+	cubemap *pCubemap = OGLCubemap::MakeCubemapFromName(this, wstrCubemapName);
+	CN(pCubemap);
+
+Success:
+	return pCubemap;
+
+Error:
+	if (pCubemap != nullptr) {
+		delete pCubemap;
+		pCubemap = nullptr;
 	}
 
 	return nullptr;
@@ -1005,6 +1356,9 @@ SinkNode* OpenGLImp::MakeSinkNode(std::string strNodeName) {
 	if (strNodeName == "display") {
 		pSinkNode = DNode::MakeNode<OGLViewportDisplay>(this);
 	}
+	else if (strNodeName == "displaycamera") {
+		pSinkNode = DNode::MakeNode<OGLCameraViewportDisplay>(this);
+	}
 
 	return pSinkNode;
 }
@@ -1017,10 +1371,10 @@ SourceNode* OpenGLImp::MakeSourceNode(std::string strNodeName) {
 	return pSourceNode;
 }
 
-ProgramNode* OpenGLImp::MakeProgramNode(std::string strNodeName) {
+ProgramNode* OpenGLImp::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
 	ProgramNode* pProgramNode = nullptr;
 
-	pProgramNode = OGLProgramFactory::MakeOGLProgram(OGLProgramFactory::OGLProgramTypeFromstring(strNodeName), this, m_versionGLSL);
+	pProgramNode = OGLProgramFactory::MakeOGLProgram(OGLProgramFactory::OGLProgramTypeFromstring(strNodeName), this, m_versionGLSL, optFlags);
 
 	return pProgramNode;
 }
@@ -1298,6 +1652,32 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::glDeleteFramebuffers(GLsizei n, const GLuint *gluiFramebuffer) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glDeleteFramebuffers(n, gluiFramebuffer);
+	CRM(CheckGLError(), "glBindFramebuffer failed");
+
+Error:
+	return r;
+}
+
+// PBO
+void *OpenGLImp::glMapBuffer(GLenum target, GLenum access) {
+	return m_OpenGLExtensions.glMapBuffer(target, access);
+}
+
+RESULT OpenGLImp::glUnmapBuffer(GLenum target) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glUnmapBuffer(target);
+	CRM(CheckGLError(), "glUnmapBuffer failed");
+
+Error:
+	return r;
+}
+
+// Render Buffers
 RESULT OpenGLImp::glGenRenderbuffers(GLsizei n, GLuint *renderbuffers) {
 	RESULT r = R_PASS;
 
@@ -1421,13 +1801,15 @@ Error:
 }
 
 RESULT OpenGLImp::glBindBuffer(GLenum target, GLuint gluiBuffer) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBindBuffer(target, gluiBuffer);
-	CRM(CheckGLError(), "glBindBuffer failed");
+	//CRM(CheckGLError(), "glBindBuffer failed");
 
-Error:
-	return r;
+	return R_PASS;
+
+//Error:
+//	return r;
 }
 
 RESULT OpenGLImp::glDeleteBuffers(GLsizei n, const GLuint *buffers) {
@@ -1517,13 +1899,16 @@ Error:
 }
 
 RESULT OpenGLImp::glBindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBindBufferBase(target, bindingPointIndex, bufferIndex);
-	CRM(CheckGLError(), "glBindBufferBase failed");
 
-Error:
-	return r;
+	return R_PASS;
+
+//	CRM(CheckGLError(), "glBindBufferBase failed");
+//
+//Error:
+//	return r;
 }
 
 RESULT OpenGLImp::glGetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar *const*uniformNames, GLuint *uniformIndices) {
@@ -1537,21 +1922,24 @@ Error:
 }
 
 RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	*pLocation = m_OpenGLExtensions.glGetUniformLocation(program, name);
-	CRM(CheckGLError(), "glGetUniformLocation failed");
+	//CRM(CheckGLError(), "glGetUniformLocation failed");
 
-	return r;
-Error:
-	*pLocation = -1;
-	return r;
+	return R_PASS;
+
+//	return r;
+//Error:
+//	*pLocation = -1;
+//	return r;
 }
 
 RESULT OpenGLImp::glUniform1i(GLint location, GLint v0) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUniform1i(location, v0);
+
 	CRM(CheckGLError(), "glUniform1i failed");
 
 Error:
@@ -1559,33 +1947,42 @@ Error:
 }
 
 RESULT OpenGLImp::glUniform1fv(GLint location, GLsizei count, const GLfloat *value) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUniform1fv(location, count, value);
-	CRM(CheckGLError(), "glUniform1fv failed");
 
-Error:
-	return r;
+	return R_PASS;
+
+//	CRM(CheckGLError(), "glUniform1fv failed");
+//
+//Error:
+//	return r;
 }
 
 RESULT OpenGLImp::glUniform4fv(GLint location, GLsizei count, const GLfloat *value) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUniform4fv(location, count, value);
-	CRM(CheckGLError(), "glUniform4fv failed");
 
-Error:
-	return r;
+	return R_PASS;
+
+//	CRM(CheckGLError(), "glUniform4fv failed");
+//
+//Error:
+//	return r;
 }
 
 RESULT OpenGLImp::glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUniformMatrix4fv(location, count, transpose, value);
-	CRM(CheckGLError(), "glUniformMatrix4fv failed");
 
-Error:
-	return r;
+	return R_PASS;
+
+//	CRM(CheckGLError(), "glUniformMatrix4fv failed");
+//
+//Error:
+//	return r;
 }
 
 // OpenGL Shaders
@@ -1594,6 +1991,18 @@ RESULT OpenGLImp::CreateShader(GLenum type, GLuint *shaderID) {
 
 	*shaderID = m_OpenGLExtensions.glCreateShader(type);
 	CRM(CheckGLError(), "glCreateShader failed");
+
+	return r;
+Error:
+	*shaderID = NULL;
+	return r;
+}
+
+RESULT OpenGLImp::CreateShaderObject(GLenum type, GLuint *shaderID) {
+	RESULT r = R_PASS;
+
+	*shaderID = m_OpenGLExtensions.glCreateShaderObject(type);
+	CRM(CheckGLError(), "glCreateShaderObject failed");
 
 	return r;
 Error:
@@ -1652,13 +2061,15 @@ Error:
 }
 
 RESULT OpenGLImp::glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBufferData(target, size, data, usage);
-	CRM(CheckGLError(), "glBufferData failed");
+	//CRM(CheckGLError(), "glBufferData failed");
 
-Error:
-	return r;
+	return R_PASS;
+
+//Error:
+//	return r;
 }
 
 RESULT OpenGLImp::glBufferSubData(GLenum target, GLsizeiptr offset, GLsizeiptr size, const void *data) {
@@ -1736,7 +2147,7 @@ RESULT OpenGLImp::BindTexture(GLenum target, GLuint texture) {
 	RESULT r = R_PASS;
 
 	glBindTexture(target, texture);
-	CRM(CheckGLError(), "glBindTexture failed");
+	//CRM(CheckGLError(), "glBindTexture failed");
 
 Error:
 	return r;

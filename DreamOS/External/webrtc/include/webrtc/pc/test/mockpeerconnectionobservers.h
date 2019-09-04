@@ -14,6 +14,7 @@
 #ifndef PC_TEST_MOCKPEERCONNECTIONOBSERVERS_H_
 #define PC_TEST_MOCKPEERCONNECTIONOBSERVERS_H_
 
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
@@ -31,12 +32,29 @@ class MockPeerConnectionObserver : public PeerConnectionObserver {
  public:
   struct AddTrackEvent {
     explicit AddTrackEvent(
-        rtc::scoped_refptr<RtpReceiverInterface> receiver,
-        std::vector<rtc::scoped_refptr<MediaStreamInterface>> streams)
-        : receiver(std::move(receiver)), streams(std::move(streams)) {}
+        rtc::scoped_refptr<RtpReceiverInterface> event_receiver,
+        std::vector<rtc::scoped_refptr<MediaStreamInterface>> event_streams)
+        : receiver(std::move(event_receiver)),
+          streams(std::move(event_streams)) {
+      for (auto stream : streams) {
+        std::vector<rtc::scoped_refptr<MediaStreamTrackInterface>> tracks;
+        for (auto audio_track : stream->GetAudioTracks()) {
+          tracks.push_back(audio_track);
+        }
+        for (auto video_track : stream->GetVideoTracks()) {
+          tracks.push_back(video_track);
+        }
+        snapshotted_stream_tracks[stream] = tracks;
+      }
+    }
 
     rtc::scoped_refptr<RtpReceiverInterface> receiver;
     std::vector<rtc::scoped_refptr<MediaStreamInterface>> streams;
+    // This map records the tracks present in each stream at the time the
+    // OnAddTrack callback was issued.
+    std::map<rtc::scoped_refptr<MediaStreamInterface>,
+             std::vector<rtc::scoped_refptr<MediaStreamTrackInterface>>>
+        snapshotted_stream_tracks;
   };
 
   MockPeerConnectionObserver() : remote_streams_(StreamCollection::Create()) {}
@@ -114,6 +132,11 @@ class MockPeerConnectionObserver : public PeerConnectionObserver {
     add_track_events_.push_back(AddTrackEvent(receiver, streams));
   }
 
+  void OnTrack(
+      rtc::scoped_refptr<RtpTransceiverInterface> transceiver) override {
+    on_track_transceivers_.push_back(transceiver);
+  }
+
   void OnRemoveTrack(
       rtc::scoped_refptr<RtpReceiverInterface> receiver) override {
     remove_track_events_.push_back(receiver);
@@ -127,16 +150,33 @@ class MockPeerConnectionObserver : public PeerConnectionObserver {
     return receivers;
   }
 
-  // Returns the label of the last added stream.
+  int CountAddTrackEventsForStream(const std::string& stream_id) {
+    int found_tracks = 0;
+    for (const AddTrackEvent& event : add_track_events_) {
+      bool has_stream_id = false;
+      for (auto stream : event.streams) {
+        if (stream->id() == stream_id) {
+          has_stream_id = true;
+          break;
+        }
+      }
+      if (has_stream_id) {
+        ++found_tracks;
+      }
+    }
+    return found_tracks;
+  }
+
+  // Returns the id of the last added stream.
   // Empty string if no stream have been added.
-  std::string GetLastAddedStreamLabel() {
+  std::string GetLastAddedStreamId() {
     if (last_added_stream_.get())
-      return last_added_stream_->label();
+      return last_added_stream_->id();
     return "";
   }
-  std::string GetLastRemovedStreamLabel() {
+  std::string GetLastRemovedStreamId() {
     if (last_removed_stream_.get())
-      return last_removed_stream_->label();
+      return last_removed_stream_->id();
     return "";
   }
 
@@ -158,6 +198,9 @@ class MockPeerConnectionObserver : public PeerConnectionObserver {
     return candidates;
   }
 
+  bool negotiation_needed() const { return renegotiation_needed_; }
+  void clear_negotiation_needed() { renegotiation_needed_ = false; }
+
   rtc::scoped_refptr<PeerConnectionInterface> pc_;
   PeerConnectionInterface::SignalingState state_;
   std::vector<std::unique_ptr<IceCandidateInterface>> candidates_;
@@ -171,6 +214,8 @@ class MockPeerConnectionObserver : public PeerConnectionObserver {
   std::string last_added_track_label_;
   std::vector<AddTrackEvent> add_track_events_;
   std::vector<rtc::scoped_refptr<RtpReceiverInterface>> remove_track_events_;
+  std::vector<rtc::scoped_refptr<RtpTransceiverInterface>>
+      on_track_transceivers_;
   int num_candidates_removed_ = 0;
 
  private:
@@ -185,14 +230,14 @@ class MockCreateSessionDescriptionObserver
       : called_(false),
         error_("MockCreateSessionDescriptionObserver not called") {}
   virtual ~MockCreateSessionDescriptionObserver() {}
-  virtual void OnSuccess(SessionDescriptionInterface* desc) {
+  void OnSuccess(SessionDescriptionInterface* desc) override {
     called_ = true;
     error_ = "";
     desc_.reset(desc);
   }
-  virtual void OnFailure(const std::string& error) {
+  void OnFailure(webrtc::RTCError error) override {
     called_ = true;
-    error_ = error;
+    error_ = error.message();
   }
   bool called() const { return called_; }
   bool result() const { return error_.empty(); }
@@ -218,10 +263,11 @@ class MockSetSessionDescriptionObserver
     called_ = true;
     error_ = "";
   }
-  void OnFailure(const std::string& error) override {
+  void OnFailure(webrtc::RTCError error) override {
     called_ = true;
-    error_ = error;
+    error_ = error.message();
   }
+
   bool called() const { return called_; }
   bool result() const { return error_.empty(); }
   const std::string& error() const { return error_; }

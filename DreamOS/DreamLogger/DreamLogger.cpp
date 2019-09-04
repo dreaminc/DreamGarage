@@ -24,9 +24,17 @@ DreamLogger* DreamLogger::s_pInstance = nullptr;
 	//extern unsigned long GetModuleFileNameA(void*, char*, unsigned long);
 
 	// TODO: Replace these with the proper path manager stuff
-	std::string GetPathOfExecutible () {
+	std::string GetPathOfExecutible() {
 		char szPathResult[MAX_PATH];
 		return std::string(szPathResult, GetModuleFileNameA(nullptr, szPathResult, MAX_PATH));
+	}
+
+	std::string GetFolderPathOfExecutible() {
+		std::string strExecPath = GetPathOfExecutible();
+		char pBuffer[MAX_PATH];
+		GetModuleFileNameA(NULL, pBuffer, MAX_PATH);
+		auto slashPosition = strExecPath.find_last_of("\\/");
+		return strExecPath.substr(0, slashPosition);
 	}
 
 	std::string GetCommandLineString() {
@@ -67,10 +75,24 @@ DreamLogger::DreamLogger() {
 }
 
 DreamLogger::~DreamLogger() {
-	// empty
+
+	if (m_pDreamLogger != nullptr) {
+		m_pDreamLogger = nullptr;
+	}
+
+	spdlog::drop_all();
 }
 
-RESULT DreamLogger::InitializeLogger() {
+RESULT DreamLogger::Flush() {
+	if (m_pDreamLogger != nullptr)
+		m_pDreamLogger->flush();
+	else
+		R_NOT_INITIALIZED;
+
+	return R_PASS;
+}
+
+RESULT DreamLogger::InitializeLoggerNoPathmanager(std::string strLogName) {
 	RESULT r = R_PASS;
 
 	// TODO: Delete old logs
@@ -81,49 +103,88 @@ RESULT DreamLogger::InitializeLogger() {
 	char szTime[32];
 	std::strftime(szTime, 32, "%Y-%m-%d_%H-%M-%S", localTimeNow);
 
-	// TODO: Move this to PathManager please 
-	auto pszAppDataPath = std::getenv(DREAM_OS_PATH_ENV);
-	if (pszAppDataPath != nullptr) {
-		m_strDreamLogPath = std::string{ pszAppDataPath } + "\\logs\\" + "log-" + szTime + ".log";
-	}
-	else {
-		m_strDreamLogPath = std::string("\\logs\\") + "log-" + szTime + ".log";
-	}
+	m_strDreamLogPath = GetFolderPathOfExecutible() + "\\" + "log-" + szTime + ".log";
 
-	// Set up the logger 
-	/*
-	el::Configurations loggerConfiguration;
-	m_pDreamLogger = el::Loggers::getLogger("dos");
+	// Set up async mode and flush to 1 second
+	spdlog::set_async_mode(LOG_QUEUE_SIZE, spdlog::async_overflow_policy::block_retry, nullptr, std::chrono::seconds(1));
+
+	m_pDreamLogger = spdlog::basic_logger_mt(strLogName, m_strDreamLogPath);
 	CN(m_pDreamLogger);
 
-	loggerConfiguration.setToDefault();
-	loggerConfiguration.set(el::Level::Info, el::ConfigurationType::Format, "%datetime %thread [DOS] %level %msg");
-	loggerConfiguration.set(el::Level::Error, el::ConfigurationType::Format, "%datetime %thread [DOS] %level %msg");
-
-	loggerConfiguration.setGlobally(el::ConfigurationType::Filename, m_strDreamLogPath);
-	loggerConfiguration.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
-
-	m_pDreamLogger->configure(loggerConfiguration);
-	*/
-
-	el::Configurations defaultConf;
-
-	defaultConf.setToDefault();
-	defaultConf.set(el::Level::Info, el::ConfigurationType::Format, "%datetime %thread [DOS] %level %msg");
-	defaultConf.set(el::Level::Error, el::ConfigurationType::Format, "%datetime %thread [DOS] %level %msg");
-	
-	defaultConf.setGlobally(el::ConfigurationType::Filename, m_strDreamLogPath);
-	defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
-
-	el::Loggers::reconfigureLogger("default", defaultConf);
-
-	m_pDreamLogger = el::Loggers::getLogger("default");
-	CN(m_pDreamLogger);
-
-	Log(DreamLogger::Level::INFO, "Process Launched: %v", GetPathOfExecutible());
-	Log(DreamLogger::Level::INFO, "PID: %v", GetProcessID());
-	Log(DreamLogger::Level::INFO, "Process Arguments: %v", GetCommandLineString());
+	Log(DreamLogger::Level::INFO, "Process Launched: %s", GetPathOfExecutible());
+	Log(DreamLogger::Level::INFO, "PID: %d", GetProcessID());
+	//Log(DreamLogger::Level::INFO, "Process Arguments: %s", GetCommandLineString());
 
 Error:
 	return R_PASS;
 }
+
+RESULT DreamLogger::InitializeLogger(std::string strLogName) {
+	RESULT r = R_PASS;
+
+	// TODO: Delete old logs
+
+	std::time_t timeNow = std::time(nullptr);
+	std::tm *localTimeNow = std::localtime(&timeNow);
+
+	char szTime[32];
+	std::strftime(szTime, 32, "%Y-%m-%d_%H-%M-%S", localTimeNow);
+
+	std::wstring wstrAppDataPath;
+	PathManager::instance()->GetDreamPath(wstrAppDataPath, DREAM_PATH_TYPE::DREAM_PATH_LOCAL);
+	wstrAppDataPath = wstrAppDataPath + L"logs\\";
+
+	// Check if logs folder exists 
+	if (PathManager::instance()->DoesPathExist(wstrAppDataPath) != R_DIRECTORY_FOUND) {
+		// Create the directory
+		wchar_t* pwszDirectory = const_cast<wchar_t*>(wstrAppDataPath.c_str());
+		PathManager::instance()->CreateDirectory(pwszDirectory);
+	}
+
+	if (wstrAppDataPath.c_str() != nullptr) {
+		m_strDreamLogPath = std::string(wstrAppDataPath.begin(), wstrAppDataPath.end()) + "log-" + szTime + ".log";
+	}
+	else {
+		m_strDreamLogPath = std::string(wstrAppDataPath.begin(), wstrAppDataPath.end()) + "log-" + szTime + ".log";
+	}
+
+	// Set up async mode and flush to 1 second
+	spdlog::set_async_mode(LOG_QUEUE_SIZE, spdlog::async_overflow_policy::block_retry, nullptr, std::chrono::seconds(1));
+
+	m_pDreamLogger = spdlog::basic_logger_mt(strLogName, m_strDreamLogPath);
+	CN(m_pDreamLogger);
+
+	Log(DreamLogger::Level::INFO, "Process Launched: %s", GetPathOfExecutible());
+	Log(DreamLogger::Level::INFO, "PID: %d", GetProcessID());
+	//Log(DreamLogger::Level::INFO, "Process Arguments: %s", GetCommandLineString());
+
+Error:
+	return R_PASS;
+}
+
+/*
+// Note: constructor must be public for this to work
+DreamLogger* DreamLogger::instance() {
+	RESULT r = R_PASS;
+
+	if (!s_pInstance) {
+		s_pInstance = new DreamLogger();
+		CN(s_pInstance);
+
+		// This allows the singleton to run an initialization function that
+		// can fail (unlike the constructor)
+		CR(s_pInstance->InitializeLogger());
+	}
+
+	// Success:
+	return s_pInstance;
+
+Error:
+	if (s_pInstance != nullptr) {
+		delete s_pInstance;
+		s_pInstance = nullptr;
+	}
+
+	return nullptr;
+}
+*/

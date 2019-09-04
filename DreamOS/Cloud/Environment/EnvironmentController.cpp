@@ -1,6 +1,8 @@
 #include "EnvironmentController.h"
 #include "Cloud/CloudController.h"
 
+#include "CameraController.h"
+
 #include "DreamLogger/DreamLogger.h"
 
 #include "Cloud/User/User.h"
@@ -19,6 +21,10 @@
 #include "Core/Utilities.h"
 
 #include "EnvironmentAsset.h"
+#include "EnvironmentShare.h"
+
+#include "Cloud/User/User.h"
+#include "Cloud/User/TwilioNTSInformation.h"
 
 EnvironmentController::EnvironmentController(Controller* pParentController, long environmentID) :
 	Controller(pParentController),
@@ -46,6 +52,17 @@ RESULT EnvironmentController::Initialize() {
 	CR(m_pPeerConnectionController->Initialize());
 	CR(m_pPeerConnectionController->RegisterPeerConnectionControllerObserver(this));
 
+	m_pCameraController = std::unique_ptr<CameraController>(new CameraController(this));
+	CN(m_pCameraController);
+	CR(m_pCameraController->Initialize());
+
+	CR(m_pCameraController->RegisterMethod("open", std::bind(&EnvironmentController::OnOpenCamera, this, std::placeholders::_1)));
+	CR(m_pCameraController->RegisterMethod("close", std::bind(&EnvironmentController::OnCloseCamera, this, std::placeholders::_1)));
+	CR(m_pCameraController->RegisterMethod("send_placement", std::bind(&EnvironmentController::OnSendCameraPlacement, this, std::placeholders::_1)));
+	CR(m_pCameraController->RegisterMethod("receive_placement", std::bind(&EnvironmentController::OnReceiveCameraPlacement, this, std::placeholders::_1)));
+	CR(m_pCameraController->RegisterMethod("stop_sending_placement", std::bind(&EnvironmentController::OnStopSendingCameraPlacement, this, std::placeholders::_1)));
+	CR(m_pCameraController->RegisterMethod("stop_receiving_placement", std::bind(&EnvironmentController::OnStopReceivingCameraPlacement, this, std::placeholders::_1)));
+
 	// Menu Controller
 	m_pMenuController = std::make_unique<MenuController>(this);
 	//m_pMenuController = std::unique_ptr<MenuController>(new MenuController(this));
@@ -54,12 +71,19 @@ RESULT EnvironmentController::Initialize() {
 	//CR(m_pMenuController->RegisterPeerConnectionControllerObserver(this));
 
 	// Register Methods
-	CR(RegisterMethod("share", std::bind(&EnvironmentController::OnSharedAsset, this, std::placeholders::_1)));
-	CR(RegisterMethod("send", std::bind(&EnvironmentController::OnSendAsset, this, std::placeholders::_1)));
+	CR(RegisterMethod("open", std::bind(&EnvironmentController::OnOpenAsset, this, std::placeholders::_1)));
+	CR(RegisterMethod("close", std::bind(&EnvironmentController::OnCloseAsset, this, std::placeholders::_1)));
+	CR(RegisterMethod("create", std::bind(&EnvironmentController::OnSharedAsset, this, std::placeholders::_1)));
+	CR(RegisterMethod("send", std::bind(&EnvironmentController::OnSharedAsset, this, std::placeholders::_1)));
 	CR(RegisterMethod("receive", std::bind(&EnvironmentController::OnReceiveAsset, this, std::placeholders::_1)));
 	CR(RegisterMethod("stop_sending", std::bind(&EnvironmentController::OnStopSending, this, std::placeholders::_1)));
 	CR(RegisterMethod("stop_receiving", std::bind(&EnvironmentController::OnStopReceiving, this, std::placeholders::_1)));
+	CR(RegisterMethod("get_by_share_type", std::bind(&EnvironmentController::OnGetByShareType, this, std::placeholders::_1)));
+
+	CR(RegisterMethod("get_form", std::bind(&EnvironmentController::OnGetForm, this, std::placeholders::_1)));
 	//TODO: no method currently for a stop_sharing response, but could potentially be used for error handling
+
+	CR(RegisterMethod("ping", std::bind(&EnvironmentController::OnEnvironmentSocketPing, this, std::placeholders::_1)));
 
 Error:
 	return r;
@@ -143,19 +167,16 @@ RESULT EnvironmentController::ConnectToEnvironmentSocket(User user, long environ
 
 	//m_environment = Environment(user.GetDefaultEnvironmentID());
 
-	SetEnvironmentID(environmentID);
-	m_environment = Environment(environmentID);
+	SetEnvironmentID(user.GetDefaultEnvironmentID());
+
+	m_environment = Environment(user.GetDefaultEnvironmentID());
 
 	std::string strURI = GetMethodURI(EnvironmentMethod::CONNECT_SOCKET);
 	strURI += std::to_string(m_environment.GetEnvironmentID()); 
 	strURI += "/";
 
-	DEBUG_LINEOUT("Connceting to environment socket URL: %s", strURI.c_str());
-
-	// TODO: Not hard coded!
-	if (m_pEnvironmentWebsocket == nullptr) {
-		CR(InitializeWebsocket(strURI));
-	}
+	DOSLOG(INFO, "Connecting to environment socket URL: %s", strURI.c_str());
+	CR(InitializeWebsocket(strURI));
 
 	s_user = user;
 	m_pEnvironmentWebsocket->SetToken(user.GetToken());
@@ -166,6 +187,25 @@ RESULT EnvironmentController::ConnectToEnvironmentSocket(User user, long environ
 	m_fConnected = true;
 
 	DOSLOG(INFO, "[EnvironmentController] user connected to socket:user=%v", user);
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::DisconnectFromEnvironmentSocket() {
+	RESULT r = R_PASS;
+
+	// close all peers
+
+	// Close all peer connections
+	CR(m_pPeerConnectionController->CloseAllPeerConnections());
+	
+	DOSLOG(INFO, "Disconnecting from Environment Socket");
+
+	CNR(m_pEnvironmentWebsocket, R_SKIPPED);
+
+	CR(m_pEnvironmentWebsocket->Stop());
+	m_pEnvironmentWebsocket = nullptr;
 
 Error:
 	return r;
@@ -197,7 +237,7 @@ RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 	//m_pendingMessageID = guidMessage.GetGUIDString();
 
 	jsonData["id"] = guidMessage.GetGUIDString();
-	jsonData["token"] = user.GetToken();
+	//jsonData["token"] = user.GetToken();
 	jsonData["method"] = "environmentuser.create";
 	jsonData["params"] = {
 		//{"sdp_offer", "{'foo': 'bar2'}"},
@@ -231,7 +271,7 @@ nlohmann::json EnvironmentController::CreateEnvironmentMessage(User user, PeerCo
 	std::string strGUID = guidMessage.GetGUIDString();
 
 	jsonData["id"] = guidMessage.GetGUIDString();
-	jsonData["token"] = user.GetToken();
+	//jsonData["token"] = user.GetToken();
 	//jsonData["type"] = "response";
 	jsonData["type"] = "request";
 
@@ -241,6 +281,32 @@ nlohmann::json EnvironmentController::CreateEnvironmentMessage(User user, PeerCo
 	jsonData["payload"] = nlohmann::json::object();
 	if (pPeerConnection != nullptr) {
 		jsonData["payload"]["peer_connection"] = pPeerConnection->GetPeerConnectionJSON();
+	}
+
+	jsonData["version"] = user.GetVersion().GetString(false);
+
+	return jsonData;
+}
+
+// TODO: Move to PeerConnection for PeerConnection related calls?
+nlohmann::json EnvironmentController::CreateICECandidateEnvironmentMessage(User user, PeerConnection *pPeerConnection, WebRTCICECandidate* pICECandidate, bool fOfferer) {
+	nlohmann::json jsonData;
+
+	// Set up the JSON data
+	guid guidMessage = guid();
+	std::string strGUID = guidMessage.GetGUIDString();
+
+	jsonData["id"] = guidMessage.GetGUIDString();
+	//jsonData["token"] = user.GetToken();
+	//jsonData["type"] = "response";
+	jsonData["type"] = "request";
+
+	//jsonData["method"] = std::string("environmentuser") + strMethod;
+	jsonData["method"] = "peer_connection_candidate.create";
+
+	jsonData["payload"] = nlohmann::json::object();
+	if (pICECandidate != nullptr) {
+		jsonData["payload"]["peer_connection_candidate"] = pPeerConnection->GetPeerConnectionICECandidateJSON(pICECandidate, fOfferer);
 	}
 
 	jsonData["version"] = user.GetVersion().GetString(false);
@@ -333,7 +399,6 @@ RESULT EnvironmentController::SetOfferCandidates(User user, PeerConnection *pPee
 
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Set Offer Candidates JSON: %s", strData.c_str());
-
 	/*
 	m_fPendingMessage = true;
 	m_state = state::SET_OFFER_CANDIDATES;
@@ -379,6 +444,31 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::CreateICECandidate(User user, WebRTCICECandidate *pICECandidate, PeerConnection *pPeerConnection, bool fOfferer) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonData;
+	std::string strData;
+
+	CloudController *pParentCloudController = dynamic_cast<CloudController*>(GetParentController());
+
+	CNM(pParentCloudController, "Parent CloudController not found or null");
+	CN(m_pEnvironmentWebsocket);
+	CBM((m_fConnected), "Environment socket not connected");
+	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
+
+	// Set up the JSON data
+	jsonData = CreateICECandidateEnvironmentMessage(user, pPeerConnection, pICECandidate, fOfferer);
+
+	strData = jsonData.dump();
+	DEBUG_LINEOUT("Create ICE Candidates JSON: %s", strData.c_str());
+
+	CR(SendEnvironmentSocketData(strData, state::CREATE_ICE_CANDIDATES));
+
+Error:
+	return r;
+}
+
 // TODO: Right now this is no different than create user... 
 RESULT EnvironmentController::UpdateEnvironmentUser() {
 	RESULT r = R_PASS;
@@ -404,7 +494,7 @@ RESULT EnvironmentController::GetEnvironmentPeerList(User user) {
 	// Set up the JSON data
 	m_pendingMessageID = UID().GetID();
 	jsonData["id"] = m_pendingMessageID;
-	jsonData["token"] = user.GetToken();
+	//jsonData["token"] = user.GetToken();
 	jsonData["method"] = "environmentuser.list";
 	jsonData["params"] = "";
 	jsonData["version"] = user.GetVersion().GetString(false);
@@ -428,23 +518,119 @@ CLOUD_CONTROLLER_TYPE EnvironmentController::GetControllerType() {
 	return CLOUD_CONTROLLER_TYPE::ENVIRONMENT; 
 }
 
-RESULT EnvironmentController::RequestShareAsset(std::string strStorageProviderScope, std::string strPath, std::string strTitle) {
+RESULT EnvironmentController::RequestOpenAsset(std::string strStorageProviderScope, std::string strPath, std::string strTitle) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload;
-	std::string strData;
-	guid guidMessage;
 	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
 	jsonPayload["environment_asset"] = nlohmann::json::object();
 	jsonPayload["environment_asset"]["path"] = strPath;
 
-	//jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
+	//jsonPayload["environment_share"]["storage_provider_scope"] = strStorageProviderScope;
 	jsonPayload["environment_asset"]["scope"] = strStorageProviderScope;
+	jsonPayload["environment_asset"]["title"] = strTitle;
 
 	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
-	CR(pCloudRequest->SetControllerMethod("environment_asset.share"));
+	CR(pCloudRequest->SetControllerMethod("environment_asset.open"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_ASSET_OPEN));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::RequestOpenCamera() {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+
+	jsonPayload["environment_camera"] = nlohmann::json::object();
+	//jsonPayload["environment_camera"]["path"] = "";
+
+	//jsonPayload["environment_share"]["storage_provider_scope"] = strStorageProviderScope;
+	jsonPayload["environment_camera"]["scope"] = "MenuProviderScope.CameraMenuProvider";
+	jsonPayload["environment_camera"]["storage_provider_scope"] = "MenuProviderScope.CameraMenuProvider";
+	jsonPayload["environment_camera"]["title"] = "Dream Virtual Camera";
+	jsonPayload["environment_camera"]["user"] = GetCloudController()->GetUserID();
+
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("environment_camera.open"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_CAMERA_OPEN));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::RequestCloseCamera(long assetID) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+
+	jsonPayload["environment_camera"] = nlohmann::json::object();
+	jsonPayload["environment_camera"]["id"] = assetID;
+
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("environment_camera.close"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_CAMERA_CLOSE));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::RequestShareCamera(long assetID) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+
+	jsonPayload["environment_camera"] = nlohmann::json::object();
+	jsonPayload["environment_camera"]["id"] = assetID;
+
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("environment_camera.share_placement"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_CAMERA_SHARE_PLACEMENT));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::RequestCloseAsset(long assetID) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+
+	jsonPayload["environment_asset"] = nlohmann::json::object();
+	jsonPayload["environment_asset"]["id"] = assetID;
+
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("environment_asset.close"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_ASSET_CLOSE));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::RequestShareAsset(long assetID, std::string strShareType) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+
+	jsonPayload["environment_share"] = nlohmann::json::object();
+	jsonPayload["environment_share"]["asset"] = assetID;
+	jsonPayload["environment_share"]["share_type"] = strShareType;
+
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("environment_share.create"));
 
 	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_ASSET_SHARE));
 
@@ -452,23 +638,16 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::RequestStopSharing(long assetID, std::string strStorageProviderScope, std::string strPath) {
+RESULT EnvironmentController::RequestStopSharing(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
-	nlohmann::json jsonPayload;
-	std::string strData;
-	guid guidMessage;
 	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
-	jsonPayload["environment_asset"] = nlohmann::json::object();
-	jsonPayload["environment_asset"]["path"] = strPath;
+	CN(pEnvironmentShare);
 
-	jsonPayload["environment_asset"]["scope"] = strStorageProviderScope;
-	jsonPayload["environment_asset"]["id"] = assetID;
-
-	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), pEnvironmentShare->MakeJsonPayload());
 	CN(pCloudRequest);
-	CR(pCloudRequest->SetControllerMethod("environment_asset.stop_sharing"));
+	CR(pCloudRequest->SetControllerMethod("environment_share.delete"));
 
 	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_STOP_SHARING));
 
@@ -476,6 +655,48 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::RequestCurrentScreenShare(std::string strShareType) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+
+	jsonPayload["environment_share"] = nlohmann::json::object();
+	jsonPayload["environment_share"]["share_type"] = strShareType;
+
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("environment_share.get_by_share_type"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_GET_BY_SHARE_TYPE));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::RequestForm(std::string key) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+	CloudController *pParentCloudController = GetCloudController();
+	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
+
+	CN(pParentCloudController);
+
+	jsonPayload["form"] = nlohmann::json::object();
+	jsonPayload["form"]["key"] = key;
+
+	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("form.get_form"));
+
+	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(pParentCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CN(pEnvironmentController);
+	CR(pEnvironmentController->SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::FORM_GET_FORM));
+
+Error:
+	return r;
+
+}
 
 RESULT EnvironmentController::PrintEnvironmentPeerList() {
 	DEBUG_LINEOUT("%d Peers Environment: %d", (int)(m_environmentPeers.size()), (int)(m_environment.GetEnvironmentID()));
@@ -483,6 +704,17 @@ RESULT EnvironmentController::PrintEnvironmentPeerList() {
 		peer.PrintEnvironmentPeer();
 
 	return R_PASS;
+}
+
+bool EnvironmentController::HasPeerConnections() {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+
+	return m_pPeerConnectionController->HasPeerConnections();
+
+Error:
+	return false;
 }
 
 long EnvironmentController::GetUserID() {
@@ -605,7 +837,21 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnSharedAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
+RESULT EnvironmentController::OnICECandidateGathered(WebRTCICECandidate *pICECandidate, PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	if (pPeerConnection->GetOfferUserID() == s_user.GetUserID()) {
+		CR(CreateICECandidate(s_user, pICECandidate, pPeerConnection, true));
+	}
+	else if (pPeerConnection->GetAnswerUserID() == s_user.GetUserID()) {
+		CR(CreateICECandidate(s_user, pICECandidate, pPeerConnection, false));
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnOpenAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
@@ -627,11 +873,168 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnSendAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
+RESULT EnvironmentController::OnOpenCamera(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentCamera = jsonPayload["/environment_camera"_json_pointer];
+
+	if (jsonEnvironmentCamera.size() != 0) {
+		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentCamera);
+		CN(pEnvironmentAsset);
+
+		// environment asset and DreamContentSource should be more closely linked
+		pEnvironmentAsset->SetContentType("ContentControlType.Camera");
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+
+			// TODO: may need to be specific to camera
+			
+			CR(m_pEnvironmentControllerObserver->OnOpenCamera(pEnvironmentAsset));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnCloseCamera(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentCamera = jsonPayload["/environment_camera"_json_pointer];
+
+	if (jsonEnvironmentCamera.size() != 0) {
+
+		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentCamera);
+		CN(pEnvironmentAsset);
+
+		// environment asset and DreamContentSource should be more closely linked
+		pEnvironmentAsset->SetContentType("ContentControlType.Camera");
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnCloseCamera(pEnvironmentAsset));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnSendCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_camera"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnSendCameraPlacement());
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnReceiveCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_camera"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnReceiveCameraPlacement(jsonEnvironmentAsset["id"].get<long>()));
+		//	jsonEnvironmentAsset["session"];
+		//	jsonEnvironmentAsset["user"];
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnStopSendingCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_camera"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnStopSendingCameraPlacement());
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnStopReceivingCameraPlacement(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_camera"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnStopReceivingCameraPlacement());
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnCloseAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
 	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+
+		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
+		CN(pEnvironmentAsset);
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnCloseAsset(pEnvironmentAsset));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnSharedAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<EnvironmentShare> pEnvironmentShare = nullptr;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentShare = jsonPayload["/environment_share"_json_pointer];
+	CBR(jsonEnvironmentShare.size() != 0, R_SKIPPED);
+
+	pEnvironmentShare = std::make_shared<EnvironmentShare>(jsonEnvironmentShare);
+	CN(pEnvironmentShare);
+
+	CNR(m_pEnvironmentControllerObserver, R_SKIPPED);
+	CR(m_pEnvironmentControllerObserver->OnShareAsset(pEnvironmentShare));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnSendAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_share"_json_pointer];
 
 	if (jsonEnvironmentAsset.size() != 0) {
 		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
@@ -649,20 +1052,17 @@ Error:
 RESULT EnvironmentController::OnReceiveAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
-	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
-	//int peerID = jsonPayload["/user"_json_pointer].get<int>();
+	std::shared_ptr<EnvironmentShare> pEnvironmentShare = nullptr;
 
-	//*
-	if (jsonEnvironmentAsset.size() != 0) {
-		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
-		CN(pEnvironmentAsset);
-		// actually doesn't need to do anything, OnVideoFrame in DOS does a peer connection check
-		if (m_pEnvironmentControllerObserver != nullptr) {
-			CR(m_pEnvironmentControllerObserver->OnReceiveAsset(pEnvironmentAsset->GetUserID()));
-		}
-	}
-	//*/
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentShare = jsonPayload["/environment_share"_json_pointer];
+	CBR(jsonEnvironmentShare.size() != 0, R_SKIPPED);
+
+	pEnvironmentShare = std::make_shared<EnvironmentShare>(jsonEnvironmentShare);
+	CN(pEnvironmentShare);
+
+	CNR(m_pEnvironmentControllerObserver, R_SKIPPED);
+	CR(m_pEnvironmentControllerObserver->OnReceiveAsset(pEnvironmentShare));
 
 Error:
 	return r;
@@ -671,29 +1071,95 @@ Error:
 RESULT EnvironmentController::OnStopReceiving(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
-	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+	std::shared_ptr<EnvironmentShare> pEnvironmentShare = nullptr;
 
-	if (jsonEnvironmentAsset.size() != 0) {
-		if (m_pEnvironmentControllerObserver != nullptr) {
-			CR(m_pEnvironmentControllerObserver->OnStopReceiving());
-		}
-	}
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentShare = jsonPayload["/environment_share"_json_pointer];
+	CBR(jsonEnvironmentShare.size() != 0, R_SKIPPED);
+
+	pEnvironmentShare = std::make_shared<EnvironmentShare>(jsonEnvironmentShare);
+	CN(pEnvironmentShare);
+
+	CNR(m_pEnvironmentControllerObserver, R_SKIPPED);
+	CR(m_pEnvironmentControllerObserver->OnStopReceiving(pEnvironmentShare));
+
 Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnStopSending(std::shared_ptr<CloudMessage> pCloudMessage) {
+RESULT EnvironmentController::OnGetByShareType(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<EnvironmentShare> pEnvironmentShare = nullptr;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	CBR(jsonPayload.size() != 0, R_SKIPPED);
+
+	if (!jsonPayload["/environment_share"_json_pointer].is_null()) {
+		nlohmann::json jsonEnvironmentShare = jsonPayload["/environment_share"_json_pointer];
+
+		pEnvironmentShare = std::make_shared<EnvironmentShare>(jsonEnvironmentShare);
+	}
+
+	CNR(m_pEnvironmentControllerObserver, R_SKIPPED);
+	CR(m_pEnvironmentControllerObserver->OnGetByShareType(pEnvironmentShare));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnGetForm(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+	nlohmann::json jsonForm = jsonPayload["/form"_json_pointer];
 
-	if (jsonEnvironmentAsset.size() != 0) {
-		if (m_pEnvironmentControllerObserver != nullptr) {
-			CR(m_pEnvironmentControllerObserver->OnStopSending());
-		}
-	}
+	// TODO: potentially build this out into a class similar to EnvironmentAsset
+	CBR(!jsonForm.is_null(), R_SKIPPED);
+
+	CBR(jsonForm["/key"_json_pointer].is_string(), R_SKIPPED);
+	CBR(jsonForm["/title"_json_pointer].is_string(), R_SKIPPED);
+	CBR(jsonForm["/url"_json_pointer].is_string(), R_SKIPPED);
+
+	CR(m_pEnvironmentControllerObserver->OnGetForm(jsonForm["/key"_json_pointer].get<std::string>(),
+												jsonForm["/title"_json_pointer].get<std::string>(),
+												jsonForm["/url"_json_pointer].get<std::string>()));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnEnvironmentSocketPing(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+
+	std::shared_ptr<CloudMessage> pCloudRequest = CloudMessage::CreateResponse(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("socket_connection.ping"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, m_state));
+
+Error:
+	return r;
+}
+
+
+RESULT EnvironmentController::OnStopSending(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<EnvironmentShare> pEnvironmentShare = nullptr;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentShare = jsonPayload["/environment_share"_json_pointer];
+	CBR(jsonEnvironmentShare.size() != 0, R_SKIPPED);
+
+	pEnvironmentShare = std::make_shared<EnvironmentShare>(jsonEnvironmentShare);
+	CN(pEnvironmentShare);
+
+	CNR(m_pEnvironmentControllerObserver, R_SKIPPED);
+	CR(m_pEnvironmentControllerObserver->OnStopSending(pEnvironmentShare));
+
 Error:
 	return r;
 }
@@ -722,7 +1188,7 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 	// Determine who to handle this
 	// TODO: Move this over to CloudMessage instead
 
-	if (strTokens[0] == "peer_connection") {
+	if (strTokens[0] == "peer_connection" || strTokens[0] == "peer_connection_candidate") {
 		nlohmann::json jsonPayload = jsonCloudMessage["/payload"_json_pointer];
 		strMethod = strTokens[1];
 
@@ -749,6 +1215,24 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 			
 			m_pPeerConnectionController->HandleEnvironmentSocketResponse(strMethod, jsonPayload);
 		}
+		else if (strType == "request") {
+			DOSLOG(INFO, "[EnvironmentController] HandleSocketMessage REQUEST %v, %v", strMethod, jsonPayload);
+
+			if (strMethod == "disconnect") {
+				// This is now done in DreamGarage since server will close the socket automatically 
+				//RESULT r = DisconnectFromEnvironmentSocket();
+				
+				auto pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+				pUserController->PendLogout();
+				
+			}
+			if (strMethod == "ping") {
+				RESULT r = HandleOnMethodCallback(pCloudMessage);
+			}
+		}
+		else {
+			DOSLOG(ERR, "[EnvironmentController] websocket msg type unknown");
+		}
 
 	}
 	else {
@@ -758,10 +1242,25 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 	if (pCloudMessage->GetController() == "menu") {
 		m_pMenuController->HandleEnvironmentSocketMessage(pCloudMessage);
 	}
-	else if (pCloudMessage->GetController() == "environment_asset") {
+	// environment_asset is for open, while environment_share is for everything else
+	else if (pCloudMessage->GetController() == "environment_share" || pCloudMessage->GetController() == "environment_asset") {
 		RESULT r = HandleOnMethodCallback(pCloudMessage);
 		// TODO: Handle error 
 	}
+	else if (pCloudMessage->GetController() == "environment_camera") {
+		m_pCameraController->HandleOnMethodCallback(pCloudMessage);
+	}
+
+	//TODO: split form into separate controller(?)
+	else if (pCloudMessage->GetController() == "user") {
+		auto pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+		pUserController->HandleEnvironmentSocketMessage(pCloudMessage);
+	}
+
+	else if (pCloudMessage->GetController() == "form") {
+		RESULT r = HandleOnMethodCallback(pCloudMessage);
+	}
+
 
 	/*
 	DEBUG_LINEOUT("HandleWebsocketMessage id:%d statuscode: %d pending:%d pending id:%d state: 0x%x", 
@@ -924,41 +1423,41 @@ Error:
 }
 
 // Video
-RESULT EnvironmentController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+RESULT EnvironmentController::BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
 	CN(m_pPeerConnectionController);
-	CR(m_pPeerConnectionController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+	CR(m_pPeerConnectionController->BroadcastVideoFrame(strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels));
 
 Error:
 	return r;
 }
 
-RESULT EnvironmentController::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+RESULT EnvironmentController::StartVideoStreaming(const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	CN(m_pPeerConnectionController);
-	CR(m_pPeerConnectionController->StartVideoStreaming(pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
+	CR(m_pPeerConnectionController->StartVideoStreaming(strVideoTrackLabel, pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
 
 Error:
 	return r;
 }
 
-RESULT EnvironmentController::StopVideoStreaming() {
+RESULT EnvironmentController::StopVideoStreaming(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	CN(m_pPeerConnectionController);
-	CR(m_pPeerConnectionController->StopVideoStreaming());
+	CR(m_pPeerConnectionController->StopVideoStreaming(strVideoTrackLabel));
 
 Error:
 	return r;
 }
 
-bool EnvironmentController::IsVideoStreamingRunning() {
+bool EnvironmentController::IsVideoStreamingRunning(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	CN(m_pPeerConnectionController);
-	return m_pPeerConnectionController->IsVideoStreamingRunning();
+	return m_pPeerConnectionController->IsVideoStreamingRunning(strVideoTrackLabel);
 
 Error:
 	return false;
@@ -1079,11 +1578,11 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT EnvironmentController::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		CR(m_pEnvironmentControllerObserver->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
 	}
 
 Error:

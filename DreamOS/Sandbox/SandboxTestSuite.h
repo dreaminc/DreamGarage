@@ -6,20 +6,23 @@
 // DREAM OS
 // DreamOS/Sandbox/SandboxTestSuite.h
 
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 #include <functional>
 #include <memory>
 
 class DreamOS;
 
-class SandboxTestSuite : public TestSuite
+class SandboxTestSuite : public DreamTestSuite
 {
 public:
 	SandboxTestSuite(DreamOS *pDreamOS);
 	~SandboxTestSuite();
 
 	virtual RESULT AddTests() override;
+
+	virtual RESULT SetupPipeline(std::string strRenderProgramName = "standard") override;
+	virtual RESULT SetupTestSuite() override;
 
 public:
 
@@ -29,7 +32,6 @@ public:
 	
 
 private:
-	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
 	RESULT SetupDreamAppPipeline();
 
 private:

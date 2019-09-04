@@ -12,6 +12,8 @@ namespace DreamLaunch {
 
     class DreamOSLauncher {
 
+        public static string k_strDreamClientFilename = "DreamClient.exe";
+
         public int Initialize() {
 
             return 0;
@@ -23,7 +25,7 @@ namespace DreamLaunch {
         }
 
         public void UpdateDreamOSExecutablePath() {
-            m_strDreamOSPath = Environment.CurrentDirectory + "\\DreamOS.exe";
+            m_strDreamOSPath = Environment.CurrentDirectory + "\\" + k_strDreamClientFilename;
         }
 
         private bool DreamOSExecutableFound() {
@@ -34,19 +36,20 @@ namespace DreamLaunch {
 
         // This will simply launch DreamOS as pass through
         // TODO: Set up custom arguments 
-        public int LaunchDreamOS() {
+        public int LaunchDreamOS(string strWorkingDirectory) {
 
             if(DreamOSExecutableFound() == false) {
-                MessageBox.Show("DreamOS.exe not found - please reinstall Dream from Setup", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(string.Format("{0} not found - please reinstall Dream from Setup", k_strDreamClientFilename), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return -1;
             }
 
             // Prepare the process to run
             ProcessStartInfo dreamOSProcessStartInfo = new ProcessStartInfo();
 
-            dreamOSProcessStartInfo.WorkingDirectory = Environment.CurrentDirectory;
+            //dreamOSProcessStartInfo.WorkingDirectory = Environment.CurrentDirectory;
+            dreamOSProcessStartInfo.WorkingDirectory = strWorkingDirectory;
             dreamOSProcessStartInfo.UseShellExecute = true;
-            dreamOSProcessStartInfo.FileName = "DreamOS.exe";
+            dreamOSProcessStartInfo.FileName = k_strDreamClientFilename;
 
             // Skip first argument which is the name of the process
             string[] commandLineArguments = Environment.GetCommandLineArgs();
@@ -81,7 +84,7 @@ namespace DreamLaunch {
                 Process.Start(dreamOSProcessStartInfo);
             }
             catch {
-                MessageBox.Show("DreamOS.exe failed to launch - please reinstall Dream from Setup", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(string.Format("{0} failed to launch - please reinstall Dream from Setup", k_strDreamClientFilename), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return -1;
             }            
 

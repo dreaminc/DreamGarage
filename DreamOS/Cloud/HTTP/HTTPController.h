@@ -56,6 +56,7 @@ public:
 	// GET
 	RESULT AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponse* pHTTPResponse  = nullptr);
 	RESULT AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponseCallback fnResponseCallback);
+	RESULT AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponseCallback fnResponseCallback, HTTPTimeoutCallback fnTimeoutCallback, long timout = 0);	// default timeout 0 --> 300 seconds
 	RESULT GET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponse& httpResponse);
 
 	// POST
@@ -74,6 +75,10 @@ public:
 
 	static const std::vector<std::string> ContentAcceptJson() {
 		return { "Content-Type: application/json", "Accept: application/json; version=1.0" };
+	}
+
+	static const std::string AuthorizationHeader(std::string& strAccessToken) {
+		return "Authorization: Bearer " + strAccessToken;
 	}
 
 public:

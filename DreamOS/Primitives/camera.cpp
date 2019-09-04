@@ -1,14 +1,22 @@
 #include "camera.h"
 
-#include "DreamLogger/DreamLogger.h"
-
-#define DEFAULT_NEAR_PLANE 0.1f
-#define DEFAULT_FAR_PLANE 1000.0f
 #define DEFAULT_CAMERA_ROTATE_SPEED 0.002f
 #define DEFAULT_CAMERA_MOVE_SPEED 2.0f
-
 #define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_PERSPECTIVE
-//#define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_ORTHOGRAPHIC
+
+#include "matrix/ProjectionMatrix.h"  // for ::PROJECTION_MATRIX_PERSPECTIVE, DEFAULT_FAR_PLANE, DEFAULT_NEAR_PLANE, ProjectionMatrix
+#include "matrix/RotationMatrix.h"    // for RotationMatrix
+#include "matrix/ViewMatrix.h"        // for ViewMatrix
+#include "point.h"                    // for point
+#include "quaternion.h"               // for quaternion
+#include "ray.h"                      // for ray
+#include "RESULT/EHM.h"                          // for CN, CR, DEBUG_LINEOUT
+#include "stdint.h"                              // for uint8_t
+#include "vector.h"                   // for vector
+#include "VirtualObj.h"               // for VirtualObj
+
+#include "Sense/SenseKeyboard.h"
+#include "Primitives/composite.h"
 
 camera::camera(point ptOrigin, viewport cameraVieport) :
 	VirtualObj(ptOrigin),
@@ -26,6 +34,8 @@ camera::camera(point ptOrigin, viewport cameraVieport) :
 	//m_ptOrigin = ptOrigin;
 	//m_qRotation = quaternion();
 	m_qOffsetOrientation = quaternion();
+	m_objectState.SetMass(1.0);
+	m_objectState.SetInertiaTensorSphere(1.0);
 }
 
 camera::~camera() {
@@ -55,10 +65,16 @@ int camera::GetViewHeight() {
 }
 
 vector camera::GetRightVector() {
-	quaternion temp = GetOrientation();
-	temp.Normalize();
+	quaternion qOrientation = GetOrientation();
+	qOrientation.Normalize();
 
-	vector vectorRight = temp.RotateVector(vector::iVector());
+	//vector vectorRight = qOrientation.RotateVector(vector::iVector(1.0f));
+	//vector vectorRight = (vector::iVector(1.0f)).RotateByQuaternion(qOrientation);
+	vector vectorRight = (vector::iVector(1.0f)).RotateByQuaternion(GetWorldOrientation());
+
+	//RotationMatrix matRotation = RotationMatrix(GetWorldOrientation());
+	//vector vectorRight = (vector)(matRotation * (vector::iVector(1.0f)));
+
 	return vectorRight.Normal();
 }
 
@@ -74,6 +90,12 @@ vector camera::GetLookVector() {
 	//RotationMatrix matLook = RotationMatrix(GetOrientation());
 	vector vLook = matLook * vector(0.0f, 0.0f, -1.0f);
 	return vLook.Normal();
+}
+
+// used for positioning in some DreamApps
+vector camera::GetLookVectorXZ() {
+	vector vLook = GetLookVector();
+	return vector(vLook.x(), 0.0f, vLook.z()).Normal();
 }
 
 ProjectionMatrix camera::GetProjectionMatrix() {
@@ -113,7 +135,7 @@ RESULT camera::RotateCameraByDiffXY(camera_precision dx, camera_precision dy) {
 	SetOrientation(qRotation);
 
 	vector vectorLook = GetLookVector();
-	DEBUG_LINEOUT_RETURN("Camera rotating: x:%0.3f y:%0.3f z:%0.3f", vectorLook.x(), vectorLook.y(), vectorLook.z());
+	//DEBUG_LINEOUT_RETURN("Camera rotating: x:%0.3f y:%0.3f z:%0.3f", vectorLook.x(), vectorLook.y(), vectorLook.z());
 
 	return R_PASS;
 }

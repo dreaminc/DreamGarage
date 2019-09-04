@@ -14,7 +14,9 @@
 #include <string>
 #include <vector>
 
-#include "p2p/base/jseptransport.h"
+#include "api/candidate.h"
+#include "api/optional.h"
+#include "p2p/base/transportdescription.h"
 #include "rtc_base/asyncpacketsocket.h"
 #include "rtc_base/socketaddress.h"
 
@@ -27,6 +29,7 @@ namespace cricket {
 class Connection;
 class IceMessage;
 class StunMessage;
+class StunStats;
 
 enum ProtocolType {
   PROTO_UDP,
@@ -123,6 +126,8 @@ class PortInterface {
   sigslot::signal1<const rtc::SentPacket&> SignalSentPacket;
 
   virtual std::string ToString() const = 0;
+
+  virtual void GetStunStats(rtc::Optional<StunStats>* stats) = 0;
 
  protected:
   PortInterface();

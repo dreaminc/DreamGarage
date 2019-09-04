@@ -24,7 +24,6 @@
 
 #include "common_types.h"  // NOLINT(build/include)
 #include "modules/audio_device/include/audio_device.h"
-#include "rtc_base/basictypes.h"
 #include "rtc_base/criticalsection.h"
 #include "rtc_base/messagehandler.h"
 #include "rtc_base/scoped_ref_ptr.h"
@@ -89,9 +88,6 @@ class FakeAudioCaptureModule
   int32_t StartRecording() override;
   int32_t StopRecording() override;
   bool Recording() const override;
-
-  int32_t SetAGC(bool enable) override;
-  bool AGC() const override;
 
   int32_t InitSpeaker() override;
   bool SpeakerIsInitialized() const override;

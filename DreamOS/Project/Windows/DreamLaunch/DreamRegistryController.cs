@@ -111,12 +111,15 @@ namespace DreamLaunch {
             }
             catch (UnauthorizedAccessException ex) {
                 fAdmin = false;
+                Debug.WriteLine(ex);
             }
             catch (Exception ex) {
                 fAdmin = false;
+                Debug.WriteLine(ex);
             }
 
-            return fAdmin;
+            //return fAdmin;
+            return true; // we're using manifest to require admin
     }
 
     public int Initialize() {

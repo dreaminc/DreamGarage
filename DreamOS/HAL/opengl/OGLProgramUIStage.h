@@ -12,7 +12,7 @@
 
 class OGLProgramUIStage : public OGLProgram, public UIStageProgram {
 public:
-	OGLProgramUIStage(OpenGLImp *pParentImp);
+	OGLProgramUIStage(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 
@@ -26,12 +26,12 @@ public:
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 
 	//UIStageProgram
-	virtual RESULT SetClippingViewMatrix(ViewMatrix matView) override;
-	virtual RESULT SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane) override;
-	virtual RESULT SetClippingFrustrum(float width, float height, float nearPlane, float farPlane, float angle) override;
-
 	virtual RESULT SetOriginPoint(point ptOrigin) override;
 	virtual RESULT SetOriginDirection(vector vOrigin) override;
+
+	virtual RESULT SetIsAugmented(bool fAugmented) override;
+	virtual RESULT SetClippingThreshold(float clippingThreshold) override;
+	virtual RESULT SetClippingRate(float clippingRate) override;
 
 protected:
 	stereocamera *m_pCamera = nullptr;
@@ -50,6 +50,10 @@ private:
 	OGLUniformBool *m_pUniformHasTextureColor;
 
 	OGLUniformBool *m_pUniformClippingEnabled;
+	OGLUniformBool *m_pUniformAR;
+
+	OGLUniformFloat *m_pUniformClippingThreshold;
+	OGLUniformFloat *m_pUniformClippingRate;
 
 	// quad uniforms for clip
 	OGLUniformPoint *m_pUniformQuadCenter;

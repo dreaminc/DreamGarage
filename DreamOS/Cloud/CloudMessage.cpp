@@ -77,6 +77,8 @@ std::shared_ptr<CloudMessage> CloudMessage::CreateResponse(CloudController *pPar
 
 	pCloudMessage->m_type = CloudMessage::type::RESPONSE;
 
+	pCloudMessage->SetPayload(jsonData);
+
 //Success:
 	return pCloudMessage;
 
@@ -142,7 +144,7 @@ std::string CloudMessage::GetJSONDataString(int indent) {
 	nlohmann::json jsonData;
 
 	jsonData["id"] = m_GUID.GetGUIDString();
-	jsonData["token"] = m_strToken;
+	//jsonData["token"] = m_strToken;
 	
 	switch (m_type) {
 		case type::REQUEST:		jsonData["type"] = "request"; break;
@@ -153,6 +155,11 @@ std::string CloudMessage::GetJSONDataString(int indent) {
 	jsonData["method"] = m_strController + '.' + m_strMethod;
 	jsonData["version"] = m_version.GetString(false);
 	jsonData["payload"] = m_jsonPayload;
+
+	if (m_type == type::RESPONSE) {
+		jsonData["errors"] = nlohmann::json::object();
+		jsonData["meta"] = nlohmann::json::object();
+	}
 
 	return jsonData.dump(indent);
 }

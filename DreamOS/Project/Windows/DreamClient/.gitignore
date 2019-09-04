@@ -1,0 +1,13 @@
+# Ignore a lot of the Visual Studio files
+*.sdf
+/.vs/*
+/Debug/*
+/x64/*
+*.opendb
+*.opensdf
+*.htm
+/DevReleases/*
+/ProdReleases/*
+*.nupkg
+/packages/*
+

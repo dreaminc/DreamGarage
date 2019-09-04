@@ -63,30 +63,47 @@ Error:
 RESULT OVRHMDSinkNode::RenderNode(long frameID) {
 	RESULT r = R_PASS;
 
+	static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+	std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+
 	auto pCamera = m_pParentImp->GetCamera();
 	int pxViewportWidth = m_pParentImp->GetViewport().Width();
 	int pxViewportHeight = m_pParentImp->GetViewport().Height();
 	int channels = 4;
 
-	pCamera->ResizeCamera(m_pParentHMD->GetEyeWidth(), m_pParentHMD->GetEyeHeight());
+	ovrSession OVRSession = m_pParentHMD->GetOVRSession();
+	ovrSessionStatus OVRSessionStatus;
+	CR((RESULT)ovr_GetSessionStatus(OVRSession, &OVRSessionStatus));
+	CBR((bool)OVRSessionStatus.IsVisible == true, R_SKIPPED);	// If experience is not visible in HMD e.g. they're in oculus menu, don't commit frames
 
-	for (int i = 0; i < HMD_NUM_EYES; i++) {
-		pCamera->SetCameraEye((EYE_TYPE)(i));
+	double msDiff = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+	if (msDiff > (MS_90_FPS * m_fpsPadding) - m_msTimeSpentOnRenderAvg) {
+		lastUpdateTime = timeNow;
+		pCamera->ResizeCamera(m_pParentHMD->GetEyeWidth(), m_pParentHMD->GetEyeHeight());
 
-		m_pParentImp->ClearHALBuffers();
-		m_pParentImp->ConfigureHAL();
+		for (int i = 0; i < HMD_NUM_EYES; i++) {
+			pCamera->SetCameraEye((EYE_TYPE)(i));
 
-		m_pParentHMD->SetAndClearRenderSurface((EYE_TYPE)(i));
+			m_pParentImp->ClearHALBuffers();
+			m_pParentImp->ConfigureHAL();
 
-		CR(m_pInputConnection[i]->RenderConnections(frameID));
+			m_pParentHMD->SetAndClearRenderSurface((EYE_TYPE)(i));
 
-		// Commit Frame to HMD
-		m_pParentHMD->UnsetRenderSurface((EYE_TYPE)(i));
-		m_pParentHMD->CommitSwapChain((EYE_TYPE)(i));
+			CR(m_pInputConnection[i]->RenderConnections(frameID));
+
+			// Commit Frame to HMD
+			m_pParentHMD->UnsetRenderSurface((EYE_TYPE)(i));
+			m_pParentHMD->CommitSwapChain((EYE_TYPE)(i));
+		}
+		
+		double msTimeSpentRendering = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - timeNow).count();
+		m_msTimeSpentOnRenderAvg = m_msTimeSpentOnRenderAvg * m_weightOnAverage + msTimeSpentRendering * (1 - m_weightOnAverage);
+
+		m_pParentHMD->SubmitFrame();
+	
+		m_pParentHMD->RenderHMDMirror();
 	}
-
-	m_pParentHMD->SubmitFrame();
-	m_pParentHMD->RenderHMDMirror();
+	
 
 Error:
 	return r;
@@ -138,13 +155,17 @@ RESULT OVRHMDSinkNode::SubmitFrame() {
 	CR((RESULT)ovr_SubmitFrame(OVRSession, 0, nullptr, &layers, 1));
 
 	/* TODO: Might want to check on session
-	ovrSessionStatus sessionStatus;
-	ovr_GetSessionStatus(session, &sessionStatus);
-	if (sessionStatus.ShouldQuit)
-	goto Done;
-	if (sessionStatus.ShouldRecenter)
-	ovr_RecenterTrackingOrigin(session);
-	*/
+	ovrSessionStatus OVRSessionStatus;
+	ovr_GetSessionStatus(OVRSession, &OVRSessionStatus);
+
+	if (OVRSessionStatus.ShouldQuit) {
+		m_pParentHMD->ShutdownParentSandbox();
+	}
+
+	if (OVRSessionStatus.ShouldRecenter) {
+		CR((RESULT)ovr_RecenterTrackingOrigin(OVRSession));
+	}
+	//*/
 
 Error:
 	return r;

@@ -28,8 +28,12 @@ constexpr quaternion_precision operator "" _q(long double number)
 	return static_cast<quaternion_precision>(number);
 }
 
-typedef struct {
+typedef struct quaternionXYZW {
 	quaternion_precision x, y, z, w;
+
+	quaternionXYZW(float qW, float qX, float qY, float qZ) : w(qW), x(qX), y(qY), z(qZ)
+	{	// empty
+	}
 } quaternionXYZW;
 
 class quaternion {
@@ -43,7 +47,8 @@ public:
 	quaternion(quaternionXYZW qXYZW);
 	quaternion(vector i, vector j, vector k);
 
-	RESULT Print(char *pszOptName = nullptr);
+	//RESULT Print(char *pszOptName = nullptr);
+	RESULT Print(const char* const &pszOptName = nullptr);
 
 	RESULT SetQuaternion(quaternion_precision theta, quaternion_precision x, quaternion_precision y, quaternion_precision z);
 	RESULT SetQuaternion(vector i, vector j, vector k);
@@ -122,7 +127,8 @@ public:
 	const quaternion& operator+(const quaternion& arg) const;
 
 	quaternion& operator-=(const quaternion& rhs);
-	const quaternion& operator-(const quaternion& arg) const;
+	//const quaternion& operator-(const quaternion& arg) const;
+	quaternion operator-(const quaternion& arg) const;
 
 	bool operator==(const quaternion& rhs);
 	bool operator!=(const quaternion& rhs);

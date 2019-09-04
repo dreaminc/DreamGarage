@@ -9,9 +9,12 @@
 #include "Cloud/CloudTestSuite.h"
 #include "Cloud/webrtc/WebRTCTestSuite.h"
 #include "HAL/HALTestSuite.h"
+#include "HAL/Pipeline/PipelineTestSuite.h"
 #include "DreamOSTestSuite.h"
+#include "DreamShareView/MultiContentTestSuite.h"
 #include "Sound/SoundTestSuite.h"
 #include "Sandbox/SandboxTestSuite.h"
+#include "Primitives/DimensionTestSuite.h"
 
 std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pContext) {
 	RESULT r = R_PASS;
@@ -48,6 +51,11 @@ std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pC
 			pTestSuite = std::make_shared<WebRTCTestSuite>((DreamOS*)pContext);
 		} break;
 
+		case TEST_SUITE_TYPE::MULTICONTENT: {
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
+			pTestSuite = std::make_shared<MultiContentTestSuite>((DreamOS*)pContext);
+		} break;
+
 		case TEST_SUITE_TYPE::UI: {
 			CNM(pContext, "This test suite requires DreamOS to be passed as context");
 			pTestSuite = std::make_shared<UITestSuite>((DreamOS*)pContext);			
@@ -73,6 +81,11 @@ std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pC
 			pTestSuite = std::make_shared<HALTestSuite>((DreamOS*)pContext);
 		} break;
 
+		case TEST_SUITE_TYPE::PIPELINE: {
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
+			pTestSuite = std::make_shared<PipelineTestSuite>((DreamOS*)pContext);
+		} break;
+
 		case TEST_SUITE_TYPE::SANDBOX: {
 			CNM(pContext, "This test suite requires DreamOS to be passed as context");
 			pTestSuite = std::make_shared<SandboxTestSuite>((DreamOS*)pContext);
@@ -81,6 +94,11 @@ std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pC
 		case TEST_SUITE_TYPE::MATH: {
 			// TODO: TODO
 			//pTestSuite = std::make_shared<MATHTestSuite>(nullptr);
+		} break;
+
+		case TEST_SUITE_TYPE::DIMENSION: {
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
+			pTestSuite = std::make_shared<DimensionTestSuite>((DreamOS*)pContext);
 		} break;
 
 		default: {

@@ -8,6 +8,7 @@
 
 #include "Primitives/stereocamera.h"
 #include "Primitives/rectangle.h"
+#include "Primitives/hand/hand.h"
 
 #include "Extras/OVR_Math.h"
 
@@ -17,10 +18,15 @@
 
 #include "OVRTouchController.h"
 
+#include "OVRPlatform.h"
+
+#include "OVR_CAPI_Audio.h"
+#include "Core/Utilities.h"
+
 OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_ovrSession(nullptr),
-	m_ovrMirrorTexture(nullptr)
+	m_pOVRMirrorTexture(nullptr)
 {
 	// empty stub
 }
@@ -58,13 +64,20 @@ HMDSourceNode* OVRHMD::GetHMDSourceNode() {
 	return nullptr;
 }
 
-RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
+RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight, bool fHMDMirror) {
 	RESULT r = R_PASS;
 
 	ovrGraphicsLuid luid;
 	m_pHALImp = halimp;
 	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(halimp);
 
+	// Initializes Oculus Platform
+	m_pOVRPlatform = new OVRPlatform();
+	CN(m_pOVRPlatform);
+
+	DOSLOG(INFO, "Initializing Oculus platform");
+	CRM(m_pOVRPlatform->InitializePlatform(), "Failed to initialize Oculus Platform");
+	
 	// Initializes LibOVR, and the Rift
 	// TODO: may be important to make an OVR Logger.  
 	// use it as an arg to ovr_Initialize
@@ -81,7 +94,7 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 		m_TrackerDescriptions.push_back(ovr_GetTrackerDesc(m_ovrSession, i));
 
 	// FloorLevel will give tracking poses where the floor height is 0
-	CR((RESULT)ovr_SetTrackingOriginType(m_ovrSession, ovrTrackingOrigin_FloorLevel));
+	CR((RESULT)ovr_SetTrackingOriginType(m_ovrSession, ovrTrackingOrigin_EyeLevel));
 
 	// Set up the mirror texture
 	if (wndWidth == 0)
@@ -90,10 +103,11 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	if (wndHeight == 0)
 		wndHeight = m_ovrHMDDescription.Resolution.h / 2;
 
-	m_ovrMirrorTexture = new OVRMirrorTexture(oglimp, m_ovrSession, wndWidth, wndHeight);
-	
-	CN(m_ovrMirrorTexture);
-	CR(m_ovrMirrorTexture->OVRInitialize());
+	if (fHMDMirror == true) {
+		m_pOVRMirrorTexture = new OVRMirrorTexture(oglimp, m_ovrSession, wndWidth, wndHeight);
+		CN(m_pOVRMirrorTexture);
+		CR(m_pOVRMirrorTexture->OVRInitialize());
+	}
 	
 	// Turn off vsync to let the compositor do its magic
 	oglimp->wglSwapIntervalEXT(0);
@@ -106,9 +120,6 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	m_pSenseController = new OVRTouchController(m_ovrSession);
 	CN(m_pSenseController);
 	CR(m_pSenseController->Initialize());
-
-	qLeftRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)(M_PI / 2.0f));
-	qRightRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)(-M_PI / 2.0f));
 
 #ifdef _USE_TEST_APP
 	// In testing we just use spheres to speed up on testing
@@ -132,7 +143,7 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 		pMesh->SetPosition(point(-0.00629f, 0.02522f, -0.03469f) + ptAdjust);
 		pMesh->SetOrientation(quaternion::MakeQuaternionWithEuler(39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
 		//pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
-		m_pParentSandbox->AddObject(pMesh.get());
+		//m_pParentSandbox->AddObject(pMesh.get());
 		//pMesh->SetVisible(false);
 
 		m_pRightControllerModel = m_pParentSandbox->MakeModel(L"\\OculusTouch\\RightController\\oculus_cv1_controller_right.obj");
@@ -140,7 +151,7 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 		pMesh->SetPosition(point(0.00629f, 0.02522f, -0.03469f) + ptAdjust);
 		pMesh->SetOrientation(quaternion::MakeQuaternionWithEuler(39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
 		//pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
-		m_pParentSandbox->AddObject(pMesh.get());
+		//m_pParentSandbox->AddObject(pMesh.get());
 		//pMesh->SetVisible(false);
 	}
 
@@ -156,7 +167,16 @@ Error:
 	return r;
 }
 
+bool OVRHMD::IsHMDTracked() {
 
+	// this is used slightly differently in UpdateHMD(), 
+	// will need to change this if the timing method is different
+	double fTiming = ovr_GetPredictedDisplayTime(m_ovrSession, 0);
+
+	ovrTrackingState trackingState = ovr_GetTrackingState(m_ovrSession, fTiming, true);
+
+	return trackingState.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked);
+}
 
 composite *OVRHMD::GetSenseControllerObject(ControllerType controllerType) {
 	switch (controllerType) {
@@ -174,6 +194,24 @@ composite *OVRHMD::GetSenseControllerObject(ControllerType controllerType) {
 
 HMDDeviceType OVRHMD::GetDeviceType() {
 	return HMDDeviceType::OCULUS;
+}
+
+bool OVRHMD::IsARHMD() {
+	return false;
+}
+
+std::string OVRHMD::GetDeviceTypeString() {
+	return "HMDType.OculusRift";
+}
+
+RESULT OVRHMD::RecenterHMD() {
+	RESULT r = R_PASS;
+
+	DOSLOG(INFO, "ShouldRecenter");
+	CRM((RESULT)ovr_RecenterTrackingOrigin(m_ovrSession), "Failed to recenter OVRHMD");
+
+Error:
+	return r;
 }
 
 ProjectionMatrix OVRHMD::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {
@@ -254,7 +292,11 @@ RESULT OVRHMD::SetUpFrame() {
 }
 
 RESULT OVRHMD::RenderHMDMirror() {
-	return m_ovrMirrorTexture->RenderMirrorToBackBuffer();
+	if (m_pOVRMirrorTexture != nullptr) {
+		return m_pOVRMirrorTexture->RenderMirrorToBackBuffer();
+	}
+
+	return R_SKIPPED;
 }
 
 RESULT OVRHMD::BindFramebuffer(EYE_TYPE eye) {
@@ -284,7 +326,32 @@ RESULT OVRHMD::SubmitFrame() {
 RESULT OVRHMD::UpdateHMD() {
 	RESULT r = R_PASS;
 
-	//ovr_RecenterTrackingOrigin(m_ovrSession);
+	ovrSessionStatus OVRSessionStatus;
+	ovr_GetSessionStatus(m_ovrSession, &OVRSessionStatus);
+	static bool fLostFocus = false;
+	if (OVRSessionStatus.ShouldQuit) {
+		DOSLOG(INFO, "ShouldQuit received from Oculus, shutting down sandbox")
+		m_pParentSandbox->HMDShutdown();
+	}
+
+	if (OVRSessionStatus.ShouldRecenter) {
+		CR(RecenterHMD());
+		NotifySubscribers(HMD_EVENT_TYPE::HMD_EVENT_RESET_VIEW, &HMDEvent(HMD_EVENT_RESET_VIEW, HMDDeviceType::OCULUS));
+	}
+	
+	// TODO: These should be SessionStatus.HasInputFocus but we'd need to upgrade the PC SDK. Using these for now
+	//		 https://developer.oculus.com/documentation/pcsdk/latest/concepts/dg-dash/
+	if (!fLostFocus && !OVRSessionStatus.IsVisible) {
+		fLostFocus = true;
+		NotifySubscribers(HMD_EVENT_TYPE::HMD_EVENT_UNFOCUS, &HMDEvent(HMD_EVENT_UNFOCUS, HMDDeviceType::OCULUS));
+	}
+
+	if (fLostFocus && OVRSessionStatus.IsVisible) {
+		fLostFocus = false;
+		NotifySubscribers(HMD_EVENT_TYPE::HMD_EVENT_FOCUS, &HMDEvent(HMD_EVENT_FOCUS, HMDDeviceType::OCULUS));
+	}
+
+	CRM(m_pOVRPlatform->Update(), "Oculus Platform passed an error");
 
 #ifdef HMD_OVR_USE_PREDICTED_TIMING
 	double fTiming = ovr_GetPredictedDisplayTime(m_ovrSession, 0);
@@ -314,6 +381,9 @@ RESULT OVRHMD::UpdateHMD() {
 		ovrInputState inputState;
 		ovr_GetInputState(m_ovrSession, ovrControllerType::ovrControllerType_Touch, &inputState);
 
+		UpdateSenseController(ovrControllerType_LTouch, inputState);
+		UpdateSenseController(ovrControllerType_RTouch, inputState);
+
 		point offset = m_pParentSandbox->GetCamera()->camera::GetPosition();
 
 		RotationMatrix qOffset = RotationMatrix();
@@ -327,10 +397,8 @@ RESULT OVRHMD::UpdateHMD() {
 			auto& hand = i == 0 ? m_pLeftHand : m_pRightHand;
 			auto& pModel = i == 0 ? m_pLeftControllerModel : m_pRightControllerModel;
 
-			if (trackingState.HandStatusFlags[i] != 3) {
+			if (trackingState.HandStatusFlags[i] && 0x11 == 0) {
 				hand->SetTracked(false);
-				//hand->SetVisible(false);
-				//pModel->SetVisible(false);
 				continue;
 			}
 
@@ -340,28 +408,28 @@ RESULT OVRHMD::UpdateHMD() {
 			pModel->SetPosition(ptControllerPosition + offset);
 
 			quaternion qOrientation = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HandPoses[i].ThePose.Orientation)));
+
 			// Act like this doesn't exist
 			qOrientation.Reverse();
 			qOrientation *= qRotation;
 			qOrientation.Reverse();
 
-			quaternion base = i == 0 ? qLeftRotation : qRightRotation;
 			hand->SetOrientation(qOrientation);
-			//hand->SetOrientation(qOrientation * base);
-			hand->SetLocalOrientation(qOrientation);
 			pModel->SetOrientation(qOrientation);
+
+			if (hand->GetPhantomModel() != nullptr) {
+				hand->GetPhantomModel()->SetPosition(ptControllerPosition + offset);
+				hand->GetPhantomModel()->SetOrientation(qOrientation);
+			}
 			
 			HAND_TYPE hType = i == 0 ? HAND_TYPE::HAND_LEFT : HAND_TYPE::HAND_RIGHT;
 			hand->SetTracked(true);
 			//pModel->SetVisible(true);
-
-			ovrControllerType type = i == 0 ? ovrControllerType_LTouch : ovrControllerType_RTouch; 
-			UpdateSenseController(type, inputState);
 		}
 	}
 
 
-//Error:
+Error:
 	return r;
 }
 
@@ -380,10 +448,12 @@ RESULT OVRHMD::UpdateSenseController(ovrControllerType type, ovrInputState& inpu
 	//0x0400 - Left stick press
 	//0x100000 - Left menu
 
-//	cState.fMenu = (inputState.Buttons & 1<<20) != 0;
-	// B and Y spawn the menu event
-	cState.fMenu = ((inputState.Buttons & 1<<1) != 0);
+	// A, B, X, Y, and Left menu (hamburger) spawn the menu event
+	cState.fMenu = ((inputState.Buttons & 1) != 0);
+	cState.fMenu = ((inputState.Buttons & 1<<1) != 0) || cState.fMenu;
+	cState.fMenu = ((inputState.Buttons & 1<<8) != 0) || cState.fMenu;
 	cState.fMenu = ((inputState.Buttons & 1<<9) != 0) || cState.fMenu;
+	cState.fMenu = (inputState.Buttons & 1<<20) != 0 || cState.fMenu;
 
 	// TODO: should probably change this value in controllerState to 'fSelected'
 	//cState.triggerRange = ((inputState.Buttons & 1) != 0) ? 1.0f : 0.0f;
@@ -397,7 +467,7 @@ RESULT OVRHMD::UpdateSenseController(ovrControllerType type, ovrInputState& inpu
 		case ovrControllerType::ovrControllerType_RTouch: {
 			cState.type = CONTROLLER_RIGHT;
 		} break;
-
+			
 		default: {
 			return r;
 		} break;
@@ -415,12 +485,48 @@ Error:
 	return r;
 }
 
+RESULT OVRHMD::GetAudioDeviceOutID(std::wstring &wstrAudioDeviceOutGUID) {
+	RESULT r = R_PASS;
+
+	WCHAR wszDeviceOutStrBuffer[OVR_AUDIO_MAX_DEVICE_STR_SIZE];
+	CRM((RESULT)ovr_GetAudioDeviceOutGuidStr(wszDeviceOutStrBuffer), "Failed to retrieve OVR audio device out GUID");
+	wstrAudioDeviceOutGUID = std::wstring(wszDeviceOutStrBuffer);
+
+	//GUID deviceOutGuid;
+	//CRM((RESULT)ovr_GetAudioDeviceOutGuid(&deviceOutGuid), "Failed to retrieve OVR audio device out GUID");
+	//wstrAudioDeviceOutGUID = util::GuidToWideString(deviceOutGuid);
+	
+Error:
+	return r;
+}
+
+RESULT OVRHMD::GetAudioDeviceInGUID(std::wstring &wstrAudioDeviceInGUID) {
+	RESULT r = R_PASS;
+
+	//WCHAR wszDeviceInStrBuffer[OVR_AUDIO_MAX_DEVICE_STR_SIZE];
+	//CRM((RESULT)ovr_GetAudioDeviceInGuidStr(wszDeviceInStrBuffer), "Failed to retrieve OVR audio device out GUID");
+	//wstrAudioDeviceInGUID = std::wstring(wszDeviceInStrBuffer);
+
+	// TODO:
+
+Error:
+	return r;
+}
+
+RESULT OVRHMD::ShutdownParentSandbox() {
+	RESULT r = R_PASS;
+	CR(m_pParentSandbox->Shutdown());
+
+Error:
+	return r;
+}
+
 RESULT OVRHMD::ReleaseHMD() {
 	RESULT r = R_PASS;
 
-	if (m_ovrSession != nullptr) {
-		ovr_Destroy(m_ovrSession);
-		m_ovrSession = nullptr;
+	if (m_pOVRMirrorTexture != nullptr) {
+		delete m_pOVRMirrorTexture;
+		m_pOVRMirrorTexture = nullptr;
 	}
 
 	if (m_pOVRHMDSinkNode != nullptr) {
@@ -428,6 +534,12 @@ RESULT OVRHMD::ReleaseHMD() {
 		m_pOVRHMDSinkNode = nullptr;
 	}
 
+	if (m_ovrSession != nullptr) {
+		DOSLOG(INFO, "ovr_Destroy");
+		ovr_Destroy(m_ovrSession);
+		m_ovrSession = nullptr;
+	}
+	DOSLOG(INFO, "ovr_Shutdown");
 	ovr_Shutdown();
 
 //Error:

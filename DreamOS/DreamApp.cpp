@@ -1,9 +1,16 @@
 #include "DreamApp.h"
+
 #include "DreamOS.h"
 #include "Primitives/composite.h"
-#include "Primitives/vector.h"
 
 // DreamAppBase
+DreamAppBase::DreamAppBase(DreamOS* pDreamOS, void* pContext) :
+	m_pDreamOS(pDreamOS),
+	m_pContext(pContext)
+{
+	// 
+}
+
 RESULT DreamAppBase::SetPriority(int priority) {
 	m_priority = priority;
 	return R_PASS;
@@ -81,5 +88,43 @@ Error:
 
 unsigned int DreamAppBase::GetHandleLimit() {
 	return 1;
+}
+
+composite* DreamAppBase::GetComposite() {
+	return m_pComposite;
+}
+
+RESULT DreamAppBase::SetComposite(composite* pComposite) {
+	RESULT r = R_PASS;
+
+	CBM(m_pComposite == nullptr, "composite is already set");
+
+	m_pComposite = pComposite;
+
+Error:
+	return r;
+}
+
+void* DreamAppBase::GetAppContext() {
+	return m_pContext;
+}
+
+RESULT DreamAppBase::Initialize() {
+	RESULT r = R_PASS;
+
+	// Grab the context composite from DreamOS
+	CN(m_pDreamOS);
+	m_pComposite = m_pDreamOS->AddComposite();
+	CN(m_pComposite);
+
+	// Initialize the OBB (collisions)
+	CR(m_pComposite->InitializeOBB());
+	CR(m_pDreamOS->AddObjectToInteractionGraph(m_pComposite));
+
+	// Initialize the App
+	CR(InitializeApp(m_pContext));
+
+Error:
+	return r;
 }
 

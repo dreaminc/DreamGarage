@@ -30,6 +30,10 @@ struct IconFormat
 };
 
 #define LABEL_SIZE 0.8f
+#define LABEL_WIDTH_SCALE 0.9 
+#define LABEL_HEIGHT_SCALE 0.28125
+#define LABEL_HEIGHT_POSITION -0.46f
+#define LABEL_LINE_HEIGHT_SCALE 0.1f
 
 struct LabelFormat
 {
@@ -59,10 +63,10 @@ struct LabelFormat
 class UIMenuItem : public UIButton {
 public:
 	UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS);
+	UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS, float width, float height);
 
 	RESULT Initialize();
 
-	std::shared_ptr<composite> GetContext();
 	std::shared_ptr<quad> GetQuad();
 
 	RESULT Update(IconFormat& iconFormat, LabelFormat& labelFormat);
@@ -71,11 +75,15 @@ public:
 	bool Contains(VirtualObj* pObj);
 
 	std::string& GetName();
+	RESULT SetName(std::string strName);
 
+	std::string& GetKey();
+	RESULT SetKey(std::string strKey);
 
 private:
 	std::shared_ptr<text> m_pLabel = nullptr;
 	std::string m_strName;
+	std::string m_strKey;
 
 private:
 	std::shared_ptr<composite> m_pParentContext = nullptr;

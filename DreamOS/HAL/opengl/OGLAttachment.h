@@ -11,6 +11,8 @@
 //#include "Primitives/Framebuffer.h"
 
 class OGLRenderbuffer;
+class OGLTexture;
+class OGLCubemap;
 
 class OGLAttachment {
 public:
@@ -29,14 +31,21 @@ public:
 	RESULT AttachRenderBufferToFramebuffer(GLenum target = GL_FRAMEBUFFER, GLenum attachment = GL_DEPTH_ATTACHMENT, GLenum renderbuffertarget = GL_RENDERBUFFER);
 
 	RESULT MakeOGLTextureMultisample();
-	RESULT MakeOGLDepthTexture(GLenum internalGLFormat = GL_DEPTH_COMPONENT24, GLenum pixelDataType = GL_UNSIGNED_INT, texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	RESULT MakeOGLTexture(texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	RESULT MakeOGLDepthTexture(texture::type type = texture::type::TEXTURE_2D, GLenum internalGLFormat = GL_DEPTH_COMPONENT24, GLenum pixelDataType = GL_UNSIGNED_INT);
+	RESULT MakeOGLTexture(texture::type type = texture::type::TEXTURE_2D);
 
 	GLuint GetOGLRenderbufferIndex();
 	GLuint GetOGLTextureIndex();
 	GLenum GetOGLTextureTarget();
 
+	// Cubemap
+	RESULT MakeOGLCubemap();
+	RESULT AttachCubemapToFramebuffer(GLenum target, GLenum attachment);
+	GLuint GetOGLCubemapIndex();
+	GLenum GetOGLCubemapTarget();
+
 	OGLTexture *GetOGLTexture() { return m_pOGLTexture; }
+	OGLCubemap *GetOGLCubemap() { return m_pOGLCubemap; }
 	OGLRenderbuffer *GetOGLRenderBuffer() { return m_pOGLRenderbuffer; }
 
 	RESULT Resize(int pxWidth, int pxHeight);
@@ -74,6 +83,7 @@ private:
 
 	OGLRenderbuffer *m_pOGLRenderbuffer = nullptr;
 	OGLTexture *m_pOGLTexture = nullptr;
+	OGLCubemap *m_pOGLCubemap = nullptr;
 };
 
 #endif // ! OGL_DEPTHBUFFER_H_

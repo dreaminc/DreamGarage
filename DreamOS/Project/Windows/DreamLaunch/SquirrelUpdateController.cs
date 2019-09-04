@@ -8,8 +8,8 @@ using System.Windows;
 using Microsoft.Win32;
 using System.Diagnostics;
 
-using Squirrel;
-using NuGet;
+//using Squirrel;
+//using NuGet;
 
 namespace DreamLaunch {
 
@@ -37,11 +37,11 @@ namespace DreamLaunch {
 
         private void HandleOnInitialInstall(Version ver) {
             //MessageBox.Show("OnInitialInstall", "DreamLaunch", MessageBoxButton.OK, MessageBoxImage.Information);
-
+            /*
             if (m_squirrelUpdateManager != null) {
                 m_squirrelUpdateManager.CreateShortcutForThisExe();
             }
-
+            //*/
             m_fInitialInstall = true;
         }
 
@@ -102,14 +102,16 @@ namespace DreamLaunch {
             try {
                 if (m_mainWindow != null)
                     m_mainWindow.SetStatusText("Checking for Update");
-
+                /*
                 UpdateInfo updateInfo = await m_squirrelUpdateManager.CheckForUpdate();
                 
-                if((updateInfo.CurrentlyInstalledVersion == null) ||
+                if((updateInfo.CurrentlyInstalledVersion == null) ||    // This could be if (updateInfo.ReleasesToApply.Any())  ?
                    (updateInfo.FutureReleaseEntry != null && updateInfo.FutureReleaseEntry.Version > updateInfo.CurrentlyInstalledVersion.Version)) 
                 {
                     if (m_mainWindow != null)
                         m_mainWindow.SetStatusText(string.Format("Downloading New Version: {0}", updateInfo.FutureReleaseEntry.Version));
+
+                    m_strVersion = updateInfo.FutureReleaseEntry.Version.ToString();
 
                     ReleaseEntry releaseEntry = await m_squirrelUpdateManager.UpdateApp(progress: HandleOnUpdateAppProgress);
 
@@ -120,8 +122,24 @@ namespace DreamLaunch {
 
                         // Launch the app here
                     }
+
+                    if (releaseEntry != null && updateInfo.CurrentlyInstalledVersion != null) {
+                        string[] commandLineArguments = Environment.GetCommandLineArgs();
+                        string strCommandArgs = "";
+                        commandLineArguments = commandLineArguments.Skip(1).ToArray();
+                        foreach (string arg in commandLineArguments) {
+                            strCommandArgs += (" " + arg);
+                        }
+
+                        // Deal with weird parsing
+                        strCommandArgs = System.Net.WebUtility.UrlDecode(strCommandArgs);
+
+                        UpdateManager.RestartApp(null, strCommandArgs);
+                    }
                 }
                 else {
+                    m_strVersion = updateInfo.CurrentlyInstalledVersion.Version.ToString();
+
                     if (m_mainWindow != null)
                         m_mainWindow.SetStatusText(string.Format("Version {0} Up To Date", updateInfo.CurrentlyInstalledVersion.Version));
                 }
@@ -154,11 +172,12 @@ namespace DreamLaunch {
             // Figure out where to look for RELEASES
 
 #if (_PROD_RELEASE)
+            // TODO: update this when the bucket has something
             m_strReleasesURI = "https://github.com/dreaminc/Dream/releases/download/Releases/";
 #else
-            m_strReleasesURI = "https://github.com/dreaminc/Dream/releases/download/DevReleases/";
+            m_strReleasesURI = "https://dream-client-build-develop.s3-accelerate.amazonaws.com";
 #endif
-
+            /*
             if (m_squirrelUpdateManager == null) {
                 try {
                     if (m_mainWindow != null)
@@ -183,20 +202,28 @@ namespace DreamLaunch {
               onAppUninstall: HandleOnAppUninstall,
               onFirstRun: HandleOnFirstRun,
               onAppObsoleted: HandleOnAppObsoleted);
-
+             */
             return 0;
         }
 
         public string GetSquirrelRootAppDirectory() {
-            if (m_squirrelUpdateManager != null)
-                return m_squirrelUpdateManager.RootAppDirectory;
+            //if (m_squirrelUpdateManager != null)
+            //    return m_squirrelUpdateManager.RootAppDirectory;
+
+            return null;
+        }
+
+        public string GetAppVersion() {
+            if(m_strVersion != null)
+                return m_strVersion;
 
             return null;
         }
 
         private MainWindow m_mainWindow = null;
-        private UpdateManager m_squirrelUpdateManager = null;
+        //private UpdateManager m_squirrelUpdateManager = null;
         private string m_strReleasesURI = null;
+        private string m_strVersion = null;
         private bool m_fFirstRun = false;
         private bool m_fInitialInstall = false;
     }

@@ -165,7 +165,7 @@ font::font(const std::wstring& strFontFilename, composite *pContext, bool fDista
 	std::wstring strFile = L"Fonts/" + GetFontImageFile();
 	const wchar_t* pszFile = strFile.c_str();
 	
-	m_pTexture = pContext->MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pTexture = pContext->MakeTexture(texture::type::TEXTURE_2D, const_cast<wchar_t*>(pszFile));
 }
 
 font::font(const std::wstring& strFontFilename, bool fDistanceMap) :
@@ -187,7 +187,7 @@ T font::GetValue(const std::wstring& wstrLine, const std::wstring& wstrValueName
 	RESULT r = R_PASS;
 	T value;
 
-	CR(GetValue(value, wstrLine, wstrValueName, delimiter));
+	CBR(GetValue(value, wstrLine, wstrValueName, delimiter) == R_PASS, R_SKIPPED);
 
 	return value;
 
@@ -201,9 +201,7 @@ RESULT font::GetValue(T& value, const std::wstring& wstrLine, const std::wstring
 
 	auto pos = wstrLine.find(wstrValueName);
 
-	CB((pos < wstrLine.size()));
-
-	{
+	if (pos < wstrLine.size()) {
 		pos += wstrValueName.size();
 		std::wstring valueString = wstrLine.substr(pos, wstrLine.find(delimiter, pos) - pos);
 		std::wistringstream iss(valueString);

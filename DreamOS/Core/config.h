@@ -17,6 +17,8 @@
 #define RIGHT_HANDED
 //#define LEFT_HANDED
 
+//#define USE_LOCALHOST
+
 // Comment out to use production
 //#define _USE_TEST_APP	
 //#define _UNIT_TESTING
@@ -29,7 +31,7 @@
 	#include <Windows.h>
 
 	#ifdef WIN32_LEAN_AND_MEAN
-		#undef WIN32_LEAN_AND_MEANndu
+		#undef WIN32_LEAN_AND_MEAN
 	#endif
 
 	#ifndef WIN32
@@ -38,6 +40,7 @@
 
 	#pragma warning( disable : 4312)
 	#pragma warning( disable : 4244)	// TODO: WebRTC port.h needs this, it's not a good one though
+	#pragma warning( disable:  4102)	// This disables the warning for unused labels (useful for doc and consistency)
 
 #elif defined(__APPLE__)
 	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_OSX

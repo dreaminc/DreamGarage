@@ -20,17 +20,27 @@ Error:
 	return;
 }
 
+UIMenuItem::UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS, float width, float height) :
+	UIButton(pHALImp, pDreamOS, width, height)
+{
+	RESULT r = R_PASS;
+
+	CR(Initialize());
+
+// Success:
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
+}
+
 RESULT UIMenuItem::Initialize() {
 	RESULT r = R_PASS;
 
-//	m_pContextComposite = m_pParentContext->AddComposite();
-//	CN(m_pContextComposite);
-
-	CR(m_pContextComposite->InitializeOBB());
 	CR(m_pSurfaceComposite->InitializeOBB());
 
-	//m_pQuad = m_pContextComposite->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
-		//CR(pDreamOS->AddAndRegisterInteractionObject(m_pSurfaceComposite.get(), (InteractionEventType)(i), this));
 	m_pSurface->SetMaterialAmbient(0.75f);
 	m_strName = "";
 
@@ -38,10 +48,6 @@ RESULT UIMenuItem::Initialize() {
 
 Error:
 	return r;
-}
-
-std::shared_ptr<composite> UIMenuItem::GetContext() {
-	return m_pContextComposite;
 }
 
 std::shared_ptr<quad> UIMenuItem::GetQuad() {
@@ -54,17 +60,19 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	std::shared_ptr<text> pText;
 	std::shared_ptr<quad> pIcon;
 
-	labelFormat.pFont->SetLineHeight(0.025f);
+	labelFormat.pFont->SetLineHeight(LABEL_LINE_HEIGHT_SCALE * GetSurface()->GetWidth());
 
 	m_pLabel = std::shared_ptr<text>(m_pDreamOS->MakeText(
 		labelFormat.pFont,
 		labelFormat.strLabel, 
-		0.225,
-		0.0703125, 
+		GetSurface()->GetWidth() * LABEL_WIDTH_SCALE,//0.225,
+		GetSurface()->GetWidth() * LABEL_HEIGHT_SCALE,//0.0703125, 
 		text::flags::WRAP | text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
 
 	m_pLabel->RotateXByDeg(90.0f);
 
+	// ptPosition should probably not be a member of LabelFormat anymore
+	labelFormat.ptPosition = point(0.0f, LABEL_HEIGHT_POSITION * GetSurface()->GetWidth(), 0.0f);
 	m_pLabel->SetPosition(labelFormat.ptPosition);
 
 	vector bgNormal = vector(0.0f, sin(-M_PI / 6.0), cos(-M_PI / 6.0));
@@ -99,9 +107,6 @@ RESULT UIMenuItem::SetObjectParams(point ptQuad, quaternion qQuad, point ptConte
 	m_pSurface->MoveTo(ptQuad);
 	m_pSurface->SetOrientation(qQuad);
 
-	m_pContextComposite->MoveTo(ptContext);
-	m_pContextComposite->SetOrientation(qContext);
-
 	return R_PASS;
 }
 
@@ -113,4 +118,18 @@ bool UIMenuItem::Contains(VirtualObj *pObj) {
 
 std::string& UIMenuItem::GetName() {
 	return m_pLabel->GetText();
+}
+
+RESULT UIMenuItem::SetName(std::string strName) {
+	m_pLabel->SetText(strName);
+	return R_PASS;
+}
+
+std::string& UIMenuItem::GetKey() {
+	return m_strKey;
+}
+
+RESULT UIMenuItem::SetKey(std::string strKey) {
+	m_strKey = strKey;
+	return R_PASS;
 }

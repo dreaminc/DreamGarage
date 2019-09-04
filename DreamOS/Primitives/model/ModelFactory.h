@@ -8,12 +8,24 @@
 
 #include <string>
 
+#include "Primitives/PrimParams.h"
+
 class model;
 class HALImp;
+class DreamOS;
 
 class ModelFactory  {
 public:
-	static model* MakeModel(HALImp *pParentImp, std::wstring wstrModelFilename);
+	enum flags : uint32_t {
+		NONE						= 0,
+		PRETRANSFORM_VERTICES		= 1 << 0,
+		FLIP_WINDING				= 1 << 1,
+		INVALID						= 0xFFFFFFFF
+	};
+
+public:
+	static model* MakeModel(HALImp *pParentImp, std::wstring wstrModelFilename, ModelFactory::flags modelFactoryFlags = ModelFactory::flags::NONE);
+	static model* MakeModel(DreamOS *pDOS, PrimParams *pPrimParams, bool fInitialize = false);
 };
 
 #endif // ! MODEL_FACTORY_H_

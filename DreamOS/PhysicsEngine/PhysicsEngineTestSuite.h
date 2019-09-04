@@ -4,21 +4,26 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/Primitices/matrix/MatrixTestSuite.h
+// DreamOS/PhysicsEngine/PhysicsEngineTestSutie.h
 
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 #include <functional>
 #include <memory>
 
+#include "Scene/ObjectStoreNode.h"
+
 class DreamOS;
 
-class PhysicsEngineTestSuite : public TestSuite {
+class PhysicsEngineTestSuite : public DreamTestSuite {
 public:
 	PhysicsEngineTestSuite(DreamOS *pDreamOS);
 	~PhysicsEngineTestSuite();
 
 	virtual RESULT AddTests() override;
+
+	virtual RESULT SetupPipeline(std::string strRenderShaderName = "standard") override;
+	virtual RESULT SetupTestSuite() override;
 
 	RESULT AddTestCompositeRay();
 	RESULT AddTestMultiCompositeRayQuad();
@@ -27,6 +32,7 @@ public:
 	RESULT AddTestRayQuadsComposite();
 	RESULT AddTestBallVolume();
 	RESULT AddTestVolumeVolumePointFace();
+	RESULT AddTestVolumeToPlaneVolumeDominos();
 	RESULT AddTestVolumeToPlaneVolume();
 	RESULT AddTestSphereVsSphereArray();
 	RESULT AddTestSphereVsSphere();
@@ -51,11 +57,11 @@ public:
 
 
 private:
-	RESULT SetupSkyboxPipeline(std::string strRenderShaderName);
 	RESULT ResetTest(void *pContext);
 
 private:
-	DreamOS *m_pDreamOS;
+	DreamOS *m_pDreamOS = nullptr;
+	ObjectStoreNode *m_pSceneGraph = nullptr;
 
 };
 

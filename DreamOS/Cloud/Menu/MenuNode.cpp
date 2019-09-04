@@ -27,8 +27,13 @@ MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 	if (jsonMenuNode["/submenu"_json_pointer].is_array()) {
 		for (auto &subMenuNode : jsonMenuNode["/submenu"_json_pointer]) {
 			std::shared_ptr<MenuNode> pSubMenuNode = std::make_shared<MenuNode>(subMenuNode);
+			pSubMenuNode->m_strParentScope = m_strScope;
 			m_menuNodes.push_back(pSubMenuNode);
 		}
+	}
+
+	if (jsonMenuNode["/next_page_token"_json_pointer].is_string()) {
+		m_strNextPageToken = jsonMenuNode["/next_page_token"_json_pointer].get<std::string>();
 	}
 
 	if (jsonMenuNode["/icon_url"_json_pointer].is_string())
@@ -159,6 +164,10 @@ const std::string& MenuNode::GetTitle() {
 	return m_strTitle;
 }
 
+const std::string& MenuNode::GetNextPageToken() {
+	return m_strNextPageToken;
+}
+
 const std::string& MenuNode::GetIconURL() {
 	return m_strIconURL;
 }
@@ -167,11 +176,40 @@ const std::string& MenuNode::GetThumbnailURL() {
 	return m_strThumbnailURL;
 }
 
+const std::string& MenuNode::GetParentScope() {
+	return m_strParentScope;
+}
+
+std::string MenuNode::GetKey() {
+	m_strKey = m_strPath + m_strScope;
+	return m_strKey;
+}
+
 const MenuNode::type& MenuNode::GetNodeType() {
 	return m_nodeType;
 }
 
+texture* MenuNode::GetThumbnailTexture() {
+	return m_pThumbnailTexture;
+}
+
+std::shared_ptr<UIButton> MenuNode::GetAssociatedButton() {
+	return m_pUIButton;
+}
+
 RESULT MenuNode::SetName(std::string strName) {
 	m_strTitle = strName;
+	return R_PASS;
+}
+
+RESULT MenuNode::SetThumbnailTexture(texture* pTexture) {
+	
+	m_pThumbnailTexture = pTexture;
+
+	return R_PASS;
+}
+
+RESULT MenuNode::SetAssociatedButton(std::shared_ptr<UIButton> pButton) {
+	m_pUIButton = pButton;
 	return R_PASS;
 }

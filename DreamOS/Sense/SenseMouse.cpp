@@ -191,8 +191,8 @@ RESULT SenseMouse::SetMouseState(SenseMouseEventType eventType, int newX, int ne
 	*/
 
 Error:
-	m_lastX = newX;
-	m_lastY = newY;
+	//m_lastX = newX;
+	//m_lastY = newY;
 
 	return r;
 }

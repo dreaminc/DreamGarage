@@ -18,6 +18,7 @@ RESULT Win64Mouse::CaptureMouse() {
 
 	if (m_fMouseCaptured == false) {
 		SenseMouse::CaptureMouse();
+		GetCenterPosition(m_lastX, m_lastY);
 		HWND hwndLast = SetCapture(hwnd);
 		CB(ShowCursor(false));
 	}
@@ -45,7 +46,16 @@ Error:
 }
 
 RESULT Win64Mouse::UpdateMouseState(SenseMouseEventType eventType, int newX, int newY, int state) {
-	return SetMouseState(eventType, newX, newY, state);
+	RESULT r = R_PASS;
+
+	CR(SetMouseState(eventType, newX, newY, state));	
+
+	if (m_fMouseCaptured) {
+		CR(CenterMousePosition());
+	}
+
+Error:
+	return r;
 }
 
 RESULT Win64Mouse::SetMousePosition(int x, int y) {

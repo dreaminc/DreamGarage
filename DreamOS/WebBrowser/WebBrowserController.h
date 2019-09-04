@@ -56,13 +56,30 @@ public:
 public:
 	class observer {
 	public:
-		virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) = 0;
+		virtual RESULT OnPaint(const void *pBuffer, int width, int height, WebBrowserController::PAINT_ELEMENT_TYPE type, WebBrowserRect rect) = 0;
 		virtual RESULT OnAudioPacket(const AudioPacket &pendingAudioPacket) = 0;
+		virtual RESULT OnAfterCreated() = 0;
 		virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) = 0;
 		virtual RESULT OnLoadStart() = 0;
 		virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) = 0;
+		virtual RESULT OnLoadError(int errorCode, std::string strError, std::string strFailedURL) = 0;
 		virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) = 0;
+		virtual bool OnCertificateError(std::string strURL, unsigned int certError) = 0;
 		virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, std::string strURL) = 0;
+		virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) = 0;
+		virtual RESULT SetTitle(std::string strTitle) = 0;
+		virtual RESULT SetIsSecureConnection(bool fSecure) = 0;
+
+		// Dream Form Extensions
+		virtual RESULT HandleDreamFormSuccess() = 0;
+		virtual RESULT HandleDreamFormCancel() = 0;
+		virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) = 0;
+		virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) = 0;
+
+		// Dream Browser Extensions
+		virtual RESULT HandleIsInputFocused(bool fInputFocused) = 0;
+		virtual RESULT HandleCanTabNext(bool fTabNext) = 0;
+		virtual RESULT HandleCanTabPrevious(bool fTabPrevious) = 0;
 	};
 
 public:
@@ -74,7 +91,7 @@ public:
 
 	// Poll for the current frame of the browser.
 	// This function can be called by any thread.
-	//virtual RESULT PollFrame(std::function<bool(unsigned char *output, unsigned int width, unsigned int height)> pred) = 0;
+	virtual RESULT PollFrame() = 0;
 
 	virtual RESULT CloseBrowser() = 0;
 
@@ -93,6 +110,16 @@ public:
 	virtual bool CanGoBack() = 0;
 	virtual bool CanGoForward() = 0;	
 
+	virtual RESULT TabNext() = 0;
+	virtual RESULT TabPrevious() = 0;
+	virtual RESULT CanTabNext() = 0;
+	virtual RESULT CanTabPrevious() = 0;
+
+	virtual RESULT IsInputFocused() = 0;
+	virtual RESULT UnfocusInput() = 0;
+
+	virtual RESULT ParseURL(std::string strURL, std::string& strParsedURL) = 0;
+
 	// Get the new dirty frames since last time they were polled.
 	// returns the number of new dirty frame.
 	// This function can be called by any thread.
@@ -106,6 +133,9 @@ public:
 
 	// Loads a URL
 	virtual RESULT LoadURL(const std::string& strURL) = 0;
+	virtual RESULT ReplaceURL(const std::string& strURL) = 0;
+
+	virtual bool CheckIsError(int errorCode) = 0;
 
 	// Loads a Web Request
 	virtual RESULT LoadRequest(const WebRequest &webRequest) = 0;

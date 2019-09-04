@@ -32,8 +32,10 @@
 #include "Primitives/user.h"
 #include "Primitives/DimRay.h"
 #include "Primitives/DimPlane.h"
+#include "Primitives/billboard.h"
 
 #include "Pipeline/Pipeline.h"
+#include "Pipeline/PipelineCommon.h"
 
 class SandboxApp;
 
@@ -42,6 +44,7 @@ class SandboxApp;
 class SinkNode;
 class SourceNode;
 class ProgramNode;
+struct PrimParams;
 
 //class composite;
 
@@ -97,7 +100,7 @@ public:
 	
 	virtual SinkNode* MakeSinkNode(std::string strSinkNodeName) = 0;
 	virtual SourceNode* MakeSourceNode(std::string strNodeName) = 0;
-	virtual ProgramNode* MakeProgramNode(std::string strNodeName) = 0;
+	virtual ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) = 0;
 
 public:
 
@@ -162,12 +165,16 @@ public:
 		return pObj;
 	}
 
+	virtual DimObj *MakeObject(PrimParams *pPrimParams, bool fInitialize = true) = 0;
+	virtual texture* MakeTexture(PrimParams *pPrimParams, bool fInitialize = true) = 0;
+	virtual RESULT InitializeObject(DimObj *pDimObj) = 0;
+	virtual RESULT InitializeTexture(texture *pTexture) = 0;
+
 	// TODO: Remove and use param pack function
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
 
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) = 0;
-	virtual quad* MakeQuad(double width, double height, point origin, vector vNormal = vector::jVector()) = 0;
-	virtual quad* MakeQuad(double width, double height, point origin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector()) = 0;
+	virtual quad* MakeQuad(double width, double height, point ptCenter, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector()) = 0;
 	virtual quad* MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector()) = 0;
 
 	virtual sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) = 0;
@@ -185,10 +192,12 @@ public:
 	virtual text* MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) = 0;
 	virtual text* MakeText(const std::wstring& wstrFontName, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) = 0;
 
-	virtual texture* MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
-	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) = 0;
-	virtual texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) = 0;
 	virtual texture* MakeTexture(const texture &srcTexture) = 0;
+	virtual texture* MakeTexture(texture::type type, const wchar_t *pszFilename) = 0;
+	virtual texture* MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) = 0;
+	virtual texture *MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) = 0;
+
+	virtual cubemap* MakeCubemap(const std::wstring &wstrCubemapName) = 0;
 
 	virtual skybox *MakeSkybox() = 0;
 
@@ -204,6 +213,8 @@ public:
 
 	virtual user *MakeUser() = 0;
 
+	virtual billboard *MakeBillboard(point ptOrigin, float width, float height) = 0;
+
 
 	// Composite
 	//template<typename... Targs>
@@ -218,6 +229,7 @@ public:
 	virtual FlatContext* MakeFlatContext(int pxFBWidth, int pxFBHeight, int channels) = 0;
 
 	virtual hand* MakeHand(HAND_TYPE type) = 0;
+	virtual hand* MakeHand(HAND_TYPE type, long avatarID) = 0;
 
 	/*
 	virtual model* MakeModel(const std::vector<vertex>& vertices) = 0;
@@ -239,7 +251,6 @@ protected:
 private:
 	UID m_uid;
 };
-
 
 template<>
 template<typename... Targs>

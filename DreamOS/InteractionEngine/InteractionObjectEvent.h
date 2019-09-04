@@ -11,6 +11,7 @@
 #include <memory>
 
 #include "ActiveObject.h"
+#include "Sense/SenseController.h"
 
 class VirtualObj;
 class ContactPoint;
@@ -29,7 +30,8 @@ typedef enum InteractionEventType {
 	INTERACTION_EVENT_MENU,
 	INTERACTION_EVENT_SELECT_DOWN,
 	INTERACTION_EVENT_SELECT_UP,
-	INTERACTION_EVENT_WHEEL,		// TODO: Should we change this to pad and pass a point?
+	INTERACTION_EVENT_WHEEL,		
+	INTERACTION_EVENT_PAD_MOVE,
 	INTERACTION_EVENT_KEY_DOWN,
 	INTERACTION_EVENT_KEY_UP,
 	INTERACTION_EVENT_INVALID
@@ -47,6 +49,7 @@ typedef struct InteractionObjectEvent {
 	vector m_vNormal[4];
 	int m_numContacts;
 	ActiveObject::state m_activeState;
+	ControllerState m_state;
 	
 	int m_value;
 
@@ -60,6 +63,8 @@ public:
 	RESULT AddPoint(ContactPoint contactPoint);
 
 	RESULT SetValue(int val);
+	RESULT SetControllerState(ControllerState state);
+	ControllerState GetControllerState();
 
 } INTERACTION_OBJECT_EVENT;
 

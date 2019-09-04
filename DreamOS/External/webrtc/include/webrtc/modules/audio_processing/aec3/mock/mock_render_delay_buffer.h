@@ -25,15 +25,12 @@ namespace test {
 class MockRenderDelayBuffer : public RenderDelayBuffer {
  public:
   explicit MockRenderDelayBuffer(int sample_rate_hz)
-      : block_buffer_(GetRenderDelayBufferSize(4, 4),
+      : block_buffer_(GetRenderDelayBufferSize(4, 4, 12),
                       NumBandsForRate(sample_rate_hz),
                       kBlockSize),
         spectrum_buffer_(block_buffer_.buffer.size(), kFftLengthBy2Plus1),
         fft_buffer_(block_buffer_.buffer.size()),
-        render_buffer_(kAdaptiveFilterLength,
-                       &block_buffer_,
-                       &spectrum_buffer_,
-                       &fft_buffer_),
+        render_buffer_(&block_buffer_, &spectrum_buffer_, &fft_buffer_),
         downsampled_render_buffer_(GetDownSampledBufferSize(4, 4)) {
     ON_CALL(*this, GetRenderBuffer())
         .WillByDefault(
@@ -48,18 +45,18 @@ class MockRenderDelayBuffer : public RenderDelayBuffer {
   MOCK_METHOD1(Insert,
                RenderDelayBuffer::BufferingEvent(
                    const std::vector<std::vector<float>>& block));
-  MOCK_METHOD0(PrepareCaptureCall, RenderDelayBuffer::BufferingEvent());
-  MOCK_METHOD1(SetDelay, void(size_t delay));
+  MOCK_METHOD0(PrepareCaptureProcessing, RenderDelayBuffer::BufferingEvent());
+  MOCK_METHOD1(SetDelay, bool(size_t delay));
   MOCK_CONST_METHOD0(Delay, size_t());
   MOCK_CONST_METHOD0(MaxDelay, size_t());
-  MOCK_CONST_METHOD0(MaxApiJitter, size_t());
-  MOCK_CONST_METHOD0(IsBlockAvailable, bool());
-  MOCK_CONST_METHOD0(GetRenderBuffer, const RenderBuffer&());
+  MOCK_METHOD0(GetRenderBuffer, RenderBuffer*());
   MOCK_CONST_METHOD0(GetDownsampledRenderBuffer,
                      const DownsampledRenderBuffer&());
+  MOCK_CONST_METHOD1(CausalDelay, bool(size_t delay));
+  MOCK_METHOD1(SetAudioBufferDelay, void(size_t delay_ms));
 
  private:
-  const RenderBuffer& FakeGetRenderBuffer() const { return render_buffer_; }
+  RenderBuffer* FakeGetRenderBuffer() { return &render_buffer_; }
   const DownsampledRenderBuffer& FakeGetDownsampledRenderBuffer() const {
     return downsampled_render_buffer_;
   }

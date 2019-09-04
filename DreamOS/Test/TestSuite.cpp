@@ -1,11 +1,9 @@
 #include "TestSuite.h"
 
-TestSuite::TestSuite() {
+TestSuite::TestSuite(std::string strName) :
+	m_strName(strName)
+{
 	ClearTests();
-}
-
-TestSuite::~TestSuite() {
-	// Empty
 }
 
 // TODO: this should be added when this is a stand alone module
@@ -24,16 +22,48 @@ Error:
 	return r;
 }
 
-// This will run tests per the update loop, for the given duration 
+
+RESULT TestSuite::SelectTest(std::string strTestName) {
+	RESULT r = R_PASS;
+
+	for (auto &pTest : m_tests) {
+		if (pTest->GetTestName() == strTestName) {
+			m_pSingleTestToRun = pTest;
+			break;
+		}
+	}
+
+	CNM(m_pSingleTestToRun, "Test %s not found", strTestName.c_str());
+
+Error:
+	return r;
+}
+
+// This will run tests per the update loop, for the given duration
 // zero duration indicates no duration
 
 RESULT TestSuite::UpdateAndRunTests(void *pContext) {
 	RESULT r = R_PASS;
 
-	CBR((m_currentTest != m_tests.end()), R_COMPLETE);
+	// This will run set up the first time
+	// TODO: Would be better for set up / tear down to be run
+	//       for each test
+	if (m_fTestSuiteSetup == false) {
+		CRM(SetupTestSuite(), "Failed to set up test suite %s", m_strName.c_str());
+		m_fTestSuiteSetup = true;
+	}
+
+	if (m_pSingleTestToRun == nullptr) {
+		CBR((m_currentTest != m_tests.end()), R_COMPLETE);
+	}
 
 	{
-		auto pTest = (*m_currentTest);
+		std::shared_ptr<TestObject> pTest = nullptr;
+		
+		if (m_pSingleTestToRun != nullptr)
+			pTest = m_pSingleTestToRun;
+		else 
+			pTest = (*m_currentTest);
 
 		switch (pTest->GetTestState()) {
 			case TestObject::state::NOT_INITIALIZED: {
@@ -64,13 +94,19 @@ RESULT TestSuite::UpdateAndRunTests(void *pContext) {
 			case TestObject::state::COMPLETE: {
 				// Reset and load next test
 				CR(pTest->ResetTest());
-				
+
 				// Repeat the number of repeats as needed - otherwise increment test
 				if (pTest->CurrentRepetition() < pTest->Repetitions()) {
 					CR(pTest->InitializeTest(pContext));
 				}
 				else {
-					m_currentTest++;
+					if (m_pSingleTestToRun == nullptr) {
+						m_currentTest++;
+					}
+					else {
+						// We're done!
+						r = R_COMPLETE;
+					}
 				}
 			} break;
 		}
@@ -80,7 +116,7 @@ Error:
 	return r;
 }
 
-// This will run all tests consecutively 
+// This will run all tests consecutively
 RESULT TestSuite::RunTests() {
 	RESULT r = R_PASS;
 
@@ -123,78 +159,113 @@ std::shared_ptr<TestObject> TestSuite::GetCurrentTest() {
 		return nullptr;
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize,
+// Shim to let tests be created with the descriptor struct
+std::shared_ptr<TestObject> TestSuite::AddTest(std::string strTestName, TestObject::TestDescriptor testDescriptor) {
+	testDescriptor.strTestName = strTestName;
+
+	return AddTest(testDescriptor);
+}
+
+std::shared_ptr<TestObject> TestSuite::AddTest(const TestObject::TestDescriptor &testDescriptor) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<TestObject> pNewTest = nullptr;
+
+	// Ensure no tests of same name exists
+	for (auto &pTest : m_tests) {
+		CBM((pTest->GetTestName() != testDescriptor.strTestName), 
+			"%s test already exists, test names must be unique to suites", testDescriptor.strTestName.c_str());
+	}
+
+	pNewTest = std::make_shared<TestObject>(testDescriptor);
+	CNM(pNewTest, "Failed to allocate new test");
+
+	CRM(pNewTest->SetParentTestSuite(this), "Failed to set parent test suite for test %s", testDescriptor.strTestName.c_str());
+
+	m_tests.push_back(pNewTest);
+
+	return pNewTest;
+
+Error:
+	if (pNewTest != nullptr) {
+		pNewTest = nullptr;
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<TestObject> TestSuite::AddTest(std::string strTestName, std::function<RESULT(void*)> fnInitialize,
 	std::function<RESULT(void*)> fnUpdate,
 	std::function<RESULT(void*)> fnTest,
 	std::function<RESULT(void*)> fnReset,
 	void *pContext)
 {
-	RESULT r = R_PASS;
+	TestObject::TestDescriptor fnStruct = { nullptr };
 
-	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnInitialize, fnUpdate, fnTest, fnReset, pContext);
-	CNM(pNewTest, "Failed to allocate new test");
-	m_tests.push_back(pNewTest);
+	fnStruct.fnInitialize = fnInitialize;
+	fnStruct.fnUpdate = fnUpdate;
+	fnStruct.fnTest = fnTest;
+	fnStruct.fnReset = fnReset;
+	fnStruct.fnTestNoContext = nullptr;
+	fnStruct.pContext = pContext;
 
-	return pNewTest;
-
-Error:
-	return nullptr;
+	return AddTest(strTestName, fnStruct);
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize, 
-	std::function<RESULT(void*)> fnUpdate, 
-	std::function<RESULT(void*)> fnTest, 
-	void *pContext) 
+std::shared_ptr<TestObject> TestSuite::AddTest(std::string strTestName, std::function<RESULT(void*)> fnInitialize,
+	std::function<RESULT(void*)> fnUpdate,
+	std::function<RESULT(void*)> fnTest,
+	void *pContext)
 {
-	RESULT r = R_PASS;
+	TestObject::TestDescriptor fnStruct = { nullptr };
 
-	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnInitialize, fnUpdate, fnTest, pContext);
-	CNM(pNewTest, "Failed to allocate new test");
-	m_tests.push_back(pNewTest);
-	
-	return pNewTest;
+	fnStruct.fnInitialize = fnInitialize;
+	fnStruct.fnUpdate = fnUpdate;
+	fnStruct.fnTest = fnTest;
+	fnStruct.fnReset = nullptr;
+	fnStruct.fnTestNoContext = nullptr;
+	fnStruct.pContext = pContext;
 
-Error:
-	return nullptr;
+	return AddTest(strTestName, fnStruct);
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize, std::function<RESULT(void*)> fnTest, void *pContext) {
-	RESULT r = R_PASS;
+std::shared_ptr<TestObject> TestSuite::AddTest(std::string strTestName, std::function<RESULT(void*)> fnInitialize, std::function<RESULT(void*)> fnTest, void *pContext) {
+	TestObject::TestDescriptor fnStruct = { nullptr };
 
-	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnInitialize, fnTest, pContext);
-	CNM(pNewTest, "Failed to allocate new test");
-	m_tests.push_back(pNewTest);
+	fnStruct.fnInitialize = fnInitialize;
+	fnStruct.fnUpdate = nullptr;
+	fnStruct.fnTest = fnTest;
+	fnStruct.fnReset = nullptr;
+	fnStruct.fnTestNoContext = nullptr;
+	fnStruct.pContext = pContext;
 
-	return pNewTest;
-
-Error:
-	return nullptr;
+	return AddTest(strTestName, fnStruct);
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnTest, void *pContext) {
-	RESULT r = R_PASS;
+std::shared_ptr<TestObject> TestSuite::AddTest(std::string strTestName, std::function<RESULT(void*)> fnTest, void *pContext) {
+	TestObject::TestDescriptor fnStruct = { nullptr };
 
-	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnTest, pContext);
-	CNM(pNewTest, "Failed to allocate new test");
-	m_tests.push_back(pNewTest);
+	fnStruct.fnInitialize = nullptr;
+	fnStruct.fnUpdate = nullptr;
+	fnStruct.fnTest = fnTest;
+	fnStruct.fnReset = nullptr;
+	fnStruct.fnTestNoContext = nullptr;
+	fnStruct.pContext = pContext;
 
-	return pNewTest;
-
-Error:
-	return nullptr;
+	return AddTest(strTestName, fnStruct);
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT()> fnTestFunction, void *pContext) {
-	RESULT r = R_PASS;
+std::shared_ptr<TestObject> TestSuite::AddTest(std::string strTestName, std::function<RESULT()> fnTestFunction, void *pContext) {
+	TestObject::TestDescriptor fnStruct = { nullptr };
 
-	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnTestFunction, pContext);
-	CNM(pNewTest, "Failed to allocate new test");
-	m_tests.push_back(pNewTest);
+	fnStruct.fnInitialize = nullptr;
+	fnStruct.fnUpdate = nullptr;
+	fnStruct.fnTest = nullptr;
+	fnStruct.fnReset = nullptr;
+	fnStruct.fnTestNoContext = fnTestFunction;
+	fnStruct.pContext = pContext;
 
-	return pNewTest;
-
-Error:
-	return nullptr;
+	return AddTest(strTestName, fnStruct);
 }
 
 RESULT TestSuite::ClearTests() {
@@ -208,6 +279,7 @@ RESULT TestSuite::Initialize() {
 	RESULT r = R_PASS;
 
 	CR(ClearTests());
+
 	CRM(AddTests(), "Failed to add tests");
 
 	m_currentTest = m_tests.begin();

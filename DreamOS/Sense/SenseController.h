@@ -17,6 +17,7 @@ typedef enum SenseControllerEventType {
 	SENSE_CONTROLLER_TRIGGER_DOWN,
 	SENSE_CONTROLLER_TRIGGER_UP,
 	SENSE_CONTROLLER_PAD_MOVE,
+	SENSE_CONTROLLER_META_CLOSED,
 	SENSE_CONTROLLER_INVALID
 } SENSE_CONTROLLER_EVENT_TYPE;
 
@@ -32,6 +33,7 @@ typedef struct ControllerState {
 	point ptTouchpad;
 	bool fGrip;
 	bool fMenu;
+	bool fClosed;
 } CONTROLLER_STATE;
 
 typedef struct SenseControllerEvent : SenseDevice::SenseDeviceEvent {

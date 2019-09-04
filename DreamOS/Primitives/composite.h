@@ -19,11 +19,13 @@ class sphere;
 class volume;
 class DimRay;
 class user;
-class quad;
+//class quad;
+#include "Primitives/quad.h"
+
 class model;
 
 class hand;
-#include "HandType.h"
+#include "Primitives/hand/HandType.h"
 
 class camera;
 class FlatContext;
@@ -31,6 +33,9 @@ class UIView;
 class stereocamera;
 
 class DreamOS;
+
+#include "Primitives/model/ModelFactory.h"
+
 
 class composite : public virtual DimObj {
 public:
@@ -46,7 +51,8 @@ public:
 
 	virtual RESULT UpdateBoundingVolume() override;
 
-	///*
+	// TODO: This is currently not building correctly, so has been removed for now
+	/*
 	template<typename objType, typename... Targs>
 	std::shared_ptr<objType> Add(Targs... Fargs) {
 		RESULT r = R_PASS;
@@ -140,21 +146,27 @@ public:
 
 	std::shared_ptr<model> MakeModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
 	std::shared_ptr<model> AddModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
+	std::shared_ptr<model> MakeModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags);
+	std::shared_ptr<model> AddModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags);
 
 	std::shared_ptr<hand> MakeHand(HAND_TYPE type);
 	std::shared_ptr<hand> AddHand(HAND_TYPE type);
 
+	std::shared_ptr<hand> MakeHand(HAND_TYPE type, long avatarID);
+	std::shared_ptr<hand> AddHand(HAND_TYPE type, long avatarID);
+
 	std::shared_ptr<user> MakeUser();
 	std::shared_ptr<user> AddUser();
 
-	std::shared_ptr<quad> MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
-	std::shared_ptr<quad> AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
-	
 	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin);
-	std::shared_ptr<quad> AddQuad(double width, double height, point ptOrigin);
-
+	std::shared_ptr<quad> MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal = vector::jVector());
-	std::shared_ptr<quad> AddQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal = vector::jVector());
+	std::shared_ptr<quad> MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector());
+	
+	std::shared_ptr<quad> AddQuad(double width, double height, point ptOrigin);
+	std::shared_ptr<quad> AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
+	std::shared_ptr<quad> AddQuad(double width, double height, point ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal = vector::jVector());
+	std::shared_ptr<quad> AddQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector());
 
 	std::shared_ptr<DimRay> MakeRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	std::shared_ptr<DimRay> AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
@@ -165,13 +177,13 @@ public:
 	std::shared_ptr<UIView> MakeUIView(DreamOS *pDreamOS);
 	std::shared_ptr<UIView> AddUIView(DreamOS *pDreamOS);
 
-	std::shared_ptr<texture> MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
-	std::shared_ptr<texture> MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n);
+	std::shared_ptr<texture> MakeTexture(texture::type type, wchar_t *pszFilename);
+	std::shared_ptr<texture> MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n);
 
 	// TODO: This is temporary - should move all textures to 
 	// shared pointers or use a central store / special texture object handle
 	// that chops the memory when not used 
-	texture* MakeTextureRaw(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	texture* MakeTextureRaw(texture::type type, wchar_t *pszFilename);
 
 public:
 	RESULT RenderToTexture(std::shared_ptr<FlatContext> context);

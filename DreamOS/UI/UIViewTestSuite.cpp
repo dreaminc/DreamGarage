@@ -3,12 +3,11 @@
 #include "DreamOS.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
-#include "DreamControlView/DreamControlView.h"
+//#include "DreamControlView/UIControlView.h"
 
 #include "UIView.h"
 #include "UIButton.h"
-#include "UIScrollView.h"
-#include "UIMallet.h"
+#include "UISpatialScrollView.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
 #include "HAL/Pipeline/SinkNode.h"
@@ -18,29 +17,28 @@
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
 
-#include "Primitives/hand.h"
-
 #include "Primitives/font.h"
 #include "Primitives/text.h"
+#include "Primitives/hand/hand.h"
+
 #include <string>
 #include "Sense/SenseController.h"
 
+#include "Scene/CameraNode.h"
+#include "Scene/ObjectStoreNode.h"
+
+#include "Sandbox/CommandLineManager.h"
+
 UIViewTestSuite::UIViewTestSuite(DreamOS *pDreamOS) :
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("uiview", pDreamOS)
 {
 	RESULT r = R_PASS;
-
-	CR(Initialize());
 
 	Validate();
 	return;
 Error:
 	Invalidate();
 	return;
-}
-
-UIViewTestSuite::~UIViewTestSuite() {
-
 }
 
 RESULT UIViewTestSuite::Initialize() {
@@ -66,21 +64,25 @@ RESULT UIViewTestSuite::SetupPipeline() {
 	CNM(pDestSinkNode, "Destination sink node isn't set");
 
 	CR(pHAL->MakeCurrentContext());
-	
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+	{
 
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	CR(pHAL->ReleaseCurrentContext());
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+	}
 
 Error:
 	return r;
@@ -98,56 +100,59 @@ RESULT UIViewTestSuite::SetupUIStagePipeline(UIStageProgram* &pUIStageProgram) {
 
 	//CR(pHAL->MakeCurrentContext());
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	{
 
-	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-	CN(pReferenceGeometryProgram);
-	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-	//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-/*
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	CN(pUIProgramNode);
-	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	//*/
+		// Skybox
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-//*
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
-	CN(pUIProgramNode);
-	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	/*
+		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
+		CN(pUIProgramNode);
+		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//*/
 
-	// Connect output as pass-thru to internal blend program
-	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	//*/
-	pUIStageProgram = dynamic_cast<UIStageProgram*>(pUIProgramNode);
+		//*
+		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+		CN(pUIProgramNode);
+		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	// Screen Quad Shader (opt - we could replace this if we need to)
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
-	
-	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+		// Connect output as pass-thru to internal blend program
+		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//*/
+		pUIStageProgram = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
-	// Connect Program to Display
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		// Screen Quad Shader (opt - we could replace this if we need to)
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+
+		// Connect Program to Display
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+	}
 
 Error:
 	return r;
@@ -165,47 +170,51 @@ RESULT UIViewTestSuite::SetupUINodePipeline() {
 
 	//CR(pHAL->MakeCurrentContext());
 
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
-//	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	{
 
-	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-	CN(pReferenceGeometryProgram);
-	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	//	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-	//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-//*
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	CN(pUIProgramNode);
-	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	//*/
+		// Skybox
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	// Screen Quad Shader (opt - we could replace this if we need to)
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
-	
-	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+	//*
+		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
+		CN(pUIProgramNode);
+		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//*/
 
-	// Connect Program to Display
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		// Screen Quad Shader (opt - we could replace this if we need to)
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+
+		// Connect Program to Display
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+	}
 
 Error:
 	return r;
@@ -215,7 +224,7 @@ RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
 	CR(AddTestDreamUIBar());
-	//CR(AddTestUIScrollView());
+	//CR(AddTestUISpatialScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
@@ -247,7 +256,10 @@ RESULT UIViewTestSuite::UpdateHandRay(void *pContext) {
 
 	ray rCast;
 	CN(m_pDreamOS);
-	hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
+
+	hand *pHand;
+	pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
+	CN(pHand);
 
 	if (pHand != nullptr) {
 		point ptHand = pHand->GetPosition();
@@ -259,7 +271,7 @@ RESULT UIViewTestSuite::UpdateHandRay(void *pContext) {
 		//TODO: investigate how to properly get look vector for controllers
 		//vector vHandLook = qHand.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
 
-		vector vHandLook = RotationMatrix(qHand) * vector(0.0f, 0.0f, -1.0f);
+		vector vHandLook = (vector)(RotationMatrix(qHand) * vector(0.0f, 0.0f, -1.0f));
 		vHandLook.Normalize();
 
 		rCast = ray(ptHand, vHandLook);
@@ -393,17 +405,15 @@ RESULT UIViewTestSuite::AddTestUIView() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize,
+	auto pUITest = AddTest("uiview", fnInitialize,
 		std::bind(&UIViewTestSuite::UpdateHandRay, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
 		nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Basic test of uiview working locally");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
@@ -460,22 +470,21 @@ RESULT UIViewTestSuite::AddTestUIButton() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize,
+	auto pUITest = AddTest("uibutton", fnInitialize,
 		std::bind(&UIViewTestSuite::UpdateHandRay, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
 		nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Basic test of uiview working locally");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
 }
 
+// TODO: How is this different than the above
 RESULT UIViewTestSuite::AddTestUIButtons() {
 	RESULT r = R_PASS;
 
@@ -512,23 +521,21 @@ RESULT UIViewTestSuite::AddTestUIButtons() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize,
+	auto pUITest = AddTest("uibuttons", fnInitialize,
 		std::bind(&UIViewTestSuite::UpdateHandRay, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
 		nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Basic test of uiview working locally");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
 }
 
-RESULT UIViewTestSuite::AddTestUIScrollView() {
+RESULT UIViewTestSuite::AddTestUISpatialScrollView() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 10000.0;
@@ -536,10 +543,8 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 	struct TestContext {
 		composite* pComposite = nullptr;
 		std::shared_ptr<UIView> pView = nullptr;
-		std::shared_ptr<UIScrollView> pScrollView = nullptr;
+		std::shared_ptr<UISpatialScrollView> pScrollView = nullptr;
 		std::vector<std::shared_ptr<UIButton>> pButtons = {};
-		UIMallet* pLeftMallet = nullptr;
-		UIMallet* pRightMallet = nullptr;
 	};
 	TestContext *pContext = new TestContext();
 
@@ -552,8 +557,6 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 		auto& pView = pTestContext->pView;
 		auto& pScrollView = pTestContext->pScrollView;
 		auto& pButtons = pTestContext->pButtons;
-		auto& pLeftMallet = pTestContext->pLeftMallet;
-		auto& pRightMallet = pTestContext->pRightMallet;
 
 		int numButtons = 8;
 
@@ -569,7 +572,7 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 		pView = pComposite->AddUIView(m_pDreamOS);
 		pView->InitializeOBB();
 
-		pScrollView = pView->AddUIScrollView();
+		pScrollView = pView->AddUISpatialScrollView();
 
 		for (int i = 0; i < numButtons; i++) {
 			pButtons.emplace_back(pView->MakeUIButton()); // ScrollView adds them
@@ -579,15 +582,6 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 		//pScrollView->SetPosition(point(0.0f, 0.0f, 5.0f));
 		pScrollView->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 1.0f, 0.0f));
 		pScrollView->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, -(float)(M_PI_2), 0.0f));
-
-		pLeftMallet = new UIMallet(m_pDreamOS);
-		pRightMallet = new UIMallet(m_pDreamOS);
-
-		pLeftMallet->Show();
-		pRightMallet->Show();
-
-		m_pDreamOS->AddInteractionObject(pLeftMallet->GetMalletHead());
-		m_pDreamOS->AddInteractionObject(pRightMallet->GetMalletHead());
 
 	Error:
 		return r;
@@ -601,15 +595,12 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 
 		{
 			auto pScrollView = pTestContext->pScrollView;
-			auto& pLeftMallet = pTestContext->pLeftMallet;
-			auto& pRightMallet = pTestContext->pRightMallet;
 
 			hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
 			CN(pHand);
 			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
-			if (pLeftMallet)
-				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetHeadOffset()));
+			pHand->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pHand->GetMalletOffset()));
 
 			pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 			CN(pHand);
@@ -617,8 +608,7 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 			qOffset = RotationMatrix();
 			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
-			if (pRightMallet)
-				pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetHeadOffset()));
+			pHand->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pHand->GetMalletOffset()));
 
 			CR(pScrollView->Update());
 		}
@@ -626,22 +616,21 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 			return r;
 		};
 
-	auto pUITest = AddTest(fnInitialize,
+	auto pUITest = AddTest("spatialscrollview", fnInitialize,
 		fnUpdate,
 		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
 		pContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Basic test of uiview working locally");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
 }
 
+// TODO: Does this belong in this test suite?
 RESULT UIViewTestSuite::AddTestDreamUIBar() {
 	RESULT r = R_PASS;
 
@@ -651,7 +640,10 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 		RESULT r = R_PASS;
 		
 		CN(m_pDreamOS);
-		UIStageProgram *pUIStageProgram = nullptr;
+
+		UIStageProgram *pUIStageProgram;
+		pUIStageProgram = nullptr;
+		
 		CR(SetupUIStagePipeline(pUIStageProgram));
 
 		{
@@ -664,9 +656,13 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 		{
 			auto pCloudController = m_pDreamOS->GetCloudController();
 			auto pCommandLineManager = CommandLineManager::instance();
+			
 			DEBUG_LINEOUT("Initializing Cloud Controller");
+			
 			quad *pQuad = nullptr;
+			
 			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+			
 			{
 				std::string strUsername = pCommandLineManager->GetParameterValue("username");
 				std::string strPassword = pCommandLineManager->GetParameterValue("password");
@@ -722,13 +718,11 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest("dreamuibar", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Basic test of uiview working locally");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
@@ -746,8 +740,6 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 		bool fDecreaseMalletAngle = false;
 		DreamOS *pDreamOS;	
 		float malletAngle = 180.0f;
-		UIMallet *pKLeftMallet = nullptr;
-		UIMallet *pKRightMallet = nullptr;
 		virtual RESULT Notify(SenseControllerEvent *event) override {
 			RESULT r = R_PASS;
 			SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
@@ -800,31 +792,35 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
+		
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		pTestContext->pDreamOS = m_pDreamOS;
+		
 		auto& pMalletAngle = pTestContext->malletAngle;
 		
-		CN(m_pDreamOS);
 		UIStageProgram *pUIStageProgram = nullptr;
+		
+		CN(m_pDreamOS);
+
+		
 		CR(SetupUIStagePipeline(pUIStageProgram));
 
 		{
 
 			pTestContext->pKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
-			pTestContext->pKeyboard->ShowKeyboard();
-//			pTestContext->pKLeftMallet = pTestContext->pKeyboard->GetLeftMallet();
-//			pTestContext->pKRightMallet = pTestContext->pKeyboard->GetRightMallet();
-			//m_pDreamOS->AddInteractionObject(pTestContext->pKLeftMallet->GetMalletHead());
-			//m_pDreamOS->AddInteractionObject(pTestContext->pKRightMallet->GetMalletHead());
+			pTestContext->pKeyboard->Show();
 			//*
 			composite *pComposite = m_pDreamOS->AddComposite();
 			CN(pComposite);
 			pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, -1.5f, 0.6f));	//with hmd
 			
 			auto pView = pComposite->AddUIView(m_pDreamOS);
+			
 			CN(pView);
-			auto& pUIButtonAngleIncrease = pView->AddUIButton();
-			auto& pUIButtonAngleDecrease = pView->AddUIButton();
+			
+			std::shared_ptr<UIButton> pUIButtonAngleIncrease = pView->AddUIButton();
+			std::shared_ptr<UIButton> pUIButtonAngleDecrease = pView->AddUIButton();
+			
 			CN(pUIButtonAngleIncrease);
 			CN(pUIButtonAngleDecrease);
 			pUIButtonAngleIncrease->SetPosition(point(0.5f, 0.0f, -0.1f));
@@ -898,13 +894,11 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 	};
 
 	auto fnTest = [&](void *pContext) {return R_PASS; };
-	auto pUIViewTest = AddTest(fnInitialize, fnUpdate, fnTest, pTestContext);
+	auto pUIViewTest = AddTest("keyboardangle", fnInitialize, fnUpdate, fnTest, pTestContext);
 	CN(pUIViewTest);
 
-	pUIViewTest->SetTestName("Local UIView Test");
 	pUIViewTest->SetTestDescription("Test to adjust Keyboard and Mallet angles");
 	pUIViewTest->SetTestDuration(sTestTime);
-	pUIViewTest->SetTestRepeats(1);
 Error:
 	return r;
 }
@@ -938,9 +932,11 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {	// can adjust scroll view depth w
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		UIStageProgram *pUIStageProgram = nullptr;
+		
 		CN(pTestContext);
 		CN(m_pDreamOS);
-		UIStageProgram *pUIStageProgram = nullptr;
+		
 		CR(SetupUIStagePipeline(pUIStageProgram));
 
 		{
@@ -949,16 +945,16 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {	// can adjust scroll view depth w
 			pComposite->InitializeOBB();
 			std::shared_ptr<UIView> pView = pComposite->AddUIView(m_pDreamOS);
 			pView->InitializeOBB();
-			std::shared_ptr<UIScrollView> pScrollView = pView->AddUIScrollView();
+			std::shared_ptr<UISpatialScrollView> pScrollView = pView->AddUISpatialScrollView();
 			std::vector<std::shared_ptr<UIButton>> pButtons = {};
 			for (int i = 0; i < 4; i++) {	
 				pButtons.emplace_back(pView->MakeUIButton());
 			}
 			
-			texture *pTexturePlaceholder = m_pDreamOS->MakeTexture(L"menu-item-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			texture *pTextureDropbox = m_pDreamOS->MakeTexture(L"dropbox.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			texture *pTextureDrive = m_pDreamOS->MakeTexture(L"google-drive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			texture *pTextureCloud = m_pDreamOS->MakeTexture(L"cloud-storage.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pTexturePlaceholder = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"menu-item-background.png");
+			texture *pTextureDropbox = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"dropbox.png");
+			texture *pTextureDrive = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"google-drive.png");
+			texture *pTextureCloud = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"cloud-storage.png");
 
 			pScrollView->UpdateMenuButtons(pButtons);
 			
@@ -1023,19 +1019,18 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {	// can adjust scroll view depth w
 		return R_PASS;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, pTestContext);
+	auto pUITest = AddTest("curvedtitle", fnInitialize, fnUpdate, fnTest, pTestContext);
 	CN(pUITest);
 	CN(pTestContext);
 
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Test to show curved Title");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
 }
 
+// TODO: Should this go into the DOS test suite?
 RESULT UIViewTestSuite::AddTestDreamControlView() {	
 	RESULT r = R_PASS;
 	
@@ -1048,9 +1043,9 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 		std::string strURL = "http://www.youtube.com";
 
 		std::shared_ptr<UIKeyboard> pUIKeyboard = nullptr;
+		UIStageProgram *pUIStageProgram = nullptr;
 
 		CN(m_pDreamOS);
-		UIStageProgram *pUIStageProgram = nullptr;
 		CR(SetupUIStagePipeline(pUIStageProgram));
 
 		{
@@ -1082,7 +1077,7 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 			pUIKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
 			pUIKeyboard->SetVisible(true);
 
-			auto& pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, true);
+			//auto pDreamControlView = m_pDreamOS->LaunchDreamApp<UIControlView>(this, true);
 			
 		}
 
@@ -1099,12 +1094,10 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 		return R_PASS;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, nullptr);
+	auto pUITest = AddTest("dreamcontrolview", fnInitialize, fnUpdate, fnTest, nullptr);
 	CN(pUITest);
-	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Full Test of DreamControlView");
 	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;

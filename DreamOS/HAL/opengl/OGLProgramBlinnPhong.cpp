@@ -9,8 +9,8 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramBlinnPhong::OGLProgramBlinnPhong(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglblinnphong"),
+OGLProgramBlinnPhong::OGLProgramBlinnPhong(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglblinnphong", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)
 {
@@ -51,7 +51,8 @@ RESULT OGLProgramBlinnPhong::OGLInitialize() {
 	CR(m_pOGLFramebuffer->OGLInitialize());
 	CR(m_pOGLFramebuffer->Bind());
 
-	CR(m_pOGLFramebuffer->SetSampleCount(4));
+	//CR(m_pOGLFramebuffer->SetSampleCount(4));
+	CR(m_pOGLFramebuffer->SetSampleCount(1));
 
 	CR(m_pOGLFramebuffer->MakeColorAttachment());
 	
@@ -59,7 +60,7 @@ RESULT OGLProgramBlinnPhong::OGLInitialize() {
 	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());
 	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
 	*/
-	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	///*
@@ -75,12 +76,57 @@ Error:
 	return r;
 }
 
+RESULT OGLProgramBlinnPhong::OGLInitialize(version versionOGL) {
+	RESULT r = R_PASS;
+
+	CR(OGLInitialize());
+
+	m_versionOGL = versionOGL;
+
+	// Create and set the shaders
+	
+	// Global
+	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
+	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
+	CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
+
+	// Vertex
+	CRM(MakeVertexShader(L"blinnphong.vert"), "Failed to create vertex shader");
+
+	// Fragment
+	CRM(MakeFragmentShader(L"blinnphong.frag"), "Failed to create fragment shader");
+
+	// Link the program
+	CRM(LinkProgram(), "Failed to link program");
+
+	// TODO: This could all be done in one call in the OGLShader honestly
+	// Attributes
+	// TODO: Tabulate attributes (get them from shader, not from class)
+	WCR(GetVertexAttributesFromProgram());
+	WCR(BindAttributes());
+
+	//CR(PrintActiveAttributes());
+
+	// Uniform Variables
+	CR(GetUniformVariablesFromProgram());
+
+	// Uniform Blocks
+	CR(GetUniformBlocksFromProgram());
+	CR(BindUniformBlocks());
+
+	// TODO:  Currently using a global material 
+	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+
+Error:
+	return r;
+}
+
 RESULT OGLProgramBlinnPhong::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
 	CR(MakeInput<stereocamera>("camera", &m_pCamera));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs

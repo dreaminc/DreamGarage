@@ -23,7 +23,6 @@
 #include "base/task_scheduler/task_scheduler.h"
 #include "base/task_scheduler/task_tracker.h"
 #include "base/task_scheduler/task_traits.h"
-#include "base/threading/thread.h"
 #include "build/build_config.h"
 
 #if defined(OS_POSIX) && !defined(OS_NACL_SFI)
@@ -37,6 +36,7 @@
 namespace base {
 
 class HistogramBase;
+class Thread;
 
 namespace internal {
 
@@ -50,16 +50,19 @@ class BASE_EXPORT TaskSchedulerImpl : public TaskScheduler {
       TaskTracker;
 #endif
 
-  // |name| is used to label threads and histograms. |task_tracker| can be used
-  // for tests that need more execution control. By default, the production
-  // TaskTracker is used.
-  explicit TaskSchedulerImpl(StringPiece name,
-                             std::unique_ptr<TaskTrackerImpl> task_tracker =
-                                 std::make_unique<TaskTrackerImpl>());
+  // Creates a TaskSchedulerImpl with a production TaskTracker.
+  //|histogram_label| is used to label histograms, it must not be empty.
+  explicit TaskSchedulerImpl(StringPiece histogram_label);
+
+  // For testing only. Creates a TaskSchedulerImpl with a custom TaskTracker.
+  TaskSchedulerImpl(StringPiece histogram_label,
+                    std::unique_ptr<TaskTrackerImpl> task_tracker);
+
   ~TaskSchedulerImpl() override;
 
   // TaskScheduler:
-  void Start(const TaskScheduler::InitParams& init_params) override;
+  void Start(const TaskScheduler::InitParams& init_params,
+             SchedulerWorkerObserver* scheduler_worker_observer) override;
   void PostDelayedTaskWithTraits(const Location& from_here,
                                  const TaskTraits& traits,
                                  OnceClosure task,
@@ -81,6 +84,7 @@ class BASE_EXPORT TaskSchedulerImpl : public TaskScheduler {
       const TaskTraits& traits) const override;
   void Shutdown() override;
   void FlushForTesting() override;
+  void FlushAsyncForTesting(OnceClosure flush_callback) override;
   void JoinForTesting() override;
 
  private:
@@ -92,9 +96,8 @@ class BASE_EXPORT TaskSchedulerImpl : public TaskScheduler {
   // |all_tasks_user_blocking_| is set.
   TaskTraits SetUserBlockingPriorityIfNeeded(const TaskTraits& traits) const;
 
-  const std::string name_;
-  Thread service_thread_;
   const std::unique_ptr<TaskTrackerImpl> task_tracker_;
+  std::unique_ptr<Thread> service_thread_;
   DelayedTaskManager delayed_task_manager_;
   SchedulerSingleThreadTaskRunnerManager single_thread_task_runner_manager_;
 

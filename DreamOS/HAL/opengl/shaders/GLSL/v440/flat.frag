@@ -6,7 +6,7 @@ in Data {
 } DataIn;
 
 uniform	bool u_hasColorTexture;
-uniform sampler2D u_textureColor;
+layout (binding = 0) uniform sampler2D u_textureColor;
 
 uniform bool u_fDistanceMap;
 uniform float u_buffer;

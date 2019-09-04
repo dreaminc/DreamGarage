@@ -13,9 +13,10 @@
 
 class OGLProgramBlinnPhongTexture : public OGLProgram {
 public:
-	OGLProgramBlinnPhongTexture(OpenGLImp *pParentImp);
+	OGLProgramBlinnPhongTexture(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
+	virtual RESULT OGLInitialize(version versionOGL) override;
 
 	virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID) override;

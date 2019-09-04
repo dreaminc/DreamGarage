@@ -22,6 +22,8 @@ public:
 	// Distance of point from plane
 	point_precision Distance(point ptP);
 	point_precision Distance(line l, point *pptClosestLineA = nullptr, point *pptClosestLineB = nullptr, vector *pvNormal = nullptr);
+	point_precision SegmentDistance(line l, point *pptClosestLineA = nullptr, point *pptClosestLineB = nullptr, vector *pvNormal = nullptr);
+	
 	point ProjectedPoint(point ptP);
 
 	vector GetVector();

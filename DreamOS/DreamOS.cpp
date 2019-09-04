@@ -1,19 +1,30 @@
 #include "DreamOS.h"
 
-#include "DreamLogger/DreamLogger.h"
+#include "Primitives/PrimParams.h"
+
+//#include "DreamLogger/DreamLogger.h"
 #include "DreamAppManager.h"
+#include "DreamModuleManager.h"
 
 #include "Primitives/font.h"
+#include "Core/Utilities.h"
 
 #include "Cloud/Environment/PeerConnection.h"
 #include "DreamMessage.h"
 
+//#include "DreamGarage/DreamSoundSystem.h"
+#include "Sound/AudioPacket.h"
+#include "DreamGarage/AudioDataMessage.h"
+
 #include "DreamAppMessage.h"
+#include "DreamGarage/DreamSettingsApp.h"
 
 // Messages
 #include "PeerHandshakeMessage.h"
 #include "PeerAckMessage.h"
 #include "PeerStayAliveMessage.h"
+
+#include "HAL/Pipeline/ProgramNode.h"
 
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
@@ -21,13 +32,13 @@ DreamOS::DreamOS() :
 {
 	RESULT r = R_PASS;
 
-//Success:
+	//Success:
 	Validate();
 	return;
 
-//Error:
-//	Invalidate();
-//	return;
+	//Error:
+	//	Invalidate();
+	//	return;
 }
 
 DreamOS::~DreamOS() {
@@ -41,17 +52,16 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	// TODO: This should be put into time a manager / utility 
 	srand(static_cast <unsigned> (time(0)));
 
-	// Initialize logger
-	// DreamLogger::InitializeLogger();
-	//DOSLOG(INFO, "DreamOS Starting...");
-//	auto pLoggerInstance = DreamLogger::instance();
-//	CN(pLoggerInstance);
-
 	// Create the Sandbox
-	m_pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM);
+	m_pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM, this);
 	CNM(m_pSandbox, "Failed to create sandbox");
 	CVM(m_pSandbox, "Sandbox is Invalid!");
 	CRM(m_pSandbox->SetDreamOSHandle(this), "Failed to set DreamOS handle");
+
+	// Initialize logger
+	auto pDreamLogger = DreamLogger::instance();
+	CN(pDreamLogger);
+	pDreamLogger->Log(DreamLogger::Level::INFO, "DreamOS Starting ...");
 
 	// This gives our DreamOS app instance a chance to configure the
 	// sandbox prior to it getting initialized 
@@ -60,11 +70,11 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	// Check if Dream is launching from a web browser url.
 	// a url command from a web page, to trigger the launch of Dream, would start with 'dreamos:run' command line.
 	// The following code splits the white space of a single command line param in that case, into a list of command line arguments.
-	if ((argc > 1) && 
+	if ((argc > 1) &&
 		((std::string(argv[1]).substr(0, 11).compare("dreamos:run") == 0) ||
-		 (std::string(argv[1]).substr(0, 14).compare("dreamosdev:run") == 0))) {
+		(std::string(argv[1]).substr(0, 14).compare("dreamosdev:run") == 0))) {
 		//  Dream is launching from a web page
-		
+
 		DOSLOG(INFO, "[DreamOS] Dream launched from web");
 
 		// Decide if to split args or not
@@ -108,7 +118,8 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	// TODO: need that module pattern
 	if (GetSandboxConfiguration().fInitCloud) {
 		CRM(RegisterPeerConnectionObserver(this), "Failed to register Peer Connection Observer");
-		CRM(RegisterEnvironmentObserver(this), "Failed to register environment controller");
+		CRM(RegisterEnvironmentObserver(this), "Failed to register environment controller observer");
+		CRM(RegisterUserObserver(this), "Failed to register user controller observer");
 	}
 
 	// Give the Client a chance to set up the pipeline
@@ -124,12 +135,37 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	// be as well)
 
 	// Auto Login Handling
+	/*
 	auto pCommandLineManager = CommandLineManager::instance();
 	CN(pCommandLineManager);
 
 	if (pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
 		// auto login
-		GetCloudController()->Start();
+		CloudController* pCloudController = GetCloudController();
+		if (pCloudController != nullptr) {
+			pCloudController->Start();
+		}
+	}
+	//*/
+
+	// Sandbox Modules and Apps
+
+	// Audio System
+	if (m_pSandbox->m_SandboxConfiguration.fInitSound) {
+		CRM(InitializeDreamSoundSystem(), "Failed to initialize the Dream Sound System");
+		CRM(RegisterSoundSystemObserver(this), "Failed to register this as sound system observer");
+	}
+
+	// Object Loader Module
+	CRM(InitializeDreamObjectModule(), "Failed to initialize the Dream Object Module");
+
+	// Dream User App
+	if (m_pSandbox->m_SandboxConfiguration.fInitUserApp) {
+		CRM(InitializeDreamUserApp(), "Failed to initalize user app");
+	}
+
+	if (m_pSandbox->m_SandboxConfiguration.fInitKeyboard) {
+		CR(InitializeKeyboard());
 	}
 
 	CRM(DidFinishLoading(), "Failed to run DidFinishLoading");
@@ -191,10 +227,10 @@ RESULT DreamOS::CheckDreamPeerAppStates() {
 		CN(pDreamPeerApp);
 
 		// Detect handshake request hung
-		if (pDreamPeerApp->IsDataChannel() && 
-			pDreamPeerApp->GetState() != DreamPeerApp::state::ESTABLISHED) 
+		if (pDreamPeerApp->IsDataChannel() &&
+			pDreamPeerApp->GetState() != DreamPeerApp::state::ESTABLISHED)
 		{
-		//if (pDreamPeerApp->IsHandshakeRequestHung()) {
+			//if (pDreamPeerApp->IsHandshakeRequestHung()) {
 			long userID = GetUserID();
 			long peerUserID = pDreamPeerApp->GetPeerUserID();
 
@@ -205,6 +241,17 @@ RESULT DreamOS::CheckDreamPeerAppStates() {
 			CR(SendDataMessage(peerUserID, &peerHandshakeMessage));
 		}
 
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::UpdateAllPeerLabelOrientations(camera *pCamera) {
+	RESULT r = R_PASS;
+
+	for (auto it = m_dreamPeerApps.begin(); it != m_dreamPeerApps.end(); it++) {
+		it->second->UpdateLabelOrientation(pCamera);
 	}
 
 Error:
@@ -229,9 +276,9 @@ RESULT DreamOS::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor,
 	// Create a new peer
 	auto pDreamPeer = CreateNewPeer(pPeerConnection);
 	CN(pDreamPeer);
-
-	CR(pDreamPeer->RegisterDreamPeerObserver(this));
 	
+	CR(pDreamPeer->RegisterDreamPeerObserver(this));
+
 Error:
 	return r;
 }
@@ -281,6 +328,76 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::RegisterDOSObserver(DOSObserver *pDOSObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pDOSObserver), "Observer cannot be nullptr");
+	CBM((m_pDOSObserver == nullptr), "Can't overwrite DOS observer");
+
+	m_pDOSObserver = pDOSObserver;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::UnregisterDOSObserver(DOSObserver *pDOSObserver) {
+	RESULT r = R_PASS;
+
+	CN(pDOSObserver);
+	CBM((m_pDOSObserver == pDOSObserver), "DOS Observer is not set to this object");
+
+	m_pDOSObserver = nullptr;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::SendDOSMessage(std::string& strMessage) {
+	RESULT r = R_PASS;
+
+	CNR(m_pDOSObserver, R_SKIPPED);
+
+	CR(m_pDOSObserver->HandleDOSMessage(strMessage));
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::RegisterWindows64Observer(Windows64Observer *pWindows64Observer) {
+	RESULT r = R_PASS;
+
+	CNM((pWindows64Observer), "Observer cannot be nullptr");
+	CBM((m_pWindows64Observer == nullptr), "Can't overwrite Windows64Observer");
+
+	m_pWindows64Observer = pWindows64Observer;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::UnregisterWindows64Observer(Windows64Observer *pWindows64Observer) {
+	RESULT r = R_PASS;
+
+	CN(pWindows64Observer);
+	CBM((m_pWindows64Observer == pWindows64Observer), "Windows64Observer is not set to this object");
+
+	m_pWindows64Observer = nullptr;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
+	RESULT r = R_PASS;
+
+	CNM(m_pWindows64Observer, "Windows64Observer was nullptr");
+
+	m_pWindows64Observer->HandleWindows64CopyData(messageSize, pMessageData, pxHeight, pxWidth);
+
+Error:
+	return r;
+}
+
 RESULT DreamOS::OnDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
@@ -293,7 +410,7 @@ Error:
 
 RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) {
 	RESULT r = R_PASS;
-	
+
 	DreamMessage::type dreamMsgType = (DreamMessage::type)(pDataMessage->GetType());
 
 	// Route the message to the right place
@@ -301,25 +418,25 @@ RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMes
 	if (dreamMsgType < DreamMessage::type::CLIENT) {
 		// DREAM OS Messages
 		switch (dreamMsgType) {
-			case DreamMessage::type::PEER_HANDSHAKE: {
-				DOSLOG(INFO, "[DreamOS] PEER_HANDSHAKE user: %v peer: %v", pPeerConnection->GetUserID(), pPeerConnection->GetPeerUserID());
-				PeerHandshakeMessage *pPeerHandshakeMessage = reinterpret_cast<PeerHandshakeMessage*>(pDataMessage);
-				CR(HandlePeerHandshakeMessage(pPeerConnection, pPeerHandshakeMessage));
-			} break;
+		case DreamMessage::type::PEER_HANDSHAKE: {
+			DOSLOG(INFO, "[DreamOS] PEER_HANDSHAKE user: %v peer: %v", pPeerConnection->GetUserID(), pPeerConnection->GetPeerUserID());
+			PeerHandshakeMessage *pPeerHandshakeMessage = reinterpret_cast<PeerHandshakeMessage*>(pDataMessage);
+			CR(HandlePeerHandshakeMessage(pPeerConnection, pPeerHandshakeMessage));
+		} break;
 
-			case DreamMessage::type::PEER_STAYALIVE: {
-				PeerStayAliveMessage *pPeerStayAliveMessage = reinterpret_cast<PeerStayAliveMessage*>(pDataMessage);
-				CR(HandlePeerStayAliveMessage(pPeerConnection, pPeerStayAliveMessage));
-			} break;
+		case DreamMessage::type::PEER_STAYALIVE: {
+			PeerStayAliveMessage *pPeerStayAliveMessage = reinterpret_cast<PeerStayAliveMessage*>(pDataMessage);
+			CR(HandlePeerStayAliveMessage(pPeerConnection, pPeerStayAliveMessage));
+		} break;
 
-			case DreamMessage::type::PEER_ACK: {
-				PeerAckMessage *pPeerAckMessage = reinterpret_cast<PeerAckMessage*>(pDataMessage);
-				CR(HandlePeerAckMessage(pPeerConnection, pPeerAckMessage));
-			} break;
+		case DreamMessage::type::PEER_ACK: {
+			PeerAckMessage *pPeerAckMessage = reinterpret_cast<PeerAckMessage*>(pDataMessage);
+			CR(HandlePeerAckMessage(pPeerConnection, pPeerAckMessage));
+		} break;
 
-			default: {
-				DEBUG_LINEOUT("Unhandled Dream OS Message of Type 0x%I64x", dreamMsgType);
-			} break;
+		default: {
+			DEBUG_LINEOUT("Unhandled Dream OS Message of Type 0x%I64x", dreamMsgType);
+		} break;
 		}
 	}
 	else if (dreamMsgType >= DreamMessage::type::CLIENT && dreamMsgType < DreamMessage::type::APP) {
@@ -359,7 +476,7 @@ RESULT DreamOS::HandlePeerHandshakeMessage(PeerConnection* pPeerConnection, Peer
 
 		/*
 		if (pDreamPeer->IsPeerReady()) {
-			int a = 5;
+		int a = 5;
 		}
 		*/
 	}
@@ -401,24 +518,24 @@ RESULT DreamOS::HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMes
 	long peerUserID = pPeerConnection->GetPeerUserID();
 
 	switch (pPeerAckMessage->GetACKType()) {
-		case PeerAckMessage::type::PEER_HANDSHAKE: {
-			pDreamPeer->ReceivedHandshakeACK();
-			DOSLOG(INFO, "[DreamOS] PEER_HANDSHAKE_ACK, user: %v, peer: %v", userID, peerUserID);
+	case PeerAckMessage::type::PEER_HANDSHAKE: {
+		pDreamPeer->ReceivedHandshakeACK();
+		DOSLOG(INFO, "[DreamOS] PEER_HANDSHAKE_ACK, user: %v, peer: %v", userID, peerUserID);
 
-			/*
-			if (pDreamPeer->IsPeerReady()) {
-				int a = 5;
-			}
-			*/
-		} break;
+		/*
+		if (pDreamPeer->IsPeerReady()) {
+		int a = 5;
+		}
+		*/
+	} break;
 
-		case PeerAckMessage::type::PEER_STAY_ALIVE: {
-			// TODO: update the stay alive
-		} break;
+	case PeerAckMessage::type::PEER_STAY_ALIVE: {
+		// TODO: update the stay alive
+	} break;
 
-		default: {
-			// TODO: ?
-		} break;
+	default: {
+		// TODO: ?
+	} break;
 	}
 
 Error:
@@ -429,20 +546,22 @@ std::shared_ptr<DreamPeerApp> DreamOS::CreateNewPeer(PeerConnection *pPeerConnec
 	RESULT r = R_PASS;
 	std::shared_ptr<DreamPeerApp> pDreamPeerApp = nullptr;
 
-	long peerUserID = 0; 
-	
+	long peerUserID = 0;
+
 	CNM(pPeerConnection, "Peer Connection invalid");
 	peerUserID = pPeerConnection->GetPeerUserID();
 
 	CBM((m_dreamPeerApps.find(peerUserID) == m_dreamPeerApps.end()), "Error: Peer user ID %d already exists", peerUserID);
 
+	//pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this, true);
 	pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this, true);
 	CNM(pDreamPeerApp, "Failed to create dream peer app");
 
-	pDreamPeerApp->SetPeerConnection(pPeerConnection);
+	CR(pDreamPeerApp->SetPeerConnection(pPeerConnection));
 
 	// Set map
 	m_dreamPeerApps[peerUserID] = pDreamPeerApp;
+	DOSLOG(INFO, "DreamPeerApp added to connections");
 
 	return pDreamPeerApp;
 
@@ -503,6 +622,37 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::ClearPeers() {
+	RESULT r = R_PASS;
+
+	std::map<long, std::shared_ptr<DreamPeerApp>>::iterator it;
+
+	for (auto &pairDreamPeer : m_dreamPeerApps) {
+
+		std::shared_ptr<DreamPeerApp> pDreamPeerApp = pairDreamPeer.second;
+		
+		CRM(ShutdownDreamApp<DreamPeerApp>(pDreamPeerApp), "Failed to shut down dream peer app");
+	}
+
+Error:
+	//m_dreamPeerApps.clear();
+
+	return r;
+}
+
+bool DreamOS::HasPeerApps() {
+	RESULT r = R_PASS;
+
+	CN(m_pSandbox);
+	CN(m_pSandbox->m_pDreamAppManager);
+
+
+	return m_pSandbox->m_pDreamAppManager->GetDreamApp("DreamPeerApp").size() > 0;
+
+Error:
+	return false;
+}
+
 DreamPeerApp::state DreamOS::GetPeerState(long peerUserID) {
 	std::shared_ptr<DreamPeerApp> pDreamPeer = nullptr;
 
@@ -530,6 +680,128 @@ hand *DreamOS::GetHand(HAND_TYPE handType) {
 	return m_pSandbox->GetHand(handType);
 }
 
+DimObj *DreamOS::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
+	return m_pSandbox->MakeObject(pPrimParams, fInitialize);
+}
+
+texture *DreamOS::MakeTexture(PrimParams *pPrimParams, bool fInitialize) {
+	return m_pSandbox->MakeTexture(pPrimParams, fInitialize);
+}
+
+RESULT DreamOS::InitializeObject(DimObj *pDimObj) {
+	return m_pSandbox->InitializeObject(pDimObj);
+}
+
+RESULT DreamOS::InitializeTexture(texture *pTexture) {
+	return m_pSandbox->InitializeTexture(pTexture);
+}
+
+RESULT DreamOS::MakeModel(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	model::params *pModelParams = new model::params(wstrModelFilename, modelFactoryFlags);
+	CN(pModelParams);
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pModelParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::MakeMesh(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, const mesh::params &meshParams, void *pContext) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	mesh::params *pMeshParams = new mesh::params(meshParams);
+	CN(pMeshParams);
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pMeshParams, fnOnObjectReady, pContext), "Failed to queue new mesh object in async obj module");
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::MakeSphere(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	sphere::params *pSphereParams = new sphere::params(radius, numAngularDivisions, numVerticalDivisions);
+	CN(pSphereParams);
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pSphereParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::MakeVolume(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, double width, double length, double height, bool fTriangleBased) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	volume::params *pVolumeParams = new volume::params(volume::VOLUME_TYPE::RECTANGULAR_CUBOID, width, length, height, fTriangleBased);
+	CN(pVolumeParams);
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pVolumeParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::MakeQuad(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, void *pContext, double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	quad::params *pQuadParams = new quad::params(width, height, numHorizontalDivisions, numVerticalDivisions, vNormal);
+	CN(pQuadParams);
+
+	pQuadParams->pTextureHeight = pTextureHeight;
+
+	CRM(m_pDreamObjectModule->QueueNewObject(pQuadParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::LoadTexture(std::function<RESULT(texture*, void*)> fnOnTextureReady, void *pContext, texture::type type, const wchar_t *pszFilename) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
+
+	texture::params *pTextureParams = new texture::params(type, pszFilename);
+	CN(pTextureParams);
+
+	
+	CRM(m_pDreamObjectModule->QueueNewTexture(pTextureParams, fnOnTextureReady, pContext), "Failed to queue new object in async obj module");
+
+Error:
+	return r;
+}
+
+ProgramNode* DreamOS::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
+	RESULT r = R_PASS;
+
+	ProgramNode *pProgramNode = nullptr;
+
+	pProgramNode = m_pSandbox->MakeProgramNode(strNodeName, optFlags);
+	CN(pProgramNode);
+
+	return pProgramNode;
+
+Error:
+	if (pProgramNode != nullptr) {
+		delete pProgramNode;
+		pProgramNode = nullptr;
+	}
+
+	return nullptr;
+}
+
 quaternion DreamOS::GetCameraOrientation() {
 	return m_pSandbox->GetCameraOrientation();
 }
@@ -544,12 +816,20 @@ RESULT DreamOS::Start() {
 	CR(m_pSandbox->RunAppLoop());
 
 Error:
+	DreamLogger::instance()->Flush();
 	return r;
 }
 
 RESULT DreamOS::Exit(RESULT exitcode) {
+	RESULT r = R_PASS;
+
 	DEBUG_LINEOUT("DREAM OS %s Exiting with 0x%x result", m_versionDreamOS.GetString().c_str(), exitcode);
-	return exitcode;
+
+	CR(m_pSandbox->PendShutdown());
+	CR(exitcode);
+
+Error:
+	return r;
 }
 
 InteractionEngineProxy *DreamOS::GetInteractionEngineProxy() {
@@ -564,6 +844,14 @@ HMD *DreamOS::GetHMD() {
 	return m_pSandbox->m_pHMD;
 }
 
+HWND DreamOS::GetDreamHWND() {
+	return m_pSandbox->GetWindowHandle();
+}
+
+RESULT DreamOS::RecenterHMD() {
+	return m_pSandbox->m_pHMD->RecenterHMD();
+}
+
 RESULT DreamOS::SetHALConfiguration(HALImp::HALConfiguration halconf) {
 	return m_pSandbox->SetHALConfiguration(halconf);
 }
@@ -576,8 +864,16 @@ CloudController *DreamOS::GetCloudController() {
 	return m_pSandbox->m_pCloudController;
 }
 
+std::shared_ptr<DreamSoundSystem> DreamOS::GetDreamSoundSystem() {
+	return m_pDreamSoundSystem;
+}
+
 long DreamOS::GetUserID() {
 	return m_pSandbox->m_pCloudController->GetUserID();
+}
+
+long DreamOS::GetUserAvatarID() {
+	return m_pSandbox->m_pCloudController->GetUserAvatarID();
 }
 
 ControllerProxy* DreamOS::GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controllerType) {
@@ -643,12 +939,36 @@ std::vector<UID> DreamOS::GetAppUID(std::string strAppName) {
 
 UID DreamOS::GetUniqueAppUID(std::string strAppName) {
 	std::vector<UID> vAppUID = m_pSandbox->m_pDreamAppManager->GetAppUID(strAppName);
+	
 	if (vAppUID.size() == 1) {
 		return vAppUID[0];
 	}
 	else {
 		return UID::MakeInvalidUID();
 	}
+}
+
+std::shared_ptr<DreamAppBase> DreamOS::GetDreamAppFromUID(UID appUID) {
+	return m_pSandbox->m_pDreamAppManager->GetDreamAppFromUID(appUID);
+}
+
+std::vector<UID> DreamOS::GetModuleUID(std::string strName) {
+	return m_pSandbox->m_pDreamModuleManager->GetModuleUID(strName);
+}
+
+UID DreamOS::GetUniqueModuleUID(std::string strName) {
+	std::vector<UID> vModuleUID = m_pSandbox->m_pDreamModuleManager->GetModuleUID(strName);
+	
+	if (vModuleUID.size() == 1) {
+		return vModuleUID[0];
+	}
+	else {
+		return UID::MakeInvalidUID();
+	}
+}
+
+std::shared_ptr<DreamModuleBase> DreamOS::GetDreamModuleFromUID(UID moduleUID) {
+	return m_pSandbox->m_pDreamModuleManager->GetDreamModuleFromUID(moduleUID);
 }
 
 HALImp* DreamOS::GetHALImp() {
@@ -665,26 +985,167 @@ Error:
 	return r;
 }
 
-RESULT DreamOS::InitializeDreamUser() {
+RESULT DreamOS::InitializeDreamUserApp() {
 	RESULT r = R_PASS;
 
-	m_pDreamUser = LaunchDreamApp<DreamUserApp>(this);
-	CNM(m_pDreamUser, "Failed to launch dream user app");
+	m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
+	CNM(m_pDreamUserApp, "Failed to launch dream user app");
 
-	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
-	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set left hand");
+	//WCRM(m_pDreamUserApp->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
+	//WCRM(m_pDreamUserApp->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
 
 Error:
 	return r;
 }
+
+RESULT DreamOS::InitializeCloudController() {
+	RESULT r = R_PASS;
+
+	CR(m_pSandbox->InitializeCloudController());
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::InitializeDreamObjectModule() {
+	RESULT r = R_PASS;
+
+	DOSLOG(INFO, "Initializing Dream Object Module");
+
+	m_pDreamObjectModule = LaunchDreamModule<DreamObjectModule>(this);
+	CNM(m_pDreamObjectModule, "Failed to launch Dream Object Module");
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::InitializeDreamSoundSystem() {
+	RESULT r = R_PASS;
+
+	DOSLOG(INFO, "Initializing Dream Sound System");
+
+	m_pDreamSoundSystem = LaunchDreamModule<DreamSoundSystem>(this);
+	CNM(m_pDreamSoundSystem, "Failed to launch Dream Sound System Module");
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::RegisterSoundSystemObserver(DreamSoundSystem::observer *pObserver) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamSoundSystem, "Sound system not initialized");
+	CR(m_pDreamSoundSystem->RegisterObserver(pObserver));
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::UnregisterSoundSystemObserver() {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamSoundSystem, "Sound system not initialized");
+	CR(m_pDreamSoundSystem->UnregisterObserver());
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
+	RESULT r = R_PASS;
+
+	int nChannels = pCaptureBuffer->NumChannels();
+	int samplingFrequency = pCaptureBuffer->GetSamplingRate();
+
+	AudioPacket pendingAudioPacket;
+	pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket);
+
+	// Measure time diff
+	//static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+	//std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+	//auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+	//lastUpdateTime = timeNow;
+	
+	// Broadcast out captured audio
+	if (GetCloudController() != nullptr) {
+		GetCloudController()->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
+	}
+	pendingAudioPacket.DeleteBuffer();
+	//std::chrono::system_clock::time_point timeNow2 = std::chrono::system_clock::now();
+	//auto diffVal2 = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow2 - timeNow).count();
+
+Error:
+	return r;
+}
+
+std::shared_ptr<SpatialSoundObject> DreamOS::AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamSoundSystem, "Sound system not initialized");
+
+	return m_pDreamSoundSystem->AddSpatialSoundObject(ptPosition, vEmitterDirection, vListenerDirection);
+
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<SoundFile> DreamOS::LoadSoundFile(const std::wstring &wstrFilename, SoundFile::type soundFileType) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamSoundSystem, "Sound system not initialized");
+
+	return m_pDreamSoundSystem->LoadSoundFile(wstrFilename, soundFileType);
+
+Error:
+	return nullptr;
+}
+
+RESULT DreamOS::PushAudioPacketToMixdown(DreamSoundSystem::MIXDOWN_TARGET mixdownTarget, int numFrames, const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamSoundSystem, "Sound system not initialized");
+
+	return m_pDreamSoundSystem->PushAudioPacketToMixdown(mixdownTarget, numFrames, pendingAudioPacket);
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::LoopSoundFile(std::shared_ptr<SoundFile> pSoundFile) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamSoundSystem, "Sound system not initialized");
+
+	return m_pDreamSoundSystem->LoopSoundFile(pSoundFile);
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamSoundSystem, "Sound system not initialized");
+
+	return m_pDreamSoundSystem->PlaySoundFile(pSoundFile);
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::MuteDreamVCamAudio(bool fMute) {
+	// TODO: imp this lmao
+	return R_NOT_IMPLEMENTED;
+}
+
 
 // This is a pass-thru at the moment
 RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
 }
 
-RESULT DreamOS::AddObject(VirtualObj *pObject) {
-	return m_pSandbox->AddObject(pObject);
+RESULT DreamOS::AddObject(VirtualObj *pObject, SandboxApp::PipelineType pipelineType) {
+	return m_pSandbox->AddObject(pObject, pipelineType);
 }
 
 // This is a pass-thru at the moment
@@ -698,12 +1159,21 @@ RESULT DreamOS::AddInteractionObject(VirtualObj *pObject) {
 
 /*
 RESULT DreamOS::UpdateInteractionPrimitive(const ray &rCast) {
-	return m_pSandbox->UpdateInteractionPrimitive(rCast);
+return m_pSandbox->UpdateInteractionPrimitive(rCast);
 }
 */
 
 RESULT DreamOS::SetGravityAcceleration(double acceleration) {
 	return m_pSandbox->SetGravityAcceleration(acceleration);
+}
+
+// Sandbox Level Objects 
+std::shared_ptr<NamedPipeClient> DreamOS::MakeNamedPipeClient(std::wstring strPipename) {
+	return m_pSandbox->MakeNamedPipeClient(strPipename);
+}
+
+std::shared_ptr<NamedPipeServer> DreamOS::MakeNamedPipeServer(std::wstring strPipename) {
+	return m_pSandbox->MakeNamedPipeServer(strPipename);
 }
 
 RESULT DreamOS::SetGravityState(bool fEnabled) {
@@ -754,6 +1224,10 @@ cylinder* DreamOS::AddCylinder(double radius, double height, int numAngularDivis
 	return m_pSandbox->AddCylinder(radius, height, numAngularDivisions, numVerticalDivisions);
 }
 
+DimRay* DreamOS::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+	return m_pSandbox->MakeRay(ptOrigin, vDirection, step, fDirectional);
+}
+
 DimRay* DreamOS::AddRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
 	return m_pSandbox->AddRay(ptOrigin, vDirection, step, fDirectional);
 }
@@ -776,6 +1250,18 @@ quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, 
 
 quad* DreamOS::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	return m_pSandbox->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
+}
+
+HysteresisObject *DreamOS::MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType) {
+	return m_pSandbox->MakeHysteresisObject(onThreshold, offThreshold, objectType);
+}
+
+std::shared_ptr<UIKeyboard> DreamOS::GetKeyboardApp() {
+	return m_pKeyboard;
+}
+
+std::shared_ptr<DreamUserApp> DreamOS::GetUserApp() {
+	return m_pDreamUserApp;
 }
 
 RESULT DreamOS::ReleaseFont(std::wstring wstrFontFileName) {
@@ -807,9 +1293,9 @@ RESULT DreamOS::ClearFonts() {
 	return R_PASS;
 }
 
-std::shared_ptr<font> DreamOS::MakeFont(std::wstring wstrFontFileName, bool fDistanceMap ) {
+std::shared_ptr<font> DreamOS::MakeFont(std::wstring wstrFontFileName, bool fDistanceMap) {
 	RESULT r = R_PASS;
-	
+
 	// First check font store
 	std::shared_ptr<font> pFont = GetFont(wstrFontFileName);
 
@@ -821,7 +1307,7 @@ std::shared_ptr<font> DreamOS::MakeFont(std::wstring wstrFontFileName, bool fDis
 			std::wstring strFile = L"Fonts/" + pFont->GetFontImageFile();
 			const wchar_t* pszFile = strFile.c_str();
 
-			CR(pFont->SetTexture(std::shared_ptr<texture>(MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_DIFFUSE))));
+			CR(pFont->SetTexture(std::shared_ptr<texture>(MakeTexture(texture::type::TEXTURE_2D, const_cast<wchar_t*>(pszFile)))));
 		}
 
 		// Push font into store
@@ -870,20 +1356,24 @@ text* DreamOS::AddText(std::shared_ptr<font> pFont, const std::string& content, 
 	return m_pSandbox->AddText(pFont, content, width, height, fBillboard);
 }
 
-texture* DreamOS::MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
-	return m_pSandbox->MakeTexture(pszFilename, type);
+texture* DreamOS::MakeTexture(texture::type type, const wchar_t *pszFilename) {
+	return m_pSandbox->MakeTexture(type, pszFilename);
 }
 
-texture *DreamOS::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
-	return m_pSandbox->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, type);
+texture *DreamOS::MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) {
+	return m_pSandbox->MakeTextureFromFileBuffer(type, pBuffer, pBuffer_n);
 }
 
 texture* DreamOS::MakeTexture(const texture &srcTexture) {
 	return m_pSandbox->MakeTexture(srcTexture);
 }
 
-texture* DreamOS::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
+texture* DreamOS::MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
 	return m_pSandbox->MakeTexture(type, width, height, pixelFormat, channels, pBuffer, pBuffer_n);
+}
+
+cubemap* DreamOS::MakeCubemap(const std::wstring &wstrCubemapName) {
+	return m_pSandbox->MakeCubemap(wstrCubemapName);
 }
 
 skybox *DreamOS::AddSkybox() {
@@ -896,11 +1386,11 @@ skybox *DreamOS::MakeSkybox() {
 
 /*
 model *DreamOS::AddModel(wchar_t *pszModelName) {
-	return m_pSandbox->AddModel(pszModelName);
+return m_pSandbox->AddModel(pszModelName);
 }
 
 model *DreamOS::MakeModel(wchar_t *pszModelName) {
-	return m_pSandbox->AddModel(pszModelName);
+return m_pSandbox->AddModel(pszModelName);
 }
 */
 
@@ -910,6 +1400,14 @@ model *DreamOS::MakeModel(const std::wstring& wstrModelFilename, texture* pTextu
 
 model *DreamOS::AddModel(const std::wstring& wstrModelFilename, texture* pTexture) {
 	return m_pSandbox->AddModel(wstrModelFilename, pTexture);
+}
+
+model *DreamOS::MakeModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+	return m_pSandbox->MakeModel(wstrModelFilename, modelFactoryFlags);
+}
+
+model *DreamOS::AddModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+	return m_pSandbox->AddModel(wstrModelFilename, modelFactoryFlags);
 }
 
 composite *DreamOS::AddComposite() {
@@ -928,6 +1426,14 @@ user *DreamOS::AddUser() {
 	return m_pSandbox->AddUser();
 }
 
+billboard *DreamOS::AddBillboard(point ptOrigin, float width, float height) {
+	return m_pSandbox->AddBillboard(ptOrigin, width, height);
+}
+
+billboard *DreamOS::MakeBillboard(point ptOrigin, float width, float height) {
+	return m_pSandbox->MakeBillboard(ptOrigin, width, height);
+}
+
 RESULT DreamOS::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {
 	return m_pSandbox->RegisterUpdateCallback(fnUpdateCallback);
 }
@@ -942,6 +1448,14 @@ RESULT DreamOS::SetSandboxConfiguration(SandboxApp::configuration sandboxconf) {
 
 const SandboxApp::configuration& DreamOS::GetSandboxConfiguration() {
 	return m_pSandbox->GetSandboxConfiguration();
+}
+
+std::wstring DreamOS::GetHardwareID() {
+	return m_pSandbox->GetHardwareID();
+}
+
+std::string DreamOS::GetHMDTypeString() {
+	return m_pSandbox->GetHMDTypeString();
 }
 
 // Physics Engine
@@ -1000,8 +1514,8 @@ Error:
 	return r;
 }
 
-RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject) {
-	return m_pSandbox->AddObjectToUIGraph(pObject);
+RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject, SandboxApp::PipelineType pipelineType) {
+	return m_pSandbox->AddObjectToUIGraph(pObject, pipelineType);
 }
 
 RESULT DreamOS::AddObjectToUIClippingGraph(VirtualObj *pObject) {
@@ -1016,6 +1530,10 @@ RESULT DreamOS::RemoveObjectFromUIClippingGraph(VirtualObj *pObject) {
 	return m_pSandbox->RemoveObjectFromUIClippingGraph(pObject);
 }
 
+RESULT DreamOS::RemoveObjectFromAuxUIGraph(VirtualObj *pObject) {
+	return m_pSandbox->RemoveObjectFromAuxUIGraph(pObject);
+}
+
 // Cloud Controller
 
 RESULT DreamOS::RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver) {
@@ -1026,8 +1544,12 @@ RESULT DreamOS::RegisterEnvironmentObserver(CloudController::EnvironmentObserver
 	return m_pSandbox->RegisterEnvironmentObserver(pEnvironmentObserver);
 }
 
-RESULT DreamOS::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
-	return m_pSandbox->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels);
+RESULT DreamOS::RegisterUserObserver(CloudController::UserObserver *pUserObserver) {
+	return m_pSandbox->RegisterUserObserver(pUserObserver);
+}
+
+RESULT DreamOS::BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	return m_pSandbox->BroadcastVideoFrame(strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels);
 }
 
 RESULT DreamOS::SendDataMessage(long userID, Message *pDataMessage) {
@@ -1038,8 +1560,8 @@ RESULT DreamOS::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pSandbox->BroadcastDataMessage(pDataMessage);
 }
 
-RESULT DreamOS::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
-	return m_pSandbox->BroadcastDreamAppMessage(pDreamAppMessage);
+RESULT DreamOS::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags) {
+	return m_pSandbox->BroadcastDreamAppMessage(pDreamAppMessage, messageFlags);
 }
 
 RESULT DreamOS::RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
@@ -1058,6 +1580,38 @@ RESULT DreamOS::RegisterSubscriber(SenseControllerEventType controllerEvent, Sub
 	return m_pSandbox->RegisterSubscriber(controllerEvent, pControllerSubscriber);
 }
 
+RESULT DreamOS::RegisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber) {
+	return m_pSandbox->RegisterSubscriber(gamePadEvent, pGamepadSubscriber);
+}
+
+RESULT DreamOS::RegisterSubscriber(HMDEventType hmdEvent, Subscriber<HMDEvent>* pHMDEventSubscriber) {
+	return m_pSandbox->RegisterSubscriber(hmdEvent, pHMDEventSubscriber);
+}
+
+RESULT DreamOS::UnregisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
+	return m_pSandbox->UnregisterSubscriber(controllerEvent, pControllerSubscriber);
+}
+
+RESULT DreamOS::UnregisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber) {
+	return m_pSandbox->UnregisterSubscriber(gamePadEvent, pGamepadSubscriber);
+}
+
+RESULT DreamOS::GetCredential(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType) {
+	return m_pSandbox->GetKeyValue(wstrKey, strOut, credType);
+}
+
+RESULT DreamOS::SaveCredential(std::wstring wstrKey, std::string strValue, CredentialManager::type credType, bool fOverwrite) {
+	return m_pSandbox->SetKeyValue(wstrKey, strValue, credType, fOverwrite);
+}
+
+RESULT DreamOS::RemoveCredential(std::wstring wstrKey, CredentialManager::type credType) {
+	return m_pSandbox->RemoveKeyValue(wstrKey, credType);
+}
+
+bool DreamOS::IsSandboxInternetConnectionValid() {
+	return m_pSandbox->IsSandboxInternetConnectionValid();
+}
+
 long DreamOS::GetTickCount() {
 	return m_pSandbox->GetTickCount();
 }
@@ -1068,7 +1622,7 @@ RESULT DreamOS::RegisterVideoStreamSubscriber(PeerConnection *pVideoSteamPeerCon
 	CN(pVideoStreamSubscriber);
 	CBM((m_pVideoStreamSubscriber == nullptr), "Video Steam Subscriber is already set");
 
-	m_pVideoSteamPeerConnectionSource = pVideoSteamPeerConnectionSource;
+	m_pVideoStreamPeerConnectionSource = pVideoSteamPeerConnectionSource;
 	m_pVideoStreamSubscriber = pVideoStreamSubscriber;
 
 Error:
@@ -1091,12 +1645,100 @@ bool DreamOS::IsRegisteredVideoStreamSubscriber(DreamVideoStreamSubscriber *pVid
 	return (m_pVideoStreamSubscriber == pVideoStreamSubscriber);
 }
 
-RESULT DreamOS::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT DreamOS::RegisterCameraVideoStreamSubscriber(PeerConnection *pVideoSteamPeerConnectionSource, DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
+	RESULT r = R_PASS;
+
+	CN(pVideoStreamSubscriber);
+	CBM((m_pCameraVideoStreamSubscriber == nullptr), "Video Steam Subscriber is already set");
+
+	m_pCameraVideoStreamPeerConnectionSource = pVideoSteamPeerConnectionSource;
+	m_pCameraVideoStreamSubscriber = pVideoStreamSubscriber;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::UnregisterCameraVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
+	RESULT r = R_PASS;
+
+	CN(pVideoStreamSubscriber);
+	CBM((m_pCameraVideoStreamSubscriber == pVideoStreamSubscriber), "Video Steam Subscriber is not set to this object");
+
+	m_pCameraVideoStreamSubscriber = nullptr;
+
+Error:
+	return r;
+}
+
+bool DreamOS::IsRegisteredCameraVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
+	return (m_pCameraVideoStreamSubscriber == pVideoStreamSubscriber);
+}
+
+RESULT DreamOS::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_NOT_HANDLED;
 
-	if (m_pVideoStreamSubscriber != nullptr && pPeerConnection == m_pVideoSteamPeerConnectionSource) {
-		CR(m_pVideoStreamSubscriber->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+	if (strVideoTrackLabel == kChromeVideoLabel) {
+		if (m_pVideoStreamSubscriber != nullptr && pPeerConnection == m_pVideoStreamPeerConnectionSource) {
+			CR(m_pVideoStreamSubscriber->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		}
 	}
+	else if (strVideoTrackLabel == kVCamVideoLabel) {
+		if (m_pCameraVideoStreamSubscriber != nullptr && pPeerConnection == m_pCameraVideoStreamPeerConnectionSource) {
+			CR(m_pCameraVideoStreamSubscriber->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		}
+	}
+
+Error:
+	return r;
+}
+
+bool DreamOS::IsSharing() {
+	return m_pDreamShareView->IsStreaming();
+}
+
+texture* DreamOS::GetSharedContentTexture() {
+
+	if (m_pDreamShareView != nullptr) {
+		return m_pDreamShareView->GetCastingTexture();
+	}
+	
+	return nullptr;
+}
+
+texture* DreamOS::GetSharedContentPointerTexture() {
+	if (m_pDreamShareView != nullptr) {
+		return m_pDreamShareView->GetPointingTexture();
+	}
+	return nullptr;
+}
+
+texture* DreamOS::GetSharedCameraTexture() {
+	return nullptr;
+}
+
+RESULT DreamOS::SetSharedContentTexture(texture* pSharedTexture) {
+	if (m_pDreamShareView != nullptr) {
+		m_pDreamShareView->SetCastingTexture(pSharedTexture);
+	}
+
+	return R_PASS;
+}
+
+RESULT DreamOS::BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	CN(m_pDreamShareView);
+	m_pDreamShareView->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight);
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::BroadcastSharedAudioPacket(const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CN(m_pDreamShareView);
+	CR(m_pDreamShareView->BroadcastAudioPacket(pendingAudioPacket));
 
 Error:
 	return r;

@@ -12,8 +12,8 @@ private:
 		const void* pAudioDataBuffer;
 		int bitsPerSample;
 		int samplingRate;
-		size_t channels;
-		size_t frames;
+		size_t numChannels;
+		size_t numFrames;
 	} m_body;
 
 public:
@@ -29,8 +29,8 @@ public:
 		m_body.pAudioDataBuffer = pAudioDataBuffer;
 		m_body.bitsPerSample = bitsPerSample;
 		m_body.samplingRate = samplingRate;
-		m_body.channels = channels;
-		m_body.frames = frames;
+		m_body.numChannels = channels;
+		m_body.numFrames = frames;
 	}
 
 	~AudioDataMessage() {
@@ -57,12 +57,12 @@ public:
 		return m_body.samplingRate;
 	}
 
-	const size_t GetChannels() {
-		return m_body.channels;
+	const size_t GetNumChannels() {
+		return m_body.numChannels;
 	}
 
-	const size_t GetFrames() {
-		return m_body.frames;
+	const size_t GetNumFrames() {
+		return m_body.numFrames;
 	}
 };
 

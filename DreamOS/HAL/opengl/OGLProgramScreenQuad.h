@@ -14,9 +14,11 @@ class OGLQuad;
 
 class OGLProgramScreenQuad : public OGLProgram {
 public:
-	OGLProgramScreenQuad(OpenGLImp *pParentImp);
+	OGLProgramScreenQuad(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramScreenQuad(OpenGLImp *pParentImp, std::string strName = "oglscreenquad", PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
+	virtual RESULT OGLInitialize(version versionOGL) override;
 
 	virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID) override;
@@ -41,6 +43,9 @@ private:
 
 	OGLUniformBool *m_pFUniformTextureMS = nullptr;
 	OGLUniformInt *m_pUniformColorTextureMS_n = nullptr;
+
+	OGLUniformFloat *m_pUniformWindowWidth = nullptr;
+	OGLUniformFloat *m_pUniformWindowHeight = nullptr;
 
 	OGLUniformVector *m_pUniformBackgroundColor = nullptr;
 };

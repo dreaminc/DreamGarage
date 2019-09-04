@@ -2,8 +2,15 @@
 #include "Primitives/ray.h"
 #include "UIButton.h"
 #include "UIMenuItem.h"
-#include "UIScrollView.h"
-#include "DreamControlView/UIControlBar.h"
+#include "UISpatialScrollView.h"
+#include "UIFlatScrollView.h"
+#include "UISurface.h"
+#include "UIPointerLabel.h"
+
+// TODO: move these files to DreamOS(?)
+#include "DreamGarage/UserAreaControls.h"
+#include "DreamGarage/UITabView.h"
+#include "DreamControlView/UIControlView.h"
 
 #include "DreamOS.h"
 
@@ -102,6 +109,43 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<UIButton> UIView::MakeUIButton(std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture, float width, float height) {
+	std::shared_ptr<UIButton> pButton(new UIButton(m_pHALImp, m_pDreamOS, width, height, pEnabledTexture, pDisabledTexture));
+
+	return pButton;
+}
+
+std::shared_ptr<UIButton> UIView::AddUIButton(std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture, float width, float height) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIButton> pButton = MakeUIButton(pEnabledTexture, pDisabledTexture, width, height);
+	CR(AddObject(pButton));
+	return pButton;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIButton> UIView::AddButton(float offset, float width, float height, std::function<RESULT(UIButton*, void*)> fnCallback, std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIButton> pButton = AddUIButton(pEnabledTexture, pDisabledTexture, width, height);
+
+	pButton->SetPosition(point(offset, 0.0f, 0.0f));
+
+	// if there isn't a trigger callback provided, 
+	// the button doesn't need to be interactable at all
+	if (fnCallback != nullptr) {
+		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
+		CR(pButton->RegisterTouchStart());
+		CR(pButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnCallback));
+	}
+	
+	return pButton;
+Error:
+	return nullptr;
+}
+
+
 std::shared_ptr<UIMenuItem> UIView::MakeUIMenuItem() {
 	std::shared_ptr<UIMenuItem> pButton(new UIMenuItem(m_pHALImp, m_pDreamOS));
 
@@ -118,34 +162,137 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<UIControlBar> UIView::MakeUIControlBar() {
-	std::shared_ptr<UIControlBar> pControlBar(new UIControlBar(m_pHALImp, m_pDreamOS));
+std::shared_ptr<UIMenuItem> UIView::MakeUIMenuItem(float width, float height) {
+	std::shared_ptr<UIMenuItem> pButton(new UIMenuItem(m_pHALImp, m_pDreamOS, width, height));
+
+	return pButton;
+}
+
+std::shared_ptr<UIMenuItem> UIView::AddUIUIMenuItem(float width, float height) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIMenuItem> pButton = MakeUIMenuItem(width, height);
+	CR(AddObject(pButton));
+	return pButton;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UserAreaControls> UIView::MakeUIContentControlBar() {
+	std::shared_ptr<UserAreaControls> pControlBar(new UserAreaControls(m_pHALImp, m_pDreamOS));
 
 	return pControlBar;
 }
 
-std::shared_ptr<UIControlBar> UIView::AddUIControlBar() {
+std::shared_ptr<UserAreaControls> UIView::AddUIContentControlBar() {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<UIControlBar> pControlBar = MakeUIControlBar();
+	std::shared_ptr<UserAreaControls> pControlBar = MakeUIContentControlBar();
 	CR(AddObject(pControlBar));
 	return pControlBar;
 Error:
 	return nullptr;
 }
 
-std::shared_ptr<UIScrollView> UIView::MakeUIScrollView() {
-	std::shared_ptr<UIScrollView> pScrollView(new UIScrollView(m_pHALImp, m_pDreamOS));
+std::shared_ptr<UITabView> UIView::MakeUITabView() {
+	std::shared_ptr<UITabView> pTabView(new UITabView (m_pHALImp, m_pDreamOS));
+
+	return pTabView;
+}
+
+std::shared_ptr<UITabView> UIView::AddUITabView() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UITabView> pTabView = MakeUITabView();
+	CR(AddObject(pTabView));
+	return pTabView;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UISpatialScrollView> UIView::MakeUISpatialScrollView() {
+	std::shared_ptr<UISpatialScrollView> pScrollView(new UISpatialScrollView(m_pHALImp, m_pDreamOS));
 
 	return pScrollView;
 }
 
-std::shared_ptr<UIScrollView> UIView::AddUIScrollView() {
+std::shared_ptr<UISpatialScrollView> UIView::AddUISpatialScrollView() {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<UIScrollView> pScrollView = MakeUIScrollView();
+	std::shared_ptr<UISpatialScrollView> pScrollView = MakeUISpatialScrollView();
 	CR(AddObject(pScrollView));
 	return pScrollView;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIFlatScrollView> UIView::MakeUIFlatScrollView() {
+	std::shared_ptr<UIFlatScrollView> pScrollView(new UIFlatScrollView(m_pHALImp, m_pDreamOS));
+
+	return pScrollView;
+}
+
+std::shared_ptr<UIFlatScrollView> UIView::AddUIFlatScrollView() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIFlatScrollView> pScrollView = MakeUIFlatScrollView();
+	CR(AddObject(pScrollView));
+	return pScrollView;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIControlView> UIView::MakeUIControlView() {
+	std::shared_ptr<UIControlView> pControlView(new UIControlView(m_pHALImp, m_pDreamOS));
+
+	return pControlView;
+}
+
+std::shared_ptr<UIControlView> UIView::AddUIControlView() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIControlView> pControlView = MakeUIControlView();
+	CR(AddObject(pControlView));
+	return pControlView;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UISurface> UIView::MakeUISurface() {
+	std::shared_ptr<UISurface> pSurface(new UISurface(m_pHALImp, m_pDreamOS));
+
+	return pSurface;
+}
+
+std::shared_ptr<UISurface> UIView::AddUISurface() {
+	RESULT r = R_PASS;
+	std::shared_ptr<UISurface> pSurface = MakeUISurface();
+	CR(AddObject(pSurface));
+	return pSurface;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIPointerLabel> UIView::MakeUIPointerLabel() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIPointerLabel> pPointerLabel(new UIPointerLabel(m_pHALImp, m_pDreamOS));
+	CN(pPointerLabel);
+	CR(pPointerLabel->Initialize());
+
+	return pPointerLabel;
+Error:
+	if (pPointerLabel != nullptr) {
+		pPointerLabel = nullptr;
+	}
+	return nullptr;
+}
+
+std::shared_ptr<UIPointerLabel> UIView::AddUIPointerLabel() {
+	RESULT r = R_PASS;
+	std::shared_ptr<UIPointerLabel> pLabel = MakeUIPointerLabel();
+	CR(AddObject(pLabel));
+	return pLabel;
 Error:
 	return nullptr;
 }

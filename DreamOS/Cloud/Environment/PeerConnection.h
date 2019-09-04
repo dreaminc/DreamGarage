@@ -40,21 +40,21 @@ public:
 	}
 
 	RESULT Print() {
-		DEBUG_LINEOUT("User ID %d Peer ID %d Peer Connection ID %d", m_offerUserID, m_answerUserID, m_peerConnectionID);
+		DOSLOG(INFO, "User ID %d Peer ID %d Peer Connection ID %d", m_offerUserID, m_answerUserID, m_peerConnectionID);
 		
-		DEBUG_LINEOUT("SDP Offer: %s", m_strSDPOffer.c_str());
-		DEBUG_LINEOUT("%d Offer Candidates:", static_cast<int>(m_offerICECandidates.size()));
+		DOSLOG(INFO, "SDP Offer: %s", m_strSDPOffer.c_str());
+		DOSLOG(INFO, "%d Offer Candidates:", static_cast<int>(m_offerICECandidates.size()));
 		for (auto &iceCandidate : m_offerICECandidates) {
 			iceCandidate.Print();
 		}
-		DEBUG_LINEOUT(" ");
+		DOSLOG(INFO, " ");
 
-		DEBUG_LINEOUT("SDP Answer: %s", m_strSDPAnswer.c_str());
-		DEBUG_LINEOUT("%d Answer Candidates:", static_cast<int>(m_answerICECandidates.size()));
+		DOSLOG(INFO, "SDP Answer: %s", m_strSDPAnswer.c_str());
+		DOSLOG(INFO, "%d Answer Candidates:", static_cast<int>(m_answerICECandidates.size()));
 		for (auto &iceCandidate : m_answerICECandidates) {
 			iceCandidate.Print();
 		}
-		DEBUG_LINEOUT(" ");
+		DOSLOG(INFO, " ");
 
 		return R_PASS;
 	}
@@ -143,11 +143,11 @@ public:
 		RESULT r = R_PASS;
 
 		long userID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
-		long environmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+		//long environmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
 		m_offerPosition = jsonOfferSocketConnection["/position"_json_pointer].get<long>();
 
 		CR(SetOfferUserID(userID));
-		CR(SetEnvironmentID(environmentID));
+		//CR(SetEnvironmentID(environmentID));
 
 	Error:
 		return r;
@@ -157,11 +157,11 @@ public:
 		RESULT r = R_PASS;
 
 		long peerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
-		long environmentID = jsonAnswerSocketConnection["/environment"_json_pointer].get<long>();
+		//long environmentID = jsonAnswerSocketConnection["/environment"_json_pointer].get<long>();
 		m_answerPosition = jsonAnswerSocketConnection["/position"_json_pointer].get<long>();
 
 		CR(SetAnswerUserID(peerUserId));
-		CR(SetEnvironmentID(environmentID));
+		//CR(SetEnvironmentID(environmentID));
 
 	Error:
 		return r;
@@ -225,6 +225,30 @@ public:
 		return r;
 	}
 
+	RESULT UpdatePeerConnectionCandidateFromJSON(nlohmann::json jsonPeerConnection) {
+		RESULT r = R_PASS;
+
+		if (jsonPeerConnection["/candidate"_json_pointer] != nullptr) {
+			std::string strCandidateType = jsonPeerConnection["/candidate_type"_json_pointer].get<std::string>();
+
+			auto &jsonICECandidate = jsonPeerConnection["/candidate"_json_pointer];
+			std::string strSDPCandidate = jsonICECandidate[kCandidateSdpName].get<std::string>();
+			std::string strSDPMediaID = jsonICECandidate[kCandidateSdpMidName].get<std::string>();
+			int SDPMediateLineIndex = jsonICECandidate[kCandidateSdpMlineIndexName].get<int>();
+
+			WebRTCICECandidate iceCandidate(strSDPCandidate, strSDPMediaID, SDPMediateLineIndex);
+			if (strCandidateType == "PeerCandidateType.Offer") {
+				m_offerICECandidates.push_back(iceCandidate);
+			}
+			else {
+				m_answerICECandidates.push_back(iceCandidate);
+			}
+		}
+		
+	Error:
+		return r;
+	}
+
 	nlohmann::json GetPeerConnectionJSON() {
 		nlohmann::json jsonData;
 
@@ -261,6 +285,36 @@ public:
 		return jsonData;
 	}
 
+	nlohmann::json GetPeerConnectionICECandidateJSON(WebRTCICECandidate *pICECandidate, bool fOfferer) {
+		nlohmann::json jsonData;
+
+		jsonData["peer_connection"] = std::to_string(m_peerConnectionID);
+
+		if (fOfferer) {
+			// TODO: Add RESULT handling
+			nlohmann::json jsonICECandidate;
+
+			jsonICECandidate[kCandidateSdpName] = pICECandidate->m_strSDPCandidate;
+			jsonICECandidate[kCandidateSdpMidName] = pICECandidate->m_strSDPMediaID;
+			jsonICECandidate[kCandidateSdpMlineIndexName] = pICECandidate->m_SDPMediateLineIndex;
+
+			jsonData["candidate"] = jsonICECandidate;
+			jsonData["candidate_type"] = "PeerCandidateType.Offer";
+		}
+		else {
+			nlohmann::json jsonICECandidate;
+
+			jsonICECandidate[kCandidateSdpName] = pICECandidate->m_strSDPCandidate;
+			jsonICECandidate[kCandidateSdpMidName] = pICECandidate->m_strSDPMediaID;
+			jsonICECandidate[kCandidateSdpMlineIndexName] = pICECandidate->m_SDPMediateLineIndex;
+
+			jsonData["candidate"] = jsonICECandidate;
+			jsonData["candidate_type"] = "PeerCandidateType.Answer";
+		}
+
+		return jsonData;
+	}
+
 	//nlohmann::json GetCandidatesJSON(std::list<WebRTCICECandidate> iceCandidates, nlohmann::json &jsonCandidates) {
 	RESULT GetCandidatesJSON(std::list<WebRTCICECandidate> iceCandidates, nlohmann::json &jsonCandidates) {
 		RESULT r = R_PASS;
@@ -291,12 +345,22 @@ public:
 		return R_PASS;
 	}
 
+	RESULT AppendOfferCandidate(WebRTCICECandidate *pICECandidate) {
+		m_offerICECandidates.emplace_back(*pICECandidate);	// Should this be push_back()?
+		return R_PASS;
+	}
+
 	const std::list<WebRTCICECandidate>& GetAnswerCandidates() { 
 		return m_answerICECandidates; 
 	}
 
 	RESULT SetAnswerCandidates(std::list<WebRTCICECandidate>& iceCandidates) {
 		m_answerICECandidates = iceCandidates;
+		return R_PASS;
+	}
+
+	RESULT AppendAnswerCandidate(WebRTCICECandidate *pICECandidate) {
+		m_answerICECandidates.emplace_back(*pICECandidate);
 		return R_PASS;
 	}
 
@@ -318,7 +382,16 @@ public:
 		return m_fWebRTCConnectionStable;
 	}
 
-	
+	long GetPeerSeatPosition() {
+		if (m_userID == m_offerUserID) {
+			return m_answerPosition;
+		}
+		else if (m_userID == m_answerUserID) {
+			return m_offerPosition;
+		}
+
+		return -1;
+	}
 
 private:
 	long m_userID;

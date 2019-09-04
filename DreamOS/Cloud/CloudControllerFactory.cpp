@@ -5,6 +5,8 @@
 
 #include "Sandbox/CommandLineManager.h"
 
+#include "CloudController.h"
+
 #include <memory>
 
 CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_IMP_TYPE type, void *pContext = nullptr) {

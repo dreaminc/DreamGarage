@@ -9,72 +9,106 @@
 // This test suite should cover testing all functionality related to the
 // HAL (graphics) layer and interfaces.
 
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 #include <functional>
 #include <memory>
 
-class DreamOS;
+#include "DreamOS.h"
+
 class HALImp;
 
-class HALTestSuite : public TestSuite {
+class HALTestSuite : public DreamTestSuite {
 public:
 	HALTestSuite(DreamOS *pDreamOS);
-	~HALTestSuite();
+
+	~HALTestSuite() = default;
 
 	virtual RESULT AddTests() override;
 
 public:
 	// Note: This should eventually call the DreamGarageApp pipeline
 	// function rather than duplicating it
-	RESULT SetupSkyboxPipeline(std::string strRenderShaderName = "environment");
+	virtual RESULT SetupPipeline(std::string strRenderShaderName = "standard") override;
+	virtual RESULT SetupTestSuite() override;
 
+	//virtual RESULT DefaultResetProcess(void *pContext) override;
+
+	// Skybox Test
 	RESULT AddTestSkybox();
 
-	RESULT AddTestEnvironmentShader();
+	// Shader Tests
+	RESULT AddTestFadeShader();
+	RESULT AddTestWaterShader();
+	RESULT AddTestWaterShaderCube();
+	RESULT AddTestGeometryShader();
+	RESULT AddTestBillboardShader();
+	RESULT AddTestIncludeShader();
+	RESULT AddTestToonShader();
+	RESULT AddTestBlinnPhongShader();
+	RESULT AddTestBlinnPhongShaderTexture();
+	RESULT AddTestBlinnPhongShaderTextureBump();
+	RESULT AddTestBlinnPhongShaderTextureBumpDisplacement();
+	RESULT AddTestMinimalShader();
+	RESULT AddTestMinimalTextureShader();
+	RESULT AddTestTextureFormats();
+	RESULT AddTestBlinnPhongShaderBlur();
+	RESULT AddTestDepthPeelingShader();
+	RESULT AddTestObjectMaterialsBump();
+	RESULT AddTestObjectMaterialsColors();
+	RESULT AddTestEnvironmentMapping();
 
+	// Pixel Buffer Object
+	RESULT AddTestTextureUpdate();
+	RESULT AddTestPBOTextureUpload();
+	RESULT AddTestPBOTextureReadback();
+
+	RESULT AddTestTextureSubRegionUpdate();
+
+	// Environments
+	RESULT AddTestStandardShader();
+	RESULT AddTestEnvironments();
+
+	// Objects
 	RESULT AddTestModelInstancing();
 	RESULT AddTestText();
 	RESULT AddTestModel();
 	RESULT AddTestUserModel();
 	RESULT AddTestModelOrientation();
 	RESULT AddTestQuadObject();
+	RESULT AddTestHeightQuadObject();
 	RESULT AddTestUIShaderStage();
+	RESULT AddTestFlatContextNesting();
+
+	RESULT AddTestCubeMap();
+	RESULT AddTestIrradianceMap();
 
 	RESULT TestNestedOBB();
-
-	RESULT AddTestRotation();
-
-	// TODO: Consolidate the HMD tests 
-	// TODO: This should be easy as this is now supported by pipeline
-	RESULT AddTestMinimalShaderHMD();
-	RESULT AddTestBlinnPhongShader();
-	RESULT AddTestBlinnPhongShaderBlurHMD();
-	RESULT AddTestBlinnPhongShaderTextureHMD();
-	RESULT AddTestBlinnPhongShaderTextureCopy();
+	RESULT TestNestedCompositesQauds();
 
 	RESULT AddTestMouseDrag();
-	RESULT AddTestMinimalShader();
-	RESULT AddTestMinimalTextureShader();
-	RESULT AddTestBlinnPhongShaderBlur();
-	RESULT AddTestBlinnPhongShaderTexture();
-
+	
 	RESULT AddTestSenseHaptics();
-
-	RESULT AddTestDepthPeelingShader();
 
 	RESULT AddTestRenderToTextureQuad();
 	RESULT AddTestFramerateVolumes();
 	RESULT AddTestAlphaVolumes();
 
-private:
-	RESULT ResetTest(void *pContext);
+	RESULT AddTestRemoveObjects();
+	RESULT AddTestRotation();
+
+	RESULT AddTestCamera();
+	RESULT AddTest3rdPersonCamera();
 
 private:
-	HALImp *GetHALImp();
+	virtual RESULT DefaultResetProcess(void *pContext) override;
 
 private:
-	DreamOS *m_pDreamOS;
+	HALImp* GetHALImp() {
+		return m_pDreamOS->GetHALImp();
+	}
+
+private:
 	HALImp *m_pHALImp = nullptr;
 };
 

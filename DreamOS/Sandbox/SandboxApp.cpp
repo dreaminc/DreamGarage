@@ -1,30 +1,52 @@
 #include "SandboxApp.h"
-#include "Cloud/CloudController.h"
 
-#include "Cloud/Message/Message.h"
+#include "Primitives/PrimParams.h"
+
+#include "Cloud/CloudController.h"
 
 #include "Primitives/ray.h"
 
-#include <HMD/OpenVR/OpenVRDevice.h>
-#include <HMD/Oculus/OVR.h>
+#ifndef OCULUS_PRODUCTION_BUILD
+	#include <HMD/OpenVR/OpenVRDevice.h>
+#endif
 
-#include "DreamAppManager.h"
 #include "DreamAppMessage.h"
 
-#include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/ProgramNode.h"
-
 #include "Primitives/model/ModelFactory.h"
 
-#include <HMD/HMDFactory.h>
+#include "CommandLineManager.h"
+
+#include "InteractionEngine/InteractionEngine.h"
+#include "PhysicsEngine/PhysicsEngine.h"
+
+#include "Scene/CameraNode.h"
+#include "Scene/ObjectStoreNode.h"
+#include "PhysicsEngine/CollisionDetector.h"
+
+#include "Sense/SenseLeapMotion.h"
+
+#include "DreamAppManager.h"
+#include "DreamModuleManager.h"
+
+#include "HAL/Pipeline/SinkNode.h"
+
+#include "Primitives/HysteresisPlane.h"
+#include "Primitives/HysteresisSphere.h"
+#include "Primitives/HysteresisCylinder.h"
+
+// TODO: Fix
+#include "HAL/opengl/OGLHand.h"
 
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
 	m_pOpenGLRenderingContext(nullptr),
 	m_pSceneGraph(nullptr),
+	m_pAuxSceneGraph(nullptr),
 	m_pUISceneGraph(nullptr),
 	m_pUIClippingSceneGraph(nullptr),
+	m_pAuxUISceneGraph(nullptr),
 	m_pPhysicsGraph(nullptr),
 	m_pInteractionGraph(nullptr),
 	m_pFlatSceneGraph(nullptr),
@@ -93,11 +115,11 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 		case SENSE_MOUSE_MOVE: {
 			// For object intersection testing
 			//SenseMouse::PrintEvent(mEvent);
-			
+
 			if (m_fMouseIntersectObjects) {
 				// Create ray
-				// TODO: This will only work for non-HMD camera 
-				
+				// TODO: This will only work for non-HMD camera
+
 				ray rayCamera = m_pCamera->GetRay(mEvent->xPos, mEvent->yPos);
 
 				// intersect ray
@@ -140,7 +162,7 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 
 RESULT SandboxApp::GetMouseRay(ray &rCast, double t){
 	RESULT r = R_PASS;
-	int mouseX = 0; 
+	int mouseX = 0;
 	int mouseY = 0;
 	int pxWidth = 0;
 	int pxHeight = 0;
@@ -148,9 +170,9 @@ RESULT SandboxApp::GetMouseRay(ray &rCast, double t){
 	// Get mouse position
 	CR(m_pSenseMouse->GetMousePosition(mouseX, mouseY));
 	CR(GetSandboxWindowSize(pxWidth, pxHeight));
-	
+
 	if (mouseX >= 0 && mouseY >= 0 && mouseX <= pxWidth && mouseY <= pxHeight) {
-		
+
 		CN(m_pCamera);
 		rCast = m_pCamera->GetRay(mouseX, mouseY, t);
 
@@ -184,12 +206,12 @@ RESULT SandboxApp::Notify(CollisionGroupEvent* gEvent) {
 
 	for (auto &pObject : gEvent->m_collisionGroup) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
-		
+
 		if (pDimObj != nullptr) {
 			pDimObj->SetVertexColor(color(COLOR_RED));
 		}
 	}
-	
+
 
 //Error:
 	return r;
@@ -210,7 +232,7 @@ RESULT SandboxApp::RegisterImpKeyboardEvents() {
 	//CR(RegisterSubscriber(SVK_UP, pCamera));
 	//CR(RegisterSubscriber(SVK_DOWN, pCamera));
 	//CR(RegisterSubscriber(SVK_RIGHT, pCamera));
-	
+
 	//CR(RegisterSubscriber(SVK_SPACE, pCamera));
 
 	/*
@@ -249,9 +271,33 @@ Error:
 }
 
 // temp
-#include "HAL/opengl/OGLHand.h"
+#include "DreamLogger/DreamLogger.h"            // for DreamLogger
+#include "HAL/opengl/OpenGLRenderingContext.h"  // for OpenGLRenderingContext
+#include "HAL/Pipeline/Pipeline.h"              // for Pipeline
+#include "Primitives/billboard.h"               // for billboard
+#include "Primitives/composite.h"               // for composite
+#include "Primitives/cylinder.h"                // for cylinder
+#include "Primitives/DimObj.h"                  // for DimObj
+#include "Primitives/DimPlane.h"                // for DimPlane
+#include "Primitives/DimRay.h"                  // for DimRay
+#include "Primitives/FlatContext.h"             // for FlatContext
+#include "Primitives/model/mesh.h"              // for mesh
+#include "Primitives/model/model.h"             // for model
+#include "Primitives/quad.h"                    // for quad
+#include "Primitives/skybox.h"                  // for skybox
+#include "Primitives/sphere.h"                  // for sphere
+#include "Primitives/stereocamera.h"            // for stereocamera
+#include "Primitives/user.h"                    // for user
+#include "Primitives/volume.h"                  // for volume
+#include "RESULT/EHM.h"                         // for CR, CN, CNM, CRM, DOSLOG, CB, CVM, WCNM, CBM, CNR
+#include "Scene/ObjectStore.h"                  // for ObjectStore
+#include "Scene/ObjectStoreFactory.h"           // for ObjectStoreFactory, ObjectStoreFactory::TYPE, ObjectStoreFactory::TYPE::LIST
+#include "vcruntime_new.h"                      // for operator delete, operator new
+#include <synchapi.h>                           // for Sleep
+#include <WinUser.h>                            // for GetAsyncKeyState, VK_ESCAPE
+class SinkNode;
 
-// TODO: shouldn't be this way ultimately 
+// TODO: shouldn't be this way ultimately
 RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	RESULT r = R_PASS;
 
@@ -264,10 +310,7 @@ RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
 
-	pLeftHand->SetOriented(true);
-	pRightHand->SetOriented(true);
-
-	//TODO: broken for now
+	// TODO: broken for now
 //	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
 //	CR(m_pSenseLeapMotion->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));
 
@@ -281,9 +324,6 @@ RESULT SandboxApp::RegisterImpControllerEvents() {
 	if (m_pHMD != nullptr) {
 		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_LEFT);
 		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_RIGHT);
-
-		pLeftHand->SetOriented(false);
-		pRightHand->SetOriented(false);
 
 		CR(m_pHMD->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
 		CR(m_pHMD->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));
@@ -299,9 +339,8 @@ Error:
 	return r;
 }
 
-//hand *Windows64App::AttachHand
-
 hand *SandboxApp::GetHand(HAND_TYPE handType) {
+
 	if (m_pHMD != nullptr) {
 		return m_pHMD->GetHand(handType);
 	}
@@ -309,7 +348,7 @@ hand *SandboxApp::GetHand(HAND_TYPE handType) {
 	if (m_pSenseLeapMotion != nullptr) {
 		return m_pSenseLeapMotion->GetHand(handType);
 	}
-	
+
 	return nullptr;
 }
 
@@ -324,23 +363,69 @@ RESULT SandboxApp::SetSandboxRunning(bool fRunning) {
 }
 
 inline PathManager* SandboxApp::GetPathManager() {
-	return m_pPathManager; 
+	return m_pPathManager;
 }
 
 inline OpenGLRenderingContext * SandboxApp::GetOpenGLRenderingContext() {
-	return m_pOpenGLRenderingContext; 
+	return m_pOpenGLRenderingContext;
+}
+
+bool SandboxApp::IsShuttingDown() {
+	return m_fPendingShutdown;
+}
+
+RESULT SandboxApp::PendShutdown() {
+	m_fPendingShutdown = true;
+	return R_PASS;
 }
 
 RESULT SandboxApp::Shutdown() {
 	RESULT r = R_SUCCESS;
 
+	DOSLOG(INFO, "Begin sandbox shutdown.");
+
 	if (m_pDreamAppManager != nullptr) {
 		CR(m_pDreamAppManager->Shutdown());
 		m_pDreamAppManager = nullptr;
 	}
+	DOSLOG(INFO, "App Manager Shutdown");
+
+	if (m_pDreamModuleManager != nullptr) {
+		CR(m_pDreamModuleManager->Shutdown());
+		m_pDreamModuleManager = nullptr;
+	}
+	DOSLOG(INFO, "Module Manager Shutdown");
+
+	if (m_pHMD != nullptr) {
+		CR(m_pHMD->ReleaseHMD());
+		delete m_pHMD;
+		m_pHMD = nullptr;
+	}
+	DOSLOG(INFO, "Release HMD");
 
 	// Implementation specific shutdown
 	CR(ShutdownSandbox());
+	DOSLOG(INFO, "Sandbox Shutdown complete");
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::HMDShutdown() {
+	RESULT r = R_PASS;
+
+	//*
+	DOSLOG(INFO, "OVRShutdown called");
+	if (m_pHMD != nullptr) {
+		DOSLOG(INFO, "Releasing HMD");
+		CR(m_pHMD->ReleaseHMD());
+		delete m_pHMD;
+		m_pHMD = nullptr;
+		DOSLOG(INFO, "HMD Released");
+	}
+	//*/
+
+	PendShutdown();
 
 Error:
 	return r;
@@ -353,13 +438,20 @@ RESULT SandboxApp::RunAppLoop() {
 	CN(m_pHALImp);
 	CR(m_pHALImp->MakeCurrentContext());
 
+#ifdef OCULUS_PRODUCTION_BUILD
+	// TODO: This is a hack until async model loading can happen
+	// Literally only doing it to pass oculus tests
+	m_pHALImp->Render();
+	SwapDisplayBuffers();
+#endif
+
 	SetSandboxRunning(true);
 
 	// TODO: This should be moved to the sandbox
 	while (IsSandboxRunning()) {
 		CR(HandleMessages());	// Handle windows messages
-		
-		if (!IsSandboxRunning()) 
+
+		if (!IsSandboxRunning())
 			break;
 
 #ifdef CEF_ENABLED
@@ -367,8 +459,8 @@ RESULT SandboxApp::RunAppLoop() {
 		CR(m_pCloudController->Update());
 #endif
 
-		// Time Manager
-		CR(m_pTimeManager->Update());
+		// Module Manager
+		CR(m_pDreamModuleManager->Update());
 
 		// App Manager
 		CR(m_pDreamAppManager->Update());
@@ -384,20 +476,28 @@ RESULT SandboxApp::RunAppLoop() {
 
 		// Update the mouse
 		// TODO: This is wrong architecture, this should
-		// be parallel 
+		// be parallel
 		// TODO: Update Sense etc
 		//m_pWin64Mouse->UpdateMousePosition();
 
 		if (m_pHMD != nullptr) {
-			m_pHMD->UpdateHMD();
+			CRM(m_pHMD->UpdateHMD(), "UpdateHMD failed in Sandbox");
 		}
 
-		// Update Scene 
+		// Update Scene
 		//CR(m_pSceneGraph->UpdateScene());
 
 		// TODO: Do these need to be wired up this way?
 		// Why not just do an Update with retained graph
 
+		// Do this before we set the program or any GPU specific things
+		// since this gives objects the opportunity to do stuff on the GPU side
+		// TODO: why
+		OGLProgram::UpdateObjectStore(m_pUIClippingSceneGraph);
+		OGLProgram::UpdateObjectStore(m_pUISceneGraph);
+		OGLProgram::UpdateObjectStore(m_pAuxUISceneGraph);
+
+		// TODO: MODULE
 		// Update Physics
 		CR(m_pPhysicsEngine->UpdateObjectStore(m_pPhysicsGraph));
 
@@ -419,13 +519,18 @@ RESULT SandboxApp::RunAppLoop() {
 		SwapDisplayBuffers();
 
 		//DreamConsole::GetConsole()->OnFrameRendered();
-
-		if (GetAsyncKeyState(VK_ESCAPE)) {
+#ifdef _DEBUG
+		if (IsShuttingDown() || GetAsyncKeyState(VK_ESCAPE)) {
+#else
+		if (IsShuttingDown()) {
+#endif
+			Sleep(1000);
 			Shutdown();
 		}
 	}
 
 Error:
+	DreamLogger::instance()->Flush();
 	return r;
 }
 
@@ -448,24 +553,27 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	// Set up command line manager
 	m_pCommandLineManager = CommandLineManager::instance();
 	CN(m_pCommandLineManager);
-	
-	// previous AWS server
-	// CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "http://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
-	// CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
 
-	CR(m_pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.develop.dreamos.com:443"));
-	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.develop.dreamos.com:443"));
-	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
-	CR(m_pCommandLineManager->RegisterParameter("otk.id", "otk.id", "INVALIDONETIMEKEY"));
-
-	CR(m_pCommandLineManager->RegisterParameter("username", "u", "defaulttestuser@dreamos.com"));
-	CR(m_pCommandLineManager->RegisterParameter("password", "p", "Nightmare479!"));
 	CR(m_pCommandLineManager->RegisterParameter("hmd", "h", ""));
+	CR(m_pCommandLineManager->RegisterParameter("environment", "env", "default"));
+	
 	CR(m_pCommandLineManager->RegisterParameter("leap", "lp", ""));
-	CR(m_pCommandLineManager->RegisterParameter("testval", "t", "1"));
+	CR(m_pCommandLineManager->RegisterParameter("namedpipe", "n", ""));
+
+	//CR(m_pCommandLineManager->RegisterParameter("otk.id", "otk.id", "INVALIDONETIMEKEY"));
+	//CR(m_pCommandLineManager->RegisterParameter("username", "u", "defaulttestuser@dreamos.com"));
+	//CR(m_pCommandLineManager->RegisterParameter("password", "p", "Nightmare479!"));
 
 	// This can attempt to connect to a given environment
-	CR(m_pCommandLineManager->RegisterParameter("environment", "env", "default"));
+
+#ifndef PRODUCTION_BUILD
+	CR(m_pCommandLineManager->RegisterParameter("environment.path", "env.path", "default"));
+	CR(m_pCommandLineManager->RegisterParameter("head.path", "head.path", "default"));
+	CR(m_pCommandLineManager->RegisterParameter("lefthand.path", "lhand.path", "default"));
+	CR(m_pCommandLineManager->RegisterParameter("righthand.path", "rhand.path", "default"));
+
+	CR(m_pCommandLineManager->RegisterParameter("rtoken", "rt", ""));
+#endif
 
 	// For auto login, use '-l auto'
 #if defined(_USE_TEST_APP) || defined(_UNIT_TESTING)
@@ -473,7 +581,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 #else
 	CR(m_pCommandLineManager->RegisterParameter("login", "l", "auto"));
 #endif
-	
+
 	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
 
 	// Set up Scene Graph
@@ -481,17 +589,28 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
 
+	m_pAuxSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pAuxSceneGraph, "Failed to allocate Scene Graph");
+
 	m_pUISceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pUISceneGraph, "Failed to allocate UI Scene Graph");
-	
+
+	m_pAuxUISceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pAuxUISceneGraph, "Failed to allocate Aux UI Scene Graph");
+
 	m_pUIClippingSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pUIClippingSceneGraph, "Failed to allocate UI Clipping Scene Graph");
+
+	m_pBillboardSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pBillboardSceneGraph, "Failed to allocate UI Clipping Scene Graph");
 
 	// This will prevent scene graph from being deleted when not connected
 	// TODO: Attach to Sandbox somehow?
 	CB(m_pSceneGraph->incRefCount());
+	CB(m_pAuxSceneGraph->incRefCount());
 	CB(m_pUISceneGraph->incRefCount());
 	CB(m_pUIClippingSceneGraph->incRefCount());
+	CB(m_pAuxUISceneGraph->incRefCount());
 
 	// Set up flat graph
 	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
@@ -505,17 +624,27 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 		m_SandboxConfiguration.fUseHMD = false;
 	}
 	CRM(InitializeHMD(), "Failed to initialize HMD");
+	DOSLOG(INFO, "HMD Initialized");
 
 	// Set up the pipeline
 	CR(SetUpHALPipeline(m_pHALImp->GetRenderPipelineHandle()));
+	DOSLOG(INFO, "HAL Pipeline Setup Successful");
 
 	// Generalize this module pattern
 	if (m_SandboxConfiguration.fInitCloud) {
 		CRM(InitializeCloudController(), "Failed to initialize cloud controller");
 	}
 
-	CRM(InitializeTimeManager(), "Failed to initialize time manager");
+	CRM(InitializeDreamModuleManager(), "Failed to initialize Dream Module Manager");
+
+	// TODO: Time manager should be converted to a module
+	CRM(InitializeTimeManagerModule(), "Failed to initialize time manager");
+
+	if ((m_pCommandLineManager->GetParameterValue("namedpipe").compare("") == 0) == false) {
+		m_SandboxConfiguration.fInitNamedPipe = false;
+	}
 	CRM(InitializeDreamAppManager(), "Failed to initialize app manager");
+	DOSLOG(INFO, "Finished Initializing DreamAppManager");
 
 	if ((m_pCommandLineManager->GetParameterValue("leap").compare("") == 0) == false) {
 		m_SandboxConfiguration.fUseLeap = false;
@@ -523,11 +652,15 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	// TODO: Show this be replaced with individual initialization of each component?
 	CRM(InitializeSandbox(), "Failed to initialize sandbox");
+	DOSLOG(INFO, "Finished Initializing Sandbox");
 
+	// TODO: Make these into modules
 	// TODO: These have dependencies potentially on previous modules
 	// TODO: Need to create proper module loading / dependency system
 	CRM(InitializePhysicsEngine(), "Failed to initialize physics engine");
+
 	CRM(InitializeInteractionEngine(), "Failed to initialize interaction engine");
+
 
 	// Auto Login Handling
 	// This is done in DreamOS now
@@ -540,11 +673,12 @@ Error:
 	return r;
 }
 
+// TODO: Module
 RESULT SandboxApp::InitializePhysicsEngine() {
 	RESULT r = R_PASS;
 
 	m_pPhysicsEngine = PhysicsEngine::MakePhysicsEngine();
-	CNMW(m_pPhysicsEngine, "Physics Engine failed to initialize");
+	WCNM(m_pPhysicsEngine, "Physics Engine failed to initialize");
 
 	// Set up physics graph
 	m_pPhysicsGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
@@ -559,11 +693,12 @@ Error:
 	return r;
 }
 
+// TODO: Module
 RESULT SandboxApp::InitializeInteractionEngine() {
 	RESULT r = R_PASS;
 
 	m_pInteractionEngine = InteractionEngine::MakeEngine(this);
-	CNMW(m_pInteractionEngine, "Interaction Engine failed to initialize");
+	WCNM(m_pInteractionEngine, "Interaction Engine failed to initialize");
 
 	// Set up interaction graph
 	m_pInteractionGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
@@ -582,14 +717,29 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::InitializeTimeManager() {
+RESULT SandboxApp::InitializeTimeManagerModule() {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamModuleManager, "Module manager is not running");
+
+	DOSLOG(INFO, "Launching Time Manager Module");
+
+	m_pTimeManagerModule = m_pDreamModuleManager->CreateRegisterAndStartModule<TimeManagerModule>(this);	
+	CNM(m_pTimeManagerModule, "Failed to launch Time Manager Module");
+	CVM(m_pTimeManagerModule, "Failed to validate Time Manager Module");
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::InitializeDreamModuleManager() {
 	RESULT r = R_PASS;
 
 	// Initialize Time Manager
-	m_pTimeManager = std::make_unique<TimeManager>();
+	m_pDreamModuleManager = std::make_unique<DreamModuleManager>(GetDreamOSHandle());
 
-	CNM(m_pTimeManager, "Failed to allocate Time Manager");
-	CVM(m_pTimeManager, "Failed to validate Time Manager");
+	CNM(m_pDreamModuleManager, "Failed to allocate Dream Module Manager");
+	CVM(m_pDreamModuleManager, "Failed to validate Dream Module Manager");
 
 Error:
 	return r;
@@ -636,7 +786,14 @@ RESULT SandboxApp::InitializeHMD() {
 	if (GetSandboxConfiguration().fUseHMD) {
 		//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, pxWidth, pxHeight);
 		//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, pxWidth, pxHeight);
-		m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, pxWidth, pxHeight);
+		m_pHMD = HMDFactory::MakeHMD(
+			m_SandboxConfiguration.hmdType,
+			this,
+			m_pHALImp,
+			pxWidth,
+			pxHeight,
+			GetSandboxConfiguration().fHMDMirror	// disable / enable mirror
+		);
 
 		if (m_pHMD != nullptr) {
 			CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
@@ -691,6 +848,21 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 	CNM(pDestSinkNode, "Destination sink node isn't set");
 
 	CB(pDestSinkNode->incRefCount());
+
+	// Add 3rd person sink node if set
+	if (GetSandboxConfiguration().f3rdPersonCamera == true) {
+		SinkNode *p3rdPersonSinkNode = nullptr;
+		p3rdPersonSinkNode = m_pHALImp->MakeSinkNode("displaycamera");
+		CNM(p3rdPersonSinkNode, "Failed to create 3rd person sink node");
+
+		CNM(pRenderPipeline, "Pipeline not initialized");
+		CR(pRenderPipeline->SetAuxiliarySinkNode(p3rdPersonSinkNode));
+
+		p3rdPersonSinkNode = pRenderPipeline->GetAuxiliarySinkNode();
+		CNM(p3rdPersonSinkNode, "Auxiliary sink node isn't set");
+
+		CB(p3rdPersonSinkNode->incRefCount());
+	}
 
 Error:
 	return r;
@@ -750,11 +922,28 @@ const HALImp::HALConfiguration& SandboxApp::GetHALConfiguration() {
 	return m_pHALImp->GetHALConfiguration();
 }
 
+
+
 // Sandbox Factory Methods
-RESULT SandboxApp::AddObject(VirtualObj *pObject) {
+
+// Sandbox Objects
+std::shared_ptr<NamedPipeClient> SandboxApp::MakeNamedPipeClient(std::wstring strPipename) {
+	return nullptr;
+}
+
+std::shared_ptr<NamedPipeServer> SandboxApp::MakeNamedPipeServer(std::wstring strPipename) {
+	return nullptr;
+}
+
+RESULT SandboxApp::AddObject(VirtualObj *pObject, PipelineType pipelineType) {
 	RESULT r = R_PASS;
 
-	CR(m_pSceneGraph->PushObject(pObject));
+	if (static_cast<int>(pipelineType & PipelineType::MAIN) != 0) {
+		CR(m_pSceneGraph->PushObject(pObject));
+	}
+	if (static_cast<int>(pipelineType & PipelineType::AUX) != 0) {
+		CR(m_pAuxSceneGraph->PushObject(pObject));
+	}
 
 Error:
 	return r;
@@ -793,10 +982,15 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject) {
+RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject, PipelineType pipelineType) {
 	RESULT r = R_PASS;
 
-	CR(m_pUISceneGraph->PushObject(pObject));
+	if (static_cast<int>(pipelineType & PipelineType::MAIN) != 0) {
+		CR(m_pUISceneGraph->PushObject(pObject));
+	}
+	if (static_cast<int>(pipelineType & PipelineType::AUX) != 0) {
+		CR(m_pAuxUISceneGraph->PushObject(pObject));
+	}
 
 Error:
 	return r;
@@ -813,10 +1007,14 @@ Error:
 
 RESULT SandboxApp::RemoveObjectFromUIGraph(VirtualObj *pObject) {
 	return m_pUISceneGraph->RemoveObject(pObject);
-}	   
-	   
+}
+
 RESULT SandboxApp::RemoveObjectFromUIClippingGraph(VirtualObj *pObject) {
 	return m_pUIClippingSceneGraph->RemoveObject(pObject);
+}
+
+RESULT SandboxApp::RemoveObjectFromAuxUIGraph(VirtualObj *pObject) {
+	return m_pAuxUISceneGraph->RemoveObject(pObject);
 }
 
 /*
@@ -841,8 +1039,10 @@ RESULT SandboxApp::RemoveObject(VirtualObj *pObject) {
 
 	CR(m_pPhysicsGraph->RemoveObject(pObject));
 	CR(m_pSceneGraph->RemoveObject(pObject));
+	CR(m_pAuxSceneGraph->RemoveObject(pObject));
 	CR(m_pUISceneGraph->RemoveObject(pObject));
 	CR(m_pUIClippingSceneGraph->RemoveObject(pObject));
+	CR(m_pAuxUISceneGraph->RemoveObject(pObject));
 
 	CR(m_pInteractionEngine->RemoveObject(pObject, m_pInteractionGraph));
 	CR(m_pInteractionGraph->RemoveObject(pObject));
@@ -861,12 +1061,14 @@ RESULT SandboxApp::RemoveAllObjects() {
 	RESULT r = R_PASS;
 
 	// removes all animations
-	CR(m_pInteractionEngine->RemoveAllObjects()); 
+	CR(m_pInteractionEngine->RemoveAllObjects());
 
 	CR(m_pPhysicsGraph->RemoveAllObjects());
 	CR(m_pSceneGraph->RemoveAllObjects());
+	CR(m_pAuxSceneGraph->RemoveAllObjects());
 	CR(m_pUISceneGraph->RemoveAllObjects());
 	CR(m_pUIClippingSceneGraph->RemoveAllObjects());
+	CR(m_pAuxUISceneGraph->RemoveAllObjects());
 	CR(m_pInteractionGraph->RemoveAllObjects());
 
 Error:
@@ -891,6 +1093,60 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::InitializeObject(DimObj *pDimObj) {
+	return m_pHALImp->InitializeObject(pDimObj);
+}
+
+RESULT SandboxApp::InitializeTexture(texture *pTexture) {
+	return m_pHALImp->InitializeTexture(pTexture);
+}
+
+DimObj *SandboxApp::MakeObject(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+	DimObj *pDimObj = nullptr;
+
+	if (pPrimParams->GetPrimitiveType() == PRIMITIVE_TYPE::MODEL) {
+		CNM(m_pDreamOSHandle, "Async model loading not supported without a DreamOS handle in Sandbox");
+
+		pDimObj = ModelFactory::MakeModel(m_pDreamOSHandle, pPrimParams, fInitialize);
+		CN(pDimObj);
+	}
+	else {
+		pDimObj = m_pHALImp->MakeObject(pPrimParams, fInitialize);
+		CN(pDimObj);
+	}
+
+Success:
+	return pDimObj;
+
+Error:
+	if (pDimObj != nullptr) {
+		delete pDimObj;
+		pDimObj = nullptr;
+	}
+
+	return nullptr;
+}
+
+texture *SandboxApp::MakeTexture(PrimParams *pPrimParams, bool fInitialize) {
+	RESULT r = R_PASS;
+	texture *pTexture = nullptr;
+
+	pTexture = m_pHALImp->MakeTexture(pPrimParams, fInitialize);
+	CN(pTexture);
+
+Success:
+	return pTexture;
+
+Error:
+	if (pTexture != nullptr) {
+		delete pTexture;
+		pTexture = nullptr;
+	}
+
+	return nullptr;
+}
+
 FlatContext* SandboxApp::AddFlatContext(int width, int height, int channels) {
 	RESULT r = R_PASS;
 
@@ -913,7 +1169,7 @@ Error:
 
 RESULT SandboxApp::RenderToTexture(FlatContext* pContext) {
 	RESULT r = R_PASS;
-	
+
 	CR(m_pHALImp->RenderToTexture(pContext, m_pCamera));
 
 Error:
@@ -991,12 +1247,12 @@ Error:
 }
 
 DimRay* SandboxApp::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
-	return m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional); 
+	return m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional);
 }
 
 DimRay* SandboxApp::AddRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
 	RESULT r = R_PASS;
-	DimRay* pRay = m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional); 
+	DimRay* pRay = m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional);
 	CN(pRay);
 
 	CR(AddObject(pRay));
@@ -1193,9 +1449,12 @@ text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string& strCo
 
 	auto pText = m_pHALImp->MakeText(pFont, strContent, width, height, textFlags);
 
+	//*
 	if (pText->IsRenderToQuad()) {
 		CR(pText->RenderToQuad());
 	}
+	//*/
+	//CR(r);
 
 	return pText;
 
@@ -1315,16 +1574,20 @@ texture* SandboxApp::MakeTexture(const texture &srcTexture) {
 	return m_pHALImp->MakeTexture(srcTexture);
 }
 
-texture* SandboxApp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
-	return m_pHALImp->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, width, height, pixelFormat, channels, pBuffer, pBuffer_n);
+texture* SandboxApp::MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
+	return m_pHALImp->MakeTexture(type, width, height, pixelFormat, channels, pBuffer, pBuffer_n);
 }
 
-texture* SandboxApp::MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
-	return m_pHALImp->MakeTexture(pszFilename, type);
+texture* SandboxApp::MakeTexture(texture::type type, const wchar_t *pszFilename) {
+	return m_pHALImp->MakeTexture(type, pszFilename);
 }
 
-texture* SandboxApp::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
-	return m_pHALImp->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, type);
+texture* SandboxApp::MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) {
+	return m_pHALImp->MakeTextureFromFileBuffer(type, pBuffer, pBuffer_n);
+}
+
+cubemap* SandboxApp::MakeCubemap(const std::wstring &wstrCubemapName) {
+	return m_pHALImp->MakeCubemap(wstrCubemapName);
 }
 
 skybox* SandboxApp::MakeSkybox() {
@@ -1375,10 +1638,26 @@ Error:
 }
 */
 
-mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices) {
+mesh* SandboxApp::MakeMesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
 
 	mesh* pMesh = m_pHALImp->MakeMesh(vertices);
+	CN(pMesh);
+
+	return pMesh;
+
+Error:
+	if (pMesh != nullptr) {
+		delete pMesh;
+		pMesh = nullptr;
+	}
+	return nullptr;
+}
+
+mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices) {
+	RESULT r = R_PASS;
+
+	mesh* pMesh = MakeMesh(vertices);
 	CN(pMesh);
 
 	CR(AddObject(pMesh));
@@ -1394,10 +1673,26 @@ Error:
 	return nullptr;
 }
 
-mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+mesh* SandboxApp::MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 	RESULT r = R_PASS;
 
 	mesh* pMesh = m_pHALImp->MakeMesh(vertices, indices);
+	CN(pMesh);
+
+	return pMesh;
+
+Error:
+	if (pMesh != nullptr) {
+		delete pMesh;
+		pMesh = nullptr;
+	}
+	return nullptr;
+}
+
+mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+	RESULT r = R_PASS;
+
+	mesh* pMesh = MakeMesh(vertices, indices);
 	CN(pMesh);
 
 	CR(AddObject(pMesh));
@@ -1449,12 +1744,97 @@ Error:
 	return nullptr;
 }
 
+billboard *SandboxApp::AddBillboard(point ptOrigin, float width, float height) {
+	RESULT r = R_PASS;
+
+	billboard *pBillboard = MakeBillboard(ptOrigin, width, height);
+	CN(pBillboard);
+
+	// billboards are always rendered by the billboard shader right now (also in aux with same scene graph)
+	m_pBillboardSceneGraph->PushObject(pBillboard);
+
+	return pBillboard;
+
+Error:
+	if (pBillboard != nullptr) {
+		delete pBillboard;
+		pBillboard = nullptr;
+	}
+	return nullptr;
+}
+
+billboard *SandboxApp::MakeBillboard(point ptOrigin, float width, float height) {
+	RESULT r = R_PASS;
+
+	billboard *pBillboard = m_pHALImp->MakeBillboard(ptOrigin, width, height);
+	CN(pBillboard);
+
+	return pBillboard;
+
+Error:
+	if (pBillboard != nullptr) {
+		delete pBillboard;
+		pBillboard = nullptr;
+	}
+	return nullptr;
+}
+
+ProgramNode* SandboxApp::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
+	RESULT r = R_PASS;
+
+	ProgramNode *pProgramNode = nullptr;
+
+	CN(m_pHALImp);
+
+	pProgramNode = m_pHALImp->MakeProgramNode(strNodeName, optFlags);
+	CN(pProgramNode);
+
+	return pProgramNode;
+
+Error:
+	if (pProgramNode != nullptr) {
+		delete pProgramNode;
+		pProgramNode = nullptr;
+	}
+
+	return nullptr;
+}
+
+HysteresisObject *SandboxApp::MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType) {
+	RESULT r = R_PASS;
+
+	HysteresisObject *pObject = nullptr;
+
+	switch (objectType) {
+		case (SPHERE): {
+			pObject = new HysteresisSphere(onThreshold, offThreshold);
+		} break;
+		case (CYLINDER): {
+			pObject = new HysteresisCylinder(onThreshold, offThreshold);
+		} break;
+		case (PLANE): {
+			pObject = new HysteresisPlane(onThreshold, offThreshold);
+		} break;
+	}
+
+	CN(pObject);
+
+	return pObject;
+
+Error:
+	if (pObject != nullptr) {
+		delete pObject;
+		pObject = nullptr;
+	}
+	return nullptr;
+}
+
 model* SandboxApp::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture) {
 	RESULT r = R_PASS;
 
 	// TODO: Other bits (position, scale, rotation)
 
-	model *pModel = ModelFactory::MakeModel(m_pHALImp, wstrModelFilename);
+	model *pModel = ModelFactory::MakeModel(m_pHALImp, wstrModelFilename, ModelFactory::flags::NONE);
 	CN(pModel);
 
 // Success:
@@ -1477,7 +1857,47 @@ model* SandboxApp::AddModel(const std::wstring& wstrModelFilename, texture* pTex
 
 	CR(AddObject(pModel));
 
-// Success:
+Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+
+	return nullptr;
+}
+
+model *SandboxApp::MakeModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+	RESULT r = R_PASS;
+
+	// TODO: Other bits (position, scale, rotation)
+
+	model *pModel = ModelFactory::MakeModel(m_pHALImp, wstrModelFilename, modelFactoryFlags);
+	CN(pModel);
+
+Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+
+	return nullptr;
+}
+
+model *SandboxApp::AddModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+	RESULT r = R_PASS;
+
+	model *pModel = MakeModel(wstrModelFilename, modelFactoryFlags);
+	CN(pModel);
+
+	CR(AddObject(pModel));
+
+Success:
 	return pModel;
 
 Error:
@@ -1499,7 +1919,7 @@ composite* SandboxApp::AddComposite() {
 	composite* pComposite = MakeComposite();
 	CN(pComposite);
 	CR(AddObject(pComposite));
-	
+
 	//Success:
 	return pComposite;
 
@@ -1552,8 +1972,12 @@ RESULT SandboxApp::RegisterEnvironmentObserver(CloudController::EnvironmentObser
 	return m_pCloudController->RegisterEnvironmentObserver(pEnvironmentObserver);
 }
 
-RESULT SandboxApp::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
-	return m_pCloudController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels);
+RESULT SandboxApp::RegisterUserObserver(CloudController::UserObserver *pUserObserver) {
+	return m_pCloudController->RegisterUserObserver(pUserObserver);
+}
+
+RESULT SandboxApp::BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	return m_pCloudController->BroadcastVideoFrame(strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels);
 }
 
 RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {
@@ -1565,10 +1989,13 @@ RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pCloudController->BroadcastDataMessage(pDataMessage);
 }
 
-RESULT SandboxApp::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+RESULT SandboxApp::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags) {
 	RESULT r = R_PASS;
 
-	CN(pPeerConnection);
+	if ((messageFlags & DreamAppMessage::flags::SHARE_NETWORK) != DreamAppMessage::flags::NONE) {
+		CN(pPeerConnection);
+	}
+
 	CN(pDreamAppMessage);
 
 	CR(m_pDreamAppManager->HandleDreamAppMessage(pPeerConnection, pDreamAppMessage));
@@ -1577,12 +2004,18 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
+RESULT SandboxApp::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags) {
 	RESULT r = R_PASS;
 
 	CBM((m_pDreamAppManager->FindDreamAppWithName(pDreamAppMessage->GetDreamAppName())), "Cannot find dream app name %s", pDreamAppMessage->GetDreamAppName().c_str());
 
-	CR(BroadcastDataMessage(pDreamAppMessage));
+	if ((messageFlags & DreamAppMessage::flags::SHARE_NETWORK) != DreamAppMessage::flags::NONE) {
+		CR(BroadcastDataMessage(pDreamAppMessage));
+	}
+
+	if ((messageFlags & DreamAppMessage::flags::SHARE_LOCAL) != DreamAppMessage::flags::NONE) {
+		CR(HandleDreamAppMessage(nullptr, pDreamAppMessage, DreamAppMessage::flags::SHARE_LOCAL));
+	}
 
 Error:
 	return r;
@@ -1592,7 +2025,7 @@ Error:
 RESULT SandboxApp::RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber) {
 	RESULT r = R_PASS;
 
-	CR(m_pTimeManager->RegisterSubscriber(timeEvent, pTimeSubscriber));
+	CR(m_pTimeManagerModule->RegisterSubscriber(timeEvent, pTimeSubscriber));
 
 Error:
 	return r;
@@ -1640,6 +2073,50 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::RegisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber) {
+	RESULT r = R_PASS;
+
+	CNM(m_pSenseGamepad, "Gamepad not initialized");
+	CR(m_pSenseGamepad->RegisterSubscriber(gamePadEvent, pGamepadSubscriber));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::RegisterSubscriber(HMDEventType hmdEvent, Subscriber<HMDEvent>* pHMDEventSubscriber) {
+	RESULT r = R_PASS;
+
+	CNR(m_SandboxConfiguration.fUseHMD, R_SKIPPED);
+	CNM(m_pHMD, "HMD not initialized");
+	CR(m_pHMD->RegisterSubscriber(hmdEvent, pHMDEventSubscriber));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::UnregisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
+	RESULT r = R_PASS;
+	if (m_pHMD != nullptr) {
+		SenseController *pSenseController = m_pHMD->GetSenseController();
+		if (pSenseController != nullptr) {
+			CR(pSenseController->UnregisterSubscriber(controllerEvent, pControllerSubscriber));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::UnregisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber) {
+	RESULT r = R_PASS;
+
+	CNM(m_pSenseGamepad, "Gamepad not initialized");
+	CR(m_pSenseGamepad->UnregisterSubscriber(gamePadEvent, pGamepadSubscriber));
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::SetDreamOSHandle(DreamOS *pDreamOSHandle) {
 	RESULT r = R_PASS;
 
@@ -1652,4 +2129,12 @@ Error:
 
 DreamOS *SandboxApp::GetDreamOSHandle() {
 	return m_pDreamOSHandle;
+}
+
+std::wstring SandboxApp::GetHardwareID() {
+	return m_strHardwareID;
+}
+
+std::string SandboxApp::GetHMDTypeString() {
+	return m_pHMD->GetDeviceTypeString();
 }

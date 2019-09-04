@@ -5,11 +5,12 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 #include "OGLTexture.h"
+#include "OGLText.h"
 
 #include "Scene/ObjectStore.h"
 
-OGLProgram::OGLProgram(OpenGLImp *pParentImp, std::string strName) :
-	ProgramNode(strName),
+OGLProgram::OGLProgram(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
+	ProgramNode(strName, optFlags),
 	m_pParentImp(pParentImp),
 	m_OGLProgramIndex(NULL),
 	m_pVertexShader(nullptr),
@@ -43,6 +44,51 @@ RESULT OGLProgram::OGLInitialize() {
 
 	CR(CreateProgram());
 	CR(IsProgram());
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::OGLInitialize(version versionOGL) {
+	RESULT r = R_PASS;
+
+	CBM(0, "OGLInitialize against version not supported for this OGLProgram");
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const wchar_t *pszFragmentShaderFilename, version versionOGL) {
+	RESULT r = R_PASS;
+
+	CR(OGLInitialize());
+
+	m_versionOGL = versionOGL;
+
+	// Create and set the shaders
+	CRM(MakeVertexShader(pszVertexShaderFilename), "Failed to create vertex shader");
+	CRM(MakeFragmentShader(pszFragmentShaderFilename), "Failed to create fragment shader");
+
+	// Link the program
+	CRM(LinkProgram(), "Failed to link program");
+
+	// TODO: This could all be done in one call in the OGLShader honestly
+	// Attributes
+	// TODO: Tabulate attributes (get them from shader, not from class)
+	WCR(GetVertexAttributesFromProgram());
+	WCR(BindAttributes());
+
+	//CR(PrintActiveAttributes());
+
+	// Uniform Variables
+	CR(GetUniformVariablesFromProgram());
+
+	// Uniform Blocks
+	CR(GetUniformBlocksFromProgram());
+	CR(BindUniformBlocks());
+
+	// TODO:  Currently using a global material 
+	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
 
 Error:
 	return r;
@@ -91,22 +137,36 @@ Error:
 	return r;
 }
 
+RESULT OGLProgram::BindToFramebuffer() {
+	m_pOGLFramebuffer->Bind();
+	m_pOGLFramebuffer->SetAndClearViewport(true, true);
+
+	// Check framebuffer
+	//CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+	return R_PASS;
+}
+
+// Critial path function
 RESULT OGLProgram::BindToFramebuffer(OGLFramebuffer* pFramebuffer) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	//CR(m_pOGLFramebuffer->BindOGLFramebuffer());
 
 	// Render to our framebuffer
 	// By default, uses the member framebuffer
-	OGLFramebuffer* pOGLFramebuffer = (pFramebuffer == nullptr) ? m_pOGLFramebuffer : pFramebuffer;
-	CR(pOGLFramebuffer->Bind());
-	CR(pOGLFramebuffer->SetAndClearViewport(true, true));
+	//OGLFramebuffer* pOGLFramebuffer = (pFramebuffer == nullptr) ? m_pOGLFramebuffer : pFramebuffer;
+	//CR(pOGLFramebuffer->Bind());
+	//CR(pOGLFramebuffer->SetAndClearViewport(true, true));
+
+	pFramebuffer->Bind();
+	pFramebuffer->SetAndClearViewport(true, true);
 
 	// Check framebuffer
-	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+	//CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
 
-Error:
-	return r;
+//Error:
+	return R_PASS;
 }
 
 RESULT OGLProgram::UnbindFramebuffer() {
@@ -212,8 +272,8 @@ RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum type
 RESULT OGLProgram::UpdateFramebufferToCamera(OGLFramebuffer*&pOGLFramebuffer, camera *pCamera, GLenum internalDepthFormat, GLenum typeDepth, int channels) {
 	RESULT r = R_PASS;
 
-	int pxWidth = pCamera->GetViewWidth();
-	int pxHeight = pCamera->GetViewHeight();
+	int pxWidth = pCamera->GetViewWidth() / m_frameBufferDivisionFactor;
+	int pxHeight = pCamera->GetViewHeight() / m_frameBufferDivisionFactor;
 
 	CN(pOGLFramebuffer);
 
@@ -267,12 +327,12 @@ RESULT OGLProgram::InitializeFrameBufferWithDepth(OGLFramebuffer*&pOGLFramebuffe
 		CR(pOGLFramebuffer->Bind());
 		CR(pOGLFramebuffer->MakeColorAttachment());
 
-		CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 		CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 		//CR(pOGLFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 		CR(pOGLFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
-		CR(pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(internalDepthFormat, typeDepth));
+		CR(pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(texture::type::TEXTURE_2D, typeDepth, internalDepthFormat));
 		//CR(pOGLFramebuffer->InitializeDepthAttachment(internalDepthFormat, typeDepth));
 
 		CR(pOGLFramebuffer->InitializeOGLDrawBuffers(1));
@@ -295,7 +355,7 @@ RESULT OGLProgram::InitializeDepthFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, G
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
-	CR(pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(internalDepthFormat, typeDepth));
+	CR(pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(texture::type::TEXTURE_2D, typeDepth, internalDepthFormat));
 	//CR(pOGLFramebuffer->InitializeDepthAttachment(internalDepthFormat, typeDepth));
 
 	//CR(pOGLFramebuffer->SetOGLDepthbufferTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
@@ -341,12 +401,12 @@ RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer *pFramebuffer, GLenum internalD
 
 	// Color attachment
 	CR(pFramebuffer->MakeColorAttachment());
-	CR(pFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	// Depth attachment 
 	CR(pFramebuffer->MakeDepthAttachment());
-	CR(pFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(texture::type::TEXTURE_2D, GL_DEPTH_COMPONENT16, GL_FLOAT));
 	CR(pFramebuffer->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 
 	CR(pFramebuffer->InitializeOGLDrawBuffers(1));
@@ -365,7 +425,7 @@ RESULT OGLProgram::InitializeRenderTexture(GLenum internalDepthFormat, GLenum ty
 RESULT OGLProgram::InitializeRenderTexture(OGLTexture*&pOGLRenderTexture, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
-	pOGLRenderTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE); 
+	pOGLRenderTexture = new OGLTexture(m_pParentImp, texture::type::TEXTURE_2D);
 	CN(pOGLRenderTexture);
 
 	CR(pOGLRenderTexture->SetWidth(pxWidth));
@@ -420,54 +480,6 @@ Error:
 }
 */
 
-RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const wchar_t *pszFragmentShaderFilename, version versionOGL) {
-	RESULT r = R_PASS;
-
-	CR(OGLInitialize());
-
-	m_versionOGL = versionOGL;
-
-	// Create and set the shaders
-	CRM(MakeVertexShader(pszVertexShaderFilename), "Failed to create vertex shader");
-	CRM(MakeFragmentShader(pszFragmentShaderFilename), "Failed to create fragment shader");
-
-	// Link the program
-	CRM(LinkProgram(), "Failed to link program");
-
-	// TODO: This could all be done in one call in the OGLShader honestly
-	// Attributes
-	// TODO: Tabulate attributes (get them from shader, not from class)
-	WCR(GetVertexAttributesFromProgram());
-	WCR(BindAttributes());
-	//WCR(m_pVertexShader->GetAttributeLocationsFromShader());
-	//WCR(m_pVertexShader->EnableAttributes());
-
-	//CR(PrintActiveAttributes());
-
-	// Uniform Variables
-	CR(GetUniformVariablesFromProgram());
-
-	// Uniform Blocks
-	CR(GetUniformBlocksFromProgram());
-	CR(BindUniformBlocks());
-//	CR(InitializeUniformBlocks());
-
-	//WCR(m_pVertexShader->GetUniformLocationsFromShader());
-	//WCR(m_pVertexShader->BindUniformBlocks());
-	//WCR(m_pVertexShader->InitializeUniformBlocks());
-
-	//WCR(m_pFragmentShader->GetUniformLocationsFromShader());
-	//WCR(m_pFragmentShader->BindUniformBlocks());
-	//WCR(m_pFragmentShader->InitializeUniformBlocks());
-
-
-	// TODO:  Currently using a global material 
-	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
-
-Error:
-	return r;
-}
-
 // TODO: Just a pass through, but might make sense to absorb the functionality here
 // or stuff it into the OGLShader
 RESULT OGLProgram::CreateShader(GLenum type, GLuint *pShaderID) {
@@ -477,6 +489,54 @@ RESULT OGLProgram::CreateShader(GLenum type, GLuint *pShaderID) {
 
 Error:
 	return r;
+}
+
+RESULT OGLProgram::AddSharedShaderFilename(GLenum shaderType, std::wstring strShaderFilename) {
+	
+	std::vector<std::wstring> *pShaderFiles = nullptr;
+
+	if (m_sharedShaderFilenamesTyped.find(shaderType) == m_sharedShaderFilenamesTyped.end()) {
+		m_sharedShaderFilenamesTyped[shaderType] = std::vector<std::wstring>();
+	}
+	
+	pShaderFiles = &(m_sharedShaderFilenamesTyped[shaderType]);
+
+	if (std::find(pShaderFiles->begin(), pShaderFiles->end(), strShaderFilename) == pShaderFiles->end()) {
+		pShaderFiles->push_back(strShaderFilename);
+	}
+
+	return R_PASS;
+}
+
+RESULT OGLProgram::AddSharedShaderFilename(std::wstring strShaderFilename) {
+	if (std::find(m_sharedShaderFilenamesGlobal.begin(), m_sharedShaderFilenamesGlobal.end(), strShaderFilename) == m_sharedShaderFilenamesGlobal.end()) {
+		m_sharedShaderFilenamesGlobal.push_back(strShaderFilename);
+	}
+
+	return R_PASS;
+}
+
+RESULT OGLProgram::ClearSharedShaders() {
+	m_sharedShaderFilenamesTyped = std::map<GLenum, std::vector<std::wstring>>();
+	m_sharedShaderFilenamesGlobal = std::vector<std::wstring>();
+
+	return R_PASS;
+}
+
+std::vector<std::wstring> OGLProgram::GetSharedShaderFilenames(GLenum shaderType) {
+	std::vector<std::wstring> retFiles = std::vector<std::wstring>();
+	
+	if (m_sharedShaderFilenamesGlobal.size() != 0) {
+		retFiles.insert(retFiles.begin(),
+			m_sharedShaderFilenamesGlobal.begin(), m_sharedShaderFilenamesGlobal.end());
+	}
+
+	if (m_sharedShaderFilenamesTyped.count(shaderType) != 0) {
+		retFiles.insert(retFiles.begin(), 
+			m_sharedShaderFilenamesTyped[shaderType].begin(), m_sharedShaderFilenamesTyped[shaderType].end());
+	}
+	
+	return retFiles;
 }
 
 RESULT OGLProgram::IsProgram() {
@@ -821,6 +881,21 @@ Error:
 	return r;
 }
 
+RESULT OGLProgram::MakeGeometryShader(const wchar_t *pszFilename) {
+	RESULT r = R_PASS;
+
+	OGLGeometryShader *pGeometryShader = new OGLGeometryShader(this);
+	CN(pGeometryShader);
+	CRM(m_pParentImp->CheckGLError(), "Create OpenGL Geometry Shader failed");
+
+	CRM(pGeometryShader->InitializeFromFile(pszFilename, m_versionOGL), "Failed to initialize geometry shader from file");
+
+	CRM(AttachShader(pGeometryShader), "Failed to attach geometry shader");
+
+Error:
+	return r;
+}
+
 RESULT OGLProgram::MakeFragmentShader(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
@@ -852,6 +927,60 @@ RESULT OGLProgram::RenderObjectStoreBoundingVolumes(ObjectStore *pObjectStore) {
 		else {
 			CR(RenderObjectBoundingVolume(pDimObj));
 		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::UpdateObjectStore(ObjectStore *pObjectStore) {
+	RESULT r = R_PASS;
+
+	ObjectStoreImp *pObjectStoreImp = pObjectStore->GetSceneGraphStore();
+	VirtualObj *pVirtualObj = nullptr;
+
+	pObjectStore->Reset();
+
+	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
+		if (pVirtualObj != nullptr && pVirtualObj->IsVisible() == true) {
+			OGLProgram::UpdateObject((DimObj*)pVirtualObj);
+		}
+	}
+
+	//Error:
+	return r;
+}
+
+RESULT OGLProgram::UpdateObject(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	// TODO: Remove this dynamic cast
+	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+
+	// IsVisible will return false for Virtual Objects
+	// TODO: Composite should be smarter than this
+	if (pOGLObj != nullptr) {
+		pOGLObj->Update();
+	}
+
+	if (pDimObj->HasChildren()) {
+		CR(OGLProgram::UpdateChildren(pDimObj));
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::UpdateChildren(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	// TODO: Rethink this since it's in the critical path
+	for (auto &pVirtualObj : pDimObj->GetChildren()) {
+		//auto pDimObjChild = std::dynamic_pointer_cast<DimObj>(pVirtualObj);
+		//CR(RenderObject(pDimObjChild.get()));
+
+		if (pVirtualObj->IsVisible() == true)
+			OGLProgram::UpdateObject((DimObj*)(pVirtualObj.get()));
 	}
 
 Error:
@@ -917,7 +1046,8 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
 
 	// IsVisible will return false for Virtual Objects
-	if (pOGLObj != nullptr) {
+	// TODO: Composite should be smarter than this
+	if (pOGLObj != nullptr && pOGLObj->NumberIndices() > 0) {
 
 		// Update buffers if marked as dirty
 		if (pDimObj->CheckAndCleanDirty()) {
@@ -980,7 +1110,7 @@ RESULT OGLProgram::RenderChildren(DimObj *pDimObj) {
 			RenderObject((DimObj*)(pVirtualObj.get()));
 	}
 
-//Error:
+Error:
 	return r;
 }
 
@@ -1043,7 +1173,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgram::AttachShader(OpenGLShader *pOpenGLShader) {
+RESULT OGLProgram::AttachShader(OGLShader *pOpenGLShader) {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
 
@@ -1056,6 +1186,11 @@ RESULT OGLProgram::AttachShader(OpenGLShader *pOpenGLShader) {
 		case GL_FRAGMENT_SHADER: {
 			this->m_pFragmentShader = dynamic_cast<OGLFragmentShader*>(pOpenGLShader);
 			CN(this->m_pFragmentShader);
+		} break;
+
+		case GL_GEOMETRY_SHADER: {
+			this->m_pGeometryShader = dynamic_cast<OGLGeometryShader*>(pOpenGLShader);
+			CN(this->m_pGeometryShader);
 		} break;
 
 		default: {

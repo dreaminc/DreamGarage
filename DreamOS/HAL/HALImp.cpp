@@ -1,6 +1,6 @@
 #include "HALImp.h"
 
-#include "HAl/Pipeline/ProgramNode.h"
+#include "HAL/Pipeline/ProgramNode.h"
 
 #include "HAL/FlatProgram.h"
 
@@ -99,7 +99,6 @@ FlatProgram* HALImp::GetFlatProgram() {
 
 //Success:
 	return pFlatProgram;
-
 Error:
 	if (pFlatProgram != nullptr) {
 		delete pFlatProgram;
@@ -139,6 +138,7 @@ RESULT HALImp::RenderToTexture(FlatContext* pFlatContext) {
 	CN(pFlatProgram);
 	
 	pFlatProgram->SetFlatFramebuffer(pFlatContext->GetFramebuffer());
+	pFlatProgram->SetFlatContext(pFlatContext);
 	pFlatProgram->RenderFlatContext(pFlatContext);
 
 Error:
@@ -158,12 +158,17 @@ Error:
 RESULT HALImp::Render() {
 	RESULT r = R_PASS;
 
+	MakeCurrentContext();
+
 	// Pipeline stuff
 	m_pRenderPipeline->RunPipeline();
 
 	FlushHALBuffers();
 
-//Error:
+	// NOTE: This is breaking NSight and Fraps
+	//ReleaseCurrentContext();
+
+Error:
 	return r;
 }
 

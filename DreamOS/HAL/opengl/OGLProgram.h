@@ -17,9 +17,10 @@
 #include "Primitives/light.h"
 #include "Primitives/stereocamera.h"
 
-#include "shaders/OpenGLShader.h"
+#include "shaders/OGLShader.h"
 #include "shaders/OGLVertexShader.h"
 #include "shaders/OGLFragmentShader.h"
+#include "shaders/OGLGeometryShader.h"
 
 #include "shaders/OGLUniform.h"
 #include "shaders/OGLUniformBlock.h"
@@ -39,7 +40,7 @@ class ObjectStore;
 
 class OGLProgram : public ProgramNode {
 public:
-	OGLProgram(OpenGLImp *pParentImp, std::string strName = "oglprogram");
+	OGLProgram(OpenGLImp *pParentImp, std::string strName = "oglprogram", PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 	~OGLProgram();
 
 	// ProgramNode Interface
@@ -47,6 +48,7 @@ public:
 	virtual RESULT ProcessNode(long frameID = 0) override;
 
 	virtual RESULT OGLInitialize();
+	virtual RESULT OGLInitialize(version versionOGL);
 	RESULT OGLInitialize(const wchar_t *pszVertexShaderFilename, const wchar_t *pszFragmentShaderFilename, version versionFile);
 	
 	RESULT CreateProgram();
@@ -72,6 +74,7 @@ public:
 	//RESULT MakeShader(const wchar_t *pszFilename, version versionFile);
 	RESULT MakeVertexShader(const wchar_t *pszFilename);
 	RESULT MakeFragmentShader(const wchar_t *pszFilename);
+	RESULT MakeGeometryShader(const wchar_t *pszFilename);
 
 	// TODO: Likely more eloquent way to do this
 	RESULT RenderObjectStoreBoundingVolumes(ObjectStore *pObjectStore);
@@ -81,6 +84,11 @@ public:
 	RESULT RenderChildren(DimObj *pDimObj);	
 	RESULT RenderChildrenBoundingVolumes(DimObj *pDimObj);
 	//RESULT RenderObject(VirtualObj *pVirtualObj);
+
+	// Update
+	static RESULT UpdateObjectStore(ObjectStore *pObjectStore);
+	static RESULT UpdateObject(DimObj *pDimObj);
+	static RESULT UpdateChildren(DimObj *pDimObj);
 	
 	RESULT SetLights(ObjectStore *pSceneGraph);
 	virtual RESULT SetLights(std::vector<light*> *pLights);
@@ -96,6 +104,16 @@ public:
 	
 	// Shaders
 	RESULT CreateShader(GLenum type, GLuint *pShaderID);
+
+	RESULT AddSharedShaderFilename(GLenum shaderType, std::wstring strShaderFilename);
+	RESULT AddSharedShaderFilename(std::wstring strShaderFilename);
+
+	RESULT ClearSharedShaders();
+	std::vector<std::wstring> GetSharedShaderFilenames(GLenum shaderType);
+	
+	std::map<GLenum, std::vector<std::wstring>> m_sharedShaderFilenamesTyped;
+	std::vector<std::wstring> m_sharedShaderFilenamesGlobal;
+	
 
 	GLuint GetOGLProgramIndex() { 
 		return m_OGLProgramIndex;
@@ -120,10 +138,13 @@ public:
 	RESULT EnableVertexBitangentAttribute();
 	*/
 
-	RESULT AttachShader(OpenGLShader *pOpenGLShader);
+	RESULT AttachShader(OGLShader *pOpenGLShader);
 
 	RESULT BindToDepthBuffer();
-	RESULT BindToFramebuffer(OGLFramebuffer* pFramebuffer = nullptr);
+	
+	RESULT BindToFramebuffer();
+	RESULT BindToFramebuffer(OGLFramebuffer* pFramebuffer);
+
 	RESULT UnbindFramebuffer();
 	RESULT BindToScreen(int pxWidth, int pxHeight);
 
@@ -145,7 +166,8 @@ protected:
 
 	// OGL Framebuffer
 	// This can be used to render the program to a texture / framebuffer
-	OGLFramebuffer *m_pOGLFramebuffer;
+	OGLFramebuffer *m_pOGLFramebuffer = nullptr;
+
 	RESULT InitializeFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 	RESULT InitializeFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int channels = 4);
 	RESULT InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
@@ -168,9 +190,9 @@ protected:
 	RESULT InitializeRenderTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 
 	// Shaders
-	OGLVertexShader *m_pVertexShader;
-	OGLFragmentShader *m_pFragmentShader;
-	// TODO: Other shaders ?
+	OGLVertexShader *m_pVertexShader = nullptr;
+	OGLGeometryShader *m_pGeometryShader = nullptr;
+	OGLFragmentShader *m_pFragmentShader = nullptr;
 
 	// Vertex Attributes
 	RESULT RegisterVertexAttribute(OGLVertexAttribute **pOGLVertexAttribute, std::string strVertexAttributeName);
@@ -200,6 +222,8 @@ protected:
 	RESULT InitializeUniformBlocks();
 
 	// TODO: Pipelines
+
+	int m_frameBufferDivisionFactor = 1;
 };
 
 #endif // ! OGL_PROGRAM_H_

@@ -24,13 +24,14 @@ enum COLOR_TYPE {
 	COLOR_RED,
 	COLOR_GREEN,
 	COLOR_BLUE,
+	COLOR_AQUA,
 	COLOR_YELLOW,
 	COLOR_PINK,
 	COLOR_INVALID
 };
 
 enum class PIXEL_FORMAT {
-	Unspecified, // this will generate an RGB/RGBA based on the number of channels
+	GREYSCALE,
 	RGB,
 	RGBA,
 	BGR,
@@ -71,6 +72,7 @@ public:
 			case COLOR_BLUE: { SetColor(0.0f, 0.0f, 1.0f, 1.0f); } break;
 			case COLOR_YELLOW: { SetColor(1.0f, 1.0f, 0.0f, 1.0f); } break;
 			case COLOR_PINK: { SetColor(1.0f, 20.0f/255.0f, 147.0f/255.0f, 1.0f); } break;
+			case COLOR_AQUA: { SetColor(0.0f, 1.0f, 1.0f, 1.0f); } break;
 
 			default: {
 				this->clear();
@@ -85,6 +87,35 @@ public:
 		this->element(3, 0) = a;
 
 		return R_PASS;
+	}
+
+	RESULT IncrementRGB(float amount) {
+		RESULT r = R_PASS;
+
+		this->r() += amount;
+
+		if (this->r() > 1.0f) {
+			float diffR = this->r() - 1.0f;
+
+			this->r() = 1.0f;
+			this->g() += diffR;
+
+			if (this->g() > 1.0f) {
+				float diffG = this->g() - 1.0f;
+
+				this->g() = 0.0f;
+				this->b() += diffG;
+
+				if (this->b() > 1.0f) {
+					this->r() = 0.0f; 
+					this->g() = 0.0f; 
+					this->b() = 0.0f;
+				}
+			}
+		}
+
+	Error:
+		return r;
 	}
 
 	// TODO: Understand performance implications of this although both element and this are inline

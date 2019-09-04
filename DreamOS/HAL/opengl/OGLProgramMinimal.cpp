@@ -9,14 +9,14 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglminimal")
+OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglminimal", optFlags)
 {
 	// empty
 }
 
-OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp, std::string strName) :
-	OGLProgram(pParentImp, strName)
+OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, strName, optFlags)
 {
 	// empty
 }
@@ -43,23 +43,25 @@ RESULT OGLProgramMinimal::OGLInitialize() {
 	//CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT24, GL_INT));
 
 	///*
-	int pxWidth = m_pParentImp->GetViewport().Width();
-	int pxHeight = m_pParentImp->GetViewport().Height();
+	if (IsPassthru() == false) {
+		int pxWidth = m_pParentImp->GetViewport().Width();
+		int pxHeight = m_pParentImp->GetViewport().Height();
 
-	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
-	CR(m_pOGLFramebuffer->OGLInitialize());
-	CR(m_pOGLFramebuffer->Bind());
+		m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
+		CR(m_pOGLFramebuffer->OGLInitialize());
+		CR(m_pOGLFramebuffer->Bind());
 
-	CR(m_pOGLFramebuffer->SetSampleCount(4));
+		CR(m_pOGLFramebuffer->SetSampleCount(4));
 
-	CR(m_pOGLFramebuffer->MakeColorAttachment());
-	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+		CR(m_pOGLFramebuffer->MakeColorAttachment());
+		CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
+		CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
-	CR(m_pOGLFramebuffer->MakeDepthAttachment());
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
+		CR(m_pOGLFramebuffer->MakeDepthAttachment());
+		CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
 
-	CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
+		CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
+	}
 	//*/
 
 Error:
@@ -70,12 +72,18 @@ RESULT OGLProgramMinimal::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs
-	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	if (IsPassthru() == true) {
+		CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
+		CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
+	}
+	else {
+		CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	}
 
 Error:
 	return r;
@@ -98,7 +106,12 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	//glDisable(GL_DEPTH_TEST);
 
 	if (m_pOGLFramebuffer != nullptr) {
-		BindToFramebuffer(m_pOGLFramebuffer);
+		if (IsPassthru()) {
+			m_pOGLFramebuffer->Bind();
+		}
+		else {
+			BindToFramebuffer(m_pOGLFramebuffer);
+		}
 	}
 
 	glEnable(GL_BLEND);
@@ -121,6 +134,7 @@ RESULT OGLProgramMinimal::SetObjectTextures(OGLObj *pOGLObj) {
 }
 
 RESULT OGLProgramMinimal::SetObjectUniforms(DimObj *pDimObj) {
+	
 	if (m_pUniformModelMatrix != nullptr) {
 		auto matModel = pDimObj->GetModelMatrix();
 		m_pUniformModelMatrix->SetUniform(matModel);

@@ -16,12 +16,7 @@
 #include "Primitives/point.h"
 #include "Primitives/quaternion.h"
 
-#include "Primitives/hand.h"
-
-#define NAMETAG_BORDER 0.1f
-#define NAMETAG_HEIGHT 0.3f
-#define NAME_LINE_HEIGHT .12f
-#define USERNAME_ANIMATION_DURATION 0.3f
+#include "Primitives/hand/HandState.h"
 
 class User;
 class PeerConnection;
@@ -29,14 +24,18 @@ class composite;
 class UIView;
 class DreamOS;
 class user;
+class camera;
 class text;
 class font;
+class SpatialSoundObject;
+class AudioDataMessage;
+class CameraNode;
 
 struct InteractionObjectEvent;
 
 class WebRTCPeerConnectionProxy;
 
-class DreamPeerApp : public DreamApp<DreamPeerApp>, public Subscriber<InteractionObjectEvent> {
+class DreamPeerApp : public DreamApp<DreamPeerApp> {
 	friend class DreamAppManager;
 
 public:
@@ -78,7 +77,7 @@ private:
 
 public:
 
-	DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext = nullptr);
+	DreamPeerApp(DreamOS *pDOS, void *pContext = nullptr);
 	//DreamPeerApp::DreamPeerApp(DreamOS *pDOS, PeerConnection *pPeerConnection, void *pContext = nullptr);
 
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;
@@ -90,7 +89,11 @@ protected:
 	static DreamPeerApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
+
+	// This needs to be called before InitializeUserNameLabel
+	// because it uses the width of the rendered text object
+
+public:
 	RESULT ShowUserNameField();
 	RESULT HideUserNameField();
 
@@ -118,6 +121,10 @@ public:
 	PeerConnection *GetPeerConnection();
 	RESULT SetPeerConnection(PeerConnection *pPeerConnection);
 
+	RESULT PendProfilePhotoDownload();
+	RESULT OnProfilePhotoDownload(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext);
+	RESULT UpdateProfilePhoto();
+
 	WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy();
 
 	std::shared_ptr<user> GetUserModel();
@@ -130,17 +137,27 @@ public:
 	bool IsUserNameVisible();
 	RESULT SetPosition(const point& ptPosition);
 	RESULT SetOrientation(const quaternion& qOrientation);
-	RESULT UpdateHand(const hand::HandState& pHandState);
+	RESULT UpdateHand(const HandState& pHandState);
 	RESULT UpdateMouth(float mouthScale);
 	RESULT RotateByDeg(float degX, float degY, float degZ);
+	RESULT SetSeatingPosition(int seatingPosition);
 	
-	RESULT SetUsernameAnimationDuration(float animationDuration);
+	RESULT HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMessage);
+
+	std::shared_ptr<composite> GetUserLabelComposite();
+	RESULT SetUserLabelPosition(point ptPosition);
+	RESULT SetUserLabelOrientation(quaternion qOrientation);
+	RESULT UpdateLabelOrientation(camera *pCamera);
+
 private:
 	RESULT SetState(DreamPeerApp::state peerState);
 
 private:
 	long m_peerUserID = -1;
 	std::string m_strScreenName;
+	std::string m_strInitials;
+	long m_avatarModelId = -1;
+	std::string m_strProfilePhotoURL;
 
 	DreamOS *m_pDOS = nullptr;
 	
@@ -148,32 +165,10 @@ private:
 	
 	DreamPeerApp::state m_state = DreamPeerApp::state::UNINITIALIZED;
 
+	std::shared_ptr<SpatialSoundObject> m_pSpatialSoundObject = nullptr;
 	std::shared_ptr<user> m_pUserModel = nullptr;
 	bool m_fPendingAssignedUserModel = false;
-	bool m_fGazeInteraction = false;
 	bool m_fVisible = false;
-
-	sphere *m_pSphere = nullptr;
-
-	std::shared_ptr<volume> m_pPhantomVolume = nullptr;
-	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
-	
-	double m_msTimeGazeStart;
-	double m_msTimeUserNameDelay = 1250;
-
-	// appear and disappear duration in seconds (direct plug into PushAnimation)
-	float m_userNameAnimationDuration = USERNAME_ANIMATION_DURATION;
-
-	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
-	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 0.5f);
-	color m_visibleColor = color(1.0f, 1.0f, 1.0f, 1.0f);
-
-	std::shared_ptr<composite> m_pNameComposite = nullptr;
-	std::shared_ptr<text> m_pTextUserName = nullptr;
-	std::shared_ptr<font> m_pFont = nullptr;
-
-	std::shared_ptr<quad> m_pNameBackground = nullptr;
-	std::shared_ptr<texture> m_pTextBoxTexture = nullptr;
 
 private:
 	PeerConnectionState m_peerConnectionState = {0};

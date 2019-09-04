@@ -1,7 +1,7 @@
 #ifndef DREAM_APP_HANDLE_H_
 #define DREAM_APP_HANDLE_H_
 
-#include "Result/EHM.h"
+#include "RESULT/RESULT.h"
 
 class DreamAppHandle {
 	friend class DreamAppManager;

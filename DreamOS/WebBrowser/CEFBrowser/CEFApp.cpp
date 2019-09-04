@@ -41,11 +41,11 @@ Error:
 	return r;
 }
 
-RESULT CEFApp::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
+RESULT CEFApp::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int audioSteamID, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
 	RESULT r = R_PASS;
 
 	CN(m_pCEFAppObserver);
-	CR(m_pCEFAppObserver->OnAudioData(pCEFBrowser, frames, channels, bitsPerSample, pDataBuffer));
+	CR(m_pCEFAppObserver->OnAudioData(pCEFBrowser, audioSteamID, frames, channels, bitsPerSample, pDataBuffer));
 
 Error:
 	return r;
@@ -56,6 +56,16 @@ RESULT CEFApp::OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, CefRenderHandler::Pain
 
 	CN(m_pCEFAppObserver);
 	CR(m_pCEFAppObserver->OnPaint(pCEFBrowser, type, dirtyRects, pBuffer, width, height));
+
+Error:
+	return r;
+}
+
+RESULT CEFApp::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect) {
+	RESULT r = R_PASS;
+
+	CN(m_pCEFAppObserver);
+	CR(m_pCEFAppObserver->OnPopupSize(browser, rect));
 
 Error:
 	return r;
@@ -86,6 +96,16 @@ RESULT CEFApp::OnLoadEnd(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> 
 
 	CN(m_pCEFAppObserver);
 	CR(m_pCEFAppObserver->OnLoadEnd(pCEFBrowser, pCEFFrame, httpStatusCode));
+
+Error:
+	return r;
+}
+
+RESULT CEFApp::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::ErrorCode errorCode, const CefString& strError, const CefString& strFailedURL) {
+	RESULT r = R_PASS;
+
+	CN(m_pCEFAppObserver);
+	CR(m_pCEFAppObserver->OnLoadError(pCEFBrowser, pCEFFrame, errorCode, strError, strFailedURL));
 
 Error:
 	return r;
@@ -159,6 +179,10 @@ void CEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<C
 
 		cefProcessMessageArguments->SetBool(3, pCEFDOMNode->IsEditable());
 
+		//TODO: should also use the height and y coordinate of this field
+		// to properly set the position of the screen during OnNodeFocusChanged
+		//pCEFDOMNode->GetElementBounds();
+
 		int cefDOMNodeType = pCEFDOMNode->GetType();
 		cefProcessMessageArguments->SetInt(4, cefDOMNodeType);
 	}
@@ -188,6 +212,18 @@ Error:
 	return r;
 }
 
+RESULT CEFApp::HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBrowser, CefRefPtr<CefListValue> pMessageArguments) {
+	RESULT r = R_PASS;
+
+	if (m_pCEFAppObserver != nullptr) {
+		CR(m_pCEFAppObserver->HandleDreamExtensionCall(pCefBrowser, pMessageArguments));
+	}
+
+Error:
+	return r;
+
+}
+
 RESULT CEFApp::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) {
 	RESULT r = R_PASS;
 
@@ -197,6 +233,27 @@ RESULT CEFApp::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, 
 
 Error:
 	return r;
+}
+
+RESULT CEFApp::CheckForHeaders(std::multimap<std::string, std::string> &headermap, CefRefPtr<CefBrowser> pCefBrowser, std::string strURL) {
+	RESULT r = R_PASS;
+
+	if (m_pCEFAppObserver != nullptr) {
+		CR(m_pCEFAppObserver->CheckForHeaders(headermap, pCefBrowser, strURL));
+	}
+
+Error:
+	return r;
+}
+
+bool CEFApp::OnCertificateError(CefRefPtr<CefBrowser> browser, cef_errorcode_t cert_error, const CefString& request_url, CefRefPtr<CefSSLInfo> ssl_info, CefRefPtr<CefRequestCallback> callback) {
+	RESULT r = R_PASS;
+
+	CN(m_pCEFAppObserver);
+
+	return m_pCEFAppObserver->OnCertificateError(browser, cert_error, request_url, ssl_info, callback);
+Error:
+	return false;
 }
 
 // This doesn't do much right now
@@ -219,12 +276,34 @@ Error:
 	return;
 }
 
+void CEFApp::OnWebKitInitialized() {
+	/*
+	RESULT r = R_PASS;
+
+	DOSLOG(DreamLogger::Level::INFO, "OnWebKitInitialized");
+
+	// Create an instance of my CefV8Handler object.
+	m_pCEFV8Handler = new CEFV8Handler();
+	CN(m_pCEFV8Handler);
+
+	// Register Extension
+
+	m_pCEFDreamExtension = new CEFExtension(L"DreamCEFExtension.js", m_pCEFV8Handler);
+	CNM(m_pCEFDreamExtension, "Failed to allocate cef extension object");
+	CRM(m_pCEFDreamExtension->Initialize(), "Failed to initialize cef extension");
+
+Error:*/
+	return;
+}
+
 RESULT CEFApp::OnBrowserCreated(std::shared_ptr<CEFBrowserController> pCEFBrowserController) {
 	RESULT r = R_PASS;
 
 	CN(pCEFBrowserController);
 
 	m_promiseCEFBrowserController.set_value(pCEFBrowserController);
+
+	m_pCEFAppObserver->OnAfterCreated(pCEFBrowserController->GetCEFBrowser());
 
 Error:
 	return r;
@@ -250,7 +329,7 @@ std::shared_ptr<WebBrowserController> CEFApp::CreateBrowser(int width, int heigh
 
 	// Set background color to opaque white
 	cefBrowserSettings.background_color = 0xFFFFFFFF;
-
+	cefBrowserSettings.windowless_frame_rate = 24;
 	// Set up the promise (Will be set in OnBrowserCreated)
 	
 	m_promiseCEFBrowserController = std::promise<std::shared_ptr<CEFBrowserController>>();
@@ -265,6 +344,8 @@ std::shared_ptr<WebBrowserController> CEFApp::CreateBrowser(int width, int heigh
 	// Blocks until promise is settled
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = futureCEFBrowserController.get();
 	CR(pCEFBrowserController->Resize(width, height));
+
+	//m_pCEFAppObserver->OnAfterCreated(pCEFBrowserController->GetCEFBrowser());
 
 	return pCEFBrowserController;
 

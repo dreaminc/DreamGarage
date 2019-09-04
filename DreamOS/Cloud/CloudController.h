@@ -10,18 +10,15 @@
 // The base DreamCloud controller 
 
 #include "Controller.h"
+#include "ControllerProxy.h"
+
 #include "CloudImp.h"
 #include "User/UserFactory.h"
 #include "Environment/EnvironmentController.h"
+
 #include <memory>
 #include <thread>
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
-#include "Primitives/quaternion.h"
-#include "Primitives/hand.h"
-
-class ControllerProxy;
 class Message;
 class UpdateHeadMessage; 
 class UpdateHandMessage;
@@ -30,9 +27,14 @@ class AudioDataMessage;
 class MenuControllerProxy;
 class HTTPControllerProxy;
 
+class hand;
 class User;
 class TwilioNTSInformation;
 class EnvironmentAsset;
+class texture;
+class point;
+class vector;
+class quaternion;
 
 enum class CLOUD_CONTROLLER_TYPE {
 	CLOUD,
@@ -49,12 +51,14 @@ public:
 	//virtual CLOUD_CONTROLLER_TYPE GetControllerType() = 0;
 	//virtual RESULT RequestSubMenu(std::string strScope = "", std::string strPath = "", std::string strTitle = "") = 0;
 	virtual long GetUserID() = 0;
+	virtual long GetUserAvatarID() = 0;
 };
 
 class CloudController : public Controller, 
 						public CloudControllerProxy,
 						public std::enable_shared_from_this<CloudController>, 
-						public EnvironmentController::EnvironmentControllerObserver
+						public EnvironmentController::EnvironmentControllerObserver,
+						public UserController::UserControllerObserver
 {
 protected:
 	typedef std::function<RESULT(PeerConnection*, const std::string&)> HandleDataChannelStringMessageCallback;
@@ -74,7 +78,7 @@ public:
 		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) = 0;
 		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
-		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
+		virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) = 0;
 		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) = 0;
 	};
@@ -82,32 +86,64 @@ public:
 	class EnvironmentObserver {
 	public:
 		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
-		virtual RESULT OnReceiveAsset(long userID) = 0;
-		virtual RESULT OnStopSending() = 0;
-		virtual RESULT OnStopReceiving() = 0;
+		virtual RESULT OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
+		virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
+		virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
+		virtual RESULT OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
+		virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
+		virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
+		virtual RESULT OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
+
+		virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
+		virtual RESULT OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
+		virtual RESULT OnSendCameraPlacement() = 0;
+		virtual RESULT OnStopSendingCameraPlacement() = 0;
+		virtual RESULT OnReceiveCameraPlacement(long userID) = 0;
+		virtual RESULT OnStopReceivingCameraPlacement() = 0;
+	};
+
+	class UserObserver {
+	public:
+		virtual RESULT OnDreamVersion(version dreamVersion) = 0;
+		virtual RESULT OnAPIConnectionCheck(bool fIsConnected) = 0;
+
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) = 0;
+		virtual RESULT OnSetSettings() = 0;
+
+		virtual RESULT OnLogin() = 0;
+		virtual RESULT OnLogout() = 0;
+		virtual RESULT OnPendLogout() = 0;
+		virtual RESULT OnSwitchTeams() = 0;
+
+		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
+		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) = 0;
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) = 0;
 	};
 
 	RESULT RegisterPeerConnectionObserver(PeerConnectionObserver* pPeerConnectionControllerObserver);
 	RESULT RegisterEnvironmentObserver(EnvironmentObserver* pEnvironmentObserver);
+	RESULT RegisterUserObserver(UserObserver* pUserObserver);
 
 private:
 	PeerConnectionObserver *m_pPeerConnectionObserver = nullptr;
 	EnvironmentObserver *m_pEnvironmentObserver = nullptr;
+	UserObserver *m_pUserObserver = nullptr;
 	
 public:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
 
 	// Video
-	RESULT StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
-	RESULT StopVideoStreaming();
-	bool IsVideoStreamingRunning();
-	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
-	RESULT BroadcastTextureFrame(texture *pTexture, int level, PIXEL_FORMAT pixelFormat);
+	RESULT StartVideoStreaming(const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
+	RESULT StopVideoStreaming(const std::string &strVideoTrackLabel);
+	bool IsVideoStreamingRunning(const std::string &strVideoTrackLabel);
+	RESULT BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT BroadcastTextureFrame(const std::string &strVideoTrackLabel, texture *pTexture, int level, PIXEL_FORMAT pixelFormat);
 
 	// Audio 
 	RESULT BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket);
 	float GetRunTimeMicAverage();
+	RESULT SetRunTimeMicAverage(float runTimeMicAverage);
 
 	// TODO: Generalize channels
 
@@ -142,6 +178,7 @@ public:
 	bool IsEnvironmentConnected();
 
 	virtual long GetUserID() override;
+	virtual long GetUserAvatarID() override;
 
 	//RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON);
 	//std::string GetSDPOfferString();
@@ -166,14 +203,43 @@ public:
 	virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
 	virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
-	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
+	virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 
-	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) override;
-	virtual RESULT OnReceiveAsset(long userID) override;
-	virtual RESULT OnStopSending() override;
-	virtual RESULT OnStopReceiving() override;
+	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+	virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+	virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+	virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+	virtual RESULT OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+
+	virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnSendCameraPlacement() override;
+	virtual RESULT OnStopSendingCameraPlacement() override;
+	virtual RESULT OnReceiveCameraPlacement(long userID) override;
+	virtual RESULT OnStopReceivingCameraPlacement() override;
+
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
+
+	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override;
+
+	// UserControllerObserver
+	virtual RESULT OnDreamVersion(version dreamVersion) override;
+	virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override;
+	virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override;
+	virtual RESULT OnSetSettings() override;
+
+	virtual RESULT OnLogin() override;
+	virtual RESULT OnLogout() override;
+	virtual RESULT OnPendLogout() override;
+	virtual RESULT OnSwitchTeams() override;
+
+	virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override;
+	virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override;
+	virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) override;
+
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
@@ -181,7 +247,7 @@ public:
 	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
 	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
-	
+
 	// Proxy Objects
 public:
 	ControllerProxy* GetControllerProxy(CLOUD_CONTROLLER_TYPE controllerType);
@@ -207,10 +273,13 @@ private:
 
 	std::thread	m_cloudThread;
 	bool m_fRunning;
-	bool m_fLoginOnStart = true;
+	bool m_fLoginOnStart = false;
 
 	RESULT CloudThreadProcess();
 	RESULT CloudThreadProcessParams(std::string strUsername, std::string strPassword, long environmentID);
+
+	// TEMP:
+	float m_runTimeMicAverage = 0.0f;
 };
 
 #endif

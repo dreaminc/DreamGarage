@@ -104,7 +104,7 @@ CLOUD_CONTROLLER_TYPE MenuController::GetControllerType() {
 	return CLOUD_CONTROLLER_TYPE::MENU;
 }
 
-RESULT MenuController::RequestSubMenu(std::string strScope, std::string strPath, std::string strTitle) {
+RESULT MenuController::RequestSubMenu(std::string strScope, std::string strPath, std::string strTitle, std::string strNextPageToken) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload;
@@ -122,6 +122,9 @@ RESULT MenuController::RequestSubMenu(std::string strScope, std::string strPath,
 	jsonPayload["menu"]["path"] = strPath;
 	jsonPayload["menu"]["scope"] = strScope;
 	jsonPayload["menu"]["title"] = strTitle;
+	if (strNextPageToken != "") {
+		jsonPayload["menu"]["next_page_token"] = strNextPageToken;
+	}
 
 	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
 	CN(pCloudRequest);

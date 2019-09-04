@@ -21,6 +21,7 @@
 #include "base/logging.h"
 #include "examples/peerconnection/client/defaults.h"
 #include "media/engine/webrtcvideocapturerfactory.h"
+#include "api/mediastreaminterface.h"
 
 #include "modules/video_capture/video_capture_factory.h"
 
@@ -33,7 +34,6 @@
 #include "Core/Utilities.h"
 
 #include "WebRTCCustomVideoCapturer.h"
-#include "WebRTCLocalAudioSource.h"
 #include "WebRTCLocalAudioTrack.h"
 
 #include "Primitives/texture.h"
@@ -58,21 +58,25 @@ protected:
 
 public:
 	virtual void OnSuccess() {
-		DEBUG_LINEOUT("DummySetSessionDescriptionObserver On Success");
+		DOSLOG(INFO, "DummySetSessionDescriptionObserver On Success");
 	}
 
 	virtual void OnFailure(const std::string& strError) {
 		DOSLOG(INFO, "[DummySetSessionDescriptionObserver] On Failure: %v", strError);
-		DEBUG_LINEOUT("DummySetSessionDescriptionObserver On Failure: %s", strError.c_str());
+		DOSLOG(INFO, "DummySetSessionDescriptionObserver On Failure: %s", strError.c_str());
 	}
 };
 
-WebRTCPeerConnection::WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, long peerConnectionID, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory) :
+WebRTCPeerConnection::WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, 
+										   long peerConnectionID, 
+										   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory,
+										   WebRTCConductor *pParentWebRTCConductor) :
 	m_pParentObserver(pParentObserver),
 	m_peerConnectionID(peerConnectionID),
 	m_pWebRTCPeerConnectionFactory(nullptr),
 	m_pWebRTCPeerConnectionInterface(nullptr),
-	m_WebRTCPeerID(-1)
+	m_WebRTCPeerID(-1),
+	m_pParentWebRTCConductor(pParentWebRTCConductor)
 {
 	if (pWebRTCPeerConnectionFactory != nullptr) {
 		pWebRTCPeerConnectionFactory->AddRef();
@@ -110,7 +114,7 @@ RESULT WebRTCPeerConnection::InitializePeerConnection(bool fAddDataChannel) {
 	CN(m_pWebRTCPeerConnectionFactory);	// ensure peer connection initialized
 	CB((m_pWebRTCPeerConnectionInterface.get() == nullptr));			// ensure peer connection uninitialized
 
-																		//CBM((CreatePeerConnection(DTLS_OFF)), "Error CreatePeerConnection failed");
+	//CBM((CreatePeerConnection(DTLS_OFF)), "Error CreatePeerConnection failed");
 	CBM((CreatePeerConnection(DTLS_ON)), "Error CreatePeerConnection failed");
 	CN(m_pWebRTCPeerConnectionInterface.get());
 
@@ -127,36 +131,16 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
 
-	rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface = nullptr;
+	// User Stream
+	CR(AddLocalAudioSource(kUserAudioLabel, kUserStreamLabel));
+	
+	// Chrome Stream
+	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
+	CR(AddVideoStream(kChromeCaptureDevice, kChromeVideoLabel, kChromeStreamLabel));
 
-	///*
-	// User Stream (Voice)
-	CB((m_WebRTCLocalActiveStreams.find(kUserStreamLabel) == m_WebRTCLocalActiveStreams.end()));
-
-	pMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kUserStreamLabel);
-	CNM(pMediaStreamInterface, "Failed to create user media stream");
-
-	CR(AddAudioStream(pMediaStreamInterface, kUserAudioLabel));
-	//CR(AddLocalAudioSource(pMediaStreamInterface, kUserAudioLabel));
-
-	// Chrome Video
-	// TODO: Put back
-	CR(AddVideoStream(pMediaStreamInterface));
-
-	// Chrome Audio Source
-	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
-
-	// Add user stream to peer connection interface
-	if (!m_pWebRTCPeerConnectionInterface->AddStream(pMediaStreamInterface)) {
-		DEBUG_LINEOUT("Adding user media stream to PeerConnection failed");
-	}
-
-	// Insert it into our local active streams (referenced in OnAddStream
-	m_WebRTCLocalActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->label(), pMediaStreamInterface));
-
-	// Chrome Media Stream
-	CB((m_WebRTCLocalActiveStreams.find(kChromeStreamLabel) == m_WebRTCLocalActiveStreams.end()));
-	//*/
+	// Virtual Camera Stream
+	CR(AddVideoStream(kVCamCaptureDevice, kVCamVideoLabel, kVCamStreamLabel));
+	CR(AddLocalAudioSource(kVCamAudiolabel, kVCamStreamLabel));
 
 	// Data Channel
 	// This is not in the media streaming interface
@@ -208,19 +192,31 @@ std::unique_ptr<cricket::VideoCapturer> WebRTCPeerConnection::OpenVideoCaptureDe
 
 
 
-RESULT WebRTCPeerConnection::InitializeVideoCaptureDevice(std::string strDeviceName) {
+RESULT WebRTCPeerConnection::InitializeVideoCaptureDevice(std::string strDeviceName, std::string strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
-	WebRTCCustomVideoCapturerFactory webrtcCustomVideoCapturer;
+	WebRTCCustomVideoCapturerFactory webrtcCustomVideoCapturerFactory;
 	
-	m_pCricketVideoCapturer = webrtcCustomVideoCapturer.Create(cricket::Device(strDeviceName, 0));
-	CNM(m_pCricketVideoCapturer, "Failed to create video capturer");
+	// First check such a device doesn't exist
+	CBM((m_videoCaptureDevices.find(strVideoTrackLabel) == m_videoCaptureDevices.end()), "Video Track %s already exists", strVideoTrackLabel.c_str());
+
+	m_videoCaptureDevices[strVideoTrackLabel] = webrtcCustomVideoCapturerFactory.Create(cricket::Device(strDeviceName, 0));
+	CNM(m_videoCaptureDevices[strVideoTrackLabel], "Failed to create video capturer");
 
 Error:
 	return r;
 }
 
-RESULT WebRTCPeerConnection::AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
+cricket::VideoCapturer* WebRTCPeerConnection::GetVideoCaptureDeviceByTrackName(std::string strTrackName) {
+	if(m_videoCaptureDevices.find(strTrackName) != m_videoCaptureDevices.end()) {
+		return (m_videoCaptureDevices[strTrackName]).get();
+	}
+	else {
+		return nullptr;
+	}
+}
+
+RESULT WebRTCPeerConnection::AddVideoStream(const std::string &strVideoCaptureDevice, const std::string &strVideoTrackLabel, const std::string &strMediaStreamLabel) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<webrtc::VideoTrackInterface> pVideoTrack = nullptr;
@@ -230,24 +226,21 @@ RESULT WebRTCPeerConnection::AddVideoStream(rtc::scoped_refptr<webrtc::MediaStre
 	// Set up constraints
 	webrtc::FakeConstraints videoSourceConstraints;
 
-	// TODO: Add video constraints if needed
-	//pVideoCapturer = OpenVideoCaptureDevice();
-	//CN(pVideoCapturer);
+	CR(InitializeVideoCaptureDevice(strVideoCaptureDevice, strVideoTrackLabel));
 
-	CR(InitializeVideoCaptureDevice("default_capture"));
-	pVideoCapturer = m_pCricketVideoCapturer.get();
+	pVideoCapturer = GetVideoCaptureDeviceByTrackName(strVideoTrackLabel);
 	CN(pVideoCapturer);
 
 	pVideoTrackSource = m_pWebRTCPeerConnectionFactory->CreateVideoSource(pVideoCapturer, &videoSourceConstraints);
 	CN(pVideoTrackSource);
 
 	pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(
-		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(kChromeVideoLabel, pVideoTrackSource)
+		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(strVideoTrackLabel, pVideoTrackSource)
 	);
-	//CN(pVideoTrack);
+	CN(pVideoTrack);
 
 	pVideoTrack->AddRef();
-	pMediaStreamInterface->AddTrack(pVideoTrack);
+	m_pWebRTCPeerConnectionInterface->AddTrack(pVideoTrack, {strMediaStreamLabel});
 
 Error:
 	return r;
@@ -267,10 +260,10 @@ Error:
 }
 
 // TODO:
-RESULT WebRTCPeerConnection::AddLocalAudioSource(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel) {
+RESULT WebRTCPeerConnection::AddLocalAudioSource(const std::string &strAudioTrackLabel, const std::string &strMediaStreamLabel) {
 	RESULT r = R_PASS;
 
-	rtc::scoped_refptr<webrtc::AudioTrackInterface> pAudioTrack = nullptr;
+	rtc::scoped_refptr<webrtc::AudioTrackInterface> pLocalAudioTrack = nullptr;
 
 	// Set up constraints
 	webrtc::FakeConstraints audioSourceConstraints;
@@ -295,9 +288,13 @@ RESULT WebRTCPeerConnection::AddLocalAudioSource(rtc::scoped_refptr<webrtc::Medi
 
 		//fakeAudioOptions.playout_sample_rate = rtc::Optional<uint32_t>(44100);
 		//fakeAudioOptions.recording_sample_rate = rtc::Optional<uint32_t>(44100);
+		
+		fakeAudioOptions.echo_cancellation = rtc::Optional<bool>(false);
+		fakeAudioOptions.auto_gain_control = rtc::Optional<bool>(false);
+		fakeAudioOptions.noise_suppression = rtc::Optional<bool>(false);
+		fakeAudioOptions.highpass_filter = rtc::Optional<bool>(false);
+		fakeAudioOptions.typing_detection = rtc::Optional<bool>(false);
 
-		//auto pWebRTCLocalAudioSource = new rtc::RefCountedObject<WebRTCLocalAudioSource>();
-		//auto pWebRTCLocalAudioSource = WebRTCLocalAudioSource::Create(strAudioTrackLabel, audioSourceConstraints);
 		auto pWebRTCLocalAudioSource = WebRTCLocalAudioSource::Create(strAudioTrackLabel, fakeAudioOptions);
 		CN(pWebRTCLocalAudioSource);
 
@@ -307,23 +304,26 @@ RESULT WebRTCPeerConnection::AddLocalAudioSource(rtc::scoped_refptr<webrtc::Medi
 		m_pWebRTCLocalAudioSources[strAudioTrackLabel] = pWebRTCLocalAudioSource;
 
 		///*
-		pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
+		pLocalAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
 			m_pWebRTCPeerConnectionFactory->CreateAudioTrack(
 				strAudioTrackLabel,
 				pWebRTCLocalAudioSource)
 			);
-		CN(pAudioTrack);
+		CN(pLocalAudioTrack);
 
-		pAudioTrack->AddRef();
+		pLocalAudioTrack->AddRef();
 
-		pMediaStreamInterface->AddTrack(pAudioTrack);
+		auto pRTPSender = m_pWebRTCPeerConnectionInterface->AddTrack(pLocalAudioTrack, {strMediaStreamLabel});
+		//std::string strTrackID = pRTPSender.value()->id();
+
 	}
+
 
 Error:
 	return r;
 }
 
-RESULT WebRTCPeerConnection::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel) {
+RESULT WebRTCPeerConnection::AddAudioStream(const std::string &strAudioTrackLabel) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<webrtc::AudioTrackInterface> pAudioTrack = nullptr;
@@ -345,29 +345,27 @@ RESULT WebRTCPeerConnection::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStre
 
 	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
 		m_pWebRTCPeerConnectionFactory->CreateAudioTrack(
-			strAudioTrackLabel, 
+			strAudioTrackLabel,
 			m_pWebRTCPeerConnectionFactory->CreateAudioSource(&audioSourceConstraints))
 		);
 
 	pAudioTrack->AddRef();
-	
-	pMediaStreamInterface->AddTrack(pAudioTrack);
 
-	//pAudioTrack->GetSource()
+	m_pWebRTCPeerConnectionInterface->AddTrack(pAudioTrack, {kUserStreamLabel});
 
-	//Error:
+Error:
 	return r;
 }
 
 RESULT WebRTCPeerConnection::AddDataChannel() {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("WebRTCConductor::AddDataChannel");
+	DOSLOG(INFO, "WebRTCConductor::AddDataChannel");
 
 	webrtc::DataChannelInit dataChannelInit;
 
 	// Set max transmit time to 3 frames
-	dataChannelInit.maxRetransmitTime = ((int)(1000.0f / 90.0f) * 3);
+	//dataChannelInit.maxRetransmitTime = ((int)(1000.0f / 90.0f) * 3);
 	dataChannelInit.reliable = false;
 	dataChannelInit.ordered = false;
 
@@ -375,6 +373,8 @@ RESULT WebRTCPeerConnection::AddDataChannel() {
 
 	m_pDataChannelInterface = m_pWebRTCPeerConnectionInterface->CreateDataChannel(kUserDataLabel, &dataChannelInit);
 	CN(m_pDataChannelInterface);
+
+	m_pDataChannelInterface->AddRef();
 	
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface>> DataChannelPair;
 	m_WebRTCLocalActiveDataChannels.insert(DataChannelPair(m_pDataChannelInterface->label(), m_pDataChannelInterface));
@@ -425,12 +425,17 @@ RESULT WebRTCPeerConnection::SetAudioVolume(double val) {
 
 	util::Clamp<double>(val, 0.0f, 10.0f);
 
-	CB((m_WebRTCLocalActiveStreams.size() > 0));
-	{
-		auto pMediaStream = m_WebRTCRemoteActiveStreams[kUserStreamLabel];
-		CN(pMediaStream);
+	//CB((m_WebRTCLocalActiveStreams.size() > 0));
 
-		auto pAudioTrack = pMediaStream->FindAudioTrack(kUserAudioLabel);
+	{
+		//auto pMediaStream = m_WebRTCRemoteActiveStreams[kUserStreamLabel];
+		//CN(pMediaStream);
+			
+		auto pMediaStreamTrack = m_pWebRTCPeerConnectionInterface->local_streams()->FindAudioTrack(kUserAudioLabel);
+		//auto pAudioTrack = pMediaStream->FindAudioTrack(kUserAudioLabel);
+		CN(pMediaStreamTrack);
+
+		auto pAudioTrack = dynamic_cast<webrtc::AudioTrackInterface*>(pMediaStreamTrack);
 		CN(pAudioTrack);
 
 		// Set volume
@@ -447,123 +452,212 @@ WebRTCPeerConnectionProxy* WebRTCPeerConnection::GetProxy() {
 
 // PeerConnectionObserver Interface
 
+// TODO: remove this
+#define _USE_TEST_APP
+
 // TODO: Add multiple streams (video vector, audio vector etc)
 // This is important if we want to multiple video streams as we will need to do soon (this is per peer connection)
 void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
 	
 	// TODO: do we add to a map like out going? Or check existing ?
 
-	DEBUG_LINEOUT("OnAddStream: %s", pMediaStreamInterface->label().c_str());
-
-	// Add to remote streams
-	if (m_WebRTCRemoteActiveStreams.find(pMediaStreamInterface->label()) == m_WebRTCRemoteActiveStreams.end()) {
-		typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
-		m_WebRTCRemoteActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->label(), pMediaStreamInterface));
-	}
-
+	DOSLOG(INFO, "OnAddStream: %s", pMediaStreamInterface->id().c_str());
+	
 	if (!pMediaStreamInterface) {
-		DEBUG_LINEOUT("Cannot add stream");
+		DOSLOG(INFO, "Cannot add stream");
 		return;
 	}
+	
+	auto audioTracks = pMediaStreamInterface->GetAudioTracks();
 
-	// User
-	// Audio track
+	// TODO: Turn this shit into a function bruh
+
+	// User Audio track	
 	auto pUserAudioTrack = pMediaStreamInterface->FindAudioTrack(kUserAudioLabel);
 	if (pUserAudioTrack != nullptr) {
-		auto pUserAudioTrackSource = pUserAudioTrack->GetSource();
+		if (pUserAudioTrack->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
 
-		if (pUserAudioTrackSource != nullptr) {
-			DEBUG_LINEOUT("Found AudioTrackSourceInterface");
+			std::string strTrackName = pUserAudioTrack->id();
 
-			// Not currently using this as previous for mouth size
-			// We'll want to put this back in when we go to localaudiosource though
-			//pUserAudioTrackSource->AddSink(this);
+			DOSLOG(INFO, "OnAddStream: %s", strTrackName.c_str());
 
-#ifndef _USE_TEST_APP
-			// Turn off audio for non-testing
-			SetAudioVolume(0.0f);
-#endif
+			webrtc::AudioSourceInterface* pUserAudioTrackSource = pUserAudioTrack->GetSource();
 
-			DEBUG_LINEOUT("Added user audio sink");
-		}
-		else {
-			DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");
+			if (pUserAudioTrackSource != nullptr) {
+				std::shared_ptr<WebRTCAudioTrackSink> pWebRTCAudioTrackSink = std::make_shared<WebRTCAudioTrackSink>(strTrackName);
+				
+				pWebRTCAudioTrackSink->RegisterObserver(this);
+
+				m_webRTCAudioTrackSinks[strTrackName] = pWebRTCAudioTrackSink;
+				
+				pUserAudioTrackSource->AddSink(pWebRTCAudioTrackSink.get());
+				
+			}
 		}
 	}
 
-	// Chrome
+	// Chrome Audio Track
 	auto pChromeAudioTrack = pMediaStreamInterface->FindAudioTrack(kChromeAudioLabel);
-	if (pChromeAudioTrack != nullptr) {
-		auto pChromeAudioTrackSource = pChromeAudioTrack->GetSource();
+	if (pChromeAudioTrack != nullptr && pChromeAudioTrack->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
+
+		std::string strTrackName = pChromeAudioTrack->id();
+
+		DOSLOG(INFO, "OnAddStream: %s", strTrackName.c_str());
+
+		webrtc::AudioSourceInterface* pChromeAudioTrackSource = pChromeAudioTrack->GetSource();
 
 		if (pChromeAudioTrackSource != nullptr) {
-			DEBUG_LINEOUT("Found AudioTrackSourceInterface");
 
-			//pChromeAudioTrackSource->AddSink(this);
+			std::shared_ptr<WebRTCAudioTrackSink> pWebRTCAudioTrackSink = std::make_shared<WebRTCAudioTrackSink>(strTrackName);
+			pWebRTCAudioTrackSink->RegisterObserver(this);
+			m_webRTCAudioTrackSinks[strTrackName] = pWebRTCAudioTrackSink;
 
-			//SetAudioVolume(0.0f);
-
-			DEBUG_LINEOUT("Added chrome audio sink");
+			pChromeAudioTrackSource->AddSink(pWebRTCAudioTrackSink.get());
+			
 		}
-		else {
-			DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");
+	}
+	
+	// VCam Audio Track
+	auto pVCamAudioTrack = pMediaStreamInterface->FindAudioTrack(kVCamAudiolabel);
+	if (pVCamAudioTrack != nullptr && pVCamAudioTrack->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
+
+		std::string strTrackName = pVCamAudioTrack->id();
+
+		DOSLOG(INFO, "OnAddStream: %s", strTrackName.c_str());
+
+		webrtc::AudioSourceInterface* pVCamAudioTrackSource = pVCamAudioTrack->GetSource();
+
+		if (pVCamAudioTrackSource != nullptr) {
+
+			std::shared_ptr<WebRTCAudioTrackSink> pWebRTCAudioTrackSink = std::make_shared<WebRTCAudioTrackSink>(strTrackName);
+			pWebRTCAudioTrackSink->RegisterObserver(this);
+			m_webRTCAudioTrackSinks[strTrackName] = pWebRTCAudioTrackSink;
+
+			pVCamAudioTrackSource->AddSink(pWebRTCAudioTrackSink.get());
+
 		}
 	}
 
-	// Video track
+	// Chrome Video track
 	auto pVideoTrack = pMediaStreamInterface->FindVideoTrack(kChromeVideoLabel);
 	if (pVideoTrack != nullptr) {
-		DEBUG_LINEOUT("Found VideoTrackSourceInterface");
+		DOSLOG(INFO, "Found VideoTrackSourceInterface");
+	
+		auto pVideoTrackSource = pVideoTrack->GetSource();
+	
+		if (pVideoTrackSource != nullptr) {
+			if (R_PASS != InitializeVideoSink(kChromeVideoLabel, pVideoTrackSource)) {
+				DEBUG_LINEOUT("Failed to initialize video sink for vcam");
+			}
+	
+			///*
+			if (m_videoCaptureDevices[kChromeCaptureDevice] != nullptr) {
+				cricket::VideoFormat videoCaptureFormat(1280, 960, cricket::VideoFormat::FpsToInterval(30), cricket::FOURCC_ARGB);
+				m_videoCaptureDevices[kChromeCaptureDevice]->Start(videoCaptureFormat);
+			}
+			//*/
+	
+		}
+		else {
+			DOSLOG(INFO, "Cannot VideoTrackInterface::GetSource");
+		}
+	}	
+
+	// VCam Video track
+	pVideoTrack = pMediaStreamInterface->FindVideoTrack(kVCamVideoLabel);
+	if (pVideoTrack != nullptr) {
+		DOSLOG(INFO, "Found VideoTrackSourceInterface");
 
 		auto pVideoTrackSource = pVideoTrack->GetSource();
 
 		if (pVideoTrackSource != nullptr) {
-			// Get some information
-			webrtc::VideoTrackSourceInterface::Stats stats;
-			pVideoTrackSource->GetStats(&stats);
 
-			// This object informs the source of the format requirements of the sink
-			rtc::VideoSinkWants videoSinkWants = rtc::VideoSinkWants();
+			if (R_PASS != InitializeVideoSink(kVCamVideoLabel, pVideoTrackSource)) {
+				DEBUG_LINEOUT("Failed to initialize video sink for vcam");
+			}
 
-			pVideoTrackSource->AddOrUpdateSink(this, videoSinkWants);
-			//bool res = track->GetSource()->is_screencast();
-			
-			//const int64_t interval = 1000000000;//33333333
-			//cricket::VideoFormat format(512, 512, 1000000000, cricket::FOURCC_RGBA);
-			//g_capturer->Start(format);
-			
-			//track->GetSource()->Restart();
-
-			// Kick off our capturer (testing)
 			///*
-			if (m_pCricketVideoCapturer != nullptr) {
+			// TODO: Put into function?
+			if (m_videoCaptureDevices[kVCamCaptureDevice] != nullptr) {
 				cricket::VideoFormat videoCaptureFormat(1280, 960, cricket::VideoFormat::FpsToInterval(30), cricket::FOURCC_ARGB);
-				m_pCricketVideoCapturer->Start(videoCaptureFormat);
+				m_videoCaptureDevices[kVCamCaptureDevice]->Start(videoCaptureFormat);
 			}
 			//*/
 
 		}
 		else {
-			DEBUG_LINEOUT("Cannot VideoTrackInterface::GetSource");
+			DOSLOG(INFO, "Cannot VideoTrackInterface::GetSource");
 		}
-
-	}	
-
+	}
+	
 	if (m_pParentObserver != nullptr) {
 		m_pParentObserver->OnAddStream(m_peerConnectionID, pMediaStreamInterface);
 	}
 }
 
+RESULT WebRTCPeerConnection::InitializeVideoSink(std::string strTrackName, webrtc::VideoTrackSourceInterface* pVideoTrackSource) {
+	RESULT r = R_PASS;
+
+	// First check such a device doesn't exist
+	CBM((m_videoSinks.find(strTrackName) == m_videoSinks.end()), "Video Sink %s already exists", strTrackName.c_str());
+
+	m_videoSinks[strTrackName] = std::unique_ptr<WebRTCVideoSink>(WebRTCVideoSink::MakeWebRTCVideoSink(strTrackName, this, pVideoTrackSource));
+	CNM(m_videoSinks[strTrackName], "Failed to create video capturer");
+
+Error:
+	return r;
+}
+
+WebRTCVideoSink* WebRTCPeerConnection::GetVideoSink(std::string strTrackName) {
+	if (m_videoSinks.find(strTrackName) != m_videoSinks.end()) {
+		return (m_videoSinks[strTrackName]).get();
+	}
+	else {
+		return nullptr;
+	}
+}
+
 void WebRTCPeerConnection::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
-	DEBUG_LINEOUT("OnRemoveStream: %s", pMediaStreamInterface->label().c_str());
+	DOSLOG(INFO, "OnRemoveStream: %s", pMediaStreamInterface->id().c_str());
 
 	if (m_pParentObserver != nullptr) {
 		m_pParentObserver->OnRemoveStream(m_peerConnectionID, pMediaStreamInterface);
 	}
 }
 
+// TODO: We want to move to these when unified is fully baked
+void WebRTCPeerConnection::OnAddTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> pReceiver,
+	const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>&streams)
+{
+	rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> pTrack = pReceiver->track();
+	
+	std::string strMediaStreamName = streams[0]->id();
+	
+	if (pTrack->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
+		
+		webrtc::AudioTrackInterface* pAudioTrack = static_cast<webrtc::AudioTrackInterface*>(pTrack.get());
+		std::string strAudioTrackName = pAudioTrack->id();
+	
+		DOSLOG(INFO, "OnAddTrack: %s", strAudioTrackName.c_str());
+	//
+	//	// TODO: get the actual stupid name
+	//	//m_webRTCAudioTrackSinks
+	//	std::shared_ptr<WebRTCAudioTrackSink> pWebRTCAudioTrackSink = std::make_shared<WebRTCAudioTrackSink>(strAudioTrackName);
+	//	m_webRTCAudioTrackSinks[strAudioTrackName] = pWebRTCAudioTrackSink;
+	//
+	//	pAudioTrack->AddSink(pWebRTCAudioTrackSink.get());
+	//
+	//	//auto pAudioTrackSource = pAudioTrack->GetSource();
+	//	//pAudioTrackSource->AddSink(this);
+	}
+}
+
+void WebRTCPeerConnection::OnRemoveTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver) {
+	DOSLOG(INFO, "OnRemoveTrack: %s", receiver->track()->id().c_str());
+}
+
 void WebRTCPeerConnection::OnRenegotiationNeeded() {
-	DEBUG_LINEOUT("OnRenegotiationNeeded");
+	DOSLOG(INFO, "OnRenegotiationNeeded");
 
 	if (m_pParentObserver != nullptr) {
 		m_pParentObserver->OnRenegotiationNeeded(m_peerConnectionID);
@@ -573,7 +667,7 @@ void WebRTCPeerConnection::OnRenegotiationNeeded() {
 }
 
 void WebRTCPeerConnection::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannelInterface) {
-	DEBUG_LINEOUT("OnDataChannel: %s", pDataChannelInterface->label().c_str());
+	DOSLOG(INFO, "OnDataChannel: %s", pDataChannelInterface->label().c_str());
 
 	// Add to remote data streams
 	if (m_WebRTCRemoteActiveDataChannels.find(pDataChannelInterface->label()) == m_WebRTCRemoteActiveDataChannels.end()) {
@@ -597,19 +691,20 @@ void WebRTCPeerConnection::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelI
 	}
 }
 
-void WebRTCPeerConnection::OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
-	
-	// TODO: Register local source as sink or something
-	std::string strAudioTrackLabel = "tempTrack";
+void WebRTCPeerConnection::OnAudioTrackSinkData(std::string strAudioTrackLabel, const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {	
+	//DOSLOG(INFO, "OnAudioData: %s %d samples", strAudioTrackLabel.c_str(), (int)frames);
 	
 	if (m_pParentObserver != nullptr) {
 		m_pParentObserver->OnAudioData(strAudioTrackLabel, m_peerConnectionID, pAudioBuffer, bitsPerSample, samplingRate, channels, frames);
 	}
+
 }
 
+/*
 // TODO: Update WebRTC version and move to webrtc::video_frame since 
 // I'm not sure what the hell cricket is all about
 
+// TODO: Create a per-stream video sink! 
 // TODO: Need to be wary of memory stuff
 // Might want to give observer the handle for the memory and 
 // they will deallocate it
@@ -625,23 +720,19 @@ void WebRTCPeerConnection::OnFrame(const webrtc::VideoFrame& cricketVideoFrame) 
 	const rtc::scoped_refptr<webrtc::VideoFrameBuffer>& webRTCVideoFrameBuffer = cricketVideoFrame.video_frame_buffer();
 	webrtc::VideoFrame webRTCVideoFrame(webRTCVideoFrameBuffer, 0, 0, webrtc::VideoRotation::kVideoRotation_0);
 	
-	/*
-	VideoFrame(const rtc::scoped_refptr<webrtc::VideoFrameBuffer>& buffer,
-	uint32_t timestamp,
-	int64_t render_time_ms,
-	VideoRotation rotation);
-	*/
+	//VideoFrame(const rtc::scoped_refptr<webrtc::VideoFrameBuffer>& buffer,
+	//uint32_t timestamp,
+	//int64_t render_time_ms,
+	//VideoRotation rotation);
 
 	int convertFromI420Result = webrtc::ConvertFromI420(webRTCVideoFrame, webrtc::VideoType::kARGB, 0, pVideoFrameDataBuffer);
 	CBM((convertFromI420Result == 0), "YUV I420 conversion failed");
 	
-	/*
-	{
-		std::lock_guard<std::mutex> lock(g_UpdateTextureMutex);
-		memcpy_s(m_pRecieveBuffer, m_ScreenWidth * m_ScreenHeight * 4, dst_frame, frame.height()*frame.width() * 4);
-		g_updateTexture = true;
-	}
-	*/
+	//{
+	//	std::lock_guard<std::mutex> lock(g_UpdateTextureMutex);
+	//	memcpy_s(m_pRecieveBuffer, m_ScreenWidth * m_ScreenHeight * 4, dst_frame, frame.height()*frame.width() * 4);
+	//	g_updateTexture = true;
+	//}
 
 	if (m_pParentObserver != nullptr) {
 		m_pParentObserver->OnVideoFrame(m_peerConnectionID, pVideoFrameDataBuffer, videoFrameWidth, videoFrameHeight);
@@ -658,6 +749,19 @@ Error:
 
 	return;
 }
+*/
+
+RESULT WebRTCPeerConnection::OnVideoFrame(std::string strVideoTrackName, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnVideoFrame(strVideoTrackName, m_peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight);
+	}
+
+Error:
+	return r;
+}
+
 
 // TODO: Add callbacks
 void WebRTCPeerConnection::OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) {
@@ -665,46 +769,46 @@ void WebRTCPeerConnection::OnSignalingChange(webrtc::PeerConnectionInterface::Si
 
 	switch (new_state) {
 	case webrtc::PeerConnectionInterface::kStable: {
-		DEBUG_LINEOUT("WebRTC Connection Stable");
+		DOSLOG(INFO, "WebRTC Connection Stable");
 		DOSLOG(INFO, "%v WebRTC Connection Stable", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnWebRTCConnectionStable(m_peerConnectionID);
 		}
 		else {
-			DEBUG_LINEOUT("No WebRTCPeerConnection Observer registered");
+			DOSLOG(INFO, "No WebRTCPeerConnection Observer registered");
 		}
 	} break;
 
 	case webrtc::PeerConnectionInterface::kHaveLocalOffer: {
-		DEBUG_LINEOUT("WebRTC Connection Has Local Offer");
+		DOSLOG(INFO, "WebRTC Connection Has Local Offer");
 		DOSLOG(INFO, "%v WebRTC Connection Has Local Offer", GetLogSignature());
 	} break;
 
 	case webrtc::PeerConnectionInterface::kHaveLocalPrAnswer: {
-		DEBUG_LINEOUT("WebRTC Connection Has Local Answer");
+		DOSLOG(INFO, "WebRTC Connection Has Local Answer");
 		DOSLOG(INFO, "%v WebRTC Connection Has Local Answer", GetLogSignature());
 	} break;
 
 	case webrtc::PeerConnectionInterface::kHaveRemoteOffer: {
-		DEBUG_LINEOUT("WebRTC Connection has remote offer");
+		DOSLOG(INFO, "WebRTC Connection has remote offer");
 		DOSLOG(INFO, "%v WebRTC Connection Has remote Offer", GetLogSignature());
 	} break;
 
 	case webrtc::PeerConnectionInterface::kHaveRemotePrAnswer: {
-		DEBUG_LINEOUT("WebRTC Connection has remote answer");
+		DOSLOG(INFO, "WebRTC Connection has remote answer");
 		DOSLOG(INFO, "%v WebRTC Connection Has remote answer", GetLogSignature());
 	} break;
 
 	case webrtc::PeerConnectionInterface::kClosed: {
-		DEBUG_LINEOUT("WebRTC Connection closed");
+		DOSLOG(INFO, "WebRTC Connection closed");
 		DOSLOG(INFO, "%v WebRTC Connection closed", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnWebRTCConnectionClosed(m_peerConnectionID);
 		}
 		else {
-			DEBUG_LINEOUT("No WebRTC Peer Connection Observer registered");
+			DOSLOG(INFO, "No WebRTC Peer Connection Observer registered");
 		}
 	} break;
 	}
@@ -715,7 +819,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 
 	switch (new_state) {
 	case webrtc::PeerConnectionInterface::kIceConnectionNew: {
-		DEBUG_LINEOUT("ICE Connection New");
+		DOSLOG(INFO, "ICE Connection New");
 		DOSLOG(INFO, "%v ICE Connection New", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
@@ -724,7 +828,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionChecking: {
-		DEBUG_LINEOUT("ICE Connection Checking");
+		DOSLOG(INFO, "ICE Connection Checking");
 		DOSLOG(INFO, "%v ICE Connection Checking", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
@@ -733,7 +837,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionConnected: {
-		DEBUG_LINEOUT("ICE Connection Connected");
+		DOSLOG(INFO, "ICE Connection Connected");
 		DOSLOG(INFO, "%v ICE Connection Connected", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
@@ -742,7 +846,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionCompleted: {
-		DEBUG_LINEOUT("ICE Connection Completed");
+		DOSLOG(INFO, "ICE Connection Completed");
 		DOSLOG(INFO, "%v ICE Connection Completed", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
@@ -751,7 +855,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionFailed: {
-		DEBUG_LINEOUT("ICE Connection Failed");
+		DOSLOG(INFO, "ICE Connection Failed");
 		DOSLOG(INFO, "%v ICE Connection Failed", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
@@ -760,7 +864,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionDisconnected: {
-		DEBUG_LINEOUT("ICE Connection Disconnected");
+		DOSLOG(INFO, "ICE Connection Disconnected");
 		DOSLOG(INFO, "%v ICE Connection Disconnected", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
@@ -769,7 +873,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionClosed: {
-		DEBUG_LINEOUT("ICE Connection Closed");
+		DOSLOG(INFO, "ICE Connection Closed");
 		DOSLOG(INFO, "%v ICE Connection Closed", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
@@ -778,7 +882,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionMax: {
-		DEBUG_LINEOUT("ICE Connection Max");
+		DOSLOG(INFO, "ICE Connection Max");
 		DOSLOG(INFO, "%v ICE Connection Max", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
@@ -794,38 +898,38 @@ void WebRTCPeerConnection::OnIceGatheringChange(webrtc::PeerConnectionInterface:
 
 	switch (new_state) {
 	case webrtc::PeerConnectionInterface::kIceGatheringNew: {
-		DEBUG_LINEOUT("ICE Gathering New");
+		DOSLOG(INFO, "ICE Gathering New");
 		DOSLOG(INFO, "%v ICE Gathering New", GetLogSignature());
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceGatheringGathering: {
-		DEBUG_LINEOUT("ICE Garthering");
+		DOSLOG(INFO, "ICE Garthering");
 		DOSLOG(INFO, "%v ICE Gathering", GetLogSignature());
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceGatheringComplete: {
-		DEBUG_LINEOUT("ICE Gathering Complete");
+		DOSLOG(INFO, "ICE Gathering Complete");
 		DOSLOG(INFO, "%v ICE Gathering Complete", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
-			m_pParentObserver->OnICECandidatesGatheringDone(m_peerConnectionID);
+			//m_pParentObserver->OnICECandidatesGatheringDone(m_peerConnectionID);
 		}
 		else {
-			DEBUG_LINEOUT("No WebRTC Peer Connection Observer registered");
+			DOSLOG(INFO, "No WebRTC Peer Connection Observer registered");
 		}
 	}break;
 	}
 }
 
 void WebRTCPeerConnection::OnIceConnectionReceivingChange(bool fReceiving) {
-	DEBUG_LINEOUT("ICE Receiving %s", (fReceiving) ? "true" : "false");
+	DOSLOG(INFO, "ICE Receiving %s", (fReceiving) ? "true" : "false");
 	DOSLOG(INFO, "[WebRTCPeerConnection] OnIceConnectionReceivingChange: %v", ((fReceiving) ? "true" : "false"));
 }
 
 void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* pICECandidate) {
-	DEBUG_LINEOUT("OnIceCandidate: %s %d", pICECandidate->sdp_mid().c_str(), pICECandidate->sdp_mline_index());
+	DOSLOG(INFO, "OnIceCandidate: %s %d", pICECandidate->sdp_mid().c_str(), pICECandidate->sdp_mline_index());
 	DOSLOG(INFO, "[WebRTCPeerConnection] OnIceCandidate: %v %v", pICECandidate->sdp_mid(), pICECandidate->sdp_mline_index());
-
+	DOSLOG(INFO, "Using: %s %s %s %s", pICECandidate->candidate().protocol(), pICECandidate->candidate().priority(), pICECandidate->candidate().type(), pICECandidate->candidate().url());
 	//Json::StyledWriter writer;
 	//Json::Value jmessage;
 
@@ -839,6 +943,11 @@ void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* p
 	}
 
 	m_webRTCICECandidates.push_back(iceCandidate);
+
+	// we can just use the last value instead of creating another copy
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnICECandidateGathered(&m_webRTCICECandidates.back(), m_peerConnectionID);
+	}
 }
 
 // DataChannelObserver Implementation
@@ -860,9 +969,9 @@ void WebRTCPeerConnection::OnStateChange() {
 	//CN(pWebRTCDataChannel);
 	CN(m_pDataChannelInterface);
 
-	//DEBUG_LINEOUT("WebRTCConductor::OnStateChange %d", pWebRTCDataChannel->state());
+	//DOSLOG(INFO, "WebRTCConductor::OnStateChange %d", pWebRTCDataChannel->state());
 	auto dataChannelState = m_pDataChannelInterface->state();
-	DEBUG_LINEOUT("WebRTCConductor::OnStateChange %s", GetDataStateString(dataChannelState).c_str());
+	DOSLOG(INFO, "WebRTCConductor::OnStateChange %s", GetDataStateString(dataChannelState).c_str());
 
 	switch (dataChannelState) {
 		case webrtc::DataChannelInterface::DataState::kConnecting: {
@@ -906,8 +1015,10 @@ void WebRTCPeerConnection::OnMessage(const webrtc::DataBuffer& buffer) {
 			CR(m_pParentObserver->OnDataChannelMessage(m_peerConnectionID, pDataBuffer, pDataBuffer_n));
 		}
 		else {
-			DEBUG_LINEOUT("WebRTCConductor::OnMessage (Binary Databuffer %d bytes)", (int)buffer.size());
+			DOSLOG(INFO, "WebRTCConductor::OnMessage (Binary Databuffer %d bytes)", (int)buffer.size());
 		}
+
+		delete[] pDataBuffer;
 	}
 	else {
 		int pszBufferString_n = (int)(buffer.size()) + 1;
@@ -922,8 +1033,10 @@ void WebRTCPeerConnection::OnMessage(const webrtc::DataBuffer& buffer) {
 			CR(m_pParentObserver->OnDataChannelStringMessage(m_peerConnectionID, strData));
 		}
 		else {
-			DEBUG_LINEOUT("WebRTCConductor::OnMessage: %s (String Databuffer)", strData.c_str());
+			DOSLOG(INFO, "WebRTCConductor::OnMessage: %s (String Databuffer)", strData.c_str());
 		}
+
+		delete[] pszBufferString;
 	}
 Error:
 	return;
@@ -945,7 +1058,7 @@ void WebRTCPeerConnection::OnSuccess(webrtc::SessionDescriptionInterface* sessio
 			CR(m_pParentObserver->OnSDPOfferSuccess(m_peerConnectionID));
 		}
 		else {
-			DEBUG_LINEOUT("SDP Offer Success");
+			DOSLOG(INFO, "SDP Offer Success");
 			DOSLOG(INFO, "%v SDP Offer Success", GetLogSignature());
 		}
 	}
@@ -954,7 +1067,7 @@ void WebRTCPeerConnection::OnSuccess(webrtc::SessionDescriptionInterface* sessio
 			CR(m_pParentObserver->OnSDPAnswerSuccess(m_peerConnectionID));
 		}
 		else {
-			DEBUG_LINEOUT("SDP Answer Success");
+			DOSLOG(INFO, "SDP Answer Success");
 			DOSLOG(INFO, "%v SDP Answer Success", GetLogSignature());
 		}
 	}
@@ -977,14 +1090,14 @@ Error:
 void WebRTCPeerConnection::OnFailure(const std::string& strError) {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("WebRTC Error: %s", strError.c_str());
+	DOSLOG(INFO, "WebRTC Error: %s", strError.c_str());
 	DOSLOG(INFO, "[WebRTCPeerConnection] WebRTC Error: %v", strError.c_str());
 
 	if (m_pParentObserver != nullptr) {
 		CR(m_pParentObserver->OnSDPFailure(m_peerConnectionID, m_fOffer));
 	}
 	else {
-		DEBUG_LINEOUT("SDP %s Failure", m_fOffer ? "offer" : "answer");
+		DOSLOG(INFO, "SDP %s Failure", m_fOffer ? "offer" : "answer");
 		DOSLOG(INFO, "[WebRTCPeerConnection] SDP %v failure", (m_fOffer ? "offer" : "answer")); 
 	}
 
@@ -992,39 +1105,88 @@ Error:
 	return;
 }
 
+#include "p2p/client/basicportallocator.h"
+
 RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	RESULT r = R_PASS;
 
 	webrtc::PeerConnectionInterface::RTCConfiguration rtcConfiguration;
-	rtcConfiguration.dscp();
+	rtcConfiguration.enable_dtls_srtp = dtls;
+	//rtcConfiguration.ice_connection_receiving_timeout = 1000;
+	
+	// Not really working?
+	//rtcConfiguration.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
 
 	webrtc::PeerConnectionInterface::IceServer iceServer;
 	webrtc::FakeConstraints webrtcConstraints;
 	std::unique_ptr<rtc::RTCCertificateGeneratorInterface> pCertificateGenerator = nullptr;
 	TwilioNTSInformation twilioNTSInformation = m_pParentObserver->GetTwilioNTSInformation();
 
+	std::unique_ptr<cricket::BasicPortAllocator> pPortAllocator = nullptr;
+
 	CN(m_pWebRTCPeerConnectionFactory.get());		// ensure factory is valid
 	CB((m_pWebRTCPeerConnectionInterface.get() == nullptr));	// ensure peer connection is nullptr
 
-	for (auto &strICEServerURI : twilioNTSInformation.m_ICEServerURIs) {
-		iceServer.uri = strICEServerURI;
-		iceServer.username = twilioNTSInformation.GetUsername();
-		iceServer.password = twilioNTSInformation.GetPassword();
+	for (int i = 0; i < twilioNTSInformation.m_ICEServerURIs.size(); i++) {
+		
+		iceServer.urls.emplace_back(twilioNTSInformation.m_ICEServerURIs[i]);
+		//DOSLOG(INFO, "Adding ice server: %s", twilioNTSInformation.m_ICEServerURIs[i]);
+
+		iceServer.username = twilioNTSInformation.m_ICEServerUsernames[i];
+		//DOSLOG(INFO, "Username: %s", twilioNTSInformation.m_ICEServerUsernames[i]);
+
+		iceServer.password = twilioNTSInformation.m_ICEServerPasswords[i];
+		//DOSLOG(INFO, "Password: %s", twilioNTSInformation.m_ICEServerPasswords[i]);
+
+		//iceServer.tls_cert_policy = webrtc::PeerConnectionInterface::kTlsCertPolicyInsecureNoCheck;
+
 		rtcConfiguration.servers.push_back(iceServer);
 	}
 
+	//iceServer.uri = "turn:w1.xirsys.com:80?transport=tcp";
+	//iceServer.username = "e1fa02b0-c151-11e8-8acc-4963be209ae3";
+	//iceServer.password = "e1fa0332-c151-11e8-80e4-3b6f3523fb32";
+	//rtcConfiguration.servers.push_back(iceServer);
+
+	//// Testing
+	//{
+	//	webrtc::PeerConnectionInterface::IceServer testGoogleSTUNServer;
+	//	testGoogleSTUNServer.uri = "stun:stun.l.google.com:19302";
+	//	rtcConfiguration.servers.push_back(testGoogleSTUNServer);
+	//}
+
 	if (dtls) {
 		//if (rtc::SSLStreamAdapter::HaveDtlsSrtp()) {
-		pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
+		//pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
+		pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(
+			new rtc::RTCCertificateGenerator(m_pParentWebRTCConductor->m_signalingThread.get(), 
+											 m_pParentWebRTCConductor->m_workerThread.get())
+		);
 		//}
 
-		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
+		//webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
 		//webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableRtpDataChannels, "true");
 
-		rtcConfiguration.enable_dtls_srtp = rtc::Optional<bool>(true);
+		webrtcConstraints.SetAllowDtlsSctpDataChannels();
+		//rtcConfiguration.enable_dtls_srtp = rtc::Optional<bool>(true);
+
 		//rtcConfiguration.enable_rtp_data_channel = true;
 
-		m_pWebRTCPeerConnectionInterface = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(rtcConfiguration, &webrtcConstraints, NULL, std::move(pCertificateGenerator), this);
+		m_pWebRTCPeerConnectionInterface = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(
+			rtcConfiguration,
+			&webrtcConstraints,
+			nullptr,
+			std::move(pCertificateGenerator),
+			this
+		);
+
+		//webrtc::PeerConnectionDependencies peerConnectionDependencies;
+		//peerConnectionDependencies.observer = this;
+		//peerConnectionDependencies.cert_generator = nullptr;
+		//peerConnectionDependencies.tls_cert_verifier = nullptr;
+		//peerConnectionDependencies.allocator = nullptr;
+		//
+		//m_pWebRTCPeerConnectionInterface = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(rtcConfiguration, peerConnectionDependencies);
 	}
 	else {
 		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "false");
@@ -1045,7 +1207,7 @@ RESULT WebRTCPeerConnection::CreateOffer() {
 	CN(m_pWebRTCPeerConnectionInterface);
 
 	m_fOffer = true;
-	m_pWebRTCPeerConnectionInterface->CreateOffer(this, NULL);
+	m_pWebRTCPeerConnectionInterface->CreateOffer(this, webrtc::PeerConnectionInterface::RTCOfferAnswerOptions());
 
 Error:
 	return r;
@@ -1065,14 +1227,14 @@ RESULT WebRTCPeerConnection::CreateSDPOfferAnswer(std::string strSDPOffer) {
 
 	strSDPType = sessionDescriptionInterface->type();
 
-	DEBUG_LINEOUT(" Received %s session description: %s", strSDPType.c_str(), strSDPOffer.c_str());
+	DOSLOG(INFO, " Received %s session description: %s", strSDPType.c_str(), strSDPOffer.c_str());
 
 	m_pWebRTCPeerConnectionInterface->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), sessionDescriptionInterface);
 
 	//if (sessionDescriptionInterface->type() == webrtc::SessionDescriptionInterface::kOffer) {
 	//if(strSDPType == webrtc::SessionDescriptionInterface::kOffer) {
 	if (strSDPType == "offer") {
-		m_pWebRTCPeerConnectionInterface->CreateAnswer(this, NULL);
+		m_pWebRTCPeerConnectionInterface->CreateAnswer(this, webrtc::PeerConnectionInterface::RTCOfferAnswerOptions());
 	}
 
 	// Saves the candidates
@@ -1111,7 +1273,7 @@ RESULT WebRTCPeerConnection::SetSDPAnswer(std::string strSDPAnswer) {
 	CNM((sessionDescriptionInterface),
 		"Can't parse received session description message. SdpParseError was: %s", sdpError.description.c_str());
 
-	DEBUG_LINEOUT(" Received %s session description: %s", strSDPType.c_str(), strSDPAnswer.c_str());
+	DOSLOG(INFO, " Received %s session description: %s", strSDPType.c_str(), strSDPAnswer.c_str());
 
 	m_pWebRTCPeerConnectionInterface->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), sessionDescriptionInterface);
 
@@ -1134,7 +1296,7 @@ RESULT WebRTCPeerConnection::AddIceCandidate(WebRTCICECandidate iceCandidate) {
 	CBM((candidate.get()), "Can't parse received candidate message. SdpParseError was: %s", sdpError.description.c_str());
 	CBM((m_pWebRTCPeerConnectionInterface->AddIceCandidate(candidate.get())), "Failed to apply the received candidate");
 
-	DEBUG_LINEOUT("Received candidate : %s", iceCandidate.m_strSDPCandidate.c_str());
+	DOSLOG(INFO, "Received candidate : %s", iceCandidate.m_strSDPCandidate.c_str());
 	DOSLOG(INFO, "%v Received candidate: %v", GetLogSignature(), iceCandidate.m_strSDPCandidate);
 	
 // Success:
@@ -1172,18 +1334,19 @@ RESULT WebRTCPeerConnection::SendDataChannelMessage(uint8_t *pDataChannelBuffer,
 		int a = 5;
 	}
 
-	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(pDataChannelBuffer, pDataChannelBuffer_n), true)));
+	// Since UpdateHead and Hands from DreamGarage is unprotected - it should check if peers exist before trying to broadcast the message
+	CBR(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(pDataChannelBuffer, pDataChannelBuffer_n), true)), R_SKIPPED);
 	
 Error:
 	return r;
 }
 
-RESULT WebRTCPeerConnection::SendVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+RESULT WebRTCPeerConnection::SendVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
-	CN(m_pCricketVideoCapturer);
+	CN(m_videoCaptureDevices[strVideoTrackLabel]);
 
-	WebRTCCustomVideoCapturer* pWebRTCCustomVideoCapturer = (WebRTCCustomVideoCapturer*)(m_pCricketVideoCapturer.get());
+	WebRTCCustomVideoCapturer* pWebRTCCustomVideoCapturer = (WebRTCCustomVideoCapturer*)(m_videoCaptureDevices[strVideoTrackLabel].get());
 
 	CR(pWebRTCCustomVideoCapturer->SubmitNewFrameBuffer(pVideoFrameBuffer, pxWidth, pxHeight, channels));
 
@@ -1218,12 +1381,12 @@ uint32_t GetCricketVideoFormatColorSpace(PIXEL_FORMAT pixelFormat) {
 // this is because WebRTC doesn't really seem to work this way.  Not providing frames
 // to the video source is the same as not streaming. 
 
-RESULT WebRTCPeerConnection::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+RESULT WebRTCPeerConnection::StartVideoStreaming(const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	return R_DEPRECATED;
 
-	CN(m_pCricketVideoCapturer);
+	CN(m_videoCaptureDevices[strVideoTrackLabel]);
 
 	{
 		cricket::VideoFormat desiredVideoFormat;
@@ -1236,40 +1399,40 @@ RESULT WebRTCPeerConnection::StartVideoStreaming(int pxDesiredWidth, int pxDesir
 		);
 
 		cricket::VideoFormat streamingVideoFormat;
-		CB(m_pCricketVideoCapturer->GetBestCaptureFormat(desiredVideoFormat, &streamingVideoFormat));
+		CB(m_videoCaptureDevices[strVideoTrackLabel]->GetBestCaptureFormat(desiredVideoFormat, &streamingVideoFormat));
 
-		m_pCricketVideoCapturer->Start(streamingVideoFormat);
+		m_videoCaptureDevices[strVideoTrackLabel]->Start(streamingVideoFormat);
 
-		CB((IsVideoStreamingRunning()));
+		CB((IsVideoStreamingRunning(strVideoTrackLabel)));
 	}
 
 Error:
 	return r;
 }
 
-RESULT WebRTCPeerConnection::StopVideoStreaming() {
+RESULT WebRTCPeerConnection::StopVideoStreaming(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	return R_DEPRECATED;
 
-	CN(m_pCricketVideoCapturer);
+	CN(m_videoCaptureDevices[strVideoTrackLabel]);
 
 	{
-		m_pCricketVideoCapturer->Stop();
+		m_videoCaptureDevices[strVideoTrackLabel]->Stop();
 
-		CB((IsVideoStreamingRunning() == false));
+		CB((IsVideoStreamingRunning(strVideoTrackLabel) == false));
 	}
 
 Error:
 	return r;
 }
 
-bool WebRTCPeerConnection::IsVideoStreamingRunning() {
+bool WebRTCPeerConnection::IsVideoStreamingRunning(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
-	CN(m_pCricketVideoCapturer);
+	CN(m_videoCaptureDevices[strVideoTrackLabel]);
 
-	return m_pCricketVideoCapturer->IsRunning();
+	return m_videoCaptureDevices[strVideoTrackLabel]->IsRunning();
 
 Error:
 	return false; 
@@ -1327,8 +1490,8 @@ std::string WebRTCPeerConnection::GetSDPJSONString(std::string strSessionDescrip
 }
 
 RESULT WebRTCPeerConnection::PrintLocalSDP() {
-	DEBUG_LINEOUT("WebRTCConductor: Local SDP:");
-	DEBUG_LINEOUT("%s", m_strLocalSessionDescriptionProtocol.c_str());
+	DOSLOG(INFO, "WebRTCConductor: Local SDP:");
+	DOSLOG(INFO, "%s", m_strLocalSessionDescriptionProtocol.c_str());
 
 	DOSLOG(INFO, "[WebRTCPeerConnection] WebRTCConductor: Local SDP: %v", m_strLocalSessionDescriptionProtocol);
 
@@ -1348,8 +1511,8 @@ std::string WebRTCPeerConnection::GetLocalSDPJSONString() {
 }
 
 RESULT WebRTCPeerConnection::PrintRemoteSDP() {
-	DEBUG_LINEOUT("WebRTCPeerConnection: Remote SDP:");
-	DEBUG_LINEOUT("%s", m_strRemoteSessionDescriptionProtocol.c_str());
+	DOSLOG(INFO, "WebRTCPeerConnection: Remote SDP:");
+	DOSLOG(INFO, "%s", m_strRemoteSessionDescriptionProtocol.c_str());
 
 	DOSLOG(INFO, "[WebRTCPeerConnection] WebRTCConductor: Remote SDP: %v", m_strRemoteSessionDescriptionProtocol);
 

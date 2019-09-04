@@ -1,44 +1,69 @@
 #include "volume.h"
 
-volume::volume(double width, double length, double height, bool fTriangleBased) :
-	m_volumeType(RECTANGULAR_CUBOID),
-	m_fTriangleBased(fTriangleBased)
+volume::volume(volume::params *pVolumeParams) :
+	m_params(*pVolumeParams)
 {
 	RESULT r = R_PASS;
 	CR(Allocate());
 
-	if (width == length && width == height && length == height) {
-		m_volumeType = CUBE;
+	if (m_params.width == m_params.length && m_params.width == m_params.height && m_params.length == m_params.height) {
+		m_params.volumeType = CUBE;
 	}
 
-	CR(SetVolumeVertices(width, length, height, m_fTriangleBased));
+	CR(SetVolumeVertices(m_params.width, m_params.length, m_params.height, m_params.fTriangleBased));
 
 	// TODO: Allow for changing this - put it into a factory
 	//CR(InitializeAABB());
 	CR(InitializeOBB());
 	//CR(InitializeBoundingSphere());
 
-	//Success:
+Success:
 	Validate();
 	return;
+
+Error:
+	Invalidate();
+	return;
+}
+
+volume::volume(double width, double length, double height, bool fTriangleBased) :
+	m_params(RECTANGULAR_CUBOID, width, length, height, fTriangleBased)
+{
+	RESULT r = R_PASS;
+	CR(Allocate());
+
+	if (m_params.width == m_params.length && m_params.width == m_params.height && m_params.length == m_params.height) {
+		m_params.volumeType = CUBE;
+	}
+
+	CR(SetVolumeVertices(m_params.width, m_params.length, m_params.height, m_params.fTriangleBased));
+
+	// TODO: Allow for changing this - put it into a factory
+	//CR(InitializeAABB());
+	CR(InitializeOBB());
+	//CR(InitializeBoundingSphere());
+
+Success:
+	Validate();
+	return;
+
 Error:
 	Invalidate();
 	return;
 }
 
 volume::volume(double side, bool fTriangleBased) :
-	m_volumeType(CUBE),
-	m_fTriangleBased(fTriangleBased)
+	m_params(CUBE, side, side, side, fTriangleBased)
 {
 	RESULT r = R_PASS;
 	CR(Allocate());
 
-	CR(SetVolumeVertices(side, side, side, m_fTriangleBased));
+	CR(SetVolumeVertices(m_params.width, m_params.length, m_params.height, m_params.fTriangleBased));
 	
 	// TODO: Allow for changing this - put it into a factory
 	CR(InitializeAABB());
 
-//Success:
+Success:
 	Validate();
 	return;
 Error:
@@ -47,8 +72,7 @@ Error:
 }
 
 volume::volume(BoundingBox* pBoundingBox, bool fTriangleBased) :
-	m_volumeType(RECTANGULAR_CUBOID),
-	m_fTriangleBased(fTriangleBased)
+	m_params(RECTANGULAR_CUBOID, pBoundingBox->GetWidth(), pBoundingBox->GetLength(), pBoundingBox->GetHeight(), fTriangleBased)
 {
 	RESULT r = R_PASS;
 	CR(Allocate());
@@ -58,7 +82,7 @@ volume::volume(BoundingBox* pBoundingBox, bool fTriangleBased) :
 	// TODO: Allow for changing this - put it into a factory
 	CR(InitializeAABB());
 
-//Success:
+Success:
 	Validate();
 	return;
 
@@ -105,18 +129,18 @@ RESULT volume::SetVolumeVertices(BoundingBox* pBoundingBox, bool fTriangleBased)
 	//double height = pBoundingBox->GetHeight();
 	//double width = pBoundingBox->GetLength();
 
-	double length = pBoundingBox->GetHalfVectorWidth(false) * 2.0f;
-	double height = pBoundingBox->GetHalfVectorHeight(false) * 2.0f;
-	double width = pBoundingBox->GetHalfVectorLength(false) * 2.0f;
+	m_params.length = pBoundingBox->GetHalfVectorWidth(false) * 2.0f;
+	m_params.height = pBoundingBox->GetHalfVectorHeight(false) * 2.0f;
+	m_params.width = pBoundingBox->GetHalfVectorLength(false) * 2.0f;
 
-	if (width == length &&
-		width == height &&
-		length == height) 
+	if (m_params.width == m_params.length &&
+		m_params.width == m_params.height &&
+		m_params.length == m_params.height)
 	{
-		m_volumeType = CUBE;
+		m_params.volumeType = CUBE;
 	}
 
-	CR(SetVolumeVertices(width, length, height, m_fTriangleBased, pBoundingBox->GetCenter()));
+	CR(SetVolumeVertices(m_params.width, m_params.length, m_params.height, m_params.fTriangleBased, pBoundingBox->GetCenter()));
 
 Error:
 	return r;
@@ -127,7 +151,7 @@ RESULT volume::Allocate() {
 
 	CR(AllocateVertices(NUM_VOLUME_POINTS));
 
-	if (m_fTriangleBased) {
+	if (m_params.fTriangleBased) {
 		CR(AllocateTriangleIndexGroups(NUM_VOLUME_TRIS));
 	}
 	else {
@@ -144,7 +168,7 @@ unsigned int volume::NumberVertices() {
 
 unsigned int volume::NumberIndices() {
 	//return NUM_VOLUME_INDICES;
-	if (m_fTriangleBased) {
+	if (m_params.fTriangleBased) {
 		return NUM_VOLUME_TRI_INDICES;
 	}
 	else {
@@ -219,10 +243,10 @@ RESULT volume::SetVolumeVertices(double width, double length, double height, boo
 
 	///*
 	// Left face
-	m_pVertices[TL = vertCount++] = vertex(point(halfWidth, -halfHeight, halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(0.0f, 1.0f));		// A
-	m_pVertices[TR = vertCount++] = vertex(point(halfWidth, halfHeight, halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(1.0f, 1.0f));		// B
-	m_pVertices[BL = vertCount++] = vertex(point(halfWidth, -halfHeight, -halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(0.0f, 0.0f));		// C
-	m_pVertices[BR = vertCount++] = vertex(point(halfWidth, halfHeight, -halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(1.0f, 0.0f));		// D
+	m_pVertices[BR = vertCount++] = vertex(point(-halfWidth, -halfHeight, halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(0.0f, 1.0f));		// A
+	m_pVertices[TR = vertCount++] = vertex(point(-halfWidth, halfHeight, halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(1.0f, 1.0f));		// B
+	m_pVertices[BL = vertCount++] = vertex(point(-halfWidth, -halfHeight, -halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(0.0f, 0.0f));		// C
+	m_pVertices[TL = vertCount++] = vertex(point(-halfWidth, halfHeight, -halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(1.0f, 0.0f));		// D
 
 	if (fTriangleBased) {
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
@@ -242,10 +266,10 @@ RESULT volume::SetVolumeVertices(double width, double length, double height, boo
 
 	///*
 	// Right face
-	m_pVertices[TR = vertCount++] = vertex(point(-halfWidth, -halfHeight, halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(1.0f, 1.0f));		// A
-	m_pVertices[TL = vertCount++] = vertex(point(-halfWidth, halfHeight, halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(0.0f, 1.0f));		// B
-	m_pVertices[BR = vertCount++] = vertex(point(-halfWidth, -halfHeight, -halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(1.0f, 0.0f));		// C
-	m_pVertices[BL = vertCount++] = vertex(point(-halfWidth, halfHeight, -halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(0.0f, 0.0f));		// D
+	m_pVertices[BL = vertCount++] = vertex(point(halfWidth, -halfHeight, halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(1.0f, 1.0f));		// A
+	m_pVertices[TL = vertCount++] = vertex(point(halfWidth, halfHeight, halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(0.0f, 1.0f));		// B
+	m_pVertices[BR = vertCount++] = vertex(point(halfWidth, -halfHeight, -halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(1.0f, 0.0f));		// C
+	m_pVertices[TR = vertCount++] = vertex(point(halfWidth, halfHeight, -halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(0.0f, 0.0f));		// D
 
 	if (fTriangleBased) {
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
@@ -315,10 +339,10 @@ RESULT volume::SetVolumeVertices(double width, double length, double height, boo
 		}
 	}
 
-	//	Error:
+Error:
 	return r;
 }
 
 bool volume::IsTriangleBased() {
-	return m_fTriangleBased;
+	return m_params.fTriangleBased;
 }

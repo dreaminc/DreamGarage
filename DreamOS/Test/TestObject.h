@@ -17,6 +17,9 @@
 
 class TestObject {
 public:
+	friend class TestSuite;
+
+public:
 	enum class state {
 		NOT_INITIALIZED,
 		INITIALIZED,
@@ -24,6 +27,21 @@ public:
 		STOPPED,
 		DONE,
 		COMPLETE
+	};
+
+	struct TestDescriptor {
+		std::function<RESULT(void*)> fnInitialize = nullptr;
+		std::function<RESULT(void*)> fnUpdate = nullptr;
+		std::function<RESULT(void*)> fnTest = nullptr;
+		std::function<RESULT(void*)> fnReset = nullptr;
+
+		std::function<RESULT()> fnTestNoContext = nullptr;
+
+		std::string strTestName = "default";
+		std::string strTestDescription = "default";
+		double sDuration = 10.0f;
+		int nRepeats = 1;
+		void *pContext = nullptr;
 	};
 
 public:
@@ -45,6 +63,8 @@ public:
 			   std::function<RESULT(void*)> fnReset,
 			   void *pContext = nullptr);
 
+	TestObject(const TestObject::TestDescriptor &testDescriptor);
+
 	~TestObject();
 
 	RESULT InitializeTest(void* pContext = nullptr);
@@ -63,8 +83,13 @@ public:
 
 	bool DidTestPass();
 
-public:
+protected:
 	RESULT SetTestName(std::string strName);
+	RESULT SetParentTestSuite(TestSuite *pParentTestSuite);
+
+public:
+	std::string GetTestName();
+
 	RESULT SetTestDescription(std::string strDescription);
 	RESULT SetTestDuration(double sDuration);
 	RESULT SetTestRepeats(int nRepeats);
@@ -89,19 +114,20 @@ private:
 	std::chrono::high_resolution_clock::duration m_timeDurationRunTest;
 	std::chrono::high_resolution_clock::duration m_timeDurationTotal;
 
-	std::function<RESULT(void*)> m_fnInitialize;
-	RESULT m_initializeResult;
+	std::function<RESULT(void*)> m_fnInitialize = nullptr;
+	RESULT m_initializeResult = R_NOT_HANDLED;
 
-	std::function<RESULT(void*)> m_fnUpdate;
-	RESULT m_updateResult;
+	std::function<RESULT(void*)> m_fnUpdate = nullptr;
+	RESULT m_updateResult = R_NOT_HANDLED;
 
-	std::function<RESULT(void*)> m_fnTest;
-	RESULT m_testResult;
+	std::function<RESULT(void*)> m_fnTest = nullptr;
+	RESULT m_testResult = R_NOT_HANDLED;
 
-	std::function<RESULT(void*)> m_fnReset;
-	RESULT m_resetResult;
+	std::function<RESULT(void*)> m_fnReset = nullptr;
+	RESULT m_resetResult = R_NOT_HANDLED;
 
-	void* m_pContext;
+	TestSuite *m_pParentTestSuite = nullptr;
+	void* m_pContext = nullptr;
 };
 
 #endif // ! TEST_OBJECT_H_

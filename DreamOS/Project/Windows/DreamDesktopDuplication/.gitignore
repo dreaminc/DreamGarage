@@ -1,0 +1,3 @@
+# Ignore a lot of the Visual Studio files
+/x64/*
+

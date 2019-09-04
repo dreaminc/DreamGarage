@@ -84,7 +84,7 @@ vector vector::Normal() {
 	return result;
 }
 
-RESULT vector::Print(char *pszOptName) {
+RESULT vector::Print(const char* const &pszOptName) {
 	DEBUG_LINEOUT("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "v", x(), y(), z(), w());
 	return R_PASS;
 }
@@ -149,7 +149,8 @@ vector vector::cross(vector rhs) {
 
 // Normalized Cross Product
 vector vector::NormalizedCross(vector rhs) {
-	return vector(this->Normal(), rhs.Normal());
+	vector vRet = vector(this->Normal(), rhs.Normal());
+	return vRet.Normal();
 }
 
 // http://gamedev.stackexchange.com/questions/28395/rotating-vector3-by-a-quaternion

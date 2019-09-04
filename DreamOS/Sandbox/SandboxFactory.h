@@ -15,9 +15,11 @@ typedef enum {
 	SANDBOX_APP_INVALID
 } SANDBOX_APP_TYPE;
 
+class DreamOS;
+
 class SandboxFactory {
 public:
-	static SandboxApp* MakeSandbox(SANDBOX_APP_TYPE type);
+	static SandboxApp* MakeSandbox(SANDBOX_APP_TYPE type, DreamOS *pDOSHandle);
 };
 
 #endif // ! SANDBOX_FACTORY_H_

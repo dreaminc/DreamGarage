@@ -23,6 +23,9 @@
 //#include "CEFAppObserver.h"
 
 //class WebBrowserController;
+class CEFV8Handler;
+
+class CEFExtension;
 
 class DreamCEFApp :  //public CEFHandler::CEFHandlerObserver, 
 	public CefApp,
@@ -58,6 +61,24 @@ public:
 		return this;
 	}
 
+	virtual void OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) override {
+
+		command_line->AppendSwitchWithValue(L"autoplay-policy", L"no-user-gesture-required");
+		
+		command_line->AppendSwitchWithValue(L"disable-blink-features", L"RootLayerScrolling");
+
+		command_line->AppendSwitchWithValue(L"disable-features", L"AsyncWheelEvents");
+		command_line->AppendSwitchWithValue(L"disable-features", L"TouchpadAndWheelScrollLatching");
+
+		//command_line->AppendSwitch(L"mute-audio");
+		command_line->AppendSwitch(L"enable-widevine-cdm");
+
+		command_line->AppendSwitch(L"enable-media-stream");
+		command_line->AppendSwitch(L"use-dream-device-for-media-stream");
+
+		return;
+	}
+
 	// CefBrowserProcessHandler methods:
 	virtual void OnContextInitialized() override;
 
@@ -67,6 +88,7 @@ public:
 	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
 	virtual void OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefDOMNode> node) override;
 	virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
+	virtual void OnWebKitInitialized() override;
 
 	// CEFAppObserver
 	//virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
@@ -76,7 +98,8 @@ private:
 	// Include the default reference counting implementation.
 	//std::promise<std::shared_ptr<CEFBrowserController>> m_promiseCEFBrowserController;
 
-	//CEFAppObserver* m_pCEFAppObserver = nullptr;
+	CefRefPtr<CEFV8Handler> m_pCEFV8Handler = nullptr;
+	CEFExtension *m_pCEFDreamExtension = nullptr;
 
 	IMPLEMENT_REFCOUNTING(DreamCEFApp);
 };

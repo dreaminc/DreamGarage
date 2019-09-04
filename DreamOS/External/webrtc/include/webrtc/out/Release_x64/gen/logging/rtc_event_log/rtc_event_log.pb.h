@@ -68,6 +68,12 @@ extern EventDefaultTypeInternal _Event_default_instance_;
 class EventStream;
 class EventStreamDefaultTypeInternal;
 extern EventStreamDefaultTypeInternal _EventStream_default_instance_;
+class IceCandidatePairConfig;
+class IceCandidatePairConfigDefaultTypeInternal;
+extern IceCandidatePairConfigDefaultTypeInternal _IceCandidatePairConfig_default_instance_;
+class IceCandidatePairEvent;
+class IceCandidatePairEventDefaultTypeInternal;
+extern IceCandidatePairEventDefaultTypeInternal _IceCandidatePairEvent_default_instance_;
 class LossBasedBweUpdate;
 class LossBasedBweUpdateDefaultTypeInternal;
 extern LossBasedBweUpdateDefaultTypeInternal _LossBasedBweUpdate_default_instance_;
@@ -128,11 +134,13 @@ enum Event_EventType {
   Event_EventType_AUDIO_NETWORK_ADAPTATION_EVENT = 16,
   Event_EventType_BWE_PROBE_CLUSTER_CREATED_EVENT = 17,
   Event_EventType_BWE_PROBE_RESULT_EVENT = 18,
-  Event_EventType_ALR_STATE_EVENT = 19
+  Event_EventType_ALR_STATE_EVENT = 19,
+  Event_EventType_ICE_CANDIDATE_PAIR_CONFIG = 20,
+  Event_EventType_ICE_CANDIDATE_PAIR_EVENT = 21
 };
 bool Event_EventType_IsValid(int value);
 const Event_EventType Event_EventType_EventType_MIN = Event_EventType_UNKNOWN_EVENT;
-const Event_EventType Event_EventType_EventType_MAX = Event_EventType_ALR_STATE_EVENT;
+const Event_EventType Event_EventType_EventType_MAX = Event_EventType_ICE_CANDIDATE_PAIR_EVENT;
 const int Event_EventType_EventType_ARRAYSIZE = Event_EventType_EventType_MAX + 1;
 
 enum DelayBasedBweUpdate_DetectorState {
@@ -164,6 +172,75 @@ bool BweProbeResult_ResultType_IsValid(int value);
 const BweProbeResult_ResultType BweProbeResult_ResultType_ResultType_MIN = BweProbeResult_ResultType_SUCCESS;
 const BweProbeResult_ResultType BweProbeResult_ResultType_ResultType_MAX = BweProbeResult_ResultType_TIMEOUT;
 const int BweProbeResult_ResultType_ResultType_ARRAYSIZE = BweProbeResult_ResultType_ResultType_MAX + 1;
+
+enum IceCandidatePairConfig_IceCandidatePairConfigType {
+  IceCandidatePairConfig_IceCandidatePairConfigType_ADDED = 0,
+  IceCandidatePairConfig_IceCandidatePairConfigType_UPDATED = 1,
+  IceCandidatePairConfig_IceCandidatePairConfigType_DESTROYED = 2,
+  IceCandidatePairConfig_IceCandidatePairConfigType_SELECTED = 3
+};
+bool IceCandidatePairConfig_IceCandidatePairConfigType_IsValid(int value);
+const IceCandidatePairConfig_IceCandidatePairConfigType IceCandidatePairConfig_IceCandidatePairConfigType_IceCandidatePairConfigType_MIN = IceCandidatePairConfig_IceCandidatePairConfigType_ADDED;
+const IceCandidatePairConfig_IceCandidatePairConfigType IceCandidatePairConfig_IceCandidatePairConfigType_IceCandidatePairConfigType_MAX = IceCandidatePairConfig_IceCandidatePairConfigType_SELECTED;
+const int IceCandidatePairConfig_IceCandidatePairConfigType_IceCandidatePairConfigType_ARRAYSIZE = IceCandidatePairConfig_IceCandidatePairConfigType_IceCandidatePairConfigType_MAX + 1;
+
+enum IceCandidatePairConfig_IceCandidateType {
+  IceCandidatePairConfig_IceCandidateType_LOCAL = 0,
+  IceCandidatePairConfig_IceCandidateType_STUN = 1,
+  IceCandidatePairConfig_IceCandidateType_PRFLX = 2,
+  IceCandidatePairConfig_IceCandidateType_RELAY = 3,
+  IceCandidatePairConfig_IceCandidateType_UNKNOWN_CANDIDATE_TYPE = 4
+};
+bool IceCandidatePairConfig_IceCandidateType_IsValid(int value);
+const IceCandidatePairConfig_IceCandidateType IceCandidatePairConfig_IceCandidateType_IceCandidateType_MIN = IceCandidatePairConfig_IceCandidateType_LOCAL;
+const IceCandidatePairConfig_IceCandidateType IceCandidatePairConfig_IceCandidateType_IceCandidateType_MAX = IceCandidatePairConfig_IceCandidateType_UNKNOWN_CANDIDATE_TYPE;
+const int IceCandidatePairConfig_IceCandidateType_IceCandidateType_ARRAYSIZE = IceCandidatePairConfig_IceCandidateType_IceCandidateType_MAX + 1;
+
+enum IceCandidatePairConfig_Protocol {
+  IceCandidatePairConfig_Protocol_UDP = 0,
+  IceCandidatePairConfig_Protocol_TCP = 1,
+  IceCandidatePairConfig_Protocol_SSLTCP = 2,
+  IceCandidatePairConfig_Protocol_TLS = 3,
+  IceCandidatePairConfig_Protocol_UNKNOWN_PROTOCOL = 4
+};
+bool IceCandidatePairConfig_Protocol_IsValid(int value);
+const IceCandidatePairConfig_Protocol IceCandidatePairConfig_Protocol_Protocol_MIN = IceCandidatePairConfig_Protocol_UDP;
+const IceCandidatePairConfig_Protocol IceCandidatePairConfig_Protocol_Protocol_MAX = IceCandidatePairConfig_Protocol_UNKNOWN_PROTOCOL;
+const int IceCandidatePairConfig_Protocol_Protocol_ARRAYSIZE = IceCandidatePairConfig_Protocol_Protocol_MAX + 1;
+
+enum IceCandidatePairConfig_AddressFamily {
+  IceCandidatePairConfig_AddressFamily_IPV4 = 0,
+  IceCandidatePairConfig_AddressFamily_IPV6 = 1,
+  IceCandidatePairConfig_AddressFamily_UNKNOWN_ADDRESS_FAMILY = 2
+};
+bool IceCandidatePairConfig_AddressFamily_IsValid(int value);
+const IceCandidatePairConfig_AddressFamily IceCandidatePairConfig_AddressFamily_AddressFamily_MIN = IceCandidatePairConfig_AddressFamily_IPV4;
+const IceCandidatePairConfig_AddressFamily IceCandidatePairConfig_AddressFamily_AddressFamily_MAX = IceCandidatePairConfig_AddressFamily_UNKNOWN_ADDRESS_FAMILY;
+const int IceCandidatePairConfig_AddressFamily_AddressFamily_ARRAYSIZE = IceCandidatePairConfig_AddressFamily_AddressFamily_MAX + 1;
+
+enum IceCandidatePairConfig_NetworkType {
+  IceCandidatePairConfig_NetworkType_ETHERNET = 0,
+  IceCandidatePairConfig_NetworkType_LOOPBACK = 1,
+  IceCandidatePairConfig_NetworkType_WIFI = 2,
+  IceCandidatePairConfig_NetworkType_VPN = 3,
+  IceCandidatePairConfig_NetworkType_CELLULAR = 4,
+  IceCandidatePairConfig_NetworkType_UNKNOWN_NETWORK_TYPE = 5
+};
+bool IceCandidatePairConfig_NetworkType_IsValid(int value);
+const IceCandidatePairConfig_NetworkType IceCandidatePairConfig_NetworkType_NetworkType_MIN = IceCandidatePairConfig_NetworkType_ETHERNET;
+const IceCandidatePairConfig_NetworkType IceCandidatePairConfig_NetworkType_NetworkType_MAX = IceCandidatePairConfig_NetworkType_UNKNOWN_NETWORK_TYPE;
+const int IceCandidatePairConfig_NetworkType_NetworkType_ARRAYSIZE = IceCandidatePairConfig_NetworkType_NetworkType_MAX + 1;
+
+enum IceCandidatePairEvent_IceCandidatePairEventType {
+  IceCandidatePairEvent_IceCandidatePairEventType_CHECK_SENT = 0,
+  IceCandidatePairEvent_IceCandidatePairEventType_CHECK_RECEIVED = 1,
+  IceCandidatePairEvent_IceCandidatePairEventType_CHECK_RESPONSE_SENT = 2,
+  IceCandidatePairEvent_IceCandidatePairEventType_CHECK_RESPONSE_RECEIVED = 3
+};
+bool IceCandidatePairEvent_IceCandidatePairEventType_IsValid(int value);
+const IceCandidatePairEvent_IceCandidatePairEventType IceCandidatePairEvent_IceCandidatePairEventType_IceCandidatePairEventType_MIN = IceCandidatePairEvent_IceCandidatePairEventType_CHECK_SENT;
+const IceCandidatePairEvent_IceCandidatePairEventType IceCandidatePairEvent_IceCandidatePairEventType_IceCandidatePairEventType_MAX = IceCandidatePairEvent_IceCandidatePairEventType_CHECK_RESPONSE_RECEIVED;
+const int IceCandidatePairEvent_IceCandidatePairEventType_IceCandidatePairEventType_ARRAYSIZE = IceCandidatePairEvent_IceCandidatePairEventType_IceCandidatePairEventType_MAX + 1;
 
 enum MediaType {
   ANY = 0,
@@ -307,6 +384,8 @@ class Event : public ::google::protobuf::MessageLite /* @@protoc_insertion_point
     kProbeCluster = 17,
     kProbeResult = 18,
     kAlrState = 19,
+    kIceCandidatePairConfig = 20,
+    kIceCandidatePairEvent = 21,
     SUBTYPE_NOT_SET = 0,
   };
 
@@ -389,6 +468,10 @@ class Event : public ::google::protobuf::MessageLite /* @@protoc_insertion_point
     Event_EventType_BWE_PROBE_RESULT_EVENT;
   static const EventType ALR_STATE_EVENT =
     Event_EventType_ALR_STATE_EVENT;
+  static const EventType ICE_CANDIDATE_PAIR_CONFIG =
+    Event_EventType_ICE_CANDIDATE_PAIR_CONFIG;
+  static const EventType ICE_CANDIDATE_PAIR_EVENT =
+    Event_EventType_ICE_CANDIDATE_PAIR_EVENT;
   static inline bool EventType_IsValid(int value) {
     return Event_EventType_IsValid(value);
   }
@@ -532,6 +615,24 @@ class Event : public ::google::protobuf::MessageLite /* @@protoc_insertion_point
   ::webrtc::rtclog::AlrState* release_alr_state();
   void set_allocated_alr_state(::webrtc::rtclog::AlrState* alr_state);
 
+  // optional .webrtc.rtclog.IceCandidatePairConfig ice_candidate_pair_config = 20;
+  bool has_ice_candidate_pair_config() const;
+  void clear_ice_candidate_pair_config();
+  static const int kIceCandidatePairConfigFieldNumber = 20;
+  const ::webrtc::rtclog::IceCandidatePairConfig& ice_candidate_pair_config() const;
+  ::webrtc::rtclog::IceCandidatePairConfig* mutable_ice_candidate_pair_config();
+  ::webrtc::rtclog::IceCandidatePairConfig* release_ice_candidate_pair_config();
+  void set_allocated_ice_candidate_pair_config(::webrtc::rtclog::IceCandidatePairConfig* ice_candidate_pair_config);
+
+  // optional .webrtc.rtclog.IceCandidatePairEvent ice_candidate_pair_event = 21;
+  bool has_ice_candidate_pair_event() const;
+  void clear_ice_candidate_pair_event();
+  static const int kIceCandidatePairEventFieldNumber = 21;
+  const ::webrtc::rtclog::IceCandidatePairEvent& ice_candidate_pair_event() const;
+  ::webrtc::rtclog::IceCandidatePairEvent* mutable_ice_candidate_pair_event();
+  ::webrtc::rtclog::IceCandidatePairEvent* release_ice_candidate_pair_event();
+  void set_allocated_ice_candidate_pair_event(::webrtc::rtclog::IceCandidatePairEvent* ice_candidate_pair_event);
+
   SubtypeCase subtype_case() const;
   // @@protoc_insertion_point(class_scope:webrtc.rtclog.Event)
  private:
@@ -552,6 +653,8 @@ class Event : public ::google::protobuf::MessageLite /* @@protoc_insertion_point
   void set_has_probe_cluster();
   void set_has_probe_result();
   void set_has_alr_state();
+  void set_has_ice_candidate_pair_config();
+  void set_has_ice_candidate_pair_event();
 
   inline bool has_subtype() const;
   void clear_subtype();
@@ -577,6 +680,8 @@ class Event : public ::google::protobuf::MessageLite /* @@protoc_insertion_point
     ::webrtc::rtclog::BweProbeCluster* probe_cluster_;
     ::webrtc::rtclog::BweProbeResult* probe_result_;
     ::webrtc::rtclog::AlrState* alr_state_;
+    ::webrtc::rtclog::IceCandidatePairConfig* ice_candidate_pair_config_;
+    ::webrtc::rtclog::IceCandidatePairEvent* ice_candidate_pair_event_;
   } subtype_;
   ::google::protobuf::uint32 _oneof_case_[1];
 
@@ -690,12 +795,12 @@ class RtpPacket : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::google::protobuf::uint32 packet_length() const;
   void set_packet_length(::google::protobuf::uint32 value);
 
-  // optional uint32 probe_cluster_id = 5;
+  // optional int32 probe_cluster_id = 5;
   bool has_probe_cluster_id() const;
   void clear_probe_cluster_id();
   static const int kProbeClusterIdFieldNumber = 5;
-  ::google::protobuf::uint32 probe_cluster_id() const;
-  void set_probe_cluster_id(::google::protobuf::uint32 value);
+  ::google::protobuf::int32 probe_cluster_id() const;
+  void set_probe_cluster_id(::google::protobuf::int32 value);
 
   // @@protoc_insertion_point(class_scope:webrtc.rtclog.RtpPacket)
  private:
@@ -717,7 +822,7 @@ class RtpPacket : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   bool incoming_;
   int type_;
   ::google::protobuf::uint32 packet_length_;
-  ::google::protobuf::uint32 probe_cluster_id_;
+  ::google::protobuf::int32 probe_cluster_id_;
   friend struct protobuf_rtc_5fevent_5flog_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
@@ -2424,19 +2529,19 @@ class BweProbeCluster : public ::google::protobuf::MessageLite /* @@protoc_inser
 
   // accessors -------------------------------------------------------
 
-  // optional uint64 bitrate_bps = 2;
-  bool has_bitrate_bps() const;
-  void clear_bitrate_bps();
-  static const int kBitrateBpsFieldNumber = 2;
-  ::google::protobuf::uint64 bitrate_bps() const;
-  void set_bitrate_bps(::google::protobuf::uint64 value);
-
-  // optional uint32 id = 1;
+  // optional int32 id = 1;
   bool has_id() const;
   void clear_id();
   static const int kIdFieldNumber = 1;
-  ::google::protobuf::uint32 id() const;
-  void set_id(::google::protobuf::uint32 value);
+  ::google::protobuf::int32 id() const;
+  void set_id(::google::protobuf::int32 value);
+
+  // optional int32 bitrate_bps = 2;
+  bool has_bitrate_bps() const;
+  void clear_bitrate_bps();
+  static const int kBitrateBpsFieldNumber = 2;
+  ::google::protobuf::int32 bitrate_bps() const;
+  void set_bitrate_bps(::google::protobuf::int32 value);
 
   // optional uint32 min_packets = 3;
   bool has_min_packets() const;
@@ -2466,8 +2571,8 @@ class BweProbeCluster : public ::google::protobuf::MessageLite /* @@protoc_inser
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
-  ::google::protobuf::uint64 bitrate_bps_;
-  ::google::protobuf::uint32 id_;
+  ::google::protobuf::int32 id_;
+  ::google::protobuf::int32 bitrate_bps_;
   ::google::protobuf::uint32 min_packets_;
   ::google::protobuf::uint32 min_bytes_;
   friend struct protobuf_rtc_5fevent_5flog_2eproto::TableStruct;
@@ -2563,12 +2668,12 @@ class BweProbeResult : public ::google::protobuf::MessageLite /* @@protoc_insert
 
   // accessors -------------------------------------------------------
 
-  // optional uint32 id = 1;
+  // optional int32 id = 1;
   bool has_id() const;
   void clear_id();
   static const int kIdFieldNumber = 1;
-  ::google::protobuf::uint32 id() const;
-  void set_id(::google::protobuf::uint32 value);
+  ::google::protobuf::int32 id() const;
+  void set_id(::google::protobuf::int32 value);
 
   // optional .webrtc.rtclog.BweProbeResult.ResultType result = 2;
   bool has_result() const;
@@ -2577,12 +2682,12 @@ class BweProbeResult : public ::google::protobuf::MessageLite /* @@protoc_insert
   ::webrtc::rtclog::BweProbeResult_ResultType result() const;
   void set_result(::webrtc::rtclog::BweProbeResult_ResultType value);
 
-  // optional uint64 bitrate_bps = 3;
+  // optional int32 bitrate_bps = 3;
   bool has_bitrate_bps() const;
   void clear_bitrate_bps();
   static const int kBitrateBpsFieldNumber = 3;
-  ::google::protobuf::uint64 bitrate_bps() const;
-  void set_bitrate_bps(::google::protobuf::uint64 value);
+  ::google::protobuf::int32 bitrate_bps() const;
+  void set_bitrate_bps(::google::protobuf::int32 value);
 
   // @@protoc_insertion_point(class_scope:webrtc.rtclog.BweProbeResult)
  private:
@@ -2596,9 +2701,9 @@ class BweProbeResult : public ::google::protobuf::MessageLite /* @@protoc_insert
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
-  ::google::protobuf::uint32 id_;
+  ::google::protobuf::int32 id_;
   int result_;
-  ::google::protobuf::uint64 bitrate_bps_;
+  ::google::protobuf::int32 bitrate_bps_;
   friend struct protobuf_rtc_5fevent_5flog_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
@@ -2689,6 +2794,396 @@ class AlrState : public ::google::protobuf::MessageLite /* @@protoc_insertion_po
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   bool in_alr_;
+  friend struct protobuf_rtc_5fevent_5flog_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class IceCandidatePairConfig : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:webrtc.rtclog.IceCandidatePairConfig) */ {
+ public:
+  IceCandidatePairConfig();
+  virtual ~IceCandidatePairConfig();
+
+  IceCandidatePairConfig(const IceCandidatePairConfig& from);
+
+  inline IceCandidatePairConfig& operator=(const IceCandidatePairConfig& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::std::string& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+
+  inline ::std::string* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const IceCandidatePairConfig& default_instance();
+
+  static inline const IceCandidatePairConfig* internal_default_instance() {
+    return reinterpret_cast<const IceCandidatePairConfig*>(
+               &_IceCandidatePairConfig_default_instance_);
+  }
+  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+    20;
+
+  GOOGLE_ATTRIBUTE_NOINLINE void Swap(IceCandidatePairConfig* other);
+
+  // implements Message ----------------------------------------------
+
+  inline IceCandidatePairConfig* New() const PROTOBUF_FINAL { return New(NULL); }
+
+  IceCandidatePairConfig* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from)
+    PROTOBUF_FINAL;
+  void CopyFrom(const IceCandidatePairConfig& from);
+  void MergeFrom(const IceCandidatePairConfig& from);
+  void Clear() PROTOBUF_FINAL;
+  bool IsInitialized() const PROTOBUF_FINAL;
+
+  size_t ByteSizeLong() const PROTOBUF_FINAL;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+  void DiscardUnknownFields();
+  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(IceCandidatePairConfig* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::std::string GetTypeName() const PROTOBUF_FINAL;
+
+  // nested types ----------------------------------------------------
+
+  typedef IceCandidatePairConfig_IceCandidatePairConfigType IceCandidatePairConfigType;
+  static const IceCandidatePairConfigType ADDED =
+    IceCandidatePairConfig_IceCandidatePairConfigType_ADDED;
+  static const IceCandidatePairConfigType UPDATED =
+    IceCandidatePairConfig_IceCandidatePairConfigType_UPDATED;
+  static const IceCandidatePairConfigType DESTROYED =
+    IceCandidatePairConfig_IceCandidatePairConfigType_DESTROYED;
+  static const IceCandidatePairConfigType SELECTED =
+    IceCandidatePairConfig_IceCandidatePairConfigType_SELECTED;
+  static inline bool IceCandidatePairConfigType_IsValid(int value) {
+    return IceCandidatePairConfig_IceCandidatePairConfigType_IsValid(value);
+  }
+  static const IceCandidatePairConfigType IceCandidatePairConfigType_MIN =
+    IceCandidatePairConfig_IceCandidatePairConfigType_IceCandidatePairConfigType_MIN;
+  static const IceCandidatePairConfigType IceCandidatePairConfigType_MAX =
+    IceCandidatePairConfig_IceCandidatePairConfigType_IceCandidatePairConfigType_MAX;
+  static const int IceCandidatePairConfigType_ARRAYSIZE =
+    IceCandidatePairConfig_IceCandidatePairConfigType_IceCandidatePairConfigType_ARRAYSIZE;
+
+  typedef IceCandidatePairConfig_IceCandidateType IceCandidateType;
+  static const IceCandidateType LOCAL =
+    IceCandidatePairConfig_IceCandidateType_LOCAL;
+  static const IceCandidateType STUN =
+    IceCandidatePairConfig_IceCandidateType_STUN;
+  static const IceCandidateType PRFLX =
+    IceCandidatePairConfig_IceCandidateType_PRFLX;
+  static const IceCandidateType RELAY =
+    IceCandidatePairConfig_IceCandidateType_RELAY;
+  static const IceCandidateType UNKNOWN_CANDIDATE_TYPE =
+    IceCandidatePairConfig_IceCandidateType_UNKNOWN_CANDIDATE_TYPE;
+  static inline bool IceCandidateType_IsValid(int value) {
+    return IceCandidatePairConfig_IceCandidateType_IsValid(value);
+  }
+  static const IceCandidateType IceCandidateType_MIN =
+    IceCandidatePairConfig_IceCandidateType_IceCandidateType_MIN;
+  static const IceCandidateType IceCandidateType_MAX =
+    IceCandidatePairConfig_IceCandidateType_IceCandidateType_MAX;
+  static const int IceCandidateType_ARRAYSIZE =
+    IceCandidatePairConfig_IceCandidateType_IceCandidateType_ARRAYSIZE;
+
+  typedef IceCandidatePairConfig_Protocol Protocol;
+  static const Protocol UDP =
+    IceCandidatePairConfig_Protocol_UDP;
+  static const Protocol TCP =
+    IceCandidatePairConfig_Protocol_TCP;
+  static const Protocol SSLTCP =
+    IceCandidatePairConfig_Protocol_SSLTCP;
+  static const Protocol TLS =
+    IceCandidatePairConfig_Protocol_TLS;
+  static const Protocol UNKNOWN_PROTOCOL =
+    IceCandidatePairConfig_Protocol_UNKNOWN_PROTOCOL;
+  static inline bool Protocol_IsValid(int value) {
+    return IceCandidatePairConfig_Protocol_IsValid(value);
+  }
+  static const Protocol Protocol_MIN =
+    IceCandidatePairConfig_Protocol_Protocol_MIN;
+  static const Protocol Protocol_MAX =
+    IceCandidatePairConfig_Protocol_Protocol_MAX;
+  static const int Protocol_ARRAYSIZE =
+    IceCandidatePairConfig_Protocol_Protocol_ARRAYSIZE;
+
+  typedef IceCandidatePairConfig_AddressFamily AddressFamily;
+  static const AddressFamily IPV4 =
+    IceCandidatePairConfig_AddressFamily_IPV4;
+  static const AddressFamily IPV6 =
+    IceCandidatePairConfig_AddressFamily_IPV6;
+  static const AddressFamily UNKNOWN_ADDRESS_FAMILY =
+    IceCandidatePairConfig_AddressFamily_UNKNOWN_ADDRESS_FAMILY;
+  static inline bool AddressFamily_IsValid(int value) {
+    return IceCandidatePairConfig_AddressFamily_IsValid(value);
+  }
+  static const AddressFamily AddressFamily_MIN =
+    IceCandidatePairConfig_AddressFamily_AddressFamily_MIN;
+  static const AddressFamily AddressFamily_MAX =
+    IceCandidatePairConfig_AddressFamily_AddressFamily_MAX;
+  static const int AddressFamily_ARRAYSIZE =
+    IceCandidatePairConfig_AddressFamily_AddressFamily_ARRAYSIZE;
+
+  typedef IceCandidatePairConfig_NetworkType NetworkType;
+  static const NetworkType ETHERNET =
+    IceCandidatePairConfig_NetworkType_ETHERNET;
+  static const NetworkType LOOPBACK =
+    IceCandidatePairConfig_NetworkType_LOOPBACK;
+  static const NetworkType WIFI =
+    IceCandidatePairConfig_NetworkType_WIFI;
+  static const NetworkType VPN =
+    IceCandidatePairConfig_NetworkType_VPN;
+  static const NetworkType CELLULAR =
+    IceCandidatePairConfig_NetworkType_CELLULAR;
+  static const NetworkType UNKNOWN_NETWORK_TYPE =
+    IceCandidatePairConfig_NetworkType_UNKNOWN_NETWORK_TYPE;
+  static inline bool NetworkType_IsValid(int value) {
+    return IceCandidatePairConfig_NetworkType_IsValid(value);
+  }
+  static const NetworkType NetworkType_MIN =
+    IceCandidatePairConfig_NetworkType_NetworkType_MIN;
+  static const NetworkType NetworkType_MAX =
+    IceCandidatePairConfig_NetworkType_NetworkType_MAX;
+  static const int NetworkType_ARRAYSIZE =
+    IceCandidatePairConfig_NetworkType_NetworkType_ARRAYSIZE;
+
+  // accessors -------------------------------------------------------
+
+  // optional .webrtc.rtclog.IceCandidatePairConfig.IceCandidatePairConfigType config_type = 1;
+  bool has_config_type() const;
+  void clear_config_type();
+  static const int kConfigTypeFieldNumber = 1;
+  ::webrtc::rtclog::IceCandidatePairConfig_IceCandidatePairConfigType config_type() const;
+  void set_config_type(::webrtc::rtclog::IceCandidatePairConfig_IceCandidatePairConfigType value);
+
+  // optional uint32 candidate_pair_id = 2;
+  bool has_candidate_pair_id() const;
+  void clear_candidate_pair_id();
+  static const int kCandidatePairIdFieldNumber = 2;
+  ::google::protobuf::uint32 candidate_pair_id() const;
+  void set_candidate_pair_id(::google::protobuf::uint32 value);
+
+  // optional .webrtc.rtclog.IceCandidatePairConfig.IceCandidateType local_candidate_type = 3;
+  bool has_local_candidate_type() const;
+  void clear_local_candidate_type();
+  static const int kLocalCandidateTypeFieldNumber = 3;
+  ::webrtc::rtclog::IceCandidatePairConfig_IceCandidateType local_candidate_type() const;
+  void set_local_candidate_type(::webrtc::rtclog::IceCandidatePairConfig_IceCandidateType value);
+
+  // optional .webrtc.rtclog.IceCandidatePairConfig.Protocol local_relay_protocol = 4;
+  bool has_local_relay_protocol() const;
+  void clear_local_relay_protocol();
+  static const int kLocalRelayProtocolFieldNumber = 4;
+  ::webrtc::rtclog::IceCandidatePairConfig_Protocol local_relay_protocol() const;
+  void set_local_relay_protocol(::webrtc::rtclog::IceCandidatePairConfig_Protocol value);
+
+  // optional .webrtc.rtclog.IceCandidatePairConfig.NetworkType local_network_type = 5;
+  bool has_local_network_type() const;
+  void clear_local_network_type();
+  static const int kLocalNetworkTypeFieldNumber = 5;
+  ::webrtc::rtclog::IceCandidatePairConfig_NetworkType local_network_type() const;
+  void set_local_network_type(::webrtc::rtclog::IceCandidatePairConfig_NetworkType value);
+
+  // optional .webrtc.rtclog.IceCandidatePairConfig.AddressFamily local_address_family = 6;
+  bool has_local_address_family() const;
+  void clear_local_address_family();
+  static const int kLocalAddressFamilyFieldNumber = 6;
+  ::webrtc::rtclog::IceCandidatePairConfig_AddressFamily local_address_family() const;
+  void set_local_address_family(::webrtc::rtclog::IceCandidatePairConfig_AddressFamily value);
+
+  // optional .webrtc.rtclog.IceCandidatePairConfig.IceCandidateType remote_candidate_type = 7;
+  bool has_remote_candidate_type() const;
+  void clear_remote_candidate_type();
+  static const int kRemoteCandidateTypeFieldNumber = 7;
+  ::webrtc::rtclog::IceCandidatePairConfig_IceCandidateType remote_candidate_type() const;
+  void set_remote_candidate_type(::webrtc::rtclog::IceCandidatePairConfig_IceCandidateType value);
+
+  // optional .webrtc.rtclog.IceCandidatePairConfig.AddressFamily remote_address_family = 8;
+  bool has_remote_address_family() const;
+  void clear_remote_address_family();
+  static const int kRemoteAddressFamilyFieldNumber = 8;
+  ::webrtc::rtclog::IceCandidatePairConfig_AddressFamily remote_address_family() const;
+  void set_remote_address_family(::webrtc::rtclog::IceCandidatePairConfig_AddressFamily value);
+
+  // optional .webrtc.rtclog.IceCandidatePairConfig.Protocol candidate_pair_protocol = 9;
+  bool has_candidate_pair_protocol() const;
+  void clear_candidate_pair_protocol();
+  static const int kCandidatePairProtocolFieldNumber = 9;
+  ::webrtc::rtclog::IceCandidatePairConfig_Protocol candidate_pair_protocol() const;
+  void set_candidate_pair_protocol(::webrtc::rtclog::IceCandidatePairConfig_Protocol value);
+
+  // @@protoc_insertion_point(class_scope:webrtc.rtclog.IceCandidatePairConfig)
+ private:
+  void set_has_config_type();
+  void clear_has_config_type();
+  void set_has_candidate_pair_id();
+  void clear_has_candidate_pair_id();
+  void set_has_local_candidate_type();
+  void clear_has_local_candidate_type();
+  void set_has_local_relay_protocol();
+  void clear_has_local_relay_protocol();
+  void set_has_local_network_type();
+  void clear_has_local_network_type();
+  void set_has_local_address_family();
+  void clear_has_local_address_family();
+  void set_has_remote_candidate_type();
+  void clear_has_remote_candidate_type();
+  void set_has_remote_address_family();
+  void clear_has_remote_address_family();
+  void set_has_candidate_pair_protocol();
+  void clear_has_candidate_pair_protocol();
+
+  ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable int _cached_size_;
+  int config_type_;
+  ::google::protobuf::uint32 candidate_pair_id_;
+  int local_candidate_type_;
+  int local_relay_protocol_;
+  int local_network_type_;
+  int local_address_family_;
+  int remote_candidate_type_;
+  int remote_address_family_;
+  int candidate_pair_protocol_;
+  friend struct protobuf_rtc_5fevent_5flog_2eproto::TableStruct;
+};
+// -------------------------------------------------------------------
+
+class IceCandidatePairEvent : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:webrtc.rtclog.IceCandidatePairEvent) */ {
+ public:
+  IceCandidatePairEvent();
+  virtual ~IceCandidatePairEvent();
+
+  IceCandidatePairEvent(const IceCandidatePairEvent& from);
+
+  inline IceCandidatePairEvent& operator=(const IceCandidatePairEvent& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::std::string& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+
+  inline ::std::string* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const IceCandidatePairEvent& default_instance();
+
+  static inline const IceCandidatePairEvent* internal_default_instance() {
+    return reinterpret_cast<const IceCandidatePairEvent*>(
+               &_IceCandidatePairEvent_default_instance_);
+  }
+  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+    21;
+
+  GOOGLE_ATTRIBUTE_NOINLINE void Swap(IceCandidatePairEvent* other);
+
+  // implements Message ----------------------------------------------
+
+  inline IceCandidatePairEvent* New() const PROTOBUF_FINAL { return New(NULL); }
+
+  IceCandidatePairEvent* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from)
+    PROTOBUF_FINAL;
+  void CopyFrom(const IceCandidatePairEvent& from);
+  void MergeFrom(const IceCandidatePairEvent& from);
+  void Clear() PROTOBUF_FINAL;
+  bool IsInitialized() const PROTOBUF_FINAL;
+
+  size_t ByteSizeLong() const PROTOBUF_FINAL;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+  void DiscardUnknownFields();
+  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(IceCandidatePairEvent* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::std::string GetTypeName() const PROTOBUF_FINAL;
+
+  // nested types ----------------------------------------------------
+
+  typedef IceCandidatePairEvent_IceCandidatePairEventType IceCandidatePairEventType;
+  static const IceCandidatePairEventType CHECK_SENT =
+    IceCandidatePairEvent_IceCandidatePairEventType_CHECK_SENT;
+  static const IceCandidatePairEventType CHECK_RECEIVED =
+    IceCandidatePairEvent_IceCandidatePairEventType_CHECK_RECEIVED;
+  static const IceCandidatePairEventType CHECK_RESPONSE_SENT =
+    IceCandidatePairEvent_IceCandidatePairEventType_CHECK_RESPONSE_SENT;
+  static const IceCandidatePairEventType CHECK_RESPONSE_RECEIVED =
+    IceCandidatePairEvent_IceCandidatePairEventType_CHECK_RESPONSE_RECEIVED;
+  static inline bool IceCandidatePairEventType_IsValid(int value) {
+    return IceCandidatePairEvent_IceCandidatePairEventType_IsValid(value);
+  }
+  static const IceCandidatePairEventType IceCandidatePairEventType_MIN =
+    IceCandidatePairEvent_IceCandidatePairEventType_IceCandidatePairEventType_MIN;
+  static const IceCandidatePairEventType IceCandidatePairEventType_MAX =
+    IceCandidatePairEvent_IceCandidatePairEventType_IceCandidatePairEventType_MAX;
+  static const int IceCandidatePairEventType_ARRAYSIZE =
+    IceCandidatePairEvent_IceCandidatePairEventType_IceCandidatePairEventType_ARRAYSIZE;
+
+  // accessors -------------------------------------------------------
+
+  // optional .webrtc.rtclog.IceCandidatePairEvent.IceCandidatePairEventType event_type = 1;
+  bool has_event_type() const;
+  void clear_event_type();
+  static const int kEventTypeFieldNumber = 1;
+  ::webrtc::rtclog::IceCandidatePairEvent_IceCandidatePairEventType event_type() const;
+  void set_event_type(::webrtc::rtclog::IceCandidatePairEvent_IceCandidatePairEventType value);
+
+  // optional uint32 candidate_pair_id = 2;
+  bool has_candidate_pair_id() const;
+  void clear_candidate_pair_id();
+  static const int kCandidatePairIdFieldNumber = 2;
+  ::google::protobuf::uint32 candidate_pair_id() const;
+  void set_candidate_pair_id(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:webrtc.rtclog.IceCandidatePairEvent)
+ private:
+  void set_has_event_type();
+  void clear_has_event_type();
+  void set_has_candidate_pair_id();
+  void clear_has_candidate_pair_id();
+
+  ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable int _cached_size_;
+  int event_type_;
+  ::google::protobuf::uint32 candidate_pair_id_;
   friend struct protobuf_rtc_5fevent_5flog_2eproto::TableStruct;
 };
 // ===================================================================
@@ -3406,6 +3901,102 @@ inline void Event::set_allocated_alr_state(::webrtc::rtclog::AlrState* alr_state
   // @@protoc_insertion_point(field_set_allocated:webrtc.rtclog.Event.alr_state)
 }
 
+// optional .webrtc.rtclog.IceCandidatePairConfig ice_candidate_pair_config = 20;
+inline bool Event::has_ice_candidate_pair_config() const {
+  return subtype_case() == kIceCandidatePairConfig;
+}
+inline void Event::set_has_ice_candidate_pair_config() {
+  _oneof_case_[0] = kIceCandidatePairConfig;
+}
+inline void Event::clear_ice_candidate_pair_config() {
+  if (has_ice_candidate_pair_config()) {
+    delete subtype_.ice_candidate_pair_config_;
+    clear_has_subtype();
+  }
+}
+inline  const ::webrtc::rtclog::IceCandidatePairConfig& Event::ice_candidate_pair_config() const {
+  // @@protoc_insertion_point(field_get:webrtc.rtclog.Event.ice_candidate_pair_config)
+  return has_ice_candidate_pair_config()
+      ? *subtype_.ice_candidate_pair_config_
+      : ::webrtc::rtclog::IceCandidatePairConfig::default_instance();
+}
+inline ::webrtc::rtclog::IceCandidatePairConfig* Event::mutable_ice_candidate_pair_config() {
+  if (!has_ice_candidate_pair_config()) {
+    clear_subtype();
+    set_has_ice_candidate_pair_config();
+    subtype_.ice_candidate_pair_config_ = new ::webrtc::rtclog::IceCandidatePairConfig;
+  }
+  // @@protoc_insertion_point(field_mutable:webrtc.rtclog.Event.ice_candidate_pair_config)
+  return subtype_.ice_candidate_pair_config_;
+}
+inline ::webrtc::rtclog::IceCandidatePairConfig* Event::release_ice_candidate_pair_config() {
+  // @@protoc_insertion_point(field_release:webrtc.rtclog.Event.ice_candidate_pair_config)
+  if (has_ice_candidate_pair_config()) {
+    clear_has_subtype();
+    ::webrtc::rtclog::IceCandidatePairConfig* temp = subtype_.ice_candidate_pair_config_;
+    subtype_.ice_candidate_pair_config_ = NULL;
+    return temp;
+  } else {
+    return NULL;
+  }
+}
+inline void Event::set_allocated_ice_candidate_pair_config(::webrtc::rtclog::IceCandidatePairConfig* ice_candidate_pair_config) {
+  clear_subtype();
+  if (ice_candidate_pair_config) {
+    set_has_ice_candidate_pair_config();
+    subtype_.ice_candidate_pair_config_ = ice_candidate_pair_config;
+  }
+  // @@protoc_insertion_point(field_set_allocated:webrtc.rtclog.Event.ice_candidate_pair_config)
+}
+
+// optional .webrtc.rtclog.IceCandidatePairEvent ice_candidate_pair_event = 21;
+inline bool Event::has_ice_candidate_pair_event() const {
+  return subtype_case() == kIceCandidatePairEvent;
+}
+inline void Event::set_has_ice_candidate_pair_event() {
+  _oneof_case_[0] = kIceCandidatePairEvent;
+}
+inline void Event::clear_ice_candidate_pair_event() {
+  if (has_ice_candidate_pair_event()) {
+    delete subtype_.ice_candidate_pair_event_;
+    clear_has_subtype();
+  }
+}
+inline  const ::webrtc::rtclog::IceCandidatePairEvent& Event::ice_candidate_pair_event() const {
+  // @@protoc_insertion_point(field_get:webrtc.rtclog.Event.ice_candidate_pair_event)
+  return has_ice_candidate_pair_event()
+      ? *subtype_.ice_candidate_pair_event_
+      : ::webrtc::rtclog::IceCandidatePairEvent::default_instance();
+}
+inline ::webrtc::rtclog::IceCandidatePairEvent* Event::mutable_ice_candidate_pair_event() {
+  if (!has_ice_candidate_pair_event()) {
+    clear_subtype();
+    set_has_ice_candidate_pair_event();
+    subtype_.ice_candidate_pair_event_ = new ::webrtc::rtclog::IceCandidatePairEvent;
+  }
+  // @@protoc_insertion_point(field_mutable:webrtc.rtclog.Event.ice_candidate_pair_event)
+  return subtype_.ice_candidate_pair_event_;
+}
+inline ::webrtc::rtclog::IceCandidatePairEvent* Event::release_ice_candidate_pair_event() {
+  // @@protoc_insertion_point(field_release:webrtc.rtclog.Event.ice_candidate_pair_event)
+  if (has_ice_candidate_pair_event()) {
+    clear_has_subtype();
+    ::webrtc::rtclog::IceCandidatePairEvent* temp = subtype_.ice_candidate_pair_event_;
+    subtype_.ice_candidate_pair_event_ = NULL;
+    return temp;
+  } else {
+    return NULL;
+  }
+}
+inline void Event::set_allocated_ice_candidate_pair_event(::webrtc::rtclog::IceCandidatePairEvent* ice_candidate_pair_event) {
+  clear_subtype();
+  if (ice_candidate_pair_event) {
+    set_has_ice_candidate_pair_event();
+    subtype_.ice_candidate_pair_event_ = ice_candidate_pair_event;
+  }
+  // @@protoc_insertion_point(field_set_allocated:webrtc.rtclog.Event.ice_candidate_pair_event)
+}
+
 inline bool Event::has_subtype() const {
   return subtype_case() != SUBTYPE_NOT_SET;
 }
@@ -3555,7 +4146,7 @@ inline void RtpPacket::set_allocated_header(::std::string* header) {
   // @@protoc_insertion_point(field_set_allocated:webrtc.rtclog.RtpPacket.header)
 }
 
-// optional uint32 probe_cluster_id = 5;
+// optional int32 probe_cluster_id = 5;
 inline bool RtpPacket::has_probe_cluster_id() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
@@ -3566,14 +4157,14 @@ inline void RtpPacket::clear_has_probe_cluster_id() {
   _has_bits_[0] &= ~0x00000010u;
 }
 inline void RtpPacket::clear_probe_cluster_id() {
-  probe_cluster_id_ = 0u;
+  probe_cluster_id_ = 0;
   clear_has_probe_cluster_id();
 }
-inline ::google::protobuf::uint32 RtpPacket::probe_cluster_id() const {
+inline ::google::protobuf::int32 RtpPacket::probe_cluster_id() const {
   // @@protoc_insertion_point(field_get:webrtc.rtclog.RtpPacket.probe_cluster_id)
   return probe_cluster_id_;
 }
-inline void RtpPacket::set_probe_cluster_id(::google::protobuf::uint32 value) {
+inline void RtpPacket::set_probe_cluster_id(::google::protobuf::int32 value) {
   set_has_probe_cluster_id();
   probe_cluster_id_ = value;
   // @@protoc_insertion_point(field_set:webrtc.rtclog.RtpPacket.probe_cluster_id)
@@ -4896,49 +5487,49 @@ inline void AudioNetworkAdaptation::set_num_channels(::google::protobuf::uint32 
 
 // BweProbeCluster
 
-// optional uint32 id = 1;
+// optional int32 id = 1;
 inline bool BweProbeCluster::has_id() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+  return (_has_bits_[0] & 0x00000001u) != 0;
 }
 inline void BweProbeCluster::set_has_id() {
-  _has_bits_[0] |= 0x00000002u;
+  _has_bits_[0] |= 0x00000001u;
 }
 inline void BweProbeCluster::clear_has_id() {
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline void BweProbeCluster::clear_id() {
-  id_ = 0u;
+  id_ = 0;
   clear_has_id();
 }
-inline ::google::protobuf::uint32 BweProbeCluster::id() const {
+inline ::google::protobuf::int32 BweProbeCluster::id() const {
   // @@protoc_insertion_point(field_get:webrtc.rtclog.BweProbeCluster.id)
   return id_;
 }
-inline void BweProbeCluster::set_id(::google::protobuf::uint32 value) {
+inline void BweProbeCluster::set_id(::google::protobuf::int32 value) {
   set_has_id();
   id_ = value;
   // @@protoc_insertion_point(field_set:webrtc.rtclog.BweProbeCluster.id)
 }
 
-// optional uint64 bitrate_bps = 2;
+// optional int32 bitrate_bps = 2;
 inline bool BweProbeCluster::has_bitrate_bps() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+  return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void BweProbeCluster::set_has_bitrate_bps() {
-  _has_bits_[0] |= 0x00000001u;
+  _has_bits_[0] |= 0x00000002u;
 }
 inline void BweProbeCluster::clear_has_bitrate_bps() {
-  _has_bits_[0] &= ~0x00000001u;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline void BweProbeCluster::clear_bitrate_bps() {
-  bitrate_bps_ = GOOGLE_ULONGLONG(0);
+  bitrate_bps_ = 0;
   clear_has_bitrate_bps();
 }
-inline ::google::protobuf::uint64 BweProbeCluster::bitrate_bps() const {
+inline ::google::protobuf::int32 BweProbeCluster::bitrate_bps() const {
   // @@protoc_insertion_point(field_get:webrtc.rtclog.BweProbeCluster.bitrate_bps)
   return bitrate_bps_;
 }
-inline void BweProbeCluster::set_bitrate_bps(::google::protobuf::uint64 value) {
+inline void BweProbeCluster::set_bitrate_bps(::google::protobuf::int32 value) {
   set_has_bitrate_bps();
   bitrate_bps_ = value;
   // @@protoc_insertion_point(field_set:webrtc.rtclog.BweProbeCluster.bitrate_bps)
@@ -4996,7 +5587,7 @@ inline void BweProbeCluster::set_min_bytes(::google::protobuf::uint32 value) {
 
 // BweProbeResult
 
-// optional uint32 id = 1;
+// optional int32 id = 1;
 inline bool BweProbeResult::has_id() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -5007,14 +5598,14 @@ inline void BweProbeResult::clear_has_id() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void BweProbeResult::clear_id() {
-  id_ = 0u;
+  id_ = 0;
   clear_has_id();
 }
-inline ::google::protobuf::uint32 BweProbeResult::id() const {
+inline ::google::protobuf::int32 BweProbeResult::id() const {
   // @@protoc_insertion_point(field_get:webrtc.rtclog.BweProbeResult.id)
   return id_;
 }
-inline void BweProbeResult::set_id(::google::protobuf::uint32 value) {
+inline void BweProbeResult::set_id(::google::protobuf::int32 value) {
   set_has_id();
   id_ = value;
   // @@protoc_insertion_point(field_set:webrtc.rtclog.BweProbeResult.id)
@@ -5045,7 +5636,7 @@ inline void BweProbeResult::set_result(::webrtc::rtclog::BweProbeResult_ResultTy
   // @@protoc_insertion_point(field_set:webrtc.rtclog.BweProbeResult.result)
 }
 
-// optional uint64 bitrate_bps = 3;
+// optional int32 bitrate_bps = 3;
 inline bool BweProbeResult::has_bitrate_bps() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
@@ -5056,14 +5647,14 @@ inline void BweProbeResult::clear_has_bitrate_bps() {
   _has_bits_[0] &= ~0x00000004u;
 }
 inline void BweProbeResult::clear_bitrate_bps() {
-  bitrate_bps_ = GOOGLE_ULONGLONG(0);
+  bitrate_bps_ = 0;
   clear_has_bitrate_bps();
 }
-inline ::google::protobuf::uint64 BweProbeResult::bitrate_bps() const {
+inline ::google::protobuf::int32 BweProbeResult::bitrate_bps() const {
   // @@protoc_insertion_point(field_get:webrtc.rtclog.BweProbeResult.bitrate_bps)
   return bitrate_bps_;
 }
-inline void BweProbeResult::set_bitrate_bps(::google::protobuf::uint64 value) {
+inline void BweProbeResult::set_bitrate_bps(::google::protobuf::int32 value) {
   set_has_bitrate_bps();
   bitrate_bps_ = value;
   // @@protoc_insertion_point(field_set:webrtc.rtclog.BweProbeResult.bitrate_bps)
@@ -5097,7 +5688,292 @@ inline void AlrState::set_in_alr(bool value) {
   // @@protoc_insertion_point(field_set:webrtc.rtclog.AlrState.in_alr)
 }
 
+// -------------------------------------------------------------------
+
+// IceCandidatePairConfig
+
+// optional .webrtc.rtclog.IceCandidatePairConfig.IceCandidatePairConfigType config_type = 1;
+inline bool IceCandidatePairConfig::has_config_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void IceCandidatePairConfig::set_has_config_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void IceCandidatePairConfig::clear_has_config_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void IceCandidatePairConfig::clear_config_type() {
+  config_type_ = 0;
+  clear_has_config_type();
+}
+inline ::webrtc::rtclog::IceCandidatePairConfig_IceCandidatePairConfigType IceCandidatePairConfig::config_type() const {
+  // @@protoc_insertion_point(field_get:webrtc.rtclog.IceCandidatePairConfig.config_type)
+  return static_cast< ::webrtc::rtclog::IceCandidatePairConfig_IceCandidatePairConfigType >(config_type_);
+}
+inline void IceCandidatePairConfig::set_config_type(::webrtc::rtclog::IceCandidatePairConfig_IceCandidatePairConfigType value) {
+  assert(::webrtc::rtclog::IceCandidatePairConfig_IceCandidatePairConfigType_IsValid(value));
+  set_has_config_type();
+  config_type_ = value;
+  // @@protoc_insertion_point(field_set:webrtc.rtclog.IceCandidatePairConfig.config_type)
+}
+
+// optional uint32 candidate_pair_id = 2;
+inline bool IceCandidatePairConfig::has_candidate_pair_id() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void IceCandidatePairConfig::set_has_candidate_pair_id() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void IceCandidatePairConfig::clear_has_candidate_pair_id() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void IceCandidatePairConfig::clear_candidate_pair_id() {
+  candidate_pair_id_ = 0u;
+  clear_has_candidate_pair_id();
+}
+inline ::google::protobuf::uint32 IceCandidatePairConfig::candidate_pair_id() const {
+  // @@protoc_insertion_point(field_get:webrtc.rtclog.IceCandidatePairConfig.candidate_pair_id)
+  return candidate_pair_id_;
+}
+inline void IceCandidatePairConfig::set_candidate_pair_id(::google::protobuf::uint32 value) {
+  set_has_candidate_pair_id();
+  candidate_pair_id_ = value;
+  // @@protoc_insertion_point(field_set:webrtc.rtclog.IceCandidatePairConfig.candidate_pair_id)
+}
+
+// optional .webrtc.rtclog.IceCandidatePairConfig.IceCandidateType local_candidate_type = 3;
+inline bool IceCandidatePairConfig::has_local_candidate_type() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void IceCandidatePairConfig::set_has_local_candidate_type() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void IceCandidatePairConfig::clear_has_local_candidate_type() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void IceCandidatePairConfig::clear_local_candidate_type() {
+  local_candidate_type_ = 0;
+  clear_has_local_candidate_type();
+}
+inline ::webrtc::rtclog::IceCandidatePairConfig_IceCandidateType IceCandidatePairConfig::local_candidate_type() const {
+  // @@protoc_insertion_point(field_get:webrtc.rtclog.IceCandidatePairConfig.local_candidate_type)
+  return static_cast< ::webrtc::rtclog::IceCandidatePairConfig_IceCandidateType >(local_candidate_type_);
+}
+inline void IceCandidatePairConfig::set_local_candidate_type(::webrtc::rtclog::IceCandidatePairConfig_IceCandidateType value) {
+  assert(::webrtc::rtclog::IceCandidatePairConfig_IceCandidateType_IsValid(value));
+  set_has_local_candidate_type();
+  local_candidate_type_ = value;
+  // @@protoc_insertion_point(field_set:webrtc.rtclog.IceCandidatePairConfig.local_candidate_type)
+}
+
+// optional .webrtc.rtclog.IceCandidatePairConfig.Protocol local_relay_protocol = 4;
+inline bool IceCandidatePairConfig::has_local_relay_protocol() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void IceCandidatePairConfig::set_has_local_relay_protocol() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void IceCandidatePairConfig::clear_has_local_relay_protocol() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void IceCandidatePairConfig::clear_local_relay_protocol() {
+  local_relay_protocol_ = 0;
+  clear_has_local_relay_protocol();
+}
+inline ::webrtc::rtclog::IceCandidatePairConfig_Protocol IceCandidatePairConfig::local_relay_protocol() const {
+  // @@protoc_insertion_point(field_get:webrtc.rtclog.IceCandidatePairConfig.local_relay_protocol)
+  return static_cast< ::webrtc::rtclog::IceCandidatePairConfig_Protocol >(local_relay_protocol_);
+}
+inline void IceCandidatePairConfig::set_local_relay_protocol(::webrtc::rtclog::IceCandidatePairConfig_Protocol value) {
+  assert(::webrtc::rtclog::IceCandidatePairConfig_Protocol_IsValid(value));
+  set_has_local_relay_protocol();
+  local_relay_protocol_ = value;
+  // @@protoc_insertion_point(field_set:webrtc.rtclog.IceCandidatePairConfig.local_relay_protocol)
+}
+
+// optional .webrtc.rtclog.IceCandidatePairConfig.NetworkType local_network_type = 5;
+inline bool IceCandidatePairConfig::has_local_network_type() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void IceCandidatePairConfig::set_has_local_network_type() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void IceCandidatePairConfig::clear_has_local_network_type() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void IceCandidatePairConfig::clear_local_network_type() {
+  local_network_type_ = 0;
+  clear_has_local_network_type();
+}
+inline ::webrtc::rtclog::IceCandidatePairConfig_NetworkType IceCandidatePairConfig::local_network_type() const {
+  // @@protoc_insertion_point(field_get:webrtc.rtclog.IceCandidatePairConfig.local_network_type)
+  return static_cast< ::webrtc::rtclog::IceCandidatePairConfig_NetworkType >(local_network_type_);
+}
+inline void IceCandidatePairConfig::set_local_network_type(::webrtc::rtclog::IceCandidatePairConfig_NetworkType value) {
+  assert(::webrtc::rtclog::IceCandidatePairConfig_NetworkType_IsValid(value));
+  set_has_local_network_type();
+  local_network_type_ = value;
+  // @@protoc_insertion_point(field_set:webrtc.rtclog.IceCandidatePairConfig.local_network_type)
+}
+
+// optional .webrtc.rtclog.IceCandidatePairConfig.AddressFamily local_address_family = 6;
+inline bool IceCandidatePairConfig::has_local_address_family() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void IceCandidatePairConfig::set_has_local_address_family() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void IceCandidatePairConfig::clear_has_local_address_family() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void IceCandidatePairConfig::clear_local_address_family() {
+  local_address_family_ = 0;
+  clear_has_local_address_family();
+}
+inline ::webrtc::rtclog::IceCandidatePairConfig_AddressFamily IceCandidatePairConfig::local_address_family() const {
+  // @@protoc_insertion_point(field_get:webrtc.rtclog.IceCandidatePairConfig.local_address_family)
+  return static_cast< ::webrtc::rtclog::IceCandidatePairConfig_AddressFamily >(local_address_family_);
+}
+inline void IceCandidatePairConfig::set_local_address_family(::webrtc::rtclog::IceCandidatePairConfig_AddressFamily value) {
+  assert(::webrtc::rtclog::IceCandidatePairConfig_AddressFamily_IsValid(value));
+  set_has_local_address_family();
+  local_address_family_ = value;
+  // @@protoc_insertion_point(field_set:webrtc.rtclog.IceCandidatePairConfig.local_address_family)
+}
+
+// optional .webrtc.rtclog.IceCandidatePairConfig.IceCandidateType remote_candidate_type = 7;
+inline bool IceCandidatePairConfig::has_remote_candidate_type() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void IceCandidatePairConfig::set_has_remote_candidate_type() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void IceCandidatePairConfig::clear_has_remote_candidate_type() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void IceCandidatePairConfig::clear_remote_candidate_type() {
+  remote_candidate_type_ = 0;
+  clear_has_remote_candidate_type();
+}
+inline ::webrtc::rtclog::IceCandidatePairConfig_IceCandidateType IceCandidatePairConfig::remote_candidate_type() const {
+  // @@protoc_insertion_point(field_get:webrtc.rtclog.IceCandidatePairConfig.remote_candidate_type)
+  return static_cast< ::webrtc::rtclog::IceCandidatePairConfig_IceCandidateType >(remote_candidate_type_);
+}
+inline void IceCandidatePairConfig::set_remote_candidate_type(::webrtc::rtclog::IceCandidatePairConfig_IceCandidateType value) {
+  assert(::webrtc::rtclog::IceCandidatePairConfig_IceCandidateType_IsValid(value));
+  set_has_remote_candidate_type();
+  remote_candidate_type_ = value;
+  // @@protoc_insertion_point(field_set:webrtc.rtclog.IceCandidatePairConfig.remote_candidate_type)
+}
+
+// optional .webrtc.rtclog.IceCandidatePairConfig.AddressFamily remote_address_family = 8;
+inline bool IceCandidatePairConfig::has_remote_address_family() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void IceCandidatePairConfig::set_has_remote_address_family() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void IceCandidatePairConfig::clear_has_remote_address_family() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void IceCandidatePairConfig::clear_remote_address_family() {
+  remote_address_family_ = 0;
+  clear_has_remote_address_family();
+}
+inline ::webrtc::rtclog::IceCandidatePairConfig_AddressFamily IceCandidatePairConfig::remote_address_family() const {
+  // @@protoc_insertion_point(field_get:webrtc.rtclog.IceCandidatePairConfig.remote_address_family)
+  return static_cast< ::webrtc::rtclog::IceCandidatePairConfig_AddressFamily >(remote_address_family_);
+}
+inline void IceCandidatePairConfig::set_remote_address_family(::webrtc::rtclog::IceCandidatePairConfig_AddressFamily value) {
+  assert(::webrtc::rtclog::IceCandidatePairConfig_AddressFamily_IsValid(value));
+  set_has_remote_address_family();
+  remote_address_family_ = value;
+  // @@protoc_insertion_point(field_set:webrtc.rtclog.IceCandidatePairConfig.remote_address_family)
+}
+
+// optional .webrtc.rtclog.IceCandidatePairConfig.Protocol candidate_pair_protocol = 9;
+inline bool IceCandidatePairConfig::has_candidate_pair_protocol() const {
+  return (_has_bits_[0] & 0x00000100u) != 0;
+}
+inline void IceCandidatePairConfig::set_has_candidate_pair_protocol() {
+  _has_bits_[0] |= 0x00000100u;
+}
+inline void IceCandidatePairConfig::clear_has_candidate_pair_protocol() {
+  _has_bits_[0] &= ~0x00000100u;
+}
+inline void IceCandidatePairConfig::clear_candidate_pair_protocol() {
+  candidate_pair_protocol_ = 0;
+  clear_has_candidate_pair_protocol();
+}
+inline ::webrtc::rtclog::IceCandidatePairConfig_Protocol IceCandidatePairConfig::candidate_pair_protocol() const {
+  // @@protoc_insertion_point(field_get:webrtc.rtclog.IceCandidatePairConfig.candidate_pair_protocol)
+  return static_cast< ::webrtc::rtclog::IceCandidatePairConfig_Protocol >(candidate_pair_protocol_);
+}
+inline void IceCandidatePairConfig::set_candidate_pair_protocol(::webrtc::rtclog::IceCandidatePairConfig_Protocol value) {
+  assert(::webrtc::rtclog::IceCandidatePairConfig_Protocol_IsValid(value));
+  set_has_candidate_pair_protocol();
+  candidate_pair_protocol_ = value;
+  // @@protoc_insertion_point(field_set:webrtc.rtclog.IceCandidatePairConfig.candidate_pair_protocol)
+}
+
+// -------------------------------------------------------------------
+
+// IceCandidatePairEvent
+
+// optional .webrtc.rtclog.IceCandidatePairEvent.IceCandidatePairEventType event_type = 1;
+inline bool IceCandidatePairEvent::has_event_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void IceCandidatePairEvent::set_has_event_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void IceCandidatePairEvent::clear_has_event_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void IceCandidatePairEvent::clear_event_type() {
+  event_type_ = 0;
+  clear_has_event_type();
+}
+inline ::webrtc::rtclog::IceCandidatePairEvent_IceCandidatePairEventType IceCandidatePairEvent::event_type() const {
+  // @@protoc_insertion_point(field_get:webrtc.rtclog.IceCandidatePairEvent.event_type)
+  return static_cast< ::webrtc::rtclog::IceCandidatePairEvent_IceCandidatePairEventType >(event_type_);
+}
+inline void IceCandidatePairEvent::set_event_type(::webrtc::rtclog::IceCandidatePairEvent_IceCandidatePairEventType value) {
+  assert(::webrtc::rtclog::IceCandidatePairEvent_IceCandidatePairEventType_IsValid(value));
+  set_has_event_type();
+  event_type_ = value;
+  // @@protoc_insertion_point(field_set:webrtc.rtclog.IceCandidatePairEvent.event_type)
+}
+
+// optional uint32 candidate_pair_id = 2;
+inline bool IceCandidatePairEvent::has_candidate_pair_id() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void IceCandidatePairEvent::set_has_candidate_pair_id() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void IceCandidatePairEvent::clear_has_candidate_pair_id() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void IceCandidatePairEvent::clear_candidate_pair_id() {
+  candidate_pair_id_ = 0u;
+  clear_has_candidate_pair_id();
+}
+inline ::google::protobuf::uint32 IceCandidatePairEvent::candidate_pair_id() const {
+  // @@protoc_insertion_point(field_get:webrtc.rtclog.IceCandidatePairEvent.candidate_pair_id)
+  return candidate_pair_id_;
+}
+inline void IceCandidatePairEvent::set_candidate_pair_id(::google::protobuf::uint32 value) {
+  set_has_candidate_pair_id();
+  candidate_pair_id_ = value;
+  // @@protoc_insertion_point(field_set:webrtc.rtclog.IceCandidatePairEvent.candidate_pair_id)
+}
+
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -5151,6 +6027,12 @@ template <> struct is_proto_enum< ::webrtc::rtclog::Event_EventType> : ::google:
 template <> struct is_proto_enum< ::webrtc::rtclog::DelayBasedBweUpdate_DetectorState> : ::google::protobuf::internal::true_type {};
 template <> struct is_proto_enum< ::webrtc::rtclog::VideoReceiveConfig_RtcpMode> : ::google::protobuf::internal::true_type {};
 template <> struct is_proto_enum< ::webrtc::rtclog::BweProbeResult_ResultType> : ::google::protobuf::internal::true_type {};
+template <> struct is_proto_enum< ::webrtc::rtclog::IceCandidatePairConfig_IceCandidatePairConfigType> : ::google::protobuf::internal::true_type {};
+template <> struct is_proto_enum< ::webrtc::rtclog::IceCandidatePairConfig_IceCandidateType> : ::google::protobuf::internal::true_type {};
+template <> struct is_proto_enum< ::webrtc::rtclog::IceCandidatePairConfig_Protocol> : ::google::protobuf::internal::true_type {};
+template <> struct is_proto_enum< ::webrtc::rtclog::IceCandidatePairConfig_AddressFamily> : ::google::protobuf::internal::true_type {};
+template <> struct is_proto_enum< ::webrtc::rtclog::IceCandidatePairConfig_NetworkType> : ::google::protobuf::internal::true_type {};
+template <> struct is_proto_enum< ::webrtc::rtclog::IceCandidatePairEvent_IceCandidatePairEventType> : ::google::protobuf::internal::true_type {};
 template <> struct is_proto_enum< ::webrtc::rtclog::MediaType> : ::google::protobuf::internal::true_type {};
 
 }  // namespace protobuf

@@ -1,9 +1,10 @@
 #include "OGLAttachment.h"
 
 #include "OGLTexture.h"
+#include "OGLCubemap.h"
 #include "OGLRenderbuffer.h"
 
-OGLAttachment ::OGLAttachment (OpenGLImp *pParentImp, int width, int height, int channels, int sampleCount) :
+OGLAttachment::OGLAttachment (OpenGLImp *pParentImp, int width, int height, int channels, int sampleCount) :
 	m_width(width),
 	m_height(height),
 	m_channels(channels),
@@ -13,7 +14,7 @@ OGLAttachment ::OGLAttachment (OpenGLImp *pParentImp, int width, int height, int
 	// Empty
 }
 
-OGLAttachment ::~OGLAttachment () {
+OGLAttachment::~OGLAttachment () {
 	if (m_pOGLRenderbuffer != nullptr) {
 		delete m_pOGLRenderbuffer;
 		m_pOGLRenderbuffer = nullptr;
@@ -25,7 +26,7 @@ OGLAttachment ::~OGLAttachment () {
 	}
 }
 
-GLuint OGLAttachment ::GetOGLRenderbufferIndex() {
+GLuint OGLAttachment::GetOGLRenderbufferIndex() {
 	if (m_pOGLRenderbuffer != nullptr) {
 		return m_pOGLRenderbuffer->GetOGLRenderbufferIndex();
 	}
@@ -117,18 +118,36 @@ Error:
 }
 
 RESULT OGLAttachment::AttachToFramebuffer(GLenum target, GLenum attachment) {
-	return m_pParentImp->glFramebufferTexture(target, attachment, m_pOGLTexture->GetOGLTextureIndex(), 0);
+	RESULT r = R_PASS;
+
+	CN(m_pOGLTexture);
+	CR(m_pParentImp->glFramebufferTexture(target, attachment, m_pOGLTexture->GetOGLTextureIndex(), 0));
+
+Error:
+	return r;
 }
 
 RESULT OGLAttachment::AttachTextureToFramebuffer(GLenum target, GLenum attachment) {
-	return m_pParentImp->glFramebufferTexture2D(target, attachment, m_pOGLTexture->GetOGLTextureTarget(), m_pOGLTexture->GetOGLTextureIndex(), 0);
+	RESULT r = R_PASS;
+
+	CN(m_pOGLTexture);
+	CR(m_pParentImp->glFramebufferTexture2D(target, attachment, m_pOGLTexture->GetOGLTextureTarget(), m_pOGLTexture->GetOGLTextureIndex(), 0));
+
+Error:
+	return r;
 }
 
 RESULT OGLAttachment::AttachRenderBufferToFramebuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget) {
-	return m_pParentImp->glFramebufferRenderbuffer(target, attachment, renderbuffertarget, m_pOGLRenderbuffer->GetOGLRenderbufferIndex());
+	RESULT r = R_PASS;
+
+	CN(m_pOGLRenderbuffer);
+	CR(m_pParentImp->glFramebufferRenderbuffer(target, attachment, renderbuffertarget, m_pOGLRenderbuffer->GetOGLRenderbufferIndex()));
+
+Error:
+	return r;
 }
 
-RESULT OGLAttachment::MakeOGLDepthTexture(GLenum internalGLFormat, GLenum pixelDataType, texture::TEXTURE_TYPE type) {
+RESULT OGLAttachment::MakeOGLDepthTexture(texture::type type, GLenum internalGLFormat, GLenum pixelDataType) {
 	RESULT r = R_PASS;
 
 	m_pOGLTexture = OGLTexture::MakeTextureWithFormat(m_pParentImp, 
@@ -144,7 +163,7 @@ Error:
 	return r;
 }
 
-RESULT OGLAttachment::MakeOGLTexture(texture::TEXTURE_TYPE type) {
+RESULT OGLAttachment::MakeOGLTexture(texture::type type) {
 	RESULT r = R_PASS;
 
 	if (m_sampleCount == 1) {
@@ -159,10 +178,57 @@ Error:
 	return r;
 }
 
+RESULT OGLAttachment::MakeOGLCubemap() {
+	RESULT r = R_PASS;
+
+	if (m_sampleCount == 1) {
+		m_pOGLCubemap = OGLCubemap::MakeCubemap(m_pParentImp, m_width, m_height, m_channels);
+		CN(m_pOGLCubemap);
+	}
+	else {
+		CBM((false), "Not currently supporting multi-sample cube maps");
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLAttachment::AttachCubemapToFramebuffer(GLenum target, GLenum attachment) {
+	RESULT r = R_PASS;
+
+	CN(m_pOGLCubemap);
+
+	CR(m_pParentImp->glFramebufferTexture2D(target,
+											attachment,
+											//m_pOGLCubemap->GetOGLTextureTarget(), 
+											GL_TEXTURE_CUBE_MAP_POSITIVE_X,				// why this?
+											m_pOGLCubemap->GetOGLTextureIndex(),
+											0));
+
+Error:
+	return r;
+}
+
+GLenum OGLAttachment::GetOGLCubemapTarget() {
+	if (m_pOGLCubemap != nullptr) {
+		return m_pOGLCubemap->GetOGLTextureTarget();
+	}
+
+	return 0;
+}
+
+GLuint OGLAttachment::GetOGLCubemapIndex() {
+	if (m_pOGLCubemap != nullptr) {
+		return m_pOGLCubemap->GetOGLTextureIndex();
+	}
+
+	return 0;
+}
+
 RESULT OGLAttachment::MakeOGLTextureMultisample() {
 	RESULT r = R_PASS;
 
-	m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, GL_TEXTURE_2D_MULTISAMPLE);
+	m_pOGLTexture = new OGLTexture(m_pParentImp, texture::type::TEXTURE_2D, GL_TEXTURE_2D_MULTISAMPLE);
 	CN(m_pOGLTexture);
 
 	m_pOGLTexture->SetWidth(m_width);

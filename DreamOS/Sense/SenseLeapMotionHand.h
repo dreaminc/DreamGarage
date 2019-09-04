@@ -16,7 +16,8 @@
 
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
-#include "Primitives/hand.h"
+
+class hand;
 
 typedef enum SenseLeapMotionHandType {
 	SENSE_LEAPMOTION_HAND_LEFT,
@@ -167,15 +168,10 @@ private:
 
 public:
 	point m_ptPalmPosition;
-
 	point m_ptThumbFingerTipPosition;
-	
 	point m_ptIndexFingerTipPosition;
-	
 	point m_ptMiddleFingerTipPosition;
-	
 	point m_ptRingFingerTipPosition;
-	
 	point m_ptPinkyFingerTipPosition;
 };
 

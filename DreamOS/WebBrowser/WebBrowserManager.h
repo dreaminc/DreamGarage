@@ -28,8 +28,14 @@ public:
 
 	virtual std::shared_ptr<WebBrowserController> MakeNewBrowser(int width, int height, const std::string& strURL) = 0;
 
-	std::shared_ptr<WebBrowserController> WebBrowserManager::CreateNewBrowser(int width, int height, const std::string& strURL);
+	virtual RESULT UpdateJobProcesses() = 0;
+
+	std::shared_ptr<WebBrowserController> CreateNewBrowser(int width, int height, const std::string& strURL);
 	std::shared_ptr<WebBrowserController> GetBrowser(const std::string& strID);
+	
+	RESULT RemoveBrowser(std::shared_ptr<WebBrowserController> pWebBrowserController);
+
+	virtual RESULT DeleteCookies() = 0;
 
 protected:
 	RESULT ClearAllBrowserControllers();

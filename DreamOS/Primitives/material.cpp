@@ -1,36 +1,49 @@
 #include "material.h"
+
 material::material() :
-	m_shine(100.0f),
-	m_bump(0.0f),
-	m_ambient(0.03f),
-	reserved3(0.0f),
+	m_shine(DEFUALT_MATERIAL_SHINE),
+	m_bumpiness(1.0f),
+	m_ambient(DEFAULT_MATERIAL_AMBIENT_LEVEL),
+	m_displacement(0.0f),
 	m_colorAmbient(COLOR_WHITE),
 	m_colorDiffuse(COLOR_WHITE),
-	m_colorSpecular(COLOR_WHITE)
+	m_colorSpecular(COLOR_WHITE),
+	m_tilingU(1.0f),
+	m_tilingV(1.0f),
+	m_reflectivity(0.0f),
+	m_refractivity(0.0f)
 {
 	// empty
 }
 
 material::material(float shine, color colorAmbient, color colorDiffuse, color colorSpecular) :
 	m_shine(shine),
-	m_bump(0.0f),
-	m_ambient(0.0f),
-	reserved3(0.0f),
+	m_bumpiness(1.0f),
+	m_ambient(DEFAULT_MATERIAL_AMBIENT_LEVEL),
+	m_displacement(0.0f),
 	m_colorAmbient(colorAmbient),
 	m_colorDiffuse(colorDiffuse),
-	m_colorSpecular(colorSpecular)
+	m_colorSpecular(colorSpecular),
+	m_tilingU(1.0f),
+	m_tilingV(1.0f),
+	m_reflectivity(0.0f),
+	m_refractivity(0.0f)
 {
 	// empty
 }
 
 material::material(float shine, float bump, color colorAmbient, color colorDiffuse, color colorSpecular, float ambient) :
 	m_shine(shine),
-	m_bump(bump),
+	m_bumpiness(bump),
 	m_ambient(ambient),
-	reserved3(0.0f),
+	m_displacement(0.0f),
 	m_colorAmbient(colorAmbient),
 	m_colorDiffuse(colorDiffuse),
-	m_colorSpecular(colorSpecular)
+	m_colorSpecular(colorSpecular),
+	m_tilingU(1.0f),
+	m_tilingV(1.0f),
+	m_reflectivity(0.0f),
+	m_refractivity(0.0f)
 {
 	// empty
 }
@@ -70,12 +83,41 @@ color material::GetDiffuseColor() {
 	return m_colorDiffuse;
 }
 
+color material::GetSpecularColor() {
+	return m_colorSpecular;
+}
+
+color material::GetAmbientColor() {
+	return m_colorAmbient;
+}
+
 RESULT material::SetShininess(float shine) {
 	m_shine = shine;
 	return R_PASS;
 }
 
 RESULT material::SetBumpiness(float bumpiness) {
-	m_bump = bumpiness;
+	m_bumpiness = bumpiness;
+	return R_PASS;
+}
+
+RESULT material::SetReflectivity(float reflectivity) {
+	m_reflectivity = reflectivity;
+	return R_PASS;
+}
+
+RESULT material::SetRefractivity(float refractivity){
+	m_refractivity = refractivity;
+	return R_PASS;
+}
+
+RESULT material::SetDisplacement(float displacement) {
+	m_displacement = displacement;
+	return R_PASS;
+}
+
+RESULT material::SetUVTiling(float uTiling, float vTiling) {
+	m_tilingU = uTiling;
+	m_tilingV = vTiling;
 	return R_PASS;
 }

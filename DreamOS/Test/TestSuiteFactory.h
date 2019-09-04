@@ -17,12 +17,15 @@ public:
 		UIVIEW,
 		CLOUD,
 		WEBRTC,
+		MULTICONTENT,
 		HAL,
 		MATH,
 		ANIMATION,
 		OS,
 		SOUND,
 		SANDBOX,
+		DIMENSION,
+		PIPELINE,
 		INVALID
 	} ;
 

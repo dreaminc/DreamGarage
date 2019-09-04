@@ -9,6 +9,9 @@
 
 #include "HMD/HMD.h"
 #include "HMD/HMDSinkNode.h"
+#define MS_90_FPS (1.0f / 90.0f)
+
+#ifndef OCULUS_PRODUCTION_BUILD
 
 // Include the Oculus SDK
 #include <openvr.h>
@@ -47,7 +50,11 @@ private:
 
 	bool m_fVblank;
 	bool m_fGlFinishHack;
-};
 
+	double m_msTimeSpentOnRenderAvg = 1.0;	// because starting with 0 will get us no where
+	double m_weightOnAverage = 0.9f;		// how much fast or slow we respond to changes in render speed
+	double m_fpsPadding = 0.9f;				// gives an extra bit of time buffer for us in case rendering takes long 
+};
+#endif
 
 #endif	// ! OPENVR_HMD_SINK_NODE_H_

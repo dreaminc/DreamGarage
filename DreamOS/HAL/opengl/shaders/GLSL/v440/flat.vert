@@ -28,5 +28,11 @@ void main(void) {
 	gl_Position = u_mat4Model * vec4(inV_vec4Position.x + xoffset, inV_vec4Position.y + yoffset, inV_vec4Position.z, 1.0f);
 	*/
 
-	gl_Position = u_mat4Projection * u_mat4Model * inV_vec4Position;
+	vec4 vec4ModelPosition = u_mat4Model * inV_vec4Position;
+//	vec4ModelPosition.y = 0.0f;
+
+	//gl_Position = u_mat4Projection * u_mat4Model * inV_vec4Position;
+	gl_Position = u_mat4Projection * vec4ModelPosition;
+
+	//gl_Position.z = 0.0f;
 }

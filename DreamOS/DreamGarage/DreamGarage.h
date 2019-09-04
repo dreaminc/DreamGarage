@@ -1,7 +1,7 @@
 #ifndef DREAM_GARAGE_H_
 #define DREAM_GARAGE_H_
 
-#include "RESULT/EHM.h"
+#include "RESULT/RESULT.h"          // for RESULT
 
 // DREAM GARAGE
 // DreamGarage.h
@@ -9,21 +9,59 @@
 // which is the interface to the engine and platform layers for the application
 
 #include "DreamOS.h"
-#include "Sense/SenseKeyboard.h"
-#include "Sense/SenseMouse.h"
+#include "Primitives/version.h"
+#include "array"                    // for array
+#include "memory"                   // for shared_ptr
+#include "Primitives/point.h"       // for point
+#include "Primitives/quaternion.h"  // for quaternion
+#include "Primitives/vector.h"      // for vector
+#include "Sandbox/SandboxApp.h"     // for SandboxApp, SandboxApp::PipelineType
+#include "utility"                  // for pair
+#include "xstring"                  // for string, wstring
+
+#include <stddef.h>                 // for size_t
+
+class AudioDataMessage;
+class CameraNode;
+class DreamMessage;
+class DreamPeerApp;
+class EnvironmentAsset;
+class EnvironmentShare;
+class OGLProgram;
+class PeerConnection;
+class Pipeline;
+class ProgramNode;
+class UpdateHandMessage;
+class UpdateHeadMessage;
+class UserController;
+class quad;
+class texture;
+class user;
+struct HandState;
+struct SenseKeyboardEvent;
+struct SenseTypingEvent;
 
 class DreamUIBar;
 class DreamContentView;
 class DreamBrowser;
-class DreamControlView;
+class UIControlView;
+class DreamUserControlArea;
+class DreamGamepadCameraApp;
+class DreamEnvironmentApp;
 class UIStageProgram;
 class UpdateMouthMessage;
+class OGLProgramScreenFade;
+
+class SkyboxScatterProgram;
+class FogProgram;
+
 
 #define MAX_PEERS 8
 
-class DreamGarage : public DreamOS, 
-				    public Subscriber<SenseKeyboardEvent>, 
-					public Subscriber<SenseTypingEvent>
+class DreamGarage : public DreamOS,
+				    public Subscriber<SenseKeyboardEvent>,
+					public Subscriber<SenseTypingEvent>,
+					public DOSObserver
 {
 public:
 
@@ -39,6 +77,25 @@ public:
 	RESULT SendHandPosition();
 	RESULT SendMouthSize();
 
+	virtual bool UseInstallPath() override {
+#if defined(PRODUCTION_BUILD) || defined(STAGING_BUILD)
+		return true;
+#else
+		return false;
+#endif
+	}
+
+	virtual std::wstring GetDreamFolderPath() {
+		return std::wstring(L"\\Dream\\");
+
+		// TODO: Understand the implications of this, we no longer have a DreamDev build now
+//#ifdef PRODUCTION_BUILD
+//		return std::wstring(L"\\Dream\\");
+//#else STAGING_BUILD
+//		return std::wstring(L"\\DreamDev\\");
+//#endif
+	}
+
 	// TODO: this is just a debug test temp
 	//RESULT SendSwitchHeadMessage();
 
@@ -48,10 +105,15 @@ public:
 	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) override;
 	virtual RESULT Update(void) override;
 
+	RESULT SetupMirrorPipeline(Pipeline *pRenderPipeline);
+	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, SandboxApp::PipelineType pipelineType) override;
+	virtual version GetDreamVersion() override;
+
+	virtual CameraNode *GetAuxCameraNode() override;
+
 	// Cloud Controller
 	//RESULT InitializeCloudControllerCallbacks();
 
-	RESULT GetRoundtablePosition(int index, point &ptPosition, float &rotationAngle);
 	RESULT SetRoundtablePosition(int index);
 	RESULT SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingPosition);
 
@@ -72,29 +134,75 @@ public:
 
 	// Environment
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
-	virtual RESULT OnReceiveAsset(long userID) override;
-	virtual RESULT OnStopSending() override;
-	virtual RESULT OnStopReceiving() override;
+	virtual RESULT OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+	virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+	virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+
+	virtual RESULT OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+
+	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override;
+
+	virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override;
+
+	// Virtual Camera
+	virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnSendCameraPlacement() override;
+	virtual RESULT OnStopSendingCameraPlacement() override;
+	virtual RESULT OnReceiveCameraPlacement(long userID) override;
+	virtual RESULT OnStopReceivingCameraPlacement() override;
+
+	virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override;
+
+	virtual RESULT SaveCameraSettings(point ptPosition, quaternion qOrientation) override;
+
+	// User Observer
+	virtual RESULT OnDreamVersion(version dreamVersion) override;
+	virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override;
+
+	virtual RESULT OnLogin() override;
+	virtual RESULT OnLogout() override;
+	virtual RESULT OnPendLogout() override;
+	virtual RESULT OnSwitchTeams() override;
+	RESULT PendSwitchTeams();
+
+	virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override;
+	virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override;
+	virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId);
+
+
+	// DOS Observer
+	virtual RESULT HandleDOSMessage(std::string& strMessage) override;
 
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleHandUpdateMessage(PeerConnection* pPeerConnection, UpdateHandMessage *pUpdateHandMessage);
 	RESULT HandleMouthUpdateMessage(PeerConnection* pPeerConnection, UpdateMouthMessage *pUpdateMouthMessage);
-	RESULT HandleAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage);
+	RESULT HandleUserAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage);
 
-	// 
+	//
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
-	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
+	RESULT SendUpdateHandMessage(long userID, HandState handState);
 
 	RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
-	RESULT BroadcastUpdateHandMessage(hand::HandState handState);
+	RESULT BroadcastUpdateHandMessage(HandState handState);
 	RESULT BroadcastUpdateMouthMessage(float mouthSize);
 
 	user* ActivateUser(long userId);
 
+	virtual RESULT Exit(RESULT r) override;
+
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 	virtual RESULT Notify(SenseTypingEvent *kbEvent) override;
+
+	// Camera Sharing
+	virtual texture* GetSharedCameraTexture() override;
+
+	virtual RESULT GetDefaultVCamPlacement(point& ptPosition, quaternion& qOrientation) override;
+
+	virtual bool IsCameraInUse() override;
 
 private:
 	//std::map<long, user*> m_peerUsers;
@@ -107,27 +215,59 @@ private:
 
 	std::array<std::pair<DreamPeerApp*, user*>, MAX_PEERS> m_usersModelPool = { std::pair<DreamPeerApp*, user*>(nullptr, nullptr) };
 
+private:
+	RESULT AuthenticateFromStoredCredentials();
 
 private:
+	version m_versionDreamClient = version(DREAM_VERSION);
+
 	bool m_fSeated = false;
 	float m_tick = 0.0f;
-	float m_seatPositioningRadius = 4.0f;
-	std::vector<int> m_seatLookup = { 4, 1, 3, 2, 5, 0 };
-	float m_initialAngle = 90.0f;
-	float m_keepOutAngle = 5.0f;
-
-	bool m_fShouldUpdateAppComposites = false;
 
 	long m_pendingAssetReceiveUserID = -1;
+	std::vector<std::shared_ptr<EnvironmentShare>> m_pPendingEnvironmentShares;
+
+	bool m_fPendLogout = false;
+	bool m_fPendSwitchTeams = false;
+	bool m_fPendExit = false;
+
+	// TODO: should these be here
+	bool m_fFirstLogin = true;
+	bool m_fHasCredentials = false;
+	bool m_fInitHands = false;
+
+	std::string m_strRefreshToken;
+	std::string m_strAccessToken;
+	UserController* m_pUserController;
+
+	CameraNode* m_pAuxCamera = nullptr;
 
 	// UI
 	//ViewMatrix *m_pClippingView;
-	UIStageProgram *m_pUIProgramNode;
-	
-	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
-	std::shared_ptr<DreamContentView> m_pDreamContentView;
-	std::shared_ptr<DreamBrowser> m_pDreamBrowser;
-	std::shared_ptr<DreamControlView> m_pDreamControlView;
+	UIStageProgram *m_pUIProgramNode = nullptr;
+	std::vector<SkyboxScatterProgram*> m_skyboxProgramNodes;
+	OGLProgramScreenFade *m_pScreenFadeProgramNode = nullptr;
+	ProgramNode* m_pRenderEnvironmentProgramNode = nullptr;
+	ProgramNode* m_pRefractionProgramNode = nullptr;
+	ProgramNode* m_pReflectionProgramNode = nullptr;
+
+	std::vector<FogProgram*> m_fogProgramNodes;
+	std::vector<ProgramNode*> m_waterProgramNodes;
+
+	// For mirror
+	ProgramNode* m_pRenderEnvironmentProgramNodeMirror = nullptr;
+	ProgramNode* m_pRefractionProgramNodeMirror = nullptr;
+	ProgramNode* m_pReflectionProgramNodeMirror = nullptr;
+
+	quad* m_pWaterQuad = nullptr;
+	DreamEnvironmentApp* m_pDreamEnvironmentApp = nullptr;
+	DreamUserControlArea* m_pDreamUserControlArea = nullptr;
+	DreamUIBar* m_pDreamUIBar = nullptr;
+	DreamContentView* m_pDreamContentView = nullptr;
+	DreamBrowser* m_pDreamBrowser = nullptr;
+	UIControlView* m_pDreamControlView = nullptr;
+	DreamGamepadCameraApp* m_pDreamGamepadCameraApp = nullptr;
+
 };
 
 #endif	// DREAM_GARAGE_H_

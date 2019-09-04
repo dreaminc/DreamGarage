@@ -28,7 +28,7 @@ RESULT OGLViewportDisplay::PreProcessNode(long frameID) {
 
 	m_pParentImp->SetViewTarget(EYE_MONO, pCamera->GetViewWidth(), pCamera->GetViewHeight());
 
-//Error:
+Error:
 	return r;
 }
 
@@ -39,6 +39,7 @@ RESULT OGLViewportDisplay::ProcessNode(long frameID) {
 	// A lot of this is rendering the inputs, this should actually go into DNode
 
 	auto pCamera = m_pParentImp->GetCamera();
+
 	int pxViewportWidth = m_pParentImp->GetViewport().Width();
 	int pxViewportHeight = m_pParentImp->GetViewport().Height();
 	int channels = 4;
@@ -57,9 +58,6 @@ RESULT OGLViewportDisplay::ProcessNode(long frameID) {
 		m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 		m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	}
-
-
-	CR(r);
 
 Error:
 	return r;

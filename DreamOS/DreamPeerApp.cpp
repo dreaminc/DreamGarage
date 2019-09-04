@@ -5,10 +5,18 @@
 #include "InteractionEngine/AnimationItem.h"
 
 #include "Primitives/font.h"
+#include "Primitives/hand/hand.h"
+#include "Primitives/user.h"
 
 #include "Cloud/HTTP/HTTPController.h"
 #include "Cloud/Environment/PeerConnection.h"
 #include "UI/UIView.h"
+
+#include "Sound/SpatialSoundObject.h"
+#include "DreamGarage/AudioDataMessage.h"
+
+#include "Core/Utilities.h"
+#include "Primitives/camera.h"
 
 DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext) :
 	DreamApp<DreamPeerApp>(pDOS, pContext),
@@ -19,15 +27,6 @@ DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext) :
 	// empty
 }
 
-//DreamPeerApp::DreamPeerApp(DreamOS *pDOS, PeerConnection *pPeerConnection, void *pContext) :
-//	DreamApp<DreamPeerApp>(pDOS, pContext),
-//	m_pDOS(pDOS),
-//	m_state(DreamPeerApp::state::UNINITIALIZED),
-//	m_pPeerConnection(pPeerConnection)
-//{
-//	// empty
-//}
-
 DreamPeerApp* DreamPeerApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamPeerApp *pDreamApp = new DreamPeerApp(pDreamOS, pContext);
 	return pDreamApp;
@@ -36,23 +35,10 @@ DreamPeerApp* DreamPeerApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 RESULT DreamPeerApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	// Subscribers (children)
-	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-	//	CR(GetDOS()->RegisterEventSubscriber((InteractionEventType)(i), this));
-	//}
-
 	CR(SetState(state::INITIALIZED));
 
 	SetAppName("DreamPeerApp");
 	SetAppDescription("A Dream User App");
-
-	// NOTE: User Model is assigned externally
-	GetComposite()->InitializeOBB();
-	GetDOS()->AddObjectToInteractionGraph(GetComposite());
-
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_ENDED, this));
 
 Error:
 	return r;
@@ -70,9 +56,15 @@ Error:
 RESULT DreamPeerApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(r);
+	if (m_pUserModel != nullptr) {
+		m_pUserModel->RemoveMouth();
 
-	m_pUserModel = nullptr;
+		GetDOS()->RemoveObjectFromUIGraph(m_pUserModel->GetUserObjectComposite().get());
+		GetDOS()->RemoveObjectFromAuxUIGraph(m_pUserModel->GetUserObjectComposite().get());
+
+		GetDOS()->RemoveObject(m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT).get());
+		GetDOS()->RemoveObject(m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT).get());
+	}
 
 Error:
 	return r;
@@ -83,211 +75,62 @@ RESULT DreamPeerApp::Update(void *pContext) {
 
 	// If pending user mode - add to composite here
 	if (m_fPendingAssignedUserModel) {
+
 		CN(m_pUserModel);
 		CR(GetComposite()->AddObject(m_pUserModel));
 		m_fPendingAssignedUserModel = false;
 	}
 
-	//if (m_pSphere == nullptr) {
-	//	m_pSphere = GetDOS()->AddSphere(0.025f, 10, 10);
-	//	CN(m_pSphere);
-	//}
-
-	/*
-	if (m_pOrientationRay == nullptr) {
-		m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
-		CN(m_pOrientationRay);
-		m_pOrientationRay->SetVisible(false);
-
-		// Adding the line below will register the peer look ray and will trigger an 
-		// event when the peer is looking at something that consumes these events
-		//CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
-	}
-	//*/
-
-	if (m_pPhantomVolume == nullptr) {
-		m_pPhantomVolume = GetComposite()->AddVolume(2.0f);
-		CN(m_pPhantomVolume);
-		m_pPhantomVolume->SetVisible(false);
+	if (m_pSpatialSoundObject == nullptr) {
+		m_pSpatialSoundObject = GetDOS()->AddSpatialSoundObject(point(), vector(), vector());
+		CN(m_pSpatialSoundObject);
 	}
 
-	///*
-	if (m_pNameComposite == nullptr) {
-		m_pNameComposite = GetComposite()->AddComposite();
-		
-		GetDOS()->AddObjectToUIGraph(m_pNameComposite.get());
-	}
-
-	if (m_pFont == nullptr) {
-		m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-		CN(m_pFont);
-		m_pFont->SetLineHeight(NAME_LINE_HEIGHT);
-		
-	}
-
-	if (m_pNameBackground == nullptr) {
-		CN(m_pNameComposite);
-
-		m_pNameBackground = m_pNameComposite->AddQuad(0.9f, 0.2f);
-		CN(m_pNameBackground);
-
-		m_pNameBackground->SetPosition(point(0.0f, NAMETAG_HEIGHT, -0.01f));
-		
-		m_pNameBackground->SetVisible(false);
-		
-		m_pTextBoxTexture = GetComposite()->MakeTexture(L"user-nametag-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-		m_pNameBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
-		m_pNameBackground->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
-		m_pNameBackground->SetMaterialDiffuseColor(m_hiddenColor);
-	}
-
-	if (m_pTextUserName == nullptr && m_strScreenName != "") {
-		m_pTextUserName = std::shared_ptr<text>(GetDOS()->MakeText(
-			m_pFont,
-			m_strScreenName,
-			0.9 - NAMETAG_BORDER,
-			0.2 - NAMETAG_BORDER,
-			text::flags::TRAIL_ELLIPSIS | text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
-		CN(m_pTextUserName);
-
-		m_pTextUserName->SetVisible(false);
-
-		m_pTextUserName->SetPosition(point(0.0f, NAMETAG_HEIGHT, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
-		m_pTextUserName->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
-		CR(m_pNameComposite->AddObject(m_pTextUserName));
-		m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetCameraLookXZ()));
-		m_pTextUserName->SetMaterialDiffuseColor(m_hiddenColor);
-	}
-	
 	if (m_pUserModel != nullptr) {
-		m_pNameComposite->SetPosition(m_pUserModel->GetHead()->GetPosition() + point(0.0f, 0.5f, 0.0f));
+		m_pUserModel->Update();
+		m_pUserModel->UpdateUserNameLabelPlacement(GetDOS()->GetCamera());
 	}
-	
-	if (m_fGazeInteraction) {
-		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-		if (msTimeNow - m_msTimeGazeStart > m_msTimeUserNameDelay) {
-			ShowUserNameField();
-			m_fGazeInteraction = false;
-		}
-	}
-
-	//*/
 
 Error:
 	return r;
 }
 
-RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
+std::shared_ptr<composite> DreamPeerApp::GetUserLabelComposite() {
+	return m_pUserModel->GetUserLabelComposite();
+}
+
+RESULT DreamPeerApp::SetUserLabelPosition(point ptPosition) {
 	RESULT r = R_PASS;
 
-	if (mEvent->m_pInteractionObject != nullptr) {
-		CBR((mEvent->m_pInteractionObject != m_pOrientationRay.get()), R_SKIPPED);
-		CNR(m_pUserModel, R_SKIPPED);
-	}
+	m_pUserModel->SetUserLabelPosition(ptPosition);
 
-	//if (m_pSphere != nullptr) {
-	//	m_pSphere->SetPosition(mEvent->m_ptContact[0]);
-	//}
-
-	// handle event
-	switch (mEvent->m_eventType) {
-		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			// can't rely on m_pUserModel existing as the peer enters and leaves
-			if (IsVisible() && !IsUserNameVisible()) {
-				std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-				m_msTimeGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-				m_fGazeInteraction = true;
-			}
-		} break;
-
-		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
-			if (IsVisible() && !IsUserNameVisible() && !m_fGazeInteraction) {
-				std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-				m_msTimeGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-				m_fGazeInteraction = true;
-			}
-		} break;
-
-		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
-			m_fGazeInteraction = false;
-			if (IsUserNameVisible()) {
-				HideUserNameField();
-			}
-		} break;
-
-		case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
-			// stub
-		} break;
-
-		case InteractionEventType::ELEMENT_COLLIDE_TRIGGER: {
-			// stub
-		} break;
-
-		case InteractionEventType::ELEMENT_COLLIDE_MOVED: {
-			// stub
-		} break;
-
-		case InteractionEventType::ELEMENT_COLLIDE_ENDED: {
-			// stub
-		} break;
-	}
-
-Error:
 	return r;
 }
 
-RESULT DreamPeerApp::SetUsernameAnimationDuration(float animationDuration) {
-	m_userNameAnimationDuration = animationDuration;
-	return R_PASS;
+RESULT DreamPeerApp::SetUserLabelOrientation(quaternion qOrientation) {
+	RESULT r = R_PASS;
+
+	m_pUserModel->SetUserLabelOrientation(qOrientation);
+
+	return r;
+}
+
+RESULT DreamPeerApp::UpdateLabelOrientation(camera *pCamera) {
+	RESULT r = R_PASS;
+
+	CNR(m_pUserModel, R_SKIPPED);
+	CR(m_pUserModel->UpdateUserNameLabelPlacement(pCamera));
+
+Error:
+	return r;
 }
 
 RESULT DreamPeerApp::HideUserNameField() {
 	RESULT r = R_PASS;
 	
-	auto fnStartCallback = [&](void *pContext) {
-		return R_PASS;
-	};
+	CNR(m_pUserModel, R_SKIPPED);
+	CR(m_pUserModel->HideUserNameField());
 
-	auto fnEndCallback = [&](void *pContext) {
-		m_pNameComposite->SetVisible(false);
-		return R_PASS;
-	};
-	/*
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pTextUserName.get(),
-		m_hiddenColor,
-		0.5,
-		AnimationCurveType::LINEAR,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
-	//*/
-	///*
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pTextUserName.get(),
-		m_hiddenColor,
-		m_userNameAnimationDuration,
-		AnimationCurveType::SIGMOID,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
-
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pNameBackground.get(),
-		m_hiddenColor,
-		m_userNameAnimationDuration,
-		AnimationCurveType::SIGMOID,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
-	//*/
 Error:
 	return r;
 }
@@ -295,53 +138,9 @@ Error:
 RESULT DreamPeerApp::ShowUserNameField() {
 	RESULT r = R_PASS;
 
-	auto fnStartCallback = [&](void *pContext) {
-		m_pNameComposite->SetVisible(true);
-		return R_PASS;
-	};
+	CNR(m_pUserModel, R_SKIPPED);
+	CR(m_pUserModel->ShowUserNameField());
 
-	auto fnEndCallback = [&](void *pContext) {
-
-		return R_PASS;
-	};	
-
-	m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetCameraLookXZ()));
-	//* quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
-	/*
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pNameComposite.get(),
-		m_visibleColor,
-		0.5,
-		AnimationCurveType::LINEAR,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
-	//*/
-	///*
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pNameBackground.get(),
-		m_backgroundColor,
-		m_userNameAnimationDuration,
-		AnimationCurveType::SIGMOID,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
-
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pTextUserName.get(),
-		m_visibleColor,
-		m_userNameAnimationDuration,
-		AnimationCurveType::SIGMOID,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
-	//*/
 Error:
 	return r;
 }
@@ -411,8 +210,17 @@ RESULT DreamPeerApp::SetPeerConnection(PeerConnection *pPeerConnection) {
 	m_pPeerConnection = pPeerConnection;
 	m_peerUserID = m_pPeerConnection->GetPeerUserID();	
 	
-	auto pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-	m_strScreenName = pUserControllerProxy->GetPeerScreenName(m_peerUserID);
+	UserController* pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
+	// TODO: async version?
+	pUserController->GetPeerProfile(m_peerUserID);
+
+	m_strScreenName = pUserController->GetPeerScreenName(m_peerUserID);
+	m_strInitials = pUserController->GetPeerInitials(m_peerUserID);
+	m_avatarModelId = pUserController->GetPeerAvatarModelID(m_peerUserID);
+	m_strProfilePhotoURL = pUserController->GetPeerProfilePhotoURL(m_peerUserID);
+
+	DOSLOG(INFO, "SetPeerConnection: %s %d", m_strScreenName, m_avatarModelId);
 
 Error:
 	return r;
@@ -428,7 +236,32 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 	CN(pUserModel);
 	m_pUserModel = std::shared_ptr<user>(pUserModel);
 	m_pUserModel->SetVisible(m_fVisible);
+	m_pUserModel->SetDreamOS(GetDOS());
+
 	m_fPendingAssignedUserModel = true;
+	CR(m_pUserModel->UpdateAvatarModelWithID(m_avatarModelId));
+
+	m_pUserModel->InitializeObject();
+	GetDOS()->AddObjectToUIGraph(m_pUserModel->GetUserObjectComposite().get(), SandboxApp::PipelineType::MAIN | SandboxApp::PipelineType::AUX);
+
+	m_pUserModel->SetScreenName(m_strScreenName);
+	m_pUserModel->SetProfilePhoto(m_strProfilePhotoURL);
+
+	//m_pUserLabelComposite->SetVisible(true);
+	m_pUserModel->GetUserLabelComposite()->SetVisible(true);
+	//CR(ShowUserNameField());
+
+	GetDOS()->AddObjectToUIGraph(m_pUserModel->GetMouth().get(), SandboxApp::PipelineType::AUX);
+
+Error:
+	return r;
+}
+
+RESULT DreamPeerApp::SetSeatingPosition(int seatingPosition) {
+	RESULT r = R_PASS;
+
+	CNR(m_pUserModel, R_SKIPPED);
+	m_pUserModel->SetSeatingPosition(seatingPosition);
 
 Error:
 	return r;
@@ -453,18 +286,22 @@ RESULT DreamPeerApp::SetVisible(bool fVisible) {
 
 	CN(m_pUserModel);
 	CR(m_pUserModel->SetVisible(fVisible));
+
+	if (m_pUserModel != nullptr && m_pUserModel->GetMouth() != nullptr) {
+		CR(m_pUserModel->GetMouth()->SetVisible(fVisible));
+	}
 	
-	if (m_pNameComposite != nullptr) {
-		m_pNameComposite->SetVisible(fVisible, false);
+	if (m_pUserModel->GetUserLabelComposite() != nullptr) {
+		m_pUserModel->GetUserLabelComposite()->SetVisible(fVisible, false);
 	}
 
 	pHand = m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT);
 	CN(pHand);
-	pHand->SetVisible(fVisible);
+	pHand->SetVisible(fVisible, false);
 
 	pHand = m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT);
 	CN(pHand);
-	pHand->SetVisible(fVisible);
+	pHand->SetVisible(fVisible, false);
 
 Error:
 	return r;
@@ -475,20 +312,21 @@ bool DreamPeerApp::IsVisible() {
 }
 
 bool DreamPeerApp::IsUserNameVisible() {
-	if (m_pTextUserName != nullptr && m_pNameBackground != nullptr) {
-		return m_pTextUserName->IsVisible() && m_pNameBackground->IsVisible();
-	}
-	else {
-		return false;
-	}
+	return m_pUserModel != nullptr && m_pUserModel->IsUserNameVisible();
 }
 
 RESULT DreamPeerApp::SetPosition(const point& ptPosition) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
-	//m_pUserModel->GetHead()->SetPosition(ptPosition);
+	//m_pUserModel->SetPosition(ptPosition);
 	GetComposite()->SetPosition(ptPosition);
+	m_pUserModel->SetMouthPosition(ptPosition);
+	SetUserLabelPosition(ptPosition);
+
+	if (m_pSpatialSoundObject != nullptr) {
+		m_pSpatialSoundObject->SetPosition(ptPosition);
+	}
 
 Error:
 	return r;
@@ -498,7 +336,13 @@ RESULT DreamPeerApp::SetOrientation(const quaternion& qOrientation) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
+	//m_pUserModel->SetOrientation(qOrientation);
 	m_pUserModel->GetHead()->SetOrientation(qOrientation);
+	m_pUserModel->SetMouthOrientation(qOrientation);
+
+	if (m_pSpatialSoundObject != nullptr) {
+		m_pSpatialSoundObject->SetOrientation(qOrientation);
+	}
 
 Error:
 	return r;
@@ -507,7 +351,7 @@ Error:
 RESULT DreamPeerApp::RotateByDeg(float degX, float degY, float degZ) {
 	RESULT r = R_PASS;
 
-	CN(m_pUserModel);
+	CNR(m_pUserModel, R_SKIPPED);
 	//m_pUserModel->RotateByDeg(degX, degY, degZ);
 	m_pUserModel->GetHead()->RotateByDeg(degX, degY, degZ);
 	//GetComposite()->RotateByDeg(degX, degY, degZ);
@@ -516,17 +360,73 @@ Error:
 	return r;
 }
 
+RESULT DreamPeerApp::HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMessage) {
+	RESULT r = R_PASS;
+
+	/*
+	// Audio is now being played by the flat mono channels up in DreamGarage
+	int16_t *pAudioDataBuffer = (int16_t*)(pAudioDataMessage->GetAudioMessageBuffer());
+	CN(pAudioDataBuffer);
+
+	size_t numFrames = pAudioDataMessage->GetNumFrames();
+
+	// TODO: Handle channels?
+	size_t channels = pAudioDataMessage->GetNumChannels();
+
+	// Play
+	if (m_pSpatialSoundObject != nullptr) {
+
+		// Not sure if we need to allocate new memory here or not
+
+		int16_t *pInt16Soundbuffer = new int16_t[numFrames];
+		memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * numFrames);
+
+		if (pInt16Soundbuffer != nullptr) {
+			CR(m_pSpatialSoundObject->PushMonoAudioBuffer((int)numFrames, pInt16Soundbuffer));
+		}
+	}
+	*/
+
+	// Mouth Position
+	//*
+	{
+		auto pAudioBuffer = pAudioDataMessage->GetAudioMessageBuffer();
+		CN(pAudioBuffer);
+
+		size_t numSamples = pAudioDataMessage->GetNumChannels() * pAudioDataMessage->GetNumFrames();
+		long averageAccumulator = 0.0f;
+
+		for (int i = 0; i < numSamples; ++i) {
+			int16_t value = *(static_cast<const int16_t*>(pAudioBuffer) + i);
+			//float scaledValue = (float)(value) / (std::numeric_limits<int16_t>::max());
+
+			averageAccumulator += std::abs(value);
+		}
+
+		float mouthScale = ((float)((float)averageAccumulator / (float)numSamples)) / ((float)(std::numeric_limits<int16_t>::max()));
+		mouthScale *= 10.0f;
+
+		util::Clamp<float>(mouthScale, 0.0f, 1.0f);
+		UpdateMouth(mouthScale);
+	}
+	//*/
+
+Error:
+	return r;
+}
+
 RESULT DreamPeerApp::UpdateMouth(float mouthScale) {
 	RESULT r = R_PASS;
 
-	CN(m_pUserModel);
+	CNR(m_pUserModel, R_SKIPPED);
+
 	m_pUserModel->UpdateMouth(mouthScale);
 
 Error:
 	return r;
 }
 
-RESULT DreamPeerApp::UpdateHand(const hand::HandState& handState) {
+RESULT DreamPeerApp::UpdateHand(const HandState& handState) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);

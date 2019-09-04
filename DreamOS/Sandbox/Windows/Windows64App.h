@@ -25,6 +25,7 @@
 class OpenGLImp;
 class Win64Keyboard;
 class Win64Mouse;
+class Win64CredentialManager;
 
 class Windows64App : public SandboxApp {
 public:
@@ -46,17 +47,31 @@ public:	// Sandbox Interface
 
 	virtual RESULT SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) override;
 	virtual long GetTickCount() override;
+	virtual RESULT GetStackTrace() override;
 
 	virtual	RESULT GetSandboxWindowSize(int &width, int &height) override;
 
+	virtual RESULT InitializeCredentialManager() override;
+
+	virtual RESULT SetKeyValue(std::wstring wstrKey, std::string strField, CredentialManager::type credType, bool fOverwrite) override;
+	virtual RESULT GetKeyValue(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType) override;
+	virtual RESULT RemoveKeyValue(std::wstring wstrKey, CredentialManager::type credType) override;
+
+	virtual bool IsSandboxInternetConnectionValid() override;
+
+	// Sandbox Objects
+	virtual std::shared_ptr<NamedPipeClient> MakeNamedPipeClient(std::wstring strPipename) override;
+	virtual std::shared_ptr<NamedPipeServer> MakeNamedPipeServer(std::wstring strPipename) override;
+
 public:
-	RESULT InitializePathManager();
+	virtual RESULT InitializePathManager(DreamOS *pDOSHandle) override;	
 	RESULT InitializeOpenGLRenderingContext();
 	RESULT InitializeCloudController();
 	//RESULT InitializeHAL();
 	RESULT InitializeKeyboard();
 	RESULT InitializeMouse();
-	RESULT InitializeLeapMotion();
+	RESULT InitializeGamepad();
+	RESULT InitializeLeapMotion();	
 
 private:
 	static LRESULT __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
@@ -65,18 +80,19 @@ private:
 	RESULT SetDimensions(int pxWidth, int pxHeight);
 
 	// Handle a mouse event from a window's message. Return true if the message is handled, and false otherwise.
-	bool	HandleMouseEvent(const MSG&	windowMassage);
+	bool HandleMouseEvent(const MSG&	windowMassage);
 	// Handle a key event from a window's message. Return true if the message is handled, and false otherwise.
-	bool	HandleKeyEvent(const MSG&	windowMassage);
+	bool HandleKeyEvent(const MSG&	windowMassage);
 
 public:
 	HDC GetDeviceContext();
-	HWND GetWindowHandle();
+	virtual HWND GetWindowHandle() override;
 
 	RESULT RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> m_fnUIThreadCallback);
 	RESULT UnregisterUIThreadCallback();
 
 private:
+	bool m_fSentFrame = false;
 	bool m_fFullscreen;
 	long m_wndStyle;
 
@@ -93,6 +109,11 @@ private:
 
 	HDC m_hDC;					// Private GDI Device Context
 	HINSTANCE m_hInstance;		// Holds The Instance Of The Application
+
+	// DesktopCapture vars
+	unsigned int m_desktoppxWidth = 0;
+	unsigned int m_desktoppxHeight = 0;
+	unsigned long m_pDesktopFrameData_n = 0;
 
 private:
 	std::function<void(int msg_id, void* data)> m_fnUIThreadCallback;

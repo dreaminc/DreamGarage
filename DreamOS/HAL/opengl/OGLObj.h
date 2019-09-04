@@ -26,11 +26,13 @@ public:
 	// or externally from the object (TODO: factory class needed)
 	virtual RESULT OGLInitialize();
 	RESULT UpdateOGLBuffers();
+	virtual RESULT UpdateBuffers() override;
 
 	// Override this method when necessary by a child object
 	// Many objects will not need to though. 
 	//virtual RESULT Render() {
 	virtual RESULT Render();
+	virtual RESULT Update();
 
 	virtual RESULT RenderOGLBoundingVolume();
 	virtual RESULT UpdateOGLBoundingVolume();
@@ -39,6 +41,7 @@ public:
 	OGLTexture *GetOGLTextureAmbient();
 	OGLTexture *GetOGLTextureDiffuse();
 	OGLTexture *GetOGLTextureSpecular();
+	OGLTexture* GetOGLTextureDisplacement();
 	
 	OGLObj *GetOGLBoundingVolume();
 

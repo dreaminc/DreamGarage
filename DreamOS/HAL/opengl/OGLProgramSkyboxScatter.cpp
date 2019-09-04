@@ -9,8 +9,10 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramSkyboxScatter::OGLProgramSkyboxScatter(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglskyboxscatter")
+#include "Primitives/matrix/ReflectionMatrix.h"
+
+OGLProgramSkyboxScatter::OGLProgramSkyboxScatter(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglskyboxscatter", optFlags)
 {
 	// empty
 }
@@ -52,10 +54,71 @@ RESULT OGLProgramSkyboxScatter::OGLInitialize() {
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
 	*/
 
-	// TODO: We can create the skybox mesh here and pull it out of scene graph / box or whatever
+Error:
+	return r;
+}
+
+RESULT OGLProgramSkyboxScatter::OGLInitialize(version versionOGL) {
+	RESULT r = R_PASS;
+
+	CR(OGLInitialize());
+
+	m_versionOGL = versionOGL;
+
+	// Create and set the shaders
+
+	// Global
+	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
+
+	// Vertex
+	CRM(MakeVertexShader(L"skyboxScatter.vert"), "Failed to create vertex shader");
+
+	// Fragment
+	CRM(MakeFragmentShader(L"skyboxScatter.frag"), "Failed to create fragment shader");
+
+	// Link the program
+	CRM(LinkProgram(), "Failed to link program");
+
+	// TODO: This could all be done in one call in the OGLShader honestly
+	// Attributes
+	// TODO: Tabulate attributes (get them from shader, not from class)
+	WCR(GetVertexAttributesFromProgram());
+	WCR(BindAttributes());
+
+	//CR(PrintActiveAttributes());
+
+	// Uniform Variables
+	CR(GetUniformVariablesFromProgram());
+
+	// Uniform Blocks
+	CR(GetUniformBlocksFromProgram());
+	CR(BindUniformBlocks());
+
+	// TODO:  Currently using a global material 
+	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
 
 Error:
 	return r;
+}
+
+RESULT OGLProgramSkyboxScatter::SetReflectionObject(VirtualObj *pReflectionObject) {
+	RESULT r = R_PASS;
+
+	quad *pQuad = dynamic_cast<quad*>(pReflectionObject);
+	CNM(pQuad, "Object not supported for reflection");
+
+	m_pReflectionObject = pQuad;
+
+Error:
+	return r;
+}
+
+RESULT OGLProgramSkyboxScatter::SetSunDirection(vector vSunDirection) {
+	RESULT r = R_PASS;
+	
+	m_sunDirection = vSunDirection;
+
+	return R_PASS;
 }
 
 RESULT OGLProgramSkyboxScatter::SetupConnections() {
@@ -64,8 +127,8 @@ RESULT OGLProgramSkyboxScatter::SetupConnections() {
 	// Inputs
 	//TODO: CR(MakeInput("lights"));
 
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 
 	// Outputs
@@ -89,6 +152,7 @@ RESULT OGLProgramSkyboxScatter::ProcessNode(long frameID) {
 
 	//UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
+	// TODO: Replace with a static volume here
 	skybox *pSkybox = nullptr;
 	CR(pObjectStore->GetSkybox(pSkybox));
 
@@ -107,7 +171,6 @@ RESULT OGLProgramSkyboxScatter::ProcessNode(long frameID) {
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// 3D Object / skybox
-	//RenderObjectStore(m_pSceneGraph);
 	CR(RenderObject(pSkybox));
 
 	UnbindFramebuffer();
@@ -130,21 +193,42 @@ RESULT OGLProgramSkyboxScatter::SetObjectUniforms(DimObj *pDimObj) {
 RESULT OGLProgramSkyboxScatter::SetCameraUniforms(camera *pCamera) {
 
 	auto matV = pCamera->GetViewMatrix();
-	auto matP = pCamera->GetProjectionMatrix();
-	auto matVP = matP * matV;
+	auto matP = pCamera->GetProjectionMatrix();	
 	auto matVO = pCamera->GetOrientationMatrix();
 
-	auto pxWidth = pCamera->GetViewWidth();
-	auto pxHeight = pCamera->GetViewHeight();
+	if (m_pReflectionObject != nullptr) {
+		plane reflectionPlane = dynamic_cast<quad*>(m_pReflectionObject)->GetPlane();
 
-	vector sunDirection = vector(0.0f, m_SunY, 0.5f);
-	sunDirection.Normalize();
+		plane householderReflectionPlane = reflectionPlane;
+		householderReflectionPlane.SetPlanePosition(point(0.0f, 0.0f, 0.0f));
+
+		auto matReflection = ReflectionMatrix(reflectionPlane);
+		auto matHouseholderReflection = ReflectionMatrix(householderReflectionPlane);
+
+		auto matFlip = ReflectionMatrix(plane(plane::type::XZ));
+
+		matV = matFlip * matV * matReflection;
+		matVO = matFlip * matVO * matHouseholderReflection;
+	}
+
+	auto matVP = matP * matV;
+
+	//auto pxWidth = pCamera->GetViewWidth();
+	//auto pxHeight = pCamera->GetViewHeight();
+
+	int pxWidth = m_pOGLFramebuffer->GetWidth();
+	int pxHeight = m_pOGLFramebuffer->GetHeight();
+
+	/*
+	m_sunDirection = vector(0.0f, m_SunY, 0.5f);
+	m_sunDirection.Normalize();
 	//sunY += 0.01f;
 	m_theta += m_delta;
-	sunDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, m_theta) * sunDirection;
-	sunDirection.Normalize();
+	m_sunDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, m_theta) * sunDirection;
+	m_sunDirection.Normalize();
+	//*/
 
-	m_pUniformSunDirection->SetUniform(sunDirection);
+	m_pUniformSunDirection->SetUniform(m_sunDirection);
 	m_pUniformViewMatrix->SetUniform(matV);
 	m_pUniformProjectionMatrix->SetUniform(matP);
 	m_pUniformViewOrientationMatrix->SetUniform(matVO);
@@ -158,26 +242,47 @@ RESULT OGLProgramSkyboxScatter::SetCameraUniforms(stereocamera* pStereoCamera, E
 
 	auto matV = pStereoCamera->GetViewMatrix(eye);
 	auto matP = pStereoCamera->GetProjectionMatrix(eye);
-	auto matVP = matP * matV;
 	auto matVO = pStereoCamera->GetOrientationMatrix();
 
-	auto pxWidth = (pStereoCamera->GetViewWidth());
-	auto pxHeight = (pStereoCamera->GetViewHeight());
+	//auto pxWidth = (pStereoCamera->GetViewWidth());
+	//auto pxHeight = (pStereoCamera->GetViewHeight());
 
+	int pxWidth = m_pOGLFramebuffer->GetWidth();
+	int pxHeight = m_pOGLFramebuffer->GetHeight();
+	
 	/*
 	point sunDirection = point(0.3f, sunY, -0.5f);
 	sunY += 0.0002f;
 	DEBUG_OUT("%f\n", sunY);
 	*/
 
-	vector sunDirection = vector(0.0f, m_SunY, -0.5f);
+	if (m_pReflectionObject != nullptr) {
+		plane reflectionPlane = dynamic_cast<quad*>(m_pReflectionObject)->GetPlane();
+
+		plane householderReflectionPlane = reflectionPlane;
+		householderReflectionPlane.SetPlanePosition(point(0.0f, 0.0f, 0.0f));
+
+		auto matReflection = ReflectionMatrix(reflectionPlane);
+		auto matHouseholderReflection = ReflectionMatrix(householderReflectionPlane);
+
+		auto matFlip = ReflectionMatrix(plane(plane::type::XZ));
+
+		matV = matFlip * matV * matReflection;
+		matVO = matFlip * matVO * matHouseholderReflection;
+	}
+
+	//auto matVP = matP * matV;
+
+	/*
+	vector sunDirection = vector(1.0f, m_SunY, -0.4f);
 	sunDirection.Normalize();
 	//sunY += 0.01f;
 	m_theta += m_delta;
 	sunDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, m_theta) * sunDirection;
 	sunDirection.Normalize();
+	//*/
 
-	m_pUniformSunDirection->SetUniform(sunDirection);
+	m_pUniformSunDirection->SetUniform(m_sunDirection);
 
 	m_pUniformViewMatrix->SetUniform(matV);
 	m_pUniformProjectionMatrix->SetUniform(matP);

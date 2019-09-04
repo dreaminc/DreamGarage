@@ -12,6 +12,8 @@
 #include <vector>
 
 #include "json.hpp"
+#include "Primitives/texture.h"
+#include "UI/UIButton.h"
 
 class MenuNode : public dirty {
 public:
@@ -34,7 +36,7 @@ public:
 	
 public:
 	MenuNode();
-	MenuNode(nlohmann::json jsonMenuNode);
+	MenuNode(nlohmann::json jsonMenuNode);	
 	MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle, std::string strMIMEType);
 	MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle, std::string strMIMEType, std::string strIconURL, std::string strThumbnailURL);
 
@@ -51,23 +53,39 @@ public:
 	const std::string& GetScope();
 	const std::string& GetMIMEType();
 	const std::string& GetTitle();
+	const std::string& GetNextPageToken();
 	const std::string& GetIconURL();
 	const std::string& GetThumbnailURL();
+	std::string GetKey();
+	texture* GetThumbnailTexture();
+
+	const std::string& GetParentScope();
+
+	std::shared_ptr<UIButton> GetAssociatedButton();
 
 	const MenuNode::type& GetNodeType();
 
 	RESULT SetName(std::string strName);
+	RESULT SetThumbnailTexture(texture* pTexture);
+	RESULT SetAssociatedButton(std::shared_ptr<UIButton> pButton);
 
 	std::vector<std::shared_ptr<MenuNode>> GetSubMenuNodes();
 
 private:
 	MenuNode::type m_nodeType;
-	std::string m_strPath;
-	std::string m_strScope;
+	std::string m_strPath = "";
+	std::string m_strScope = "";
 	std::string m_strTitle;
 	std::string m_strMIMEType;
 	std::string m_strIconURL;
 	std::string m_strThumbnailURL;
+	std::string m_strNextPageToken;
+	std::string m_strKey = "";
+
+	std::string m_strParentScope = "";
+
+	texture* m_pThumbnailTexture = nullptr;
+	std::shared_ptr<UIButton> m_pUIButton = nullptr;
 
 	std::vector<std::shared_ptr<MenuNode>> m_menuNodes;
 

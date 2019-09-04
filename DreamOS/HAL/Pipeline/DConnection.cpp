@@ -3,7 +3,7 @@
 #include "DNode.h"
 #include "ProgramNode.h"
 
-DConnection::DConnection(DNode* pParentNode, CONNECTION_TYPE connType, DCONNECTION_FLAGS optFlags) :
+DConnection::DConnection(DNode* pParentNode, CONNECTION_TYPE connType, PIPELINE_FLAGS optFlags) :
 	m_pParentNode(pParentNode),
 	m_connType(connType),
 	m_flags(optFlags)
@@ -11,7 +11,7 @@ DConnection::DConnection(DNode* pParentNode, CONNECTION_TYPE connType, DCONNECTI
 	// empty
 }
 
-DConnection::DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, DCONNECTION_FLAGS optFlags) :
+DConnection::DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, PIPELINE_FLAGS optFlags) :
 	m_pParentNode(pParentNode),
 	m_strName(strName),
 	m_connType(connType),
@@ -52,7 +52,8 @@ RESULT DConnection::Disconnect(DConnection* pRemoteConnection) {
 		ConnectionTypeString(pRemoteConnection->m_connType).c_str(), pRemoteConnection->m_pParentNode->GetName().c_str(), pRemoteConnection->GetName().c_str());
 
 	if (pRemoteConnection->m_pParentNode != nullptr) {
-		CR(pRemoteConnection->m_pParentNode->Disconnect());
+		//CR(pRemoteConnection->m_pParentNode->Disconnect());
+		CR(pRemoteConnection->Disconnect());
 	}
 
 Error:
@@ -153,14 +154,14 @@ CONNECTION_TYPE DConnection::GetType() {
 }
 
 bool DConnection::IsActive() {
-	if (static_cast<int>(m_flags & DCONNECTION_FLAGS::PASSIVE) != 0)
+	if (static_cast<int>(m_flags & PIPELINE_FLAGS::PASSIVE) != 0)
 		return false;
 	else
 		return true;
 }
 
 bool DConnection::IsPassthru() {
-	if (static_cast<int>(m_flags & DCONNECTION_FLAGS::PASSTHRU) != 0)
+	if (static_cast<int>(m_flags & PIPELINE_FLAGS::PASSTHRU) != 0)
 		return true;
 	else
 		return false;
@@ -183,4 +184,16 @@ RESULT DConnection::RenderConnections(long frameID) {
 
 RESULT DConnection::RenderParent(long frameID) {
 	return m_pParentNode->RenderNode(frameID);
+}
+
+RESULT DConnection::SetConnectionsDirty(long frameID) {
+	for (auto &pConnection : m_connections) {
+		if (pConnection->IsActive()) {
+			if (pConnection->m_pParentNode->IsDirtyFlagSet() && pConnection->m_pParentNode->IsDirty() == false) {
+				pConnection->m_pParentNode->SetDirty(frameID);
+			}
+		}
+	}
+
+	return R_PASS;
 }

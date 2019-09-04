@@ -23,25 +23,21 @@
 #include <iomanip>
 
 
+// TODO: Change naming to non-Twilio related
 class TwilioNTSInformation {
 public:
 	TwilioNTSInformation() :
 		m_TTL(-1),
-		m_strUsername(""),
-		m_strPassword(""),
 		m_timeCreated(0),
 		m_timeUpdated(0)
 	{
-		ClearICEServerURIs();
+		ClearICEServers();
 	}
 
-	TwilioNTSInformation(std::string strDateCreated, std::string strDateUpdated, int TTL,
-						 std::string strUsername, std::string strPassword) : 
-		m_TTL(TTL),
-		m_strUsername(strUsername),
-		m_strPassword(strPassword)
+	TwilioNTSInformation(std::string strDateCreated, std::string strDateUpdated, int TTL) : 
+		m_TTL(TTL)
 	{
-		ClearICEServerURIs();
+		ClearICEServers();
 
 		struct std::tm tmCreated;
 		std::istringstream ssCreated(strDateCreated);
@@ -58,45 +54,43 @@ public:
 		// empty
 	}
 
-	RESULT ClearICEServerURIs() {
+	RESULT ClearICEServers() {
 		m_ICEServerURIs.clear();
+		m_ICEServerUsernames.clear();
+		m_ICEServerPasswords.clear();
+
 		return R_PASS;
 	}
 
 	// Note that the ordering of calling this function will mean something going into the WebRTC
 	// so important to make sure that the ordering received from server is ensured
-	RESULT AddICEServerURI(std::string strICEServerURI) {
+	RESULT AddICEServerURI(std::string strICEServerURI, std::string strUsername, std::string strPassword) {
 		RESULT r = R_PASS;
 
 		auto it = std::find(m_ICEServerURIs.begin(), m_ICEServerURIs.end(), strICEServerURI);
 		CBM((it == m_ICEServerURIs.end()), "%s already in list", strICEServerURI.c_str());
 
+		// TODO: this is a bit flimsy but it should be ok since it all 
+		// happens at the same time, and cleared at the same time
 		m_ICEServerURIs.push_back(strICEServerURI);
+		m_ICEServerUsernames.push_back(strUsername);
+		m_ICEServerPasswords.push_back(strPassword);
 
 	Error:
 		return r;
 	}
 
 	RESULT Print() {
-		DEBUG_LINEOUT("Twilio NTS Information TTL: %d", m_TTL);
-		DEBUG_LINEOUT("Created: %s Updated %s", std::ctime(&m_timeCreated), std::ctime(&m_timeUpdated));
-		DEBUG_LINEOUT("Username: %s", m_strUsername.c_str());
-		DEBUG_LINEOUT("Password: %s", m_strPassword.c_str());
-
-		int i = 0;
-		for (auto &strICEServerURI : m_ICEServerURIs) {
-			DEBUG_LINEOUT("%d: %s", i++, strICEServerURI.c_str());
+		DOSLOG(INFO, "Twilio NTS Information TTL: %d", m_TTL);
+		DOSLOG(INFO, "Created: %s Updated %s", std::ctime(&m_timeCreated), std::ctime(&m_timeUpdated));
+		
+		for (int i = 0; i < m_ICEServerURIs.size(); i++) {
+			DOSLOG(INFO, "%d: %s", i, m_ICEServerURIs[i].c_str());
+			//DOSLOG(INFO, "%d: Username: %s", i, m_ICEServerUsernames[i].c_str());
+			//DOSLOG(INFO, "%d: Password: %s", i, m_ICEServerPasswords[i].c_str());
 		}
 
 		return R_PASS;
-	}
-
-	std::string GetUsername() {
-		return m_strUsername;
-	}
-
-	std::string GetPassword() {
-		return m_strPassword;
 	}
 
 private:
@@ -108,7 +102,9 @@ private:
 	std::string m_strPassword;
 
 public:
-	std::list<std::string> m_ICEServerURIs;
+	std::vector<std::string> m_ICEServerURIs;
+	std::vector<std::string> m_ICEServerUsernames;
+	std::vector<std::string> m_ICEServerPasswords;
 };
 
 

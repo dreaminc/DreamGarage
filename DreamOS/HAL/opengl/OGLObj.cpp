@@ -128,6 +128,10 @@ Error:
 	return r;
 }
 
+RESULT OGLObj::UpdateBuffers() {
+	return UpdateOGLBuffers();
+}
+
 RESULT OGLObj::UpdateOGLBuffers() {
 	RESULT r = R_PASS;
 
@@ -147,6 +151,10 @@ RESULT OGLObj::UpdateOGLBuffers() {
 
 Error:
 	return r;
+}
+
+RESULT OGLObj::Update() {
+	return R_NOT_IMPLEMENTED;
 }
 
 // Override this method when necessary by a child object
@@ -300,6 +308,11 @@ RESULT OGLObj::RenderOGLBoundingVolume() {
 
 Error:
 	return r;
+}
+
+OGLTexture* OGLObj::GetOGLTextureDisplacement() {
+	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(DimObj::GetDisplacementTexture());
+	return pTexture;
 }
 
 OGLTexture* OGLObj::GetOGLTextureBump() {

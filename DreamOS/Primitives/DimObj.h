@@ -20,7 +20,6 @@
 #include "QuadIndexGroup.h"
 #include "Vertex.h"
 
-#include "TimeManager/TimeManager.h"
 #include "material.h"
 #include "texture.h"
 
@@ -31,7 +30,6 @@ class BoundingVolume;
 class CollisionManifold;
 
 class DimObj : public VirtualObj, 
-			   public Subscriber<TimeEvent>, 
 			   public dirty 
 {
 	friend class OGLObj;
@@ -56,6 +54,7 @@ protected:
 	texture *m_pTextureAmbient = nullptr;
 	texture *m_pTextureDiffuse = nullptr;
 	texture *m_pTextureSpecular = nullptr;
+	texture *m_pDisplacementTexture = nullptr;
 
 private:
 	bool m_fVisible;
@@ -100,7 +99,10 @@ public:
 	bool IsWireframe();
 	RESULT SetWireframe(bool fWireframe = true);
 
-	color GetColor();
+	color GetDiffuseColor();
+	color GetSpecularColor();
+	color GetAmbientColor();
+
 	RESULT SetVertexColor(color c, bool fSetChildren = false);
 	RESULT SetAlpha(color_precision a);
 
@@ -116,17 +118,24 @@ public:
 
 	RESULT SetBumpTexture(texture *pBumpTexture);
 	texture *GetBumpTexture();
+
+	RESULT SetDisplacementTexture(texture *pDisplacementTexture);
+	texture* GetDisplacementTexture();
 	
 	// TODO: Above accessors / create texture store
 	RESULT SetMaterialColors(color c, bool fSetChildren = false);
 	RESULT SetMaterialTexture(MaterialTexture type, texture *pTexture);
-	RESULT SetMaterialAmbient(float ambient);
+	RESULT SetMaterialAmbient(float ambient, bool fSetChildren = false);
 
 	RESULT SetMaterialDiffuseColor(color c, bool fSetChildren = false);
 	RESULT SetMaterialSpecularColor(color c, bool fSetChildren = false);
 	RESULT SetMaterialAmbientColor(color c, bool fSetChildren = false);
 	RESULT SetMaterialShininess(float shine, bool fSetChildren = false);
 	RESULT SetMaterialBumpiness(float bumpiness, bool fSetChildren = false);
+	RESULT SetMaterialDisplacement(float displacement, bool fSetChildren = false);
+	RESULT SetMaterialReflectivity(float reflectivity, bool fSetChildren = false);
+	RESULT SetMaterialRefractivity(float refractivity, bool fSetChildren = false);
+	RESULT SetMaterialUVTiling(float uTiling, float vTiling, bool fSetChildren = false);
 	
 
 	RESULT SetRandomColor();
@@ -142,6 +151,8 @@ public:
 	RESULT RemoveChild(VirtualObj *pObj);
 	RESULT RemoveLastChild();
 	RESULT ClearChildren();
+
+	std::shared_ptr<DimObj> GetChildObject(int index);
 
 	// Explicit instantiations in source 
 	template <class objType> 
@@ -218,9 +229,6 @@ public:
 	
 	// TODO: Should this moved up into vertex?
 	RESULT RotateVerticesByEulerVector(vector vEuler);
-	
-	// TODO: This shouldn't be baked in here ultimately
-	RESULT Notify(TimeEvent *event);
 
 	material* GetMaterial();
 	RESULT SetMaterial(material mMaterial);
@@ -228,6 +236,7 @@ public:
 	matrix<virtual_precision, 4, 4> GetRotationMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
 	matrix<virtual_precision, 4, 4> GetTranslationMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
 	matrix<virtual_precision, 4, 4> GetModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
+	matrix<virtual_precision, 4, 4> GetFlatModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
 	matrix<virtual_precision, 4, 4> GetRelativeModelMatrix();
 };
 

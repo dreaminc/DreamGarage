@@ -9,6 +9,7 @@
 // DreamOS/HMD/OpenVR/OpenVRController.h
 // The OpenVR controller class
 
+#ifndef OCULUS_PRODUCTION_BUILD
 // Include the OpenVR SDK
 #include <openvr.h>
 
@@ -33,5 +34,5 @@ public:
 private:
 	vr::IVRSystem *m_pIVRHMD = nullptr;
 };
-
+#endif
 #endif // ! OPENVR_CONTROLLER_H_

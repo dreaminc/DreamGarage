@@ -1,12 +1,15 @@
 #include "CloudController.h"
 
+#include "Primitives/point.h"
+#include "Primitives/vector.h"
+#include "Primitives/quaternion.h"
+
+#include "Primitives/texture.h"
+
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"
 
 #include "Cloud/Message/Message.h"
-//#include "Cloud/Message/UpdateHandMessage.h"
-//#include "Cloud/Message/UpdateHeadMessage.h"
-//#include "Cloud/Message/AudioDataMessage.h"
 
 #include "User/User.h"
 #include "User/TwilioNTSInformation.h"
@@ -55,13 +58,14 @@ RESULT CloudController::CloudThreadProcess() {
 
 	m_fRunning = true;
 
+	// TODO: WAT
 	// Message pump goes here
 #if (defined(_WIN32) || defined(_WIN64))
 	Win32Helper::ThreadBlockingMessageLoop();
 #else
 #pragma message ("not implemented message loop")
 	while (m_fRunning) {
-
+	
 	}
 #endif
 
@@ -76,6 +80,7 @@ RESULT CloudController::CloudThreadProcessParams(std::string strUsername, std::s
 
 	DEBUG_LINEOUT("CloudThreadProcess start");
 
+	//TODO: this code is going to have to be changed further to have the correct login flow
 	if (m_fLoginOnStart) {
 		DEBUG_LINEOUT("Logging into server with user credentials");
 
@@ -124,9 +129,10 @@ RESULT CloudController::Start(bool fLoginOnStart) {
 
 	DEBUG_LINEOUT("CloudController::Start");
 
+	m_fRunning = true;
 	m_fLoginOnStart = fLoginOnStart;
 
-	m_cloudThread = std::thread(&CloudController::CloudThreadProcess, this);
+	//m_cloudThread = std::thread(&CloudController::CloudThreadProcess, this);
 
 Error:
 	return r;
@@ -139,9 +145,10 @@ RESULT CloudController::Start(std::string strUsername, std::string strPassword, 
 
 	DEBUG_LINEOUT("CloudController::Start");
 
+	m_fRunning = true;
 	m_fLoginOnStart = true;
 
-	m_cloudThread = std::thread(&CloudController::CloudThreadProcessParams, this, strUsername, strPassword, environmentID);
+	//m_cloudThread = std::thread(&CloudController::CloudThreadProcessParams, this, strUsername, strPassword, environmentID);
 
 Error:
 	return r;
@@ -218,6 +225,8 @@ RESULT CloudController::InitializeUser(version ver) {
 
 	m_pUserController = std::unique_ptr<UserController>(UserFactory::MakeUserController(ver, this));
 	CN(m_pUserController);
+	m_pUserController->Initialize();
+	m_pUserController->RegisterUserControllerObserver(this);
 
 Error:
 	return r;
@@ -364,33 +373,132 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnReceiveAsset(long userID) {
+RESULT CloudController::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	if (m_pEnvironmentObserver != nullptr) {
-		CR(m_pEnvironmentObserver->OnReceiveAsset(userID));
+		CR(m_pEnvironmentObserver->OnReceiveAsset(pEnvironmentShare));
 	}
 
 Error:
 	return r;
 }
 
-RESULT CloudController::OnStopSending() {
+RESULT CloudController::OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	if (m_pEnvironmentObserver != nullptr) {
-		CR(m_pEnvironmentObserver->OnStopSending());
+		CR(m_pEnvironmentObserver->OnStopSending(pEnvironmentShare));
 	}
 
 Error:
 	return r;
 }
 
-RESULT CloudController::OnStopReceiving() {
+RESULT CloudController::OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	if (m_pEnvironmentObserver != nullptr) {
-		CR(m_pEnvironmentObserver->OnStopReceiving());
+		CR(m_pEnvironmentObserver->OnShareAsset(pEnvironmentShare));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnCloseAsset(pEnvironmentAsset));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnGetByShareType(pEnvironmentShare));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnStopReceiving(pEnvironmentShare));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnOpenCamera(pEnvironmentAsset));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnCloseCamera(pEnvironmentAsset));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnSendCameraPlacement() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnSendCameraPlacement());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnStopSendingCameraPlacement() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnStopSendingCameraPlacement());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnReceiveCameraPlacement(long userID) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnReceiveCameraPlacement(userID));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnStopReceivingCameraPlacement() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnStopReceivingCameraPlacement());
 	}
 
 Error:
@@ -419,14 +527,146 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT CloudController::OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnGetForm(strKey, strTitle, strURL));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnAPIConnectionCheck(bool fIsConnected) {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnAPIConnectionCheck(fIsConnected));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnDreamVersion(version dreamVersion) {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnDreamVersion(dreamVersion));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnGetSettings(ptPosition, qOrientation, fIsSet));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnSetSettings() {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnSetSettings());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnLogin() {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnLogin());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnLogout() {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnLogout());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnPendLogout() {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnPendLogout());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnSwitchTeams() {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnSwitchTeams());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnFormURL(strKey, strTitle, strURL));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnAccessToken(fSuccess, strAccessToken));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnGetTeam(fSuccess, environmentId, environmentModelId));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	long senderUserID = pPeerConnection->GetPeerUserID();
 	long recieverUserID = pPeerConnection->GetUserID();
 
 	if (m_pPeerConnectionObserver != nullptr) {
-		CR(m_pPeerConnectionObserver->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+		CR(m_pPeerConnectionObserver->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
 	}
 
 Error:
@@ -594,6 +834,13 @@ long CloudController::GetUserID() {
 	return -1;
 }
 
+long CloudController::GetUserAvatarID() {
+	if (m_pUserController != nullptr) {
+		return m_pUserController->GetUserAvatarModelID();
+	}
+	return -1;
+}
+
 /*
 RESULT CloudController::InitializeConnection(bool fMaster, bool fAddDataChannel) {
 	RESULT r = R_PASS;
@@ -696,7 +943,7 @@ RESULT CloudController::BroadcastDataMessage(Message *pDataMessage) {
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
-	CB(m_fRunning);
+	CBR(m_fRunning, R_SKIPPED);
 
 	CN(m_pUserController);
 	{
@@ -710,6 +957,10 @@ RESULT CloudController::BroadcastDataMessage(Message *pDataMessage) {
 	}
 
 Error:
+	if (pDatachannelBuffer != nullptr) {
+		delete[] pDatachannelBuffer;
+		pDatachannelBuffer = nullptr;
+	}
 	return r;
 }
 
@@ -717,7 +968,7 @@ Error:
 RESULT CloudController::BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
-	CB(m_fRunning);
+	CBR(m_fRunning, R_SKIPPED);	// Because otherwise this clogs the logs
 
 	CN(m_pEnvironmentController);
 	CN(m_pEnvironmentController->BroadcastAudioPacket(strAudioTrackLabel, pendingAudioPacket));
@@ -727,28 +978,34 @@ Error:
 }
 
 float CloudController::GetRunTimeMicAverage() {
-	if (m_pEnvironmentController != nullptr) {
-		return m_pEnvironmentController->GetRunTimeMicAverage();
-	}
+	// TODO: Fix this
+	//if (m_pEnvironmentController != nullptr) {
+	//	return m_pEnvironmentController->GetRunTimeMicAverage();
+	//}
 
-	return 0.0f;
+	return m_runTimeMicAverage;
 }
 
 
+RESULT CloudController::SetRunTimeMicAverage(float runTimeMicAverage) {
+	m_runTimeMicAverage = runTimeMicAverage;
+	return R_PASS;
+}
+
 // Video
-RESULT CloudController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+RESULT CloudController::BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
 
 	CN(m_pEnvironmentController);
-	CR(m_pEnvironmentController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+	CR(m_pEnvironmentController->BroadcastVideoFrame(strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels));
 
 Error:
 	return r;
 }
 
-RESULT CloudController::BroadcastTextureFrame(texture *pTexture, int level, PIXEL_FORMAT pixelFormat) {
+RESULT CloudController::BroadcastTextureFrame(const std::string &strVideoTrackLabel, texture *pTexture, int level, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
@@ -760,44 +1017,44 @@ RESULT CloudController::BroadcastTextureFrame(texture *pTexture, int level, PIXE
 
 	// Broadcast the data
 	CR(m_pEnvironmentController->BroadcastVideoFrame(
-		pTexture->GetImageBuffer(), pTexture->GetWidth(), pTexture->GetHeight(), pTexture->GetChannels()
+		strVideoTrackLabel, pTexture->GetImageBuffer(), pTexture->GetWidth(), pTexture->GetHeight(), pTexture->GetChannels()
 	));
 
 Error:
 	return r;
 }
 
-RESULT CloudController::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+RESULT CloudController::StartVideoStreaming(const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
 	CN(m_pEnvironmentController);
 
-	CR(m_pEnvironmentController->StartVideoStreaming(pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
+	CR(m_pEnvironmentController->StartVideoStreaming(strVideoTrackLabel, pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
 
 Error:
 	return r;
 }
 
-RESULT CloudController::StopVideoStreaming() {
+RESULT CloudController::StopVideoStreaming(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
 	CN(m_pEnvironmentController);
 
-	CR(m_pEnvironmentController->StopVideoStreaming());
+	CR(m_pEnvironmentController->StopVideoStreaming(strVideoTrackLabel));
 
 Error:
 	return r;
 }
 
-bool CloudController::IsVideoStreamingRunning() {
+bool CloudController::IsVideoStreamingRunning(const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
 	CN(m_pEnvironmentController);
 
-	return m_pEnvironmentController->IsVideoStreamingRunning();
+	return m_pEnvironmentController->IsVideoStreamingRunning(strVideoTrackLabel);
 
 Error:
 	return false;
@@ -872,6 +1129,17 @@ RESULT CloudController::RegisterEnvironmentObserver(EnvironmentObserver* pEnviro
 	CNM((pEnvironmentObserver), "Observer cannot be nullptr");
 	CBM((m_pEnvironmentObserver == nullptr), "Can't overwrite environment observer");
 	m_pEnvironmentObserver = pEnvironmentObserver;
+
+Error:
+	return r;
+}
+
+RESULT CloudController::RegisterUserObserver(UserObserver* pUserObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pUserObserver), "Observer cannot be nullptr");
+	CBM((m_pUserObserver == nullptr), "Can't overwrite environment observer");
+	m_pUserObserver = pUserObserver;
 
 Error:
 	return r;

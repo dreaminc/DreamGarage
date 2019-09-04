@@ -16,8 +16,10 @@
 #include "base/logging.h"
 #include "base/macros.h"
 #include "base/memory/ref_counted.h"
+#include "base/strings/string_piece.h"
 #include "base/synchronization/atomic_flag.h"
 #include "base/synchronization/condition_variable.h"
+#include "base/synchronization/waitable_event.h"
 #include "base/task_runner.h"
 #include "base/task_scheduler/priority_queue.h"
 #include "base/task_scheduler/scheduler_lock.h"
@@ -26,12 +28,14 @@
 #include "base/task_scheduler/scheduler_worker_stack.h"
 #include "base/task_scheduler/sequence.h"
 #include "base/task_scheduler/task.h"
+#include "base/task_scheduler/tracked_ref.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
 
 namespace base {
 
 class HistogramBase;
+class SchedulerWorkerObserver;
 class SchedulerWorkerPoolParams;
 
 namespace internal {
@@ -58,25 +62,29 @@ class BASE_EXPORT SchedulerWorkerPoolImpl : public SchedulerWorkerPool {
 
   // Constructs a pool without workers.
   //
-  // |name| is used to label the pool's threads ("TaskScheduler" + |name| +
-  // index) and histograms ("TaskScheduler." + histogram name + "." + |name| +
-  // extra suffixes). |priority_hint| is the preferred thread priority; the
-  // actual thread priority depends on shutdown state and platform capabilities.
+  // |histogram_label| is used to label the pool's histograms ("TaskScheduler."
+  // + histogram_name + "." + |histogram_label| + extra suffixes), it must not
+  // be empty. |pool_label| is used to label the pool's threads, it must not be
+  // empty. |priority_hint| is the preferred thread priority; the actual thread
+  // priority depends on shutdown state and platform capabilities.
   // |task_tracker| keeps track of tasks. |delayed_task_manager| handles tasks
   // posted with a delay.
-  SchedulerWorkerPoolImpl(
-      const std::string& name,
-      ThreadPriority priority_hint,
-      TaskTracker* task_tracker,
-      DelayedTaskManager* delayed_task_manager);
+  SchedulerWorkerPoolImpl(StringPiece histogram_label,
+                          StringPiece pool_label,
+                          ThreadPriority priority_hint,
+                          TrackedRef<TaskTracker> task_tracker,
+                          DelayedTaskManager* delayed_task_manager);
 
   // Creates workers following the |params| specification, allowing existing and
   // future tasks to run. Uses |service_thread_task_runner| to monitor for
-  // blocked threads in the pool. |worker_environment| specifies any requested
-  // environment to execute the tasks. Can only be called once.
-  // CHECKs on failure.
+  // blocked threads in the pool. If specified, |scheduler_worker_observer| will
+  // be notified when a worker enters and exits its main function. It must not
+  // be destroyed before JoinForTesting() has returned (must never be destroyed
+  // in production). |worker_environment| specifies any requested environment to
+  // execute the tasks. Can only be called once. CHECKs on failure.
   void Start(const SchedulerWorkerPoolParams& params,
              scoped_refptr<TaskRunner> service_thread_task_runner,
+             SchedulerWorkerObserver* scheduler_worker_observer,
              WorkerEnvironment worker_environment);
 
   // Destroying a SchedulerWorkerPoolImpl returned by Create() is not allowed in
@@ -103,26 +111,33 @@ class BASE_EXPORT SchedulerWorkerPoolImpl : public SchedulerWorkerPool {
   // TODO(fdoray): Remove this method. https://crbug.com/687264
   int GetMaxConcurrentNonBlockedTasksDeprecated() const;
 
-  // Waits until at least |n| workers are idle.
+  // Waits until at least |n| workers are idle. Note that while workers are
+  // disallowed from cleaning up during this call: tests using a custom
+  // |suggested_reclaim_time_| need to be careful to invoke this swiftly after
+  // unblocking the waited upon workers as: if a worker is already detached by
+  // the time this is invoked, it will never make it onto the idle stack and
+  // this call will hang.
   void WaitForWorkersIdleForTesting(size_t n);
 
   // Waits until all workers are idle.
   void WaitForAllWorkersIdleForTesting();
 
-  // Disallows worker cleanup. If the suggested reclaim time is not
-  // TimeDelta::Max(), the test must call this before JoinForTesting() to reduce
-  // the chance of thread detachment during the process of joining all of the
-  // threads, and as a result, threads running after JoinForTesting().
-  void DisallowWorkerCleanupForTesting();
+  // Waits until |n| workers have cleaned up. Tests that use this must:
+  //  - Invoke WaitForWorkersCleanedUpForTesting(n) well before any workers
+  //    have had time to clean up.
+  //  - Have a long enough |suggested_reclaim_time_| to strengthen the above.
+  //  - Only invoke this once (currently doesn't support waiting for multiple
+  //    cleanup phases in the same test).
+  void WaitForWorkersCleanedUpForTesting(size_t n);
 
   // Returns the number of workers in this worker pool.
-  size_t NumberOfWorkersForTesting();
+  size_t NumberOfWorkersForTesting() const;
 
   // Returns |worker_capacity_|.
-  size_t GetWorkerCapacityForTesting();
+  size_t GetWorkerCapacityForTesting() const;
 
   // Returns the number of workers that are idle (i.e. not running tasks).
-  size_t NumberOfIdleWorkersForTesting();
+  size_t NumberOfIdleWorkersForTesting() const;
 
   // Sets the MayBlock waiting threshold to TimeDelta::Max().
   void MaximizeMayBlockThresholdForTesting();
@@ -141,10 +156,6 @@ class BASE_EXPORT SchedulerWorkerPoolImpl : public SchedulerWorkerPool {
   static constexpr TimeDelta kBlockedWorkersPollPeriod =
       TimeDelta::FromMilliseconds(50);
 
-  SchedulerWorkerPoolImpl(const SchedulerWorkerPoolParams& params,
-                          TaskTracker* task_tracker,
-                          DelayedTaskManager* delayed_task_manager);
-
   // SchedulerWorkerPool:
   void OnCanScheduleSequence(scoped_refptr<Sequence> sequence) override;
 
@@ -156,8 +167,9 @@ class BASE_EXPORT SchedulerWorkerPoolImpl : public SchedulerWorkerPool {
   void WakeUpOneWorker();
 
   // Performs the same action as WakeUpOneWorker() except asserts |lock_| is
-  // acquired rather than acquires it.
-  void WakeUpOneWorkerLockRequired();
+  // acquired rather than acquires it and returns true if worker wakeups are
+  // permitted.
+  bool WakeUpOneWorkerLockRequired();
 
   // Adds a worker, if needed, to maintain one idle worker, |worker_capacity_|
   // permitting.
@@ -173,7 +185,7 @@ class BASE_EXPORT SchedulerWorkerPoolImpl : public SchedulerWorkerPool {
   void RemoveFromIdleWorkersStackLockRequired(SchedulerWorker* worker);
 
   // Returns true if worker cleanup is permitted.
-  bool CanWorkerCleanupForTesting();
+  bool CanWorkerCleanupForTestingLockRequired();
 
   // Tries to add a new SchedulerWorker to the pool. Returns the new
   // SchedulerWorker on success, nullptr otherwise. Cannot be called before
@@ -194,8 +206,12 @@ class BASE_EXPORT SchedulerWorkerPoolImpl : public SchedulerWorkerPool {
   TimeDelta MayBlockThreshold() const;
 
   // Starts calling AdjustWorkerCapacity() periodically on
-  // |service_thread_task_runner_|.
-  void PostAdjustWorkerCapacityTaskLockRequired();
+  // |service_thread_task_runner_| if not already requested.
+  void PostAdjustWorkerCapacityTaskIfNeeded();
+
+  // Calls AdjustWorkerCapacity() and schedules it again as necessary. May only
+  // be called from the service thread.
+  void AdjustWorkerCapacityTaskFunction();
 
   // Returns true if AdjustWorkerCapacity() should periodically be called on
   // |service_thread_task_runner_|.
@@ -204,7 +220,7 @@ class BASE_EXPORT SchedulerWorkerPoolImpl : public SchedulerWorkerPool {
   void DecrementWorkerCapacityLockRequired();
   void IncrementWorkerCapacityLockRequired();
 
-  const std::string name_;
+  const std::string pool_label_;
   const ThreadPriority priority_hint_;
 
   // PriorityQueue from which all threads of this worker pool get work.
@@ -220,6 +236,8 @@ class BASE_EXPORT SchedulerWorkerPoolImpl : public SchedulerWorkerPool {
   // |num_pending_may_block_workers_|, |idle_workers_stack_|,
   // |idle_workers_stack_cv_for_testing_|, |num_wake_ups_before_start_|,
   // |cleanup_timestamps_|, |polling_worker_capacity_|,
+  // |worker_cleanup_disallowed_for_testing_|,
+  // |num_workers_cleaned_up_for_testing_|,
   // |SchedulerWorkerDelegateImpl::is_on_idle_workers_stack_|,
   // |SchedulerWorkerDelegateImpl::incremented_worker_capacity_since_blocked_|
   // and |SchedulerWorkerDelegateImpl::may_block_start_time_|. Has
@@ -267,15 +285,21 @@ class BASE_EXPORT SchedulerWorkerPoolImpl : public SchedulerWorkerPool {
   // |worker_capacity_|.
   bool polling_worker_capacity_ = false;
 
+  // Indicates to the delegates that workers are not permitted to cleanup.
+  bool worker_cleanup_disallowed_for_testing_ = false;
+
+  // Counts the number of workers cleaned up since Start(). Tests with a custom
+  // |suggested_reclaim_time_| can wait on a specific number of workers being
+  // cleaned up via WaitForWorkersCleanedUpForTesting().
+  size_t num_workers_cleaned_up_for_testing_ = 0;
+
+  // Signaled, if non-null, when |num_workers_cleaned_up_for_testing_| is
+  // incremented.
+  std::unique_ptr<ConditionVariable> num_workers_cleaned_up_for_testing_cv_;
+
   // Used for testing and makes MayBlockThreshold() return the maximum
   // TimeDelta.
   AtomicFlag maximum_blocked_threshold_for_testing_;
-
-  // Signaled once JoinForTesting() has returned.
-  WaitableEvent join_for_testing_returned_;
-
-  // Indicates to the delegates that workers are not permitted to cleanup.
-  AtomicFlag worker_cleanup_disallowed_;
 
 #if DCHECK_IS_ON()
   // Set at the start of JoinForTesting().
@@ -295,6 +319,18 @@ class BASE_EXPORT SchedulerWorkerPoolImpl : public SchedulerWorkerPool {
   HistogramBase* const num_tasks_between_waits_histogram_;
 
   scoped_refptr<TaskRunner> service_thread_task_runner_;
+
+  // Optional observer notified when a worker enters and exits its main
+  // function. Set in Start() and never modified afterwards.
+  SchedulerWorkerObserver* scheduler_worker_observer_ = nullptr;
+
+  // Ensures recently cleaned up workers (ref.
+  // SchedulerWorkerDelegateImpl::CleanupLockRequired()) had time to exit as
+  // they have a raw reference to |this| (and to TaskTracker) which can
+  // otherwise result in racy use-after-frees per no longer being part of
+  // |workers_| and hence not being explicitly joined in JoinForTesting() :
+  // https://crbug.com/810464.
+  TrackedRefFactory<SchedulerWorkerPoolImpl> tracked_ref_factory_;
 
   DISALLOW_COPY_AND_ASSIGN(SchedulerWorkerPoolImpl);
 };

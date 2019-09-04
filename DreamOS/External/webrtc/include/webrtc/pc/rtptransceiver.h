@@ -51,7 +51,8 @@ namespace webrtc {
 // AudioRtpSenders, AudioRtpReceivers, and a VoiceChannel. Video RtpTransceivers
 // will have VideoRtpSenders, VideoRtpReceivers, and a VideoChannel.
 class RtpTransceiver final
-    : public rtc::RefCountedObject<RtpTransceiverInterface> {
+    : public rtc::RefCountedObject<RtpTransceiverInterface>,
+      public sigslot::has_slots<> {
  public:
   // Construct a Plan B-style RtpTransceiver with no senders, receivers, or
   // channel set.
@@ -66,8 +67,6 @@ class RtpTransceiver final
       rtc::scoped_refptr<RtpReceiverProxyWithInternal<RtpReceiverInternal>>
           receiver);
   ~RtpTransceiver() override;
-
-  cricket::MediaType media_type() const { return media_type_; }
 
   // Returns the Voice/VideoChannel set for this transceiver. May be null if
   // the transceiver is not in the currently set local/remote description.
@@ -109,7 +108,58 @@ class RtpTransceiver final
     return receivers_;
   }
 
+  // Returns the backing object for the transceiver's Unified Plan sender.
+  rtc::scoped_refptr<RtpSenderInternal> sender_internal() const;
+
+  // Returns the backing object for the transceiver's Unified Plan receiver.
+  rtc::scoped_refptr<RtpReceiverInternal> receiver_internal() const;
+
+  // RtpTransceivers are not associated until they have a corresponding media
+  // section set in SetLocalDescription or SetRemoteDescription. Therefore,
+  // when setting a local offer we need a way to remember which transceiver was
+  // used to create which media section in the offer. Storing the mline index
+  // in CreateOffer is specified in JSEP to allow us to do that.
+  rtc::Optional<size_t> mline_index() const { return mline_index_; }
+  void set_mline_index(rtc::Optional<size_t> mline_index) {
+    mline_index_ = mline_index;
+  }
+
+  // Sets the MID for this transceiver. If the MID is not null, then the
+  // transceiver is considered "associated" with the media section that has the
+  // same MID.
+  void set_mid(const rtc::Optional<std::string>& mid) { mid_ = mid; }
+
+  // Sets the intended direction for this transceiver. Intended to be used
+  // internally over SetDirection since this does not trigger a negotiation
+  // needed callback.
+  void set_direction(RtpTransceiverDirection direction) {
+    direction_ = direction;
+  }
+
+  // Sets the current direction for this transceiver as negotiated in an offer/
+  // answer exchange. The current direction is null before an answer with this
+  // transceiver has been set.
+  void set_current_direction(RtpTransceiverDirection direction);
+
+  // According to JSEP rules for SetRemoteDescription, RtpTransceivers can be
+  // reused only if they were added by AddTrack.
+  void set_created_by_addtrack(bool created_by_addtrack) {
+    created_by_addtrack_ = created_by_addtrack;
+  }
+  bool created_by_addtrack() const { return created_by_addtrack_; }
+
+  // Returns true if this transceiver has ever had the current direction set to
+  // sendonly or sendrecv.
+  bool has_ever_been_used_to_send() const {
+    return has_ever_been_used_to_send_;
+  }
+
+  // Fired when the RtpTransceiver state changes such that negotiation is now
+  // needed (e.g., in response to a direction change).
+  sigslot::signal0<> SignalNegotiationNeeded;
+
   // RtpTransceiverInterface implementation.
+  cricket::MediaType media_type() const override;
   rtc::Optional<std::string> mid() const override;
   rtc::scoped_refptr<RtpSenderInterface> sender() const override;
   rtc::scoped_refptr<RtpReceiverInterface> receiver() const override;
@@ -121,6 +171,8 @@ class RtpTransceiver final
   void SetCodecPreferences(rtc::ArrayView<RtpCodecCapability> codecs) override;
 
  private:
+  void OnFirstPacketReceived(cricket::BaseChannel* channel);
+
   const bool unified_plan_;
   const cricket::MediaType media_type_;
   std::vector<rtc::scoped_refptr<RtpSenderProxyWithInternal<RtpSenderInternal>>>
@@ -133,12 +185,16 @@ class RtpTransceiver final
   RtpTransceiverDirection direction_ = RtpTransceiverDirection::kInactive;
   rtc::Optional<RtpTransceiverDirection> current_direction_;
   rtc::Optional<std::string> mid_;
+  rtc::Optional<size_t> mline_index_;
+  bool created_by_addtrack_ = false;
+  bool has_ever_been_used_to_send_ = false;
 
   cricket::BaseChannel* channel_ = nullptr;
 };
 
 BEGIN_SIGNALING_PROXY_MAP(RtpTransceiver)
 PROXY_SIGNALING_THREAD_DESTRUCTOR()
+PROXY_CONSTMETHOD0(cricket::MediaType, media_type);
 PROXY_CONSTMETHOD0(rtc::Optional<std::string>, mid);
 PROXY_CONSTMETHOD0(rtc::scoped_refptr<RtpSenderInterface>, sender);
 PROXY_CONSTMETHOD0(rtc::scoped_refptr<RtpReceiverInterface>, receiver);

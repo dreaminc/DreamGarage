@@ -36,8 +36,8 @@ RESULT SenseController::SetControllerState(ControllerState controllerState) {
 	}
 	currentState->triggerRange = controllerState.triggerRange;
 
-
-	if (currentState->ptTouchpad != controllerState.ptTouchpad) {
+	// the idea here is to only avoid constantly sending PAD_MOVE events when there is no scrolling happening
+	if (currentState->ptTouchpad != controllerState.ptTouchpad || vector(controllerState.ptTouchpad).magnitudeSquared() != 0.0f) {
 		eventType = SENSE_CONTROLLER_PAD_MOVE;
 		NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
 	}
@@ -62,8 +62,13 @@ RESULT SenseController::SetControllerState(ControllerState controllerState) {
 		eventType = SENSE_CONTROLLER_MENU_UP;
 		NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
 	}
-	currentState->fMenu = controllerState.fMenu;
+	m_controllerStates[CONTROLLER_LEFT].fMenu = controllerState.fMenu;
+	m_controllerStates[CONTROLLER_RIGHT].fMenu = controllerState.fMenu;
 
+	//TODO:
+	currentState->fClosed = controllerState.fClosed;
+	eventType = SENSE_CONTROLLER_META_CLOSED;
+	NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
 
 	return R_PASS;
 }

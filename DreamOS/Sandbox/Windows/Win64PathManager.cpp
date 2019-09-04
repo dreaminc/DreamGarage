@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <cstring>
 
+#include <ShlObj.h>	// For SHGetKnownFolderPath()
+
+#include "DreamOS.h"
+
 Win64PathManager::Win64PathManager() :
 	PathManager()	// Call super
 {
@@ -80,6 +84,50 @@ Error:
 	return r;
 }
 
+RESULT Win64PathManager::GetDreamPath(std::wstring &wstrAppDataPath, DREAM_PATH_TYPE pathValueType) {
+	RESULT r = R_PASS;
+
+	if (m_fUseInstallPath) {
+		switch (pathValueType) {
+		case (DREAM_PATH_ROAMING): {
+			REFKNOWNFOLDERID rfid = FOLDERID_RoamingAppData;
+			DWORD dwFlags = 0;
+			HANDLE hToken = nullptr;	// Get for Current User
+			PWSTR ppszPath[MAX_PATH];
+
+			CRM((RESULT)SHGetKnownFolderPath(rfid, dwFlags, hToken, ppszPath), "Could not find appdata folder");
+			wstrAppDataPath = *ppszPath;
+		} break;
+
+		case(DREAM_PATH_LOCAL): {
+			REFKNOWNFOLDERID rfid = FOLDERID_LocalAppData;
+			DWORD dwFlags = 0;
+			HANDLE hToken = nullptr;	// Get for Current User
+			PWSTR ppszPath[MAX_PATH];
+
+			CRM((RESULT)SHGetKnownFolderPath(rfid, dwFlags, hToken, ppszPath), "Could not find appdata folder");
+			wstrAppDataPath = *ppszPath;
+		} break;
+		}
+
+		wstrAppDataPath = wstrAppDataPath + m_wstrDreamFolder;	
+	}
+	else {	// non-prod builds
+		GetDreamPath(wstrAppDataPath);
+		wstrAppDataPath = wstrAppDataPath + L"\\";	// logger and cefcache expect \\ ending
+	}
+
+	// Check if Dream folder exists 
+	if (PathManager::instance()->DoesPathExist(wstrAppDataPath) != R_DIRECTORY_FOUND) {
+		// Create the directory
+		wchar_t* pwszDirectory = const_cast<wchar_t*>(wstrAppDataPath.c_str());
+		PathManager::instance()->CreateDirectory(pwszDirectory);
+	}
+
+Error:
+	return r;
+}
+
 RESULT Win64PathManager::GetDreamPath(std::wstring &r_wstrDreamPath) {
 	RESULT r = R_PASS;
 
@@ -138,6 +186,16 @@ Error:
 	return r;
 }
 
+// This will create a local DreamOS path directory
+RESULT Win64PathManager::CreateDirectory(wchar_t *pszDirectoryName) {
+	RESULT r = R_PASS;
+
+	CBM(::CreateDirectoryW(pszDirectoryName, NULL), "Failed to create directory %S", pszDirectoryName);
+
+Error:
+	return r;
+}
+
 RESULT Win64PathManager::UpdateCurrentPath() {
 	RESULT r = R_PASS;
 
@@ -148,7 +206,7 @@ RESULT Win64PathManager::UpdateCurrentPath() {
 	return r;
 }
 
-RESULT Win64PathManager::InitializePaths() {
+RESULT Win64PathManager::InitializePaths(DreamOS *pDOSHandle) {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("Win64PathManager Initialize Paths");
@@ -157,35 +215,43 @@ RESULT Win64PathManager::InitializePaths() {
 	char *pszDreamPath = NULL;
 	size_t pszDreamPath_n = 0;
 
-#ifndef NOT_USE_DREAM_OS_PATH_ENV
-	// Dream path is derived from environment variable in Debug/Release build
+	if (pDOSHandle->UseInstallPath()) {
 
-	errno_t err = _dupenv_s(&pszDreamPath, &pszDreamPath_n, DREAM_OS_PATH_ENV);
-	if (pszDreamPath != NULL) {
-		DEBUG_LINEOUT("Found %s env variable: %s", DREAM_OS_PATH_ENV, pszDreamPath);
+		m_fUseInstallPath = true;
+		m_wstrDreamFolder = pDOSHandle->GetDreamFolderPath();
 
-		//mbstowcs(m_pszDreamRootPath, pszDreamPath, pszDreamPath_n);
-		mbstowcs_s(&m_pszDreamRootPath_n, m_pszDreamRootPath, pszDreamPath, pszDreamPath_n);
+		// Dream path is derived from the running .exe path in Production build
+		HMODULE hModule = GetModuleHandleW(NULL);
+		WCHAR wszCurrentExePath[MAX_PATH];
+		std::wstring wstrCurrentExeFolder;
+
+		CB(GetModuleFileNameW(hModule, wszCurrentExePath, MAX_PATH) != 0);
+
+		wstrCurrentExeFolder = std::wstring(wszCurrentExePath);
+		wstrCurrentExeFolder = wstrCurrentExeFolder.substr(0, wstrCurrentExeFolder.rfind('\\'));
+
+		std::copy(wstrCurrentExeFolder.begin(), wstrCurrentExeFolder.end(), m_pszDreamRootPath);
 	}
 	else {
-		// Try to back pedal to find dreampaths.txt
-		DEBUG_LINEOUT("%s env variable not found", DREAM_OS_PATH_ENV);
-		DEBUG_LINEOUT("Please define the %s env to point at the root directory of DreamOS", DREAM_OS_PATH_ENV);
+		// Dream path is derived from environment variable in Debug/Release build
+
+		m_fUseInstallPath = false;
+		m_wstrDreamFolder = L"";
+
+		errno_t err = _dupenv_s(&pszDreamPath, &pszDreamPath_n, DREAM_OS_PATH_ENV);
+
+		if (pszDreamPath != NULL) {
+			DEBUG_LINEOUT("Found %s env variable: %s", DREAM_OS_PATH_ENV, pszDreamPath);
+
+			//mbstowcs(m_pszDreamRootPath, pszDreamPath, pszDreamPath_n);
+			mbstowcs_s(&m_pszDreamRootPath_n, m_pszDreamRootPath, pszDreamPath, pszDreamPath_n);
+		}
+		else {
+			// Try to back pedal to find dreampaths.txt
+			DEBUG_LINEOUT("%s env variable not found", DREAM_OS_PATH_ENV);
+			DEBUG_LINEOUT("Please define the %s env to point at the root directory of DreamOS", DREAM_OS_PATH_ENV);
+		}
 	}
-#else
-	// Dream path is derived from the running .exe path in Production build
-
-	HMODULE hModule = GetModuleHandleW(NULL);
-	WCHAR path[MAX_PATH];
-	std::wstring exeFolder;
-
-	CB(GetModuleFileNameW(hModule, path, MAX_PATH) != 0);
-
-	exeFolder = std::wstring(path);
-	exeFolder = exeFolder.substr(0, exeFolder.rfind('\\'));
-
-	std::copy(exeFolder.begin(), exeFolder.end(), m_pszDreamRootPath);
-#endif
 
 	CRM(SetCurrentPath(m_pszDreamRootPath), "Failed to set current path to dream root");
 

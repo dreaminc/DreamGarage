@@ -1,7 +1,7 @@
 #include "ProgramNode.h"
 
-ProgramNode::ProgramNode(std::string strName) :
-	DNode(strName)
+ProgramNode::ProgramNode(std::string strName, PIPELINE_FLAGS optFlags) :
+	DNode(strName, optFlags)
 {
 	// empty
 }

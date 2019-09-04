@@ -45,8 +45,8 @@ Error:
 }
 
 double image::GetAverageValueAtUV(double uValue, double vValue) {
-	int pxValueX = static_cast<int>(uValue * m_width);
-	int pxValueY = static_cast<int>(vValue * m_height);
+	int pxValueX = static_cast<int>(uValue * (m_width - 1));
+	int pxValueY = static_cast<int>(vValue * (m_height - 1));
 
 	int lookUp = pxValueX * (sizeof(unsigned char) * m_channels) + (pxValueY * (sizeof(unsigned char) * m_channels * m_width));
 
@@ -95,4 +95,23 @@ int image::GetHeight() {
 
 int image::GetChannels() {
 	return m_channels;
+}
+
+PIXEL_FORMAT image::GetPixelFormat() {
+	switch (m_channels) {
+		case 1: {
+			return PIXEL_FORMAT::GREYSCALE;
+		} break;
+
+		case 3: {
+			return PIXEL_FORMAT::BGR;
+		} break;
+
+		case 4: {
+			return PIXEL_FORMAT::BGRA;
+		} break;
+
+	}
+
+	return PIXEL_FORMAT::INVALID;
 }

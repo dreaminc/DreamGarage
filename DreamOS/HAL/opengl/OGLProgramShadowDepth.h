@@ -16,8 +16,8 @@
 
 class OGLProgramShadowDepth : public OGLProgram {
 public:
-	OGLProgramShadowDepth(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp, "oglshadowdepth"),
+	OGLProgramShadowDepth(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) :
+		OGLProgram(pParentImp, "oglshadowdepth", optFlags),
 		m_pShadowEmitter(nullptr)
 	{
 		// empty

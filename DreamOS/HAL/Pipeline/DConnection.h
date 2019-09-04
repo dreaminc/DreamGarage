@@ -19,9 +19,11 @@ template <class objType> class DConnectionTyped;
 class DConnection : public DObject {
 	template <class objType> friend class DConnectionTyped;
 
+	friend class DNode;
+
 protected:
-	DConnection(DNode* pParentNode, CONNECTION_TYPE connType, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE);
-	DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE);
+	DConnection(DNode* pParentNode, CONNECTION_TYPE connType, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 public:
 	~DConnection();
@@ -47,11 +49,12 @@ public:
 
 	RESULT RenderConnections(long frameID = 0);
 	RESULT RenderParent(long frameID = 0);
+	RESULT SetConnectionsDirty(long frameID = 0);
 
 	virtual RESULT LinkInputToOutputObjects(DConnection* pInputConnection, DConnection* pOutputConnection) = 0;
 
 	template <class objType>
-	static DConnection* MakeDConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
+	static DConnection* MakeDConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) {
 		
 		///*
 		RESULT r = R_PASS;
@@ -70,7 +73,7 @@ public:
 	}
 
 	template <class objType>
-	static DConnection* MakeDConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType **ppObject, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
+	static DConnection* MakeDConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType **ppObject, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) {
 
 		///*
 		RESULT r = R_PASS;
@@ -89,7 +92,7 @@ public:
 	}
 
 private:
-	DCONNECTION_FLAGS m_flags;
+	PIPELINE_FLAGS m_flags;
 	DNode* m_pParentNode = nullptr;
 	std::vector<DConnection*> m_connections;
 
@@ -102,7 +105,7 @@ template <class objType>
 class DConnectionTyped : public DConnection {
 public:
 
-	DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) :
+	DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) :
 		DConnection(pParentNode, strName, connType, optFlags),
 		m_pObject(pObject),
 		m_ppObject(nullptr)
@@ -110,7 +113,7 @@ public:
 		// empty
 	}
 
-	DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType **ppObject, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) :
+	DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType **ppObject, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) :
 		DConnection(pParentNode, strName, connType, optFlags),
 		m_pObject(nullptr),
 		m_ppObject(ppObject)

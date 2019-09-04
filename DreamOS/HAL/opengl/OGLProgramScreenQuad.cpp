@@ -8,8 +8,14 @@
 #include "OGLTexture.h"
 #include "OGLAttachment.h"
 
-OGLProgramScreenQuad::OGLProgramScreenQuad(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglscreenquad")
+OGLProgramScreenQuad::OGLProgramScreenQuad(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglscreenquad", optFlags)
+{
+	// empty
+}
+
+OGLProgramScreenQuad::OGLProgramScreenQuad(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, strName, optFlags)
 {
 	// empty
 }
@@ -31,8 +37,12 @@ RESULT OGLProgramScreenQuad::OGLInitialize() {
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformBackgroundColor), std::string("u_vec4BackgroundColor")));
 
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformWindowWidth), std::string("u_windowWidth")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformWindowHeight), std::string("u_windowHeight")));
+
 	m_pScreenQuad = new OGLQuad(m_pParentImp, 1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f)); // , nullptr, vNormal);
 	CN(m_pScreenQuad);
+	CR(m_pScreenQuad->OGLInitialize());
 
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 	//InitializeFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 4);
@@ -51,12 +61,50 @@ RESULT OGLProgramScreenQuad::OGLInitialize() {
 	CR(m_pOGLFramebuffer->SetSampleCount(1));
 
 	CR(m_pOGLFramebuffer->MakeColorAttachment());
-	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	//CR(m_pOGLFramebuffer->MakeDepthAttachment());
 	//CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
 	//*/
+
+	//CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
+
+	CRM(m_pOGLFramebuffer->CheckStatus(), "Frame buffer messed up");
+
+Error:
+	return r;
+}
+
+RESULT OGLProgramScreenQuad::OGLInitialize(version versionOGL) {
+	RESULT r = R_PASS;
+
+	CR(OGLInitialize());
+
+	m_versionOGL = versionOGL;
+
+	// Global
+	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
+	CRM(AddSharedShaderFilename(L"AACommon.shader"), "Failed to add global shared shader code");
+
+	// Vertex
+	CRM(MakeVertexShader(L"screenquad.vert"), "Failed to create vertex shader");
+
+	// Fragment
+	CRM(MakeFragmentShader(L"screenquad.frag"), "Failed to create fragment shader");
+
+	// Link the program
+	CRM(LinkProgram(), "Failed to link program");
+
+	WCR(GetVertexAttributesFromProgram());
+	WCR(BindAttributes());
+
+	// Uniform Variables
+	CR(GetUniformVariablesFromProgram());
+
+	// Uniform Blocks
+	CR(GetUniformBlocksFromProgram());
+	CR(BindUniformBlocks());
 
 Error:
 	return r;
@@ -80,11 +128,17 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 
 	UseProgram();
 
+	// Set up texture bindings
+	//m_pUniformColorTexture->SetUniform(0);
+	//m_pUniformColorTextureMS->SetUniform(1);
+
 	//glDisable(GL_CULL_FACE);
 
 	// Seems to be killing our texture
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 	UpdateFramebufferToCamera(m_pParentImp->GetCamera(), GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+
+	//CRM(m_pOGLFramebuffer->CheckStatus(), "Frame buffer messed up");
 
 	if (m_pOGLFramebuffer != nullptr) {
 		BindToFramebuffer(m_pOGLFramebuffer);
@@ -93,6 +147,13 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 	glDisable(GL_BLEND);
 
 	if (m_pOGLFramebufferInput != nullptr) {
+
+		if (m_pUniformWindowWidth != nullptr)
+			m_pUniformWindowWidth->SetUniform((float)m_pOGLFramebufferInput->GetWidth());
+
+		if (m_pUniformWindowHeight != nullptr)
+			m_pUniformWindowHeight->SetUniform((float)m_pOGLFramebufferInput->GetHeight());
+
 		int sampleCount = m_pOGLFramebufferInput->GetSampleCount();
 
 		if (sampleCount > 1) {
@@ -101,26 +162,37 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 			m_pUniformColorTextureMS_n->SetUniformInteger(sampleCount);
 
 			if (m_fRenderDepth) {
-				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
+				m_pParentImp->BindTexture(
+					m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), 
+					m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex()
+				);
 			}
 			else {
-				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex());
+				m_pParentImp->BindTexture(
+					m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), 
+					m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex()
+				);
 			}
 
-			m_pUniformColorTextureMS->SetUniform(1);
+			//m_pUniformColorTextureMS->SetUniform(1);
 			m_pFUniformTextureMS->SetUniform(true);
 		}
 		else {
 			m_pParentImp->glActiveTexture(GL_TEXTURE0);
-
+			
 			if (m_fRenderDepth) {
-				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
+				m_pParentImp->BindTexture(
+					m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), 
+					m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex()
+				);
 			}
 			else {
-				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex());
+				m_pParentImp->BindTexture(
+					m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), 
+					m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex()
+				);
 			}
-
-			m_pUniformColorTextureMS->SetUniform(0);
+			
 			m_pFUniformTextureMS->SetUniform(false);
 		}
 	}
@@ -129,7 +201,7 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 
 	UnbindFramebuffer();
 
-	//Error:
+Error:
 	return r;
 }
 

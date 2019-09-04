@@ -13,12 +13,13 @@
 
 #include <vector>
 
+#include "api/audio/echo_canceller3_config.h"
 #include "api/optional.h"
 #include "modules/audio_processing/aec3/decimator.h"
+#include "modules/audio_processing/aec3/delay_estimate.h"
 #include "modules/audio_processing/aec3/downsampled_render_buffer.h"
 #include "modules/audio_processing/aec3/matched_filter.h"
 #include "modules/audio_processing/aec3/matched_filter_lag_aggregator.h"
-#include "modules/audio_processing/include/audio_processing.h"
 #include "rtc_base/constructormagic.h"
 
 namespace webrtc {
@@ -32,11 +33,12 @@ class EchoPathDelayEstimator {
                          const EchoCanceller3Config& config);
   ~EchoPathDelayEstimator();
 
-  // Resets the estimation.
-  void Reset();
+  // Resets the estimation. If the soft-reset is specified, only  the matched
+  // filters are reset.
+  void Reset(bool soft_reset);
 
   // Produce a delay estimate if such is avaliable.
-  rtc::Optional<size_t> EstimateDelay(
+  rtc::Optional<DelayEstimate> EstimateDelay(
       const DownsampledRenderBuffer& render_buffer,
       rtc::ArrayView<const float> capture);
 
@@ -53,6 +55,8 @@ class EchoPathDelayEstimator {
   Decimator capture_decimator_;
   MatchedFilter matched_filter_;
   MatchedFilterLagAggregator matched_filter_lag_aggregator_;
+  rtc::Optional<DelayEstimate> old_aggregated_lag_;
+  size_t consistent_estimate_counter_ = 0;
 
   RTC_DISALLOW_COPY_AND_ASSIGN(EchoPathDelayEstimator);
 };

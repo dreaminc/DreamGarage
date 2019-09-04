@@ -7,7 +7,7 @@
 // DreamOS/PhysicsEngine/CollisionTestSuite.h
 // The Collision test suite
 
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 #include <functional>
 #include <memory>
@@ -16,12 +16,15 @@
 
 class DreamOS;
 
-class CollisionTestSuite : public TestSuite {
+class CollisionTestSuite : public DreamTestSuite {
 public:
 	CollisionTestSuite(DreamOS *pDreamOS);
-	~CollisionTestSuite();
+	~CollisionTestSuite() = default;
 
 	virtual RESULT AddTests() override;
+
+	virtual RESULT SetupPipeline(std::string strRenderShaderName = "standard") override;
+	virtual RESULT SetupTestSuite() override;  
 
 	RESULT AddTestRayModel();
 	RESULT AddTestScaledCompositeRay();
@@ -44,8 +47,11 @@ public:
 	RESULT AddTestQuadQuad();
 	//RESULT AddTestQuadOBB();
 
+	// OBB - OBB
+	RESULT AddTestOBBOBB();
 
-	// TODO: OBB - OBB
+	// Hysteresis
+	RESULT AddTestHysteresisObj();
 
 	// TODO: OBB - Sphere
 
@@ -62,11 +68,10 @@ public:
 	// AABB 
 
 private:
-	RESULT SetupSkyboxPipeline(std::string strRenderShaderName);
 	RESULT ResetTest(void *pContext);
 
 private:
-	DreamOS *m_pDreamOS;
+	DreamOS * m_pDreamOS = nullptr;
 	ObjectStoreNode *m_pSceneGraph = nullptr;
 };
 

@@ -28,6 +28,7 @@
 #include "OVRMirrorTexture.h"
 
 class OGLFramebuffer;
+class OVRPlatform;
 
 class OVRHMD : public HMD {
 	friend class OVRHMDSinkNode;
@@ -42,7 +43,7 @@ public:
 	virtual RESULT InitializeHMDSinkNode() override;
 
 	//RESULT InitializeHMD(HALImp *halimp);
-	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0) override;
+	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0, bool fHMDMirror = true) override;
 	virtual RESULT UpdateHMD() override;
 	virtual RESULT ReleaseHMD() override;
 
@@ -59,8 +60,21 @@ public:
 	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) override;
 	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) override;
 
+	virtual bool IsHMDTracked() override;
+
 	virtual composite *GetSenseControllerObject(ControllerType controllerType) override;
 	virtual HMDDeviceType GetDeviceType() override;
+	virtual bool IsARHMD() override;
+	virtual std::string GetDeviceTypeString() override;
+
+	virtual RESULT RecenterHMD() override;
+
+public:
+
+	RESULT ShutdownParentSandbox();
+
+	virtual RESULT GetAudioDeviceOutID(std::wstring &wstrAudioDeviceOutGUID) override;
+	virtual RESULT GetAudioDeviceInGUID(std::wstring &wstrAudioDeviceInGUID) override;
 
 protected:
 	inline const ovrSession &GetOVRSession() { return m_ovrSession; }
@@ -74,15 +88,17 @@ public:
 	ovrHmdDesc m_ovrHMDDescription;
 	std::vector<ovrTrackerDesc> m_TrackerDescriptions;
 
+	OVRPlatform* m_pOVRPlatform = nullptr;
+
 	// Mirror Texture (TODO: Move to separate sink node)
-	OVRMirrorTexture *m_ovrMirrorTexture;
+	OVRMirrorTexture *m_pOVRMirrorTexture = nullptr;
 	//OGLDepthbuffer *m_depthbuffers[HMD_NUM_EYES];		// TODO: Push this into the swap chain
 
 	quaternion qLeftRotation;
 	quaternion qRightRotation;
 
-	composite *m_pLeftControllerModel;
-	composite *m_pRightControllerModel;
+	composite *m_pLeftControllerModel = nullptr;
+	composite *m_pRightControllerModel = nullptr;
 
 private:
 	OVRHMDSinkNode *m_pOVRHMDSinkNode = nullptr;

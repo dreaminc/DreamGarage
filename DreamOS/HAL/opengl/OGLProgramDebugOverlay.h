@@ -16,7 +16,7 @@ class stereocamera;
 
 class OGLProgramDebugOverlay : public OGLProgramMinimal {
 public:
-	OGLProgramDebugOverlay(OpenGLImp *pParentImp);
+	OGLProgramDebugOverlay(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	virtual RESULT OGLInitialize() override;
 

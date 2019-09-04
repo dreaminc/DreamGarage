@@ -28,6 +28,7 @@ class VideoEncoderSoftwareFallbackWrapper : public VideoEncoder {
   VideoEncoderSoftwareFallbackWrapper(
       std::unique_ptr<webrtc::VideoEncoder> sw_encoder,
       std::unique_ptr<webrtc::VideoEncoder> hw_encoder);
+  ~VideoEncoderSoftwareFallbackWrapper() override;
 
   int32_t InitEncode(const VideoCodec* codec_settings,
                      int32_t number_of_cores,
@@ -41,7 +42,7 @@ class VideoEncoderSoftwareFallbackWrapper : public VideoEncoder {
                  const CodecSpecificInfo* codec_specific_info,
                  const std::vector<FrameType>* frame_types) override;
   int32_t SetChannelParameters(uint32_t packet_loss, int64_t rtt) override;
-  int32_t SetRateAllocation(const BitrateAllocation& bitrate_allocation,
+  int32_t SetRateAllocation(const VideoBitrateAllocation& bitrate_allocation,
                             uint32_t framerate) override;
   bool SupportsNativeHandle() const override;
   ScalingSettings GetScalingSettings() const override;
@@ -79,7 +80,7 @@ class VideoEncoderSoftwareFallbackWrapper : public VideoEncoder {
 
   // The last bitrate/framerate set, and a flag for noting they are set.
   bool rates_set_;
-  BitrateAllocation bitrate_allocation_;
+  VideoBitrateAllocation bitrate_allocation_;
   uint32_t framerate_;
 
   // The last channel parameters set, and a flag for noting they are set.

@@ -1,5 +1,8 @@
 #include "DreamBrowser.h"
-#include "DreamControlView/DreamControlView.h"
+//#include "DreamControlView/UIControlView.h"
+#include "DreamShareView/DreamShareView.h"
+#include "DreamUserControlArea/DreamUserControlArea.h"
+#include "DreamFormApp.h"
 #include "DreamOS.h"
 #include "Core/Utilities.h"
 
@@ -17,191 +20,14 @@
 #include "WebBrowser/DOMNode.h"
 #include "Sound/AudioPacket.h"
 
-RESULT DreamBrowserHandle::SetScope(std::string strScope) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(SetBrowserScope(strScope));
-Error:
-	return r;
-}
+#include "Core/Utilities.h"
 
-RESULT DreamBrowserHandle::ScrollTo(int pxXScroll, int pxYScroll) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ScrollBrowserToPoint(pxXScroll, pxYScroll));
-Error: 
-	return r;
-}
+#include "Sound/SoundBuffer.h"
+#include "HAL\opengl\OGLTexture.h"	// necessary for the dynamic cast to enable PBO
 
-RESULT DreamBrowserHandle::ScrollToX(int pxXScroll) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ScrollBrowserToX(pxXScroll));
-Error:
-	return r;
-}
+#include "Cloud/HTTP/HTTPCommon.h"
 
-RESULT DreamBrowserHandle::ScrollToY(int pyYScroll) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ScrollBrowserToY(pyYScroll));
-Error:
-	return r;
-}
-
-RESULT DreamBrowserHandle::ScrollByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ScrollBrowserByDiff(pxXDiff, pxYDiff, scrollPoint));
-Error:
-	return r;
-}
-
-RESULT DreamBrowserHandle::ScrollXByDiff(int pxXDiff) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ScrollBrowserXByDiff(pxXDiff));
-Error:
-	return r;
-}
-
-RESULT DreamBrowserHandle::ScrollYByDiff(int pxYDiff) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ScrollBrowserYByDiff(pxYDiff));
-Error:
-	return r;
-}
-
-RESULT DreamBrowserHandle::SetPath(std::string strPath) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(SetBrowserPath(strPath));
-
-Error:
-	return r;
-}
-
-RESULT DreamBrowserHandle::SendKeyCharacter(char chKey, bool fkeyDown) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(SendKeyPressed(chKey, fkeyDown));
-Error:
-	return r;
-}
-
-RESULT DreamBrowserHandle::SendURI(std::string strURI) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(SetURI(strURI));
-Error:
-	return r;
-}
-
-RESULT DreamBrowserHandle::SendMalletMoveEvent(WebBrowserPoint mousePoint) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(SendMouseMoveEvent(mousePoint));
-Error:
-	return r;
-}
-
-RESULT DreamBrowserHandle::SendBackEvent() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return HandleBackEvent();
-Error:
-	return r;
-}
-
-RESULT DreamBrowserHandle::SendForwardEvent() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return HandleForwardEvent();
-Error:
-	return r;
-}
-
-RESULT DreamBrowserHandle::SendStopEvent() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return HandleStopEvent();
-Error:
-	return r;
-}
-
-RESULT DreamBrowserHandle::SendContactToBrowserAtPoint(WebBrowserPoint ptContact, bool fMouseDown) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ClickBrowser(ptContact, fMouseDown));
-Error:
-	return r;
-}
-
-int DreamBrowserHandle::GetScrollPixelsX() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return GetScrollX();
-Error:
-	return -1;
-}
-
-int DreamBrowserHandle::GetScrollPixelsY() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return GetScrollY();
-Error:
-	return -1;
-}
-
-// TODO bring through CEF
-int DreamBrowserHandle::GetPageHeightFromBrowser() {	
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return GetPageHeight();
-Error:
-	return -1;
-}
-
-int DreamBrowserHandle::GetPageWidthFromBrowser() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return GetPageWidth();
-Error:
-	return -1;
-}
-
-int DreamBrowserHandle::GetWidthOfBrowser() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return GetBrowserWidth();
-Error:
-	return -1;
-}
-
-int DreamBrowserHandle::GetHeightOfBrowser() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return GetBrowserHeight();
-Error:
-	return -1;
-}
-
-float DreamBrowserHandle::GetAspectRatioFromBrowser() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return GetAspectRatio();
-Error:
-	return -1;
-}
-
-RESULT DreamBrowserHandle::RequestBeginStream() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(BeginStream());
-Error:
-	return r;
-}
+#include <thread>
 
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamBrowser>(pDreamOS, pContext)
@@ -210,28 +36,37 @@ DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 }
 
 DreamBrowser::~DreamBrowser(){
+	/*
 	RESULT r = R_PASS;
 
 	CR(Shutdown());
 
 Error:
 	return;
+	//*/
 }
 
 RESULT DreamBrowser::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
+	m_soundState = sound::state::STOPPED;
+
+	// Join thread
+	if (m_browserAudioProcessingThread.joinable()) {
+		m_browserAudioProcessingThread.join();
+	}
+
+	/*
 	if (m_pWebBrowserManager != nullptr) {
-		CR(m_pWebBrowserManager->Shutdown());
+		m_pWebBrowserManager->Shutdown();
 		//m_pWebBrowserManager = nullptr;
 	}
+	//*/
+
+	CRM(TeardownAudioBusSoundBuffers(), "Failed to tear down browser audio bus sound buffers");
 
 Error:
 	return r;
-}
-
-DreamAppHandle* DreamBrowser::GetAppHandle() {
-	return (DreamBrowserHandle*)(this);
 }
 
 RESULT DreamBrowser::ScrollBrowserToPoint(int pxXScroll, int pxYScroll) {
@@ -317,18 +152,30 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::ScrollBrowserByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) {
+RESULT DreamBrowser::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) {
 	RESULT r = R_PASS;
 	
 	CNR(m_pWebBrowserController, R_SKIPPED);
 
-	WebBrowserMouseEvent mouseEvent;
-	mouseEvent.pt = scrollPoint;
+	WebBrowserPoint ptWebContact;
+	ptWebContact.x = (int)(scrollPoint.x());
+	ptWebContact.y = (int)(scrollPoint.y());
 
-	m_pxXPosition += pxXDiff;
-	m_pxYPosition += pxYDiff;
+	m_mouseScrollEvent.pt = ptWebContact;
 
-	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, pxXDiff, pxYDiff));
+	if (abs(pxXDiff) > abs(pxYDiff)) {
+		pxYDiff = 0.0f;
+	}
+	else {
+		pxXDiff = 0.0f;
+	}
+
+	m_pxXPosition += (int)pxXDiff;
+	m_pxYPosition += (int)pxYDiff;
+	
+	m_pxXScroll += pxXDiff;
+	m_pxYScroll += pxYDiff;
+	//CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, (int)pxXDiff, (int)pxYDiff));
 
 Error:
 	return r;
@@ -390,50 +237,59 @@ int DreamBrowser::GetBrowserWidth() {
 	return m_browserWidth;
 }
 
-RESULT DreamBrowser::SendKeyPressed(char chKey, bool fkeyDown) {
+RESULT DreamBrowser::OnKeyPress(char chKey, bool fkeyDown) {
 	RESULT r = R_PASS;
+	CBR(chKey != SVK_SHIFT, R_SKIPPED);		// don't send these key codes to browser (capital letters and such have different values already)
+	CBR(chKey != 0, R_SKIPPED);
+	CBR(chKey != SVK_CONTROL, R_SKIPPED);
+
 	CNR(m_pWebBrowserController, R_SKIPPED);
 	CR(m_pWebBrowserController->SendKeyEventChar(chKey, fkeyDown));
+
 Error:
 	return r;
 }
 
-RESULT DreamBrowser::SendURL(std::string strURL) {
+RESULT DreamBrowser::CreateBrowserSource(std::string strURL) {
 	RESULT r = R_PASS;
 
 //	SetVisible(true);
 
 	std::string strTitle = "website";
-	SetBrowserPath(strURL);
+	SetPath(strURL);
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-	CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, m_strPath, strTitle), "Failed to share environment asset");
+	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(m_strScope, m_strPath, strTitle), "Failed to share environment asset");
 
 Error:
 	return r;
 }
 
-RESULT DreamBrowser::SendMouseMoveEvent(WebBrowserPoint mousePoint) {
+RESULT DreamBrowser::OnMouseMove(point mousePoint) {
 	RESULT r = R_PASS;
 
-	WebBrowserMouseEvent mouseEvent;
-	mouseEvent.pt.x = mousePoint.x;
-	mouseEvent.pt.y = mousePoint.y;
+	m_mouseDragEvent.pt.x = (int)mousePoint.x();
+	m_mouseDragEvent.pt.y = (int)mousePoint.y();
 
-	CR(m_pWebBrowserController->SendMouseMove(mouseEvent));
+	m_fUpdateDrag = true;
+
 Error:
 	return r;
 }
 
-RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact, bool fMouseDown) {
+RESULT DreamBrowser::OnClick(point ptContact, bool fMouseDown) {
 	RESULT r = R_PASS;
 
 	CNR(m_pWebBrowserController, R_SKIPPED);
 	WebBrowserMouseEvent mouseEvent;
 
-	mouseEvent.pt = ptContact;
-	m_lastWebBrowserPoint = ptContact;
+	WebBrowserPoint ptWebContact;
+	ptWebContact.x = (int)(ptContact.x());
+	ptWebContact.y = (int)(ptContact.y());
+
+	mouseEvent.pt = ptWebContact;
+	m_lastWebBrowserPoint = ptWebContact;
 
 	mouseEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
 	
@@ -443,51 +299,22 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
+RESULT DreamBrowser::OnAfterCreated() {
 	RESULT r = R_PASS;
 
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
-
-	if (!fLoading) {
-		m_strCurrentURL = strCurrentURL;
-		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-
-		CN(pDreamControlViewHandle);
-
-		//pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
-		if (m_strCurrentURL != "") {
-			pDreamControlViewHandle->SendURLText(m_strCurrentURL);
-		}
-
-	}
-
-Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
 	return r;
 }
 
-RESULT DreamBrowser::FadeQuadToBlack() {
+RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
-	//Fade to black
-	auto fnEndCallback = [&](void *pContext) {
-		RESULT r = R_PASS;
-		//m_pBrowserQuad->SetVisible(false);
-		return r;
-	};
+	if (!fLoading) {
+		m_strCurrentURL = strCurrentURL;
+		
+		CR(m_pWebBrowserController->IsInputFocused());
 
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pBrowserQuad.get(),
-		color(0.0f, 0.0f, 0.0f, 1.0f),
-		0.1f,
-		AnimationCurveType::LINEAR,
-		AnimationFlags(),
-		nullptr,
-		fnEndCallback,
-		this
-	));
+		m_fUpdateControlBarInfo = true;
+	}
 
 Error:
 	return r;
@@ -495,56 +322,35 @@ Error:
 
 RESULT DreamBrowser::OnLoadStart() {
 	RESULT r = R_PASS;	
+
+	return r;
+}
+
+RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
+	RESULT r = R_PASS;
 	
-	if (m_fShouldBeginStream) {
-		CR(BeginStream());
-	} 
-	else {
-		m_fShouldBeginStream = true;
+	//m_strCurrentURL = strCurrentURL;
+
+	if (m_pObserver != nullptr && httpStatusCode == (int)HTTPStatusCode::OK) {
+		CR(m_pObserver->HandleLoadEnd());
+	//	m_fUpdateControlBarInfo = true;
 	}
 
 Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
+RESULT DreamBrowser::OnLoadError(int errorCode, std::string strError, std::string strFailedURL) {
 	RESULT r = R_PASS;
 
-	auto fnStartCallback = [&](void *pContext) {
-		RESULT r = R_PASS;
-		DreamControlViewHandle *pDreamControlViewHandle = nullptr;
-
-		if (strCurrentURL != "about:blank") {
-			m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+	// currently our handling of OnCertificateError causes an abort(-3)
+	// that error isn't handled here so the privacy message isn't overriden
+	if (m_pObserver != nullptr) {
+		CN(m_pWebBrowserController);
+		if (errorCode != -3 && m_pWebBrowserController->CheckIsError(errorCode)) {
+			CR(m_pWebBrowserController->ReplaceURL(m_pObserver->GetLoadErrorURL()));
 		}
-
-		m_strCurrentURL = strCurrentURL;
-		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-		CN(pDreamControlViewHandle);
-
-		pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
-
-#ifndef _USE_TEST_APP
-		m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
-#endif
-
-	Error:
-		if (pDreamControlViewHandle != nullptr) {
-			GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-		}
-		return r;
-	};
-
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pBrowserQuad.get(),
-		color(1.0f, 1.0f, 1.0f, 1.0f),
-		0.1f,
-		AnimationCurveType::LINEAR,
-		AnimationFlags(),
-		fnStartCallback,
-		nullptr,
-		this
-	));
+	}
 
 Error:
 	return r;
@@ -553,43 +359,31 @@ Error:
 RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
-	bool fMaskPasswordEnabled = false;
-	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
-		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-		CN(pDreamControlViewHandle);
+	if (m_pObserver != nullptr) {
+		CR(m_pObserver->HandleNodeFocusChanged(pDOMNode, this));
+	}
 
-		if (pDreamControlViewHandle->IsAppVisible()) {
-			std::string strTextField = pDOMNode->GetValue();
-			point ptTextBox = point(0.0f, m_lastWebBrowserPoint.y, 0.0f);
-			CR(pDreamControlViewHandle->HandleKeyboardUp(strTextField, ptTextBox));
+	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
+		if (m_pWebBrowserController != nullptr) {
+			CR(m_pWebBrowserController->CanTabNext());
+			CR(m_pWebBrowserController->CanTabPrevious());
 		}
-		fMaskPasswordEnabled = pDOMNode->IsPassword();
 	}
-
-	auto pKeyboardHandle = m_pDreamUserHandle->RequestKeyboard();
-	if (pKeyboardHandle != nullptr) {
-		pKeyboardHandle->SendPasswordFlag(fMaskPasswordEnabled);
-	}
-	m_pDreamUserHandle->SendReleaseKeyboard();
-	pKeyboardHandle = nullptr;
-
-#ifdef _USE_TEST_APP
-	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
-		DEBUG_LINEOUT("editable!");
-		m_pPointerCursor->SetVisible(false);
-	}
-	else {
-		DEBUG_LINEOUT("non editable!");
-		m_pPointerCursor->SetVisible(true);
-	}
-#endif
 
 Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
 	return r;
+}
+
+bool DreamBrowser::OnCertificateError(std::string strURL, unsigned int certError) {
+	RESULT r = R_PASS;
+
+	CN(m_pObserver);
+	CR(SetURI(m_pObserver->GetCertificateErrorURL()));
+
+	// return true here if the page should load (and execute callback->Continue(true) in CEFHandler::OnCertificateError)
+	return false;
+Error:
+	return false;
 }
 
 RESULT DreamBrowser::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, std::string strURL) {
@@ -608,6 +402,113 @@ RESULT DreamBrowser::GetResourceHandlerType(ResourceHandlerType &resourceHandler
 		resourceHandlerType = ResourceHandlerType::DEFAULT;
 	}
 
+	return r;
+}
+
+RESULT DreamBrowser::CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) {
+	RESULT r = R_PASS;
+
+	std::map<std::string, std::multimap<std::string, std::string>>::iterator it;
+
+	if (!m_headermap.empty()) {
+		it = m_headermap.find(strURL);
+		if (it != m_headermap.end()) {
+			headermap = it->second;
+		}
+	}
+
+	if (GetDOS()->GetCloudController() != nullptr) {
+		auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
+		if (pUserController != nullptr && pUserController->IsLoggedIn()) {
+			// make a copy of strURL
+			std::string strLowercaseURL = strURL;
+			util::tolowerstring(strLowercaseURL);
+
+			for (std::string& strAuthURL : m_authenticatedURLs) {
+				if (strLowercaseURL.find(strAuthURL) == 0) {
+					std::string strAccessToken = pUserController->GetSavedAccessToken();
+					std::string strFirst = "Authorization";
+					std::string strSecond = "Bearer " + strAccessToken;
+					headermap.insert(std::pair<std::string, std::string>(strFirst, strSecond));
+				}
+			}
+		}
+	}
+	
+
+	return r;
+}
+
+RESULT DreamBrowser::HandleDreamFormSuccess() {
+	RESULT r = R_PASS;
+
+	CNR(m_pObserver, R_SKIPPED);
+	CR(m_pObserver->HandleDreamFormSuccess());
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::HandleDreamFormCancel() {
+	RESULT r = R_PASS;
+
+	CNR(m_pObserver, R_SKIPPED);
+	CR(m_pObserver->HandleDreamFormCancel());
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	CNR(m_pObserver, R_SKIPPED);
+	CR(m_pObserver->HandleDreamFormSetCredentials(strRefreshToken, strAccessToken));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::HandleDreamFormSetEnvironmentId(int environmentId) {
+	RESULT r = R_PASS;
+
+	CNR(m_pObserver, R_SKIPPED);
+	CR(m_pObserver->HandleDreamFormSetEnvironmentId(environmentId));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::HandleIsInputFocused(bool fInputFocused) {
+	RESULT r = R_PASS;
+
+	CNR(m_pObserver, R_SKIPPED);
+
+	CR(m_pObserver->HandleIsInputFocused(fInputFocused, this));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::HandleCanTabNext(bool fCanNext) {
+	RESULT r = R_PASS;
+
+	CNR(m_pObserver, R_SKIPPED);
+	CR(m_pObserver->HandleCanTabNext(fCanNext));
+
+Error:
+	return r;
+
+}
+
+RESULT DreamBrowser::HandleCanTabPrevious(bool fCanPrevious) {
+	RESULT r = R_PASS;
+
+	CNR(m_pObserver, R_SKIPPED);
+	CR(m_pObserver->HandleCanTabPrevious(fCanPrevious));
+
+Error:
 	return r;
 }
 
@@ -634,14 +535,26 @@ Error:
 RESULT DreamBrowser::HandleStopEvent() {
 	RESULT r = R_PASS;
 
-	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-
-	CR(m_pEnvironmentControllerProxy->RequestStopSharing(m_currentEnvironmentAssetID, m_strScope, m_strPath));
-	CR(SetStreamingState(false));
-
-Error:
 	return r;
+}
+
+RESULT DreamBrowser::SetForceObserverAudio(bool fForceObserverAudio) {
+	
+	m_fForceObserverAudio = fForceObserverAudio;
+
+	return R_PASS;
+}
+
+RESULT DreamBrowser::HandleTabEvent() {
+	return m_pWebBrowserController->TabNext();
+}
+
+RESULT DreamBrowser::HandleBackTabEvent() {
+	return m_pWebBrowserController->TabPrevious();
+}
+
+RESULT DreamBrowser::HandleUnfocusEvent() {
+	return m_pWebBrowserController->UnfocusInput();
 }
 
 // DreamApp Interface
@@ -658,7 +571,11 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
-	SetAppName(DREAM_BROWSER_APP_NAME);
+	m_pLoadBuffer_n = pxWidth * pxHeight * 4 * sizeof(unsigned char);
+	m_pLoadBuffer = (unsigned char*)malloc(m_pLoadBuffer_n);
+	CNM(m_pLoadBuffer, "Failed to allocate DreamBrowser buffer");
+
+	SetAppName("DreamBrowser");
 	SetAppDescription("A Shared Content View");
 
 	// TODO: may want browser to have its own shader at some point, but 
@@ -666,10 +583,6 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	//
 //	GetDOS()->AddObjectToUIGraph(GetComposite());	
 
-	// Set up browser manager
-	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
-	CN(m_pWebBrowserManager);
-	CR(m_pWebBrowserManager->Initialize());
 /*
 	// Get loading screen URL
 	pCommandLineManager = CommandLineManager::instance();
@@ -685,94 +598,22 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 */
 	// Set up the quad
 	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
-	m_pBrowserQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
-	CN(m_pBrowserQuad);
-
-	
-	// Flip UV vertically
-	///*
-	m_pBrowserQuad->FlipUVVertical();
-	//*/
-
-	// attempt to give the browser a matte appearance
-	m_pBrowserQuad->SetMaterialAmbient(0.9f);
-
-	GetComposite()->SetMaterialShininess(0.0f, true);
-	GetComposite()->SetMaterialSpecularColor(color(0.0f, 0.0f, 0.0f, 1.0f), true);
-
 
 	// Set up and map the texture
-	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
-	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	CN(m_pLoadingScreenTexture);
+	m_pBrowserTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);
+	
+	CR(dynamic_cast<OGLTexture*>(m_pBrowserTexture.get())->EnableOGLPBOUnpack());
+	CR(dynamic_cast<OGLTexture*>(m_pBrowserTexture.get())->EnableOGLPBOPack());
 
-#ifndef _USE_TEST_APP
-	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
-#else
-	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
-#endif
+	m_pLoadingScreenTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, (wchar_t*)(L"client-loading-1366-768.png"));
+	CN(m_pLoadingScreenTexture);
+	//m_pBrowserTexture = m_pLoadingScreenTexture;
 
 	// Set up mouse / hand cursor model
 	///*
 	GetComposite()->InitializeOBB();
 	
-#ifdef _USE_TEST_APP
-	// Test code
-	
-	/*
-	m_pTestSphereAbsolute = GetDOS()->AddSphere(0.025f, 10, 10);
-	m_pTestSphereAbsolute->SetColor(COLOR_RED);
-	
-	m_pTestSphereRelative = GetComposite()->AddSphere(0.025f, 10, 10);
-	m_pTestSphereRelative->SetColor(COLOR_RED);
-	//*/
-
-	m_pTestQuad = GetComposite()->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f));
-	CN(m_pTestQuad);
-	m_pTestQuad->translateX(GetWidth() + 0.5f + 0.1f);
-
-	m_pPointerCursor = GetComposite()->AddModel(L"\\mouse-cursor\\mouse-cursor.obj");
-	CN(m_pPointerCursor);
-
-	m_pPointerCursor->SetPivotPoint(point(-0.2f, -0.43f, 0.0f));
-	m_pPointerCursor->SetScale(0.01f);
-	m_pPointerCursor->SetOrientationOffset(vector((float)M_PI_2, 0.0f, 0.0f));
-	m_pPointerCursor->SetMaterialAmbient(1.0f);
-	m_pPointerCursor->SetVisible(false);
-
-	GetDOS()->AddObjectToInteractionGraph(GetComposite());
-
-	// Subscribers (children)
-	/*
-	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_BEGAN, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_MOVED, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_ENDED, this));
-
-	// Mouse related
-	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_SELECT_DOWN, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_SELECT_UP, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_WHEEL, this));
-	*/
-
-	/*
-	// Test
-	CR(GetDOS()->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_INTERSECT_BEGAN, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_INTERSECT_MOVED, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_INTERSECT_ENDED, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pTestQuad.get(), INTERACTION_EVENT_SELECT_DOWN, this));
-	*/
-
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_ENDED, this));
-
-	// Mouse related
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_SELECT_DOWN, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_SELECT_UP, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_WHEEL, this));
-#endif
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_KEY_UP, this));
+	m_tLastUpdate = std::chrono::high_resolution_clock::now();
 
 Error:
 	return r;
@@ -789,7 +630,25 @@ Error:
 
 RESULT DreamBrowser::Update(void *pContext) {
 	RESULT r = R_PASS;
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+
+	auto tCurrent = std::chrono::high_resolution_clock::now();
+	double msCurrent = std::chrono::duration_cast<std::chrono::milliseconds>(tCurrent - m_tLastUpdate).count();
+
+	if (msCurrent > m_msTimeBetweenUpdates) {
+		if (m_pxXScroll != 0 || m_pxYScroll != 0) {
+			CR(m_pWebBrowserController->SendMouseWheel(m_mouseScrollEvent, m_pxXScroll, m_pxYScroll));
+
+			m_pxXScroll = 0;
+			m_pxYScroll = 0;
+
+			m_tLastUpdate = tCurrent;
+		}
+
+		if (m_fUpdateDrag) {
+			CR(m_pWebBrowserController->SendMouseMove(m_mouseDragEvent));
+			m_fUpdateDrag = false;
+		}
+	}
 
 	if (m_pWebBrowserManager != nullptr) {
 		CR(m_pWebBrowserManager->Update());
@@ -798,237 +657,520 @@ RESULT DreamBrowser::Update(void *pContext) {
 		SetVisible(false);
 	}
 
-	if (m_fReceivingStream && m_pendingFrame.fPending) {
-		CRM(UpdateFromPendingVideoFrame(), "Failed to update pending frame");
+	if (ShouldUpdateObjectTextures()) {
+		CR(UpdateObjectTextures());
 	}
 
-	if (m_pDreamUserHandle == nullptr) {
-		auto pDreamOS = GetDOS();
-		CNR(pDreamOS, R_OBJECT_NOT_FOUND);
-		auto userAppIDs = pDreamOS->GetAppUID("DreamUserApp");
-		CBR(userAppIDs.size() == 1, R_OBJECT_NOT_FOUND);
-		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
+	if (m_fUpdateControlBarInfo) {
+		if (m_pWebBrowserController != nullptr) {
+			CR(UpdateNavigationFlags());
+		}
+		if (m_pObserver != nullptr) {
+			std::string strOrigin;
+			m_pWebBrowserController->ParseURL(m_strCurrentURL, strOrigin);
+			m_pObserver->UpdateAddressBarText(strOrigin);
+		}
+		m_fUpdateControlBarInfo = false;
 	}
-	//*
-	if (m_fShowControlView) {
-		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-		CN(pDreamControlViewHandle);
-
-		CR(pDreamControlViewHandle->ShowApp());
-		pDreamControlViewHandle->SendContentType(m_strContentType);
-		m_fShowControlView = false;
-
-		m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
-		m_pBrowserQuad->SetVisible(true);
-
+	
+	// Really strange, we need to send 8 frames for the share to go through? As in OnVideoFrame isn't called on the receiver side until the 4th one is sent
+	if (m_fSendFrame && m_fFirstFrameIsReady) {
+		double msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+		if (msTimeNow - m_msTimeLastSent > m_msTimeBetweenSends) {
+			if (m_sentFrames < 8) {
+				CR(m_pWebBrowserController->PollFrame());
+				m_sentFrames++;
+			}
+			else {
+				m_fSendFrame = false;
+				m_sentFrames = 0;
+			}
+			m_msTimeLastSent = msTimeNow;
+		}
 	}
-	//*/
+	
 Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
 	return r;
 }
 
-WebBrowserPoint DreamBrowser::GetRelativeBrowserPointFromContact(point ptIntersectionContact) {
-	WebBrowserPoint webPt;
+RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL) {
+	RESULT r = R_PASS;
 
-	ptIntersectionContact.w() = 1.0f;
+	int pxWidth = m_browserWidth;
+	int pxHeight = m_browserHeight;
+	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
 
-	// First apply transforms to the ptIntersectionContact 
-	point ptAdjustedContact = inverse(m_pBrowserQuad->GetModelMatrix()) * ptIntersectionContact;
+	CNR(pWebBrowserManager, R_SKIPPED);
+	CNM(m_pWebBrowserManager == nullptr, "Manager already created");
+	m_pWebBrowserManager = pWebBrowserManager;
+
+	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
+	m_pWebBrowserManager->UpdateJobProcesses();
+	CN(m_pWebBrowserController);
+	CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
+
+	// Set up the audio system (captures audio from browser, pushes it into a buffer)
+	CRM(InitializeDreamBrowserSoundSystem(), "Failed to initialize sound system for browser");
+
+Error:
+	return r;
+}
+
+texture* DreamBrowser::GetSourceTexture() {
+	return m_pBrowserTexture.get();
+}
+
+long DreamBrowser::GetCurrentAssetID() {
+	return m_assetID;
+}
+
+RESULT DreamBrowser::SetCurrentAssetID(long assetID) {
+	m_assetID = assetID;
+	return R_PASS;
+}
+
+RESULT DreamBrowser::CloseSource() {
+	RESULT r = R_PASS;
+
+	CNR(m_pWebBrowserController, R_SKIPPED);
+	CNR(m_pWebBrowserManager, R_SKIPPED);
+	CR(m_pWebBrowserController->CloseBrowser());
+	CR(m_pWebBrowserManager->RemoveBrowser(m_pWebBrowserController));
 	
-	//m_pTestSphereRelative->SetPosition(ptAdjustedContact);
+Error:
+	return r;
+}
 
-	float width = GetWidth();
-	float height = GetHeight();
+RESULT DreamBrowser::SendFirstFrame() {
+	RESULT r = R_PASS;
+	
+	// This'll send an OnPaint which will refresh the frame and broadcast it
+	m_fSendFrame = true;
 
-	float posX = ptAdjustedContact.x();
-	float posY = ptAdjustedContact.y();
-	float posZ = ptAdjustedContact.z();
+Error:
+	return r;
+}
 
-	// TODO: This is a bit of a hack, should be a better way (this won't account for the quad normal, only orientation
-	// so it might get confused - technically this should never actually happen otherwise since we can force a dimension
-	if (std::abs(posZ) > std::abs(posY)) {
-		posY = posZ;
+RESULT DreamBrowser::PendUpdateObjectTextures() {
+	m_fUpdateObjectTextures = true;
+	return R_PASS;
+}
+
+bool DreamBrowser::ShouldUpdateObjectTextures() {
+	return m_fUpdateObjectTextures;
+}
+
+RESULT DreamBrowser::UpdateObjectTextures() {
+	RESULT r = R_PASS;
+
+	if (m_pObserver != nullptr) {
+		std::shared_ptr<DreamContentSource> pContentSource = std::dynamic_pointer_cast<DreamContentSource>(GetDOS()->GetDreamAppFromUID(GetAppUID()));
+		CNM(pContentSource, "Failed getting Browser as a content source");
+		CR(m_pObserver->UpdateContentSourceTexture(m_pBrowserTexture.get(), pContentSource));
 	}
 
-	posX /= width / 2.0f;
-	posY /= height / 2.0f;
+	m_fUpdateObjectTextures = false;
 
-	posX = (posX + 1.0f) / 2.0f;
-	posY = (posY + 1.0f) / 2.0f;  // flip it
+Error:
+	return r;
+}
 
-	// TODO: push into WebBrowserController
-	webPt.x = posX * 1366;
-	webPt.y = 768 - (posY * 768);
+RESULT DreamBrowser::UpdateNavigationFlags() {
+	RESULT r = R_PASS;
 
-	//ptAdjustedContact.Print("adj");
-	//DEBUG_LINEOUT("%d %d", webPt.x, webPt.y);
+	if (m_pWebBrowserController != nullptr) {
+		bool fCanGoBack = m_pWebBrowserController->CanGoBack();
+		bool fCanGoForward = m_pWebBrowserController->CanGoForward();
 
-	return webPt;
+		if (m_pObserver != nullptr) {
+			CR(m_pObserver->UpdateControlBarNavigation(fCanGoBack, fCanGoForward));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::RegisterObserver(DreamBrowserObserver *pObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pObserver), "Observer cannot be nullptr");
+	CBM((m_pObserver == nullptr), "Can't overwrite browser observer");
+
+	PendUpdateObjectTextures();
+	m_pObserver = pObserver;
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::UnregisterObserver(DreamBrowserObserver *pObserver) {
+	RESULT r = R_PASS;
+
+	CN(pObserver);
+	CBM((m_pObserver == pObserver), "Browser Observer is not set to this object");
+
+	m_pObserver = nullptr;
+
+Error:
+	return r;
 }
 
 // TODO: Only update the rect
 // TODO: Turn off CEF when we're not using it
-RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
+RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height, WebBrowserController::PAINT_ELEMENT_TYPE type, WebBrowserRect rect) {
 	RESULT r = R_PASS;
 
-	if (m_fReceivingStream == false) {
-		CN(m_pBrowserTexture);
+	m_fFirstFrameIsReady = true;
 
+	if (m_pBrowserTexture == nullptr) {
+		DOSLOG(INFO, "browser texture not initialized");
+	}
+
+	CNR(m_pBrowserTexture, R_SKIPPED);
+
+	if (type == WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW && (m_browserHeight != height || m_browserWidth != width)) {
 		// Update texture dimensions if needed
 		CR(m_pBrowserTexture->UpdateDimensions(width, height));
 		if (r != R_NOT_HANDLED) {
 			DEBUG_LINEOUT("Changed chrome texture dimensions");
 		}
+	}
 
-		CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
+	if (type == WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW) {
+		m_pBrowserTexture->UpdateTextureFromBuffer((unsigned char*)pBuffer, width * height * 4);
+	}
+	else if (type == WebBrowserController::PAINT_ELEMENT_TYPE::PET_POPUP && rect.width > 0 && rect.height > 0) {	// not sure why that check is necessary but better safe than sorry?
 
-		if (IsStreaming()) {
-			CR(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
+		// bounds checking and adjusting
+		int x = rect.pt.x;
+		int y = rect.pt.y;
+
+		if (x < 0) {
+			x = 0;
+		}
+		if (y < 0) {
+			y = 0;
+		}
+
+		if (x + rect.width > m_pBrowserTexture->GetWidth()) {
+			rect.width -= x + rect.width - m_pBrowserTexture->GetWidth();
+		}
+		if (y + rect.height > m_pBrowserTexture->GetHeight()) {
+			rect.height -= y + rect.height - m_pBrowserTexture->GetHeight();
+		}
+
+		//DOSLOG(INFO, "x: %d, y: %d, width: %d, height: %d", x, y, width, height);
+		m_pBrowserTexture->UpdateTextureRegionFromBuffer((unsigned char*)pBuffer, x, y, width, height);
+	}
+
+	// When the browser gets a paint event, it checks if its texture is currently shared
+	// if so, it tells the shared view to broadcast a frame
+	// This check never fails, as long as ShareView has been initialized
+	CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);
+
+	if ((GetSourceTexture() == GetDOS()->GetSharedCameraTexture()) || (GetSourceTexture() == GetDOS()->GetSharedContentTexture())) {
+		m_pBrowserTexture->LoadBufferFromTexture(m_pLoadBuffer, m_pLoadBuffer_n);
+	}
+
+	if (GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
+		GetDOS()->BroadcastSharedVideoFrame(m_pLoadBuffer, m_browserWidth, m_browserHeight);
+	}
+	if (GetSourceTexture() == GetDOS()->GetSharedCameraTexture()) {
+		// TODO: does VCam need to do the same kind of texture updates that ShareView does?
+		GetDOS()->GetCloudController()->BroadcastVideoFrame(kVCamVideoLabel, m_pLoadBuffer, m_browserWidth, m_browserHeight, 4);
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::InitializeDreamBrowserSoundSystem() {
+	RESULT r = R_PASS;
+
+	int numChannels = 2;
+	int samplingRate = 48000;
+	sound::type bufferType = sound::type::SIGNED_16_BIT;
+
+	//// Set up the render Sound buffer
+	//CRM(InitializeRenderSoundBuffer(numChannels, samplingRate, bufferType),
+	//	"Failed to initialize dream browser render sound buffer");
+
+	m_soundState = sound::state::RUNNING;
+	m_browserAudioProcessingThread = std::thread(&DreamBrowser::AudioProcess, this);
+
+Error:
+	return r;
+}
+
+/*
+RESULT DreamBrowser::InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType) {
+	RESULT r = R_PASS;
+
+	CB((m_pRenderSoundBuffer == nullptr));
+
+	m_pRenderSoundBuffer = SoundBuffer::Make(numChannels, samplingRate, bufferType);
+	CN(m_pRenderSoundBuffer);
+
+	DEBUG_LINEOUT("Initialized Dream Browser Render Sound Buffer %d channels type: %s", numChannels, SoundBuffer::TypeString(bufferType));
+
+Error:
+	return r;
+}
+*/
+
+RESULT DreamBrowser::TeardownAudioBusSoundBuffers() {
+	RESULT r = R_PASS;
+
+	for (auto &pRenderBus : m_renderAudioBuses) {
+		if (pRenderBus.second != nullptr) {
+			delete pRenderBus.second;
+			pRenderBus.second = nullptr;
+		}
+	}
+
+	m_renderAudioBuses.clear();
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::InitializeNewRenderBusSoundBuffer(const AudioPacket& pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	SoundBuffer *pRenderSoundBuffer = nullptr;
+
+	int audioStreamID = pendingAudioPacket.GetAudioStreamID(); 
+	int numChannels = pendingAudioPacket.GetNumChannels(); 
+	int samplingRate = pendingAudioPacket.GetSamplingRate();
+	sound::type bufferType = sound::type::SIGNED_16_BIT;	// T
+
+	CBM((m_renderAudioBuses.find(audioStreamID) == m_renderAudioBuses.end()), "Audio Bus %d already set up in browser", audioStreamID);
+
+	//pRenderSoundBuffer = SoundBuffer::Make(numChannels, samplingRate, bufferType);
+	// TODO: Sampling rate currently hard coded to 48000
+	pRenderSoundBuffer = SoundBuffer::Make(numChannels, m_defaultBrowserSamplingRate, bufferType);
+	CN(pRenderSoundBuffer);
+
+	m_renderAudioBuses[audioStreamID] = pRenderSoundBuffer;
+
+	DEBUG_LINEOUT("Initialized new Dream Browser Bus ID: %d Render Sound Buffer %d channels type: %s", 
+		audioStreamID, numChannels, SoundBuffer::TypeString(bufferType));
+
+Error:
+	return r;
+}
+
+int DreamBrowser::GetPendingAudioFrames() {
+	int maxPendingFrames = 0;
+	int pendingFrames = 0;
+
+	for (auto &pSoundBuffer : m_renderAudioBuses) {
+		if ((pendingFrames = pSoundBuffer.second->NumPendingFrames()) > maxPendingFrames) {
+			maxPendingFrames = pendingFrames;
+		}
+	}
+
+	return maxPendingFrames;
+}
+
+AudioPacket DreamBrowser::GetPendingRenderAudioPacket(int numFrames) {
+	RESULT r = R_PASS;
+	
+	// Create a sink audio packet to mix into
+
+	int numChannels = 2;
+	int samplingRate = m_defaultBrowserSamplingRate;
+
+	size_t pDataBuffer_n = numFrames * sizeof(int16_t) * numChannels;
+	int16_t *pDataBuffer = (int16_t*)malloc(pDataBuffer_n);
+	memset(pDataBuffer, 0, pDataBuffer_n);
+
+	AudioPacket pendingAudioPacket(numFrames, numChannels, sizeof(int16_t), samplingRate, sound::type::SIGNED_16_BIT, (uint8_t*)(pDataBuffer));
+
+	// NOTE: This code is largely duplicated from DreamSoundSystem - might
+	// be good to look into a consolidated arch for this
+	for (auto &pSoundBuffer : m_renderAudioBuses) {
+		auto pBufferTarget = pSoundBuffer.second;
+
+		if (pBufferTarget->NumPendingFrames() >= numFrames) {
+
+			AudioPacket tempMonoAudioPacket;
+
+			pBufferTarget->LockBuffer();
+
+			{
+				// This is non mix-down
+				pBufferTarget->GetAudioPacket(numFrames, &tempMonoAudioPacket);
+			}
+
+			pBufferTarget->UnlockBuffer();
+
+			pendingAudioPacket.MixInAudioPacket(tempMonoAudioPacket);
+
+			tempMonoAudioPacket.DeleteBuffer();
 		}
 	}
 
 Error:
+	return pendingAudioPacket;
+}
+
+// TODO: This is not cross platform 
+// TODO: Need to create a thread platform capability and wrap these functions 
+// in there
+#include <avrt.h>
+
+RESULT DreamBrowser::AudioProcess() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("Dream Browser Audio Process Started");
+
+	int64_t pendingBytes = 0;
+	DWORD taskIndex = 0;
+	HANDLE hAudioRenderProcessTask = AvSetMmThreadCharacteristics(TEXT("Pro Audio"), &taskIndex);
+
+	CBM((m_soundState == sound::state::RUNNING), "Dream Browser Audio Process not running");
+
+	while (m_soundState == sound::state::RUNNING) {
+		
+		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+
+		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+		auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+
+		//int audioBufferSampleLength10ms = m_pRenderSoundBuffer->GetSamplingRate() / 100;
+		int audioBufferSampleLength10ms = m_defaultBrowserSamplingRate / 100;
+
+		//if (m_pRenderSoundBuffer != nullptr ) {
+		//if (m_pRenderSoundBuffer != nullptr && diffVal > 9) {
+		//if (m_pRenderSoundBuffer != nullptr && m_pRenderSoundBuffer->NumPendingFrames() >= audioBufferSampleLength10ms) {
+		if(m_renderAudioBuses.size() != 0 && GetPendingAudioFrames() >= audioBufferSampleLength10ms) {
+
+			//m_pRenderSoundBuffer->LockBuffer();
+			//
+			//{
+			//	pendingBytes = m_pRenderSoundBuffer->NumPendingFrames();
+			//
+			//	if (pendingBytes >= audioBufferSampleLength10ms) {
+			//
+			//		//DEBUG_LINEOUT("pending %d", (int)pendingBytes)
+			//
+			//		lastUpdateTime = timeNow - std::chrono::milliseconds(diffVal - 10);
+			//
+			//		AudioPacket pendingAudioPacket;
+			//
+			//		m_pRenderSoundBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket);
+			//
+			//		if (m_pObserver != nullptr) {
+			//			if (RCHECK(m_pObserver->HandleAudioPacket(pendingAudioPacket, this)) == false) {
+			//				DOSLOG(INFO, "Handle Audio Packet Failed");
+			//			}
+			//		}
+			//	}
+			//}
+			//
+			//m_pRenderSoundBuffer->UnlockBuffer();
+
+			AudioPacket pendingAudioPacket = GetPendingRenderAudioPacket(audioBufferSampleLength10ms);
+
+			// Send to observer
+
+			if (m_pObserver != nullptr) {
+				if (RCHECK(m_pObserver->HandleAudioPacket(pendingAudioPacket, this)) == false) {
+					DOSLOG(INFO, "Handle Audio Packet Failed");
+				}
+			}
+
+			pendingAudioPacket.DeleteBuffer();
+
+		}
+
+		// Sleep the thread for 10 ms
+		Sleep(1);
+		//std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+	}
+
+Error:
+	DEBUG_LINEOUT("Dream Browser Audio Process Ended");
+
 	return r;
 }
 
 RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
+	// Handle different audio buses here
+	if ((m_renderAudioBuses.find(pendingAudioPacket.GetAudioStreamID()) == m_renderAudioBuses.end())) {
+		CRM(InitializeNewRenderBusSoundBuffer(pendingAudioPacket), 
+			"Failed to create redner audio bus for stream id %d", pendingAudioPacket.GetAudioStreamID());
+	}
+
 	// TODO: Handle this (if streaming we broadcast into webrtc
-	if (m_fStreaming) {
-		CR(GetDOS()->GetCloudController()->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
-	}
+	// TODO: Either put this back in or move it to a different layer
+	if (m_pObserver != nullptr) {
 
-Error:
-	return r;
-}
+		if (m_fForceObserverAudio || GetDOS()->GetSharedContentTexture() == m_pBrowserTexture.get() || GetDOS()->GetSharedCameraTexture() == m_pBrowserTexture.get()) {
+			//DOSLOG(INFO, "AudioPacket: Frames: %d, Channels: %d, SamplingRate: %d", pendingAudioPacket.GetNumFrames(), pendingAudioPacket.GetNumChannels(), pendingAudioPacket.GetSamplingRate());
+			
+			bool fPushPacket = false;
 
-RESULT DreamBrowser::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
-	RESULT r = R_PASS;
+			// Some basic filtering rules
+			if (m_strCurrentURL == "https://web.skype.com/") {
+				if (pendingAudioPacket.GetNumChannels() == 2 && pendingAudioPacket.GetNumFrames() == 480) {
+					//DOSLOG(INFO, "Pushing Packet!!!");
+					fPushPacket = true;
+				}
+			}
+			else {
+				fPushPacket = true;
+			}
 
-	// TODO: Create a pending frame thing
-	//CR(m_pBrowserTexture->Update((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight, texture::PixelFormat::RGBA));
+			// Push the packet to the target audio bus buffer
+			if(fPushPacket) {
+				auto pBufferTarget = m_renderAudioBuses[pendingAudioPacket.GetAudioStreamID()];
 
-	if (m_fReceivingStream) {
-		r = SetupPendingVideoFrame((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight);
+				if (pBufferTarget != nullptr) {
 
-		if (r == R_OVERFLOW) {
-			DEBUG_LINEOUT("Overflow frame!");
-			return R_PASS;
+					pBufferTarget->LockBuffer();
+
+					{
+						CR(pBufferTarget->PushAudioPacket(pendingAudioPacket, true));
+					}
+
+					pBufferTarget->UnlockBuffer();
+				}
+			}
 		}
-
-		CRM(r, "Failed for other reason");
-
-		if (!IsVisible()) {
-			SetVisible(true);
-		}
+	}
+	
+	// TODO: This is a hack to get Skype to work
+	if (pendingAudioPacket.GetSamplingRate() == 44100) {
+		CR(GetDOS()->GetDreamSoundSystem()->PlayAudioPacket(pendingAudioPacket));
 	}
 
-Error:
-	return r;
-}
-
-RESULT DreamBrowser::SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
-	RESULT r = R_PASS;
-
-	// TODO: programmatic 
-	int channels = 4;
-
-	CBRM((m_pendingFrame.fPending == false), R_OVERFLOW, "Buffer already pending");
-
-	m_pendingFrame.fPending = true;
-	m_pendingFrame.pxWidth = pxWidth;
-	m_pendingFrame.pxHeight = pxHeight;
-
-	// Allocate
-	// TODO: Might be able to avoid this if the video buffer is not changing size
-	// and just keep the memory allocated instead
-	m_pendingFrame.pDataBuffer_n = sizeof(uint8_t) * pxWidth * pxHeight * channels;
-	//m_pendingFrame.pDataBuffer = (uint8_t*)malloc(m_pendingFrame.pDataBuffer_n);
-
-	m_pendingFrame.pDataBuffer = pVideoFrameDataBuffer;
-
-	CNM(m_pendingFrame.pDataBuffer, "Failed to allocate video buffer mem");
-
-	// Copy
-	//memcpy(m_pendingFrame.pDataBuffer, pVideoFrameDataBuffer, m_pendingFrame.pDataBuffer_n);
+	//if (m_fStreaming) {
+	//	CR(GetDOS()->GetCloudController()->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
+	//}
 
 Error:
-	return r;
-}
-
-RESULT DreamBrowser::UpdateFromPendingVideoFrame() {
-	RESULT r = R_PASS;
-
-	CBM(m_pendingFrame.fPending, "No frame pending");
-	CNM(m_pendingFrame.pDataBuffer, "No data buffer");
-
-	//DEBUG_LINEOUT("inframe %d x %d", m_pendingFrame.pxWidth, m_pendingFrame.pxHeight);
-
-	// Update texture dimensions if needed
-	CR(m_pBrowserTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
-	if (r != R_NOT_HANDLED) {
-		DEBUG_LINEOUT("Changed texture dimensions");
-	}
-
-	CRM(m_pBrowserTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from pending frame");
-
-Error:
-	if (m_pendingFrame.pDataBuffer != nullptr) {
-		delete [] m_pendingFrame.pDataBuffer;
-		m_pendingFrame.pDataBuffer = nullptr;
-
-		memset(&m_pendingFrame, 0, sizeof(PendingFrame));
-	}
-
 	return r;
 }
 
 RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
-	DreamBrowserMessage *pDreamBrowserMessage = (DreamBrowserMessage*)(pDreamAppMessage);
-	CN(pDreamBrowserMessage);
-
-	//currently, only store the most recent message received
-	m_currentMessageType = pDreamBrowserMessage->GetMessageType();
-	m_currentAckType = pDreamBrowserMessage->GetAckType();
-
-	switch (pDreamBrowserMessage->GetMessageType()) {
-		case DreamBrowserMessage::type::PING: {
-			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::PING));
-		} break;
-
-		case DreamBrowserMessage::type::ACK: {
-			switch (pDreamBrowserMessage->GetAckType()) {
-				// We get a request streaming start ACK when we requested to start streaming
-				// This will begin broadcasting
-				case DreamBrowserMessage::type::REQUEST_STREAMING_START: {
-					if (IsStreaming()) {
-						// For non-changing stuff we need to send the current frame
-						CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pBrowserTexture.get(), 0, PIXEL_FORMAT::BGRA));
-					}
-
-				} break;
-			}
-		} break;
-
-		case DreamBrowserMessage::type::REQUEST_STREAMING_START: {
-			CR(StartReceiving(pPeerConnection));
-		} break;
-	}
+	CR(r);
 
 Error:
 	return r;
 }
 
-RESULT DreamBrowser::BroadcastDreamBrowserMessage(DreamBrowserMessage::type msgType, DreamBrowserMessage::type ackType) {
+RESULT DreamBrowser::BroadcastDreamBrowserMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType) {
 	RESULT r = R_PASS;
 
-	DreamBrowserMessage *pDreamBrowserMessage = new DreamBrowserMessage(0, 0, GetAppUID(), msgType, ackType);
+	DreamShareViewShareMessage *pDreamBrowserMessage = new DreamShareViewShareMessage(0, 0, GetAppUID(), msgType, ackType);
 	CN(pDreamBrowserMessage);
 
 	CR(BroadcastDreamAppMessage(pDreamBrowserMessage));
@@ -1037,266 +1179,6 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent) {
-	RESULT r = R_PASS;
-
-	switch (pEvent->m_eventType) {
-		case ELEMENT_INTERSECT_BEGAN: {
-			m_fTestQuadActive = true;
-		} break;
-
-		case ELEMENT_INTERSECT_MOVED: {
-			// empty
-		} break;
-
-		case ELEMENT_INTERSECT_ENDED: {
-			m_fTestQuadActive = false;
-		} break;
-
-		case INTERACTION_EVENT_SELECT_DOWN: {
-
-			if (m_fReceivingStream) {
-				CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
-				m_fReceivingStream = false;
-			}
-
-			SetStreamingState(false);
-
-			// TODO: May not be needed, if not streaming no video is actually being transmitted 
-			// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
-			//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
-
-			//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
-			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));
-
-			SetStreamingState(true);
-
-		} break;
-	}
-
-	CR(r);
-
-Error:
-	return r;
-}
-
-RESULT DreamBrowser::BeginStream() {
-	RESULT r = R_PASS;
-
-	if (m_fReceivingStream) {
-		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
-		m_fReceivingStream = false;
-	}
-
-	SetStreamingState(false);
-
-	// TODO: May not be needed, if not streaming no video is actually being transmitted 
-	// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
-	//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
-
-	//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
-	CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));
-	
-	// This is probably redundant!!!
-	CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pBrowserTexture.get(), 0, PIXEL_FORMAT::BGRA));
-
-	SetStreamingState(true);
-
-Error:
-	return r;
-}
-
-RESULT DreamBrowser::SetStreamingState(bool fStreaming) {
-	RESULT r = R_PASS;
-
-	m_fStreaming = fStreaming;
-
-	CNR(m_pDreamUserHandle, R_SKIPPED);
-	m_pDreamUserHandle->SendStreamingState(fStreaming);
-
-Error:
-	return r;
-}
-
-bool DreamBrowser::IsStreaming() {
-	return m_fStreaming;
-}
-
-// InteractionObjectEvent
-// Note that all of this will only occur if we're in testing mode
-RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
-	RESULT r = R_PASS;
-
-#ifdef _USE_TEST_APP
-	bool fUpdateMouse = false;
-
-	//m_pPointerCursor->SetPosition(pEvent->m_ptContact[0]);
-
-	if (pEvent->m_pObject == m_pTestQuad.get() || m_fTestQuadActive) {
-		return HandleTestQuadInteractionEvents(pEvent);
-	}
-#endif
-
-	switch (pEvent->m_eventType) {
-#ifdef _USE_TEST_APP
-		case ELEMENT_INTERSECT_BEGAN: {
-			if (m_pBrowserQuad->IsVisible()) {
-				m_pPointerCursor->SetVisible(true);
-
-				WebBrowserMouseEvent webBrowserMouseEvent;
-
-				webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
-
-				CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, false));
-
-				m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-				m_fBrowserActive = true;
-
-				fUpdateMouse = true;
-			}
-		} break;
-
-		case ELEMENT_INTERSECT_ENDED: {
-			m_pPointerCursor->SetVisible(false);
-
-			WebBrowserMouseEvent webBrowserMouseEvent;
-
-			webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
-
-			CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, true));
-
-			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-			m_fBrowserActive = false;
-
-			fUpdateMouse = true;
-		} break;
-
-		case ELEMENT_INTERSECT_MOVED: {
-			WebBrowserMouseEvent webBrowserMouseEvent;
-
-			webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
-
-			CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, false));
-
-			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-
-			fUpdateMouse = true;
-		} break;
-#endif
-
-		case INTERACTION_EVENT_SELECT_UP: {
-			WebBrowserMouseEvent webBrowserMouseEvent;
-
-			bool fMouseUp = (pEvent->m_eventType == INTERACTION_EVENT_SELECT_UP);
-
-			webBrowserMouseEvent.pt = m_lastWebBrowserPoint;
-			webBrowserMouseEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
-
-			CR(m_pWebBrowserController->SendMouseClick(webBrowserMouseEvent, fMouseUp, 1));
-
-			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-
-			//// Determine focused node
-			//CR(m_pWebBrowserController->GetFocusedNode());
-
-		} break;
-
-		case INTERACTION_EVENT_SELECT_DOWN: {
-			WebBrowserMouseEvent webBrowserMouseEvent;
-
-			bool fMouseUp = (pEvent->m_eventType == INTERACTION_EVENT_SELECT_UP);
-
-			webBrowserMouseEvent.pt = m_lastWebBrowserPoint;
-			webBrowserMouseEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
-
-			CR(m_pWebBrowserController->SendMouseClick(webBrowserMouseEvent, fMouseUp, 1));
-
-			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-		} break;
-
-		case INTERACTION_EVENT_WHEEL: {
-			WebBrowserMouseEvent webBrowserMouseEvent;
-
-			webBrowserMouseEvent.pt = m_lastWebBrowserPoint;
-			
-			int deltaX = 0;
-			int deltaY = pEvent->m_value * m_scrollFactor;
-
-			CR(m_pWebBrowserController->SendMouseWheel(webBrowserMouseEvent, deltaX, deltaY));
-
-			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-		} break;
-
-		// Keyboard
-		// TODO: Should be a "typing manager" in between?
-		// TODO: haven't seen any issues with KEY_UP being a no-op
-		case INTERACTION_EVENT_KEY_UP: break;
-		case INTERACTION_EVENT_KEY_DOWN: {
-
-#ifdef _USE_TEST_APP
-			if ((pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) && (pEvent->m_value == SVK_RETURN)) {
-				if (m_fReceivingStream) {
-					CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
-					m_fReceivingStream = false;
-				}
-
-				SetStreamingState(false);
-
-				// TODO: May not be needed, if not streaming no video is actually being transmitted 
-				// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
-				//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
-
-				//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
-				CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));
-
-				SetStreamingState(true);
-			}
-#endif
-
-			/*
-			bool fKeyDown = (pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
-			std::string strURL = "";
-
-			char chKey = (char)(pEvent->m_value);
-			m_strEntered.UpdateString(chKey);
-			
-			if (pEvent->m_value == SVK_RETURN) {
-				SetVisible(true);
-
-				std::string strScope = m_strScope;
-				std::string strTitle = "website";
-				std::string strPath = strURL;
-				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-
-				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
-			}
-			//*/
-
-			//CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
-
-		} break;
-	}
-	
-#ifdef _USE_TEST_APP
-	// First point of contact
-	if (fUpdateMouse) {
-		//if (pEvent->m_ptContact[0] != GetDOS()->GetInteractionEngineProxy()->GetInteractionRayOrigin()) {
-			//m_pPointerCursor->SetOrigin(pEvent->m_ptContact[0]);
-			point ptIntersectionContact = pEvent->m_ptContact[0];
-			ptIntersectionContact.w() = 1.0f;
-
-			point ptAdjustedContact = inverse(m_pBrowserQuad->GetModelMatrix()) * ptIntersectionContact;
-			m_pPointerCursor->SetOrigin(ptAdjustedContact);
-		//}
-	}
-#endif 
-
-	CR(r);
-
-Error:
-	return r;
-}
 
 RESULT DreamBrowser::SetPosition(point ptPosition) {
 	GetComposite()->SetPosition(ptPosition);
@@ -1306,27 +1188,17 @@ RESULT DreamBrowser::SetPosition(point ptPosition) {
 RESULT DreamBrowser::SetAspectRatio(float aspectRatio) {
 	m_aspectRatio = aspectRatio;
 
-	if (m_pBrowserQuad != nullptr)
-		return UpdateViewQuad();
-
 	return R_PASS;
 }
 
 RESULT DreamBrowser::SetDiagonalSize(float diagonalSize) {
 	m_diagonalSize = diagonalSize;
 
-	if (m_pBrowserQuad != nullptr)
-		return UpdateViewQuad();
-
 	return R_PASS;
 }
 
 RESULT DreamBrowser::SetNormalVector(vector vNormal) {
 	m_vNormal = vNormal.Normal();
-
-	if (m_pBrowserQuad != nullptr) {
-		return UpdateViewQuad();
-	}
 
 	return R_PASS;
 }
@@ -1337,23 +1209,72 @@ RESULT DreamBrowser::SetParams(point ptPosition, float diagonal, float aspectRat
 	m_aspectRatio = aspectRatio;
 	m_vNormal = vNormal.Normal();
 
-if (m_pBrowserQuad != nullptr) {
-	return UpdateViewQuad();
+	return R_PASS;
 }
 
-return R_PASS;
-}
-
-float DreamBrowser::GetAspectRatio() {
-	return m_aspectRatio;
-}
-
-float DreamBrowser::GetHeight() {
+float DreamBrowser::GetHeightFromAspectDiagonal() {
 	return std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
 
-float DreamBrowser::GetWidth() {
+float DreamBrowser::GetWidthFromAspectDiagonal() {
 	return std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
+}
+
+int DreamBrowser::GetWidth() {
+	return m_browserWidth;
+}
+
+int DreamBrowser::GetHeight() {
+	return m_browserHeight;
+}
+
+RESULT DreamBrowser::SetTitle(std::string strTitle) {
+	RESULT r = R_PASS;
+	CNR(m_pObserver, R_SKIPPED);
+	if (strTitle != "") {
+		m_strCurrentTitle = strTitle;
+		CR(m_pObserver->UpdateControlBarText(strTitle));
+	}
+	else {
+		CR(m_pObserver->UpdateControlBarText(m_strCurrentURL));
+	}
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::SetIsSecureConnection(bool fSecure) {
+	RESULT r = R_PASS;
+
+	m_fSecure = fSecure;
+	CNR(m_pObserver, R_SKIPPED);
+
+	m_pObserver->UpdateAddressBarSecurity(fSecure);
+
+Error:
+	return r;
+}
+
+std::string DreamBrowser::GetTitle() {
+	std::string strValidTitle;
+	if (m_strCurrentTitle == "") {
+		strValidTitle = m_strCurrentURL;
+	}
+	else {
+		strValidTitle = m_strCurrentTitle;
+	}
+	return strValidTitle;
+}
+
+std::string DreamBrowser::GetScheme() {
+	return m_strCurrentURL;
+}
+
+std::string DreamBrowser::GetURL() {
+	return "";
+}
+
+std::string DreamBrowser::GetContentType() {
+	return m_strContentType;
 }
 
 vector DreamBrowser::GetNormal() {
@@ -1364,81 +1285,51 @@ point DreamBrowser::GetOrigin() {
 	return GetComposite()->GetOrigin();
 }
 
-RESULT DreamBrowser::UpdateViewQuad() {
-	RESULT r = R_PASS;
-
-	CR(m_pBrowserQuad->UpdateParams(GetWidth(), GetHeight(), GetNormal()));
-
-	// Flip UV vertically
-	///*
-	if (r != R_SKIPPED) {
-		m_pBrowserQuad->FlipUVVertical();
-	}
-	//*/
-
-	CR(m_pBrowserQuad->SetDirty());
-
-	CR(m_pBrowserQuad->InitializeBoundingQuad(point(0.0f, 0.0f, 0.0f), GetWidth(), GetHeight(), GetNormal()));
-
-Error:
-	return r;
-}
-
 bool DreamBrowser::IsVisible() {
-	return m_pBrowserQuad->IsVisible();
+	return GetComposite()->IsVisible();
 }
 
 RESULT DreamBrowser::SetVisible(bool fVisible) {
 	RESULT r = R_PASS;
 		
-	CR(m_pBrowserQuad->SetVisible(fVisible));
-	//CR(m_pPointerCursor->SetVisible(fVisible));
+	CR(GetComposite()->SetVisible(fVisible));
 Error:
 	return r;
 }
 
-RESULT DreamBrowser::SetBrowserScope(std::string strScope) {
+RESULT DreamBrowser::SetScope(std::string strScope) {
 	m_strScope = strScope;
 	return R_PASS;
 }
 
-RESULT DreamBrowser::SetBrowserPath(std::string strPath) {
+RESULT DreamBrowser::SetPath(std::string strPath) {
 	m_strPath = strPath;
 	return R_PASS;
 }
 
-RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
-	RESULT r = R_PASS;
-
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
-	
-	if (m_pWebBrowserController == nullptr) {
-		m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(m_browserWidth, m_browserHeight, pEnvironmentAsset->GetURL());
-		CN(m_pWebBrowserController);
-		CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
-		/*
-		m_fShowControlView = true;
-
-		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-		CN(pDreamControlViewHandle);
-		CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
-		m_pDreamUserHandle->SendPreserveSharingState(false);	
-		*/
+RESULT DreamBrowser::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	if (m_fCanLoadRequest) {
+		SetEnvironmentAsset(pEnvironmentAsset);
 	}
+	else {
+		m_pPendingEnvironmentAsset = pEnvironmentAsset;
 
-	m_fShowControlView = true;
+		if (pEnvironmentAsset != nullptr) {
+			m_strScope = pEnvironmentAsset->GetScope();
+			m_strPath = pEnvironmentAsset->GetPath();
+		}
+	}
+	return R_PASS;
+}
 
-	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-	CN(pDreamControlViewHandle);
-	CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
-	m_pDreamUserHandle->SendPreserveSharingState(false);
+RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;	
 
 	if (pEnvironmentAsset != nullptr) {
-		WebRequest webRequest;
+		m_assetID = pEnvironmentAsset->GetAssetID();
 
-		//std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
 		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
-		ResourceHandlerType resourceHandlerType = pEnvironmentAsset->GetResourceHandlerType();	
+		ResourceHandlerType resourceHandlerType = pEnvironmentAsset->GetResourceHandlerType();
 
 		if (resourceHandlerType == ResourceHandlerType::DREAM) {	// Keeping it flexible, it's very possible there's only default and dream
 			m_dreamResourceHandlerLinks[strEnvironmentAssetURL] = resourceHandlerType;
@@ -1446,125 +1337,15 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 
 		m_strContentType = pEnvironmentAsset->GetContentType();
 
-		//std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
-		std::wstring wstrAssetURL = util::StringToWideString(strEnvironmentAssetURL);
-		CR(webRequest.SetURL(wstrAssetURL));
-		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
-
-		UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-		CN(pUserControllerProxy);
-
-		std::multimap<std::wstring, std::wstring> wstrRequestHeaders;
 		std::multimap<std::string, std::string> requestHeaders = pEnvironmentAsset->GetHeaders();
-		
-		for (std::multimap<std::string, std::string>::iterator itr = requestHeaders.begin(); itr != requestHeaders.end(); ++itr) {
 
-			std::string strKey = itr->first;
-			std::wstring wstrKey = util::StringToWideString(strKey);
-			std::string strValue = itr->second;
-			std::wstring wstrValue = util::StringToWideString(strValue);
-			
-			wstrRequestHeaders.insert(std::pair<std::wstring, std::wstring>(wstrKey, wstrValue));
+		if (!requestHeaders.empty()) {
+			m_headermap[strEnvironmentAssetURL] = requestHeaders;
 		}
-		
-		webRequest.SetRequestHeaders(wstrRequestHeaders);
-		
-		LoadRequest(webRequest);
+
 		m_currentEnvironmentAssetID = pEnvironmentAsset->GetAssetID();
 	}
 
-Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
-	return r;
-}
-
-RESULT DreamBrowser::StopSending() {
-	RESULT r = R_PASS;
-
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
-	CR(SetStreamingState(false));
-
-	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-
-	if (pDreamControlViewHandle != nullptr) {
-		pDreamControlViewHandle->HideApp();
-		pDreamControlViewHandle->SetControlViewTexture(m_pLoadingScreenTexture);
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-		
-		m_pDreamUserHandle->SendStopSharing();
-	}
-
-	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
-	//m_pWebBrowserController->CloseBrowser();
-	//m_pWebBrowserController = nullptr;
-
-	// don't stream on the next website load
-	m_fShouldBeginStream = false; 
-	CR(m_pWebBrowserController->LoadURL("about:blank"));
-	CR(SetVisible(false));
-
-Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
-	return r;
-}
-
-RESULT DreamBrowser::StartReceiving(PeerConnection *pPeerConnection) {
-	RESULT r = R_PASS;
-
-	m_pDreamUserHandle->SendPreserveSharingState(false);
-	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
-	// Switch to input
-	if (IsStreaming()) {
-		SetStreamingState(false);
-
-		// TODO: Turn off streamer etc
-	}
-
-	// Register for Video for the requester peer connection
-	// (this buffers against multi-casts that are incorrect)
-	if (GetDOS()->IsRegisteredVideoStreamSubscriber(this)) {
-		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
-	}
-
-	/*
-	// TODO: May not be needed, if not streaming no video is actually being transmitted
-	// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
-	// Stop video streaming if we're streaming
-	if (GetDOS()->GetCloudController()->IsVideoStreamingRunning()) {
-		CR(GetDOS()->GetCloudController()->StopVideoStreaming());
-	}
-	//*/
-
-	CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
-	m_fReceivingStream = true;
-
-	CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
-
-Error:
-	return r;
-}
-
-RESULT DreamBrowser::PendReceiving() {
-	RESULT r = R_PASS;
-	m_fReceivingStream = true;
-	//CR(SetVisible(true));
-
-//Error:
-	return r;
-}
-
-RESULT DreamBrowser::StopReceiving() {
-	RESULT r = R_PASS;
-	m_fReceivingStream = false;
-	CR(SetVisible(false));
-	CR(m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get()));
-
-	//CR(	BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, 
-	//								 DreamBrowserMessage::type::REPORT_STREAMING_STOP));
 Error:
 	return r;
 }
@@ -1587,18 +1368,6 @@ RESULT DreamBrowser::LoadRequest(const WebRequest &webRequest) {
 
 Error:
 	return r;
-}
-
-std::shared_ptr<texture> DreamBrowser::GetScreenTexture() {
-	return m_pBrowserTexture;
-}
-
-//TODO: currently unused?
-RESULT DreamBrowser::SetScreenTexture(texture *pTexture) {
-	m_aspectRatio = (float)pTexture->GetWidth() / (float)pTexture->GetHeight();
-	SetParams(GetOrigin(), m_diagonalSize, m_aspectRatio, m_vNormal);
-
-	return m_pBrowserQuad->SetDiffuseTexture(pTexture);
 }
 
 DreamBrowser* DreamBrowser::SelfConstruct(DreamOS *pDreamOS, void *pContext) {

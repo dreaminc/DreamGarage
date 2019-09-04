@@ -5,7 +5,7 @@
 
 #include "Primitives/valid.h"
 #include "Primitives/Subscriber.h"
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 #include <string>
 #include <vector>
@@ -37,7 +37,7 @@ struct KeyboardTestContext {
 	quad* pQuad = nullptr;
 };
 
-class UITestSuite : public valid, public TestSuite, 
+class UITestSuite : public valid, public DreamTestSuite, 
 					public Subscriber<SenseControllerEvent>, public Subscriber<SenseKeyboardEvent>, 
 					public Subscriber<SenseMouseEvent>,
 					public Subscriber<UIEvent>,
@@ -46,9 +46,9 @@ class UITestSuite : public valid, public TestSuite,
 {
 public:
 	UITestSuite(DreamOS *pDreamOS);
-	~UITestSuite();
+	~UITestSuite() = default;
 
-	RESULT Initialize();
+	virtual RESULT SetupTestSuite() override;
 
 	RESULT AddTestBrowserURL();
 	RESULT AddTestInteractionFauxUI();
@@ -59,6 +59,7 @@ public:
 	RESULT AddTestUIMenuItem();
 	RESULT AddTestFont();
 	RESULT AddTestFlatContextCompositionQuads();
+	//RESULT AddTestFlatContext();
 
 	virtual RESULT AddTests() override;
 
@@ -68,15 +69,56 @@ public:
 	// Environment Asset Callback
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
 
-	virtual RESULT OnReceiveAsset(long userID) override {
+	virtual RESULT OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT OnStopSending() override {
+	virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT OnStopReceiving() override {
+	virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnSendCameraPlacement() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnStopSendingCameraPlacement() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnReceiveCameraPlacement(long userID) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnStopReceivingCameraPlacement() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	// Environment observer forms
+	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override {
 		return R_NOT_IMPLEMENTED;
 	}
 
@@ -87,11 +129,11 @@ public:
 	virtual RESULT Notify(UIEvent *mEvent) override;
 
 private:
-	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
-	RESULT SetupUINodePipeline();
+	virtual RESULT SetupPipeline(std::string strRenderProgramName = "environment") override;
+	//RESULT SetupUINodePipeline();
 
 private:
-	DreamOS *m_pDreamOS;
+	
 	std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
 	CloudController *m_pCloudController = nullptr;
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;

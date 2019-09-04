@@ -14,7 +14,6 @@
 
 #include "api/array_view.h"
 #include "modules/rtp_rtcp/include/rtp_rtcp_defines.h"
-#include "rtc_base/basictypes.h"
 #include "rtc_base/copyonwritebuffer.h"
 
 namespace webrtc {
@@ -157,7 +156,7 @@ class RtpPacket {
   size_t payload_size_;
 
   ExtensionInfo extension_entries_[kMaxExtensionHeaders];
-  uint16_t extensions_size_ = 0;  // Unaligned.
+  size_t extensions_size_ = 0;  // Unaligned.
   rtc::CopyOnWriteBuffer buffer_;
 };
 

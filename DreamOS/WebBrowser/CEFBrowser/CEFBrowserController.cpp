@@ -5,6 +5,7 @@
 #include "include/cef_browser.h"
 #include "include/wrapper/cef_helpers.h"
 #include "include/base/cef_bind.h"
+#include "include/cef_parser.h"
 
 #include "include/cef_browser.h"
 #include "include/cef_app.h"
@@ -20,6 +21,9 @@
 #include "Cloud/WebRequestPostDataElement.h"
 
 #include "CEFDOMNode.h"
+#include "CEFStringVisitor.h"
+
+#include "Core/Utilities.h"
 
 CEFBrowserController::CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
 	m_pCEFBrowser(pCEFBrowser)
@@ -66,7 +70,8 @@ RESULT CEFBrowserController::PollFrame() {
 	
 	if (m_pWebBrowserControllerObserver != nullptr) {
 		WebBrowserRect rect = { 0, 0, m_bufferWidth, m_bufferHeight };
-		CR(m_pWebBrowserControllerObserver->OnPaint(rect, &m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
+		// Only used by browser to force an update on the frame.
+		CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorFrameBuffer[0], m_bufferWidth, m_bufferHeight, m_paintType, rect));
 	}
 
 Error:
@@ -82,9 +87,15 @@ RESULT CEFBrowserController::PollNewDirtyFrames(int &rNumFramesProcessed) {
 
 	if (m_pWebBrowserControllerObserver != nullptr) {
 		for (auto& dirtyFrame : m_NewDirtyFrames) {
-			WebBrowserRect rect = { dirtyFrame.x, dirtyFrame.y, dirtyFrame.width, dirtyFrame.height };
 			
-			CR(m_pWebBrowserControllerObserver->OnPaint(rect, &m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
+			if (m_paintType == WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW) {
+				WebBrowserRect rect = { 0, 0, m_bufferWidth, m_bufferHeight };
+				CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorFrameBuffer[0], m_bufferWidth, m_bufferHeight, m_paintType, rect));
+			}
+			else {
+				WebBrowserRect rect = { m_popupRect.x, m_popupRect.y, m_popupRect.width, m_popupRect.height };
+				CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorPopupBuffer[0], m_bufferWidth, m_bufferHeight, m_paintType, rect));
+			}
 		
 			rNumFramesProcessed++;
 		}
@@ -141,6 +152,20 @@ RESULT CEFBrowserController::LoadURL(const std::string& url) {
 	CN(m_pCEFBrowser);
 
 	m_pCEFBrowser->GetFocusedFrame()->LoadURL(url);
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::ReplaceURL(const std::string& strURL) {
+	RESULT r = R_PASS;
+	std::string strCode;
+
+	CN(m_pCEFBrowser);
+
+	strCode = "location.replace('" + strURL + "');";
+
+	m_pCEFBrowser->GetFocusedFrame()->ExecuteJavaScript(strCode, m_pCEFBrowser->GetFocusedFrame()->GetURL(), 0);
 
 Error:
 	return r;
@@ -229,11 +254,21 @@ RESULT CEFBrowserController::LoadRequest(const WebRequest &webRequest) {
 		CN(pCEFRequest);
 
 		pCEFRequest->SetFlags(UR_FLAG_NO_DOWNLOAD_DATA);
-		m_pCEFBrowser->GetFocusedFrame()->LoadRequest(pCEFRequest);
+		auto pCefFrame = m_pCEFBrowser->GetFocusedFrame();
+		pCefFrame->LoadRequest(pCEFRequest);
 	}
 
 Error:
 	return r;
+}
+
+bool CEFBrowserController::CheckIsError(int errorCode) {
+	for (int i = 0; i < m_cefErrorCodes.size(); i++) {
+		if (errorCode == m_cefErrorCodes[i]) {
+			return true;
+		}
+	}
+	return false;
 }
 
 RESULT CEFBrowserController::SendKeyEventChar(char chKey, bool fKeyDown) {
@@ -385,7 +420,7 @@ AudioPacket CEFBrowserController::PopPendingAudioPacket() {
 	return pendingAudioPacket;
 }
 
-RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, int bitsPerSample, uint8_t *pDataBuffer) {
+RESULT CEFBrowserController::PushPendingAudioPacket(int audioStreamID, int frames, int channels, int bitsPerSample, uint8_t *pDataBuffer) {
 	RESULT r = R_PASS;
 
 	///*
@@ -396,19 +431,30 @@ RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, in
 	memcpy(pNewDataBuffer, pDataBuffer, pNewDataBuffer_n);
 	//*/
 	
+	int samplingRate = 48000;
+	if (frames % 441 == 0) {
+		samplingRate = 44100;
+	}
+
 	{
 		AudioPacket newPendingPacket(
 			frames,
 			channels,
 			bitsPerSample,
+			samplingRate,		// TODO: Should bubble down from CEF or something
 			pNewDataBuffer
 			//pDataBuffer
 		);
 
-		m_pendingAudioPackets.push(newPendingPacket);
+		newPendingPacket.SetAudioStreamID(audioStreamID);
+		newPendingPacket.SetSoundType(sound::type::SIGNED_16_BIT);
+
+		//m_pendingAudioPackets.push(newPendingPacket);
 
 		// This will push directly into the pending buffer
-		//CR(m_pWebBrowserControllerObserver->OnAudioPacket(newPendingPacket));
+		CR(m_pWebBrowserControllerObserver->OnAudioPacket(newPendingPacket));
+
+		newPendingPacket.DeleteBuffer();
 	}
 
 Error:
@@ -419,12 +465,12 @@ bool CEFBrowserController::IsAudioPacketPending() {
 	return (m_pendingAudioPackets.size() > 0) ? true : false;
 }
 
-RESULT CEFBrowserController::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
+RESULT CEFBrowserController::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int audioSteamID, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
 	RESULT r = R_PASS;
 	//DEBUG_LINEOUT("CEFBrowserManager: OnAudioData");
 
 	// Queue up new audio packet 
-	CR(PushPendingAudioPacket(frames, channels, bitsPerSample, (uint8_t*)pDataBuffer));
+	CR(PushPendingAudioPacket(audioSteamID, frames, channels, bitsPerSample, (uint8_t*)pDataBuffer));
 
 Error:
 	return r;
@@ -435,10 +481,16 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 	//DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
 
 	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
-
 	size_t pBuffer_n = width * height * 4;
-
-	m_vectorBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
+	
+	if (type == PET_POPUP) {
+		m_paintType = WebBrowserController::PAINT_ELEMENT_TYPE::PET_POPUP;
+		m_vectorPopupBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
+	}
+	else {
+		m_paintType = WebBrowserController::PAINT_ELEMENT_TYPE::PET_VIEW;
+		m_vectorFrameBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
+	}
 
 	bool fSizeChanged = (width != m_bufferWidth) || (height != m_bufferHeight);
 
@@ -454,9 +506,24 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 	return r;
 }
 
+RESULT CEFBrowserController::OnPopupSize(const CefRect& rect) {
+	m_popupRect = rect;
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::OnAfterCreated() {
+	RESULT r = R_PASS;
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->OnAfterCreated());
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadingStateChange");
 
 	CN(m_pWebBrowserControllerObserver);
 	CR(m_pWebBrowserControllerObserver->OnLoadingStateChange(fLoading, fCanGoBack, fCanGoForward, strCurrentURL));
@@ -465,9 +532,19 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::SetIsSecureConnection(bool fSecure) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->SetIsSecureConnection(fSecure));
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::OnLoadStart(CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadStart");
 
 	// TODO: Add transition type
 
@@ -481,11 +558,27 @@ Error:
 RESULT CEFBrowserController::OnLoadEnd(CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) {
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
-	
+
+	if (pCEFFrame->IsMain()) {
+		CefRefPtr<CEFStringVisitor> cefstrVisitor = CefRefPtr<CEFStringVisitor>(new CEFStringVisitor());
+		cefstrVisitor->SetBrowserControllerObserver(m_pWebBrowserControllerObserver);
+		pCEFFrame->GetSource(cefstrVisitor);
+	}
 	std::string strCurrentURL = pCEFFrame->GetURL();
 
 	CN(m_pWebBrowserControllerObserver);
 	CR(m_pWebBrowserControllerObserver->OnLoadEnd(httpStatusCode, strCurrentURL));
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::ErrorCode errorCode, const CefString& strError, const CefString& strFailedURL) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadError");
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->OnLoadError((int)(errorCode), strError, strFailedURL));
 
 Error:
 	return r;
@@ -509,10 +602,110 @@ Error:
 	return r;
 }
 
+bool CEFBrowserController::OnCertificateError(std::string strURL, unsigned int certError) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebBrowserControllerObserver);
+	return m_pWebBrowserControllerObserver->OnCertificateError(strURL, certError);
+
+Error:
+	return false;
+}
+
 RESULT CEFBrowserController::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefString strCEFURL) {
 	RESULT r = R_PASS;
 
-	CR(m_pWebBrowserControllerObserver->GetResourceHandlerType(resourceHandlerType, strCEFURL));
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->GetResourceHandlerType(resourceHandlerType, strCEFURL));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->CheckForHeaders(headermap, strURL));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::HandleDreamFormSuccess() {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleDreamFormSuccess());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::HandleDreamFormCancel() {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleDreamFormCancel());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleDreamFormSetCredentials(strRefreshToken, strAccessToken));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::HandleDreamFormSetEnvironmentId(int environmentId) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleDreamFormSetEnvironmentId(environmentId));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::HandleIsInputFocused(bool fInputFocused) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleIsInputFocused(fInputFocused));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::HandleCanTabNext(bool fTabNext) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleCanTabNext(fTabNext));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::HandleCanTabPrevious(bool fTabPrevious) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleCanTabPrevious(fTabPrevious));
+	}
 
 Error:
 	return r;
@@ -538,6 +731,60 @@ RESULT CEFBrowserController::GoBack() {
 RESULT CEFBrowserController::GoForward() {
 	m_pCEFBrowser->GoForward();
 	return R_PASS;
+}
+
+RESULT CEFBrowserController::TabNext() {
+	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+	pFrame->ExecuteJavaScript("Dream.Browser.tabNext();", pFrame->GetURL(), 0);
+
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::TabPrevious() {
+	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+	pFrame->ExecuteJavaScript("Dream.Browser.tabPrevious();", pFrame->GetURL(), 0);
+
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::CanTabNext() {
+	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+
+	pFrame->ExecuteJavaScript("Dream.Browser.canTabNext();", pFrame->GetURL(), 0);
+
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::CanTabPrevious() {
+	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+	pFrame->ExecuteJavaScript("Dream.Browser.canTabPrevious();", pFrame->GetURL(), 0);
+
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::IsInputFocused() {
+	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+	pFrame->ExecuteJavaScript("Dream.Browser.isInputFocused();", pFrame->GetURL(), 0);
+
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::UnfocusInput() {
+	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+	pFrame->ExecuteJavaScript("Dream.Browser.blurFocusedInput();", pFrame->GetURL(), 0);
+
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::ParseURL(std::string strURL, std::string& strParsedURL) {
+	RESULT r = R_PASS;
+
+	CefURLParts parts;
+	CefParseURL(strURL, parts);
+
+	strParsedURL = util::WideStringToString(parts.origin.str);
+Error:
+	return r;
 }
 
 /*

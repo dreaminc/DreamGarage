@@ -9,12 +9,12 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
 
-AnimationTestSuite::AnimationTestSuite(DreamOS *pDreamOS) {
-	// empty
-	m_pDreamOS = pDreamOS;
-}
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
 
-AnimationTestSuite::~AnimationTestSuite() {
+AnimationTestSuite::AnimationTestSuite(DreamOS *pDreamOS) :
+	DreamTestSuite("animation", pDreamOS)
+{
 	// empty
 }
 
@@ -151,10 +151,9 @@ RESULT AnimationTestSuite::AddTestCurves() {
 		return ResetTest(pContext);
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pNewTest = AddTest("curves", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Animation Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(5.0);
 	pNewTest->SetTestRepeats(1);
@@ -208,10 +207,9 @@ RESULT AnimationTestSuite::AddTestRotate() {
 		return ResetTest(pContext);
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pNewTest = AddTest("rotate", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Animation Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(5.0);
 	pNewTest->SetTestRepeats(1);
@@ -237,7 +235,7 @@ RESULT AnimationTestSuite::AddTestUIColor() {
 		auto pComposite = m_pDreamOS->MakeComposite();
 		m_pDreamOS->AddObjectToUIGraph(pComposite);
 
-		texture* pTexturePNG = m_pDreamOS->MakeTexture(L"icons_600\\icon_png_600.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		texture* pTexturePNG = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"icons_600\\icon_png_600.png");
 
 		quad *m_pQuad = pComposite->MakeQuad(1.0f, 1.0f).get();
 		m_pQuad->MoveTo(0.0f, 0.0f, 0.0f);
@@ -271,10 +269,9 @@ RESULT AnimationTestSuite::AddTestUIColor() {
 		return ResetTest(pContext);
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pNewTest = AddTest("uicolor", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Animation Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(10.0);
 	pNewTest->SetTestRepeats(1);
@@ -330,10 +327,9 @@ RESULT AnimationTestSuite::AddTestAnimationBasic() {
 		return ResetTest(pContext);
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("basic", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Animation Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(10.0);
 	pNewTest->SetTestRepeats(1);
@@ -399,10 +395,9 @@ RESULT AnimationTestSuite::AddTestCancel() {
 		return ResetTest(pContext);
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("cancel", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Animation Cancel Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(5.0);
 	pNewTest->SetTestRepeats(1);

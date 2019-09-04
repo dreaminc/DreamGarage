@@ -15,15 +15,15 @@
 
 #include "SenseDevice.h"
 #include "Primitives/Publisher.h"
-#include "Primitives/Subscriber.h"
 
 #include "Primitives/valid.h"
 
-#include "Primitives/VirtualObj.h"
-#include "Primitives/composite.h"
-
 #include "SenseLeapMotionHand.h"
-#include "Primitives/LeapHand.h"
+
+#include "Primitives/hand/HandType.h"
+
+class LeapHand;
+class composite;
 
 typedef enum SenseLeapMotionEventType {
 	SENSE_LEAPMOTION_EVENT_HAND_LEFT,
@@ -83,36 +83,9 @@ public:
 	}
 	*/
 
-	RESULT AttachHand(LeapHand *pHand, HAND_TYPE handType) {
-		if(handType == HAND_TYPE::HAND_LEFT)
-			m_pLeftHand = pHand;
-		else if (handType == HAND_TYPE::HAND_RIGHT)
-			m_pRightHand = pHand;
-		else
-			return R_FAIL;
-
-		return R_PASS;
-	}
-
-	RESULT AttachModel(composite *pModel, HAND_TYPE handType) {
-		if(handType == HAND_TYPE::HAND_LEFT)
-			m_pLeftModel = pModel;
-		else if (handType == HAND_TYPE::HAND_RIGHT)
-			m_pRightModel = pModel;
-		else
-			return R_FAIL;
-
-		return R_PASS;
-	}
-
-	LeapHand *GetHand(HAND_TYPE handType) {
-		if (handType == HAND_TYPE::HAND_LEFT)
-			return m_pLeftHand;
-		else if (handType == HAND_TYPE::HAND_RIGHT)
-			return m_pRightHand;
-
-		return nullptr;
-	}
+	RESULT AttachHand(LeapHand* pHand, HAND_TYPE handType);
+	RESULT AttachModel(composite* pModel, HAND_TYPE handType);
+	hand* GetHand(HAND_TYPE handType);
 
 	bool IsConnected();
 	bool IsServiceConnected();

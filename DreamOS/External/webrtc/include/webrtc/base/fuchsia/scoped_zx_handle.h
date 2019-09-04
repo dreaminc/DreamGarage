@@ -8,8 +8,13 @@
 #include <zircon/status.h>
 #include <zircon/syscalls.h>
 
-#include "base/logging.h"
+#include "base/base_export.h"
+#include "base/fuchsia/fuchsia_logging.h"
 #include "base/scoped_generic.h"
+
+namespace zx {
+class channel;
+}
 
 namespace base {
 
@@ -19,14 +24,23 @@ struct ScopedZxHandleTraits {
   static zx_handle_t InvalidValue() { return ZX_HANDLE_INVALID; }
   static void Free(zx_handle_t object) {
     zx_status_t status = zx_handle_close(object);
-    CHECK_EQ(ZX_OK, status) << zx_status_get_string(status);
+    ZX_CHECK(status == ZX_OK, status) << "zx_handle_close";
   }
 };
 
 }  // namespace internal
 
-using ScopedZxHandle =
-    ScopedGeneric<zx_handle_t, internal::ScopedZxHandleTraits>;
+class BASE_EXPORT ScopedZxHandle
+    : public ScopedGeneric<zx_handle_t, internal::ScopedZxHandleTraits> {
+ public:
+  ScopedZxHandle() = default;
+  explicit ScopedZxHandle(zx_handle_t value) : ScopedGeneric(value) {}
+
+  explicit operator bool() const { return get() != ZX_HANDLE_INVALID; }
+
+  // Helper to converts zx::channel to ScopedZxHandle.
+  static ScopedZxHandle FromZxChannel(zx::channel channel);
+};
 
 }  // namespace base
 

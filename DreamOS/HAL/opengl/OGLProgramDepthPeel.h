@@ -20,7 +20,7 @@ class OGLProgramBlendQuad;
 
 class OGLProgramDepthPeel : public OGLProgram {
 public:
-	OGLProgramDepthPeel(OpenGLImp *pParentImp);
+	OGLProgramDepthPeel(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 

@@ -11,12 +11,16 @@
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
+#include "../FogProgram.h"
 
-class OGLProgramMinimalTexture : public OGLProgram {
+class OGLFogParamsBlock;
+
+class OGLProgramMinimalTexture : public OGLProgram, public FogProgram {
 public:
-	OGLProgramMinimalTexture(OpenGLImp *pParentImp);
+	OGLProgramMinimalTexture(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
+	virtual RESULT OGLInitialize(version versionOGL) override;
 
 	virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID) override;
@@ -32,17 +36,18 @@ protected:
 	ObjectStore *m_pSceneGraph = nullptr;
 
 private:
-	OGLVertexAttributePoint *m_pVertexAttributePosition;
-	OGLVertexAttributeColor *m_pVertexAttributeColor;
-	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord;
+	OGLVertexAttributePoint *m_pVertexAttributePosition = nullptr;
+	OGLVertexAttributeColor *m_pVertexAttributeColor = nullptr;
+	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord = nullptr;
 
-	OGLUniformMatrix4 *m_pUniformModelMatrix;
-	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
+	OGLUniformMatrix4 *m_pUniformModelMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
 
-	OGLUniformBool *m_pUniformHasTextureColor;
-	OGLUniformSampler2D *m_pUniformTextureColor;
+	OGLUniformBool *m_pUniformHasTextureColor = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
 
-	OGLMaterialBlock *m_pMaterialsBlock;
+	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
+	OGLFogParamsBlock *m_pFogParamsBlock = nullptr;
 };
 
 #endif // ! OGLPROGRAM_MINIMAL_TEXTURE_H_

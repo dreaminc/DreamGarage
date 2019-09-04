@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 
+#include "api/array_view.h"
 #include "api/optional.h"
 #include "api/rtpreceiverinterface.h"
 #include "api/rtpsenderinterface.h"
@@ -37,8 +38,7 @@ struct RtpTransceiverInit final {
   RtpTransceiverDirection direction = RtpTransceiverDirection::kSendRecv;
 
   // The added RtpTransceiver will be added to these streams.
-  // TODO(bugs.webrtc.org/7600): Not implemented.
-  std::vector<rtc::scoped_refptr<MediaStreamInterface>> streams;
+  std::vector<std::string> stream_ids;
 
   // TODO(bugs.webrtc.org/7600): Not implemented.
   std::vector<RtpEncodingParameters> send_encodings;
@@ -60,6 +60,10 @@ struct RtpTransceiverInit final {
 // https://w3c.github.io/webrtc-pc/#dom-rtcrtptransceiver
 class RtpTransceiverInterface : public rtc::RefCountInterface {
  public:
+  // Media type of the transceiver. Any sender(s)/receiver(s) will have this
+  // type as well.
+  virtual cricket::MediaType media_type() const = 0;
+
   // The mid attribute is the mid negotiated and present in the local and
   // remote descriptions. Before negotiation is complete, the mid value may be
   // null. After rollbacks, the value may change from a non-null value to null.

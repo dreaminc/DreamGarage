@@ -204,6 +204,10 @@ public:
 		return m_glCreateShader(type);
 	}
 
+	inline GLuint glCreateShaderObject(GLenum type) {
+		return m_glCreateShaderObject(type);
+	}
+
 	inline void glDeleteShader(GLuint shader) {
 		return m_glDeleteShader(shader);
 	}
@@ -280,6 +284,10 @@ public:
 		return m_glBindFramebuffer(target, framebufferID);
 	}
 
+	inline void glDeleteFramebuffers(GLsizei n, const GLuint *framebuffers) {
+		return m_glDeleteFrameBuffers(n, framebuffers);
+	}
+
 	inline void glGenRenderbuffers(GLsizei n, GLuint *renderbuffers) {
 		return m_glGenRenderbuffers(n, renderbuffers);
 	}
@@ -322,6 +330,15 @@ public:
 
 	inline void glDrawBuffers(GLsizei n, const GLenum *bufs) {
 		return m_glDrawBuffers(n, bufs);
+	}
+
+	// PBO
+	inline void* glMapBuffer(GLenum target, GLenum access) {
+		return m_glMapBuffer(target, access);
+	}
+
+	inline bool glUnmapBuffer(GLenum target) {
+		return m_glUnmapBuffer(target);
 	}
 
 	// VBO
@@ -455,6 +472,7 @@ private:
 	PFNGLATTACHSHADERPROC m_glAttachShader;
 	PFNGLDETACHSHADERPROC m_glDetachShader;
 	PFNGLCREATESHADERPROC m_glCreateShader;
+	PFNGLCREATESHADEROBJECTARBPROC m_glCreateShaderObject;
 	PFNGLDELETESHADERPROC m_glDeleteShader;
 	PFNGLSHADERSOURCEPROC m_glShaderSource;
 	PFNGLCOMPILESHADERPROC m_glCompileShader;
@@ -480,6 +498,7 @@ private:
 	// FBO
 	PFNGLGENFRAMEBUFFERSPROC m_glGenFramebuffers;
 	PFNGLBINDFRAMEBUFFERPROC m_glBindFramebuffer;
+	PFNGLDELETEFRAMEBUFFERSPROC m_glDeleteFrameBuffers;
 
 	PFNGLGENRENDERBUFFERSPROC m_glGenRenderbuffers;
 	PFNGLDELETERENDERBUFFERSPROC m_glDeleteRenderbuffers;
@@ -493,6 +512,10 @@ private:
 	PFNGLBLITFRAMEBUFFERPROC m_glBlitFramebuffer;
 
 	PFNGLDRAWBUFFERSPROC m_glDrawBuffers;
+
+	// PBO
+	PFNGLMAPBUFFERPROC m_glMapBuffer;
+	PFNGLUNMAPBUFFERPROC m_glUnmapBuffer;
 
 	// VBO
 	PFNGLGENBUFFERSPROC m_glGenBuffers;

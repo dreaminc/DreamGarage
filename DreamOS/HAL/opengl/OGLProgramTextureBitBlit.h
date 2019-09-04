@@ -14,7 +14,7 @@
 
 class OGLProgramTextureBitBlit : public OGLProgram {
 public:
-	OGLProgramTextureBitBlit(OpenGLImp *pParentImp);
+	OGLProgramTextureBitBlit(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	virtual RESULT OGLInitialize() override;
 	virtual RESULT SetupConnections() override;

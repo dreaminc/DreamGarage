@@ -33,6 +33,8 @@ RESULT InteractionEngine::Initialize() {
 
 	CR(InitializeActiveObjectQueues());
 
+	m_padInteractionEvent = InteractionObjectEvent(INTERACTION_EVENT_PAD_MOVE);
+
 Error:
 	return r;
 }
@@ -163,7 +165,24 @@ RESULT InteractionEngine::UpdateAnimationQueue() {
 	msNow /= 1000.0;
 
 	m_pObjectQueue->Update(msNow);
-//Error:
+
+	// TODO: accumulator is commented out for now because:
+	// it was combining events for left and right controllers
+	// it was always sending events even if nothing was accumulated
+	/*
+	auto tCurrent = std::chrono::high_resolution_clock::now();
+	m_msLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(tCurrent - m_tLastUpdate).count();
+
+	if (m_msLastUpdate >= (int)(FRAME_MS)) {
+		CR(NotifySubscribers(INTERACTION_EVENT_PAD_MOVE, &m_padInteractionEvent));
+
+		m_tLastUpdate = tCurrent;
+		m_padInteractionEvent = InteractionObjectEvent(INTERACTION_EVENT_PAD_MOVE);
+		m_padInteractionEvent.m_state = ControllerState();
+	}
+	//*/
+
+Error:
 	return r;
 }
 
@@ -587,7 +606,7 @@ RESULT InteractionEngine::UpdateObjectStore(ActiveObject::type activeObjectType,
 		// Acquire manifold accordingly
 		if (activeObjectType == ActiveObject::type::INTERSECT) {
 			interactionEvent.m_interactionRay = pInteractionObject->GetRay(true);
-
+			
 			if (pDimObj->Intersect(interactionEvent.m_interactionRay)) {
 				manifold = pDimObj->Collide(interactionEvent.m_interactionRay);
 				fIntersect = true;
@@ -741,6 +760,7 @@ RESULT InteractionEngine::RemoveActiveObjects(std::map<VirtualObj*, std::vector<
 		if (activeObjectQueuePair.first == ActiveObject::type::INTERSECT) {
 			interactionEvent.m_eventType = InteractionEventType::ELEMENT_INTERSECT_ENDED;
 			interactionEvent.m_interactionRay = pInteractionObject->GetRay();
+			interactionEvent.m_pInteractionObject = pInteractionObject;
 		}
 		else if (activeObjectQueuePair.first == ActiveObject::type::COLLIDE) {
 			interactionEvent.m_eventType = InteractionEventType::ELEMENT_COLLIDE_ENDED;
@@ -798,38 +818,53 @@ Error:
 RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
-	//TODO: this should be called activeObjectQueuePair, because only the second value is the activeObjectQueue
-	for (auto &activeObjectQueue : m_activeObjectQueues) {
+	// turning off time step for now
 
-		std::vector<VirtualObj*> capturedObjectsToRemove;
-		std::map<VirtualObj*, std::vector<std::shared_ptr<ActiveObject>>> activeObjectsToRemove;
+	//auto timeNow = std::chrono::high_resolution_clock::now();
+	//auto timeDelta = std::chrono::duration<double>(timeNow - m_lastUpdateTime).count();
+	//m_lastUpdateTime = timeNow;
+	//
+	//m_elapsedTime += timeDelta;
+	//
+	//if (m_elapsedTime >= m_sTimeStep) {
+	//
+	//	//m_elapsedTime = m_elapsedTime - m_sTimeStep;
+	//	m_elapsedTime = 0;
 
-		//TODO: extend capture object implementation to handle multiple captured objects
+		//TODO: this should be called activeObjectQueuePair, because only the second value is the activeObjectQueue
+		for (auto &activeObjectQueue : m_activeObjectQueues) {
 
-		// TODO: First pass (no state tracking yet)
-		// Set all objects to non-intersected - below will set it to intersected, then remaining
-		// non-intersected objects are clearly no longer in the active set
-		CR(activeObjectQueue.second.SetAllActiveObjectStates(ActiveObject::state::NOT_INTERSECTED));
+			std::vector<VirtualObj*> capturedObjectsToRemove;
+			std::map<VirtualObj*, std::vector<std::shared_ptr<ActiveObject>>> activeObjectsToRemove;
 
-		CR(UpdateCapturedObjectStore());
+			//TODO: extend capture object implementation to handle multiple captured objects
 
-		for (auto &pInteractionObject : m_interactionObjects) {
-			//CR(UpdateObjectStoreRay(pObjectStore, pInteractionObject));
-			CR(UpdateObjectStore(activeObjectQueue.first, pObjectStore, pInteractionObject));
+			// TODO: First pass (no state tracking yet)
+			// Set all objects to non-intersected - below will set it to intersected, then remaining
+			// non-intersected objects are clearly no longer in the active set
+			CR(activeObjectQueue.second.SetAllActiveObjectStates(ActiveObject::state::NOT_INTERSECTED));
 
-			UpdateCapturedObjects(pInteractionObject);
+			CR(UpdateCapturedObjectStore());
 
-			for (auto &pActiveObject : activeObjectQueue.second[pInteractionObject]) {
-				// Add to remove list if not intersected in current frame
-				if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
-					activeObjectsToRemove[pInteractionObject].push_back(pActiveObject);
+			for (auto &pInteractionObject : m_interactionObjects) {
+				//CR(UpdateObjectStoreRay(pObjectStore, pInteractionObject));
+				CR(UpdateObjectStore(activeObjectQueue.first, pObjectStore, pInteractionObject));
+
+				UpdateCapturedObjects(pInteractionObject);
+
+				for (auto &pActiveObject : activeObjectQueue.second[pInteractionObject]) {
+					// Add to remove list if not intersected in current frame
+					if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
+						activeObjectsToRemove[pInteractionObject].push_back(pActiveObject);
+					}
 				}
+				auto removePair = std::pair<ActiveObject::type, ActiveObjectQueue*>(activeObjectQueue.first, &activeObjectQueue.second);
+				CR(RemoveActiveObjects(activeObjectsToRemove, removePair, pInteractionObject));
 			}
-			auto removePair = std::pair<ActiveObject::type, ActiveObjectQueue*>(activeObjectQueue.first, &activeObjectQueue.second);
-			CR(RemoveActiveObjects(activeObjectsToRemove, removePair, pInteractionObject));
+			CR(UpdateCapturedObjectStore());
 		}
-		CR(UpdateCapturedObjectStore());
-	}
+
+	//}
 
 Error:
 	return r;
@@ -838,55 +873,78 @@ Error:
 RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 
-	//TODO:  Expand this to accommodate for left controller
-	if(pEvent->state.type == CONTROLLER_RIGHT) {
-		switch (pEvent->type) {
-			case SENSE_CONTROLLER_TRIGGER_UP: {
-				for(auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
-					VirtualObj *pObject = pActiveObject->GetObject();
+	switch (pEvent->type) {
+		case SENSE_CONTROLLER_TRIGGER_UP: {
+			for(auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
+				VirtualObj *pObject = pActiveObject->GetObject();
 
-					InteractionEventType type = INTERACTION_EVENT_SELECT_UP;
-					InteractionObjectEvent interactionEvent(type, pObject);
+				InteractionEventType type = INTERACTION_EVENT_SELECT_UP;
+				InteractionObjectEvent interactionEvent(type, pObject);
 
-					CR(NotifySubscribers(pObject, type, &interactionEvent));
-				}
-			} break;
+				CR(NotifySubscribers(pObject, type, &interactionEvent));
+			}
+		} break;
 
-			case SENSE_CONTROLLER_TRIGGER_DOWN: {
-				for (auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
-					VirtualObj *pObject = pActiveObject->GetObject();
+		case SENSE_CONTROLLER_TRIGGER_DOWN: {
+			for (auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
+				VirtualObj *pObject = pActiveObject->GetObject();
 
-					InteractionEventType type = INTERACTION_EVENT_SELECT_DOWN;
-					InteractionObjectEvent interactionEvent(type, pObject);
+				InteractionEventType type = INTERACTION_EVENT_SELECT_DOWN;
+				InteractionObjectEvent interactionEvent(type, pObject);
 
-					CR(NotifySubscribers(pObject, type, &interactionEvent));
-				}
-			} break;
 
-			case SENSE_CONTROLLER_MENU_UP: {
-				InteractionEventType type = INTERACTION_EVENT_MENU;
-				InteractionObjectEvent interactionEvent(type);
+				CR(NotifySubscribers(pObject, type, &interactionEvent));
+			}
+		} break;
+
+		case SENSE_CONTROLLER_MENU_UP: {
+			InteractionEventType type = INTERACTION_EVENT_MENU;
+			InteractionObjectEvent interactionEvent(type);
+
+			CR(NotifySubscribers(type, &interactionEvent));
+		} break;
+
+		case SENSE_CONTROLLER_PAD_MOVE: {
+			// Keeps decimal in accumulator, moves value into touchY
+			m_interactionPadAccumulator += pEvent->state.ptTouchpad.y();
+			double touchY = m_interactionPadAccumulator;
+			m_interactionPadAccumulator = std::modf(m_interactionPadAccumulator, &touchY);
+
+			m_padInteractionEvent = InteractionObjectEvent(INTERACTION_EVENT_PAD_MOVE);
+			m_padInteractionEvent.m_state = ControllerState();
+
+			for (auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
+				VirtualObj *pObject = pActiveObject->GetObject();
+
+				InteractionEventType type = INTERACTION_EVENT_WHEEL;
+				InteractionObjectEvent interactionEvent(type, pObject);
+				interactionEvent.SetValue((int)(touchY));
 
 				CR(NotifySubscribers(type, &interactionEvent));
-			} break;
+			}
 
-			case SENSE_CONTROLLER_PAD_MOVE: {
-				// Keeps decimal in accumulator, moves value into touchY
-				m_interactionPadAccumulator += pEvent->state.ptTouchpad.y();
-				double touchY = m_interactionPadAccumulator;
-				m_interactionPadAccumulator = std::modf(m_interactionPadAccumulator, &touchY);
+			/*
+			float xDiff = -pEvent->state.ptTouchpad.x();
+			float yDiff = pEvent->state.ptTouchpad.y();
 
-				for (auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
-					VirtualObj *pObject = pActiveObject->GetObject();
+			double scale = m_msLastUpdate / FRAME_MS;
 
-					InteractionEventType type = INTERACTION_EVENT_WHEEL;
-					InteractionObjectEvent interactionEvent(type, pObject);
-					interactionEvent.SetValue((int)(touchY));
+			xDiff *= scale;
+			yDiff *= scale;
+	
+			ControllerState interactionState = pEvent->state;
+			interactionState.ptTouchpad.x() = m_padInteractionEvent.GetControllerState().ptTouchpad.x() - xDiff;
+			interactionState.ptTouchpad.y() = m_padInteractionEvent.GetControllerState().ptTouchpad.y() + yDiff;
+			//*/
 
-					CR(NotifySubscribers(type, &interactionEvent));
-				}
-			} break;
-		}
+			InteractionObjectEvent padInteractionEvent(INTERACTION_EVENT_PAD_MOVE);
+			padInteractionEvent.SetControllerState(pEvent->state);
+
+			//m_padInteractionEvent.SetControllerState(interactionState);
+			CR(NotifySubscribers(INTERACTION_EVENT_PAD_MOVE, &padInteractionEvent));
+
+			
+		} break;
 	}
 
 Error:

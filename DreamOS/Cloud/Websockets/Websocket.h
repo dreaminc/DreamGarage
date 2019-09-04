@@ -30,8 +30,12 @@
 
 #pragma warning(pop)
 
-//typedef websocketpp::client<websocketpp::config::asio_client> WebsocketClient;
+#ifdef USE_LOCALHOST
+typedef websocketpp::client<websocketpp::config::asio_client> WebsocketClient;
+#else
 typedef websocketpp::client<websocketpp::config::asio_tls_client> WebsocketClient;
+#endif
+
 typedef websocketpp::lib::shared_ptr<websocketpp::lib::asio::ssl::context> context_ptr;
 
 using websocketpp::lib::placeholders::_1;
@@ -81,7 +85,7 @@ public:
 	}
 
 private:
-	RESULT ProcessingThread();
+	websocketpp::lib::shared_ptr<websocketpp::lib::thread> m_pWebsockThread;
 	void OnMessage(WebsocketClient* pWebsicketClient, websocketpp::connection_hdl hWebsocketConnection, message_ptr pWebsocketMessage);
 
 	void OnOpen(websocketpp::connection_hdl hWebsocketConnection);
@@ -89,7 +93,7 @@ private:
 	void OnFail(websocketpp::connection_hdl hWebsocketConnection);
 
 private:
-	std::thread	m_thread;
+	//std::thread	m_thread;
 	bool m_fRunning;
 	bool m_fConnectionOpen;
 

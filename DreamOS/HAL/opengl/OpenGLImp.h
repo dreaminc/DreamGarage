@@ -13,8 +13,6 @@
 
 #include "OpenGLRenderingContext.h"
 
-#include "TimeManager/TimeManager.h"
-
 //#include "Primitives/camera.h"
 #include "Primitives/version.h"
 
@@ -34,6 +32,12 @@ class OGLDreamConsole;
 class font;
 class mesh;
 
+class OGLSphere;
+class OGLVolume;
+class OGLQuad;
+class OGLModel;
+class OGLMesh;
+
 class OpenGLImp : public HALImp {
 private:
 	// TODO: Fix this architecture 
@@ -51,19 +55,27 @@ public:
 	version GetOGLVersion() { return m_versionOGL; }
 	version GetGLSLVersion() { return m_versionGLSL; }
 
+	virtual RESULT InitializeObject(DimObj *pDimObj) override;
+	virtual RESULT InitializeTexture(texture *pTexture) override;
+	virtual DimObj* MakeObject(PrimParams *pPrimParams, bool fInitialize = true) override;
+	virtual texture* MakeTexture(PrimParams *pPrimParams, bool fInitialize = true) override;
+
 	// TODO: Remove and use param pack function
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) override;
+	
+	OGLQuad* MakeQuad(PrimParams *pPrimParams, bool fInitialize);
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) override;
-	virtual quad* MakeQuad(double width, double height, point ptOrigin, vector vNormal = vector::jVector()) override;
-	virtual quad* MakeQuad(double width, double height, point ptOrigin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector()) override;
+	virtual quad* MakeQuad(double width, double height, point ptCenter, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector()) override;
 	virtual quad* MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector()) override;
 
+	OGLSphere* MakeSphere(PrimParams *pSphereParams, bool fInitialize = false);
 	virtual sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) override;
 
 	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) override;
 	virtual DimRay* MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) override;
 	virtual DimPlane* MakePlane(point ptOrigin = point(), vector vNormal = vector::jVector(1.0f)) override;
 	
+	OGLVolume *MakeVolume(PrimParams *pPrimParams, bool fInitialize = false);
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) override;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) override;
 	
@@ -74,23 +86,31 @@ public:
 	virtual text* MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) override;
 	virtual text* MakeText(const std::wstring& wstrFontName, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) override;
 	
-	virtual texture* MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) override;
-	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) override;
-	virtual texture* MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) override;
 	virtual texture* MakeTexture(const texture &srcTexture) override;
+	virtual texture* MakeTexture(texture::type type, const wchar_t *pszFilename) override;
+	virtual texture* MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) override;
+	virtual texture* MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) override;
 	
+	virtual cubemap* MakeCubemap(const std::wstring &wstrCubemapName) override;
+
 	skybox *MakeSkybox();
 
 	//mesh *MakeMesh(wchar_t *pszModelName);
+	OGLMesh* MakeMesh(PrimParams *pPrimParams, bool fInitialize = false);
 	mesh *MakeMesh(const std::vector<vertex>& vertices);
 	mesh *MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
+	OGLModel* MakeModel(PrimParams *pPrimParams, bool fInitialize = false);
 	virtual composite *MakeComposite() override;
 	virtual model *MakeModel() override;
 
 	FlatContext* MakeFlatContext(int width, int height, int channels);
 	user *MakeUser();
+
+	virtual billboard *MakeBillboard(point ptOrigin, float width, float height) override;
+
 	hand* MakeHand(HAND_TYPE type);
+	hand* MakeHand(HAND_TYPE type, long avatarID);
 
 	// TODO: Fix w/ scene graph not here
 	//composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
@@ -104,7 +124,7 @@ public:
 
 	virtual SinkNode* MakeSinkNode(std::string strSinkNodeName) override;
 	virtual SourceNode* MakeSourceNode(std::string strNodeName) override;
-	virtual ProgramNode* MakeProgramNode(std::string strNodeName) override;
+	virtual ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) override;
 
 public:
 	virtual RESULT Resize(viewport newViewport) override;
@@ -146,6 +166,11 @@ public:
 	// FBO
 	RESULT glGenFramebuffers(GLsizei n, GLuint *framebuffers);
 	RESULT glBindFramebuffer(GLenum target, GLuint gluiFramebuffer);
+	RESULT glDeleteFramebuffers(GLsizei n, const GLuint *framebuffers);
+
+	// PBO
+	void *glMapBuffer(GLenum target, GLenum access);
+	RESULT glUnmapBuffer(GLenum target);
 
 	// Renderbuffer
 	RESULT glGenRenderbuffers(GLsizei n, GLuint *renderbuffers);
@@ -202,6 +227,7 @@ public:
 
 	// Shaders
 	RESULT CreateShader(GLenum type, GLuint *shaderID);
+	RESULT CreateShaderObject(GLenum type, GLuint *shaderID);
 	RESULT ShaderSource(GLuint shaderID, GLsizei count, const GLchar *const*string, const GLint *length);
 	RESULT CompileShader(GLuint shaderID);
 	RESULT GetShaderiv(GLuint programID, GLenum pname, GLint *params);

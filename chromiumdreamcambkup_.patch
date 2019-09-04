@@ -1,0 +1,1935 @@
+diff --git a/media/audio/BUILD.gn b/media/audio/BUILD.gn
+index 6b7ecca..bf22225 100644
+--- a/media/audio/BUILD.gn
++++ b/media/audio/BUILD.gn
+@@ -143,6 +143,8 @@ source_set("audio") {
+     "audio_thread_impl.h",
+     "clockless_audio_sink.cc",
+     "clockless_audio_sink.h",
++    "dream_audio_input_stream.cc",
++    "dream_audio_input_stream.h",
+     "fake_audio_input_stream.cc",
+     "fake_audio_input_stream.h",
+     "fake_audio_log_factory.cc",
+diff --git a/media/audio/dream_audio_input_stream.cc b/media/audio/dream_audio_input_stream.cc
+new file mode 100644
+index 0000000..87ad2fc
+--- /dev/null
++++ b/media/audio/dream_audio_input_stream.cc
+@@ -0,0 +1,154 @@
++// Copyright (c) 2012 The Chromium Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "media/audio/dream_audio_input_stream.h"
++
++#include "base/atomicops.h"
++#include "base/bind.h"
++#include "base/bind_helpers.h"
++#include "base/command_line.h"
++#include "base/files/file_path.h"
++#include "base/memory/ptr_util.h"
++#include "base/single_thread_task_runner.h"
++#include "base/strings/string_split.h"
++#include "base/time/time.h"
++#include "media/audio/audio_manager_base.h"
++#include "media/audio/simple_sources.h"
++#include "media/base/audio_bus.h"
++#include "media/base/media_switches.h"
++
++namespace media {
++
++namespace {
++base::subtle::AtomicWord g_fake_input_streams_are_muted = 0;
++}
++
++AudioInputStream* DreamAudioInputStream::MakeDreamStream(
++    AudioManagerBase* manager,
++    const AudioParameters& params) {
++  return new DreamAudioInputStream(manager, params);
++}
++
++DreamAudioInputStream::DreamAudioInputStream(AudioManagerBase* manager,
++                                           const AudioParameters& params)
++    : audio_manager_(manager),
++      callback_(NULL),
++      fake_audio_worker_(manager->GetWorkerTaskRunner(), params),
++      params_(params),
++      audio_bus_(AudioBus::Create(params)) {
++  DCHECK(audio_manager_->GetTaskRunner()->BelongsToCurrentThread());
++}
++
++DreamAudioInputStream::~DreamAudioInputStream() {
++  DCHECK(!callback_);
++}
++
++bool DreamAudioInputStream::Open() {
++  DCHECK(audio_manager_->GetTaskRunner()->BelongsToCurrentThread());
++  audio_bus_->Zero();
++
++  return true;
++}
++
++void DreamAudioInputStream::Start(AudioInputCallback* callback) {
++  DCHECK(audio_manager_->GetTaskRunner()->BelongsToCurrentThread());
++  callback_ = callback;
++  fake_audio_worker_.Start(base::Bind(
++      &DreamAudioInputStream::ReadAudioFromSource, base::Unretained(this)));
++}
++
++void DreamAudioInputStream::Stop() {
++  DCHECK(audio_manager_->GetTaskRunner()->BelongsToCurrentThread());
++  fake_audio_worker_.Stop();
++  callback_ = NULL;
++}
++
++void DreamAudioInputStream::Close() {
++  DCHECK(audio_manager_->GetTaskRunner()->BelongsToCurrentThread());
++  Stop();
++  audio_manager_->ReleaseInputStream(this);
++}
++
++double DreamAudioInputStream::GetMaxVolume() {
++  DCHECK(audio_manager_->GetTaskRunner()->BelongsToCurrentThread());
++  return 1.0;
++}
++
++void DreamAudioInputStream::SetVolume(double volume) {
++  DCHECK(audio_manager_->GetTaskRunner()->BelongsToCurrentThread());
++}
++
++double DreamAudioInputStream::GetVolume() {
++  DCHECK(audio_manager_->GetTaskRunner()->BelongsToCurrentThread());
++  return 1.0;
++}
++
++bool DreamAudioInputStream::IsMuted() {
++  DCHECK(audio_manager_->GetTaskRunner()->BelongsToCurrentThread());
++  return base::subtle::NoBarrier_Load(&g_fake_input_streams_are_muted) != 0;
++}
++
++bool DreamAudioInputStream::SetAutomaticGainControl(bool enabled) {
++  return false;
++}
++
++bool DreamAudioInputStream::GetAutomaticGainControl() {
++  return false;
++}
++
++void DreamAudioInputStream::SetOutputDeviceForAec(
++    const std::string& output_device_id) {
++  // Not supported. Do nothing.
++}
++
++void DreamAudioInputStream::ReadAudioFromSource() {
++  DCHECK(audio_manager_->GetWorkerTaskRunner()->BelongsToCurrentThread());
++  DCHECK(callback_);
++
++  if (!audio_source_)
++    audio_source_ = ChooseSource();
++
++  audio_source_->OnMoreData(base::TimeDelta(), base::TimeTicks::Now(), 0,
++                            audio_bus_.get());
++  callback_->OnData(audio_bus_.get(), base::TimeTicks::Now(), 1.0);
++}
++
++using AudioSourceCallback = AudioOutputStream::AudioSourceCallback;
++std::unique_ptr<AudioSourceCallback> DreamAudioInputStream::ChooseSource() {
++  DCHECK(audio_manager_->GetWorkerTaskRunner()->BelongsToCurrentThread());
++
++  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
++      switches::kUseFileForFakeAudioCapture)) {
++    base::CommandLine::StringType switch_value =
++        base::CommandLine::ForCurrentProcess()->GetSwitchValueNative(
++            switches::kUseFileForFakeAudioCapture);
++    base::CommandLine::StringVector parameters =
++        base::SplitString(switch_value, FILE_PATH_LITERAL("%"),
++                          base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
++    CHECK(parameters.size() > 0) << "You must pass <file>[%noloop] to  --"
++                                 << switches::kUseFileForFakeAudioCapture
++                                 << ".";
++    base::FilePath path_to_wav_file = base::FilePath(parameters[0]);
++    bool looping = true;
++    if (parameters.size() == 2) {
++      CHECK(parameters[1] == FILE_PATH_LITERAL("noloop"))
++          << "Unknown parameter " << parameters[1] << " to "
++          << switches::kUseFileForFakeAudioCapture << ".";
++      looping = false;
++    }
++    return std::make_unique<FileSource>(params_, path_to_wav_file, looping);
++  }
++  return std::make_unique<BeepingSource>(params_);
++}
++
++void DreamAudioInputStream::BeepOnce() {
++  BeepingSource::BeepOnce();
++}
++
++void DreamAudioInputStream::SetGlobalMutedState(bool is_muted) {
++  base::subtle::NoBarrier_Store(&g_fake_input_streams_are_muted,
++                                (is_muted ? 1 : 0));
++}
++
++}  // namespace media
+diff --git a/media/audio/dream_audio_input_stream.h b/media/audio/dream_audio_input_stream.h
+new file mode 100644
+index 0000000..1594e3a
+--- /dev/null
++++ b/media/audio/dream_audio_input_stream.h
+@@ -0,0 +1,83 @@
++// Copyright (c) 2012 The Chromium Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++//
++// A fake implementation of AudioInputStream, useful for testing purpose.
++
++#ifndef MEDIA_AUDIO_DREAM_AUDIO_INPUT_STREAM_H_
++#define MEDIA_AUDIO_DREAM_AUDIO_INPUT_STREAM_H_
++
++#include <memory>
++#include <vector>
++
++#include "base/callback_forward.h"
++#include "base/macros.h"
++#include "media/audio/audio_io.h"
++#include "media/base/audio_parameters.h"
++#include "media/base/fake_audio_worker.h"
++
++namespace media {
++
++class AudioBus;
++class AudioManagerBase;
++
++// This class acts as a fake audio input stream. The default is to generate a
++// beeping sound unless --use-file-for-fake-audio-capture=<file> is specified,
++// in which case the indicated .wav file will be read and played into the
++// stream.
++class MEDIA_EXPORT DreamAudioInputStream
++    : public AudioInputStream {
++ public:
++  static AudioInputStream* MakeDreamStream(
++      AudioManagerBase* manager, const AudioParameters& params);
++
++  bool Open() override;
++  void Start(AudioInputCallback* callback) override;
++  void Stop() override;
++  void Close() override;
++  double GetMaxVolume() override;
++  void SetVolume(double volume) override;
++  double GetVolume() override;
++  bool IsMuted() override;
++  bool SetAutomaticGainControl(bool enabled) override;
++  bool GetAutomaticGainControl() override;
++  void SetOutputDeviceForAec(const std::string& output_device_id) override;
++
++  // Generate one beep sound. This method is called by FakeVideoCaptureDevice to
++  // test audio/video synchronization. This is a static method because
++  // FakeVideoCaptureDevice is disconnected from an audio device. This means
++  // only one instance of this class gets to respond, which is okay because we
++  // assume there's only one stream for this testing purpose. Furthermore this
++  // method will do nothing if --use-file-for-fake-audio-capture is specified
++  // since the input stream will be playing from a file instead of beeping.
++  // TODO(hclam): Make this non-static. To do this we'll need to fix
++  // crbug.com/159053 such that video capture device is aware of audio
++  // input stream.
++  static void BeepOnce();
++
++  // Set the muted state for _all_ FakeAudioInputStreams. The value is global,
++  // so it can be set before any FakeAudioInputStreams have been created.
++  static void SetGlobalMutedState(bool is_muted);
++
++ private:
++  DreamAudioInputStream(AudioManagerBase* manager,
++                       const AudioParameters& params);
++  ~DreamAudioInputStream() override;
++
++  std::unique_ptr<AudioOutputStream::AudioSourceCallback> ChooseSource();
++  void ReadAudioFromSource();
++
++  AudioManagerBase* audio_manager_;
++  AudioInputCallback* callback_;
++  FakeAudioWorker fake_audio_worker_;
++  AudioParameters params_;
++
++  std::unique_ptr<AudioOutputStream::AudioSourceCallback> audio_source_;
++  std::unique_ptr<media::AudioBus> audio_bus_;
++
++  DISALLOW_COPY_AND_ASSIGN(DreamAudioInputStream);
++};
++
++}  // namespace media
++
++#endif  // MEDIA_AUDIO_DREAM_AUDIO_INPUT_STREAM_H_
+diff --git a/media/base/media_switches.cc b/media/base/media_switches.cc
+index 4d7ffad..b7f53c0 100644
+--- a/media/base/media_switches.cc
++++ b/media/base/media_switches.cc
+@@ -91,6 +91,9 @@ const char kDisableMojoRenderer[] = "disable-mojo-renderer";
+ // Use fake device for Media Stream to replace actual camera and microphone.
+ const char kUseFakeDeviceForMediaStream[] = "use-fake-device-for-media-stream";
+ 
++// Use fake device for Media Stream to replace actual camera and microphone.
++const char kUseDreamDeviceForMediaStream[] = "use-dream-device-for-media-stream";
++
+ // Use an .y4m file to play as the webcam. See the comments in
+ // media/capture/video/file_video_capture_device.h for more details.
+ const char kUseFileForFakeVideoCapture[] = "use-file-for-fake-video-capture";
+diff --git a/media/base/media_switches.h b/media/base/media_switches.h
+index 3c9e8f0..10777c8 100644
+--- a/media/base/media_switches.h
++++ b/media/base/media_switches.h
+@@ -61,6 +61,7 @@ MEDIA_EXPORT extern const char kDisableMojoRenderer[];
+ #endif  // BUILDFLAG(ENABLE_RUNTIME_MEDIA_RENDERER_SELECTION)
+ 
+ MEDIA_EXPORT extern const char kUseFakeDeviceForMediaStream[];
++MEDIA_EXPORT extern const char kUseDreamDeviceForMediaStream[];
+ MEDIA_EXPORT extern const char kUseFileForFakeVideoCapture[];
+ MEDIA_EXPORT extern const char kUseFileForFakeAudioCapture[];
+ MEDIA_EXPORT extern const char kUseFakeJpegDecodeAccelerator[];
+diff --git a/media/capture/BUILD.gn b/media/capture/BUILD.gn
+index 3abb9a2..5bfe594 100644
+--- a/media/capture/BUILD.gn
++++ b/media/capture/BUILD.gn
+@@ -60,6 +60,8 @@ jumbo_source_set("capture_device_specific") {
+     "content/video_capture_oracle.h",
+     "video/blob_utils.cc",
+     "video/blob_utils.h",
++    "video/dream_video_capture_device.cc",
++    "video/dream_video_capture_device.h",
+     "video/fake_video_capture_device.cc",
+     "video/fake_video_capture_device.h",
+     "video/fake_video_capture_device_factory.cc",
+diff --git a/media/capture/video/create_video_capture_device_factory.cc b/media/capture/video/create_video_capture_device_factory.cc
+index 9e4bcfc..caccca3 100644
+--- a/media/capture/video/create_video_capture_device_factory.cc
++++ b/media/capture/video/create_video_capture_device_factory.cc
+@@ -69,13 +69,18 @@ CreatePlatformSpecificVideoCaptureDeviceFactory(
+ std::unique_ptr<VideoCaptureDeviceFactory> CreateVideoCaptureDeviceFactory(
+     scoped_refptr<base::SingleThreadTaskRunner> ui_task_runner) {
+   const base::CommandLine* command_line =
+-      base::CommandLine::ForCurrentProcess();
++      base::CommandLine::ForCurrentProcess(); 
++
++  LOG(INFO) << "CreateVideoCaptureDeviceFactory";
++  
+   // Use a Fake or File Video Device Factory if the command line flags are
+   // present, otherwise use the normal, platform-dependent, device factory.
+   if (command_line->HasSwitch(switches::kUseFakeDeviceForMediaStream)) {
+     if (command_line->HasSwitch(switches::kUseFileForFakeVideoCapture)) {
+       return std::make_unique<FileVideoCaptureDeviceFactory>();
+     } else {
++      LOG(INFO) << "CreateVideoCaptureDeviceFactory - FAKE";
++
+       std::vector<FakeVideoCaptureDeviceSettings> config;
+       FakeVideoCaptureDeviceFactory::ParseFakeDevicesConfigFromOptionsString(
+           command_line->GetSwitchValueASCII(
+diff --git a/media/capture/video/dream_video_capture_device.cc b/media/capture/video/dream_video_capture_device.cc
+new file mode 100644
+index 0000000..271c3ae
+--- /dev/null
++++ b/media/capture/video/dream_video_capture_device.cc
+@@ -0,0 +1,1087 @@
++// Copyright (c) 2012 The Chromium Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#include "media/capture/video/dream_video_capture_device.h"
++
++#include <stddef.h>
++#include <algorithm>
++#include <utility>
++
++#include "base/bind.h"
++#include "base/location.h"
++#include "base/macros.h"
++#include "base/memory/weak_ptr.h"
++#include "base/single_thread_task_runner.h"
++#include "base/strings/stringprintf.h"
++#include "base/threading/thread_checker.h"
++#include "base/threading/thread_task_runner_handle.h"
++#include "base/time/time.h"
++
++// TODO: Dream audio stream
++//#include "media/audio/fake_audio_input_stream.h"
++//#include "media/audio/dream_audio_input_stream.h"
++
++#include "media/base/video_frame.h"
++#include "third_party/skia/include/core/SkBitmap.h"
++#include "third_party/skia/include/core/SkCanvas.h"
++#include "third_party/skia/include/core/SkMatrix.h"
++#include "third_party/skia/include/core/SkPaint.h"
++#include "ui/gfx/codec/jpeg_codec.h"
++#include "ui/gfx/codec/png_codec.h"
++
++// Note: this is not currently multi-platform
++#include <windows.h>
++
++namespace media {
++
++namespace {
++
++// Sweep at 600 deg/sec.
++static const float kDreamPacmanAngularVelocity = 600;
++
++// Beep every 500 ms.
++static const int kDreamBeepInterval = 500;
++
++// Gradient travels from bottom to top in 5 seconds.
++static const float kDreamGradientFrequency = 1.0f / 5.0f;
++
++static const double kDreamMinZoom = 100.0;
++static const double kDreamMaxZoom = 400.0;
++static const double kDreamZoomStep = 1.0;
++
++// Larger int means better.
++enum class DreamPixelFormatMatchType : int {
++  INCOMPATIBLE = 0,
++  SUPPORTED_THROUGH_CONVERSION = 1,
++  EXACT = 2
++};
++
++DreamPixelFormatMatchType DetermineDreamFormatMatchType(
++    VideoPixelFormat supported_format,
++    VideoPixelFormat requested_format) {
++  if (requested_format == PIXEL_FORMAT_I420 &&
++      supported_format == PIXEL_FORMAT_MJPEG) {
++    return DreamPixelFormatMatchType::SUPPORTED_THROUGH_CONVERSION;
++  }
++
++  return (requested_format == supported_format)
++             ? DreamPixelFormatMatchType::EXACT
++             : DreamPixelFormatMatchType::INCOMPATIBLE;
++}
++
++const VideoCaptureFormat& FindClosestSupportedDreamFormat(
++    const VideoCaptureFormat& requested_format,
++    const VideoCaptureFormats& supported_formats) {
++  DCHECK(!supported_formats.empty());
++
++  int best_index = 0;
++
++  DreamPixelFormatMatchType best_format_match =
++      DreamPixelFormatMatchType::INCOMPATIBLE;
++  int best_width_mismatch = std::numeric_limits<int>::max();
++  float best_frame_rate_mismatch = std::numeric_limits<float>::max();
++
++  for (int i = 0; i < static_cast<int>(supported_formats.size()); i++) {
++    const auto& supported_format = supported_formats[i];
++
++    DreamPixelFormatMatchType current_format_match =
++        DetermineDreamFormatMatchType(supported_format.pixel_format,
++                                      requested_format.pixel_format);
++
++    if (current_format_match < best_format_match) {
++      continue;
++    }
++
++    if (supported_format.frame_size.width() <
++        requested_format.frame_size.width()) {
++      continue;
++    }
++
++    const int current_width_mismatch = supported_format.frame_size.width() -
++                                       requested_format.frame_size.width();
++
++    if (current_width_mismatch > best_width_mismatch) {
++      continue;
++    }
++
++    const float current_frame_rate_mismatch =
++        std::abs(supported_format.frame_rate - requested_format.frame_rate);
++
++    if (current_width_mismatch < best_width_mismatch) {
++      best_width_mismatch = current_width_mismatch;
++      best_frame_rate_mismatch = current_frame_rate_mismatch;
++      best_index = i;
++
++      continue;
++    }
++
++    DCHECK_EQ(best_frame_rate_mismatch, current_frame_rate_mismatch);
++
++    if (current_frame_rate_mismatch < best_frame_rate_mismatch) {
++      best_frame_rate_mismatch = current_frame_rate_mismatch;
++      best_index = i;
++    }
++  }
++
++  return supported_formats[best_index];
++}
++
++}  // anonymous namespace
++
++// Paints and delivers frames to a client, which is set via Initialize().
++class DreamFrameDeliverer {
++ public:
++  DreamFrameDeliverer(std::unique_ptr<DreamFramePainter> frame_painter)
++      : frame_painter_(std::move(frame_painter)) {
++    // empty
++  }
++
++  virtual ~DreamFrameDeliverer() = default;
++
++  virtual void Initialize(
++      VideoPixelFormat pixel_format,
++      std::unique_ptr<DreamVideoCaptureDevice::Client> client,
++      const DreamDeviceState* device_state) {
++    client_ = std::move(client);
++    device_state_ = device_state;
++    client_->OnStarted();
++  }
++
++  virtual void PaintAndDeliverNextFrame(base::TimeDelta timestamp_to_paint) = 0;
++
++ protected:
++  base::TimeDelta CalculateTimeSinceFirstInvocation(base::TimeTicks now) {
++    if (first_ref_time_.is_null()) {
++      first_ref_time_ = now;
++    }
++
++    return now - first_ref_time_;
++  }
++
++  DreamFramePainter* frame_painter() { return frame_painter_.get(); }
++
++  const DreamDeviceState* device_state() { return device_state_; }
++
++  VideoCaptureDevice::Client* client() { return client_.get(); }
++
++ private:
++  const std::unique_ptr<DreamFramePainter> frame_painter_ = nullptr;
++  const DreamDeviceState* device_state_ = nullptr;
++  std::unique_ptr<VideoCaptureDevice::Client> client_ = nullptr;
++  base::TimeTicks first_ref_time_;
++};
++
++// Delivers frames using its own buffers via OnIncomingCapturedData().
++class OwnBufferDreamFrameDeliverer : public DreamFrameDeliverer {
++ public:
++  OwnBufferDreamFrameDeliverer(
++      std::unique_ptr<DreamFramePainter> frame_painter);
++  ~OwnBufferDreamFrameDeliverer() override;
++
++  // Implementation of FrameDeliverer
++  void Initialize(VideoPixelFormat pixel_format,
++                  std::unique_ptr<VideoCaptureDevice::Client> client,
++                  const DreamDeviceState* device_state) override;
++
++  void PaintAndDeliverNextFrame(base::TimeDelta timestamp_to_paint) override;
++
++ private:
++  std::unique_ptr<uint8_t[]> buffer_;
++};
++
++// Delivers frames using buffers provided by the client via
++// OnIncomingCapturedBuffer().
++class DreamClientBufferFrameDeliverer : public DreamFrameDeliverer {
++ public:
++  DreamClientBufferFrameDeliverer(
++      std::unique_ptr<DreamFramePainter> frame_painter);
++  ~DreamClientBufferFrameDeliverer() override;
++
++  // Implementation of FrameDeliverer
++  void PaintAndDeliverNextFrame(base::TimeDelta timestamp_to_paint) override;
++};
++
++class DreamJpegEncodingFrameDeliverer : public DreamFrameDeliverer {
++ public:
++  DreamJpegEncodingFrameDeliverer(
++      std::unique_ptr<DreamFramePainter> frame_painter);
++  ~DreamJpegEncodingFrameDeliverer() override;
++
++  // Implementation of FrameDeliveryStrategy
++  void PaintAndDeliverNextFrame(base::TimeDelta timestamp_to_paint) override;
++
++ private:
++  std::vector<uint8_t> sk_n32_buffer_;
++  std::vector<unsigned char> jpeg_buffer_;
++};
++
++DreamFrameDelivererFactory::DreamFrameDelivererFactory(
++    DreamVideoCaptureDevice::DeliveryMode delivery_mode,
++    const DreamDeviceState* device_state)
++    : delivery_mode_(delivery_mode), device_state_(device_state) {
++  // empty
++}
++
++std::unique_ptr<DreamFrameDeliverer>
++DreamFrameDelivererFactory::CreateFrameDeliverer(
++    const VideoCaptureFormat& format) {
++  DreamFramePainter::Format painter_format;
++
++  switch (format.pixel_format) {
++    case PIXEL_FORMAT_I420: {
++      painter_format = DreamFramePainter::Format::I420;
++    } break;
++
++    case PIXEL_FORMAT_Y16: {
++      painter_format = DreamFramePainter::Format::Y16;
++    } break;
++
++    case PIXEL_FORMAT_MJPEG: {
++      painter_format = DreamFramePainter::Format::SK_N32;
++    } break;
++
++    case PIXEL_FORMAT_RGB32: {
++      painter_format = DreamFramePainter::Format::RGBA;
++    } break;
++
++    case PIXEL_FORMAT_ARGB: {
++      painter_format = DreamFramePainter::Format::ARGB;
++    } break;
++
++    default: {
++      NOTREACHED();
++      painter_format = DreamFramePainter::Format::I420;
++    } break;
++  }
++
++  auto frame_painter =
++      std::make_unique<DreamFramePainter>(painter_format, device_state_);
++
++  // Initialize frame painter pipe to Dream (this may block, so we need to
++  // figure this out)
++  frame_painter->InitializeNamedPipe();
++
++  DreamVideoCaptureDevice::DeliveryMode delivery_mode = delivery_mode_;
++
++  if (format.pixel_format == PIXEL_FORMAT_MJPEG &&
++      delivery_mode_ ==
++          DreamVideoCaptureDevice::DeliveryMode::USE_CLIENT_PROVIDED_BUFFERS) {
++    DLOG(WARNING) << "PIXEL_FORMAT_MJPEG cannot be used in combination with "
++                  << "USE_CLIENT_PROVIDED_BUFFERS. Switching to "
++                     "USE_DEVICE_INTERNAL_BUFFERS.";
++
++    delivery_mode =
++        DreamVideoCaptureDevice::DeliveryMode::USE_DEVICE_INTERNAL_BUFFERS;
++  }
++
++  switch (delivery_mode) {
++    case DreamVideoCaptureDevice::DeliveryMode::USE_DEVICE_INTERNAL_BUFFERS: {
++      if (format.pixel_format == PIXEL_FORMAT_MJPEG) {
++        return std::make_unique<DreamJpegEncodingFrameDeliverer>(
++            std::move(frame_painter));
++      } else {
++        return std::make_unique<OwnBufferDreamFrameDeliverer>(
++            std::move(frame_painter));
++      }
++    } break;
++
++    case DreamVideoCaptureDevice::DeliveryMode::USE_CLIENT_PROVIDED_BUFFERS: {
++      return std::make_unique<DreamClientBufferFrameDeliverer>(
++          std::move(frame_painter));
++    } break;
++  }
++
++  NOTREACHED();
++
++  return nullptr;
++}
++
++DreamFramePainter::DreamFramePainter(Format pixel_format,
++                                     const DreamDeviceState* dream_device_state)
++    : pixel_format_(pixel_format), dream_device_state_(dream_device_state) {
++  // empty
++}
++
++DreamFramePainter ::~DreamFramePainter() {
++  // Just turn it off
++  if (m_pDreamNamedPipeClient != nullptr) {
++    m_pDreamNamedPipeClient->StopNamedPipeProcess();
++
++    delete m_pDreamNamedPipeClient;
++    m_pDreamNamedPipeClient = nullptr;
++  }
++}
++
++std::wstring GetWindowsNamedPipeClientName(std::wstring strPipename) {
++  std::wstring wstrWindowsName = L"\\\\.\\pipe\\" + strPipename;
++  return wstrWindowsName;
++}
++
++int DreamNamedPipeClient::Initialize() {
++  int r = 0;
++
++  m_handleNamedPipe = CreateFile(
++      GetWindowsNamedPipeClientName(m_strPipename).c_str(),  // pipe name
++      GENERIC_READ |  // read and write access
++          GENERIC_WRITE,
++      0,              // no sharing
++      nullptr,        // default security attributes
++      OPEN_EXISTING,  // opens existing pipe
++      0,              // default attributes
++      nullptr);       // no template file
++
++  // Break if the pipe handle is valid.
++  if (m_handleNamedPipe == INVALID_HANDLE_VALUE) {
++    // Exit if an error other than ERROR_PIPE_BUSY occurs
++    DWORD err = GetLastError();
++    DCHECK((err == ERROR_PIPE_BUSY));
++
++    // Pipe instances are busy, so wait for 10 seconds
++    DCHECK((WaitNamedPipe(GetWindowsNamedPipeClientName(m_strPipename).c_str(),
++                          10000)));
++  }
++
++  DCHECK((m_handleNamedPipe != nullptr));
++
++  // Set mode of pipe
++  DWORD dwMode = PIPE_READMODE_BYTE;
++  bool fSuccess = SetNamedPipeHandleState(m_handleNamedPipe,  // pipe handle
++                                          &dwMode,            // new pipe mode
++                                          nullptr,   // don't set maximum bytes
++                                          nullptr);  // don't set maximum time
++
++  DCHECK((fSuccess));
++
++  // Kick off the process
++  StartNamedPipeProcess();
++
++  return r;
++}
++
++void DreamFramePainter::InitializeNamedPipe() {
++  // int result = 0;
++
++  // TODO: Not sure if we need this - pipe is of a fixed size
++  /*
++  const int width = dream_device_state_->format.frame_size.width();
++  const int height = dream_device_state_->format.frame_size.height();
++  int byteSizeOfElement = 1;
++
++  switch (pixel_format_) {
++    case Format::Y16:
++      byteSizeOfElement = sizeof(uint16_t);
++      break;
++
++    case Format::RGBA:
++    case Format::ARGB:
++    case Format::SK_N32: {
++      byteSizeOfElement = sizeof(uint32_t);
++    } break;
++
++    case Format::I420:
++      byteSizeOfElement = sizeof(uint8_t);
++      break;
++  }
++  */
++
++  m_pDreamNamedPipeClient = new DreamNamedPipeClient(this);
++  m_pDreamNamedPipeClient->Initialize();
++
++  return;
++}
++
++DreamNamedPipeClient::DreamNamedPipeClient(DreamFramePainter* pParent)
++//: m_pParent(pParent)
++{
++  // empty
++}
++
++int DreamNamedPipeClient::GetSafeBuffer(uint8_t* target_buffer,
++                                        int width,
++                                        int height,
++                                        int byteSizeOfElement) {
++  int r = 0;
++
++  int safeBuffer_i = m_pBuffer_i - 1;
++  if (safeBuffer_i < 0)
++    safeBuffer_i = (NUM_PIPE_BUFFERS - 1);
++
++  // lock?
++
++  int sizeToCopy = byteSizeOfElement * width * height;
++  if (sizeToCopy > m_pipeBufferSize) {
++    sizeToCopy = m_pipeBufferSize;
++  }
++
++  if (m_pBuffer[m_pBuffer_i] != nullptr) {
++    memcpy(target_buffer, m_pBuffer[m_pBuffer_i], sizeToCopy);
++  }
++
++  return r;
++}
++
++int DreamNamedPipeClient::NamedPipeClientProcess() {
++  int r = 0;
++
++  for (int i = 0; i < NUM_PIPE_BUFFERS; i++)
++    m_pBuffer[i] = nullptr;
++
++  // int lastBufferSize = m_pipeBufferSize;
++  m_pBuffer_n = (size_t)m_pipeBufferSize;
++  DWORD cbBytesRead = 0;
++
++  bool fSuccess = false;
++
++  m_fNamedPipeRunning = true;
++
++  DLOG(INFO) << "DVCD: Pipe client process started";
++
++  for (int i = 0; i < NUM_PIPE_BUFFERS; i++) {
++    m_pBuffer[i] = new unsigned char[m_pBuffer_n];
++    DCHECK((m_pBuffer[i] != nullptr));  // "Failed to allocate pipe buffer");
++  }
++
++  // Loop until done
++  // while (m_fNamedPipeRunning) {
++  while (m_fNamedPipeRunning) {
++    fSuccess =
++        ReadFile(m_handleNamedPipe,              // handle to pipe
++                 (void*)m_pBuffer[m_pBuffer_i],  // buffer to receive data
++                 (DWORD)m_pBuffer_n,             // size of buffer
++                 &cbBytesRead,                   // number of bytes read
++                 nullptr);                       // not overlapped I/O
++
++    // TODO: Handle this better
++    if (GetLastError() == ERROR_BROKEN_PIPE) {
++      DLOG(INFO) << "DVCD: InstanceThread: client disconnected GLE: "
++                 << GetLastError();
++    }
++
++    if (fSuccess && cbBytesRead != 0) {
++      // DLOG(INFO) << "DVCD: Got frame of byte size " << cbBytesRead;
++
++      m_pBuffer_i += 1;
++      m_pBuffer_i = m_pBuffer_i % NUM_PIPE_BUFFERS;
++    }
++  };
++
++  DLOG(INFO) << "DVCD: Pipe client process ended";
++
++  // Flush the pipe to allow the client to read the pipe's contents
++  // before disconnecting. Then disconnect the pipe, and close the
++  // handle to this pipe instance.
++
++  if (m_handleNamedPipe != INVALID_HANDLE_VALUE) {
++    FlushFileBuffers(m_handleNamedPipe);
++    DisconnectNamedPipe(m_handleNamedPipe);
++    CloseHandle(m_handleNamedPipe);
++    m_handleNamedPipe = INVALID_HANDLE_VALUE;
++  }
++
++  for (int i = 0; i < NUM_PIPE_BUFFERS; i++) {
++    if (m_pBuffer[i] != nullptr) {
++      delete[] m_pBuffer[i];
++      m_pBuffer[i] = nullptr;
++    }
++  }
++
++  m_fNamedPipeRunning = false;
++  m_fNamedPipeConnected = false;
++
++  return r;
++}
++
++int DreamNamedPipeClient::StartNamedPipeProcess() {
++  int r = 0;
++
++  // Kick off thread here
++
++  DCHECK((m_namedPipeClientProcess.joinable() == false));
++
++  m_namedPipeClientProcess =
++      std::thread(&DreamNamedPipeClient::NamedPipeClientProcess, this);
++
++  DCHECK((m_namedPipeClientProcess.joinable()));
++
++  return r;
++}
++
++int DreamNamedPipeClient::StopNamedPipeProcess() {
++  int r = 0;
++
++  // End thread
++
++  m_fNamedPipeRunning = false;
++
++  DLOG(INFO) << "StopNamedPipeProcess+";
++
++  // DCHECK(CancelSynchronousIo(m_namedPipeClientProcess.native_handle()));
++  DCHECK(TerminateThread(m_namedPipeClientProcess.native_handle(), 0));
++
++  if (m_handleNamedPipe != INVALID_HANDLE_VALUE) {
++    FlushFileBuffers(m_handleNamedPipe);
++    DisconnectNamedPipe(m_handleNamedPipe);
++    CloseHandle(m_handleNamedPipe);
++    m_handleNamedPipe = INVALID_HANDLE_VALUE;
++  }
++
++  if (m_namedPipeClientProcess.joinable()) {
++    m_namedPipeClientProcess.join();
++  }
++
++  DCHECK((m_namedPipeClientProcess.joinable() == false));
++
++  DLOG(INFO) << "StopNamedPipeProcess-";
++
++  return r;
++}
++
++void DreamFramePainter::PaintFrame(base::TimeDelta elapsed_time,
++                                   uint8_t* target_buffer) {
++  ///*
++  const int width = dream_device_state_->format.frame_size.width();
++  const int height = dream_device_state_->format.frame_size.height();
++  // const int channels = 4;
++  int byteSizeOfElement = 1;
++  uint32_t val = 0x0;
++  // Assume RGBA for now
++
++  switch (pixel_format_) {
++    case Format::Y16:
++      byteSizeOfElement = sizeof(uint16_t);
++      break;
++
++    case Format::RGBA:
++    case Format::ARGB:
++    case Format::SK_N32: {
++      byteSizeOfElement = sizeof(uint32_t);
++      val = 0x55005555;
++    } break;
++
++    case Format::I420:
++      byteSizeOfElement = sizeof(uint8_t);
++      break;
++  }
++
++  // TODO: Sizes should be more programmatic
++
++  // Update the buffer size
++  memset(target_buffer, 0, byteSizeOfElement * width * height);
++
++  if (m_pDreamNamedPipeClient != nullptr) {
++    m_pDreamNamedPipeClient->GetSafeBuffer(target_buffer, width, height, byteSizeOfElement);
++  }
++
++  /*
++  for (int i = 0; i < width * height; i++) {
++    if (i % 60 < 20) {
++      target_buffer[i * byteSizeOfElement + 2] = 0xFF;  // red
++    } else if (i % 60 < 40) {
++      target_buffer[i * byteSizeOfElement + 1] = 0xFF;  // green
++    } else {
++      target_buffer[i * byteSizeOfElement + 0] = 0xFF;  // blue
++    }
++
++    target_buffer[i * byteSizeOfElement + 3] = 0xFF;  // alpha
++  }
++
++  //*/
++
++  /*
++  DrawFrame(elapsed_time, target_buffer);
++  DrawGradientSquares(elapsed_time, target_buffer);
++  //*/
++}
++
++// Starting from top left, -45 deg gradient.  Value at point (row, column) is
++// calculated as (top_left_value + (row + column) * step) % MAX_VALUE, where
++// step is MAX_VALUE / (width + height).  MAX_VALUE is 255 (for 8 bit per
++// component) or 65535 for Y16.
++// This is handy for pixel tests where we use the squares to verify rendering.
++void DreamFramePainter::DrawGradientSquares(base::TimeDelta elapsed_time,
++                                            uint8_t* target_buffer) {
++  const int width = dream_device_state_->format.frame_size.width();
++  const int height = dream_device_state_->format.frame_size.height();
++
++  const int side = width / 16;  // square side length.
++
++  DCHECK(side);
++
++  const gfx::Point squares[] = {{0, 0},
++                                {width - side, 0},
++                                {0, height - side},
++                                {width - side, height - side}};
++
++  const float start =
++      fmod(65536 * elapsed_time.InSecondsF() * kDreamGradientFrequency, 65536);
++  const float color_step = 65535 / static_cast<float>(width + height);
++
++  for (const auto& corner : squares) {
++    for (int y = corner.y(); y < corner.y() + side; ++y) {
++      for (int x = corner.x(); x < corner.x() + side; ++x) {
++        const unsigned int value =
++            static_cast<unsigned int>(start + (x + y) * color_step) & 0xFFFF;
++        size_t offset = (y * width) + x;
++
++        switch (pixel_format_) {
++          case Format::Y16: {
++            target_buffer[offset * sizeof(uint16_t)] = value & 0xFF;
++            target_buffer[offset * sizeof(uint16_t) + 1] = value >> 8;
++          } break;
++
++          case Format::RGBA:
++          case Format::ARGB:
++          case Format::SK_N32: {
++            target_buffer[offset * sizeof(uint32_t) + 1] = value >> 8;
++            target_buffer[offset * sizeof(uint32_t) + 2] = value >> 8;
++            target_buffer[offset * sizeof(uint32_t) + 3] = value >> 8;
++          } break;
++
++          case Format::I420: {
++            target_buffer[offset] = value >> 8;
++          } break;
++        }
++      }
++    }
++  }
++}
++
++void DreamFramePainter::DrawFrame(base::TimeDelta elapsed_time,
++                                  uint8_t* target_buffer) {
++  const int width = dream_device_state_->format.frame_size.width();
++  const int height = dream_device_state_->format.frame_size.height();
++
++  SkColorType colorspace = kAlpha_8_SkColorType;
++
++  switch (pixel_format_) {
++    case Format::I420: {
++      // Skia doesn't support painting in I420. Instead, paint an 8bpp
++      // monochrome image to the beginning of |target_buffer|. This section of
++      // |target_buffer| corresponds to the Y-plane of the YUV image. Do not
++      // touch the U or V planes of |target_buffer|. Assuming they have been
++      // initialized to 0, which corresponds to a green color tone, the result
++      // will be an green-ish monochrome frame.
++      colorspace = kAlpha_8_SkColorType;
++    } break;
++
++    case Format::RGBA:
++    case Format::ARGB:
++    case Format::SK_N32: {
++      // SkColorType is RGBA on some platforms and BGRA on others.
++      colorspace = kN32_SkColorType;
++    } break;
++
++    case Format::Y16: {
++      // Skia doesn't support painting in Y16. Instead, paint an 8bpp monochrome
++      // image to the beginning of |target_buffer|. Later, move the 8bit pixel
++      // values to a position corresponding to the high byte values of 16bit
++      // pixel values (assuming the byte order is little-endian).
++      colorspace = kAlpha_8_SkColorType;
++    } break;
++  }
++
++  const SkImageInfo info =
++      SkImageInfo::Make(width, height, colorspace, kOpaque_SkAlphaType);
++
++  SkBitmap bitmap;
++  bitmap.setInfo(info);
++  bitmap.setPixels(target_buffer);
++
++  SkPaint paint;
++  paint.setStyle(SkPaint::kFill_Style);
++
++  SkCanvas canvas(bitmap);
++
++  const SkScalar unscaled_zoom = dream_device_state_->zoom / 100.f;
++  SkMatrix matrix;
++
++  matrix.setScale(unscaled_zoom, unscaled_zoom, width / 2, height / 2);
++  canvas.setMatrix(matrix);
++
++  // For the SK_N32 case, match the green color tone produced by the I420 case.
++  if (pixel_format_ == Format::SK_N32) {
++    const SkRect full_frame = SkRect::MakeWH(width, height);
++    paint.setARGB(255, 0, 127, 0);
++    canvas.drawRect(full_frame, paint);
++    paint.setColor(SK_ColorGREEN);
++  }
++
++  // Draw a sweeping circle to show an animation.
++  const float end_angle =
++      fmod(kDreamPacmanAngularVelocity * elapsed_time.InSecondsF(), 361);
++
++  const int radius = std::min(width, height) / 4;
++  const SkRect rect = SkRect::MakeXYWH(width / 2 - radius, height / 2 - radius,
++                                       2 * radius, 2 * radius);
++  canvas.drawArc(rect, 0, end_angle, true, paint);
++
++  // Draw current time.
++  const int milliseconds = elapsed_time.InMilliseconds() % 1000;
++  const int seconds = elapsed_time.InSeconds() % 60;
++  const int minutes = elapsed_time.InMinutes() % 60;
++  const int hours = elapsed_time.InHours();
++  const int frame_count = elapsed_time.InMilliseconds() *
++                          dream_device_state_->format.frame_rate / 1000;
++
++  const std::string time_string =
++      base::StringPrintf("%d:%02d:%02d:%03d %d", hours, minutes, seconds,
++                         milliseconds, frame_count);
++  canvas.scale(3, 3);
++  canvas.drawText(time_string.data(), time_string.length(), 30, 20, paint);
++
++  if (pixel_format_ == Format::Y16) {
++    // Use 8 bit bitmap rendered to first half of the buffer as high byte values
++    // for the whole buffer. Low byte values are not important.
++    for (int i = (width * height) - 1; i >= 0; --i)
++      target_buffer[i * 2 + 1] = target_buffer[i];
++  }
++}
++
++DreamPhotoDevice::DreamPhotoDevice(
++    std::unique_ptr<DreamFramePainter> sk_n32_painter,
++    const DreamDeviceState* dream_device_state,
++    const DreamPhotoDeviceConfig& config)
++    : sk_n32_painter_(std::move(sk_n32_painter)),
++      dream_device_state_(dream_device_state),
++      config_(config) {
++  // empty
++}
++
++DreamPhotoDevice::~DreamPhotoDevice() = default;
++
++void DreamPhotoDevice::TakePhoto(VideoCaptureDevice::TakePhotoCallback callback,
++                                 base::TimeDelta elapsed_time) {
++  if (config_.should_fail_take_photo) {
++    return;
++  }
++
++  // Create a PNG-encoded frame and send it back to |callback|.
++  auto required_sk_n32_buffer_size = VideoFrame::AllocationSize(
++      PIXEL_FORMAT_ARGB, dream_device_state_->format.frame_size);
++
++  std::unique_ptr<uint8_t[]> buffer(new uint8_t[required_sk_n32_buffer_size]);
++
++  memset(buffer.get(), 0, required_sk_n32_buffer_size);
++  sk_n32_painter_->PaintFrame(elapsed_time, buffer.get());
++  mojom::BlobPtr blob = mojom::Blob::New();
++
++  const gfx::PNGCodec::ColorFormat encoding_source_format =
++      (kN32_SkColorType == kRGBA_8888_SkColorType) ? gfx::PNGCodec::FORMAT_RGBA
++                                                   : gfx::PNGCodec::FORMAT_BGRA;
++
++  const bool result = gfx::PNGCodec::Encode(
++      buffer.get(), encoding_source_format,
++      dream_device_state_->format.frame_size,
++      VideoFrame::RowBytes(0 /* plane */, PIXEL_FORMAT_ARGB,
++                           dream_device_state_->format.frame_size.width()),
++      true /* discard_transparency */, std::vector<gfx::PNGCodec::Comment>(),
++      &blob->data);
++
++  DCHECK(result);
++
++  blob->mime_type = "image/png";
++
++  std::move(callback).Run(std::move(blob));
++}
++
++DreamVideoCaptureDevice::DreamVideoCaptureDevice(
++    const VideoCaptureFormats& supported_formats,
++    std::unique_ptr<DreamFrameDelivererFactory> frame_deliverer_factory,
++    std::unique_ptr<DreamPhotoDevice> photo_device,
++    std::unique_ptr<DreamDeviceState> device_state)
++    : supported_formats_(supported_formats),
++      frame_deliverer_factory_(std::move(frame_deliverer_factory)),
++      photo_device_(std::move(photo_device)),
++      device_state_(std::move(device_state)),
++      weak_factory_(this) {
++  // empty
++}
++
++DreamVideoCaptureDevice::~DreamVideoCaptureDevice() {
++  DCHECK(thread_checker_.CalledOnValidThread());
++}
++
++void DreamVideoCaptureDevice::AllocateAndStart(
++    const VideoCaptureParams& params,
++    std::unique_ptr<VideoCaptureDevice::Client> client) {
++  DCHECK(thread_checker_.CalledOnValidThread());
++
++  const VideoCaptureFormat& selected_format = FindClosestSupportedDreamFormat(
++      params.requested_format, supported_formats_);
++
++  beep_time_ = base::TimeDelta();
++  elapsed_time_ = base::TimeDelta();
++  frame_deliverer_ =
++      frame_deliverer_factory_->CreateFrameDeliverer(selected_format);
++
++  device_state_->format.frame_size = selected_format.frame_size;
++  frame_deliverer_->Initialize(device_state_->format.pixel_format,
++                               std::move(client), device_state_.get());
++  current_session_id_++;
++
++  BeepAndScheduleNextCapture(base::TimeTicks::Now());
++}
++
++void DreamVideoCaptureDevice::StopAndDeAllocate() {
++  DCHECK(thread_checker_.CalledOnValidThread());
++
++  // Invalidate WeakPtr to stop the perpetual scheduling of tasks.
++  weak_factory_.InvalidateWeakPtrs();
++  frame_deliverer_.reset();
++}
++
++void DreamVideoCaptureDevice::GetPhotoState(GetPhotoStateCallback callback) {
++  DCHECK(thread_checker_.CalledOnValidThread());
++  photo_device_->GetPhotoState(std::move(callback));
++}
++
++void DreamPhotoDevice::GetPhotoState(
++    VideoCaptureDevice::GetPhotoStateCallback callback) {
++  if (config_.should_fail_get_photo_capabilities) {
++    return;
++  }
++
++  mojom::PhotoStatePtr photo_state = mojom::PhotoState::New();
++
++  photo_state->current_white_balance_mode = mojom::MeteringMode::NONE;
++  photo_state->current_exposure_mode = mojom::MeteringMode::NONE;
++  photo_state->current_focus_mode = mojom::MeteringMode::NONE;
++
++  photo_state->exposure_compensation = mojom::Range::New();
++  photo_state->color_temperature = mojom::Range::New();
++  photo_state->iso = mojom::Range::New();
++  photo_state->iso->current = 100.0;
++  photo_state->iso->max = 100.0;
++  photo_state->iso->min = 100.0;
++  photo_state->iso->step = 0.0;
++
++  photo_state->brightness = media::mojom::Range::New();
++  photo_state->contrast = media::mojom::Range::New();
++  photo_state->saturation = media::mojom::Range::New();
++  photo_state->sharpness = media::mojom::Range::New();
++
++  photo_state->zoom = mojom::Range::New();
++  photo_state->zoom->current = dream_device_state_->zoom;
++  photo_state->zoom->max = kDreamMaxZoom;
++  photo_state->zoom->min = kDreamMinZoom;
++  photo_state->zoom->step = kDreamZoomStep;
++
++  photo_state->supports_torch = false;
++  photo_state->torch = false;
++
++  photo_state->red_eye_reduction = mojom::RedEyeReduction::NEVER;
++  photo_state->height = mojom::Range::New();
++  photo_state->height->current =
++      dream_device_state_->format.frame_size.height();
++  photo_state->height->max = 1080.0;
++  photo_state->height->min = 96.0;
++  photo_state->height->step = 1.0;
++  photo_state->width = mojom::Range::New();
++  photo_state->width->current = dream_device_state_->format.frame_size.width();
++  photo_state->width->max = 1920.0;
++  photo_state->width->min = 96.0;
++  photo_state->width->step = 1.0;
++
++  std::move(callback).Run(std::move(photo_state));
++}
++
++void DreamVideoCaptureDevice::SetPhotoOptions(
++    mojom::PhotoSettingsPtr settings,
++    SetPhotoOptionsCallback callback) {
++  DCHECK(thread_checker_.CalledOnValidThread());
++
++  photo_device_->SetPhotoOptions(std::move(settings), std::move(callback),
++                                 device_state_.get());
++}
++
++void DreamPhotoDevice::SetPhotoOptions(
++    mojom::PhotoSettingsPtr settings,
++    VideoCaptureDevice::SetPhotoOptionsCallback callback,
++    DreamDeviceState* device_state_write_access) {
++  if (config_.should_fail_set_photo_options) {
++    return;
++  }
++
++  if (settings->has_zoom) {
++    device_state_write_access->zoom =
++        std::max(kDreamMinZoom, std::min(settings->zoom, kDreamMaxZoom));
++  }
++
++  std::move(callback).Run(true);
++}
++
++void DreamVideoCaptureDevice::TakePhoto(TakePhotoCallback callback) {
++  DCHECK(thread_checker_.CalledOnValidThread());
++
++  base::ThreadTaskRunnerHandle::Get()->PostTask(
++      FROM_HERE, base::Bind(&DreamPhotoDevice::TakePhoto,
++                            base::Unretained(photo_device_.get()),
++                            base::Passed(&callback), elapsed_time_));
++}
++
++OwnBufferDreamFrameDeliverer::OwnBufferDreamFrameDeliverer(
++    std::unique_ptr<DreamFramePainter> frame_painter)
++    : DreamFrameDeliverer(std::move(frame_painter)) {
++  // empty
++}
++
++OwnBufferDreamFrameDeliverer::~OwnBufferDreamFrameDeliverer() = default;
++
++void OwnBufferDreamFrameDeliverer::Initialize(
++    VideoPixelFormat pixel_format,
++    std::unique_ptr<VideoCaptureDevice::Client> client,
++    const DreamDeviceState* device_state) {
++  DreamFrameDeliverer::Initialize(pixel_format, std::move(client),
++                                  device_state);
++  buffer_.reset(new uint8_t[VideoFrame::AllocationSize(
++      pixel_format, device_state->format.frame_size)]);
++}
++
++void OwnBufferDreamFrameDeliverer::PaintAndDeliverNextFrame(
++    base::TimeDelta timestamp_to_paint) {
++  if (!client()) {
++    return;
++  }
++
++  const size_t frame_size = device_state()->format.ImageAllocationSize();
++  memset(buffer_.get(), 0, frame_size);
++  frame_painter()->PaintFrame(timestamp_to_paint, buffer_.get());
++  base::TimeTicks now = base::TimeTicks::Now();
++
++  client()->OnIncomingCapturedData(buffer_.get(), frame_size,
++                                   device_state()->format, 0 /* rotation */,
++                                   now, CalculateTimeSinceFirstInvocation(now));
++}
++
++DreamClientBufferFrameDeliverer::DreamClientBufferFrameDeliverer(
++    std::unique_ptr<DreamFramePainter> frame_painter)
++    : DreamFrameDeliverer(std::move(frame_painter)) {
++  // empty
++}
++
++DreamClientBufferFrameDeliverer::~DreamClientBufferFrameDeliverer() = default;
++
++void DreamClientBufferFrameDeliverer::PaintAndDeliverNextFrame(
++    base::TimeDelta timestamp_to_paint) {
++  if (!client()) {
++    return;
++  }
++
++  const int arbitrary_frame_feedback_id = 0;
++
++  auto capture_buffer = client()->ReserveOutputBuffer(
++      device_state()->format.frame_size, device_state()->format.pixel_format,
++      arbitrary_frame_feedback_id);
++
++  DLOG_IF(ERROR, !capture_buffer.is_valid())
++      << "Couldn't allocate Capture Buffer";
++
++  auto buffer_access =
++      capture_buffer.handle_provider->GetHandleForInProcessAccess();
++
++  DCHECK(buffer_access->data()) << "Buffer has NO backing memory";
++
++  uint8_t* data_ptr = buffer_access->data();
++  memset(data_ptr, 0, buffer_access->mapped_size());
++  frame_painter()->PaintFrame(timestamp_to_paint, data_ptr);
++
++  base::TimeTicks now = base::TimeTicks::Now();
++
++  client()->OnIncomingCapturedBuffer(std::move(capture_buffer),
++                                     device_state()->format, now,
++                                     CalculateTimeSinceFirstInvocation(now));
++}
++
++DreamJpegEncodingFrameDeliverer::DreamJpegEncodingFrameDeliverer(
++    std::unique_ptr<DreamFramePainter> frame_painter)
++    : DreamFrameDeliverer(std::move(frame_painter)) {
++  // empty
++}
++
++DreamJpegEncodingFrameDeliverer::~DreamJpegEncodingFrameDeliverer() = default;
++
++void DreamJpegEncodingFrameDeliverer::PaintAndDeliverNextFrame(
++    base::TimeDelta timestamp_to_paint) {
++  if (!client()) {
++    return;
++  }
++
++  auto required_sk_n32_buffer_size = VideoFrame::AllocationSize(
++      PIXEL_FORMAT_ARGB, device_state()->format.frame_size);
++
++  sk_n32_buffer_.resize(required_sk_n32_buffer_size);
++
++  memset(&sk_n32_buffer_[0], 0, required_sk_n32_buffer_size);
++
++  frame_painter()->PaintFrame(timestamp_to_paint, &sk_n32_buffer_[0]);
++
++  static const int kQuality = 75;
++  SkImageInfo info = SkImageInfo::MakeN32(
++      device_state()->format.frame_size.width(),
++      device_state()->format.frame_size.height(), kOpaque_SkAlphaType);
++  SkPixmap src(info, &sk_n32_buffer_[0],
++               VideoFrame::RowBytes(0 /* plane */, PIXEL_FORMAT_ARGB,
++                                    device_state()->format.frame_size.width()));
++  bool success = gfx::JPEGCodec::Encode(src, kQuality, &jpeg_buffer_);
++  if (!success) {
++    DLOG(ERROR) << "Jpeg encoding failed";
++    return;
++  }
++
++  const size_t frame_size = jpeg_buffer_.size();
++  base::TimeTicks now = base::TimeTicks::Now();
++
++  client()->OnIncomingCapturedData(&jpeg_buffer_[0], frame_size,
++                                   device_state()->format, 0 /* rotation */,
++                                   now, CalculateTimeSinceFirstInvocation(now));
++}
++
++void DreamVideoCaptureDevice::BeepAndScheduleNextCapture(
++    base::TimeTicks expected_execution_time) {
++  DCHECK(thread_checker_.CalledOnValidThread());
++
++  const base::TimeDelta beep_interval =
++      base::TimeDelta::FromMilliseconds(kDreamBeepInterval);
++  const base::TimeDelta frame_interval =
++      base::TimeDelta::FromMicroseconds(1e6 / device_state_->format.frame_rate);
++  beep_time_ += frame_interval;
++  elapsed_time_ += frame_interval;
++
++  // Generate a synchronized beep twice per second.
++  if (beep_time_ >= beep_interval) {
++    // TODO: Audio!
++    // FakeAudioInputStream::BeepOnce();
++    // DreamAudioInputStream::BeepOnce();
++    beep_time_ -= beep_interval;
++  }
++
++  // Reschedule next CaptureTask.
++  const base::TimeTicks current_time = base::TimeTicks::Now();
++  // Don't accumulate any debt if we are lagging behind - just post the next
++  // frame immediately and continue as normal.
++  const base::TimeTicks next_execution_time =
++      std::max(current_time, expected_execution_time + frame_interval);
++  const base::TimeDelta delay = next_execution_time - current_time;
++
++  base::ThreadTaskRunnerHandle::Get()->PostDelayedTask(
++      FROM_HERE,
++      base::Bind(&DreamVideoCaptureDevice::OnNextFrameDue,
++                 weak_factory_.GetWeakPtr(), next_execution_time,
++                 current_session_id_),
++      delay);
++}
++
++void DreamVideoCaptureDevice::OnNextFrameDue(
++    base::TimeTicks expected_execution_time,
++    int session_id) {
++  DCHECK(thread_checker_.CalledOnValidThread());
++
++  if (session_id != current_session_id_)
++    return;
++
++  frame_deliverer_->PaintAndDeliverNextFrame(elapsed_time_);
++  BeepAndScheduleNextCapture(expected_execution_time);
++}
++
++}  // namespace media
+diff --git a/media/capture/video/dream_video_capture_device.h b/media/capture/video/dream_video_capture_device.h
+new file mode 100644
+index 0000000..8089c53
+--- /dev/null
++++ b/media/capture/video/dream_video_capture_device.h
+@@ -0,0 +1,205 @@
++// Copyright (c) 2012 The Chromium Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef MEDIA_CAPTURE_VIDEO_DREAM_VIDEO_CAPTURE_DEVICE_H_
++#define MEDIA_CAPTURE_VIDEO_DREAM_VIDEO_CAPTURE_DEVICE_H_
++
++#include <stdint.h>
++
++#include <memory>
++#include <string>
++#include <thread>
++#include <vector>
++
++#include "base/threading/thread_checker.h"
++#include "media/capture/video/video_capture_device.h"
++
++namespace media {
++
++struct DreamDeviceState;
++class DreamPhotoDevice;
++class DreamFrameDeliverer;
++class DreamFrameDelivererFactory;
++class DreamFramePainter;
++
++// Assume 1080p BGRA
++#define DEFAULT_NAMED_PIPE_CLIENT_BUFFER_SIZE 1280 * 720 * 4
++#define NUM_PIPE_BUFFERS 2
++
++class DreamNamedPipeClient {
++ public:
++  DreamNamedPipeClient(DreamFramePainter* pParent);
++
++  int Initialize();
++
++  int NamedPipeClientProcess();
++  int StartNamedPipeProcess();
++  int StopNamedPipeProcess();
++
++  // A safe buffer to read from 
++  int GetSafeBuffer(uint8_t* target_buffer,
++                    int width,
++                    int height,
++                    int byteSizeOfElement);
++
++ private:
++  // DreamFramePainter *m_pParent = nullptr;
++  unsigned char* m_pBuffer[NUM_PIPE_BUFFERS] = {nullptr};
++  int m_pBuffer_i = 0;
++  size_t m_pBuffer_n = 0;
++
++  bool m_fNamedPipeRunning = false;
++  bool m_fNamedPipeConnected = false;
++  std::thread m_namedPipeClientProcess;
++  HANDLE m_handleNamedPipe = nullptr;
++  int m_pipeBufferSize = DEFAULT_NAMED_PIPE_CLIENT_BUFFER_SIZE;
++
++  // bool m_fConnected = false;
++  std::wstring m_strPipename = L"dreamvcampipe";
++};
++
++class DreamFramePainter {
++ public:
++  enum class Format { I420, SK_N32, RGBA, ARGB, Y16 };
++
++  DreamFramePainter(Format pixel_format,
++                    const DreamDeviceState* dream_device_state);
++  ~DreamFramePainter();
++
++  void PaintFrame(base::TimeDelta elapsed_time, uint8_t* target_buffer);
++
++  void InitializeNamedPipe();
++
++ private:
++  void DrawGradientSquares(base::TimeDelta elapsed_time,
++                           uint8_t* target_buffer);
++
++  void DrawFrame(base::TimeDelta elapsed_time, uint8_t* target_buffer);
++
++  const Format pixel_format_;
++  const DreamDeviceState* dream_device_state_ = nullptr;
++
++ private:
++  DreamNamedPipeClient* m_pDreamNamedPipeClient = nullptr;
++};
++
++// Implementation of VideoCaptureDevice that generates test frames. This is
++// useful for testing the video capture components without having to use real
++// devices. The implementation schedules delayed tasks to itself to generate and
++// deliver frames at the requested rate.
++class DreamVideoCaptureDevice : public VideoCaptureDevice {
++ public:
++  enum class DeliveryMode {
++    USE_DEVICE_INTERNAL_BUFFERS,
++    USE_CLIENT_PROVIDED_BUFFERS
++  };
++
++  enum class DisplayMediaType { ANY, MONITOR, WINDOW, BROWSER };
++
++  DreamVideoCaptureDevice(
++      const VideoCaptureFormats& supported_formats,
++      std::unique_ptr<DreamFrameDelivererFactory> frame_deliverer_factory,
++      std::unique_ptr<DreamPhotoDevice> photo_device,
++      std::unique_ptr<DreamDeviceState> device_state);
++
++  ~DreamVideoCaptureDevice() override;
++
++  static void GetSupportedSizes(std::vector<gfx::Size>* supported_sizes);
++
++  // VideoCaptureDevice implementation.
++  void AllocateAndStart(const VideoCaptureParams& params,
++                        std::unique_ptr<Client> client) override;
++  void StopAndDeAllocate() override;
++  void GetPhotoState(GetPhotoStateCallback callback) override;
++  void SetPhotoOptions(mojom::PhotoSettingsPtr settings,
++                       SetPhotoOptionsCallback callback) override;
++  void TakePhoto(TakePhotoCallback callback) override;
++
++ private:
++  void BeepAndScheduleNextCapture(base::TimeTicks expected_execution_time);
++  void OnNextFrameDue(base::TimeTicks expected_execution_time, int session_id);
++
++  const VideoCaptureFormats supported_formats_;
++  const std::unique_ptr<DreamFrameDelivererFactory> frame_deliverer_factory_;
++  const std::unique_ptr<DreamPhotoDevice> photo_device_;
++  const std::unique_ptr<DreamDeviceState> device_state_;
++  std::unique_ptr<DreamFrameDeliverer> frame_deliverer_;
++  int current_session_id_ = 0;
++
++  // Time when the next beep occurs.
++  base::TimeDelta beep_time_;
++  // Time since the dream video started rendering frames.
++  base::TimeDelta elapsed_time_;
++
++  base::ThreadChecker thread_checker_;
++
++  // DreamVideoCaptureDevice post tasks to itself for frame construction and
++  // needs to deal with asynchronous StopAndDeallocate().
++  base::WeakPtrFactory<DreamVideoCaptureDevice> weak_factory_;
++
++  DISALLOW_COPY_AND_ASSIGN(DreamVideoCaptureDevice);
++};
++
++// Represents the current state of a DreamVideoCaptureDevice.
++// This is a separate struct because read-access to it is shared with several
++// collaborating classes.
++struct DreamDeviceState {
++  DreamDeviceState(float zoom, float frame_rate, VideoPixelFormat pixel_format)
++      : zoom(zoom), format(gfx::Size(), frame_rate, pixel_format) {
++    // empty
++  }
++
++  uint32_t zoom;
++  VideoCaptureFormat format;
++};
++
++// A dependency needed by DreamVideoCaptureDevice.
++class DreamFrameDelivererFactory {
++ public:
++  DreamFrameDelivererFactory(
++      DreamVideoCaptureDevice::DeliveryMode delivery_mode,
++      const DreamDeviceState* device_state);
++  std::unique_ptr<DreamFrameDeliverer> CreateFrameDeliverer(
++      const VideoCaptureFormat& format);
++
++ private:
++  const DreamVideoCaptureDevice::DeliveryMode delivery_mode_;
++  const DreamDeviceState* device_state_ = nullptr;
++};
++
++struct DreamPhotoDeviceConfig {
++  DreamPhotoDeviceConfig()
++      : should_fail_get_photo_capabilities(false),
++        should_fail_set_photo_options(false),
++        should_fail_take_photo(false) {}
++
++  bool should_fail_get_photo_capabilities;
++  bool should_fail_set_photo_options;
++  bool should_fail_take_photo;
++};
++
++// Implements the photo functionality of a DreamVideoCaptureDevice
++class DreamPhotoDevice {
++ public:
++  DreamPhotoDevice(std::unique_ptr<DreamFramePainter> sk_n32_painter,
++                   const DreamDeviceState* dream_device_state,
++                   const DreamPhotoDeviceConfig& config);
++  ~DreamPhotoDevice();
++
++  void GetPhotoState(VideoCaptureDevice::GetPhotoStateCallback callback);
++  void SetPhotoOptions(mojom::PhotoSettingsPtr settings,
++                       VideoCaptureDevice::SetPhotoOptionsCallback callback,
++                       DreamDeviceState* device_state_write_access);
++  void TakePhoto(VideoCaptureDevice::TakePhotoCallback callback,
++                 base::TimeDelta elapsed_time);
++
++ private:
++  const std::unique_ptr<DreamFramePainter> sk_n32_painter_;
++  const DreamDeviceState* const dream_device_state_;
++  const DreamPhotoDeviceConfig config_;
++};
++
++}  // namespace media
++
++#endif  // MEDIA_CAPTURE_VIDEO_DREAM_VIDEO_CAPTURE_DEVICE_H_
+diff --git a/media/capture/video/win/video_capture_device_factory_win.cc b/media/capture/video/win/video_capture_device_factory_win.cc
+index 38d6190..1ba2ec2 100644
+--- a/media/capture/video/win/video_capture_device_factory_win.cc
++++ b/media/capture/video/win/video_capture_device_factory_win.cc
+@@ -31,13 +31,15 @@
+ #include "media/capture/video/win/video_capture_device_mf_win.h"
+ #include "media/capture/video/win/video_capture_device_win.h"
+ 
++#include "media/capture/video/dream_video_capture_device.h"
++
+ using Descriptor = media::VideoCaptureDeviceDescriptor;
+ using Descriptors = media::VideoCaptureDeviceDescriptors;
++using Microsoft::WRL::ComPtr;
+ using base::win::GetActivationFactory;
+ using base::win::ScopedCoMem;
+ using base::win::ScopedHString;
+ using base::win::ScopedVariant;
+-using Microsoft::WRL::ComPtr;
+ 
+ namespace media {
+ 
+@@ -73,7 +75,9 @@ const char* const kBlacklistedCameraNames[] = {
+     // Name of a fake DirectShow filter on computers with GTalk installed.
+     "Google Camera Adapter",
+     // The following software WebCams cause crashes.
+-    "IP Camera [JPEG/MJPEG]", "CyberLink Webcam Splitter", "EpocCam",
++    "IP Camera [JPEG/MJPEG]",
++    "CyberLink Webcam Splitter",
++    "EpocCam",
+ };
+ static_assert(arraysize(kBlacklistedCameraNames) == BLACKLISTED_CAMERA_MAX + 1,
+               "kBlacklistedCameraNames should be same size as "
+@@ -81,7 +85,8 @@ static_assert(arraysize(kBlacklistedCameraNames) == BLACKLISTED_CAMERA_MAX + 1,
+ 
+ const char* const kModelIdsBlacklistedForMediaFoundation[] = {
+     // Devices using Empia 2860 or 2820 chips, see https://crbug.com/849636.
+-    "eb1a:2860", "eb1a:2820",
++    "eb1a:2860",
++    "eb1a:2820",
+ };
+ 
+ const std::pair<VideoCaptureApi, std::vector<std::pair<GUID, GUID>>>
+@@ -379,39 +384,134 @@ VideoCaptureDeviceFactoryWin::~VideoCaptureDeviceFactoryWin() {
+   }
+ }
+ 
++// TODO: Remove this
++static const media::FakeVideoCaptureDevice::DeliveryMode kDefaultDreamDeliveryMode =
++    media::FakeVideoCaptureDevice::DeliveryMode::USE_DEVICE_INTERNAL_BUFFERS;
++
++//static constexpr std::array<gfx::Size, 5> kDefaultDreamResolutions{
++//    {gfx::Size(96, 96), gfx::Size(320, 240), gfx::Size(640, 480),
++//     gfx::Size(1280, 720), gfx::Size(1920, 1080)}};
++
++static constexpr std::array<gfx::Size, 5> kDefaultDreamResolutions{{
++		gfx::Size(1280, 720)
++	}};
++
++//static constexpr std::array<float, 1> kDefaultDreamFrameRates{{30.0f}};
++static constexpr std::array<float, 1> kDefaultDreamFrameRates{{24.0f}};
++
++static const double kInitialZoom = 100.0;
++
++static const media::VideoPixelFormat kSupportedDreamPixelFormats[] = {
++    media::PIXEL_FORMAT_I420, media::PIXEL_FORMAT_Y16,
++    media::PIXEL_FORMAT_MJPEG, media::PIXEL_FORMAT_RGB32};
++
+ std::unique_ptr<VideoCaptureDevice> VideoCaptureDeviceFactoryWin::CreateDevice(
+     const Descriptor& device_descriptor) {
+   DCHECK(thread_checker_.CalledOnValidThread());
+-  switch (device_descriptor.capture_api) {
+-    case VideoCaptureApi::WIN_MEDIA_FOUNDATION:
+-      FALLTHROUGH;
+-    case VideoCaptureApi::WIN_MEDIA_FOUNDATION_SENSOR: {
+-      DCHECK(PlatformSupportsMediaFoundation());
+-      ComPtr<IMFMediaSource> source;
+-      if (!CreateVideoCaptureDeviceMediaFoundation(device_descriptor,
+-                                                   source.GetAddressOf())) {
+-        break;
++
++  const base::CommandLine* command_line =
++      base::CommandLine::ForCurrentProcess();
++
++  if (command_line->HasSwitch(switches::kUseDreamDeviceForMediaStream)) {
++    LOG(INFO) << "VideoCaptureDeviceFactoryWin::CreateDevice - DREAM";
++
++    DVLOG(1) << " Dream Device: " << device_descriptor.display_name();
++
++	// TODO: strip off the bs
++	FakeVideoCaptureDeviceSettings settings;
++    settings.delivery_mode = kDefaultDreamDeliveryMode;
++
++    for (const gfx::Size& resolution : kDefaultDreamResolutions) {
++      settings.supported_formats.emplace_back(
++          //resolution, kDefaultDreamFrameRates[0], media::PIXEL_FORMAT_I420);
++          //resolution, kDefaultDreamFrameRates[0], media::PIXEL_FORMAT_Y16);
++          resolution, kDefaultDreamFrameRates[0], media::PIXEL_FORMAT_RGB32);
++	}
++    
++	for (const auto& entry : settings.supported_formats) {
++      bool pixel_format_supported = false;
++
++      for (const auto& supported_pixel_format : kSupportedDreamPixelFormats) {
++        if (entry.pixel_format == supported_pixel_format) {
++          pixel_format_supported = true;
++          break;
++        }
++      }
++
++      if (!pixel_format_supported) {
++        DLOG(ERROR) << "Requested an unsupported pixel format "
++                    << VideoPixelFormatToString(entry.pixel_format);
++
++        return nullptr;
+       }
+-      std::unique_ptr<VideoCaptureDevice> device(
+-          new VideoCaptureDeviceMFWin(device_descriptor, source));
+-      DVLOG(1) << " MediaFoundation Device: "
+-               << device_descriptor.display_name();
+-      if (static_cast<VideoCaptureDeviceMFWin*>(device.get())->Init())
+-        return device;
+-      break;
+     }
+-    case VideoCaptureApi::WIN_DIRECT_SHOW: {
+-      DVLOG(1) << " DirectShow Device: " << device_descriptor.display_name();
+-      std::unique_ptr<VideoCaptureDevice> device(
+-          new VideoCaptureDeviceWin(device_descriptor));
+-      if (static_cast<VideoCaptureDeviceWin*>(device.get())->Init())
+-        return device;
+-      break;
++
++    const VideoCaptureFormat& initial_format = settings.supported_formats.front();
++
++    auto device_state = std::make_unique<DreamDeviceState>(kInitialZoom, initial_format.frame_rate, initial_format.pixel_format);
++
++    auto photo_frame_painter = std::make_unique<DreamFramePainter>(DreamFramePainter::Format::SK_N32, device_state.get());
++
++	DreamPhotoDeviceConfig dreamPhotoDeviceConfig;
++	memcpy(&dreamPhotoDeviceConfig, &(settings.photo_device_config),
++               sizeof(DreamPhotoDeviceConfig));
++
++	DreamVideoCaptureDevice::DeliveryMode dreamDeliveryMode =
++            (DreamVideoCaptureDevice::DeliveryMode)(settings.delivery_mode);
++
++    auto photo_device = std::make_unique<DreamPhotoDevice>(
++		std::move(photo_frame_painter), 
++		device_state.get(),
++        dreamPhotoDeviceConfig);
++
++    return std::make_unique<DreamVideoCaptureDevice>(
++        settings.supported_formats,
++        std::make_unique<DreamFrameDelivererFactory>(dreamDeliveryMode,
++                                                     device_state.get()),
++        std::move(photo_device), 
++		std::move(device_state));
++
++    //if (static_cast<DreamVideoCaptureDevice*>(device.get())->Init()) {
++    //  return device;
++    //}
++
++  } 
++  else {
++    switch (device_descriptor.capture_api) {
++      case VideoCaptureApi::WIN_MEDIA_FOUNDATION:
++        FALLTHROUGH;
++
++      case VideoCaptureApi::WIN_MEDIA_FOUNDATION_SENSOR: {
++        DCHECK(PlatformSupportsMediaFoundation());
++        ComPtr<IMFMediaSource> source;
++        if (!CreateVideoCaptureDeviceMediaFoundation(device_descriptor,
++                                                     source.GetAddressOf())) {
++          break;
++        }
++        std::unique_ptr<VideoCaptureDevice> device(
++            new VideoCaptureDeviceMFWin(device_descriptor, source));
++        DVLOG(1) << " MediaFoundation Device: "
++                 << device_descriptor.display_name();
++        if (static_cast<VideoCaptureDeviceMFWin*>(device.get())->Init())
++          return device;
++        break;
++      }
++
++      case VideoCaptureApi::WIN_DIRECT_SHOW: {
++        DVLOG(1) << " DirectShow Device: " << device_descriptor.display_name();
++        std::unique_ptr<VideoCaptureDevice> device(
++            new VideoCaptureDeviceWin(device_descriptor));
++        if (static_cast<VideoCaptureDeviceWin*>(device.get())->Init())
++          return device;
++        break;
++      }
++
++      default:
++        NOTREACHED();
++        break;
+     }
+-    default:
+-      NOTREACHED();
+-      break;
+   }
++
+   return nullptr;
+ }
+ 
+@@ -419,11 +519,22 @@ void VideoCaptureDeviceFactoryWin::GetDeviceDescriptors(
+     VideoCaptureDeviceDescriptors* device_descriptors) {
+   DCHECK(thread_checker_.CalledOnValidThread());
+ 
+-  if (use_media_foundation_) {
+-    GetDeviceDescriptorsMediaFoundation(device_descriptors);
+-    AugmentDescriptorListWithDirectShowOnlyDevices(device_descriptors);
++  const base::CommandLine* command_line =
++      base::CommandLine::ForCurrentProcess();
++
++  if (command_line->HasSwitch(switches::kUseDreamDeviceForMediaStream)) {
++    LOG(INFO) << "VideoCaptureDeviceFactoryWin::GetDeviceDescriptors - Use "
++                 "DREAM video device";
++
++    GetDeviceDescriptorsDream(device_descriptors);
++
+   } else {
+-    GetDeviceDescriptorsDirectShow(device_descriptors);
++    if (use_media_foundation_) {
++      GetDeviceDescriptorsMediaFoundation(device_descriptors);
++      AugmentDescriptorListWithDirectShowOnlyDevices(device_descriptors);
++    } else {
++      GetDeviceDescriptorsDirectShow(device_descriptors);
++    }
+   }
+ }
+ 
+@@ -463,18 +574,17 @@ void VideoCaptureDeviceFactoryWin::EnumerateDevicesUWP(
+       &VideoCaptureDeviceFactoryWin::FoundAllDevicesUWP,
+       base::Unretained(factory), base::Passed(&device_descriptors),
+       base::Passed(&result_callback));
+-  auto callback =
+-      Microsoft::WRL::Callback<
+-          ABI::Windows::Foundation::IAsyncOperationCompletedHandler<
+-              DeviceInformationCollection*>>(
+-          [factory, com_thread_runner, device_info_callback](
+-              IAsyncOperation<DeviceInformationCollection*>* operation,
+-              AsyncStatus status) -> HRESULT {
+-            com_thread_runner->PostTask(
+-                FROM_HERE, base::BindOnce(device_info_callback,
+-                                          base::Unretained(operation)));
+-            return S_OK;
+-          });
++  auto callback = Microsoft::WRL::Callback<
++      ABI::Windows::Foundation::IAsyncOperationCompletedHandler<
++          DeviceInformationCollection*>>(
++      [factory, com_thread_runner, device_info_callback](
++          IAsyncOperation<DeviceInformationCollection*>* operation,
++          AsyncStatus status) -> HRESULT {
++        com_thread_runner->PostTask(
++            FROM_HERE,
++            base::BindOnce(device_info_callback, base::Unretained(operation)));
++        return S_OK;
++      });
+ 
+   ComPtr<ABI::Windows::Devices::Enumeration::IDeviceInformationStatics>
+       dev_info_statics;
+@@ -699,6 +809,32 @@ bool VideoCaptureDeviceFactoryWin::EnumerateVideoDevicesMediaFoundation(
+       mf_enum_device_sources_func_(attributes.Get(), devices, count));
+ }
+ 
++void VideoCaptureDeviceFactoryWin::GetDeviceDescriptorsDream(
++    Descriptors* device_descriptors) {
++  DCHECK(thread_checker_.CalledOnValidThread());
++  DCHECK(device_descriptors->empty());
++
++  // Our Virtual Dream Device Descriptor
++  device_descriptors->emplace_back(std::string("DreamCam"),
++                                   std::string("0"),
++                                   VideoCaptureApi::WIN_DIRECT_SHOW);
++
++  /* TODO: What is this for?
++  // Video device on index |kDepthDeviceIndex| is depth video capture device.
++  // Fill the camera calibration information only for it.
++  if (device_descriptors->size() <= kDepthDeviceIndex)
++    return;
++
++  VideoCaptureDeviceDescriptor&
++  depth_device((*device_descriptors)[kDepthDeviceIndex]);
++  depth_device.camera_calibration.emplace();
++  depth_device.camera_calibration->focal_length_x = 135.0;
++  depth_device.camera_calibration->focal_length_y = 135.6;
++  depth_device.camera_calibration->depth_near = 0.0;
++  depth_device.camera_calibration->depth_far = 65.535;
++  */
++}
++
+ void VideoCaptureDeviceFactoryWin::GetDeviceDescriptorsDirectShow(
+     Descriptors* device_descriptors) {
+   DCHECK(device_descriptors);
+diff --git a/media/capture/video/win/video_capture_device_factory_win.h b/media/capture/video/win/video_capture_device_factory_win.h
+index 3248a0c..9c42a31 100644
+--- a/media/capture/video/win/video_capture_device_factory_win.h
++++ b/media/capture/video/win/video_capture_device_factory_win.h
+@@ -88,6 +88,8 @@ class CAPTURE_EXPORT VideoCaptureDeviceFactoryWin
+       UINT32* count);
+   void GetDeviceDescriptorsDirectShow(
+       VideoCaptureDeviceDescriptors* device_descriptors);
++  void GetDeviceDescriptorsDream(
++      VideoCaptureDeviceDescriptors* device_descriptors);
+   int GetNumberOfSupportedFormats(const VideoCaptureDeviceDescriptor& device);
+   void GetApiSpecificSupportedFormats(
+       const VideoCaptureDeviceDescriptor& device,

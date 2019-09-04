@@ -25,6 +25,15 @@ OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int
 }
 
 OGLFramebuffer::~OGLFramebuffer() {
+	ClearAttachments();
+	m_pParentImp->glDeleteFramebuffers(1, &m_framebufferIndex);
+}
+
+RESULT OGLFramebuffer::ClearAttachments() {
+	RESULT r = R_PASS;
+
+	//ClearColorAttachments();
+
 	if (m_pOGLDepthAttachment != nullptr) {
 		delete m_pOGLDepthAttachment;
 		m_pOGLDepthAttachment = nullptr;
@@ -39,6 +48,10 @@ OGLFramebuffer::~OGLFramebuffer() {
 		delete[] m_pDrawBuffers;
 		m_pDrawBuffers = nullptr;
 	}
+
+	Unbind();
+
+	return r;
 }
 
 RESULT OGLFramebuffer::Resize(int pxWidth, int pxHeight, GLenum internalDepthFormat, GLenum typeDepth) {
@@ -58,7 +71,7 @@ RESULT OGLFramebuffer::Resize(int pxWidth, int pxHeight, GLenum internalDepthFor
 
 		///*
 		if (m_pOGLColorAttachment->GetOGLTexture() != nullptr) {
-			texture::TEXTURE_TYPE colorTextureType = m_pOGLColorAttachment->GetOGLTexture()->GetTextureType();
+			texture::type colorTextureType = m_pOGLColorAttachment->GetOGLTexture()->GetTextureType();
 			CR(DeleteColorAttachment());
 
 			CR(MakeColorAttachment());
@@ -81,11 +94,11 @@ RESULT OGLFramebuffer::Resize(int pxWidth, int pxHeight, GLenum internalDepthFor
 
 		///*
 		if (m_pOGLDepthAttachment->GetOGLTexture() != nullptr) {
-			texture::TEXTURE_TYPE depthTextureType = m_pOGLDepthAttachment->GetOGLTexture()->GetTextureType();
+			texture::type depthTextureType = m_pOGLDepthAttachment->GetOGLTexture()->GetTextureType();
 			CR(DeleteDepthAttachment());
 
 			CR(MakeDepthAttachment());
-			CR(m_pOGLDepthAttachment->MakeOGLDepthTexture(internalDepthFormat, typeDepth, depthTextureType));
+			CR(m_pOGLDepthAttachment->MakeOGLDepthTexture(depthTextureType, internalDepthFormat, typeDepth));
 			CR(m_pOGLDepthAttachment->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 		}
 		else if (m_pOGLDepthAttachment->GetOGLRenderBuffer() != nullptr) {
@@ -126,6 +139,15 @@ RESULT OGLFramebuffer::SetOGLTextureToFramebuffer2D(GLenum target, GLenum attach
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->glFramebufferTexture2D(target, attachment, textarget, m_pOGLColorAttachment->GetOGLTextureIndex(), 0));
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::SetOGLCubemapToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget) {
+	RESULT r = R_PASS;
+
+	CR(m_pParentImp->glFramebufferTexture2D(target, attachment, textarget, m_pOGLColorAttachment->GetOGLCubemapIndex(), 0));
 
 Error:
 	return r;
@@ -198,6 +220,37 @@ texture* OGLFramebuffer::GetColorTexture() {
 
 	return nullptr;
 }
+
+/*
+// TODO: Remove the Make functions and move all to Add 
+// but don't have time to do this right now
+RESULT OGLFramebuffer::AddColorAttachment(int index) {
+	RESULT r = R_PASS;
+
+	OGLAttachment *pOGLColorAttachment = new OGLAttachment(m_pParentImp, m_width, m_height, m_channels, m_samples);
+	CN(pOGLColorAttachment);
+
+	// TODO: Check for duplicate indexes 
+	m_oglColorAttachments[index] = pOGLColorAttachment;
+
+Error:
+	return r;
+}
+
+OGLAttachment* OGLFramebuffer::GetColorAttachment(int index) {
+	// TODO: check for non existent index
+	return m_oglColorAttachments[index];
+}
+
+RESULT OGLFramebuffer::ClearColorAttachments() {
+	RESULT r = R_PASS;
+
+	m_oglColorAttachments = std::map<int, OGLAttachment*>();
+
+Error:
+	return r;
+}
+*/
 
 RESULT OGLFramebuffer::MakeColorAttachment() {
 	RESULT r = R_PASS;
@@ -324,4 +377,14 @@ Error:
 
 RESULT OGLFramebuffer::Unbind() {
 	return m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+RESULT OGLFramebuffer::CheckStatus() {
+	RESULT r = R_PASS;
+
+	// Check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
 }

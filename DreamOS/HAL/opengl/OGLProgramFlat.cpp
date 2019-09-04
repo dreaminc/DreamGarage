@@ -9,8 +9,8 @@
 #include "OGLObj.h"
 #include "OGLTexture.h"
 
-OGLProgramFlat::OGLProgramFlat(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglflat")
+OGLProgramFlat::OGLProgramFlat(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglflat", optFlags)
 {
 	// empty
 }
@@ -41,11 +41,11 @@ RESULT OGLProgramFlat::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<FlatContext>("flatcontext", &m_pFlatContext, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<FlatContext>("flatcontext", &m_pFlatContext, PIPELINE_FLAGS::PASSIVE));
 
 	// Note: This is a special case here, most framebuffer inputs will WANT to be active (another shader)
-	CR(MakeInput<framebuffer>("framebuffer", (framebuffer**)(&m_pOGLFramebuffer), DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<framebuffer>("framebuffer", (framebuffer**)(&m_pOGLFramebuffer), PIPELINE_FLAGS::PASSIVE));
 
 Error:
 	return r;
@@ -96,12 +96,11 @@ RESULT OGLProgramFlat::RenderFlatContext(FlatContext *pFlatContext) {
 		float top = pFlatContext->GetTop(false);
 		float bottom = pFlatContext->GetBottom(false);
 
-		float nearPlane = -1.0f;
-		float farPlane = 1.0f;
+		float nearPlane = -1000.0f;
+		float farPlane = 1000.0f;
 
 		// TODO: Why the negative one?
-		auto matP = ProjectionMatrix::MakeOrthoYAxis(left, right, top * -1.0f, bottom * -1.0f, nearPlane, farPlane);
-
+		matrix<float, 4,4> matP = ProjectionMatrix::MakeOrthoYAxis(left, right, top * -1.0f, bottom * -1.0f, nearPlane, farPlane);
 		m_pUniformProjectionMatrix->SetUniform(matP);
 
 		glEnable(GL_DEPTH_TEST);
@@ -139,13 +138,14 @@ RESULT OGLProgramFlat::SetObjectTextures(OGLObj *pOGLObj) {
 }
 
 RESULT OGLProgramFlat::SetObjectUniforms(DimObj *pDimObj) {
-
-	auto matModel = pDimObj->VirtualObj::GetModelMatrix();
+	auto matModel = pDimObj->GetFlatModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
+	// could do with a flag in DimObj
 	/*
 	text *pText = dynamic_cast<text*>(pDimObj);
 	if (pText != nullptr) {
+		/*
 		float buffer = pText->GetFont()->GetBuffer();
 		float gamma = pText->GetFont()->GetGamma();
 
@@ -153,11 +153,14 @@ RESULT OGLProgramFlat::SetObjectUniforms(DimObj *pDimObj) {
 		m_pUniformGamma->SetUniformFloat(&gamma);
 
 		//m_pUniformfDistanceMap->SetUniform(pText->GetFont()->HasDistanceMap());
+		//matModel = pDimObj->VirtualObj::GetModelMatrix();
+		m_pUniformModelMatrix->SetUniform(pDimObj->VirtualObj::GetModelMatrix());
 	}
 	else {
 		//m_pUniformfDistanceMap->SetUniform(true);
+		m_pUniformModelMatrix->SetUniform(pDimObj->GetModelMatrix());
 	}
-	*/
+	//*/
 
 	return R_PASS;
 }

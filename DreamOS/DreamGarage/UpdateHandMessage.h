@@ -10,21 +10,20 @@
 #include <string>
 #include "DreamGarageMessage.h"
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
-#include "Primitives/quaternion.h"
-#include "Primitives/hand.h"
+class hand;
+
+#include "Primitives/hand/HandState.h"
 
 // TODO: We might want to switch this out with other messages
 
 class UpdateHandMessage : public DreamGarageMessage {
 private:
 	__declspec(align(4)) struct MessageBody {
-		hand::HandState handState;
+		HandState handState;
 	} m_body;
 
 public:
-	UpdateHandMessage(long senderUserID, long receiverUserID, hand::HandState handState) :
+	UpdateHandMessage(long senderUserID, long receiverUserID, HandState handState) :
 		DreamGarageMessage(senderUserID, receiverUserID, DreamGarageMessage::type::UPDATE_HAND, sizeof(UpdateHandMessage))
 	{
 		m_body.handState = handState;
@@ -40,7 +39,7 @@ public:
 		return R_PASS;
 	}
 
-	hand::HandState GetHandState() {
+	HandState GetHandState() {
 		return m_body.handState;
 	}
 };

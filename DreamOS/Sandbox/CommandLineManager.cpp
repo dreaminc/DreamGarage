@@ -83,6 +83,7 @@ RESULT CommandLineManager::RegisterParameter(std::string strParamName, std::stri
 	regParam.m_strDefaultValue = strDefaultValue;
 	regParam.m_fValueSet = false;
 	regParam.m_strParamValue = "";
+	regParam.m_fEnabled = true;
 
 	m_mapRegisteredParams[strParamName] = regParam;
 
@@ -110,10 +111,51 @@ std::string CommandLineManager::GetParameterValue(std::string strParamName) {
 
 	RegisteredParameter regParam = m_mapRegisteredParams[strParamName];
 
-	if (regParam.m_fValueSet)
+	if (regParam.m_fValueSet && regParam.m_fEnabled) {
 		return regParam.m_strParamValue;
-	else
+	}
+	else {
 		return regParam.m_strDefaultValue;
+	}
+}
+
+std::vector<std::string> CommandLineManager::GetParameterValues(std::string strParamName, char cDelim) {
+	std::vector<std::string> retVec = std::vector<std::string>();
+	
+	std::string strParamVal = GetParameterValue(strParamName);
+	
+	size_t dPosition = 0;
+	std::string strTok;
+
+	while ((dPosition = strParamVal.find(cDelim)) != std::string::npos) {
+		strTok = strParamVal.substr(0, dPosition);
+		retVec.push_back(strTok);
+		strParamVal.erase(0, dPosition + 1);
+	}
+
+	retVec.push_back(strParamVal);
+
+	return retVec;
+}
+
+RESULT CommandLineManager::DisableParameter(std::string strParamName) {
+	RESULT r = R_PASS;
+
+	CBM((m_mapRegisteredParams.find(strParamName) != m_mapRegisteredParams.end()), "%s param not found", strParamName.c_str());
+	m_mapRegisteredParams[strParamName].m_fEnabled = false;
+
+Error:
+	return r;
+}
+
+RESULT CommandLineManager::EnableParameter(std::string strParamName) {
+	RESULT r = R_PASS;
+
+	CBM((m_mapRegisteredParams.find(strParamName) != m_mapRegisteredParams.end()), "%s param not found", strParamName.c_str());
+	m_mapRegisteredParams[strParamName].m_fEnabled = true;
+
+Error:
+	return r;
 }
 
 void CommandLineManager::ForEach(std::function<void(const std::string&)> func) {

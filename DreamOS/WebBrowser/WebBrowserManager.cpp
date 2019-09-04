@@ -27,6 +27,9 @@ std::shared_ptr<WebBrowserController> WebBrowserManager::CreateNewBrowser(int wi
 
 	m_webBrowserControllers.push_back(pWebBrowserController);
 
+	DOSLOG(INFO, "Added new browser controller");
+
+
 // Success:
 	return pWebBrowserController;
 
@@ -112,6 +115,11 @@ std::shared_ptr<WebBrowserController> WebBrowserManager::GetBrowser(const std::s
 	}
 
 	return nullptr;
+}
+
+RESULT WebBrowserManager::RemoveBrowser(std::shared_ptr<WebBrowserController> pWebBrowserController) {
+	m_webBrowserControllers.remove(pWebBrowserController);
+	return R_PASS;
 }
 
 /*

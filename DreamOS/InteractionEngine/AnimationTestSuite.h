@@ -2,7 +2,7 @@
 #define ANIMATION_TEST_SUITE_H_
 
 #include "RESULT/EHM.h"
-#include "Test/TestSuite.h"
+#include "Test/DreamTestSuite.h"
 
 #include "Primitives/Subscriber.h"
 #include "Sense/SenseKeyboard.h"
@@ -24,10 +24,14 @@ struct AnimationTestContext {
 	std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 };
 
-class AnimationTestSuite : public TestSuite, public Subscriber<InteractionObjectEvent>, public Subscriber<SenseKeyboardEvent> {
+class AnimationTestSuite : 
+	public DreamTestSuite, 
+	public Subscriber<InteractionObjectEvent>, 
+	public Subscriber<SenseKeyboardEvent> 
+{
 public:
 	AnimationTestSuite(DreamOS *pDreamOS);
-	~AnimationTestSuite();
+	~AnimationTestSuite() = default;
 
 	virtual RESULT AddTests() override;
 
@@ -47,8 +51,6 @@ private:
 
 	virtual RESULT Notify(InteractionObjectEvent *event) override;
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
-
-	DreamOS *m_pDreamOS;
 };
 
 #endif // ! ANIMATION_TEST_SUITE_H_

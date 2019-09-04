@@ -12,3 +12,7 @@ OGLComposite::OGLComposite(OpenGLImp *pParentImp) :
 RESULT OGLComposite::UpdateBuffers() {
 	return UpdateOGLBuffers();
 }
+
+RESULT OGLComposite::OGLInitialize() {
+	return R_SKIPPED;
+}

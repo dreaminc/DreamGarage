@@ -1,3 +1,4 @@
+#ifndef OCULUS_PRODUCTION_BUILD
 #include "OpenVRDevice.h"
 
 #include "Sandbox/SandboxApp.h"
@@ -9,6 +10,10 @@
 #include "OpenVRHMDSinkNode.h"
 
 #include "OpenVRController.h"
+
+#include "Core/Utilities.h"
+
+#include "Primitives/hand/hand.h"
 
 OpenVRDevice::OpenVRDevice(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
@@ -66,12 +71,15 @@ std::string OpenVRDevice::GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::Tracke
 	return sResult;
 }
 
-RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
+RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight, bool fHMDMirror) {
 	RESULT r = R_PASS;
 	vr::EVRInitError ivrResult = vr::VRInitError_None;
 	m_pHALImp = halimp;
 
 	m_pIVRHMD = vr::VR_Init(&ivrResult, vr::VRApplication_Scene);
+
+	vr::VRCompositor()->SetTrackingSpace(vr::TrackingUniverseSeated);
+
 	CNM(m_pIVRHMD, "Failed to initialize and allocate IVR HMD");
 	CIVRM(ivrResult, "Unable to initialize IVR runtime");
 
@@ -80,10 +88,12 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 
 	m_strDriver = GetTrackedDeviceString(m_pIVRHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_TrackingSystemName_String);
 	m_strDisplay = GetTrackedDeviceString(m_pIVRHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_SerialNumber_String);
+	m_strName = GetTrackedDeviceString(m_pIVRHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_ManufacturerName_String);
+
+	InitializeDeviceType();
 
 	// Eye Widths
 	m_pIVRHMD->GetRecommendedRenderTargetSize(&m_eyeWidth, &m_eyeHeight);
-
 
 	CRM(InitializeRenderModels(), "Failed to load render models");
 	
@@ -116,8 +126,6 @@ RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr
 		m_pControllerMeshLeftTexture = pTexture;
 		if (m_pLeftController == nullptr) {
 			m_pLeftController = m_pParentSandbox->MakeComposite();
-		}
-		if (!m_pLeftController->HasChildren()) {
 			m_pLeftController->AddObject(m_pControllerMeshLeft);
 		}
 	}
@@ -126,11 +134,10 @@ RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr
 		m_pControllerMeshRightTexture = pTexture;
 		if (m_pRightController == nullptr) {
 			m_pRightController = m_pParentSandbox->MakeComposite();
-		}
-		if (!m_pRightController->HasChildren()) {
 			m_pRightController->AddObject(m_pControllerMeshRight);
 		}
 	}
+	/*
 	else if (controllerRole == vr::TrackedControllerRole_Invalid) {
 		if (m_pControllerMeshLeft == nullptr) {
 			m_pControllerMeshLeft = std::shared_ptr<mesh>(pMesh);
@@ -156,8 +163,9 @@ RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr
 			CBM((0), "Invalid controller role and both controllers already set");
 		}
 	}
+	//*/
 
-Error:
+//Error:
 	return r;
 }
 
@@ -172,6 +180,9 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 
 	std::string sRenderModelName = GetTrackedDeviceString(m_pIVRHMD, deviceID, vr::Prop_RenderModelName_String);
 	CB((sRenderModelName.length() > 0));
+
+	vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(deviceID);
+	CBR(controllerRole != vr::TrackedControllerRole_Invalid, R_SKIPPED);
 
 	while (1) {
 		error = vr::VRRenderModels()->LoadRenderModel_Async(sRenderModelName.c_str(), &pRenderModel);
@@ -224,10 +235,12 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	CBM((indices.size() == (pRenderModel->unTriangleCount * 3)), "Index count mismatch");
 	
 	//model *pModel = nullptr;
-	mesh *pControllerMesh = m_pParentSandbox->AddMesh(verts, indices);
+	mesh *pControllerMesh = m_pParentSandbox->MakeMesh(verts, indices);
 
 	//TODO: looks a little better, but there is still likely a problem with how the controllers are positioned
-	pControllerMesh->SetScale(vector(0.9f));
+	if (m_deviceType != HMDDeviceType::OCULUS) {
+		pControllerMesh->SetScale(vector(0.9f));
+	}
 	//pModel->SetMaterialAmbient(1.0f);
 	CNM(pControllerMesh, "Open VR Controller Models failed to load");
 
@@ -241,10 +254,9 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	void *pBuffer = (void*)(pRenderModelTexture->rubTextureMapData);
 	int pBuffer_n = sizeof(uint8_t) * width * height * channels;
 
-	texture *pTexture = m_pParentSandbox->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, width, height, PIXEL_FORMAT::Unspecified, channels, pBuffer, pBuffer_n);
+	texture *pTexture = m_pParentSandbox->MakeTexture(texture::type::TEXTURE_2D, width, height, PIXEL_FORMAT::BGRA, channels, pBuffer, pBuffer_n);
 	pControllerMesh->SetDiffuseTexture(pTexture);
 
-	vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(deviceID);
 	CR(SetControllerMeshTexture(pControllerMesh, pTexture, controllerRole))
 
 Error:
@@ -259,6 +271,28 @@ Error:
 	}
 
 	return r;
+}
+
+RESULT OpenVRDevice::InitializeDeviceType() {
+	RESULT r = R_PASS;
+
+	if (m_strName == "HTC") {
+		//m_strDriver == "lighthouse"
+		m_deviceType = HMDDeviceType::VIVE;
+	}
+	else if (m_strName == "MVN") {
+		//m_deviceType = HMDDeviceType::VIVE;
+		//m_strDriver == "meta"
+		m_deviceType = HMDDeviceType::META;
+	}
+	else if (m_strName == "Oculus") {	// running from steam with Oculus headset
+		m_deviceType = HMDDeviceType::OCULUS;
+	}
+	else {
+		m_deviceType = HMDDeviceType::NONE;
+	}
+
+	return R_PASS;
 }
 
 // TODO: Might not want to have this here (move to sandbox or sense)
@@ -288,19 +322,21 @@ composite *OpenVRDevice::GetSenseControllerObject(ControllerType controllerType)
 	//*
 	switch (controllerType) {
 	case CONTROLLER_LEFT: {
-#ifdef _USE_TEST_APP
+	/*
+		if (m_pLeftController == nullptr) {
+			m_pLeftController = m_pParentSandbox->MakeComposite();
+		}
+	//*/
 		return m_pLeftController;
-#else
-		return m_pLeftController;
-#endif
 	} break;
 
 	case CONTROLLER_RIGHT: {
-#ifdef _USE_TEST_APP
+	/*
+		if (m_pRightController == nullptr) {
+			m_pRightController = m_pParentSandbox->MakeComposite();
+		}
+	//*/
 		return m_pRightController;
-#else
-		return m_pRightController;
-#endif
 	} break;
 	}
 	
@@ -311,7 +347,71 @@ composite *OpenVRDevice::GetSenseControllerObject(ControllerType controllerType)
 }
 
 HMDDeviceType OpenVRDevice::GetDeviceType() {
-	return HMDDeviceType::VIVE;
+	return m_deviceType;
+}
+
+bool OpenVRDevice::IsARHMD() {
+	return m_deviceType == HMDDeviceType::META;
+}
+
+std::string OpenVRDevice::GetDeviceTypeString() {
+	std::string strDeviceType;
+
+	switch (m_deviceType) {
+
+		case HMDDeviceType::VIVE: {
+			strDeviceType = "HMDType.HTCVive";
+		} break;
+
+		case HMDDeviceType::META: {
+			strDeviceType = "HMDType.MVNMeta";
+		} break;
+
+	}
+
+	return strDeviceType;
+}
+
+RESULT OpenVRDevice::GetAudioDeviceOutID(std::wstring &wstrAudioDeviceOutGUID) {
+	return R_NOT_IMPLEMENTED;
+	
+	/*	// Fails with UnsetSettingHasNoDefault, but steam will fall through to system default anyway
+	// Users of the system need to provide a proper default in default.vrsettings in the resources/settings/ directory of either the runtime or the driver_xxx
+	// directory. Otherwise the default will be false, 0, 0.0 or ""
+	vr::EVRSettingsError evrErr;
+	char szDeviceOutStrBuffer[128];
+
+	CN(m_pIVRHMD);
+
+	vr::COpenVRContext &ctx = vr::OpenVRInternal_ModuleContext();
+	auto pIVRSettings = ctx.VRSettings();
+	CN(pIVRSettings);
+
+	pIVRSettings->GetString(vr::k_pch_SteamVR_Section, vr::k_pch_audio_OnPlaybackDevice_String, szDeviceOutStrBuffer, 128, &evrErr);
+	CBM((evrErr == vr::EVRSettingsError::VRSettingsError_None), "Get SteamVR playback device string failed");
+
+	wstrAudioDeviceOutGUID = util::CStringToWideCString(szDeviceOutStrBuffer);
+
+Error:
+	return r;
+	//*/
+}
+
+RESULT OpenVRDevice::GetAudioDeviceInGUID(std::wstring &wstrAudioDeviceInGUID) {
+	RESULT r = R_PASS;
+
+	//vr::EVRSettingsError evrErr;
+	//char szDeviceInStrBuffer[128];
+
+	CN(m_pIVRHMD);
+
+	//vr::IVRSettings.GetString(k_pch_SteamVR_Section, k_pch_audio_OnRecordDevice_String, szDeviceInStrBuffer, 128, &evrErr);
+	//CBM((evrErr == VRSettingsError_None), "Get SteamVR playback device string failed");
+	//
+	//wstrAudioDeviceInGUID = std::wstring(szDeviceInStrBuffer);
+
+Error:
+	return r;
 }
 
 RESULT OpenVRDevice::HandleVREvent(vr::VREvent_t event) {
@@ -332,7 +432,21 @@ RESULT OpenVRDevice::HandleVREvent(vr::VREvent_t event) {
 			DEBUG_LINEOUT("Device %u updated.\n", event.trackedDeviceIndex);
 		} break;
 
+		case vr::VREvent_SeatedZeroPoseReset: {
+			NotifySubscribers(HMD_EVENT_TYPE::HMD_EVENT_RESET_VIEW, &HMDEvent(HMD_EVENT_RESET_VIEW, m_deviceType));
+		} break;
+
+		case vr::VREvent_DashboardActivated: {
+			NotifySubscribers(HMD_EVENT_TYPE::HMD_EVENT_UNFOCUS, &HMDEvent(HMD_EVENT_UNFOCUS, m_deviceType));
+		} break;
+
+		case vr::VREvent_DashboardDeactivated: {
+			NotifySubscribers(HMD_EVENT_TYPE::HMD_EVENT_FOCUS, &HMDEvent(HMD_EVENT_FOCUS, m_deviceType));
+		} break;
+
 		// TODO: Lots more events to ultimately map...
+		// TODO: this is probably where button presses should be detected:
+		// vr::VREvent_ButtonPress / vr::VREvent_ButtonUnpress
 	}
 
 //Error:
@@ -367,23 +481,77 @@ ViewMatrix OpenVRDevice::ConvertSteamVRMatrixToViewMatrix(const vr::HmdMatrix34_
 
 RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controllerRole, vr::VRControllerState_t state) {
 
+	RESULT r = R_PASS;
+
 	ControllerState cState;
 
-	cState.triggerRange = state.rAxis[1].x;
-	cState.ptTouchpad = point(state.rAxis[0].x, state.rAxis[0].y, 0.0f);
-
-	cState.fMenu = (state.ulButtonPressed & (1<<1)) != 0;
-	cState.fGrip = (state.ulButtonPressed & (1<<2)) != 0;
+	CBR(controllerRole != vr::TrackedControllerRole_Invalid, R_SKIPPED);
 
 	if (controllerRole == vr::TrackedControllerRole_LeftHand) {
+		CBR(m_pLeftController != nullptr, R_SKIPPED);
 		cState.type = CONTROLLER_LEFT;
-	} 
+	}
 	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
+		CBR(m_pRightController != nullptr, R_SKIPPED);
 		cState.type = CONTROLLER_RIGHT;
 	}
-	m_pSenseController->SetControllerState(cState); 
 
-	return R_PASS;
+	switch (m_deviceType) {
+		case HMDDeviceType::VIVE: {
+			cState.triggerRange = state.rAxis[1].x;
+
+			if ((state.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Axis0)) != 0) {
+				// force d-pad style
+				float x = state.rAxis[0].x;
+				float y = state.rAxis[0].y;
+
+				if (abs(x) >= abs(y)) {
+					if (x >= 0) cState.ptTouchpad = point(1.0f, 0.0f, 0.0f);
+					else cState.ptTouchpad = point(-1.0f, 0.0f, 0.0f);
+				}
+				else {
+					if (y >= 0) cState.ptTouchpad = point(0.0f, 1.0f, 0.0f);
+					else cState.ptTouchpad = point(0.0f, -1.0f, 0.0f);
+				}
+
+				//cState.ptTouchpad = vector(state.rAxis[0].x, state.rAxis[0].y, 0.0f).Normal();
+			}
+
+			cState.fMenu = (state.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu)) != 0;
+			cState.fGrip = (state.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) != 0;
+
+		} break;
+
+		case HMDDeviceType::OCULUS: {
+			cState.triggerRange = state.rAxis[0].x;
+
+			if ((state.ulButtonPressed | vr::ButtonMaskFromId(vr::k_EButton_Axis0)) != 0) {
+				// force d-pad style
+				float x = state.rAxis[0].x;
+				float y = state.rAxis[0].y;
+				cState.ptTouchpad = point(x, y, 0.0f);
+			}
+
+			cState.fMenu = (state.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu)) != 0;
+			cState.fGrip = (state.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) != 0;
+		} break;
+
+			/*
+		case HMDDeviceType::META: {
+			cState.fGrip = false;
+			uint64_t flag = (uint64_t)1 << 33;
+			cState.fMenu = (state.ulButtonPressed & flag) != 0;
+			cState.fClosed = (state.ulButtonPressed & flag) != 0;
+			cState.triggerRange = 0.0f;
+			cState.ptTouchpad = point(0.0f, 0.0f, 0.0f);
+		} break;
+		//*/
+	}
+
+	m_pSenseController->SetControllerState(cState);
+
+Error:
+	return r;
 }
 
 RESULT OpenVRDevice::UpdateHMD() {
@@ -397,6 +565,13 @@ RESULT OpenVRDevice::UpdateHMD() {
 	if(m_pIVRHMD->PollNextEvent(&vrEvent, sizeof(vr::VREvent_t))) {
 		HandleVREvent(vrEvent);
 	}
+
+	vr::VRControllerState_t leftState;
+	vr::VRControllerState_t rightState;
+	bool fLeft = false;
+	bool fRight = false;
+	bool fMenu = false;
+	uint32_t currentFrame;
 
 	// Process SteamVR controller state
 	for (vr::TrackedDeviceIndex_t unDevice = 0; unDevice < vr::k_unMaxTrackedDeviceCount; unDevice++) {
@@ -412,20 +587,59 @@ RESULT OpenVRDevice::UpdateHMD() {
 
 		// TODO: currently not getting click events from touch pad or trigger
 		// more info: https://github.com/ValveSoftware/openvr/wiki/IVRSystem::GetControllerState
+		vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(unDevice);
+
+		if (controllerRole == vr::TrackedControllerRole_LeftHand) {
+			if (m_pLeftController == nullptr) {
+				InitializeRenderModel(unDevice);
+			}
+		}
+		if (controllerRole == vr::TrackedControllerRole_RightHand) {
+			if (m_pRightController == nullptr) {
+				InitializeRenderModel(unDevice);
+			}
+		}
+
 		if (m_pIVRHMD->GetControllerState(unDevice, &state, sizeof(vr::VRControllerState_t))) {
 			if (m_pIVRHMD->GetTrackedDeviceClass(unDevice) == vr::TrackedDeviceClass_Controller) {
-				uint32_t currentFrame = state.unPacketNum;
+				currentFrame = state.unPacketNum;
 
 				if (currentFrame != m_vrFrameCount) {
-					m_vrFrameCount = currentFrame;
-					vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(unDevice);
-					UpdateSenseController(controllerRole, state);
+//					m_vrFrameCount = currentFrame;
+
+					//UpdateSenseController(controllerRole, state);
+
+					// unify button states for menu press
+					if (controllerRole == vr::TrackedControllerRole_LeftHand) {
+						leftState = state;
+						fLeft = true;
+						fMenu = fMenu || (leftState.ulButtonPressed & (1 << 1)) != 0;
+					}
+					else if (controllerRole == vr::TrackedControllerRole_RightHand) {
+						rightState = state;
+						fRight = true;
+						fMenu = fMenu || (rightState.ulButtonPressed & (1 << 1)) != 0;
+					}
 				}
 			}
 
 			//m_rbShowTrackedDevice[unDevice] = state.ulButtonPressed == 0;
 			// TODO: do stuff
 		}
+	}
+
+	if (fLeft || fRight) {
+		if (fLeft) {
+			leftState.ulButtonPressed |= (fMenu << 1);
+			UpdateSenseController(vr::TrackedControllerRole_LeftHand, leftState);
+		}
+		if (fRight) {
+			rightState.ulButtonPressed |= (fMenu << 1);
+			UpdateSenseController(vr::TrackedControllerRole_RightHand, rightState);
+		}
+
+		// update the frame count if either controller had an update
+		m_vrFrameCount = currentFrame;
 	}
 
 
@@ -478,15 +692,31 @@ RESULT OpenVRDevice::UpdateHMD() {
 					qOrientation *= qRotation;
 					qOrientation.Reverse();
 
+					point ptOffset = point(0.0f, 0.01f, -0.0057f);
+
 					if (controllerRole == vr::TrackedControllerRole_LeftHand && m_pControllerMeshLeft != nullptr) {
 						//m_pControllerMeshLeft->SetPosition(ptControllerPosition);
 						//m_pControllerMeshLeft->SetOrientation(qOrientation);
 						m_pLeftController->SetPosition(ptControllerPosition);
 						m_pLeftController->SetOrientation(qOrientation);
 
-						m_pLeftHand->SetPosition(ptControllerPosition);
-						m_pLeftHand->SetOrientation(qOrientation);
-						m_pLeftHand->SetLocalOrientation(qOrientation);
+						if (m_deviceType == HMDDeviceType::OCULUS) {
+							m_pLeftHand->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
+							m_pLeftHand->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+
+							if (m_pLeftHand->GetPhantomModel() != nullptr) {
+								m_pLeftHand->GetPhantomModel()->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
+								m_pLeftHand->GetPhantomModel()->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+							}
+						}
+						else {
+							m_pLeftHand->SetPosition(ptControllerPosition);
+							m_pLeftHand->SetOrientation(qOrientation);
+							if (m_pLeftHand->GetPhantomModel() != nullptr) {
+								m_pLeftHand->GetPhantomModel()->SetPosition(ptControllerPosition);
+								m_pLeftHand->GetPhantomModel()->SetOrientation(qOrientation);
+							}
+						}
 
 						fLeftHandTracked = true;
 						m_pLeftHand->SetTracked(true);
@@ -497,9 +727,22 @@ RESULT OpenVRDevice::UpdateHMD() {
 						m_pRightController->SetPosition(ptControllerPosition);
 						m_pRightController->SetOrientation(qOrientation);
 
-						m_pRightHand->SetPosition(ptControllerPosition);
-						m_pRightHand->SetOrientation(qOrientation);
-						m_pRightHand->SetLocalOrientation(qOrientation);
+						if (m_deviceType == HMDDeviceType::OCULUS) {
+							m_pRightHand->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
+							m_pRightHand->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+							if (m_pRightHand->GetPhantomModel() != nullptr) {
+								m_pRightHand->GetPhantomModel()->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
+								m_pRightHand->GetPhantomModel()->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+							}
+						}
+						else {
+							m_pRightHand->SetPosition(ptControllerPosition);
+							m_pRightHand->SetOrientation(qOrientation);
+							if (m_pRightHand->GetPhantomModel() != nullptr) {
+								m_pRightHand->GetPhantomModel()->SetPosition(ptControllerPosition);
+								m_pRightHand->GetPhantomModel()->SetOrientation(qOrientation);
+							}
+						}
 
 						fRightHandTracked = true;
 						m_pRightHand->SetTracked(true);
@@ -540,14 +783,15 @@ RESULT OpenVRDevice::UpdateHMD() {
 			}
 			
 		}
-
-		if (!fLeftHandTracked && m_pLeftHand != nullptr) {
-			m_pLeftHand->SetTracked(fLeftHandTracked);
-		}
-		if (!fRightHandTracked && m_pRightHand != nullptr) {
-			m_pRightHand->SetTracked(fRightHandTracked);
-		}
 	}
+	//*
+	if (!fLeftHandTracked && m_pLeftHand != nullptr) {
+		m_pLeftHand->SetTracked(fLeftHandTracked);
+	}
+	if (!fRightHandTracked && m_pRightHand != nullptr) {
+		m_pRightHand->SetTracked(fRightHandTracked);
+	}
+	//*/
 
 Error:
 	return r;
@@ -584,6 +828,11 @@ RESULT OpenVRDevice::UnsetRenderSurface(EYE_TYPE eye) {
 RESULT OpenVRDevice::RenderHMDMirror() {
 	return R_NOT_IMPLEMENTED;
 }
+
+RESULT OpenVRDevice::RecenterHMD() {
+	return R_NOT_IMPLEMENTED;
+}
+
 
 ProjectionMatrix OpenVRDevice::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {
 	vr::EVREye eyeType = (eye == EYE_LEFT) ? vr::Eye_Left : vr::Eye_Right;
@@ -635,3 +884,4 @@ ViewMatrix OpenVRDevice::GetViewMatrix(EYE_TYPE eye) {
 
 	return viewMat;
 }
+#endif

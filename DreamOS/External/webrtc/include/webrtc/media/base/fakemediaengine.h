@@ -27,7 +27,6 @@
 #include "media/base/streamparams.h"
 #include "media/engine/webrtcvideoengine.h"
 #include "modules/audio_processing/include/audio_processing.h"
-#include "p2p/base/sessiondescription.h"
 #include "rtc_base/checks.h"
 #include "rtc_base/copyonwritebuffer.h"
 #include "rtc_base/networkroute.h"
@@ -111,7 +110,7 @@ template <class Base> class RtpHelper : public Base {
     }
     send_streams_.push_back(sp);
     rtp_send_parameters_[sp.first_ssrc()] =
-        CreateRtpParametersWithOneEncoding();
+        CreateRtpParametersWithEncodings(sp);
     return true;
   }
   virtual bool RemoveSendStream(uint32_t ssrc) {
@@ -146,16 +145,17 @@ template <class Base> class RtpHelper : public Base {
     }
     return webrtc::RtpParameters();
   }
-  virtual bool SetRtpSendParameters(uint32_t ssrc,
-                                    const webrtc::RtpParameters& parameters) {
+  virtual webrtc::RTCError SetRtpSendParameters(
+      uint32_t ssrc,
+      const webrtc::RtpParameters& parameters) {
     auto parameters_iterator = rtp_send_parameters_.find(ssrc);
     if (parameters_iterator != rtp_send_parameters_.end()) {
       parameters_iterator->second = parameters;
-      return true;
+      return webrtc::RTCError::OK();
     }
     // Replicate the behavior of the real media channel: return false
     // when setting parameters for unknown SSRCs.
-    return false;
+    return webrtc::RTCError(webrtc::RTCErrorType::INTERNAL_ERROR);
   }
 
   virtual webrtc::RtpParameters GetRtpReceiveParameters(uint32_t ssrc) const {
@@ -382,9 +382,6 @@ class FakeVoiceMediaChannel : public RtpHelper<VoiceMediaChannel> {
     return true;
   }
 
-  virtual bool GetActiveStreams(StreamList* streams) { return true; }
-  virtual int GetOutputLevel() { return 0; }
-
   virtual bool CanInsertDtmf() {
     for (std::vector<AudioCodec>::const_iterator it = send_codecs_.begin();
          it != send_codecs_.end(); ++it) {
@@ -580,13 +577,9 @@ class FakeVideoMediaChannel : public RtpHelper<VideoMediaChannel> {
   bool SetSend(bool send) override { return set_sending(send); }
   bool SetVideoSend(
       uint32_t ssrc,
-      bool enable,
       const VideoOptions* options,
       rtc::VideoSourceInterface<webrtc::VideoFrame>* source) override {
-    if (!RtpHelper<VideoMediaChannel>::MuteStream(ssrc, !enable)) {
-      return false;
-    }
-    if (enable && options) {
+    if (options) {
       if (!SetOptions(*options)) {
         return false;
       }

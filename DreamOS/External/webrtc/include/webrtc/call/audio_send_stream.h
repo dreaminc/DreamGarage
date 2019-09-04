@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 
+#include "api/audio_codecs/audio_codec_pair_id.h"
 #include "api/audio_codecs/audio_encoder.h"
 #include "api/audio_codecs/audio_encoder_factory.h"
 #include "api/audio_codecs/audio_format.h"
@@ -28,10 +29,7 @@
 
 namespace webrtc {
 
-// WORK IN PROGRESS
-// This class is under development and is not yet intended for for use outside
-// of WebRtc/Libjingle. Please use the VoiceEngine API instead.
-// See: https://bugs.chromium.org/p/webrtc/issues/detail?id=4690
+class AudioFrame;
 
 class AudioSendStream {
  public:
@@ -76,6 +74,10 @@ class AudioSendStream {
       // Sender SSRC.
       uint32_t ssrc = 0;
 
+      // The value to send in the MID RTP header extension if the extension is
+      // included in the list of extensions.
+      std::string mid;
+
       // RTP header extensions used for the sent stream.
       std::vector<RtpExtension> extensions;
 
@@ -90,17 +92,13 @@ class AudioSendStream {
     // the entire life of the AudioSendStream and is owned by the API client.
     Transport* send_transport = nullptr;
 
-    // Underlying VoiceEngine handle, used to map AudioSendStream to lower-level
-    // components.
-    // TODO(solenberg): Remove when VoiceEngine channels are created outside
-    // of Call.
-    int voe_channel_id = -1;
-
     // Bitrate limits used for variable audio bitrate streams. Set both to -1 to
     // disable audio bitrate adaptation.
     // Note: This is still an experimental feature and not ready for real usage.
     int min_bitrate_bps = -1;
     int max_bitrate_bps = -1;
+
+    double bitrate_priority = 1.0;
 
     // Defines whether to turn on audio network adaptor, and defines its config
     // string.
@@ -127,6 +125,7 @@ class AudioSendStream {
 
     rtc::Optional<SendCodecSpec> send_codec_spec;
     rtc::scoped_refptr<AudioEncoderFactory> encoder_factory;
+    rtc::Optional<AudioCodecPairId> codec_pair_id;
 
     // Track ID as specified during track creation.
     std::string track_id;
@@ -145,6 +144,10 @@ class AudioSendStream {
   // Stops stream activity.
   // When a stream is stopped, it can't receive, process or deliver packets.
   virtual void Stop() = 0;
+
+  // Encode and send audio.
+  virtual void SendAudioData(
+      std::unique_ptr<webrtc::AudioFrame> audio_frame) = 0;
 
   // TODO(solenberg): Make payload_type a config property instead.
   virtual bool SendTelephoneEvent(int payload_type, int payload_frequency,

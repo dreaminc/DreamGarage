@@ -7,8 +7,8 @@
 #include "Primitives/matrix/ProjectionMatrix.h"
 #include "Primitives/quad.h"
 
-OGLProgramUIStage::OGLProgramUIStage(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "ogluistage")
+OGLProgramUIStage::OGLProgramUIStage(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "ogluistage", optFlags)
 {
 	// empty
 }
@@ -33,12 +33,16 @@ RESULT OGLProgramUIStage::OGLInitialize() {
 
 	// Clipping
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingEnabled), std::string("u_clippingEnabled")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformAR), std::string("u_arEnabled")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformQuadCenter), std::string("u_ptQuadCenter")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformParentModelMatrix), std::string("u_mat4ParentModel")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformptOrigin), std::string("u_ptOrigin")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformvOrigin), std::string("u_vOrigin")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingThreshold), std::string("u_clippingThreshold")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingRate), std::string("u_clippingRate")));
 
 	// Materials 
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
@@ -72,9 +76,9 @@ RESULT OGLProgramUIStage::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("clippingscenegraph", &m_pClippingSceneGraph, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("clippingscenegraph", &m_pClippingSceneGraph, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 
 	//TODO: MatrixNode(?)
@@ -97,9 +101,12 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
+	VirtualObj *pVirtualObj = nullptr;
+
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 	//UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
+	// Update all of the UI objects
 
 	UseProgram();
 
@@ -117,15 +124,23 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	m_pUniformptOrigin->SetUniform(point(m_ptOrigin.x(), m_ptOrigin.y(), m_ptOrigin.z(), 0.0f));
 	m_pUniformvOrigin->SetUniform(m_vOrigin);
 
-	m_pUniformClippingEnabled->SetUniform(true);
-	RenderObjectStore(m_pClippingSceneGraph);
+	m_pUniformClippingThreshold->SetUniform(m_clippingThreshold);
+	m_pUniformClippingRate->SetUniform(m_clippingRate);
 
-	m_pUniformClippingEnabled->SetUniform(false);
+	m_pUniformAR->SetUniform(m_fIsAugmented);
+
+	if (m_pClippingSceneGraph != nullptr) {
+		m_pUniformClippingEnabled->SetUniform(true);
+		RenderObjectStore(m_pClippingSceneGraph);
+
+		m_pUniformClippingEnabled->SetUniform(false);
+	}
+
 	RenderObjectStore(m_pSceneGraph);
 
 	UnbindFramebuffer();
 
-	//Error:
+Error:
 	return r;
 }
 
@@ -149,25 +164,6 @@ RESULT OGLProgramUIStage::SetObjectTextures(OGLObj *pOGLObj) {
 	return r;
 }
 
-RESULT OGLProgramUIStage::SetClippingViewMatrix(ViewMatrix matView) {
-	m_clippingView = matView;
-	return R_PASS;
-}
-
-RESULT OGLProgramUIStage::SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane) {
-	m_clippingProjection = ProjectionMatrix(left, right, top, bottom, nearPlane, farPlane);
-	return R_PASS;
-}
-
-RESULT OGLProgramUIStage::SetClippingFrustrum(float width, float height, float nearPlane, float farPlane, float angle) {
-	//m_clippingProjection = ProjectionMatrix(1.0f, 0.25f, 0.0f, 10.0f);
-	//m_clippingProjection = ProjectionMatrix(1.0f, 0.25f, 0.0f, 5.0f, 15.0f);
-	//m_clippingProjection = ProjectionMatrix(0.09f, 0.25f, 0.0f, 5.0f, 120.0f);
-	//m_clippingProjection = ProjectionMatrix(1.2f, 0.25f, 0.0f, 5.0f, 15.0f);
-	m_clippingProjection = ProjectionMatrix(width, height, nearPlane, farPlane, angle);
-	return R_PASS;
-}
-
 RESULT OGLProgramUIStage::SetOriginPoint(point ptOrigin) {
 	RESULT r = R_PASS;
 
@@ -184,24 +180,49 @@ RESULT OGLProgramUIStage::SetOriginDirection(vector vOrigin) {
 	return r;
 }
 
+RESULT OGLProgramUIStage::SetIsAugmented(bool fAugmented) {
+	m_fIsAugmented = fAugmented;
+	return R_PASS;
+}
+
+RESULT OGLProgramUIStage::SetClippingThreshold(float clippingThreshold) {
+	m_clippingThreshold = clippingThreshold;
+	return R_PASS;
+}
+
+RESULT OGLProgramUIStage::SetClippingRate(float clippingRate) {
+	m_clippingRate = clippingRate;
+	return R_PASS;
+}
+
 RESULT OGLProgramUIStage::SetObjectUniforms(DimObj *pDimObj) {
 	RESULT r = R_PASS;
 
-	auto matModel = pDimObj->GetModelMatrix();
-	m_pUniformModelMatrix->SetUniform(matModel);
+	// Critical path -
+	// DimObj should be a quad, shader may break otherwise
+	// not using EHM to check
 
-	//TODO: shader likely breaks when pDimObj is not a quad
-	auto pQuad = dynamic_cast<quad*>(pDimObj);
-	if (pQuad != nullptr) {
-		DimObj* pParent = pQuad->GetParent();
+	DimObj* pParent = pDimObj->GetParent();
+	if (pParent != nullptr) {
+		auto matModelParent = pParent->GetModelMatrix();
 		if (pParent != nullptr) {
-			CR(m_pUniformQuadCenter->SetUniform(pParent->GetOrigin(true)));
-			CR(m_pUniformParentModelMatrix->SetUniform(pParent->GetModelMatrix()));
+			m_pUniformQuadCenter->SetUniform(pParent->GetOrigin(true));
+			m_pUniformParentModelMatrix->SetUniform(matModelParent);
 		}
+
+		auto matModelChild = pDimObj->VirtualObj::GetModelMatrix();
+		auto matModel = matModelParent * matModelChild;
+		m_pUniformModelMatrix->SetUniform(matModel);
+	}
+	else {
+		//auto pParentModel = pParent->GetModelMatrix();
+		auto matModel = pDimObj->GetModelMatrix();
+		m_pUniformModelMatrix->SetUniform(matModel);
 	}
 
 
-Error:
+
+//Error:
 	return r;
 }
 

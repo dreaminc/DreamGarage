@@ -104,6 +104,8 @@ RESULT AnimationQueue::CancelAnimation(DimObj *pObj, double startTime) {
 
 RESULT AnimationQueue::RemoveAnimationObject(DimObj *pObj) {
 	m_objectQueue[pObj] = std::deque<std::shared_ptr<AnimationItem>>();
+	m_objectQueue.erase(m_objectQueue.find(pObj));
+
 	return R_PASS;
 }
 

@@ -27,7 +27,15 @@
 
 #include "DreamVideoStreamSubscriber.h"
 
+#include "DreamUserControlArea/DreamContentSource.h"
+
+#include "Sound/SoundCommon.h"
+
+#include "DreamGarage/UICommon.h"
+
 #define DEFAULT_SCROLL_FACTOR 5
+
+#define CEF_UPDATE_MS (1000.0/24.0)
 
 class quad;
 class sphere;
@@ -36,90 +44,44 @@ class texture;
 class EnvironmentAsset;
 class WebBrowserManager;
 class DOMNode;
-class DreamUserHandle;
+class DreamUserControlArea;
 class AudioPacket;
+class SoundBuffer;
 
-#include "DreamBrowserMessage.h"
+#include "DreamShareViewShareMessage.h"
 
-class DreamBrowserHandle : public DreamAppHandle {
+// TODO: Move to the standard DreamBrowser::observer arch
+class DreamBrowserObserver {
 public:
-	RESULT SetScope(std::string strScope);
-	RESULT SetPath(std::string strPath);
+	virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) = 0;
 
-	RESULT ScrollTo(int pxXScroll, int pxYScroll);		// Absolute- scroll to this point
-	RESULT ScrollToX(int pxXScroll);
-	RESULT ScrollToY(int pyYScroll);
-	
-	RESULT ScrollByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint);			// Relative- scroll this far
-	RESULT ScrollXByDiff(int pxXDiff);
-	RESULT ScrollYByDiff(int pxYDiff);
+	virtual RESULT UpdateControlBarText(std::string& strTitle) = 0;
+	virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) = 0;
+	virtual RESULT UpdateAddressBarText(std::string& strURL) = 0;
+	virtual RESULT UpdateAddressBarSecurity(bool fSecure) = 0;
 
-	RESULT SendMalletMoveEvent(WebBrowserPoint mousePoint);
-	RESULT SendContactToBrowserAtPoint(WebBrowserPoint ptContact, bool fMouseDown);
+	virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) = 0;
 
-	RESULT SendBackEvent();
-	RESULT SendForwardEvent();
-	RESULT SendStopEvent();
+	virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) = 0;
+	virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) = 0;
+	virtual RESULT HandleLoadEnd() = 0;
 
-	RESULT SendKeyCharacter(char chKey, bool fkeyDown);
-	virtual RESULT SendURL (std::string strURL) = 0;
-	RESULT SendURI(std::string strURI);
+	virtual RESULT HandleDreamFormSuccess() = 0;
+	virtual RESULT HandleDreamFormCancel() = 0;
+	virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) = 0;
+	virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) = 0;
 
-	int GetScrollPixelsX();
-	int GetScrollPixelsY();
+	virtual RESULT HandleCanTabNext(bool fCanNext) = 0;
+	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) = 0;
 
-	int GetPageHeightFromBrowser();
-	int GetPageWidthFromBrowser();
-
-	int GetHeightOfBrowser();
-	int GetWidthOfBrowser();
-	float GetAspectRatioFromBrowser();
-
-	RESULT RequestBeginStream();
-
-private:
-	virtual RESULT SetBrowserScope(std::string strScope) = 0;
-	virtual RESULT SetBrowserPath(std::string strPath) = 0;
-	
-	virtual RESULT ScrollBrowserToPoint(int pxXScroll, int pxYScroll) = 0;		// Absolute- scroll to this point
-	virtual RESULT ScrollBrowserToX(int pxXScroll) = 0;
-	virtual RESULT ScrollBrowserToY(int pyYScroll) = 0;
-	
-	virtual RESULT ScrollBrowserByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) = 0;			// Relative- scroll this far
-	virtual RESULT ScrollBrowserXByDiff(int pxXDiff) = 0;
-	virtual RESULT ScrollBrowserYByDiff(int pxYDiff) = 0;
-	
-	virtual RESULT SendKeyPressed(char chkey, bool fkeyDown) = 0;
-
-	virtual RESULT SendMouseMoveEvent(WebBrowserPoint mousePoint) = 0;
-
-	virtual RESULT HandleBackEvent() = 0;
-	virtual RESULT HandleForwardEvent() = 0;
-	virtual RESULT HandleStopEvent() = 0;
-
-	virtual RESULT ClickBrowser(WebBrowserPoint ptContact, bool fMouseDown) = 0;
-
-	virtual int GetScrollX() = 0;
-	virtual int GetScrollY() = 0;
-	
-	virtual int GetPageHeight() = 0;
-	virtual int GetPageWidth() = 0;
-
-	virtual int GetBrowserHeight() = 0;
-	virtual int GetBrowserWidth() = 0;
-	virtual float GetAspectRatio() = 0;
-
-	virtual RESULT BeginStream() = 0;
-
-	virtual RESULT SetURI(std::string strURI) = 0;
+	virtual std::string GetCertificateErrorURL() { return std::string(""); };
+	virtual std::string GetLoadErrorURL() { return std::string(""); };
 };
 
 class DreamBrowser : 
 	public DreamApp<DreamBrowser>, 
-	public DreamBrowserHandle,
-	public Subscriber<InteractionObjectEvent>, 
-	public WebBrowserController::observer,
-	public DreamVideoStreamSubscriber
+	public DreamContentSource,
+	public WebBrowserController::observer
 {
 	friend class DreamAppManager;
 
@@ -128,65 +90,77 @@ public:
 	~DreamBrowser();
 
 	// DreamApp Interface
-	virtual RESULT InitializeApp(void *pContext = nullptr) override;
-	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
-	virtual RESULT Update(void *pContext = nullptr) override;
-	virtual RESULT Shutdown(void *pContext = nullptr) override;
+	virtual RESULT InitializeApp(void *pContext = nullptr);
+	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr);
+	virtual RESULT Update(void *pContext = nullptr);
+	virtual RESULT Shutdown(void *pContext = nullptr);
 
-	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) override;
+	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
 
-	virtual DreamAppHandle* GetAppHandle() override;
+	// control events
+	RESULT ScrollBrowserToPoint(int pxXScroll, int pxYScroll);		// Absolute- scroll to this point
+	RESULT ScrollBrowserToX(int pxXScroll);
+	RESULT ScrollBrowserToY(int pyYScroll);
 
-	// DreamBrowserHandle 
-	virtual RESULT ScrollBrowserToPoint(int pxXScroll, int pxYScroll) override;		// Absolute- scroll to this point
-	virtual RESULT ScrollBrowserToX(int pxXScroll) override;
-	virtual RESULT ScrollBrowserToY(int pyYScroll) override;
+	RESULT ScrollBrowserXByDiff(int pxXDiff);
+	RESULT ScrollBrowserYByDiff(int pxYDiff);
 
-	virtual RESULT ScrollBrowserByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) override;		// Relative- scroll this far
-	virtual RESULT ScrollBrowserXByDiff(int pxXDiff) override;
-	virtual RESULT ScrollBrowserYByDiff(int pxYDiff) override;
+	virtual RESULT OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) override;		// Relative- scroll this far
 
-	virtual int GetScrollX() override;		// use to get position scrolled to
-	virtual int GetScrollY() override;
+	int GetScrollX();		// use to get position scrolled to
+	int GetScrollY();
 
-	virtual int GetBrowserHeight() override;
-	virtual int GetBrowserWidth() override;
+	int GetBrowserHeight();
+	int GetBrowserWidth();
 
-	virtual int GetPageHeight() override;	// get page context
-	virtual int GetPageWidth() override;
+	int GetPageHeight();	// get page context
+	int GetPageWidth();
 
-	virtual RESULT SendKeyPressed(char chkey, bool fkeyDown);
-	virtual RESULT SendURL(std::string strURL);
+	virtual RESULT OnKeyPress(char chkey, bool fkeyDown) override;
+	RESULT CreateBrowserSource(std::string strURL);
 
-	virtual RESULT SendMouseMoveEvent(WebBrowserPoint mousePoint) override;
-	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff, bool fMouseDown) override;
+	virtual RESULT OnMouseMove(point mousePoint) override;
+	virtual RESULT OnClick(point ptDiff, bool fMouseDown) override;
 
-	virtual RESULT BeginStream() override;
-
-	// Set streaming state in both the browser and the user app
-	RESULT SetStreamingState(bool fStreaming);
-	bool IsStreaming();
-
-	RESULT BroadcastDreamBrowserMessage(DreamBrowserMessage::type msgType, DreamBrowserMessage::type ackType = DreamBrowserMessage::type::INVALID);
+	RESULT BroadcastDreamBrowserMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType = DreamShareViewShareMessage::type::INVALID);
 
 	// InteractionObjectEvent
-	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 	RESULT HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent);
 	bool m_fTestQuadActive = false;
 
 	// WebBrowserController Observer
-	virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) override;
+	virtual RESULT OnPaint(const void *pBuffer, int width, int height, WebBrowserController::PAINT_ELEMENT_TYPE type, WebBrowserRect rect) override;
 	virtual RESULT OnAudioPacket(const AudioPacket &pendingAudioPacket) override;
+	virtual RESULT OnAfterCreated() override;
 	virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) override;
 	virtual RESULT OnLoadStart() override;
 	virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) override;
+	virtual RESULT OnLoadError(int errorCode, std::string strError, std::string strFailedURL) override;
 	virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) override;
-
+	virtual bool OnCertificateError(std::string strURL, unsigned int certError) override;
 	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType,std::string strURL) override;
+	virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) override;
+	virtual RESULT SetTitle(std::string strTitle) override;
+	virtual RESULT SetIsSecureConnection(bool fSecure) override;
 
-	virtual RESULT HandleBackEvent() override;
-	virtual RESULT HandleForwardEvent() override;
-	virtual RESULT HandleStopEvent() override;
+	virtual RESULT HandleDreamFormSuccess() override;
+	virtual RESULT HandleDreamFormCancel() override;
+	virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& strAccessToken) override;
+	virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) override;
+
+	virtual RESULT HandleIsInputFocused(bool fInputFocused) override;
+	virtual RESULT HandleCanTabNext(bool fCanNext) override;
+	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override;
+
+	virtual RESULT HandleBackEvent();
+	virtual RESULT HandleForwardEvent();
+	virtual RESULT HandleStopEvent();
+
+	RESULT SetForceObserverAudio(bool fForceObserverAudio);
+
+	RESULT HandleTabEvent();
+	RESULT HandleBackTabEvent();
+	RESULT HandleUnfocusEvent();
 
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);
@@ -194,78 +168,72 @@ public:
 	RESULT SetNormalVector(vector vNormal);
 	RESULT SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal);
 
-	RESULT FadeQuadToBlack();
-
-	WebBrowserPoint GetRelativeBrowserPointFromContact(point ptIntersectionContact);
-
-	float GetWidth();
-	float GetHeight();
+	float GetWidthFromAspectDiagonal();
+	float GetHeightFromAspectDiagonal();
 	vector GetNormal();
 	point GetOrigin();
-	virtual float GetAspectRatio() override;
-
-	RESULT UpdateViewQuad();
 
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
-	virtual RESULT SetBrowserScope(std::string strScope) override;
-	virtual RESULT SetBrowserPath(std::string strPath) override;
+	// DreamContentSource
+	virtual RESULT SetScope(std::string strScope) override;
+	virtual RESULT SetPath(std::string strPath) override;
 
+	virtual int GetHeight() override;
+	virtual int GetWidth() override;
+
+	virtual std::string GetTitle() override;
+	virtual std::string GetContentType() override;
+
+	virtual std::string GetScheme() override;
+	virtual std::string GetURL() override;
+
+	RESULT PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
-	RESULT StopSending();
-	RESULT StartReceiving(PeerConnection *pPeerConnection);
-	RESULT PendReceiving();
-	RESULT StopReceiving();
-	virtual RESULT SetURI(std::string strURI) override;
+	virtual RESULT SetURI(std::string strURI);
 	RESULT LoadRequest(const WebRequest &webRequest);
 
 	RESULT SetScrollFactor(int scrollFactor);
 
-	std::shared_ptr<texture> GetScreenTexture();
+	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL);
+
+	virtual texture* GetSourceTexture() override;
+	virtual long GetCurrentAssetID() override;
+	RESULT SetCurrentAssetID(long assetID);
+
+	virtual RESULT CloseSource() override;
+	virtual RESULT SendFirstFrame() override;
+
+	RESULT PendUpdateObjectTextures();
+	bool ShouldUpdateObjectTextures();
+	RESULT UpdateObjectTextures();
+
+	RESULT UpdateNavigationFlags();
+
+	RESULT RegisterObserver(DreamBrowserObserver *pObserver);
+	RESULT UnregisterObserver(DreamBrowserObserver *pObserver);
+
 private:
-	RESULT SetScreenTexture(texture *pTexture);
-
-public:
-	// Video Stream Subscriber
-	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
-	RESULT SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
-	RESULT UpdateFromPendingVideoFrame();
-
-	struct PendingFrame {
-		bool fPending = false;
-		int pxWidth = 0;
-		int pxHeight = 0;
-		uint8_t *pDataBuffer = nullptr;
-		size_t pDataBuffer_n = 0;
-	} m_pendingFrame;
+	DreamBrowserObserver *m_pObserver = nullptr;
 
 protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	std::shared_ptr<quad> m_pBrowserQuad = nullptr;
 	std::shared_ptr<texture> m_pBrowserTexture = nullptr;
-
-#ifdef _USE_TEST_APP
-	// Test Stuff
-	std::shared_ptr<sphere> m_pTestSphereRelative = nullptr;
-	sphere *m_pTestSphereAbsolute = nullptr;
-	std::shared_ptr<quad> m_pTestQuad = nullptr;
-	std::shared_ptr<composite> m_pPointerCursor = nullptr;
-#endif
 
 	std::shared_ptr<WebBrowserController> m_pWebBrowserController = nullptr;
 	std::shared_ptr<WebBrowserManager> m_pWebBrowserManager = nullptr;
-	DreamUserHandle* m_pDreamUserHandle = nullptr;
 
 	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
 
-	WebBrowserPoint m_lastWebBrowserPoint;	// This is so scrolling can get which frame the mouse is on - e.g. drop down menus are now scrollable
-	bool m_fBrowserActive = false;
+	std::chrono::high_resolution_clock::time_point m_tLastUpdate;
 
-	int m_browserWidth = 1366;
-	int m_browserHeight = 768;
+	WebBrowserPoint m_lastWebBrowserPoint;	// This is so scrolling can get which frame the mouse is on - e.g. drop down menus are now scrollable
+
+	int m_browserWidth = BROWSER_WIDTH;
+	int m_browserHeight = BROWSER_HEIGHT;
 	float m_aspectRatio = 1.0f;
 	float m_diagonalSize = 5.0f;
 	vector m_vNormal;
@@ -273,30 +241,89 @@ private:
 	int m_pxXPosition = 0;
 	int m_pxYPosition = 0;
 
+	int m_pxXScroll = 0;
+	int m_pxYScroll = 0;
+
+	WebBrowserMouseEvent m_mouseScrollEvent;
+
+	WebBrowserMouseEvent m_mouseDragEvent;
+	bool m_fUpdateDrag = false;
+
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
 
 	int m_pageDepth = 0; // hack to avoid the loading page on back
+	std::string m_strCurrentTitle;
 	std::string m_strCurrentURL;
-
-	bool m_fStreaming = false;
-	bool m_fReceivingStream = false;
-	bool m_fReadyForFrame = false;
+	bool m_fSecure = false;
 
 	TextEntryString m_strEntered;
 	
 	std::string m_strScope;
 	std::string m_strPath;
 	std::string m_strContentType;
+
 	long m_currentEnvironmentAssetID = 0;
 	std::map<std::string, ResourceHandlerType> m_dreamResourceHandlerLinks;
-
-	DreamBrowserMessage::type m_currentMessageType;
-	DreamBrowserMessage::type m_currentAckType;
+	std::map<std::string, std::multimap<std::string, std::string>> m_headermap;
 
 	bool m_fShowControlView = false;
 
-	bool m_fShouldBeginStream = true;
+	bool m_fShouldBeginStream = false;
+	bool m_fSendFrame = false;
+	bool m_fFirstFrameIsReady = false;
+	int m_sentFrames = 0;
+	double m_msTimeLastSent = 0.0;
+	double m_msTimeBetweenSends = 100.0;
 
+	double m_msLastScreenUpdate = 0.0;
+	double m_msTimeBetweenUpdates = CEF_UPDATE_MS;
+
+	unsigned char *m_pLoadBuffer = nullptr;
+	size_t m_pLoadBuffer_n = 0;
+
+	std::shared_ptr<EnvironmentAsset> m_pPendingEnvironmentAsset;
+
+	// CEF can call LoadRequest once a URL is loaded
+	bool m_fCanLoadRequest = false;
+	bool m_fUpdateObjectTextures = false;
+	bool m_fUpdateControlBarInfo = false;
+
+	long m_assetID = -1;
+
+	// TODO: Convert into configuration struct or flag system
+	bool m_fForceObserverAudio = false;
+
+private:
+	// when the user goes to a URL that starts with these strings, we send their auth token as well
+	// TODO: build native URL parser for future flexibility
+	std::vector<std::string> m_authenticatedURLs = {
+		"http://localhost:8001",
+		"http://localhost:8002",
+		"https://api.develop.dreamos.com",
+		"https://www.develop.dreamos.com",
+		"https://api.dreamos.com",
+		"https://dreamos.com"
+	};
+
+	// Sound stuff
+private:
+	RESULT InitializeDreamBrowserSoundSystem();
+	
+	//RESULT InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
+	
+	RESULT TeardownAudioBusSoundBuffers();
+	RESULT InitializeNewRenderBusSoundBuffer(const AudioPacket& pendingAudioPacket);
+	int GetPendingAudioFrames();
+	AudioPacket GetPendingRenderAudioPacket(int numFrames);
+
+	RESULT AudioProcess();
+
+	sound::state m_soundState = sound::state::UNINITIALIZED;
+	std::map<int, SoundBuffer*> m_renderAudioBuses;
+	//SoundBuffer *m_pRenderSoundBuffer = nullptr;
+	
+	std::thread	m_browserAudioProcessingThread;		
+	int m_defaultBrowserSamplingRate = 48000;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

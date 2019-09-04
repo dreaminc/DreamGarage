@@ -4,7 +4,7 @@
 // When we solve logging we need to solve this too
 #pragma warning( disable : 4005)
 
-#include "DreamLogger/DreamLogger.h"
+//#include "DreamLogger/DreamLogger.h"
 
 #include "WebRTCImp.h"
 
@@ -29,6 +29,10 @@
 
 #include "api/audio_codecs/builtin_audio_decoder_factory.h"
 #include "api/audio_codecs/builtin_audio_encoder_factory.h"
+#include "api/video_codecs/builtin_video_decoder_factory.h"
+#include "api/video_codecs/builtin_video_encoder_factory.h"
+
+#include "modules/audio_processing/include/audio_processing.h"
 
 #include "Sound/AudioPacket.h"
 
@@ -69,7 +73,8 @@ rtc::scoped_refptr<WebRTCPeerConnection> WebRTCConductor::AddNewPeerConnection(l
 			new rtc::RefCountedObject<WebRTCPeerConnection>(
 				this, 
 				peerConnectionID, 
-				m_pWebRTCPeerConnectionFactory) 
+				m_pWebRTCPeerConnectionFactory,
+				this)	// TODO: there is a more eloquent way to do this
 			);
 	
 	CNM(pWebRTCPeerConnection, "Failed to allocate new peer connection");
@@ -256,9 +261,7 @@ RESULT WebRTCConductor::AddOfferCandidates(PeerConnection *pPeerConnection) {
 	auto pWebRTCPeerConnection = GetPeerConnection(pPeerConnection->GetPeerConnectionID());
 
 	if (pWebRTCPeerConnection != nullptr) {
-		for (auto &iceCandidate : pPeerConnection->GetOfferCandidates()) {
-			CR(pWebRTCPeerConnection->AddIceCandidate(iceCandidate));
-		}
+		CR(pWebRTCPeerConnection->AddIceCandidate(pPeerConnection->GetOfferCandidates().back()));
 	}
 
 Error:
@@ -272,9 +275,7 @@ RESULT WebRTCConductor::AddAnswerCandidates(PeerConnection *pPeerConnection) {
 	auto pWebRTCPeerConnection = GetPeerConnection(pPeerConnection->GetPeerConnectionID());
 
 	if (pWebRTCPeerConnection != nullptr) {
-		for (auto &iceCandidate : pPeerConnection->GetAnswerCandidates()) {
-			CR(pWebRTCPeerConnection->AddIceCandidate(iceCandidate));
-		}
+		CR(pWebRTCPeerConnection->AddIceCandidate(pPeerConnection->GetAnswerCandidates().back()));
 	}
 
 Error:
@@ -358,10 +359,17 @@ RESULT WebRTCConductor::Initialize() {
 		m_workerThread->Invoke<rtc::scoped_refptr<webrtc::AudioDeviceModule>>(RTC_FROM_HERE,[&]()
 	{
 		//return webrtc::AudioDeviceModuleImpl::Create(webrtc::VoEId(1, -1), webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
-		return CreateAudioDeviceWithDataCapturer(0, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio, this);
+		//return CreateAudioDeviceWithDataCapturer(0, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio, this);
 		//return CreateAudioDeviceWithDataCapturer(0, webrtc::AudioDeviceModule::AudioLayer::kDummyAudio, this);
+		
 		//return webrtc::AudioDeviceModule::Create(0, webrtc::AudioDeviceModule::kDummyAudio);
 		//return webrtc::AudioDeviceModule::Create(0, webrtc::AudioDeviceModule::kPlatformDefaultAudio);
+
+		//return CreateWebRTCAudioDevice(0, webrtc::AudioDeviceModule::AudioLayer::kDummyAudio);
+		//auto pWebRTCAudioDeviceModule = rtc::scoped_refptr<webrtc::AudioDeviceModule>(new WebRTCAudioDeviceModule());
+
+		rtc::scoped_refptr<WebRTCAudioDeviceModule> pWebRTCAudioDeviceModule(new rtc::RefCountedObject<WebRTCAudioDeviceModule>());
+		return pWebRTCAudioDeviceModule;
 	});
 
 	//m_pAudioDeviceModule = webrtc::AudioDeviceModule::Create(15, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
@@ -375,16 +383,22 @@ RESULT WebRTCConductor::Initialize() {
 	m_pWebRTCPeerConnectionFactory =
 		m_signalingThread->Invoke<rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>>(RTC_FROM_HERE, [&]()
 	{
-		return webrtc::CreatePeerConnectionFactory(m_networkThread.get(),	// network thread
+		return webrtc::CreatePeerConnectionFactory(
+			m_networkThread.get(),	// network thread
 			m_workerThread.get(),	// worker thread
 			//rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
 			m_signalingThread.get(),
 			m_pAudioDeviceModule.get(),	// TODO: Default ADM
+			
 			//m_pAudioDeviceDummyModule,		// Dummy ADM
-			webrtc::CreateBuiltinAudioEncoderFactory(),	// Audio Encoder Factory
-			webrtc::CreateBuiltinAudioDecoderFactory(),	// Audio Decoder Factory
-			nullptr,	// Video Encoder Factory
-			nullptr		// Video Decoder Factory
+
+			webrtc::CreateBuiltinAudioEncoderFactory(),
+			webrtc::CreateBuiltinAudioDecoderFactory(),
+			webrtc::CreateBuiltinVideoEncoderFactory(),
+			webrtc::CreateBuiltinVideoDecoderFactory(), 
+
+			nullptr, // audio_mixer
+			nullptr // audio_processing
 		);
 	});
 
@@ -438,6 +452,37 @@ RESULT WebRTCConductor::InitializeNewPeerConnection(long peerConnectionID, long 
 	if (fCreateOffer) {
 		CRM(pWebRTCPeerConnection->CreateOffer(), "Failed to create WebRTC Offer");
 	}
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::CloseWebRTCPeerConnection(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	auto pWebRTCPeerConnection = GetPeerConnection(pPeerConnection->GetPeerConnectionID());
+	CN(pWebRTCPeerConnection);
+
+	// Get proxy from WebRTCPeerConnection
+	return pWebRTCPeerConnection->CloseWebRTCPeerConnection();
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::CloseAllPeerConnections() {
+	RESULT r = R_PASS;
+
+	// Close all current peer connections
+	for (auto webRTCPeerConnection : m_webRTCPeerConnections) {
+		int peerUserID = webRTCPeerConnection->GetPeerUserID();
+		int peerConnectionID = webRTCPeerConnection->GetPeerConnectionID();
+
+		CRM(webRTCPeerConnection->CloseWebRTCPeerConnection(), "Closing WebRTCPeerConnection User: %d Connection: %d failed", peerUserID, peerConnectionID);
+	}
+
+	// Clear peer connections vector
+	//CR(ClearPeerConnections());
 
 Error:
 	return r;
@@ -517,6 +562,14 @@ RESULT WebRTCConductor::OnSDPFailure(long peerConnectionID, bool fOffer) {
 RESULT WebRTCConductor::OnICECandidatesGatheringDone(long peerConnectionID) {
 	if (m_pParentObserver != nullptr) {
 		return m_pParentObserver->OnICECandidatesGatheringDone(peerConnectionID);
+	}
+
+	return R_NOT_HANDLED;
+}
+
+RESULT WebRTCConductor::OnICECandidateGathered(WebRTCICECandidate* pICECandidate, long peerConnectionID) {
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnICECandidateGathered(pICECandidate, peerConnectionID);
 	}
 
 	return R_NOT_HANDLED;
@@ -615,10 +668,10 @@ TwilioNTSInformation WebRTCConductor::GetTwilioNTSInformation() {
 	return m_pParentObserver->GetTwilioNTSInformation();
 }
 
-RESULT WebRTCConductor::OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+RESULT WebRTCConductor::OnVideoFrame(const std::string &strVideoTrackLabel, long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 
 	if (m_pParentObserver != nullptr) {
-		return m_pParentObserver->OnVideoFrame(peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight);
+		return m_pParentObserver->OnVideoFrame(strVideoTrackLabel, peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight);
 	}
 
 	return R_NOT_HANDLED;
@@ -686,9 +739,10 @@ Error:
 
 float WebRTCConductor::GetRunTimeMicAverage() {
 	
-	if (m_pWebRTCAudioDeviceModule != nullptr) {
-		return m_pWebRTCAudioDeviceModule->GetRunTimeMicAverage();
-	}
+	// TODO: 
+	//if (m_pAudioDeviceModule != nullptr) {
+	//	return m_pAudioDeviceModule->GetRunTimeMicAverage();
+	//}
 
 	return 0.0f;
 }
@@ -697,63 +751,62 @@ RESULT WebRTCConductor::SendAudioPacket(const std::string &strAudioTrackLabel, l
 	RESULT r = R_PASS;
 
 	// Not doing per connection with external ADM (mixing into recorded audio)
-	//rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
-	//CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
-	//
-	//CR(pWebRTCPeerConnection->SendAudioPacket(strAudioTrackLabel, pendingAudioPacket));
+	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
+	
+	CR(pWebRTCPeerConnection->SendAudioPacket(strAudioTrackLabel, pendingAudioPacket));
 
 	//WebRTCAudioDeviceModule *pADM = dynamic_cast<WebRTCAudioDeviceModule*>(m_pWebRTCAudioDeviceModule);
-	CN(m_pWebRTCAudioDeviceModule);
-	
-	CR(m_pWebRTCAudioDeviceModule->BroadcastAudioPacket(pendingAudioPacket));
+	//CN(m_pWebRTCAudioDeviceModule);
+	//CR(m_pWebRTCAudioDeviceModule->BroadcastAudioPacket(pendingAudioPacket));
 
 Error:
 	return r;
 }
 
-RESULT WebRTCConductor::SendVideoFrame(long peerConnectionID, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+RESULT WebRTCConductor::SendVideoFrame(long peerConnectionID, const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
 	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
 
-	CR(pWebRTCPeerConnection->SendVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+	CR(pWebRTCPeerConnection->SendVideoFrame(strVideoTrackLabel, pVideoFrameBuffer, pxWidth, pxHeight, channels));
 
 Error:
 	return r;
 }
 
-RESULT WebRTCConductor::StartVideoStreaming(long peerConnectionID, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+RESULT WebRTCConductor::StartVideoStreaming(long peerConnectionID, const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
 	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
 
-	CR(pWebRTCPeerConnection->StartVideoStreaming(pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
+	CR(pWebRTCPeerConnection->StartVideoStreaming(strVideoTrackLabel, pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
 
 Error:
 	return r;
 }
 
-RESULT WebRTCConductor::StopVideoStreaming(long peerConnectionID) {
+RESULT WebRTCConductor::StopVideoStreaming(long peerConnectionID, const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
 	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
 
-	CR(pWebRTCPeerConnection->StopVideoStreaming());
+	CR(pWebRTCPeerConnection->StopVideoStreaming(strVideoTrackLabel));
 
 Error:
 	return r;
 }
 
-bool WebRTCConductor::IsVideoStreamingRunning(long peerConnectionID) {
+bool WebRTCConductor::IsVideoStreamingRunning(long peerConnectionID, const std::string &strVideoTrackLabel) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
 	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
 
-	return pWebRTCPeerConnection->IsVideoStreamingRunning();
+	return pWebRTCPeerConnection->IsVideoStreamingRunning(strVideoTrackLabel);
 
 Error:
 	return false;

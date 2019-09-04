@@ -13,6 +13,8 @@
 #include <string.h>
 #include <tchar.h>
 
+class DreamOS;
+
 class Win64PathManager : public PathManager {
 public:
 	Win64PathManager();
@@ -22,17 +24,20 @@ public:
 	RESULT GetListOfFilesInPath(std::wstring strNameDir, std::vector<std::wstring> &vstrFiles, const wchar_t *pszOptExtension = nullptr);
 
 protected:
-	RESULT Dealloc();
-	RESULT InitializePaths();
-	RESULT OpenDreamPathsFile();
-	RESULT UpdateCurrentPath();
-	RESULT SetCurrentPath(wchar_t *pszPath);
+	virtual RESULT Dealloc() override;
+	virtual RESULT InitializePaths(DreamOS *pDOSHandle) override;
+	virtual RESULT OpenDreamPathsFile() override;
+	virtual RESULT UpdateCurrentPath() override;
+	virtual RESULT SetCurrentPath(wchar_t *pszPath) override;
 	//RESULT RegisterPath(wchar_t *pszName, wchar_t *pszValue);
+
+	virtual RESULT CreateDirectory(wchar_t *pszDirectoryName) override;
 
 public:
 	RESULT PrintPaths();
 
 	RESULT GetCurrentPath(wchar_t*&pszCurrentPath);
+	virtual RESULT GetDreamPath(std::wstring &wstrAppDataPath, DREAM_PATH_TYPE pathValueType) override;
 	virtual RESULT GetDreamPath(wchar_t*&pszDreamPath) override;
 	virtual RESULT GetDreamPath(char* &n_pszDreamPath) override;
 	virtual RESULT GetDreamPath(std::wstring &r_wstrDreamPath) override;

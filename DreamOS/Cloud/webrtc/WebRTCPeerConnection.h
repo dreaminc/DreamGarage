@@ -25,9 +25,13 @@
 
 #include "pc/localaudiosource.h"
 
+#include "WebRTCLocalAudioSource.h"
+#include "WebRTCAudioTrackSink.h"
+#include "WebRTCVideoSink.h"
+
 class WebRTConductor;
-class WebRTCLocalAudioSource;
-class WebRTCLocalAudioTrack;
+//class WebRTCLocalAudioSource;
+//class WebRTCAudioTrackSink;
 class User;
 class TwilioNTSInformation;
 class AudioPacket;
@@ -41,9 +45,10 @@ class WebRTCPeerConnection :
 	public webrtc::PeerConnectionObserver, 
 	public webrtc::DataChannelObserver,
 	public webrtc::CreateSessionDescriptionObserver,
-	public webrtc::AudioTrackSinkInterface,
-	public rtc::VideoSinkInterface<webrtc::VideoFrame>,
-	public WebRTCPeerConnectionProxy
+	//public rtc::VideoSinkInterface<webrtc::VideoFrame>,
+	public WebRTCPeerConnectionProxy,
+	public WebRTCAudioTrackSink::observer,
+	public WebRTCVideoSink::observer
 {
 public:
 	
@@ -58,6 +63,7 @@ public:
 		virtual RESULT OnSDPSuccess(long peerConnectionID, bool fOffer) = 0;
 		virtual RESULT OnSDPFailure(long peerConnectionID, bool fOffer) = 0;
 		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
+		virtual RESULT OnICECandidateGathered(WebRTCICECandidate *pICECandidate, long peerConnectionID) = 0;
 		virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
@@ -72,22 +78,27 @@ public:
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
 
 		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
-		virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
+		virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 	};
 
 	friend class WebRTCPeerConnectionObserver;
 	friend class WebRTCConductor;
 
 public:
-	WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, long peerConnectionID, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
+	WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, 
+						 long peerConnectionID, 
+						 rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory,
+						 WebRTCConductor *pParentWebRTCConductor
+						 );
+
 	~WebRTCPeerConnection();
 
 	// TODO: Generalize this when we add renegotiation 
 	// so that they're not hard coded per WebRTCCommon
 	RESULT AddStreams(bool fAddDataChannel = true);
-	RESULT AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
-	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
-	RESULT AddLocalAudioSource(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
+	RESULT AddVideoStream(const std::string &strVideoCaptureDevice, const std::string &strVideoTrackLabel, const std::string &strMediaStreamLabel);
+	RESULT AddAudioStream(const std::string &strAudioTrackLabel);
+	RESULT AddLocalAudioSource(const std::string &strAudioTrackLabel, const std::string &strMediaStreamLabel);
 	RESULT AddDataChannel();
 
 	RESULT SetUserPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
@@ -110,6 +121,13 @@ protected:
 	virtual void OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) override;
 	virtual void OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
 	virtual void OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
+
+	// TODO: Migrate to unified API
+	virtual void OnAddTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
+		const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>&streams) override;
+
+	virtual void OnRemoveTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver) override;
+
 	virtual void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
 	virtual void OnRenegotiationNeeded() override;
 	virtual void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state);
@@ -127,11 +145,14 @@ protected:
 	virtual void OnSuccess(webrtc::SessionDescriptionInterface* sessionDescription) override;
 	virtual void OnFailure(const std::string& error) override;
 
-	// webrtc::AudioTrackSinkInterface
-	virtual void OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
-
 	// rtc::VideoSinkInterface<cricket::VideoFrame>
-	virtual void OnFrame(const webrtc::VideoFrame& cricketVideoFrame) override;
+	//virtual void OnFrame(const webrtc::VideoFrame& cricketVideoFrame) override;
+
+	// WebRTCVideoSink::observer
+	virtual RESULT OnVideoFrame(std::string strVideoTrackName, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
+
+	// WebRTCAudioTrackSink::observer
+	virtual void OnAudioTrackSinkData(std::string strAudioTrackLabel, const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
 public:
 	RESULT InitializePeerConnection(bool fAddDataChannel = false);
@@ -145,10 +166,10 @@ public:
 	RESULT SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 	// Video
-	RESULT SendVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
-	RESULT StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
-	RESULT StopVideoStreaming();
-	bool IsVideoStreamingRunning();
+	RESULT SendVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT StartVideoStreaming(const std::string &strVideoTrackLabel, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
+	RESULT StopVideoStreaming(const std::string &strVideoTrackLabel);
+	bool IsVideoStreamingRunning(const std::string &strVideoTrackLabel);
 
 	// Audio
 	RESULT SendAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket);
@@ -162,8 +183,17 @@ public:
 	// Video
 	std::unique_ptr<cricket::VideoCapturer> OpenVideoCaptureDevice();
 
-	RESULT InitializeVideoCaptureDevice(std::string strDeviceName);
-	std::unique_ptr<cricket::VideoCapturer> m_pCricketVideoCapturer = nullptr;
+	RESULT InitializeVideoCaptureDevice(std::string strDeviceName, std::string strVideoTrackLabel);
+	cricket::VideoCapturer* GetVideoCaptureDeviceByTrackName(std::string strTrackName);
+
+	std::map<std::string, std::unique_ptr<cricket::VideoCapturer>> m_videoCaptureDevices;
+	
+	RESULT InitializeVideoSink(std::string strTrackName, webrtc::VideoTrackSourceInterface* pVideoTrackSource);
+	WebRTCVideoSink *GetVideoSink(std::string strTrackName);
+	
+	std::map<std::string, std::unique_ptr<WebRTCVideoSink>> m_videoSinks;
+
+	//std::unique_ptr<cricket::VideoCapturer> m_pCricketVideoCapturer = nullptr;
 
 public:
 	long GetPeerConnectionID() { return m_peerConnectionID; }
@@ -215,6 +245,8 @@ private:
 	bool m_fOffer;	// TODO: this needs to be generalized
 	bool m_fSDPSet;	// TODO: temp
 
+	WebRTCConductor *m_pParentWebRTCConductor = nullptr;
+
 	std::string m_strLocalSessionDescriptionProtocol;
 	std::string m_strLocalSessionDescriptionType;
 
@@ -226,15 +258,17 @@ private:
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnectionInterface;
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
 
-	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCLocalActiveStreams;
+	//std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCLocalActiveStreams;
 	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCLocalActiveDataChannels;
 
-	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCRemoteActiveStreams;
+	//std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCRemoteActiveStreams;
 	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCRemoteActiveDataChannels;
+
+	// Sinks
+	std::map<std::string, std::shared_ptr<WebRTCAudioTrackSink>> m_webRTCAudioTrackSinks;
 
 	rtc::scoped_refptr<webrtc::DataChannelInterface> m_pDataChannelInterface;
 	sigslot::signal1<webrtc::DataChannelInterface*> m_SignalOnDataChannel;
-
 
 	// local audio sources
 	std::map<std::string, rtc::scoped_refptr<WebRTCLocalAudioSource>> m_pWebRTCLocalAudioSources;

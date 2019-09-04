@@ -16,7 +16,9 @@
     #include "./Sandbox/Linux/LinuxApp.h"
 #endif
 
-SandboxApp* SandboxFactory::MakeSandbox(SANDBOX_APP_TYPE type) {
+#include "DreamOS.h"
+
+SandboxApp* SandboxFactory::MakeSandbox(SANDBOX_APP_TYPE type, DreamOS *pDOSHandle) {
 	RESULT r = R_PASS;
 	SandboxApp *pSandbox = NULL;
 	
@@ -46,7 +48,7 @@ SandboxApp* SandboxFactory::MakeSandbox(SANDBOX_APP_TYPE type) {
 	}
 
 	// Set up the Sandbox
-	CRM(pSandbox->InitializePathManager(), "Failed to initialize Sandbox path manager");
+	CRM(pSandbox->InitializePathManager(pDOSHandle), "Failed to initialize Sandbox path manager");
 	CRM(pSandbox->InitializeOpenGLRenderingContext(), "Failed to initialize Sandbox OpenGL rendering context");
 
 	return pSandbox;

@@ -10,7 +10,7 @@
 
 class OGLProgramFlat : public OGLProgram, public FlatProgram {
 public:
-	OGLProgramFlat(OpenGLImp *pParentImp);
+	OGLProgramFlat(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 

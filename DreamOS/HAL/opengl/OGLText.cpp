@@ -69,24 +69,43 @@ OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::
 
 RESULT OGLText::SetText(const std::string& strText) {
 	RESULT r = R_PASS;
-	bool fChanged = false;
+	//m_fChanged = false;
 
-	CR(text::SetText(strText));
-	fChanged = (r != R_NO_EFFECT);
+	// Update our stuff - prepare it for the next update
+	m_strPendingText.assign(strText);
 
-	// TODO: need to be able to deal with changing vertex amounts automatically
+	SetDirty();
+
+Error:
+	return r;
+}
+
+// OGLText is a composite - no actual internal buffers
+RESULT OGLText::OGLInitialize() {
+	return R_SKIPPED;
+}
+
+RESULT OGLText::Update() {
+	RESULT r = R_PASS;
+
 	if (CheckAndCleanDirty()) {
-		CR(ReleaseOGLBuffers());
-		CR(OGLInitialize());
-	}
-	
-	if (fChanged) {
-		SetDirty();
 
-		// If the text has changed then do it up
-		if (m_pFramebuffer != nullptr && IsRenderToQuad()) {
-			CR(RenderToQuad());
+		CR(text::SetText(m_strPendingText));
+
+		//// TODO: need to be able to deal with changing vertex amounts automatically
+		//if (CheckAndCleanDirty()) {
+		//	CR(ReleaseOGLBuffers());
+		//	CR(OGLInitialize());
+		//}
+
+		if (r != R_NO_EFFECT) {
+			// If the text has changed then do it up
+			if (m_pFramebuffer != nullptr && IsRenderToQuad()) {
+				CR(RenderToQuad());
+			}
 		}
+
+		m_fPendingTextChange = false;
 	}
 
 Error:

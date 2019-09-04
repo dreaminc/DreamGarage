@@ -7,6 +7,14 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
 
+#include "UI/UIView.h"
+#include "UI/UIButton.h"
+
+#include "Primitives/hand/hand.h"
+
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
+
 struct TestContext : public Subscriber<InteractionObjectEvent> {
 	DreamOS *m_pDreamOS = nullptr;
 
@@ -102,7 +110,7 @@ struct TestContext : public Subscriber<InteractionObjectEvent> {
 };
 
 InteractionEngineTestSuite::InteractionEngineTestSuite(DreamOS *pDreamOS) :
-	m_pDreamOS(pDreamOS)
+	DreamTestSuite("interaction", pDreamOS)
 {
 	RESULT r = R_PASS;
 
@@ -130,6 +138,8 @@ InteractionEngineTestSuite::~InteractionEngineTestSuite() {
 
 RESULT InteractionEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
+
+	CR(AddTestFlatCollisions());
 
 	CR(AddTestNestedCompositeOBB());
 
@@ -166,6 +176,245 @@ Error:
 	return r;
 }
 
+RESULT InteractionEngineTestSuite::AddTestFlatCollisions() {
+	RESULT r = R_PASS;
+	double sTestTime = 100.0f;
+	int nRepeats = 1;
+
+	struct CaptureContext : public Subscriber<InteractionObjectEvent> {
+		std::shared_ptr<composite> pComposite = nullptr;
+		std::shared_ptr<FlatContext> pFlatContext = nullptr;
+		quad *pRenderQuad = nullptr;
+
+		DreamOS *m_pDreamOS = nullptr;
+
+		RESULT Notify(InteractionObjectEvent *mEvent) {
+			RESULT r = R_PASS;
+
+			// handle event
+			switch (mEvent->m_eventType) {
+			case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
+				DEBUG_LINEOUT("intersect began state: 0x%x", mEvent->m_activeState);
+
+				DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+				if (pDimObj != nullptr) {
+				//	m_pDreamOS->GetInteractionEngineProxy()->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, -1.0f), 0.5f);
+				}
+
+			} break;
+
+			case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
+				DEBUG_LINEOUT("intersect moved state: 0x%x", mEvent->m_activeState);
+			} break;
+
+			case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
+				DEBUG_LINEOUT("intersect ended state: 0x%x", mEvent->m_activeState);
+			} break;
+
+			case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
+				DEBUG_LINEOUT("collide began state: 0x%x", mEvent->m_activeState);
+
+				DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+				if (pDimObj != nullptr) {
+					//pDimObj->RotateZByDeg(15.0f);
+					pDimObj->RotateYByDeg(15.0f);
+					pDimObj->SetVertexColor(COLOR_BLUE);
+					//m_pDreamOS->GetInteractionEngineProxy()->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, -1.0f), 0.1f);
+				}
+
+			} break;
+
+			case InteractionEventType::ELEMENT_COLLIDE_TRIGGER: {
+				DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+				if (pDimObj != nullptr) {
+					//pDimObj->RotateZByDeg(15.0f);
+					pDimObj->SetVertexColor(COLOR_GREEN);
+				}
+				m_pDreamOS->GetInteractionEngineProxy()->ReleaseObjects(mEvent->m_pInteractionObject);
+			}
+
+			case InteractionEventType::ELEMENT_COLLIDE_MOVED: {
+				DEBUG_LINEOUT("collide moved state: 0x%x", mEvent->m_activeState);
+			} break;
+
+			case InteractionEventType::ELEMENT_COLLIDE_ENDED: {
+				DEBUG_LINEOUT("collide ended state: 0x%x", mEvent->m_activeState);
+
+				DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+				if (pDimObj != nullptr) {
+					//pDimObj->RotateZByDeg(15.0f);
+					pDimObj->SetVertexColor(COLOR_WHITE);
+					//pDimObj->ResetRotation();
+					//pDimObj->RotateZByDeg(-15.0f);
+					pDimObj->RotateYByDeg(-15.0f);
+				}
+			} break;
+			}
+
+			//Error:
+			return r;
+		}
+	};
+
+	CaptureContext *pCaptureContext = new CaptureContext();
+	pCaptureContext->m_pDreamOS = m_pDreamOS;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(SetupPipeline());
+		CR(Initialize());
+		{
+			CaptureContext *pCaptureContext = reinterpret_cast<CaptureContext*>(pContext);
+
+			CN(pCaptureContext);
+			CN(m_pDreamOS);
+			
+			//auto pComposite = m_pDreamOS->MakeComposite();
+			auto pComposite = m_pDreamOS->AddComposite();
+			pComposite->SetVisible(true);
+			//auto pFlatContext = pComposite->MakeFlatContext();
+			auto pFComposite = m_pDreamOS->MakeComposite();
+			auto pFlatContext = pFComposite->AddFlatContext();
+			pFlatContext->InitializeBoundingQuad();
+			pCaptureContext->pComposite = std::shared_ptr<composite>(pComposite);
+			pCaptureContext->pFlatContext = pFlatContext;
+
+			quad *pRenderQuad = m_pDreamOS->AddQuad(6.0f, 6.0f);
+			pRenderQuad->SetVisible(true);
+			pFlatContext->SetIsAbsolute(true);
+			pFlatContext->SetAbsoluteBounds(pRenderQuad->GetWidth(), pRenderQuad->GetHeight());
+			//pFlatContext->RotateXByDeg(-90.0f);
+			//pFlatContext->RotateXByDeg(90.0f);
+
+			pFlatContext->AddObject(pCaptureContext->pComposite);
+			//pFlatContext->RotateXByDeg(-90.0f);
+			//pFlatContext->AddQuad(0.5f, 0.5f);
+
+			auto pView = pComposite->AddUIView(m_pDreamOS);
+			//*
+			auto pButton = pView->AddUIButton(0.5f, 0.5f);
+			pButton->GetSurface()->SetPosition(point(0.25f, 0.0f, 0.0f));
+			pButton->GetSurface()->RotateXByDeg(-90.0f);
+
+			//pButton->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 1.0f, -0.5f));
+
+			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+				CR(m_pDreamOS->AddAndRegisterInteractionObject(pButton.get(), (InteractionEventType)(i), pCaptureContext));
+				//CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), this));
+			}
+			//pFlatContext->AddObject(pButton);
+			//*/
+
+			//*
+			pButton = pView->AddUIButton(0.5f, 0.5f);
+			pButton->SetPosition(point(-0.5f, 0.0f, 0.0f));
+			pButton->GetSurface()->RotateXByDeg(-90.0f);
+			//pButton->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(-0.5f, 1.0f, -0.5f));
+
+			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+				CR(m_pDreamOS->AddAndRegisterInteractionObject(pButton.get(), (InteractionEventType)(i), pCaptureContext));
+				//CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), this));
+			}
+			//pFlatContext->AddObject(pButton);
+			//*/
+
+			m_pDreamOS->SetGravityState(false);
+
+			//*
+			//m_pDreamOS->AddObjectToUIGraph(pRenderQuad);
+			//m_pDreamOS->AddObject(pRenderQuad);
+			point ptInteraction = point(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 1.0f, -0.5f));
+			//pTComposite->SetPosition(ptInteraction);
+			//pComposite->SetPosition(point(0.1f, 0.0f, 0.0f));
+			pFlatContext->SetPosition(ptInteraction);
+			//pFlatContext->RotateXByDeg(75.0f);
+			//pFlatContext->SetPosition(point(0.0f, 0.0f, 1.0f));
+			pRenderQuad->SetPosition(ptInteraction);// +point(1.5f, 0.0f, 0.0f));
+			//pRenderQuad->RotateXByDeg(45.0f);
+			pRenderQuad->RotateXByDeg(90.0f);
+			//pFComposite->RotateXByDeg(90.0f);
+			pFlatContext->RotateXByDeg(45.0f);
+			//pComposite->RotateXByDeg(45.0f);
+			//pRenderQuad->RotateYByDeg(10.0f);
+			//pFlatContext->RotateYByDeg(10.0f);
+			pCaptureContext->pRenderQuad = pRenderQuad;
+			pFlatContext->RenderToQuad(pRenderQuad, 0.0f, 0.0f);
+			//pRenderQuad->RotateZByDeg(10.0f);
+			//pFlatContext->RotateZByDeg(10.0f);
+			//*/
+		}
+
+	Error:
+		return r;
+	};
+
+
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		CaptureContext *pCaptureContext = reinterpret_cast<CaptureContext*>(pContext);
+		CN(pCaptureContext);
+
+		{
+
+			RotationMatrix qOffset = RotationMatrix();
+			hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
+			CN(pHand);
+
+			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+
+			pHand->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pHand->GetMalletOffset()));
+
+			pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
+			CN(pHand);
+
+			qOffset = RotationMatrix();
+			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+
+			pHand->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pHand->GetMalletOffset()));
+
+			pCaptureContext->pFlatContext->RenderToQuad(pCaptureContext->pRenderQuad, 0.0f, 0.0f);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(ResetTest(pContext));
+
+	Error:
+		return r;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest("flatcollisions", fnInitialize, fnUpdate, fnTest, fnReset, pCaptureContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestDescription("Capture handling test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 	RESULT r = R_PASS;
 
@@ -173,8 +422,6 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 	int nRepeats = 1;
 
 	struct CaptureContext : public Subscriber<InteractionObjectEvent> {
-		UIMallet *pLeftMallet = nullptr;
-		UIMallet *pRightMallet = nullptr;
 		DreamOS *m_pDreamOS = nullptr;
 
 		RESULT Notify(InteractionObjectEvent *mEvent) {
@@ -299,16 +546,6 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 			CN(pCaptureContext);
 			CN(m_pDreamOS);
 			
-			pCaptureContext->pLeftMallet = new UIMallet(m_pDreamOS);
-			pCaptureContext->pLeftMallet->Show();
-			//pCaptureContext->pLeftMallet->GetMalletHead()->InitializeOBB();
-			pCaptureContext->pRightMallet = new UIMallet(m_pDreamOS);
-			pCaptureContext->pRightMallet->Show();
-			//pCaptureContext->pRightMallet->GetMalletHead()->InitializeOBB();
-
-			m_pDreamOS->AddInteractionObject(pCaptureContext->pLeftMallet->GetMalletHead());
-			m_pDreamOS->AddInteractionObject(pCaptureContext->pRightMallet->GetMalletHead());
-
 			auto pQuad = m_pDreamOS->AddQuad(0.5f, 0.5f);
 			pQuad->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 1.0f, 0.0f));
 			pQuad->RotateXByDeg(90.0f);
@@ -350,25 +587,26 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 		RESULT r = R_PASS;
 
 		CaptureContext *pCaptureContext = reinterpret_cast<CaptureContext*>(pContext);
+		CN(pCaptureContext);
 
-		RotationMatrix qOffset = RotationMatrix();
-		hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
-		CN(pHand);
-		qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-		auto& pLeftMallet = pCaptureContext->pLeftMallet;
-		auto& pRightMallet = pCaptureContext->pRightMallet;
+		{
 
-		if (pLeftMallet)
-			pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetHeadOffset()));
+			RotationMatrix qOffset = RotationMatrix();
+			hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
+			CN(pHand);
 
-		pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
-		CN(pHand);
+			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+			
+			pHand->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pHand->GetMalletOffset()));
 
-		qOffset = RotationMatrix();
-		qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+			pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
+			CN(pHand);
 
-		if (pRightMallet)
-			pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetHeadOffset()));
+			qOffset = RotationMatrix();
+			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+
+			pHand->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pHand->GetMalletOffset()));
+		}
 
 	Error:
 		return r;
@@ -385,10 +623,9 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pCaptureContext);
+	auto pNewTest = AddTest("captureobject", fnInitialize, fnUpdate, fnTest, fnReset, pCaptureContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Capture Test");
 	pNewTest->SetTestDescription("Capture handling test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -548,10 +785,9 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("nestedcompositeobb", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray Events Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -692,10 +928,9 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveComposite() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multiprimitivecomposite", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Primitive Interaction Composite Test");
 	pNewTest->SetTestDescription("Test covering multi interaction objects interacting with composite objects");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -704,6 +939,7 @@ Error:
 	return r;
 }
 
+// TODO: Lots of remove object tests 
 RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveCompositeRemove() {
 	RESULT r = R_PASS;
 
@@ -812,10 +1048,9 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveCompositeRemove() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multiprimitivecompositeremove", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Primitive Interaction Composite Test");
 	pNewTest->SetTestDescription("Test covering multi interaction objects interacting with composite objects");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -947,10 +1182,9 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveRemove() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multiprimitiveremove", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Primitive Interaction Test");
 	pNewTest->SetTestDescription("Test covering multi interaction objects interacting with non composite objects");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1178,10 +1412,9 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("multiprimitive", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Multi Primitive Interaction Test");
 	pNewTest->SetTestDescription("Test covering multi interaction objects interacting with non composite objects");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1326,10 +1559,9 @@ RESULT InteractionEngineTestSuite::AddTestObjectBasedEvents() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("objectbasedevents", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray Events Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1425,32 +1657,51 @@ RESULT InteractionEngineTestSuite::SetupPipeline(std::string strRenderProgramNam
 
 	CR(pHAL->MakeCurrentContext());
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	{
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-	CN(pReferenceGeometryProgram);
-	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		// Skybox
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+		CN(pUIProgramNode);
+		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+	}
 
 	CR(pHAL->ReleaseCurrentContext());
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngineTestSuite::SetupTestSuite() {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamOS, "DreamOS handle is not set");
 
 Error:
 	return r;
@@ -1469,7 +1720,7 @@ RESULT InteractionEngineTestSuite::Initialize() {
 	float sceneScale = 0.1f;
 	//vector evSceneRotation = vector(0.0f, 0.0f, 0.0f);
 	
-	//*
+	/*
 	auto pModel = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj");
 	pModel->SetPosition(ptSceneOffset),
 	pModel->SetScale(sceneScale); 		
@@ -1553,41 +1804,46 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRayController() {
 	auto fnUpdate = [&](void* pContext) {
 		RESULT r = R_PASS;
 
-		RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
 		ray rCast;
 
+		RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
+		CN(pTestContext);
 		CN(pTestContext->pComposite);
 		CN(pTestContext->pRay);
 
-		for (int i = 0; i < 4; i++) {
-			pTestContext->pCollidePoint[i]->SetVisible(false);
-		}
+		{
 
-		// Get Ray from controller
-
-		hand *pRightHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
-
-		if (pRightHand != nullptr) {
-			point p0 = pRightHand->GetPosition() - point(0.0f, 0.0f, 0.25f);
-			quaternion q = pRightHand->GetHandState().qOrientation;
-			q.Normalize();
-
-			//TODO: this isn't perfectly accurate, especially when the head is rotated
-			vector v = q.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
-			vector v2 = vector(-v.x(), -v.y(), v.z());
-			rCast = ray(p0, v2);
-
-			CollisionManifold manifold = pTestContext->pComposite->Collide(rCast);
-
-			if (manifold.NumContacts() > 0) {
-				for (int i = 0; i < manifold.NumContacts(); i++) {
-					pTestContext->pCollidePoint[i]->SetVisible(true);
-					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
-				}
+			for (int i = 0; i < 4; i++) {
+				pTestContext->pCollidePoint[i]->SetVisible(false);
 			}
 
-			pTestContext->pRay->UpdateFromRay(rCast);
-			//CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
+			// Get Ray from controller
+
+			hand *pRightHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
+
+			if (pRightHand != nullptr) {
+				point p0 = pRightHand->GetPosition() - point(0.0f, 0.0f, 0.25f);
+				quaternion q = pRightHand->GetHandState().qOrientation;
+				q.Normalize();
+
+				//TODO: this isn't perfectly accurate, especially when the head is rotated
+				vector v = q.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
+				vector v2 = vector(-v.x(), -v.y(), v.z());
+				rCast = ray(p0, v2);
+
+				CollisionManifold manifold = pTestContext->pComposite->Collide(rCast);
+
+				if (manifold.NumContacts() > 0) {
+					for (int i = 0; i < manifold.NumContacts(); i++) {
+						pTestContext->pCollidePoint[i]->SetVisible(true);
+						pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+					}
+				}
+
+				pTestContext->pRay->UpdateFromRay(rCast);
+				//CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
+
+			}
 
 		}
 
@@ -1616,10 +1872,9 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRayController() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("compositeraycontroller", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray Events Controller Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(10000.0);
 	pNewTest->SetTestRepeats(1);
@@ -1710,10 +1965,9 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("compositeray", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray Events Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
@@ -1875,10 +2129,9 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRayNested() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest("raynested", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray Events Test");
 	pNewTest->SetTestDescription("Event handling test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);

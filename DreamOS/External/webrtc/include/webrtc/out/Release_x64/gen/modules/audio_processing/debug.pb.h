@@ -778,6 +778,20 @@ class Config : public ::google::protobuf::MessageLite /* @@protoc_insertion_poin
   bool intelligibility_enhancer_enabled() const;
   void set_intelligibility_enhancer_enabled(bool value);
 
+  // optional bool pre_amplifier_enabled = 19;
+  bool has_pre_amplifier_enabled() const;
+  void clear_pre_amplifier_enabled();
+  static const int kPreAmplifierEnabledFieldNumber = 19;
+  bool pre_amplifier_enabled() const;
+  void set_pre_amplifier_enabled(bool value);
+
+  // optional float pre_amplifier_fixed_gain_factor = 20;
+  bool has_pre_amplifier_fixed_gain_factor() const;
+  void clear_pre_amplifier_fixed_gain_factor();
+  static const int kPreAmplifierFixedGainFactorFieldNumber = 20;
+  float pre_amplifier_fixed_gain_factor() const;
+  void set_pre_amplifier_fixed_gain_factor(float value);
+
   // @@protoc_insertion_point(class_scope:webrtc.audioproc.Config)
  private:
   void set_has_aec_enabled();
@@ -816,6 +830,10 @@ class Config : public ::google::protobuf::MessageLite /* @@protoc_insertion_poin
   void clear_has_experiments_description();
   void set_has_intelligibility_enhancer_enabled();
   void clear_has_intelligibility_enhancer_enabled();
+  void set_has_pre_amplifier_enabled();
+  void clear_has_pre_amplifier_enabled();
+  void set_has_pre_amplifier_fixed_gain_factor();
+  void clear_has_pre_amplifier_fixed_gain_factor();
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
@@ -838,6 +856,8 @@ class Config : public ::google::protobuf::MessageLite /* @@protoc_insertion_poin
   bool transient_suppression_enabled_;
   ::google::protobuf::int32 ns_level_;
   bool intelligibility_enhancer_enabled_;
+  bool pre_amplifier_enabled_;
+  float pre_amplifier_fixed_gain_factor_;
   friend struct protobuf_debug_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
@@ -2196,6 +2216,54 @@ inline void Config::set_intelligibility_enhancer_enabled(bool value) {
   set_has_intelligibility_enhancer_enabled();
   intelligibility_enhancer_enabled_ = value;
   // @@protoc_insertion_point(field_set:webrtc.audioproc.Config.intelligibility_enhancer_enabled)
+}
+
+// optional bool pre_amplifier_enabled = 19;
+inline bool Config::has_pre_amplifier_enabled() const {
+  return (_has_bits_[0] & 0x00040000u) != 0;
+}
+inline void Config::set_has_pre_amplifier_enabled() {
+  _has_bits_[0] |= 0x00040000u;
+}
+inline void Config::clear_has_pre_amplifier_enabled() {
+  _has_bits_[0] &= ~0x00040000u;
+}
+inline void Config::clear_pre_amplifier_enabled() {
+  pre_amplifier_enabled_ = false;
+  clear_has_pre_amplifier_enabled();
+}
+inline bool Config::pre_amplifier_enabled() const {
+  // @@protoc_insertion_point(field_get:webrtc.audioproc.Config.pre_amplifier_enabled)
+  return pre_amplifier_enabled_;
+}
+inline void Config::set_pre_amplifier_enabled(bool value) {
+  set_has_pre_amplifier_enabled();
+  pre_amplifier_enabled_ = value;
+  // @@protoc_insertion_point(field_set:webrtc.audioproc.Config.pre_amplifier_enabled)
+}
+
+// optional float pre_amplifier_fixed_gain_factor = 20;
+inline bool Config::has_pre_amplifier_fixed_gain_factor() const {
+  return (_has_bits_[0] & 0x00080000u) != 0;
+}
+inline void Config::set_has_pre_amplifier_fixed_gain_factor() {
+  _has_bits_[0] |= 0x00080000u;
+}
+inline void Config::clear_has_pre_amplifier_fixed_gain_factor() {
+  _has_bits_[0] &= ~0x00080000u;
+}
+inline void Config::clear_pre_amplifier_fixed_gain_factor() {
+  pre_amplifier_fixed_gain_factor_ = 0;
+  clear_has_pre_amplifier_fixed_gain_factor();
+}
+inline float Config::pre_amplifier_fixed_gain_factor() const {
+  // @@protoc_insertion_point(field_get:webrtc.audioproc.Config.pre_amplifier_fixed_gain_factor)
+  return pre_amplifier_fixed_gain_factor_;
+}
+inline void Config::set_pre_amplifier_fixed_gain_factor(float value) {
+  set_has_pre_amplifier_fixed_gain_factor();
+  pre_amplifier_fixed_gain_factor_ = value;
+  // @@protoc_insertion_point(field_set:webrtc.audioproc.Config.pre_amplifier_fixed_gain_factor)
 }
 
 // -------------------------------------------------------------------

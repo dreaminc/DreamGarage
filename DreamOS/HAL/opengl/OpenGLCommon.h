@@ -5,7 +5,7 @@
 	#include <windows.h>
 	#include <gl\gl.h>
 	#include <gl\glu.h>                               // Header File For The GLu32 Library
-	//#include <gl\glext.h>
+	#include "HAL/opengl/GL/glext.h"
 	//#include "HAL/opengl/GL/glext.h"
 	#include "HAL/opengl/GL/glcorearb.h"
 #elif defined(__APPLE__)
@@ -18,5 +18,11 @@
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
+
+#include "Primitives/color.h"
+
+GLenum GetOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int channels = 3);
+GLint GetInternalOpenGLPixelFormat(PIXEL_FORMAT pixelFormat, int bitsPerPixel = 8, int channels = 4);
+
 
 #endif // ! OPEN_GL_COMMON_H_

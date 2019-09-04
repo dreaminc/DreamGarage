@@ -91,6 +91,10 @@ text::~text() {
 		m_pQuad = nullptr;
 	}
 
+//	if (GetFramebuffer() != nullpt)
+	//delete GetFramebuffer();
+
+
 	ClearChildren();
 }
 
@@ -107,6 +111,7 @@ RESULT text::RenderToQuad() {
 	}
 
 	// Render with the appropriate curve
+	//CR(r);
 	CR(FlatContext::RenderToQuad(m_width, m_height, m_xOffset, m_yOffset, curveType));
 
 Error:
@@ -392,10 +397,12 @@ std::shared_ptr<quad> text::AddGlyphQuad(CharacterGlyph glyph, float posX, float
 	point ptGlyphBg = point(glyphQuadXPosition, 0.0f, glyphBgQuadYPosition);
 	std::shared_ptr<quad> pQuadBg = AddQuad(glyphWidth, glyphBgHeight, ptGlyphBg, uvcoord(0.0f, 0.0f), uvcoord(0.0f, 0.0f));
 	pQuadBg->SetDiffuseTexture(m_pFont->GetTexture().get());
+	pQuadBg->SetPosition(ptGlyphBg);
 
 	point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
 	std::shared_ptr<quad> pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
 	pQuad->SetDiffuseTexture(m_pFont->GetTexture().get());
+	pQuad->SetPosition(ptGlyph);
 
 	return pQuad;
 
@@ -564,6 +571,8 @@ RESULT text::SetText(const std::string& strText) {
 
 	// Clear out kids
 	CR(ClearChildren());
+
+	m_fVirtualModelMatrix = true;
 
 	m_strText = strText;
 

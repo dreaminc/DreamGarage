@@ -17,10 +17,11 @@ class HTTPRequest;
 
 class HTTPRequestHandler {
 public:
-	HTTPRequestHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback);
+	HTTPRequestHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback, HTTPTimeoutCallback fnTimeoutCallback = nullptr);
 	~HTTPRequestHandler();
 
 	virtual RESULT OnHTTPRequestComplete();
+	virtual RESULT OnHTTPRequestTimeout();
 	virtual RESULT HandleHTTPResponse(char *pBuffer, size_t elementSize, size_t numElements);
 	RESULT HandleHTTPResponse(std::string strResponse);
 
@@ -35,6 +36,7 @@ private:
 	HTTPRequest* m_pHTTPRequest;
 	HTTPResponse* m_pHTTPResponse = nullptr;
 	HTTPResponseCallback m_fnResponseCallback = nullptr;
+	HTTPTimeoutCallback m_fnTimeoutCallback = nullptr;
 };
 
 
