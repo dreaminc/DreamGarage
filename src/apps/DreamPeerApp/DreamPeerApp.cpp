@@ -18,7 +18,7 @@
 
 #include "sound/SpatialSoundObject.h"
 
-#include "garage/AudioDataMessage.h"
+#include "meetclient/AudioDataMessage.h"
 
 DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext) :
 	DreamApp<DreamPeerApp>(pDOS, pContext),

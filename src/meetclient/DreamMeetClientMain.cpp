@@ -1,11 +1,11 @@
-#include "DreamClientMain.h"
+#include "DreamMeetClientMain.h"
 
 #include <ctime>
 
 #include "core/ehm/EHM.h"
 #include "logger/DreamLogger.h"
 
-#include "garage/DreamGarage.h"
+#include "meetclient/DreamMeetClient.h"
 
 #include <string>
 
@@ -13,12 +13,17 @@
 
 #ifdef _WINDOWS
 
-	int WINAPI WinMain(HINSTANCE hInstance,
-		HINSTANCE hPrevInstance,
-		LPSTR lpCmdLine,
-		int nCmdShow)
+	int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 	{
 		RESULT r = R_PASS;
+
+		// Set up a console and attach to it
+		// TODO: Might want to explore this more
+#ifdef _DEBUG
+		AllocConsole();
+		AttachConsole(GetCurrentProcessId());
+		freopen("CON", "w", stdout);
+#endif
 
 		// get command line args and put them on the stack in argc,argv format
 		LPWSTR *wargv = nullptr;
@@ -40,11 +45,11 @@
 		// now argc,argv are available and will get destroyed on exit
 
 		// This is the entry point for the DreamOS Engine
-		DreamGarage dreamGarageApp;
-		CRM(dreamGarageApp.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
-		CRM(dreamGarageApp.Start(), "Failed to start Dream Garage");	// This is the entry point for the DreamOS Engine
+		DreamMeetClient dreamMeetClient;
+		CRM(dreamMeetClient.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
+		CRM(dreamMeetClient.Start(), "Failed to start Dream Garage");	// This is the entry point for the DreamOS Engine
 
-	//Success:
+	Success:
 		return (int)(r);
 
 	Error:
@@ -58,7 +63,7 @@
 	int main(int argc, const char *argv[]) {
 		RESULT r = R_PASS;
 
-		DreamGarage dreamGarageApp;
+		DreamMeetClient dreamGarageApp;
 		CRM(dreamGarageApp.Initialize(argc, argv), "Failed to initialize Dream Garage");
 		CRM(dreamGarageApp.Start(), "Failed to start Dream Garage");	// This is the entry point for the DreamOS Engine
 

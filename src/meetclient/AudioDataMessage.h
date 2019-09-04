@@ -10,6 +10,7 @@
 
 #include "DreamGarageMessage.h"
 
+// Likely should be at the DreamOS level of message
 class AudioDataMessage : public DreamGarageMessage {
 private:
 	__declspec(align(8)) struct MessageBody {

@@ -16,9 +16,6 @@
 
 #include "core/primitives/ray.h"
 
-// TODO: move these files to DreamOS(?)
-#include "garage/UserAreaControls.h"
-
 UIView::UIView(HALImp *pHALImp, DreamOS	*pDreamOS) :
 	composite(pHALImp),
 	m_pDreamOS(pDreamOS)

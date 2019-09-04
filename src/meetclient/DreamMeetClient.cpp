@@ -1,4 +1,4 @@
-#include "DreamGarage.h"
+#include "DreamMeetClient.h"
 
 #include <string>
 #include "chrono"                                       // for system_clock, system_clock::time_point
@@ -102,7 +102,7 @@ Error:
 }
 */
 
-RESULT DreamGarage::ConfigureSandbox() {
+RESULT DreamMeetClient::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	Sandbox::configuration sandboxconfig;
@@ -194,7 +194,7 @@ Error:
 }
 
 
-RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
+RESULT DreamMeetClient::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -245,7 +245,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, Sandbox::PipelineType pipelineType) {
+RESULT DreamMeetClient::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode, Sandbox::PipelineType pipelineType) {
 	RESULT r = R_PASS;
 
 	{
@@ -422,7 +422,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
+RESULT DreamMeetClient::SetupPipeline(Pipeline* pRenderPipeline) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -481,7 +481,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SetupUserModelPool() {
+RESULT DreamMeetClient::SetupUserModelPool() {
 	RESULT r = R_PASS;
 
 	// Set up user pool
@@ -494,7 +494,7 @@ RESULT DreamGarage::SetupUserModelPool() {
 	return r;
 }
 
-RESULT DreamGarage::AllocateAndAssignUserModelFromPool(DreamPeerApp *pDreamPeer) {
+RESULT DreamMeetClient::AllocateAndAssignUserModelFromPool(DreamPeerApp *pDreamPeer) {
 	RESULT r = R_PASS;
 
 	for (auto& userModelPair : m_usersModelPool) {
@@ -515,7 +515,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pDreamPeer) {
+RESULT DreamMeetClient::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pDreamPeer) {
 	for (auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == pDreamPeer.get()) {
 			// release model and set to invisible
@@ -540,7 +540,7 @@ RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pD
 	return R_NOT_FOUND;
 }
 
-user* DreamGarage::FindUserModelInPool(DreamPeerApp *pDreamPeer) {
+user* DreamMeetClient::FindUserModelInPool(DreamPeerApp *pDreamPeer) {
 	for (const auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == pDreamPeer) {
 			return userModelPair.second;
@@ -550,7 +550,7 @@ user* DreamGarage::FindUserModelInPool(DreamPeerApp *pDreamPeer) {
 	return nullptr;
 }
 
-RESULT DreamGarage::LoadScene() {
+RESULT DreamMeetClient::LoadScene() {
 	RESULT r = R_PASS;
 
 	// Keyboard
@@ -604,7 +604,7 @@ Error:
 
 std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
 
-RESULT DreamGarage::DidFinishLoading() {
+RESULT DreamMeetClient::DidFinishLoading() {
 	RESULT r = R_PASS;
 
 	std::string strFormType;
@@ -711,7 +711,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnDreamVersion(version dreamVersion) {
+RESULT DreamMeetClient::OnDreamVersion(version dreamVersion) {
 	RESULT r = R_PASS;
 
 	std::string strFormType;
@@ -732,7 +732,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnAPIConnectionCheck(bool fIsConnected) {
+RESULT DreamMeetClient::OnAPIConnectionCheck(bool fIsConnected) {
 	RESULT r = R_PASS;
 
 	if (fIsConnected) {
@@ -757,15 +757,15 @@ Error:
 	return r;
 }
 
-version DreamGarage::GetDreamVersion() {
+version DreamMeetClient::GetDreamVersion() {
 	return m_versionDreamClient;
 }
 
-CameraNode *DreamGarage::GetAuxCameraNode() {
+CameraNode *DreamMeetClient::GetAuxCameraNode() {
 	return m_pAuxCamera;
 }
 
-RESULT DreamGarage::AuthenticateFromStoredCredentials() {
+RESULT DreamMeetClient::AuthenticateFromStoredCredentials() {
 	RESULT r = R_PASS;
 
 	std::string strFormType;
@@ -803,7 +803,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+RESULT DreamMeetClient::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
 	RESULT r = R_PASS;
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
@@ -816,7 +816,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SendUpdateHandMessage(long userID, HandState handState) {
+RESULT DreamMeetClient::SendUpdateHandMessage(long userID, HandState handState) {
 	RESULT r = R_PASS;
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
@@ -829,7 +829,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+RESULT DreamMeetClient::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
 	RESULT r = R_PASS;
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
@@ -843,7 +843,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::BroadcastUpdateHandMessage(HandState handState) {
+RESULT DreamMeetClient::BroadcastUpdateHandMessage(HandState handState) {
 	RESULT r = R_PASS;
 
 	uint8_t *pDatachannelBuffer = nullptr;
@@ -857,7 +857,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::BroadcastUpdateMouthMessage(float mouthSize) {
+RESULT DreamMeetClient::BroadcastUpdateMouthMessage(float mouthSize) {
 	RESULT r = R_PASS;
 
 	uint8_t *pDatachannelBuffer = nullptr;
@@ -871,7 +871,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SendHeadPosition() {
+RESULT DreamMeetClient::SendHeadPosition() {
 	RESULT r = R_PASS;
 
 	point ptPosition = GetCameraPosition();
@@ -883,7 +883,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SendHandPosition() {
+RESULT DreamMeetClient::SendHandPosition() {
 	RESULT r = R_PASS;
 
 	hand *pLeftHand = GetHand(HAND_TYPE::HAND_LEFT);
@@ -901,7 +901,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SendMouthSize() {
+RESULT DreamMeetClient::SendMouthSize() {
 	RESULT r = R_PASS;
 
 	// TODO: get actual mouth size from audio (or create observer pathway - prefer former)
@@ -960,7 +960,7 @@ std::chrono::system_clock::time_point g_lastPeerStateCheckTime = std::chrono::sy
 // For testing
 std::chrono::system_clock::time_point g_lastDebugUpdate = std::chrono::system_clock::now();
 
-RESULT DreamGarage::Update(void) {
+RESULT DreamMeetClient::Update(void) {
 	RESULT r = R_PASS;
 
 	//m_browsers.Update();
@@ -1050,7 +1050,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
+RESULT DreamMeetClient::SetRoundtablePosition(int seatingPosition) {
 	RESULT r = R_PASS;
 
 	stereocamera* pCamera = GetCamera();
@@ -1091,7 +1091,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingPosition) {
+RESULT DreamMeetClient::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingPosition) {
 	RESULT r = R_PASS;
 
 	point ptSeatPosition;
@@ -1129,7 +1129,7 @@ Error:
 
 // Cloud Controller
 
-RESULT DreamGarage::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) {
+RESULT DreamMeetClient::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) {
 	RESULT r = R_PASS;
 
 	CR(m_pDreamShareViewApp->DeallocateSpheres(pDreamPeer->GetPeerUserID()));
@@ -1140,7 +1140,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
+RESULT DreamMeetClient::OnNewSocketConnection(int seatPosition) {
 	RESULT r = R_PASS;
 
 	if (!m_fSeated) {
@@ -1194,7 +1194,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
+RESULT DreamMeetClient::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	RESULT r = R_PASS;
 
 	std::vector<std::shared_ptr<EnvironmentShare>> pendingDeleteShares;
@@ -1270,7 +1270,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) {
+RESULT DreamMeetClient::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) {
 	RESULT r = R_PASS;
 	//DOSLOG(INFO, "[DreamGarage] Data received");
 
@@ -1325,7 +1325,7 @@ Error:
 	return r;
 }
 
-user* DreamGarage::ActivateUser(long userId) {
+user* DreamMeetClient::ActivateUser(long userId) {
 	/*
 	if (m_peerUsers.find(userId) == m_peerUsers.end()) {
 		if (m_usersPool.empty()) {
@@ -1350,7 +1350,7 @@ user* DreamGarage::ActivateUser(long userId) {
 	return nullptr;
 }
 
-RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+RESULT DreamMeetClient::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 	RESULT r = R_PASS;
 
 	long senderUserID = pPeerConnection->GetPeerUserID();
@@ -1422,7 +1422,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage) {
+RESULT DreamMeetClient::HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage) {
 	RESULT r = R_PASS;
 
 	/*
@@ -1458,7 +1458,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::HandleHandUpdateMessage(PeerConnection* pPeerConnection, UpdateHandMessage *pUpdateHandMessage) {
+RESULT DreamMeetClient::HandleHandUpdateMessage(PeerConnection* pPeerConnection, UpdateHandMessage *pUpdateHandMessage) {
 	RESULT r = R_PASS;
 
 	//DEBUG_LINEOUT("HandleUpdateHandMessage");
@@ -1486,7 +1486,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::HandleMouthUpdateMessage(PeerConnection* pPeerConnection, UpdateMouthMessage *pUpdateMouthMessage) {
+RESULT DreamMeetClient::HandleMouthUpdateMessage(PeerConnection* pPeerConnection, UpdateMouthMessage *pUpdateMouthMessage) {
 	RESULT r = R_PASS;
 
 	float mouthSize = pUpdateMouthMessage->GetMouthSize();
@@ -1503,7 +1503,7 @@ Error:
 }
 
 // This function is currently defunct, but will be removed when the actual audio infrastructure is turned on
-RESULT DreamGarage::HandleUserAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) {
+RESULT DreamMeetClient::HandleUserAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) {
 	RESULT r = R_PASS;
 
 	/*
@@ -1521,7 +1521,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT DreamMeetClient::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
 	if (m_pDreamUserControlArea != nullptr) {
@@ -1533,7 +1533,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT DreamMeetClient::OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
 	if (m_pDreamUserControlArea != nullptr) {
@@ -1544,7 +1544,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT DreamMeetClient::OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
 	auto pUserControllerProxy = (UserControllerProxy*)(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
@@ -1556,7 +1556,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) { 
+RESULT DreamMeetClient::OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) { 
 	RESULT r = R_PASS;
 
 //	m_pDreamUserControlArea->GetA
@@ -1574,7 +1574,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnSendCameraPlacement() {
+RESULT DreamMeetClient::OnSendCameraPlacement() {
 	RESULT r = R_PASS;
 
 	CN(m_pDreamUserControlArea);
@@ -1586,7 +1586,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnStopSendingCameraPlacement() {
+RESULT DreamMeetClient::OnStopSendingCameraPlacement() {
 	RESULT r = R_PASS;
 
 	CR(m_pDreamUserControlArea->GetVCam()->SetIsSendingCameraPlacement(false));
@@ -1595,7 +1595,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnReceiveCameraPlacement(long userID) {
+RESULT DreamMeetClient::OnReceiveCameraPlacement(long userID) {
 	RESULT r = R_PASS;
 
 	CR(m_pDreamUserControlArea->GetVCam()->SetIsReceivingCameraPlacement(true));
@@ -1604,7 +1604,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnStopReceivingCameraPlacement() {
+RESULT DreamMeetClient::OnStopReceivingCameraPlacement() {
 	RESULT r = R_PASS;
 
 	CR(m_pDreamUserControlArea->GetVCam()->SetIsReceivingCameraPlacement(false));
@@ -1613,7 +1613,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SaveCameraSettings(point ptPosition, quaternion qOrientation) {
+RESULT DreamMeetClient::SaveCameraSettings(point ptPosition, quaternion qOrientation) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserController);
@@ -1623,7 +1623,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
+RESULT DreamMeetClient::HandleDOSMessage(std::string& strMessage) {
 	RESULT r = R_PASS;
 
 	auto pCloudController = GetCloudController();
@@ -1675,7 +1675,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnLogin() {
+RESULT DreamMeetClient::OnLogin() {
 	RESULT r = R_PASS;
 
 	// TODO: choose environment based on api information
@@ -1693,7 +1693,7 @@ RESULT DreamGarage::OnLogin() {
 	return r;
 }
 
-RESULT DreamGarage::OnLogout() {
+RESULT DreamMeetClient::OnLogout() {
 	RESULT r = R_PASS;
 
 	UserController *pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
@@ -1722,7 +1722,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnPendLogout() {
+RESULT DreamMeetClient::OnPendLogout() {
 	RESULT r = R_PASS;
 
 	m_fPendLogout = true;
@@ -1733,7 +1733,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnSwitchTeams() {
+RESULT DreamMeetClient::OnSwitchTeams() {
 	RESULT r = R_PASS;
 
 	m_fSeated = false;
@@ -1769,7 +1769,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::PendSwitchTeams() {
+RESULT DreamMeetClient::PendSwitchTeams() {
 	RESULT r = R_PASS;
 
 	EnvironmentController *pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
@@ -1782,7 +1782,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) {
+RESULT DreamMeetClient::OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) {
 	RESULT r = R_PASS;
 
 	FormType type = DreamFormApp::TypeFromString(strKey);
@@ -1815,7 +1815,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
+RESULT DreamMeetClient::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
 	RESULT r = R_PASS;
 
 	if (!fSuccess) {
@@ -1848,7 +1848,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+RESULT DreamMeetClient::OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	CN(m_pDreamUserControlArea);
@@ -1872,7 +1872,7 @@ Error:
 }
 
 // TODO: Make waterquad and light positionings programmatic?
-RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) {
+RESULT DreamMeetClient::OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) {
 	RESULT r = R_PASS;
 
 	if (!fSuccess) {
@@ -1932,7 +1932,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+RESULT DreamMeetClient::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	if (m_pDreamShareViewApp != nullptr && pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
@@ -1966,7 +1966,7 @@ RESULT DreamGarage::OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmen
 	return r;
 }
 
-RESULT DreamGarage::OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+RESULT DreamMeetClient::OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 	
 	CN(pEnvironmentShare);
@@ -1983,7 +1983,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+RESULT DreamMeetClient::OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	if (pEnvironmentShare->GetShareType() == SHARE_TYPE_SCREEN) {
@@ -2012,7 +2012,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
+RESULT DreamMeetClient::OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) {
 	RESULT r = R_PASS;
 
 	if (pEnvironmentShare == nullptr) {
@@ -2025,7 +2025,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) {
+RESULT DreamMeetClient::OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) {
 	RESULT r = R_PASS;
 
 	// TODO: enum to string dictionary
@@ -2055,7 +2055,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) {
+RESULT DreamMeetClient::OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) {
 	RESULT r = R_PASS;
 
 	long assetID = -1;
@@ -2079,7 +2079,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::Exit(RESULT r) {
+RESULT DreamMeetClient::Exit(RESULT r) {
 
 	auto fnOnFadeOutCallback = [&](void *pContext) {
 
@@ -2100,7 +2100,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
+RESULT DreamMeetClient::Notify(SenseKeyboardEvent *kbEvent)  {
 	RESULT r = R_PASS;
 
 	if (GetSandboxConfiguration().f3rdPersonCamera) {
@@ -2113,14 +2113,14 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::Notify(SenseTypingEvent *kbEvent) {
+RESULT DreamMeetClient::Notify(SenseTypingEvent *kbEvent) {
 	RESULT r = R_PASS;
 
 Error:
 	return r;
 }
 
-texture* DreamGarage::GetSharedCameraTexture() {
+texture* DreamMeetClient::GetSharedCameraTexture() {
 	RESULT r = R_PASS;
 
 	CN(m_pDreamUserControlArea);
@@ -2132,7 +2132,7 @@ Error:
 	return nullptr;
 }
 
-RESULT DreamGarage::GetDefaultVCamPlacement(point& ptPosition, quaternion& qOrientation) {
+RESULT DreamMeetClient::GetDefaultVCamPlacement(point& ptPosition, quaternion& qOrientation) {
 	RESULT r = R_PASS;
 
 	CN(m_pDreamEnvironmentApp);
@@ -2142,7 +2142,7 @@ Error:
 	return r;
 }
 
-bool DreamGarage::IsCameraInUse() {
+bool DreamMeetClient::IsCameraInUse() {
 	RESULT r = R_PASS;
 	
 	CNR(m_pDreamUserControlArea, R_SKIPPED);

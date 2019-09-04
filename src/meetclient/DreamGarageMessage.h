@@ -12,6 +12,7 @@
 
 #include "os/DreamMessage.h"
 
+// TODO: Rethink this 
 class DreamGarageMessage : public DreamMessage {
 public:
 	enum class type : Message::DataType {

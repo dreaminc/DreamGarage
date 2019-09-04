@@ -61,18 +61,18 @@ class FogProgram;
 
 #define MAX_PEERS 8
 
-class DreamGarage : public DreamOS,
+class DreamMeetClient : public DreamOS,
 				    public Subscriber<SenseKeyboardEvent>,
 					public Subscriber<SenseTypingEvent>,
 					public DOSObserver
 {
 public:
 
-	DreamGarage() {
+	DreamMeetClient() {
 		// empty
 	}
 
-	~DreamGarage() {
+	~DreamMeetClient() {
 		// empty
 	}
 

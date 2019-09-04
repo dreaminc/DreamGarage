@@ -22,7 +22,6 @@ PathManager* PathManagerFactory::MakePathManager(PATH_MANAGER_TYPE type, DreamOS
 		case PATH_MANAGER_WIN32: {
             #if defined(_WIN32)
                 pPathManager = new Win64PathManager();
-                CRM(pPathManager->InitializePaths(pDOSHandle), "Failed to initialize paths!");
             #else
                 pPathManager = NULL;
                 DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
@@ -32,7 +31,6 @@ PathManager* PathManagerFactory::MakePathManager(PATH_MANAGER_TYPE type, DreamOS
         case PATH_MANAGER_OSX: {
             #if defined(__APPLE__)
                 pPathManager = new OSXPathManager();
-                CRM(pPathManager->InitializePaths(pDOSHandle), "Failed to initialize paths!");
             #else
                 pPathManager = NULL;
                 DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
@@ -44,6 +42,10 @@ PathManager* PathManagerFactory::MakePathManager(PATH_MANAGER_TYPE type, DreamOS
             DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
 		} break;
 	}
+
+	CNM(pPathManager, "Failed to allocate path manager");
+
+	CRM(pPathManager->InitializePaths(pDOSHandle), "Failed to initialize paths!");
 
 	PathManager::SetSingletonPathManager(pPathManager);
 	return pPathManager;

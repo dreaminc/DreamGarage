@@ -1,4 +1,4 @@
-# src/testclient/CMakeLists.txt - Dream Test Client Libraries CMake file
+# src/meetclient/CMakeLists.txt - Dream Meet Client CMake file
 
 file(GLOB SOURCES 
   "*.cpp"
@@ -8,7 +8,6 @@ source_group("" FILES ${SOURCES})
 
 # TODO: This should not be here!!!!!
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
-add_definitions(-DWEBRTC_WIN)
 
 # For OpenVR Matrix
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/openvr/headers)
@@ -28,7 +27,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D_CRT_SECURE_NO_WARNING
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNOMINMAX")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DWEBRTC_WIN")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DCEF_AUDIO_MIRROR")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DSTAGING_BUILD")
+# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DSTAGING_BUILD")
 # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D_ENABLE_LOGGING")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D__BASE_FILE__=\"%(Filename)%(Extension)\"")
 
@@ -78,30 +77,28 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST")               
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG:FASTLINK")         # Debugging
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")      # System
 
-set(VS_DEBUGGER_COMMAND_ARGUMENTS "-ts hal.minimalshader -t 0")
-
-add_executable(testclient
+add_executable(dreammeetclient
     ${SOURCES}
 )
 
-target_link_libraries(testclient core)
-target_link_libraries(testclient os)
-target_link_libraries(testclient sandbox)
-target_link_libraries(testclient test)
-target_link_libraries(testclient logger)
-target_link_libraries(testclient modules)
-target_link_libraries(testclient sense)
-target_link_libraries(testclient cloud)
-target_link_libraries(testclient ui)
-target_link_libraries(testclient sound)
-target_link_libraries(testclient pipeline)
-target_link_libraries(testclient scene)
-target_link_libraries(testclient hal)
-target_link_libraries(testclient hmd)
-target_link_libraries(testclient webbrowser)
+target_link_libraries(dreammeetclient core)
+target_link_libraries(dreammeetclient os)
+target_link_libraries(dreammeetclient sandbox)
+target_link_libraries(dreammeetclient test)
+target_link_libraries(dreammeetclient logger)
+target_link_libraries(dreammeetclient modules)
+target_link_libraries(dreammeetclient sense)
+target_link_libraries(dreammeetclient cloud)
+target_link_libraries(dreammeetclient ui)
+target_link_libraries(dreammeetclient sound)
+target_link_libraries(dreammeetclient pipeline)
+target_link_libraries(dreammeetclient scene)
+target_link_libraries(dreammeetclient hal)
+target_link_libraries(dreammeetclient hmd)
+target_link_libraries(dreammeetclient webbrowser)
 
 # Apps TODO: should do this based on what tests are being built
-target_link_libraries(testclient 
+target_link_libraries(dreammeetclient 
     dreampeerapp
     dreamuserapp
     dreamshareviewapp
@@ -121,7 +118,7 @@ target_link_libraries(testclient
 )
 
 # External
-target_link_libraries(testclient
+target_link_libraries(dreammeetclient
     # Optimized Configuration
     optimized ${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/OfficialBuild/libcef_dll_wrapper.lib
     optimized ${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/OfficialBuild/libcef.dll.lib
@@ -315,8 +312,7 @@ file(GLOB FREEIMAGE_BINARY_FILES
     "${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/debug/FreeImagePlusd.dll"
 )
 
-
-add_custom_command(TARGET testclient POST_BUILD
+add_custom_command(TARGET dreammeetclient POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     ${CEF_BINARY_FILES}
     ${CURL_BINARY_FILES}
@@ -326,5 +322,7 @@ add_custom_command(TARGET testclient POST_BUILD
     ${OPENSSL_BINARY_FILES}
     ${ASSIMP_BINARY_FILES}
     ${FREEIMAGE_BINARY_FILES}
-    $<TARGET_FILE_DIR:testclient>
+    $<TARGET_FILE_DIR:dreammeetclient>
 )
+
+
