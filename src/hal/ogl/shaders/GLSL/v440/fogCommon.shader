@@ -44,6 +44,7 @@ vec4 MixWithFog(in uint fogType, in vec4 shaderColor, in float fragmentDepth) {
 
 	fogFactor = clamp(fogFactor, 0.0f, 1.0f);
 	vec4 mixWithFogColor = vec4(mix(shaderColor.rgb, fogParams.color.rgb, fogFactor), 1.0f);
-	return mixWithFogColor;
 
+	//return mixWithFogColor;
+	return (shaderColor * 0.00000001f) + vec4(fogParams.color.rgb, 1.0f);
 }

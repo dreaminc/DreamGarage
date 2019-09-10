@@ -53,6 +53,8 @@ RESULT OGLProgramEnvironment::OGLInitialize() {
 		CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
 
 		CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
+
+		m_pOGLFramebuffer->SetClearColor(color(COLOR_GRAY));
 	}
 	//*/
 
@@ -164,7 +166,7 @@ RESULT OGLProgramEnvironment::ProcessNode(long frameID) {
 
 	UnbindFramebuffer();
 
-	//Error:
+Error:
 	return r;
 }
 

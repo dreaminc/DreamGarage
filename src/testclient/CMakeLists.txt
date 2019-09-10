@@ -340,3 +340,10 @@ add_custom_command(TARGET testclient POST_BUILD
     "${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/Resources"
     $<TARGET_FILE_DIR:testclient>
 )
+
+# Copy Desktop Duplication files
+add_custom_command(TARGET testclient POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E copy 
+    $<TARGET_FILE:dreamdesktop> 
+    $<TARGET_FILE_DIR:dreammeetclient>
+)

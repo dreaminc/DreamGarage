@@ -36,5 +36,5 @@ void main(void) {
 	
 	// TODO: Not really the best way to do this since now minimal texture program
 	// needs a special uniform
-	out_vec4Color = shaderColor;
+	out_vec4Color = MixWithFog(FOG_TYPE_LINEAR, shaderColor, DataIn.vertDepth);
 }

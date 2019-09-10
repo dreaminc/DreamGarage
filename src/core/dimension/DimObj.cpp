@@ -425,7 +425,7 @@ RESULT DimObj::SetDiffuseTexture(texture *pTexture) {
 	m_pTextureDiffuse = pTexture;
 
 Error:
-	return R_PASS;
+	return r;
 }
 
 RESULT DimObj::SetSpecularTexture(texture *pTexture) {
@@ -436,7 +436,7 @@ RESULT DimObj::SetSpecularTexture(texture *pTexture) {
 	m_pTextureSpecular = pTexture;
 
 Error:
-	return R_PASS;
+	return r;
 }
 
 RESULT DimObj::SetAmbientTexture(texture *pTexture) {
@@ -447,7 +447,7 @@ RESULT DimObj::SetAmbientTexture(texture *pTexture) {
 	m_pTextureAmbient = pTexture;
 
 Error:
-	return R_PASS;
+	return r;
 }
 
 RESULT DimObj::SetBumpTexture(texture *pTexture) {

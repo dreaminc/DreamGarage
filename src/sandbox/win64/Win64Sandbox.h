@@ -117,6 +117,8 @@ private:
 	unsigned int m_desktoppxHeight = 0;
 	unsigned long m_pDesktopFrameData_n = 0;
 
+	MSG m_windowsMessage;
+
 private:
 	std::function<void(int msg_id, void* data)> m_fnUIThreadCallback;
 

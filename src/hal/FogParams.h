@@ -18,7 +18,7 @@ public:
 	~FogParams();
 
 private:
-	// default lobby params
+	// Default lobby params
 	float m_startDistance = 50.0f;
 	float m_endDistance = 300.0f;
 	float m_density = 0.05f;

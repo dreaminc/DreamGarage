@@ -325,4 +325,24 @@ add_custom_command(TARGET dreammeetclient POST_BUILD
     $<TARGET_FILE_DIR:dreammeetclient>
 )
 
+# Copy CEF files
+add_custom_command(TARGET dreammeetclient POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E copy 
+    $<TARGET_FILE:dreamcef> 
+    $<TARGET_FILE_DIR:dreammeetclient>
+)
+
+add_custom_command(TARGET dreammeetclient POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E copy_directory 
+    "${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/Resources"
+    $<TARGET_FILE_DIR:dreammeetclient>
+)
+
+# Copy Desktop Duplication files
+add_custom_command(TARGET dreammeetclient POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E copy 
+    $<TARGET_FILE:dreamdesktop> 
+    $<TARGET_FILE_DIR:dreammeetclient>
+)
+
 

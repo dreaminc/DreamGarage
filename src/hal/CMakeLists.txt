@@ -40,6 +40,7 @@ file(GLOB OGL_SHADERS_GLSL
     "ogl/shaders/glsl/v440/*.frag"
 )
 source_group("ogl\\shaders\\glsl\\v440" FILES ${OGL_SHADERS_GLSL})
+set_source_files_properties(${OGL_SHADERS_GLSL} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 # Win64 
 file(GLOB OGL_WIN64_SOURCES 
@@ -72,6 +73,9 @@ add_library(hal
     # TODO: Vulkan
     # TODO: DirectX
     # TODO: Metal / MoltenVK etc
+
+    # GLSL Shaders
+    ${OGL_SHADERS_GLSL}
 )
 
 

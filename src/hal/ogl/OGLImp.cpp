@@ -80,8 +80,8 @@ RESULT OGLImp::InitializeOpenGLVersion() {
 		glGetIntegerv(GL_MINOR_VERSION, &vMinor); // minor = 2
 	}
 
-	m_versionOGL.SetVersion(vMajor, vMinor);
-	//m_versionOGL.SetVersion(4, 4);
+	//m_versionOGL.SetVersion(vMajor, vMinor);
+	m_versionOGL.SetVersion(4, 4);
 
 	// GLSL
 	// "1.50 NVIDIA via Cg compiler"

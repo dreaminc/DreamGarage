@@ -6,11 +6,12 @@
 #include "OGLAttachment.h"
 #include "OGLRenderbuffer.h"
 
-OGLFramebuffer::OGLFramebuffer(OGLImp *pParentImp) :
+OGLFramebuffer::OGLFramebuffer(OGLImp* pParentImp) :
 	framebuffer(),
 	m_pParentImp(pParentImp),
 	m_pDrawBuffers(nullptr),
-	m_pOGLDepthAttachment(nullptr)
+	m_pOGLDepthAttachment(nullptr),
+	m_colorClear(0.0f, 0.0f, 0.0f, 0.0f)
 {
 	// empty
 }
@@ -19,7 +20,8 @@ OGLFramebuffer::OGLFramebuffer(OGLImp *pParentImp, int width, int height, int ch
 	framebuffer(width, height, channels),
 	m_pParentImp(pParentImp),
 	m_pDrawBuffers(nullptr),
-	m_pOGLDepthAttachment(nullptr)
+	m_pOGLDepthAttachment(nullptr),
+	m_colorClear(0.0f, 0.0f, 0.0f, 0.0f)
 {
 	// empty
 }
@@ -327,6 +329,11 @@ GLuint OGLFramebuffer::GetFramebufferIndex() {
 	return m_framebufferIndex;
 }
 
+RESULT OGLFramebuffer::SetClearColor(color c) {
+	m_colorClear = c;
+	return R_PASS;
+}
+
 RESULT OGLFramebuffer::SetAndClearViewport(bool fColor, bool fDepth, bool fBind) {
 	if (fBind) {
 		Bind();
@@ -334,8 +341,9 @@ RESULT OGLFramebuffer::SetAndClearViewport(bool fColor, bool fDepth, bool fBind)
 
 	glViewport(0, 0, m_width, m_height);
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	//glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(m_colorClear.r(), m_colorClear.g(), m_colorClear.b(), m_colorClear.a());
 
 	GLbitfield glClearBitfield = ((fColor) ? GL_COLOR_BUFFER_BIT : 0) + ((fDepth) ? GL_DEPTH_BUFFER_BIT : 0);
 	glClear(glClearBitfield);
