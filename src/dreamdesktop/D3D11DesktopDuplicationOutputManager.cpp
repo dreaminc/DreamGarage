@@ -379,8 +379,8 @@ HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer, 
 			UINT* Desktop32 = reinterpret_cast<UINT*>(rectSurfaceForDream.pBits);
 			UINT  DesktopPitchInPixels = rectSurfaceForDream.Pitch / sizeof(UINT);
 
-			for (INT Row = 0; Row < pxHeight; ++Row) {
-				for (INT Col = 0; Col < pxWidth; ++Col) {
+			for (UINT Row = 0; Row < pxHeight; ++Row) {
+				for (UINT Col = 0; Col < pxWidth; ++Col) {
 					UINT temp = (Desktop32[(Row * DesktopPitchInPixels) + Col]);
 					pBuffer32[(Row * pxWidth) + Col] = temp;
 				}

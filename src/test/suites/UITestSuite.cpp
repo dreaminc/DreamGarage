@@ -99,52 +99,9 @@ RESULT UITestSuite::SetupTestSuite() {
 
 	m_pDreamOS->SetGravityState(false);
 
-	CR(SetupPipeline());
+	CR(SetupPipeline("standard"));
 
 	light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
-
-	/*
-	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-
-	m_pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-
-	point sceneOffset = point(90, -5, -25);
-	float sceneScale = 0.1f;
-	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
-	*/
-
-	/*
-	m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj",
-		nullptr,
-		sceneOffset,
-		sceneScale,
-		sceneDirection);
-
-	composite* pRiver = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\river.obj",
-		nullptr,
-		sceneOffset,
-		sceneScale,
-		sceneDirection);
-
-	m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\clouds.obj",
-		nullptr,
-		sceneOffset,
-		sceneScale,
-		sceneDirection);
-	//*/
-
-	/*
-	for (int i = 0; i < SenseControllerEventType::SENSE_CONTROLLER_INVALID; i++) {
-		CR(m_pDreamOS->RegisterSubscriber((SenseControllerEventType)(i), this));
-	}
-
-	for (int i = 0; i < SenseMouseEventType::SENSE_MOUSE_INVALID; i++) {
-		CR(m_pDreamOS->RegisterSubscriber((SenseMouseEventType)(i), this));
-	}
-	//*/
 
 Error:
 	return r;
@@ -911,51 +868,86 @@ Error:
 RESULT UITestSuite::AddTestBrowserURL() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 6000.0f;
-	int nRepeats = 1;
+	TestObject::TestDescriptor testDescriptor;
 
-	auto fnInitialize = [&](void *pContext) {
+	testDescriptor.sDuration= 6000.0f;
+	testDescriptor.nRepeats = 1;
+	testDescriptor.strTestName = "browserurl";
+	testDescriptor.strTestDescription = "Basic test of browser working with a URL";
+
+	struct TestContext {
+		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp;
+		std::shared_ptr<quad> pBrowserQuad;
+		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
+	};
+	testDescriptor.pContext = new TestContext();
+
+	testDescriptor.fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp = nullptr;
-		//std::string strURL = "http://www.youtube.com";
-		std::string strURL = "https://www.youtube.com/watch?v=K0igLdIH-Zc";
 
 		WebRequest webRequest;
 
+		//std::string strURL = "http://www.youtube.com";
+		std::string strURL = "https://www.youtube.com/watch?v=K0igLdIH-Zc";
+
 		CN(m_pDreamOS);		
 
-		// Create the Shared View App
-		pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
-		CNM(pDreamBrowserApp, "Failed to create dream browser");
+		TestContext* pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
 
-		// Set up the view
-		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowserApp->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowserApp->SetDiagonalSize(10.0f);
-		
-		pDreamBrowserApp->SetURI(strURL);
+		{
+			float diagonalSize = 2.0f;
+			float aspectRatio = ((float)1366 / (float)768);
+			float castWidth = std::sqrt(((aspectRatio * aspectRatio) * (diagonalSize * diagonalSize)) / (1.0f + (aspectRatio * aspectRatio)));
+			float castHeight = std::sqrt((diagonalSize * diagonalSize) / (1.0f + (aspectRatio * aspectRatio)));
+			vector vNormal = vector(0.0f, 0.0f, 1.0f).Normal();
+
+			// TODO: This should not be needed
+			pTestContext->pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+			CN(pTestContext->pWebBrowserManager);
+			CR(pTestContext->pWebBrowserManager->Initialize());
+			pTestContext->pWebBrowserManager->Update();
+
+			// Create the Shared View App
+			pTestContext->pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
+			CNM(pTestContext->pDreamBrowserApp, "Failed to create dream browser");
+
+			// Set up the view
+			//pTestContext->pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+			pTestContext->pDreamBrowserApp->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+			pTestContext->pDreamBrowserApp->SetDiagonalSize(10.0f);
+
+			pTestContext->pDreamBrowserApp->InitializeWithBrowserManager(pTestContext->pWebBrowserManager, "about:blank");
+			pTestContext->pDreamBrowserApp->SetURI(strURL);
+
+			pTestContext->pBrowserQuad = std::shared_ptr<quad>(m_pDreamOS->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal));
+			CN(pTestContext->pBrowserQuad);
+			pTestContext->pBrowserQuad->SetMaterialAmbient(0.90f);
+		}
 
 	Error:
 		return R_PASS;
 	};
 
-	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
-		return R_PASS;
-	};
-
 	// Update Code
-	auto fnUpdate = [&](void *pContext) {
+	testDescriptor.fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
+	
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 
-		CR(r);
+		//pTestContext->pWebBrowserManager->Update();
+		
+		if (pTestContext->pBrowserQuad != nullptr) {
+			pTestContext->pBrowserQuad->SetDiffuseTexture(pTestContext->pDreamBrowserApp->GetSourceTexture());
+		}
 
 	Error:
 		return r;
 	};
 
 	// Reset Code
-	auto fnReset = [&](void *pContext) {
+	testDescriptor.fnReset = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		// Will reset the sandbox as needed between tests
@@ -966,12 +958,8 @@ RESULT UITestSuite::AddTestBrowserURL() {
 		return r;
 	};
 
-	auto pUITest = AddTest("browserurl", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest(testDescriptor);
 	CN(pUITest);
-
-	pUITest->SetTestDescription("Basic test of browser working with a URL");
-	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
