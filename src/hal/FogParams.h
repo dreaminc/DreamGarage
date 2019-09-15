@@ -11,7 +11,9 @@
 
 #include "core/types/DObject.h"
 
-class FogParams : public DObject {
+// TODO: Find a better way to do this in the future
+//class FogParams : public DObject {
+class FogParams {
 public:
 	FogParams();
 	FogParams(float startDistance, float endDistance, float density, color fogColor);

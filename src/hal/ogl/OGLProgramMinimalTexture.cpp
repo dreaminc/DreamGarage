@@ -99,6 +99,11 @@ RESULT OGLProgramMinimalTexture::OGLInitialize(version versionOGL) {
 	// TODO:  Currently using a global material 
 	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
 
+	//// Background color
+	//if (m_pOGLFramebuffer != nullptr) {
+	//	m_pOGLFramebuffer->SetClearColor(color(COLOR_GRAY));
+	//}
+
 Error:
 	return r;
 }
@@ -166,7 +171,7 @@ RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
 
 	UnbindFramebuffer();
 
-	//Error:
+Error:
 	return r;
 }
 

@@ -5683,6 +5683,9 @@ RESULT HALTestSuite::AddTestMinimalTextureShader() {
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
+		//FogProgram* pFogProgram = dynamic_cast<FogProgram*>(pRenderProgramNode);
+		//CN(pFogProgram);
+
 		ProgramNode *pRenderScreenQuad;
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);

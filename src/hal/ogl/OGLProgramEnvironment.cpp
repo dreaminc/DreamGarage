@@ -54,7 +54,7 @@ RESULT OGLProgramEnvironment::OGLInitialize() {
 
 		CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
 
-		m_pOGLFramebuffer->SetClearColor(color(COLOR_GRAY));
+		//m_pOGLFramebuffer->SetClearColor(color(COLOR_GRAY));
 	}
 	//*/
 
