@@ -131,8 +131,12 @@ Error:
 RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 2000.0f;
-	int nRepeats = 1;
+	TestObject::TestDescriptor testDescriptor;
+
+	testDescriptor.sDuration = 2000.0f;
+	testDescriptor.nRepeats = 1;
+	testDescriptor.strTestName = "multipeer";
+	testDescriptor.strTestDescription = "Test multi-peer connections of WebRTc";
 
 	struct TestContext : 
 		public CloudController::PeerConnectionObserver, 
@@ -291,10 +295,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 			return r;
 		};
 
-	} *pTestContext = new TestContext();
+	};
+
+	testDescriptor.pContext = new TestContext();
 
 	// Initialize the test
-	auto fnInitialize = [&](void *pContext) {
+	testDescriptor.fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		std::string strTestValue;
@@ -356,7 +362,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 	};
 
 	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
+	testDescriptor.fnTest = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -375,7 +381,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 	};
 
 	// Update Code 
-	auto fnUpdate = [&](void *pContext) {
+	testDescriptor.fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -424,19 +430,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 		return r;
 	};
 
-	// Update Code 
-	auto fnReset = [&](void *pContext) {
-		return R_PASS;
-	};
-
 	// Add the test
-	//auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
-	auto pNewTest = AddTest("multipeer", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest(testDescriptor);
 	CN(pNewTest);
-
-	pNewTest->SetTestDescription("Test multi-peer connections of WebRTc");
-	pNewTest->SetTestDuration(sTestTime);
-	pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
@@ -1133,9 +1129,14 @@ Error:
 RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 2000.0f;
-	int nRepeats = 1;
+	TestObject::TestDescriptor testDescriptor;
+
 	float radius = 1.0f;
+
+	testDescriptor.sDuration = 2000.0f;
+	testDescriptor.nRepeats = 1;
+	testDescriptor.strTestName = "audio";
+	testDescriptor.strTestDescription = "Tests the multi-peer audio capabilities of WebRTC using the Dream Sound Client";
 
 	struct TestContext : 
 		public DreamSoundSystem::observer, 
@@ -1431,10 +1432,11 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			return "";
 		}
 
-	} *pTestContext = new TestContext();
+	};
+	testDescriptor.pContext = new TestContext();
 
 	// Initialize the test
-	auto fnInitialize = [=](void *pContext) {
+	testDescriptor.fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 
 		std::shared_ptr<DreamBrowserApp> pDreamBrowserApp = nullptr;
@@ -1589,7 +1591,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 	};
 
 	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
+	testDescriptor.fnTest = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		// Cloud Controller
@@ -1604,7 +1606,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 	};
 
 	// Update Code 
-	auto fnUpdate = [=](void *pContext) {
+	testDescriptor.fnUpdate = [=](void *pContext) {
 		RESULT r = R_PASS;
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -1686,18 +1688,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		return r;
 	};
 
-	// Update Code 
-	auto fnReset = [&](void *pContext) {
-		return R_PASS;
-	};
-
-	// Add the test
-	auto pNewTest = AddTest("audio", fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest(testDescriptor);
 	CN(pNewTest);
-
-	pNewTest->SetTestDescription("Tests the multi-peer audio capabilities of WebRTC using the Dream Sound Client");
-	pNewTest->SetTestDuration(sTestTime);
-	pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;

@@ -34,7 +34,7 @@ RESULT DreamTestClient::ConfigureSandbox() {
 	sandboxconfig.fMouseLook = true;
 	sandboxconfig.fUseGamepad = true;
 	sandboxconfig.fInitCloud = false;		// TODO: This is currently breaking stuff
-	sandboxconfig.fInitSound = false;
+	sandboxconfig.fInitSound = true;
 	sandboxconfig.fInitUserApp = false;		// Turn on for testing User app related functionality 
 	sandboxconfig.fInitNamedPipe = true;
 	sandboxconfig.fInitKeyboard = false;

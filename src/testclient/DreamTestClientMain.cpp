@@ -21,7 +21,8 @@
 		std::vector<std::string> args;
 
 		// Set up a console and attach to it
-		// TODO: Might want to explore this more
+		// TODO: Might want to explore this more (add it explicitly)
+#ifdef _DEBUG
 		if (AllocConsole()) {
 
 			AttachConsole(GetCurrentProcessId());
@@ -34,6 +35,7 @@
 		else {
 			CBM(false, "Failed to allocate console");
 		}
+#endif
 
 		for (int i = 0; i < argc; i++) {
 			std::wstring warg(wargv[i]);
