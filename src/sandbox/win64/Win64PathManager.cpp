@@ -212,7 +212,7 @@ RESULT Win64PathManager::InitializePaths(DreamOS *pDOSHandle) {
 	DEBUG_LINEOUT("Win64PathManager Initialize Paths");
 
 	// Dream Root Path - Try to find environment variable to set paths
-	char *pszDreamPath = NULL;
+	char *pszDreamPath = nullptr;
 	size_t pszDreamPath_n = 0;
 
 	if (pDOSHandle->UseInstallPath()) {
@@ -238,19 +238,52 @@ RESULT Win64PathManager::InitializePaths(DreamOS *pDOSHandle) {
 		m_fUseInstallPath = false;
 		m_wstrDreamFolder = L"";
 
-		errno_t err = _dupenv_s(&pszDreamPath, &pszDreamPath_n, DREAM_OS_PATH_ENV);
 
-		if (pszDreamPath != NULL) {
-			DEBUG_LINEOUT("Found %s env variable: %s", DREAM_OS_PATH_ENV, pszDreamPath);
+#if not defined(DOSROOTDIR) and not defined(DREAM_OS_PATH_ENV)
+	#error No path provided to non-install path case
+#endif
 
-			//mbstowcs(m_pszDreamRootPath, pszDreamPath, pszDreamPath_n);
+#ifdef DOSROOTDIR
+		if (pszDreamPath == nullptr || pszDreamPath_n == 0) {
+			pszDreamPath_n = strlen(DOSROOTDIR);
+
+			pszDreamPath = (char*)malloc(pszDreamPath_n * sizeof(char));
+			CNM(pszDreamPath, "Failed to allocate path");
+
+			strcpy(pszDreamPath, DOSROOTDIR);
+
+			if (pszDreamPath != nullptr) {
+				DEBUG_LINEOUT("Found %s macro variable: %s", DOSROOTDIR, pszDreamPath);
+			}
+			else {
+				// Try to back pedal to find dreampaths.txt
+				DEBUG_LINEOUT("%s macro variable not found", DOSROOTDIR);
+				DEBUG_LINEOUT("Please define the %s macro to point at the root directory of DreamOS", DOSROOTDIR);
+				pszDreamPath_n = 0;
+			}
+		}
+#endif
+
+#ifdef DREAM_OS_PATH_ENV
+		if (pszDreamPath == nullptr || pszDreamPath_n == 0) {
+			errno_t err = _dupenv_s(&pszDreamPath, &pszDreamPath_n, DREAM_OS_PATH_ENV);
+
+			if (pszDreamPath != nullptr) {
+				DEBUG_LINEOUT("Found %s env variable: %s", DREAM_OS_PATH_ENV, pszDreamPath);
+			}
+			else {
+				// Try to back pedal to find dreampaths.txt
+				DEBUG_LINEOUT("%s env variable not found", DREAM_OS_PATH_ENV);
+				DEBUG_LINEOUT("Please define the %s env to point at the root directory of DreamOS", DREAM_OS_PATH_ENV);
+				pszDreamPath_n = 0;
+			}
+		}
+#endif
+
+		if (pszDreamPath != nullptr) {
 			mbstowcs_s(&m_pszDreamRootPath_n, m_pszDreamRootPath, pszDreamPath, pszDreamPath_n);
 		}
-		else {
-			// Try to back pedal to find dreampaths.txt
-			DEBUG_LINEOUT("%s env variable not found", DREAM_OS_PATH_ENV);
-			DEBUG_LINEOUT("Please define the %s env to point at the root directory of DreamOS", DREAM_OS_PATH_ENV);
-		}
+		
 	}
 
 	CRM(SetCurrentPath(m_pszDreamRootPath), "Failed to set current path to dream root");

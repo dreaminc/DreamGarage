@@ -20,6 +20,10 @@ if(MSVC)
 #    add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
 endif()
 
+# Both Configurations
+set(DOS_DIR_VAL "${CMAKE_SOURCE_DIR}")
+add_definitions(-DDOSROOTDIR="${DOS_DIR_VAL}")
+
 # Release Configuration
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D_WINDOWS")
