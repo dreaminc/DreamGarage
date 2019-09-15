@@ -30,6 +30,7 @@ public:
 	// Note: This should eventually call the DreamGarageApp pipeline
 	// function rather than duplicating it
 	virtual RESULT SetupPipeline(std::string strRenderShaderName = "standard") override;
+	virtual RESULT SetupPipeline(std::string strRenderShaderName, ProgramNode **ppRenderProgram_out);
 	virtual RESULT SetupTestSuite() override;
 
 	//virtual RESULT DefaultResetProcess(void *pContext) override;
@@ -67,7 +68,7 @@ public:
 
 	// Environments
 	RESULT AddTestStandardShader();
-	RESULT AddTestEnvironments();
+	RESULT AddTestEnvironmentModels();
 
 	// Objects
 	RESULT AddTestModelInstancing();

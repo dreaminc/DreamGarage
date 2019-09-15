@@ -28,6 +28,7 @@ enum COLOR_TYPE {
 	COLOR_AQUA,
 	COLOR_YELLOW,
 	COLOR_PINK,
+	COLOR_GRAY,
 	COLOR_INVALID
 };
 
@@ -74,6 +75,7 @@ public:
 			case COLOR_YELLOW: { SetColor(1.0f, 1.0f, 0.0f, 1.0f); } break;
 			case COLOR_PINK: { SetColor(1.0f, 20.0f/255.0f, 147.0f/255.0f, 1.0f); } break;
 			case COLOR_AQUA: { SetColor(0.0f, 1.0f, 1.0f, 1.0f); } break;
+			case COLOR_GRAY: { SetColor(0.2f, 0.2f, 0.2f, 1.0f); } break;
 
 			default: {
 				this->clear();

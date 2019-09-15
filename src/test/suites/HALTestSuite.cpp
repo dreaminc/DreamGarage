@@ -101,7 +101,7 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestIncludeShader());
 
-	CR(AddTestEnvironments());
+	CR(AddTestEnvironmentModels());
 
 	CR(AddTestRemoveObjects());
 
@@ -166,6 +166,10 @@ Error:
 }
 
 RESULT HALTestSuite::SetupPipeline(std::string strRenderShaderName) {
+	return SetupPipeline(strRenderShaderName, nullptr);
+}
+
+RESULT HALTestSuite::SetupPipeline(std::string strRenderShaderName, ProgramNode **ppRenderProgram_out) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -182,6 +186,10 @@ RESULT HALTestSuite::SetupPipeline(std::string strRenderShaderName) {
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	if (pRenderProgramNode != nullptr && ppRenderProgram_out != nullptr) {
+		*ppRenderProgram_out = pRenderProgramNode;
+	}
 
 	// Reference Geometry Shader Program
 	ProgramNode* pReferenceGeometryProgram;
@@ -480,88 +488,112 @@ Error:
 }
 
 // TODO: Should be moved to DOS or another test suite since this is not really testing HAL capabilities 
-RESULT HALTestSuite::AddTestEnvironments() {
+RESULT HALTestSuite::AddTestEnvironmentModels() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 200.0f;
-	int nRepeats = 1;
+	TestObject::TestDescriptor testDescriptor;
+
+	testDescriptor.sDuration = 200.0f;
+	testDescriptor.nRepeats = 1;
+	testDescriptor.strTestName = "environmentmodel";
+	testDescriptor.strTestDescription = "Testing the environment model";
+
+	struct TestContext {
+		model* pEnvironmentModel;
+		ProgramNode* pRenderProgram;
+	};
+	testDescriptor.pContext = new TestContext();
 
 	// Initialize Code 
-	auto fnInitialize = [&](void *pContext) {
+	testDescriptor.fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		m_pDreamOS->SetGravityState(false);
 
 		float sceneScale = 0.025f;
+		std::wstring wstrAssetPath;
+		PathManager* pPathManager = PathManager::instance();
+
+		// Environment loading maps
+		std::wstring environmentFileNames[] = {
+			L"\\model\\environment\\1\\environment.fbx",		// Cave
+			L"\\model\\environment\\2\\environment.fbx",		// Canyon
+			L"\\model\\environment\\3\\environment.fbx"			// House
+		};
 
 		// Set up the pipeline
-		CR(SetupPipeline("environment"));
+		CN(m_pDreamOS);
+		CN(pPathManager);
 
-		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
-		
-		light *pLight2;
-		pLight2 = m_pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(5.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		{
+			TestContext* pTestContext;
+			pTestContext = reinterpret_cast<TestContext*>(pContext);
+			CN(pTestContext);
 
-		// environment strings
-		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\001.fbx"); // open ceiling
-		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\002.fbx"); // angular
-		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\004.fbx"); // pillars
-		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\005.fbx"); // wave
-		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\006.fbx"); // dome
-		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\007.fbx"); // cave
-		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\008.fbx"); // wood house
-		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\009.fbx"); // industrial
-		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\010.fbx"); // tube
+			CR(SetupPipeline("environment", &(pTestContext->pRenderProgram)));
+			//CR(SetupPipeline("environment"));
 
-		model* pModel;
-		pModel = m_pDreamOS->AddModel(L"CaveEnvironment.fbx"); // cave
-		//model* pModel = m_pDreamOS->AddModel(L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\006.fbx"); // cave
+			pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
 
-		// Ambient Occlusion textures
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\001_AO.png"));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\002_AO.png"));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\004_AO.png"));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\005_AO.png"));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\006_AO.png"));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\007_AO.png"));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\008_AO.png"));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\009_AO.png"));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\010_AO.png"));
+			std::wstring wstrModelPath;
+			wstrModelPath = wstrAssetPath + environmentFileNames[0];
 
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\map\\007_AO.png"));
-		pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"..\\Models\\Map\\ao_color.tga"));
+			pTestContext->pEnvironmentModel = m_pDreamOS->AddModel(wstrModelPath);
+			CN(pTestContext->pEnvironmentModel);
+			pTestContext->pEnvironmentModel->InitializeBoundingSphere();
 
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\map\\006_AO.png"));
+			sceneScale = 1.0f / pTestContext->pEnvironmentModel->GetBoundingVolume()->GetMaxPoint(true).x();
+			sceneScale *= 2.0f;
 
-		//pModel->RotateXByDeg(-90.0f);
-		//pModel->RotateYByDeg(90.0f);
-		pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
-		//pModel->RotateZByDeg(-90.0f);
-		pModel->SetScale(sceneScale);
+			pTestContext->pEnvironmentModel->SetScale(sceneScale);
+			
+			pTestContext->pEnvironmentModel->SetVisible(true);
 
-//		m_pDreamOS->AddUser();
-		model* pHead;
-		pHead = m_pDreamOS->AddModel(L"face4\\untitled.obj");
+			// Set the Fog Params
+			
+			///*
+			if (pTestContext->pRenderProgram != nullptr) {
+				
+				FogProgram* pFogProgram = dynamic_cast<FogProgram*>(pTestContext->pRenderProgram);
+				CNM(pFogProgram, "Can't cast fog program");
 
-		//auto pHead = m_pDreamOS->AddModel(L"head.FBX");
-		pHead->SetScale(sceneScale);
-		pHead->RotateYByDeg(180.0f);
+				pFogProgram->SetFogParams(FogParams(
+					900.0f,
+					1150.0f,
+					0.05f,
+					//color(202.0f / 255.0f, 190.0f / 255.0f, 161.0f / 255.0f, 1.0f)
+					color(COLOR_GREEN)
+				));
+			}
+			//*/
+
+			//m_pDreamOS->AddSphere(1.0f, 10, 10);
+
+			m_pDreamOS->GetCamera()->translateY(1.0f);
+		}
 
 	Error:
 		return r;
 	};
 
-	auto fnPass = [=](void *pContext) {
-		return R_PASS;
+	// Update Code
+	testDescriptor.fnUpdate = [&](void* pContext) {
+		RESULT r = R_PASS;
+
+		TestContext* pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		if (pTestContext->pEnvironmentModel != nullptr) {
+			pTestContext->pEnvironmentModel->RotateYByDeg(0.01f);
+		}
+
+	Error:
+		return r;
 	};
 
-	auto pNewTest = AddTest("envmodel", fnInitialize, fnPass, fnPass, fnPass, nullptr);
+	auto pNewTest = AddTest(testDescriptor);
 	CN(pNewTest);
-
-	pNewTest->SetTestDescription("Testing the environment model");
-	pNewTest->SetTestDuration(sTestTime);
-	pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
@@ -5616,8 +5648,13 @@ Error:
 RESULT HALTestSuite::AddTestMinimalTextureShader() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 40.0f;
-	int nRepeats = 1;
+	TestObject::TestDescriptor testDescriptor;
+
+	testDescriptor.sDuration = 40.0f;
+	testDescriptor.nRepeats = 1;
+
+	testDescriptor.strTestName = "minimaltextureshader";
+	testDescriptor.strTestDescription = "Testing the minimal texture shader program";
 
 	float width = 1.5f;
 	float height = width;
@@ -5626,7 +5663,7 @@ RESULT HALTestSuite::AddTestMinimalTextureShader() {
 	float padding = 0.5f;
 
 	// Initialize Code 
-	auto fnInitialize = [=](void *pContext) {
+	testDescriptor.fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
@@ -5645,6 +5682,9 @@ RESULT HALTestSuite::AddTestMinimalTextureShader() {
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		//FogProgram* pFogProgram = dynamic_cast<FogProgram*>(pRenderProgramNode);
+		//CN(pFogProgram);
 
 		ProgramNode *pRenderScreenQuad;
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
@@ -5665,7 +5705,6 @@ RESULT HALTestSuite::AddTestMinimalTextureShader() {
 		pVolume = nullptr;
 
 		{
-
 			pVolume = m_pDreamOS->AddVolume(width, height, length);
 			CN(pVolume);
 			pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
@@ -5676,33 +5715,13 @@ RESULT HALTestSuite::AddTestMinimalTextureShader() {
 			CR(pVolume->SetDiffuseTexture(pColorTexture));
 		}
 
-
 	Error:
 		return r;
 	};
 
-	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
-		return R_PASS;
-	};
-
-	// Update Code 
-	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
-	};
-
-	// Update Code 
-	auto fnReset = [&](void *pContext) {
-		return DefaultResetProcess(pContext);
-	};
-
 	// Add the test
-	auto pNewTest = AddTest("minimaltextureshader", fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pNewTest = AddTest(testDescriptor);
 	CN(pNewTest);
-
-	pNewTest->SetTestDescription("Testing the minimal texture shader program");
-	pNewTest->SetTestDuration(sTestTime);
-	pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;

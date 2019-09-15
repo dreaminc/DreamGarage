@@ -585,24 +585,23 @@ Error:
 RESULT Win64Sandbox::HandleMessages() {
 	RESULT r = R_PASS;
 
-	MSG msg;
-
-	if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
-		if (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST) {
-			HandleMouseEvent(msg);
+	if (PeekMessage(&m_windowsMessage, nullptr, NULL, NULL, PM_REMOVE)) {
+		if (m_windowsMessage.message >= WM_MOUSEFIRST && m_windowsMessage.message <= WM_MOUSELAST) {
+			HandleMouseEvent(m_windowsMessage);
 		}
-		else if (msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST) {
-			HandleKeyEvent(msg);
+		else if (m_windowsMessage.message >= WM_KEYFIRST && m_windowsMessage.message <= WM_KEYLAST) {
+			HandleKeyEvent(m_windowsMessage);
 		}
-		else if (WM_QUIT == msg.message) {
+		else if (WM_QUIT == m_windowsMessage.message) {
 			Shutdown();
-			CBR(false, (RESULT)(msg.wParam));
+			CBR(false, (RESULT)(m_windowsMessage.wParam));
 		}
 
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		TranslateMessage(&m_windowsMessage);
+		DispatchMessage(&m_windowsMessage);
 	}
 
+	// TODO: What is this shit
 	if (m_pSenseGamepad != nullptr) {
 		m_pSenseGamepad->UpdateGamepad();
 	}

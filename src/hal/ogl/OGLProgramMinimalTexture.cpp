@@ -71,7 +71,6 @@ RESULT OGLProgramMinimalTexture::OGLInitialize(version versionOGL) {
 	// Global
 	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
 	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
-	CRM(AddSharedShaderFilename(L"fogCommon.shader"), "Failed to add shared shader code");
 
 	// Vertex
 	CRM(MakeVertexShader(L"minimalTexture.vert"), "Failed to create vertex shader");
@@ -99,6 +98,11 @@ RESULT OGLProgramMinimalTexture::OGLInitialize(version versionOGL) {
 
 	// TODO:  Currently using a global material 
 	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+
+	//// Background color
+	//if (m_pOGLFramebuffer != nullptr) {
+	//	m_pOGLFramebuffer->SetClearColor(color(COLOR_GRAY));
+	//}
 
 Error:
 	return r;
@@ -153,6 +157,8 @@ RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
 
 	SetLights(pLights);
 
+	// TODO: Really shouldn't be at the minimal texture shader
+	// TODO: Need to come up with a better way to "composite" shaders / shader functionality 
 	if (m_pFogParamsBlock != nullptr) {
 		m_pFogParamsBlock->SetFogParams(m_fogParams);
 		m_pFogParamsBlock->UpdateOGLUniformBlockBuffers();
@@ -165,7 +171,7 @@ RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
 
 	UnbindFramebuffer();
 
-	//Error:
+Error:
 	return r;
 }
 

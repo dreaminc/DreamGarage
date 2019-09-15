@@ -2254,7 +2254,10 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
 
-			pTestContext->pDreamBrowserApps.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this));
+			auto pDreamBrowserApp = m_pDreamOS->LaunchDreamApp<DreamBrowserApp>(this);
+			CN(pDreamBrowserApp);
+
+			pTestContext->pDreamBrowserApps.push_back(pDreamBrowserApp);
 			pTestContext->pDreamBrowserApps[i]->InitializeWithBrowserManager(pTestContext->pWebBrowserManager, "about:blank");
 			pTestContext->pDreamBrowserApps[i]->SetURI(pTestContext->strURIs[i]);
 		}
@@ -2268,7 +2271,10 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 			pTestContext->pDreamBrowsers[i]->LoadRequest(webRequest);
 			//*/
 
-			pTestContext->pBrowserQuads.emplace_back(std::shared_ptr<quad>(m_pDreamOS->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal)));
+			quad* pBrowserQuad = m_pDreamOS->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal);
+			CN(pBrowserQuad);
+			
+			pTestContext->pBrowserQuads.push_back(std::shared_ptr<quad>(pBrowserQuad));
 			pTestContext->pBrowserQuads[i]->SetMaterialAmbient(0.90f);
 			pTestContext->pBrowserQuads[i]->FlipUVVertical();
 			pTestContext->pBrowserQuads[i]->SetPosition(point(((i%5)*castWidth * 1.05f)-4.0f, 2.0f - ((i/5)*castHeight * 1.05f), 0.0f));
@@ -2280,14 +2286,18 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 	};
 
 	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
 
 		//pTestContext->pWebBrowserManager->Update();
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
 			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowserApps[i]->GetSourceTexture());
 		}
-		return R_PASS;
+
+	Error:
+		return r;
 	};
 	auto fnTest = [&](void *pContext) {
 		return R_PASS;

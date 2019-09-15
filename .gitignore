@@ -16,3 +16,7 @@ logs/
 " OSX Generated
 .DS_Store
 .DS_Store?
+
+" CEF Generated
+**/CEFCache
+**/GPUCache

@@ -61,14 +61,14 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D__BASE_FILE__=\"%(Filename
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /W3 /WX /sdl /MP")      # General
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox /Ob2 /Oi /Ot /Oy")  # Optimization
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /EHsc /MT /Gy")         # Code Generation
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /permissive-")          # Language
+#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /permissive-")          # Language
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /FC")                   # Advanced
 
 # Compiler Flags Debug
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi /JMC /W3 /WX /sdl /MP")      # General
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Od")  # Optimization
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Gm- /EHsc /RTC1 /MTd /GS /fp:precise")         # Code Generation
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /permissive-")          # Language
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /permissive-")          # Language
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /FC")                   # Advanced
 
 # Linker flags (Release)
@@ -315,7 +315,6 @@ file(GLOB FREEIMAGE_BINARY_FILES
     "${CMAKE_SOURCE_DIR}/src/third_party/Freeimage/bin/x64/debug/FreeImagePlusd.dll"
 )
 
-
 add_custom_command(TARGET testclient POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     ${CEF_BINARY_FILES}
@@ -327,4 +326,24 @@ add_custom_command(TARGET testclient POST_BUILD
     ${ASSIMP_BINARY_FILES}
     ${FREEIMAGE_BINARY_FILES}
     $<TARGET_FILE_DIR:testclient>
+)
+
+# Copy CEF files
+add_custom_command(TARGET testclient POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E copy 
+    $<TARGET_FILE:dreamcef> 
+    $<TARGET_FILE_DIR:testclient>
+)
+
+add_custom_command(TARGET testclient POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E copy_directory 
+    "${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/Resources"
+    $<TARGET_FILE_DIR:testclient>
+)
+
+# Copy Desktop Duplication files
+add_custom_command(TARGET testclient POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E copy 
+    $<TARGET_FILE:dreamdesktop> 
+    $<TARGET_FILE_DIR:dreammeetclient>
 )

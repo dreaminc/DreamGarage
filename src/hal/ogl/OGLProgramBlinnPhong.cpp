@@ -148,9 +148,10 @@ RESULT OGLProgramBlinnPhong::ProcessNode(long frameID) {
 	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
 	UseProgram();
-	
-	if (m_pOGLFramebuffer != nullptr)
+
+	if (m_pOGLFramebuffer != nullptr) {
 		BindToFramebuffer(m_pOGLFramebuffer);
+	}
 
 	glEnable(GL_DEPTH_TEST);	// Enable depth test
 	glDepthFunc(GL_LEQUAL);		// Accept fragment if it closer to the camera than the former one
@@ -165,7 +166,7 @@ RESULT OGLProgramBlinnPhong::ProcessNode(long frameID) {
 
 	UnbindFramebuffer();
 
-	//Error:
+Error:
 	return r;
 }
 

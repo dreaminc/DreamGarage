@@ -76,6 +76,8 @@ public:
 	// Always check that our framebuffer is ok
 	RESULT CheckStatus();
 
+	RESULT SetClearColor(color c);
+
 private:
 	OGLImp *m_pParentImp = nullptr;
 
@@ -90,6 +92,8 @@ private:
 	//std::map<int, OGLAttachment*> m_oglColorAttachments;
 	
 	// TODO: Stencil attachments 
+
+	color m_colorClear;
 
 private:
 	int m_samples = 1;
