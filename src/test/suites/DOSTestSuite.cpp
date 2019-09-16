@@ -1475,24 +1475,24 @@ RESULT DOSTestSuite::AddTestDreamSoundSystem() {
 			return r;
 		};
 
-		virtual RESULT UpdateControlBarText(std::string& strTitle) { return R_NOT_IMPLEMENTED; };
-		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) { return R_NOT_IMPLEMENTED; };
-		virtual RESULT UpdateAddressBarSecurity(bool fSecure) override { return R_NOT_IMPLEMENTED; }
-		virtual RESULT UpdateAddressBarText(std::string& strURL) override { return R_NOT_IMPLEMENTED; }
+		virtual RESULT UpdateControlBarText(std::string& strTitle) { return R_NOT_IMPLEMENTED_WARNING; };
+		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) { return R_NOT_IMPLEMENTED_WARNING; };
+		virtual RESULT UpdateAddressBarSecurity(bool fSecure) override { return R_NOT_IMPLEMENTED_WARNING; }
+		virtual RESULT UpdateAddressBarText(std::string& strURL) override { return R_NOT_IMPLEMENTED_WARNING; }
 
-		virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) { return R_NOT_IMPLEMENTED; };
+		virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) { return R_NOT_IMPLEMENTED_WARNING; };
 
-		virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) { return R_NOT_IMPLEMENTED; };
-		virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) { return R_NOT_IMPLEMENTED; };
-		virtual RESULT HandleLoadEnd() { return R_NOT_IMPLEMENTED; };
+		virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) { return R_NOT_IMPLEMENTED_WARNING; };
+		virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) { return R_NOT_IMPLEMENTED_WARNING; };
+		virtual RESULT HandleLoadEnd() { return R_NOT_IMPLEMENTED_WARNING; };
 
-		virtual RESULT HandleDreamFormSuccess() { return R_NOT_IMPLEMENTED; };
-		virtual RESULT HandleDreamFormCancel() { return R_NOT_IMPLEMENTED; };
-		virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) { return R_NOT_IMPLEMENTED; };
-		virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) { return R_NOT_IMPLEMENTED; };
+		virtual RESULT HandleDreamFormSuccess() { return R_NOT_IMPLEMENTED_WARNING; };
+		virtual RESULT HandleDreamFormCancel() { return R_NOT_IMPLEMENTED_WARNING; };
+		virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) { return R_NOT_IMPLEMENTED_WARNING; };
+		virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) { return R_NOT_IMPLEMENTED_WARNING; };
 
-		virtual RESULT HandleCanTabNext(bool fCanNext) { return R_NOT_IMPLEMENTED; };
-		virtual RESULT HandleCanTabPrevious(bool fCanPrevious) { return R_NOT_IMPLEMENTED; };
+		virtual RESULT HandleCanTabNext(bool fCanNext) { return R_NOT_IMPLEMENTED_WARNING; };
+		virtual RESULT HandleCanTabPrevious(bool fCanPrevious) { return R_NOT_IMPLEMENTED_WARNING; };
 
 		virtual std::string GetCertificateErrorURL() { return std::string(""); };
 		virtual std::string GetLoadErrorURL() { return std::string(""); };

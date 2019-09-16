@@ -108,7 +108,7 @@ public:
 	std::string GetPeerProfilePhotoURL(long peerUserID);
 
 	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
-	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) { return R_NOT_IMPLEMENTED; }
+	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) { return R_NOT_IMPLEMENTED_WARNING; }
 
 private:
 	std::string GetMethodURI(UserMethod userMethod);

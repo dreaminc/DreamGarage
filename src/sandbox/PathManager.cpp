@@ -38,7 +38,7 @@ PathManager::~PathManager() {
 }
 
 RESULT PathManager::Dealloc() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT PathManager::RegisterPath(wchar_t *pszName, wchar_t *pszValue) {

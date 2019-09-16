@@ -654,7 +654,7 @@ CLOUD_CONTROLLER_TYPE HTTPController::GetControllerType() {
 
 // TODO: Should we add this implementation?
 RESULT HTTPController::RegisterControllerObserver(ControllerObserver* pControllerObserver) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT HTTPController::RequestFile(std::string strURI, std::wstring strDestinationPath) {

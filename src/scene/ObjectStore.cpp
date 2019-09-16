@@ -74,7 +74,7 @@ RESULT ObjectStore::UnlockStore() {
 }
 
 RESULT ObjectStore::RemoveObject(VirtualObj *pObject) {
-	RESULT r = R_NOT_IMPLEMENTED;
+	RESULT r = R_NOT_IMPLEMENTED_WARNING;
 
 	CN(m_pSceneGraphStore);
 	
@@ -89,7 +89,7 @@ VirtualObj* ObjectStore::FindObject(VirtualObj *pObject) {
 }
 
 RESULT ObjectStore::RemoveAllObjects() {
-	RESULT r = R_NOT_IMPLEMENTED;	
+	RESULT r = R_NOT_IMPLEMENTED_WARNING;	
 
 	CR(m_pSceneGraphStore->RemoveAllObjects());
 
@@ -98,7 +98,7 @@ Error:
 }
 
 RESULT ObjectStore::RemoveObjectByUID(UID uid) {
-	RESULT r = R_NOT_IMPLEMENTED;
+	RESULT r = R_NOT_IMPLEMENTED_WARNING;
 
 	CN(m_pSceneGraphStore);
 
@@ -128,7 +128,7 @@ std::vector<VirtualObj*> ObjectStore::GetObjects(ray rCast) {
 
 // TODO: This is holding the collide functionality here temporarily 
 RESULT ObjectStore::UpdateScene() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT ObjectStore::CommitObjects() {

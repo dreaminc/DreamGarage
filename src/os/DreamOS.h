@@ -148,10 +148,10 @@ public:
 	virtual std::wstring GetDreamFolderPath() { return std::wstring(L""); }
 	virtual version GetDreamVersion() = 0;
 
-	virtual RESULT ConfigureSandbox() { return R_NOT_IMPLEMENTED; }
+	virtual RESULT ConfigureSandbox() { return R_NOT_IMPLEMENTED_WARNING; }
 	virtual RESULT LoadScene() = 0;
-	virtual RESULT DidFinishLoading() { return R_NOT_IMPLEMENTED; }
-	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) { return R_NOT_IMPLEMENTED; }
+	virtual RESULT DidFinishLoading() { return R_NOT_IMPLEMENTED_WARNING; }
+	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) { return R_NOT_IMPLEMENTED_WARNING; }
 	virtual RESULT Update(void) = 0;
 
 	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
@@ -175,102 +175,102 @@ public:
 	// EnvironmentObserver
 	// TODO: This should be encapsulated in it's own object
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	// Environment observer virtual camera
 	virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnSendCameraPlacement() override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnStopSendingCameraPlacement() override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnReceiveCameraPlacement(long userID) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnStopReceivingCameraPlacement() override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	// Environment observer forms
 	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	//User Observer
 	virtual RESULT OnDreamVersion(version dreamVersion) {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnAPIConnectionCheck(bool fIsConnected) {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnSetSettings() override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnLogin() override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnLogout() override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnPendLogout() override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnSwitchTeams() override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	// DreamPeer Observer
@@ -679,7 +679,7 @@ public:
 	std::shared_ptr<DreamUserApp> GetUserApp();
 
 	virtual RESULT GetDefaultVCamPlacement(point& ptPosition, quaternion& qOrientation) {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	};
 
 private:

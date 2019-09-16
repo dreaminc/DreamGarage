@@ -34,11 +34,11 @@ public:
 	RESULT SetUniformInteger(GLint value);
 	RESULT Set44MatrixUniform(matrix<float, 4, 4> mat);		// TODO: Generalize this in the lower specialized class more
 
-	RESULT SetUniform(bool flag) { return R_NOT_IMPLEMENTED; }
-	RESULT SetUniform(point pt) { return R_NOT_IMPLEMENTED; }
-	RESULT SetUniform(vector v) { return R_NOT_IMPLEMENTED; }
-	RESULT SetUniform(quaternion q) { return R_NOT_IMPLEMENTED; }
-	RESULT SetUniform(matrix<float, 4, 4> mat) { return R_NOT_IMPLEMENTED; }
+	RESULT SetUniform(bool flag) { return R_NOT_IMPLEMENTED_WARNING; }
+	RESULT SetUniform(point pt) { return R_NOT_IMPLEMENTED_WARNING; }
+	RESULT SetUniform(vector v) { return R_NOT_IMPLEMENTED_WARNING; }
+	RESULT SetUniform(quaternion q) { return R_NOT_IMPLEMENTED_WARNING; }
+	RESULT SetUniform(matrix<float, 4, 4> mat) { return R_NOT_IMPLEMENTED_WARNING; }
 
 	std::string GetName() { return m_strUniformName; }
 

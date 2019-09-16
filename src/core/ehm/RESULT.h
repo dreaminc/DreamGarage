@@ -37,9 +37,10 @@ typedef enum {
 	R_PASS_TRUE,
 	R_PASS_FALSE,
 	R_QUEUE_EMPTY,
+	R_NOT_IMPLEMENTED,			
 
 	R_WARNING = RESULT_START_WARN,
-	R_NOT_IMPLEMENTED,
+	R_NOT_IMPLEMENTED_WARNING,
 	R_VIRTUAL,
 	R_ABSTRACT,
 	R_SKIPPED,
@@ -71,6 +72,8 @@ typedef enum {
 	R_POOL_FULL,				// Pool has no more objects left
 	R_BUFFER_FULL,				// Buffer is full
 	R_BUFFER_EMPTY,				// Buffer is empty
+
+	R_NOT_IMPLEMENTED_ERROR,	// Function not implemented, but required (throws error)
 
     // Matrix Error Codes
 	R_MATRIX_ROW_OUT_OF_RANGE,

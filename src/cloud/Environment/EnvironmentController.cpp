@@ -1509,7 +1509,7 @@ EnvironmentControllerProxy* EnvironmentController::GetEnvironmentControllerProxy
 }
 
 RESULT EnvironmentController::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
-	RESULT r = R_NOT_IMPLEMENTED;
+	RESULT r = R_NOT_IMPLEMENTED_WARNING;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
 		CR(m_pEnvironmentControllerObserver->OnNewPeerConnection(userID, peerUserID, fOfferor, pPeerConnection));
@@ -1531,7 +1531,7 @@ Error:
 }
 
 RESULT EnvironmentController::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
-	RESULT r = R_NOT_IMPLEMENTED;
+	RESULT r = R_NOT_IMPLEMENTED_WARNING;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
 		CR(m_pEnvironmentControllerObserver->OnPeerConnectionClosed(pPeerConnection));
@@ -1542,7 +1542,7 @@ Error:
 }
 
 RESULT EnvironmentController::OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
-	RESULT r = R_NOT_IMPLEMENTED;
+	RESULT r = R_NOT_IMPLEMENTED_WARNING;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
 		CR(m_pEnvironmentControllerObserver->OnDataChannelStringMessage(pPeerConnection, strDataChannelMessage));
@@ -1553,7 +1553,7 @@ Error:
 }
 
 RESULT EnvironmentController::OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
-	RESULT r = R_NOT_IMPLEMENTED;
+	RESULT r = R_NOT_IMPLEMENTED_WARNING;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
 		CR(m_pEnvironmentControllerObserver->OnDataChannelMessage(pPeerConnection, pDataChannelBuffer, pDataChannelBuffer_n));
@@ -1564,7 +1564,7 @@ Error:
 }
 
 RESULT EnvironmentController::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
-	RESULT r = R_NOT_IMPLEMENTED;
+	RESULT r = R_NOT_IMPLEMENTED_WARNING;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
 		CR(m_pEnvironmentControllerObserver->OnAudioData(strAudioTrackLabel, pPeerConnection, pAudioData, bitsPerSample, samplingRate, channels, frames));
@@ -1575,7 +1575,7 @@ Error:
 }
 
 RESULT EnvironmentController::OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
-	RESULT r = R_NOT_IMPLEMENTED;
+	RESULT r = R_NOT_IMPLEMENTED_WARNING;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
 		CR(m_pEnvironmentControllerObserver->OnVideoFrame(strVideoTrackLabel, pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
@@ -1586,7 +1586,7 @@ Error:
 }
 
 RESULT EnvironmentController::OnDataChannel(PeerConnection* pPeerConnection) {
-	RESULT r = R_NOT_IMPLEMENTED;
+	RESULT r = R_NOT_IMPLEMENTED_WARNING;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
 		CR(m_pEnvironmentControllerObserver->OnDataChannel(pPeerConnection));
@@ -1597,7 +1597,7 @@ Error:
 }
 
 RESULT EnvironmentController::OnAudioChannel(PeerConnection* pPeerConnection) {
-	RESULT r = R_NOT_IMPLEMENTED;
+	RESULT r = R_NOT_IMPLEMENTED_WARNING;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
 		CR(m_pEnvironmentControllerObserver->OnAudioChannel(pPeerConnection));

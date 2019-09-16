@@ -37,7 +37,7 @@ OVRHMD::~OVRHMD() {
 }
 
 RESULT OVRHMD::InitializeHMDSourceNode() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT OVRHMD::InitializeHMDSinkNode() {
@@ -301,7 +301,7 @@ RESULT OVRHMD::RenderHMDMirror() {
 }
 
 RESULT OVRHMD::BindFramebuffer(EYE_TYPE eye) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 // Commit the changes to the texture swap chain

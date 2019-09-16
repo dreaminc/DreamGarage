@@ -38,13 +38,13 @@ public:
 		// empty
 	}
 
-	virtual RESULT Update() { return R_NOT_IMPLEMENTED; }
-	virtual RESULT CreateNewURLRequest(std::wstring& strURL) { return R_NOT_IMPLEMENTED; }
+	virtual RESULT Update() { return R_NOT_IMPLEMENTED_WARNING; }
+	virtual RESULT CreateNewURLRequest(std::wstring& strURL) { return R_NOT_IMPLEMENTED_WARNING; }
 
 	CloudController* GetParentCloudController() { return m_pParentCloudController; }
 
-	virtual RESULT SetUser(User currentUser) { return R_NOT_IMPLEMENTED; };
-	virtual RESULT SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation) { return R_NOT_IMPLEMENTED; };
+	virtual RESULT SetUser(User currentUser) { return R_NOT_IMPLEMENTED_WARNING; };
+	virtual RESULT SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation) { return R_NOT_IMPLEMENTED_WARNING; };
 
 
 private:

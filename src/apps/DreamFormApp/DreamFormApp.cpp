@@ -248,15 +248,15 @@ Error:
 }
 
 RESULT DreamFormApp::HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT DreamFormApp::UpdateControlBarText(std::string& strTitle) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT DreamFormApp::UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT DreamFormApp::UpdateAddressBarSecurity(bool fSecure) {

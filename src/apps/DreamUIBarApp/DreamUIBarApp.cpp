@@ -888,7 +888,7 @@ Error:
 }
 
 RESULT DreamUIBarApp::Shutdown(void *pContext) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT DreamUIBarApp::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {

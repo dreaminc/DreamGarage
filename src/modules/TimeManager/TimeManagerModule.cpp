@@ -32,15 +32,15 @@ TimeManagerModule* TimeManagerModule::SelfConstruct(DreamOS *pDreamOS, void *pCo
 }
 
 RESULT TimeManagerModule::InitializeModule(void *pContext) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT TimeManagerModule::OnDidFinishInitializing(void *pContext) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT TimeManagerModule::Shutdown(void *pContext) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT TimeManagerModule::Reset() {

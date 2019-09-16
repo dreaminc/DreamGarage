@@ -289,7 +289,7 @@ RESULT text::SetFitToSize(bool fFitToSize) {
 
 // TODO: This will set whether or not the text is billboarded
 RESULT text::SetBillboard(bool fBillboard) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT text::SetCursorIndex(int index) {

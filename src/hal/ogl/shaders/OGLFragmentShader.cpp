@@ -113,12 +113,12 @@ Error:
 
 RESULT OGLFragmentShader::SetColorTextureUniform(GLint textureNumber) {
 	//return SetUniformInteger(textureNumber, GetColorTextureUniformName());
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT OGLFragmentShader::SetBumpTextureUniform(GLint textureNumber) {
 	//return SetUniformInteger(textureNumber, GetBumpTextureUniformName());
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT OGLFragmentShader::SetObjectTextures(OGLObj *pOGLObj) {

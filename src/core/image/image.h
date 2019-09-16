@@ -28,8 +28,8 @@ public:
 
 	virtual RESULT LoadFromPath() = 0;
 	virtual RESULT LoadFromMemory() = 0;
-	virtual RESULT Release() { return R_NOT_IMPLEMENTED; };
-	virtual RESULT LoadImage() { return R_NOT_IMPLEMENTED; };
+	virtual RESULT Release() { return R_NOT_IMPLEMENTED_WARNING; };
+	virtual RESULT LoadImage() { return R_NOT_IMPLEMENTED_WARNING; };
 
 	RESULT FlipVertical();
 	

@@ -8,7 +8,7 @@ TestSuite::TestSuite(std::string strName) :
 
 // TODO: this should be added when this is a stand alone module
 RESULT TestSuite::EndCurrentTest() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT TestSuite::ResetTests() {

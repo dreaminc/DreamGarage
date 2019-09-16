@@ -38,7 +38,7 @@ OpenVRDevice::~OpenVRDevice() {
 
 // TODO: Implement these
 RESULT OpenVRDevice::InitializeHMDSourceNode() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT OpenVRDevice::InitializeHMDSinkNode() {
@@ -375,7 +375,7 @@ std::string OpenVRDevice::GetDeviceTypeString() {
 }
 
 RESULT OpenVRDevice::GetAudioDeviceOutID(std::wstring &wstrAudioDeviceOutGUID) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 	
 	/*	// Fails with UnsetSettingHasNoDefault, but steam will fall through to system default anyway
 	// Users of the system need to provide a proper default in default.vrsettings in the resources/settings/ directory of either the runtime or the driver_xxx
@@ -800,19 +800,19 @@ Error:
 }
 
 RESULT OpenVRDevice::ReleaseHMD() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT OpenVRDevice::SetUpFrame() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT OpenVRDevice::BindFramebuffer(EYE_TYPE eye) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT OpenVRDevice::CommitSwapChain(EYE_TYPE eye) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT OpenVRDevice::SubmitFrame() {
@@ -820,7 +820,7 @@ RESULT OpenVRDevice::SubmitFrame() {
 }
 
 RESULT OpenVRDevice::SetAndClearRenderSurface(EYE_TYPE eye) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT OpenVRDevice::UnsetRenderSurface(EYE_TYPE eye) {
@@ -828,11 +828,11 @@ RESULT OpenVRDevice::UnsetRenderSurface(EYE_TYPE eye) {
 }
 
 RESULT OpenVRDevice::RenderHMDMirror() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT OpenVRDevice::RecenterHMD() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 

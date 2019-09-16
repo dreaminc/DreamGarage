@@ -749,15 +749,15 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		}
 
 		virtual RESULT OnLogin() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnSwitchTeams() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnLogout() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnPendLogout() override {
@@ -1166,11 +1166,11 @@ RESULT MultiContentTestSuite::AddTestCameraSettings() {
 		}
 
 		virtual RESULT OnLogin() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnLogout() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnPendLogout() override {
@@ -1178,11 +1178,11 @@ RESULT MultiContentTestSuite::AddTestCameraSettings() {
 		}
 
 		virtual RESULT OnSwitchTeams() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
@@ -1201,7 +1201,7 @@ RESULT MultiContentTestSuite::AddTestCameraSettings() {
 		}
 
 		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnDreamVersion(version dreamVersion) override {
@@ -1387,11 +1387,11 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		}
 		//*/
 		virtual RESULT OnLogin() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnLogout() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnPendLogout() override {
@@ -1399,19 +1399,19 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		}
 
 		virtual RESULT OnSwitchTeams() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnDreamVersion(version dreamVersion) override {

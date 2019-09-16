@@ -29,12 +29,12 @@ XAudio2SoundClient::~XAudio2SoundClient() {
 
 // TODO:
 RESULT XAudio2SoundClient::AudioSpatialProcess() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 // TODO:
 RESULT XAudio2SoundClient::AudioCaptureProcess() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 // TODO:

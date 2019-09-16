@@ -159,8 +159,8 @@ public:
 	RESULT Disconnect();
 
 	virtual RESULT RenderNode(long frameID = 0);
-	virtual RESULT ProcessNode(long frameID = 0) { return R_NOT_IMPLEMENTED; }
-	virtual RESULT PreProcessNode(long frameID = 0) { return R_NOT_IMPLEMENTED; }
+	virtual RESULT ProcessNode(long frameID = 0) { return R_NOT_IMPLEMENTED_WARNING; }
+	virtual RESULT PreProcessNode(long frameID = 0) { return R_NOT_IMPLEMENTED_WARNING; }
 
 	// Allows for the early termination of a path
 	// This will prevent connections from rendering / processing

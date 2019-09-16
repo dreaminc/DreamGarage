@@ -48,7 +48,7 @@ public:
 	}
 
 protected:
-	virtual RESULT Print() { return R_NOT_IMPLEMENTED; }
+	virtual RESULT Print() { return R_NOT_IMPLEMENTED_WARNING; }
 
 	RESULT FlagShutdown(std::string strShutdownFlagSignalName = "normal");
 	bool IsAppShuttingDown();

@@ -545,7 +545,7 @@ Error:
 }
 
 RESULT DreamDesktopApp::SendFirstFrame() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 bool DreamDesktopApp::IsVisible() {
