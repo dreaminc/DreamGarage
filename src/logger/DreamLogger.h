@@ -27,7 +27,7 @@ public:
 	};
 
 public:
-	///*
+
 	template <typename... Args>
 	RESULT Log(DreamLogger::Level logLevel, const char* pszMessage, const Args&... args) {
 		RESULT r = R_PASS;
@@ -53,12 +53,17 @@ public:
 			//case DreamLogger::Level::CRITICAL: {
 			//	m_pDreamLogger->critical(pszMessage, args...);
 			//} break;
+			
+			case DreamLogger::Level::CRITICAL:
+			case DreamLogger::Level::INVALID:
+			default: {
+				// Do nothing for now
+			} break;
 		}
 
 	Error:
 		return r;
 	}
-	//*/
 
 private:
 	DreamLogger();

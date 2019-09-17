@@ -125,13 +125,16 @@ public:
 	virtual RESULT LinkInputToOutputObjects(DConnection* pInputConnection, DConnection* pOutputConnection) override {
 		RESULT r = R_PASS;
 
+		DConnectionTyped<objType>* pTypedInputConnection = nullptr;
+		DConnectionTyped<objType>* pTypedOutputConnection = nullptr;
+		
 		CB(pInputConnection->GetType() == CONNECTION_TYPE::INPUT);
 		CB(pOutputConnection->GetType() == CONNECTION_TYPE::OUTPUT);
 
-		DConnectionTyped<objType>* pTypedInputConnection = dynamic_cast<DConnectionTyped<objType>*>(pInputConnection);
+		pTypedInputConnection = dynamic_cast<DConnectionTyped<objType>*>(pInputConnection);
 		CN(pTypedInputConnection);
 
-		DConnectionTyped<objType>* pTypedOutputConnection = dynamic_cast<DConnectionTyped<objType>*>(pOutputConnection);
+		pTypedOutputConnection = dynamic_cast<DConnectionTyped<objType>*>(pOutputConnection);
 		CN(pTypedOutputConnection);
 
 		CN(pTypedInputConnection->m_ppObject);
