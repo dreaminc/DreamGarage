@@ -10,6 +10,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Get command line args and put them on the stack in argc,argv format
 	LPWSTR* wargv = nullptr;
 	int argc = 0;
+	VulkanApp* pVulkanApp = nullptr;
 
 	wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
 	char** argv = new char* [argc];
@@ -43,12 +44,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		argv[i] = (char*)args[i].c_str();
 	}
 
-	CRM(VulkanApp::TestVulkanSetup(), "Vulkan Test Setup Failed");
+	//CRM(VulkanApp::TestVulkanSetup(), "Vulkan Test Setup Failed");
+	
+	pVulkanApp = new VulkanApp();
+	CNM(pVulkanApp, "Failed to allocate Vulkan App");
+
+	CRM(pVulkanApp->Run(), "Vulkan Test Setup Failed");
 
 Success:
+	if (pVulkanApp != nullptr) {
+		delete pVulkanApp;
+		pVulkanApp = nullptr;
+	}
+
 	return (int)(r);
 
 Error:
+	if (pVulkanApp != nullptr) {
+		delete pVulkanApp;
+		pVulkanApp = nullptr;
+	}
+
 	DEBUG_LINEOUT("Junk Vulkan Project Exiting with Error 0x%x result", r);
 	DEBUG_SYSTEM_PAUSE();
 
@@ -59,14 +75,29 @@ Error:
 
 int main(int argc, const char* argv[]) {
 	RESULT r = R_PASS;
+	VulkanApp* pVulkanApp;
 
-	CRM(VulkanApp::TestVulkanSetup(), "Vulkan Test Setup Failed");
+	//CRM(VulkanApp::TestVulkanSetup(), "Vulkan Test Setup Failed");
+	pVulkanApp = new VulkanApp();
+	CNM(pVulkanApp, "Failed to allocate Vulkan App");
+
+	CRM(vulkanApp.Run(), "Vulkan Test Setup Failed");
 
 Success:
+	if (pVulkanApp != nullptr) {
+		delete pVulkanApp;
+		pVulkanApp = nullptr;
+	}
+
 	DEBUG_LINEOUT("Junk Vulkan Project Exiting");
 	return (int)(r);
 
 Error:
+	if (pVulkanApp != nullptr) {
+		delete pVulkanApp;
+		pVulkanApp = nullptr;
+	}
+
 	DEBUG_LINEOUT("Junk Vulkan Project exiting with Error 0x%x result", r);
 	system("pause");
 
