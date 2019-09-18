@@ -149,19 +149,19 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 		int curEnvID = 0;
 
 		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnSetSettings() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnLogin() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnLogout() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnPendLogout() override {
@@ -169,11 +169,11 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 		}
 
 		virtual RESULT OnSwitchTeams() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnDreamVersion(version dreamVersion) override {
@@ -431,19 +431,19 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 		UserController *pUserController = nullptr;
 
 		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) override { 
-			return R_NOT_IMPLEMENTED; 
+			return R_NOT_IMPLEMENTED_WARNING; 
 		}
 		
 		virtual RESULT OnSetSettings() override { 
-			return R_NOT_IMPLEMENTED; 
+			return R_NOT_IMPLEMENTED_WARNING; 
 		}
 		
 		virtual RESULT OnLogin() override { 
-			return R_NOT_IMPLEMENTED; 
+			return R_NOT_IMPLEMENTED_WARNING; 
 		}
 		
 		virtual RESULT OnLogout() override { 
-			return R_NOT_IMPLEMENTED; 
+			return R_NOT_IMPLEMENTED_WARNING; 
 		}
 
 		virtual RESULT OnPendLogout() override {
@@ -451,11 +451,11 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 		}
 		
 		virtual RESULT OnSwitchTeams() override {
-			return R_NOT_IMPLEMENTED;
+			return R_NOT_IMPLEMENTED_WARNING;
 		}
 
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override { 
-			return R_NOT_IMPLEMENTED; 
+			return R_NOT_IMPLEMENTED_WARNING; 
 		}
 
 		virtual RESULT OnDreamVersion(version dreamVersion) override {

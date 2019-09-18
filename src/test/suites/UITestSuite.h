@@ -73,56 +73,56 @@ public:
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
 
 	virtual RESULT OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnSendCameraPlacement() override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnStopSendingCameraPlacement() override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnReceiveCameraPlacement(long userID) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT OnStopReceivingCameraPlacement() override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	// Environment observer forms
 	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 public:

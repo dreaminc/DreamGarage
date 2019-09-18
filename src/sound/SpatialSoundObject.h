@@ -32,7 +32,7 @@ public:
 
 	// TODO: Move this to internal buffer
 	// Function needs to copy over stuff 
-	virtual RESULT WriteTestSignalToAudioObjectBuffer(unsigned int numFrames, unsigned int samplingRate = 48000, unsigned int numChannels = 1, float frequency = 440.0f) { return R_NOT_IMPLEMENTED; }
+	virtual RESULT WriteTestSignalToAudioObjectBuffer(unsigned int numFrames, unsigned int samplingRate = 48000, unsigned int numChannels = 1, float frequency = 440.0f) { return R_NOT_IMPLEMENTED_WARNING; }
 
 	virtual RESULT LoadSoundFile(SoundFile *pSoundFile);
 	virtual RESULT PlaySoundFile(SoundFile *pSoundFile);

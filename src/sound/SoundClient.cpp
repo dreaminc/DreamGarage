@@ -232,7 +232,7 @@ Error:
 }
 
 RESULT SoundClient::LoopSoundFile(SoundFile *pSoundFile) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT SoundClient::PlaySoundFile(SoundFile *pSoundFile) {

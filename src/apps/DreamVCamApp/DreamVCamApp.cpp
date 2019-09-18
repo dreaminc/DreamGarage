@@ -144,7 +144,7 @@ RESULT DreamVCamApp::InitializePipeline() {
 
 
 	r = GetDOS()->MakePipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode, Sandbox::PipelineType::AUX);
-	if (r != R_NOT_IMPLEMENTED) {
+	if (r != R_NOT_IMPLEMENTED_WARNING) {
 		CR(r);
 	}
 	else {
@@ -508,19 +508,19 @@ RESULT DreamVCamApp::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 }
 
 RESULT DreamVCamApp::OnClick(point ptDiff, bool fMouseDown) { 
-	return R_NOT_IMPLEMENTED; 
+	return R_NOT_IMPLEMENTED_WARNING; 
 }
 
 RESULT DreamVCamApp::OnMouseMove(point mousePoint) { 
-	return R_NOT_IMPLEMENTED; 
+	return R_NOT_IMPLEMENTED_WARNING; 
 }
 
 RESULT DreamVCamApp::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) { 
-	return R_NOT_IMPLEMENTED; 
+	return R_NOT_IMPLEMENTED_WARNING; 
 }
 
 RESULT DreamVCamApp::OnKeyPress(char chkey, bool fkeyDown) { 
-	return R_NOT_IMPLEMENTED; 
+	return R_NOT_IMPLEMENTED_WARNING; 
 }
 
 texture* DreamVCamApp::GetSourceTexture() {
@@ -542,7 +542,7 @@ long DreamVCamApp::GetCurrentAssetID() {
 }
 
 RESULT DreamVCamApp::SendFirstFrame() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT DreamVCamApp::CloseSource() {

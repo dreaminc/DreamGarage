@@ -90,3 +90,6 @@ add_subdirectory(testclient)
 # # add_subdirectory(third_party)
 add_subdirectory(ui)
 add_subdirectory(webbrowser)
+
+# Adds junk repos
+add_subdirectory(junk)

@@ -158,7 +158,7 @@ public:
 
 	// CloudControllerProxy
 	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override { return CLOUD_CONTROLLER_TYPE::CLOUD; }
-	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override { return R_NOT_IMPLEMENTED; }
+	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override { return R_NOT_IMPLEMENTED_WARNING; }
 
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 

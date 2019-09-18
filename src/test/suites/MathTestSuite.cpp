@@ -329,20 +329,20 @@ RESULT MathTestSuite::TestTranslateMatrix() {
 
 RESULT MathTestSuite::TestRotateMatrix() {
 	// TODO:
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT MathTestSuite::TestScaleMatrix() {
 	// TODO:
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT MathTestSuite::TestViewMatrix() {
 	// TODO:
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT MathTestSuite::TestProjectionMatrix() {
 	// TODO:
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }

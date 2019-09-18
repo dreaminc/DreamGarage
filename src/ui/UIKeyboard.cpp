@@ -732,7 +732,7 @@ RESULT UIKeyboard::UpdateKeyState(SenseVirtualKey key, uint8_t keyState) {
 }
 
 RESULT UIKeyboard::CheckKeyState(SenseVirtualKey key) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {

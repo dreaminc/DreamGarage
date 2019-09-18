@@ -43,7 +43,7 @@ public:
 	}
 
 protected:
-	virtual RESULT InitializeSingleton() { return R_NOT_IMPLEMENTED; }
+	virtual RESULT InitializeSingleton() { return R_NOT_IMPLEMENTED_WARNING; }
 };
 
 #endif	// ! SINGLETON_H_

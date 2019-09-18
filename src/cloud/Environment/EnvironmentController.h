@@ -202,7 +202,7 @@ public:
 
 	RESULT OnEnvironmentSocketPing(std::shared_ptr<CloudMessage> pCloudMessage);
 
-	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override { return R_NOT_IMPLEMENTED; }
+	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override { return R_NOT_IMPLEMENTED_WARNING; }
 
 	long GetUserID();
 

@@ -147,7 +147,7 @@ Error:
 }
 
 RESULT X3DSpatialSoundObject::LoadSoundFile(SoundFile *pSoundFile) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT X3DSpatialSoundObject::PushMonoAudioBuffer(int numFrames, const int16_t *pSoundBuffer) {

@@ -208,11 +208,11 @@ Error:
 }
 
 RESULT texture::LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT texture::LoadFlippedBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT texture::LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) {
@@ -295,15 +295,15 @@ RESULT texture::UpdateDimensions(int width, int height) {
 }
 
 RESULT texture::Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT texture::UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT texture::UpdateTextureRegionFromBuffer(void *pBuffer, int x, int y, int width, int height) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 bool texture::IsDistanceMapped() {

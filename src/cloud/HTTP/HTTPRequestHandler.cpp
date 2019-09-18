@@ -48,7 +48,7 @@ CURL* HTTPRequestHandler::GetCURLHandle() {
 }
 
 RESULT HTTPRequestHandler::OnHTTPRequestComplete() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT HTTPRequestHandler::OnHTTPRequestTimeout() {

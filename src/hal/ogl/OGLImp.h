@@ -48,6 +48,10 @@ public:
 	OGLImp(OGLRenderingContext *pOpenGLRenderingContext);
 	~OGLImp();
 
+	virtual std::string GetHALName() {
+		return "ogl";
+	}
+
 	// Object Factory Methods
 public:
 	version GetOGLVersion() { return m_versionOGL; }

@@ -50,6 +50,22 @@ file(GLOB OGL_WIN64_SOURCES
 )
 source_group("ogl\\win64" FILES ${OGL_WIN64_SOURCES})
 
+# Vulkan
+file(GLOB VULKAN_SOURCES 
+    "vulkan/*.cpp"
+    "vulkan/*.tpp"
+    "vulkan/*.h"
+)
+source_group("vulkan" FILES ${VULKAN_SOURCES})
+
+# DirectX 11
+#file(GLOB OGL_SOURCES 
+#    "ogl/*.cpp"
+#    "olg/*.tpp"
+#    "ogl/*.h"
+#)
+#source_group("ogl" FILES ${OGL_SOURCES})
+
 # Easy Logging
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/easyloggingpp/include)
 
@@ -70,7 +86,10 @@ add_library(hal
     ${OGL_GL_SOURCES}
     ${OGL_SHADERS_SOURCES}
     ${OGL_WIN64_SOURCES}
-    # TODO: Vulkan
+    
+    # Vulkan
+    ${VULKAN_SOURCES}
+
     # TODO: DirectX
     # TODO: Metal / MoltenVK etc
 

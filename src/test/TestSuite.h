@@ -61,7 +61,7 @@ public:
 
 	std::shared_ptr<TestObject> AddTest(const TestObject::TestDescriptor &testDescriptor);
 
-	virtual RESULT SetupTestSuite() { return R_NOT_IMPLEMENTED; }
+	virtual RESULT SetupTestSuite() { return R_NOT_IMPLEMENTED_WARNING; }
 	virtual RESULT AddTests() = 0;
 	
 public:

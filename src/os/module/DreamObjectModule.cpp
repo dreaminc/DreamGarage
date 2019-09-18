@@ -90,7 +90,7 @@ Error:
 }
 
 RESULT DreamObjectModule::OnDidFinishInitializing(void *pContext) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT DreamObjectModule::Shutdown(void *pContext) {

@@ -30,7 +30,7 @@ public:
 
 private:
 	virtual RESULT Dealloc() {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 };
 

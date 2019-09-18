@@ -786,7 +786,7 @@ Error:
 }
 
 RESULT SoundTestSuite::AddTestPlaySoundHRTF() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT SoundTestSuite::AddTestEnumerateDevices() {

@@ -137,11 +137,11 @@ bool Sandbox::IsMouseIntersectObjects() {
 }
 
 RESULT Sandbox::Notify(SenseKeyboardEvent *kbEvent) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT Sandbox::Notify(SenseTypingEvent *kbEvent) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT Sandbox::Notify(SenseMouseEvent *mEvent) {

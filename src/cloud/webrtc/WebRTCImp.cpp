@@ -102,12 +102,12 @@ Error:
 }
 
 RESULT WebRTCImp::CreateNewURLRequest(std::wstring& strURL) {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 // Will simply update the message loop as needed
 RESULT WebRTCImp::Update() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 User WebRTCImp::GetUser() {

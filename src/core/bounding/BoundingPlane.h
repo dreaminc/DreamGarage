@@ -43,11 +43,11 @@ public:
 	}
 	
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual RESULT SetHalfVector(vector vHalfVector) override {
-		return R_NOT_IMPLEMENTED;
+		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
 	virtual point GetMinPoint(bool fAbsolute = false) override {

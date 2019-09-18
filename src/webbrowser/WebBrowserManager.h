@@ -22,7 +22,7 @@ public:
 
 	virtual RESULT Initialize() = 0;
 	virtual RESULT Update() = 0;
-	virtual RESULT Shutdown() { return R_NOT_IMPLEMENTED; }
+	virtual RESULT Shutdown() { return R_NOT_IMPLEMENTED_WARNING; }
 
 
 	virtual std::shared_ptr<WebBrowserController> MakeNewBrowser(int width, int height, const std::string& strURL) = 0;

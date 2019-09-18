@@ -154,8 +154,8 @@ public:
 
 	virtual RESULT HandleDreamFormSuccess() override;
 	virtual RESULT HandleDreamFormCancel() override;
-	virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) override { return R_NOT_IMPLEMENTED; };
-	virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) override { return R_NOT_IMPLEMENTED; };
+	virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) override { return R_NOT_IMPLEMENTED_WARNING; };
+	virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) override { return R_NOT_IMPLEMENTED_WARNING; };
 
 	virtual RESULT HandleCanTabNext(bool fCanNext) override;
 	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override;

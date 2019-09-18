@@ -136,7 +136,7 @@ protected:
 	// Module Thread Process
 	RESULT StartModuleProcess(void *pContext = nullptr);
 	RESULT KillModuleProcess();
-	virtual RESULT ModuleProcess(void *pContext) { return R_NOT_IMPLEMENTED; }
+	virtual RESULT ModuleProcess(void *pContext) { return R_NOT_IMPLEMENTED_WARNING; }
 
 	bool IsModuleProcessRunning() {
 		return m_moduleThread.joinable();

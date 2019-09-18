@@ -613,7 +613,7 @@ Error:
 }
 
 RESULT DreamUserControlAreaApp::HandleLoadEnd() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 bool DreamUserControlAreaApp::IsContentVisible() {
@@ -621,11 +621,11 @@ bool DreamUserControlAreaApp::IsContentVisible() {
 }
 
 RESULT DreamUserControlAreaApp::HandleDreamFormSuccess() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT DreamUserControlAreaApp::HandleDreamFormCancel() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT DreamUserControlAreaApp::HandleCanTabNext(bool fCanNext) {

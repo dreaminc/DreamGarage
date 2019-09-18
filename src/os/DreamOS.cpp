@@ -1142,7 +1142,7 @@ Error:
 // TODO: Why is this here at all
 RESULT DreamOS::MuteDreamVCamAudio(bool fMute) {
 	// TODO: imp this lmao
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 

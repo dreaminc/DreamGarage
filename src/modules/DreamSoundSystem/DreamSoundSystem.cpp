@@ -178,11 +178,11 @@ Error:
 }
 
 RESULT DreamSoundSystem::OnClientConnect() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT DreamSoundSystem::OnClientDisconnect() {
-	return R_NOT_IMPLEMENTED;
+	return R_NOT_IMPLEMENTED_WARNING;
 }
 
 RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
