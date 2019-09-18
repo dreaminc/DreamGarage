@@ -1,4 +1,5 @@
-#include "VulkanInitProj.h"
+#include "VulkanMain.h"
+#include "VulkanApp.h"
 
 #include <string>
 
@@ -42,17 +43,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		argv[i] = (char*)args[i].c_str();
 	}
 
-	//dreamTestClient = DreamTestClient();
-	//CRM(dreamTestClient.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
-	//CRM(dreamTestClient.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
+	CRM(VulkanApp::TestVulkanSetup(), "Vulkan Test Setup Failed");
 
 Success:
-	DreamLogger::instance()->Flush();
 	return (int)(r);
 
 Error:
 	DEBUG_LINEOUT("Junk Vulkan Project Exiting with Error 0x%x result", r);
-	DreamLogger::instance()->Flush();
 	DEBUG_SYSTEM_PAUSE();
 
 	return (int)(r);
@@ -63,18 +60,14 @@ Error:
 int main(int argc, const char* argv[]) {
 	RESULT r = R_PASS;
 
-	//DreamTestClient DreamTestClient;
-	//CRM(DreamTestClient.Initialize(argc, argv), "Failed to initialize Dream Test App");
-	//CRM(DreamTestClient.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
+	CRM(VulkanApp::TestVulkanSetup(), "Vulkan Test Setup Failed");
 
 Success:
 	DEBUG_LINEOUT("Junk Vulkan Project Exiting");
-	DreamLogger::instance()->Flush();
 	return (int)(r);
 
 Error:
 	DEBUG_LINEOUT("Junk Vulkan Project exiting with Error 0x%x result", r);
-	DreamLogger::instance()->Flush();
 	system("pause");
 
 	return (int)(r);
