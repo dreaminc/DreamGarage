@@ -10,11 +10,11 @@ source_group("" FILES ${SOURCES})
 # Add CEF binaries 
 link_directories(${CMAKE_BINARY_DIR})
 
-add_executable(vulkaninitproj
+add_executable(vulkanproj
     ${SOURCES}
 )
 
-target_link_libraries(dreamcef
+target_link_libraries(vulkanproj
     # TODO: Make this into a windows dependent list 
     wininet.lib
     dnsapi.lib
