@@ -75,10 +75,45 @@ Error:
 	return r;
 }
 
+RESULT VulkanApp::RetrieveSupportedVulkanExtensions(const char** ppszGLFWExtensions, unsigned int numExtensions) {
+	RESULT r = R_PASS;
+
+	// Retrieve supported extensions
+	vkEnumerateInstanceExtensionProperties(nullptr, &m_numSupportedVulkanExtensions, nullptr);
+	m_supportedExtensions = std::vector<VkExtensionProperties>(m_numSupportedVulkanExtensions);
+	vkEnumerateInstanceExtensionProperties(nullptr, &m_numSupportedVulkanExtensions, m_supportedExtensions.data());
+	
+	for (const auto& extension : m_supportedExtensions) {
+		DEBUG_LINEOUT("vk-ext: %s", extension.extensionName);
+	}
+
+	if (ppszGLFWExtensions != nullptr && numExtensions > 0) {
+		for (unsigned int i = 0; i < numExtensions; i++) {
+			bool fFound = false;
+
+			for (const auto& extension : m_supportedExtensions) {
+				if (strcmp(extension.extensionName, ppszGLFWExtensions[i]) == 0) {
+					fFound = true;
+				}
+			}
+
+			CBM(fFound, "Error: vulkan extension %s not supported", ppszGLFWExtensions[i]);
+
+			DEBUG_LINEOUT("Found extension %s", ppszGLFWExtensions[i]);
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT VulkanApp::CreateVulkanInstance() {
 	RESULT r = R_PASS;
 	
 	VkApplicationInfo appInfo = {};
+	VkInstanceCreateInfo createInfo = {};
+
+	// App Info
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.pApplicationName = "Hello Triangle";
 	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -86,7 +121,9 @@ RESULT VulkanApp::CreateVulkanInstance() {
 	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 	appInfo.apiVersion = VK_API_VERSION_1_0;
 
-	VkInstanceCreateInfo createInfo = {};
+	
+
+	// Create Info
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &appInfo;
 
@@ -95,6 +132,10 @@ RESULT VulkanApp::CreateVulkanInstance() {
 	unsigned int glfwExtensionCount = 0;
 	const char** ppszGLFWExtensions = nullptr;
 	ppszGLFWExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+	CNM(ppszGLFWExtensions, "GLFW extensions failed to retrieve");
+
+	CRM(RetrieveSupportedVulkanExtensions(ppszGLFWExtensions, glfwExtensionCount), "Failed to retrieve supproted vulkan extensions");
+
 	createInfo.enabledExtensionCount = glfwExtensionCount;
 	createInfo.ppEnabledExtensionNames = ppszGLFWExtensions;
 
@@ -130,11 +171,16 @@ Error:
 RESULT VulkanApp::CleanUp() {
 	RESULT r = R_PASS;
 
+	// Destroy Vulkan Instance
+	vkDestroyInstance(m_vkInstance, nullptr);
+
+	// Clean up window
 	if (m_pglfwWindow != nullptr) {
 		glfwDestroyWindow(m_pglfwWindow);
 		m_pglfwWindow = nullptr;
 	}
 
+	// Clean up GLFW
 	glfwTerminate();
 
 Error:

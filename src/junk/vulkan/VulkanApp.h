@@ -30,8 +30,10 @@ public:
 	RESULT CleanUp();
 
 	// Vulkan
+	
 	RESULT InitVulkan();
 	RESULT CreateVulkanInstance();
+	RESULT RetrieveSupportedVulkanExtensions(const char** ppszGLFWExtensions = nullptr, unsigned int numExtensions = 0);
 
 private:
 // Window Stuff (GLFW)
@@ -41,8 +43,10 @@ private:
 	int m_windowHeight = DEFAULT_WINDOW_HEIGHT;
 
 // Vulkan
-	unsigned int m_numVulkanExtensions = 0;
 	VkInstance m_vkInstance;
+
+	unsigned int m_numSupportedVulkanExtensions = 0;
+	std::vector<VkExtensionProperties> m_supportedExtensions;
 
 };
 
