@@ -34,12 +34,21 @@ public:
 	RESULT InitVulkan();
 	RESULT CreateVulkanInstance();
 
+	RESULT SetupVulkanDebugMessenger();
+	RESULT PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+
 	// Vulkan Extensions
 	RESULT InitializeVulkanExtensions();
 	RESULT RetrieveRequiredVulkanExtensions();
 	RESULT RetrieveSupportedVulkanExtensions();
 
 	RESULT CheckValidationLayerSupport();
+
+	static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(
+		VkDebugUtilsMessageSeverityFlagBitsEXT msgSeverity,
+		VkDebugUtilsMessageTypeFlagsEXT msgType,
+		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+		void* pContext);
 
 private:
 // Window Stuff (GLFW)
@@ -52,6 +61,7 @@ private:
 	VkInstance m_vkInstance;
 
 	
+	VkDebugUtilsMessengerEXT m_vulkanDebugMessenger;
 
 	bool m_fValidationLayersEnabled = true;
 	const std::vector<const char*> m_vulkanValidationLayers = {
@@ -62,6 +72,19 @@ private:
 	unsigned int m_numSupportedVulkanExtensions = 0;
 	std::vector<VkExtensionProperties> m_supportedExtensions;
 	std::vector<const char*> m_vulkanRequiredExtensions;
+
+private:
+	// Vulkan Extensions
+	VkResult VulkanApp::CreateDebugUtilsMessengerEXT(
+		VkInstance vkInstance,
+		const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+		const VkAllocationCallbacks* pAllocator,
+		VkDebugUtilsMessengerEXT* pDebugMessenger);
+
+	void DestroyDebugUtilsMessengerEXT(
+		VkInstance vkInstance,
+		VkDebugUtilsMessengerEXT debugMessenger,
+		const VkAllocationCallbacks* pAllocator);
 };
 
 #endif // ! VULKAN_JUNK_APP_
