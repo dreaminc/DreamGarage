@@ -12,8 +12,17 @@ file(GLOB HLSL_SOURCES
 )
 source_group("" HLSL_SOURCES)
 
-# Windows Subsystem vs Console
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+
+    # Windows Subsystem vs Console
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+
+    message("dos/src/dreamdesktop/cmakelists.txt msvc")
+    message("flags: ${CMAKE_CXX_FLAGS}")
+    message("debug flags: ${CMAKE_CXX_FLAGS_DEBUG}")
+    message("release flags: ${CMAKE_CXX_FLAGS_RELEASE}")
+
+endif()
 
 add_executable(dreamdesktop
     ${SOURCES}

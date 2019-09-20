@@ -1,4 +1,6 @@
-# src/scene/CMakeLists.txt - Dream UI CMake file
+# src/ui/CMakeLists.txt - Dream UI CMake file
+
+message("dos/src/ui/cmakelists.txt")
 
 file(GLOB SOURCES 
   "*.cpp"

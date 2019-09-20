@@ -1,5 +1,7 @@
 # src/scene/CMakeLists.txt - Dream App Library CMake file
 
+message("dos/src/apps/cmakelists.txt")
+
 # TODO: This should not be here!!!!!!!
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
 

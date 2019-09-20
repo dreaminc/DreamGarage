@@ -1,4 +1,6 @@
-# src/scene/CMakeLists.txt - Dream Sound Library CMake file
+# src/sound/CMakeLists.txt - Dream Sound Library CMake file
+
+message("dos/src/sound/cmakelists.txt")
 
 file(GLOB SOURCES 
   "*.cpp"

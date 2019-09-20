@@ -1,5 +1,7 @@
 # src/test/CMakeLists.txt - Dream Test Libraries CMake file
 
+message("dos/src/test/cmakelists.txt")
+
 file(GLOB SOURCES 
   "*.cpp"
   "*.h"

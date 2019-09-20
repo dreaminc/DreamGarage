@@ -1,4 +1,6 @@
-# src/scene/CMakeLists.txt - Dream Pipeline Library CMake file
+# src/pipeline/CMakeLists.txt - Dream Pipeline Library CMake file
+
+message("dos/src/pipeline/cmakelists.txt")
 
 file(GLOB SOURCES 
   "*.cpp"

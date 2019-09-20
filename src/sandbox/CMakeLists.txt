@@ -1,4 +1,6 @@
-# src/scene/CMakeLists.txt - Dream Sandbox Library CMake file
+# src/sandbox/CMakeLists.txt - Dream Sandbox Library CMake file
+
+message("dos/src/sandbox/cmakelists.txt")
 
 file(GLOB SOURCES 
   "*.cpp"

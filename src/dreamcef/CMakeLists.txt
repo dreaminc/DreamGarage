@@ -1,6 +1,8 @@
 # src/scene/CMakeLists.txt - Dream CEF CMake file
 # TODO: Add the patches / add all of the chromium shit
 
+message("dos/src/dreamcef/cmakelists.txt")
+
 file(GLOB SOURCES 
   "*.cpp"
   "*.tpp"
@@ -15,8 +17,15 @@ add_executable(dreamcef
     ${SOURCES}
 )
 
-# Windows Subsystem vs Console
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    # Windows Subsystem vs Console
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+
+    message("flags: ${CMAKE_CXX_FLAGS}")
+    message("debug flags: ${CMAKE_CXX_FLAGS_DEBUG}")
+    message("release flags: ${CMAKE_CXX_FLAGS_RELEASE}")
+endif()
 
 target_link_libraries(dreamcef
     debug ${CMAKE_SOURCE_DIR}/src/third_party/CEF/CEF_BINARY_3538/Debug/libcef_dll_wrapper.lib

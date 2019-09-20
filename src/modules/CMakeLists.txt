@@ -1,4 +1,6 @@
-# src/scene/CMakeLists.txt - DreamContentViewApp CMake file
+# src/modules/CMakeLists.txt - DreamContentViewApp CMake file
+
+message("dos/src/modules/cmakelists.txt")
 
 file(GLOB ANIMATION_ENGINE_SOURCES 
   "AnimationEngine/*.cpp"

@@ -14,7 +14,7 @@ add_executable(vulkaninitproj
     ${SOURCES}
 )
 
-target_link_libraries(dreamcef
+target_link_libraries(vulkaninitproj
     # TODO: Make this into a windows dependent list 
     wininet.lib
     dnsapi.lib

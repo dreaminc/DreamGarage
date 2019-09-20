@@ -1,4 +1,6 @@
-# src/scene/CMakeLists.txt - Dream Sense Library CMake file
+# src/sense/CMakeLists.txt - Dream Sense Library CMake file
+
+message("dos/src/sense/cmakelists.txt")
 
 file(GLOB SOURCES 
   "*.cpp"

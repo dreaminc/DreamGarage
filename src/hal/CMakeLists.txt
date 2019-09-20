@@ -1,4 +1,6 @@
-# src/scene/CMakeLists.txt - Dream HAL CMake file
+# src/hal/CMakeLists.txt - Dream HAL CMake file
+
+message("dos/src/hal/cmakelists.txt")
 
 file(GLOB SOURCES 
   "*.cpp"
