@@ -75,32 +75,98 @@ Error:
 	return r;
 }
 
-RESULT VulkanApp::RetrieveSupportedVulkanExtensions(const char** ppszGLFWExtensions, unsigned int numExtensions) {
+RESULT VulkanApp::InitializeVulkanExtensions() {
 	RESULT r = R_PASS;
+
+	CRM(RetrieveRequiredVulkanExtensions(), "Failed to retrieve required vulkan extensions");
+
+	CRM(RetrieveSupportedVulkanExtensions(), "Failed to retrieve supproted vulkan extensions");
+
+Error:
+	return r;
+}
+
+RESULT VulkanApp::RetrieveRequiredVulkanExtensions() {
+	RESULT r = R_PASS;
+
+	// TODO: Related to GLFW vs. WIN32 API 
+	// We will need to figure out what extensions Dream needs
+
+	uint32_t glfwExtensionCount = 0;
+	const char** ppszGLFWExtensions;
+
+	ppszGLFWExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+	CNM(ppszGLFWExtensions, "Failed to retrieve GLFW extensions");
+
+	for(int i = 0; i < glfwExtensionCount; i++) {
+		DEBUG_LINEOUT("Required extension added: %s", ppszGLFWExtensions[i]);
+		m_vulkanRequiredExtensions.push_back(ppszGLFWExtensions[i]);
+	}
+
+	if (m_fValidationLayersEnabled) {
+		m_vulkanRequiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	}
+
+Error:
+	return r;
+}
+
+RESULT VulkanApp::RetrieveSupportedVulkanExtensions() {
+	RESULT r = R_PASS;
+
+	// TODO: Related to GLFW vs. WIN32 API 
+	// We will need to figure out what extensions Dream needs
 
 	// Retrieve supported extensions
 	vkEnumerateInstanceExtensionProperties(nullptr, &m_numSupportedVulkanExtensions, nullptr);
 	m_supportedExtensions = std::vector<VkExtensionProperties>(m_numSupportedVulkanExtensions);
+
 	vkEnumerateInstanceExtensionProperties(nullptr, &m_numSupportedVulkanExtensions, m_supportedExtensions.data());
 	
 	for (const auto& extension : m_supportedExtensions) {
-		DEBUG_LINEOUT("vk-ext: %s", extension.extensionName);
+		DEBUG_LINEOUT("vk-ext found: %s", extension.extensionName);
 	}
 
-	if (ppszGLFWExtensions != nullptr && numExtensions > 0) {
-		for (unsigned int i = 0; i < numExtensions; i++) {
+	if (m_vulkanRequiredExtensions.size() > 0) {
+		for (const auto& pszRequiredVkExt : m_vulkanRequiredExtensions) {
 			bool fFound = false;
 
 			for (const auto& extension : m_supportedExtensions) {
-				if (strcmp(extension.extensionName, ppszGLFWExtensions[i]) == 0) {
+				if (strcmp(extension.extensionName, pszRequiredVkExt) == 0) {
 					fFound = true;
 				}
 			}
 
-			CBM(fFound, "Error: vulkan extension %s not supported", ppszGLFWExtensions[i]);
+			CBM(fFound, "Error: vulkan extension %s not supported", pszRequiredVkExt);
 
-			DEBUG_LINEOUT("Found extension %s", ppszGLFWExtensions[i]);
+			DEBUG_LINEOUT("Found extension %s", pszRequiredVkExt);
 		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT VulkanApp::CheckValidationLayerSupport() {
+	RESULT r = R_PASS;
+
+	uint32_t layerCount;
+	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+	std::vector<VkLayerProperties> vulkanAvailableValidationLayers(layerCount);
+	vkEnumerateInstanceLayerProperties(&layerCount, vulkanAvailableValidationLayers.data());
+
+	for (const char* pszLayerName : m_vulkanValidationLayers) {
+		bool fFound = false;
+
+		for (const auto& layerProperties : vulkanAvailableValidationLayers) {
+			if (strcmp(pszLayerName, layerProperties.layerName) == 0) {
+				fFound = true;
+				break;
+			}
+		}
+
+		CBM(fFound, "Vulkan validation layer %s not found", pszLayerName);
 	}
 
 Error:
@@ -127,22 +193,24 @@ RESULT VulkanApp::CreateVulkanInstance() {
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &appInfo;
 
-	// TODO: Related to GLFW vs. WIN32 API 
-	// We will need to figure out what extensions Dream needs
-	unsigned int glfwExtensionCount = 0;
-	const char** ppszGLFWExtensions = nullptr;
-	ppszGLFWExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-	CNM(ppszGLFWExtensions, "GLFW extensions failed to retrieve");
+	// Extensions
+	CRM(InitializeVulkanExtensions(), "Failed to initialize vulkan extensions");
+	createInfo.enabledExtensionCount = m_vulkanRequiredExtensions.size();
+	createInfo.ppEnabledExtensionNames = m_vulkanRequiredExtensions.data();
 
-	CRM(RetrieveSupportedVulkanExtensions(ppszGLFWExtensions, glfwExtensionCount), "Failed to retrieve supproted vulkan extensions");
+	// Enable validation support if our layers are supported
+	if (m_fValidationLayersEnabled) {
+		CRM(CheckValidationLayerSupport(), "Vulkan validation layer check failed");
 
-	createInfo.enabledExtensionCount = glfwExtensionCount;
-	createInfo.ppEnabledExtensionNames = ppszGLFWExtensions;
+		createInfo.enabledLayerCount = static_cast<uint32_t>(m_vulkanValidationLayers.size());
+		createInfo.ppEnabledLayerNames = m_vulkanValidationLayers.data();
+	}
+	else {
+		createInfo.enabledLayerCount = 0;
+	}
 
-	createInfo.enabledLayerCount = 0;
-
+	// Create our instance
 	CBM(vkCreateInstance(&createInfo, nullptr, &m_vkInstance) == VK_SUCCESS, "Failed to create VK instance");
-	
 
 Error:
 	return r;
@@ -150,6 +218,11 @@ Error:
 
 RESULT VulkanApp::InitVulkan() {
 	RESULT r = R_PASS;
+
+	// Disable validation layers for debug builds
+#ifndef _DEBUG
+	bool m_fValidationLayersEnabled = false;
+#endif
 
 	CRM(CreateVulkanInstance(), "Failed to create vulkan instance");
 

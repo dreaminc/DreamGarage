@@ -33,7 +33,13 @@ public:
 	
 	RESULT InitVulkan();
 	RESULT CreateVulkanInstance();
-	RESULT RetrieveSupportedVulkanExtensions(const char** ppszGLFWExtensions = nullptr, unsigned int numExtensions = 0);
+
+	// Vulkan Extensions
+	RESULT InitializeVulkanExtensions();
+	RESULT RetrieveRequiredVulkanExtensions();
+	RESULT RetrieveSupportedVulkanExtensions();
+
+	RESULT CheckValidationLayerSupport();
 
 private:
 // Window Stuff (GLFW)
@@ -45,9 +51,17 @@ private:
 // Vulkan
 	VkInstance m_vkInstance;
 
+	
+
+	bool m_fValidationLayersEnabled = true;
+	const std::vector<const char*> m_vulkanValidationLayers = {
+		"VK_LAYER_KHRONOS_validation"
+	};
+
+	// Vulkan Extensions
 	unsigned int m_numSupportedVulkanExtensions = 0;
 	std::vector<VkExtensionProperties> m_supportedExtensions;
-
+	std::vector<const char*> m_vulkanRequiredExtensions;
 };
 
 #endif // ! VULKAN_JUNK_APP_
