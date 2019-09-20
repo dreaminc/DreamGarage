@@ -57,6 +57,7 @@ Success:
 		pVulkanApp = nullptr;
 	}
 
+	DEBUG_SYSTEM_PAUSE();
 	return (int)(r);
 
 Error:

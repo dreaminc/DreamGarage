@@ -98,7 +98,7 @@ RESULT VulkanApp::RetrieveRequiredVulkanExtensions() {
 	ppszGLFWExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 	CNM(ppszGLFWExtensions, "Failed to retrieve GLFW extensions");
 
-	for(int i = 0; i < glfwExtensionCount; i++) {
+	for(unsigned int i = 0; i < glfwExtensionCount; i++) {
 		DEBUG_LINEOUT("Required extension added: %s", ppszGLFWExtensions[i]);
 		m_vulkanRequiredExtensions.push_back(ppszGLFWExtensions[i]);
 	}
@@ -187,26 +187,31 @@ RESULT VulkanApp::CreateVulkanInstance() {
 	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 	appInfo.apiVersion = VK_API_VERSION_1_0;
 
-	
-
 	// Create Info
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &appInfo;
 
 	// Extensions
 	CRM(InitializeVulkanExtensions(), "Failed to initialize vulkan extensions");
-	createInfo.enabledExtensionCount = m_vulkanRequiredExtensions.size();
+	createInfo.enabledExtensionCount = static_cast<uint32_t>(m_vulkanRequiredExtensions.size());
 	createInfo.ppEnabledExtensionNames = m_vulkanRequiredExtensions.data();
 
 	// Enable validation support if our layers are supported
+	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
 	if (m_fValidationLayersEnabled) {
 		CRM(CheckValidationLayerSupport(), "Vulkan validation layer check failed");
 
 		createInfo.enabledLayerCount = static_cast<uint32_t>(m_vulkanValidationLayers.size());
 		createInfo.ppEnabledLayerNames = m_vulkanValidationLayers.data();
+
+		CRM(PopulateDebugMessengerCreateInfo(debugCreateInfo), 
+			"Failed to populate debug messenger info for instance creation");
+
+		createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)(&debugCreateInfo);
 	}
 	else {
 		createInfo.enabledLayerCount = 0;
+		createInfo.pNext = nullptr;
 	}
 
 	// Create our instance
@@ -214,6 +219,124 @@ RESULT VulkanApp::CreateVulkanInstance() {
 
 Error:
 	return r;
+}
+
+// Should go into an extension manager like OGLImp has in dos/hal
+// Proxy function for extension
+VkResult VulkanApp::CreateDebugUtilsMessengerEXT(
+	VkInstance vkInstance,
+	const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+	const VkAllocationCallbacks* pAllocator,
+	VkDebugUtilsMessengerEXT* pDebugMessenger)
+{
+	RESULT r = R_PASS;
+
+	auto pfnVkCreateDebugUtilsMessengerEXT =
+		(PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(vkInstance, "vkCreateDebugUtilsMessengerEXT");
+
+	CNM(pfnVkCreateDebugUtilsMessengerEXT, "vkCreateDebugUtilsMessengerEXT not present");
+
+Success:
+	return pfnVkCreateDebugUtilsMessengerEXT(vkInstance, pCreateInfo, pAllocator, pDebugMessenger);
+
+Error:
+	return VK_ERROR_EXTENSION_NOT_PRESENT;
+}
+
+void VulkanApp::DestroyDebugUtilsMessengerEXT(
+	VkInstance vkInstance,
+	VkDebugUtilsMessengerEXT debugMessenger,
+	const VkAllocationCallbacks* pAllocator)
+{
+	RESULT r = R_PASS;
+
+	auto pfnVkDestroyDebugUtilsMessengerEXT =
+		(PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(vkInstance, "vkDestroyDebugUtilsMessengerEXT");
+
+	CNM(pfnVkDestroyDebugUtilsMessengerEXT, "vkDestroyDebugUtilsMessengerEXT not present");
+
+Success:
+	return pfnVkDestroyDebugUtilsMessengerEXT(vkInstance, debugMessenger, pAllocator);
+
+Error:
+	return;
+}
+
+RESULT VulkanApp::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
+	RESULT r = R_PASS;
+
+	createInfo = {};
+
+	CBM(m_fValidationLayersEnabled, "Cannot set up debug messenger if validation layers are disabled");
+
+	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+
+	createInfo.messageSeverity =
+		VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+		//VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+		VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+		VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+		//VK_DEBUG_UTILS_MESSAGE_SEVERITY_FLAG_BITS_MAX_ENUM_EXT;
+
+	createInfo.messageType =
+		VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+		VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+		VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+		//VK_DEBUG_UTILS_MESSAGE_TYPE_FLAG_BITS_MAX_ENUM_EXT;
+
+	createInfo.pfnUserCallback = VulkanDebugCallback;
+	createInfo.pUserData = (void*)(this);
+
+Error:
+	return r;
+}
+
+RESULT VulkanApp::SetupVulkanDebugMessenger() {
+	RESULT r = R_PASS;
+
+	VkDebugUtilsMessengerCreateInfoEXT createInfo = {};
+
+	CBM(m_fValidationLayersEnabled, "Cannot set up debug messenger if validation layers are disabled");
+
+	CRM(PopulateDebugMessengerCreateInfo(createInfo), "Failed to populate vkDebugUtilsMessengerCreateInfoEXT");
+
+	// Set up the call backs for the debug messenger
+	CBM((CreateDebugUtilsMessengerEXT(m_vkInstance, &createInfo, nullptr, &m_vulkanDebugMessenger) == VK_SUCCESS),
+		"Failed to set up vulkan debug messenger");
+
+Error:
+	return r;
+}
+
+VKAPI_ATTR VkBool32 VKAPI_CALL VulkanApp::VulkanDebugCallback(
+	VkDebugUtilsMessageSeverityFlagBitsEXT msgSeverity,
+	VkDebugUtilsMessageTypeFlagsEXT msgType,
+	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+	void* pContext)
+{
+	RESULT r = R_PASS;
+
+	VulkanApp* pApp = reinterpret_cast<VulkanApp*>(pContext);
+	CNM(pApp, "Invalid VulkanApp in user data");
+
+	switch (msgSeverity) {
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: 
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: {
+			// Ignore these right now
+		} break;
+
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_FLAG_BITS_MAX_ENUM_EXT: {
+			DEBUG_LINEOUT("Validation Layer: %s", pCallbackData->pMessage);
+		} break;
+	}
+
+Success:
+	return VK_TRUE;
+
+Error:
+	return VK_FALSE;
 }
 
 RESULT VulkanApp::InitVulkan() {
@@ -225,6 +348,10 @@ RESULT VulkanApp::InitVulkan() {
 #endif
 
 	CRM(CreateVulkanInstance(), "Failed to create vulkan instance");
+
+	if (m_fValidationLayersEnabled) {
+		CRM(SetupVulkanDebugMessenger(), "Failed to set up vulkan debug messenger");
+	}
 
 Error:
 	return r;
@@ -243,6 +370,11 @@ Error:
 
 RESULT VulkanApp::CleanUp() {
 	RESULT r = R_PASS;
+
+	// 
+	if (m_fValidationLayersEnabled) {
+		DestroyDebugUtilsMessengerEXT(m_vkInstance, m_vulkanDebugMessenger, nullptr);
+	}
 
 	// Destroy Vulkan Instance
 	vkDestroyInstance(m_vkInstance, nullptr);
