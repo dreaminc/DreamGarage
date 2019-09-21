@@ -16,6 +16,16 @@
 #define DEFAULT_WINDOW_WIDTH 800
 #define DEFAULT_WINDOW_HEIGHT 600
 
+
+struct VulkanQueueFamilyIndices {
+	uint32_t graphicsFamily;
+	bool fValid = false;
+
+	bool IsValid() {
+		return fValid;
+	}
+};
+
 class VulkanApp {
 
 public:
@@ -54,6 +64,8 @@ public:
 	RESULT InitializePhysicalDevices();
 	RESULT SelectPhysicalDevice();
 
+	RESULT FindQueueFamilies();
+
 private:
 // Window Stuff (GLFW)
 	GLFWwindow* m_pglfwWindow = nullptr;
@@ -76,6 +88,8 @@ private:
 	unsigned int m_numSupportedVulkanExtensions = 0;
 	std::vector<VkExtensionProperties> m_supportedExtensions;
 	std::vector<const char*> m_vulkanRequiredExtensions;
+
+	VulkanQueueFamilyIndices m_vulkanQueueFamilyIndices;
 
 private:
 	// Vulkan Extensions

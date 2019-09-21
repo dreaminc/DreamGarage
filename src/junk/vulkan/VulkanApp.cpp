@@ -411,9 +411,25 @@ RESULT VulkanApp::InitializePhysicalDevices() {
 	for (const auto& vkDeviceHandle : m_vkPhysicalDeviceHandles) {
 		if (IsVulkanDeviceSuitable(vkDeviceHandle)) {
 			if (m_hVkSelectedPhysicalDevice == nullptr) {
-				m_hVkSelectedPhysicalDevice = vkDeviceHandle;
 
+				uint32_t queueFamilyCount = 0;
+				vkGetPhysicalDeviceQueueFamilyProperties(vkDeviceHandle, &queueFamilyCount, nullptr);
+				std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+				vkGetPhysicalDeviceQueueFamilyProperties(vkDeviceHandle, &queueFamilyCount, queueFamilies.data());
+
+				int i = 0;
+				bool fFoundValidQueueFamily = false;
+				for (const auto& queueFamily : queueFamilies) {
+					if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+						fFoundValidQueueFamily = true;
+						break;
+					}
+				}
 				
+				// Only set if we find a valid queue family
+				if (fFoundValidQueueFamily) {
+					m_hVkSelectedPhysicalDevice = vkDeviceHandle;
+				}
 			}
 		}
 	}
@@ -424,6 +440,9 @@ RESULT VulkanApp::InitializePhysicalDevices() {
 
 	CNM(m_hVkSelectedPhysicalDevice, "Failed to find suitable vk physical device");
 
+	// Check queue families (sets the struct)
+	CRM(FindQueueFamilies(), "Failed to find queue families for selected vk physical device");
+	CBM(m_vulkanQueueFamilyIndices.IsValid(), "Error: invalid queue family index");
 
 Error:
 	return r;
@@ -433,6 +452,35 @@ RESULT VulkanApp::SelectPhysicalDevice() {
 	RESULT r = R_PASS;
 
 
+
+Error:
+	return r;
+}
+
+// TODO: Actual implementation should be a bit more robust than this
+RESULT VulkanApp::FindQueueFamilies() {
+	RESULT r = R_PASS;
+
+	uint32_t queueFamilyCount = 0;
+	std::vector<VkQueueFamilyProperties> queueFamilies;
+
+	CNM(m_hVkSelectedPhysicalDevice, "No physical vulkan device selected");
+
+	vkGetPhysicalDeviceQueueFamilyProperties(m_hVkSelectedPhysicalDevice, &queueFamilyCount, nullptr);
+
+	queueFamilies.resize(queueFamilyCount);
+
+	vkGetPhysicalDeviceQueueFamilyProperties(m_hVkSelectedPhysicalDevice, &queueFamilyCount, queueFamilies.data());
+
+	int i = 0;
+	for (const auto& queueFamily : queueFamilies) {
+		if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+			m_vulkanQueueFamilyIndices.graphicsFamily = i;
+			m_vulkanQueueFamilyIndices.fValid = true;
+			break;
+		}
+		i++;
+	}
 
 Error:
 	return r;
