@@ -49,7 +49,7 @@ RESULT VulkanApp::Run() {
 
 	CRM(InitWindow(), "Vulkan initialization failed");
 
-	CRM(InitVulkan(), "Vulkan initialization failed");
+	CRM(InitializeVulkan(), "Vulkan initialization failed");
 
 	CRM(MainLoop(), "Main Loop Error");
 
@@ -339,7 +339,7 @@ Error:
 	return VK_FALSE;
 }
 
-RESULT VulkanApp::InitVulkan() {
+RESULT VulkanApp::InitializeVulkan() {
 	RESULT r = R_PASS;
 
 	// Disable validation layers for debug builds
@@ -352,6 +352,87 @@ RESULT VulkanApp::InitVulkan() {
 	if (m_fValidationLayersEnabled) {
 		CRM(SetupVulkanDebugMessenger(), "Failed to set up vulkan debug messenger");
 	}
+
+	CRM(InitializePhysicalDevices(), "Failed to initialize physical devices");
+
+Error:
+	return r;
+}
+
+// TODO: More sophisticated device selection process
+// TODO: Could also use multiple devices
+bool IsVulkanDeviceSuitable(VkPhysicalDevice vkDeviceHandle) {
+	RESULT r = R_PASS;
+
+	bool fSuitable = false;
+
+	VkPhysicalDeviceProperties vkPhysicalDeviceProperties; 
+	VkPhysicalDeviceFeatures vkPhysicalDeviceFeatures;
+
+	vkGetPhysicalDeviceProperties(vkDeviceHandle, &vkPhysicalDeviceProperties);
+	vkGetPhysicalDeviceFeatures(vkDeviceHandle, &vkPhysicalDeviceFeatures);
+
+	DEBUG_LINEOUT("Found device: %s", vkPhysicalDeviceProperties.deviceName);
+
+	// Discrete GPU
+	if (vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
+		vkPhysicalDeviceFeatures.geometryShader == VK_TRUE &&
+		vkPhysicalDeviceFeatures.tessellationShader == VK_TRUE
+		)
+	{
+		fSuitable = true;
+	}
+
+	// Integrated GPU
+	if (vkPhysicalDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU &&
+		vkPhysicalDeviceFeatures.geometryShader == VK_TRUE &&
+		vkPhysicalDeviceFeatures.tessellationShader == VK_TRUE
+		)
+	{
+		fSuitable = true;
+	}
+
+Success:
+	return fSuitable;
+
+Error:
+	return false;
+}
+
+RESULT VulkanApp::InitializePhysicalDevices() {
+	RESULT r = R_PASS;
+
+	vkEnumeratePhysicalDevices(m_vkInstance, &m_vkPhysicalDevices_n, nullptr);
+	CBM((m_vkPhysicalDevices_n > 0), "No vulkan physical devices found");
+
+	m_vkPhysicalDeviceHandles = std::vector<VkPhysicalDevice>(m_vkPhysicalDevices_n);
+	vkEnumeratePhysicalDevices(m_vkInstance, &m_vkPhysicalDevices_n, m_vkPhysicalDeviceHandles.data());
+
+	for (const auto& vkDeviceHandle : m_vkPhysicalDeviceHandles) {
+		if (IsVulkanDeviceSuitable(vkDeviceHandle)) {
+			if (m_hVkSelectedPhysicalDevice == nullptr) {
+				m_hVkSelectedPhysicalDevice = vkDeviceHandle;
+
+				
+			}
+		}
+	}
+
+	VkPhysicalDeviceProperties vkPhysicalDeviceProperties;
+	vkGetPhysicalDeviceProperties(m_hVkSelectedPhysicalDevice, &vkPhysicalDeviceProperties);
+	DEBUG_LINEOUT("Selected device: %s", vkPhysicalDeviceProperties.deviceName);
+
+	CNM(m_hVkSelectedPhysicalDevice, "Failed to find suitable vk physical device");
+
+
+Error:
+	return r;
+}
+
+RESULT VulkanApp::SelectPhysicalDevice() {
+	RESULT r = R_PASS;
+
+
 
 Error:
 	return r;
@@ -367,6 +448,8 @@ RESULT VulkanApp::MainLoop() {
 Error:
 	return r;
 }
+
+
 
 RESULT VulkanApp::CleanUp() {
 	RESULT r = R_PASS;

@@ -31,7 +31,7 @@ public:
 
 	// Vulkan
 	
-	RESULT InitVulkan();
+	RESULT InitializeVulkan();
 	RESULT CreateVulkanInstance();
 
 	RESULT SetupVulkanDebugMessenger();
@@ -49,6 +49,10 @@ public:
 		VkDebugUtilsMessageTypeFlagsEXT msgType,
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pContext);
+
+	// Physical Devices
+	RESULT InitializePhysicalDevices();
+	RESULT SelectPhysicalDevice();
 
 private:
 // Window Stuff (GLFW)
@@ -85,6 +89,10 @@ private:
 		VkInstance vkInstance,
 		VkDebugUtilsMessengerEXT debugMessenger,
 		const VkAllocationCallbacks* pAllocator);
+
+	std::vector<VkPhysicalDevice> m_vkPhysicalDeviceHandles;
+	uint32_t m_vkPhysicalDevices_n = 0;
+	VkPhysicalDevice m_hVkSelectedPhysicalDevice = nullptr;
 };
 
 #endif // ! VULKAN_JUNK_APP_

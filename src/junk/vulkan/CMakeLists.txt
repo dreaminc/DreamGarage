@@ -58,7 +58,11 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")      
 
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/GLM/0.9.9.6)
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/GLFW/glfw-3.3.bin.WIN64/include)
-include_directories(${CMAKE_SOURCE_DIR}/src/third_party/VulkanSDK/1.1.121.0/Include)
+
+#project(vulkaninfo)
+find_package(Vulkan REQUIRED)
+
+include_directories(${VULKAN_SDK}/Include)
 
 add_executable(vulkanproj
     ${SOURCES}
@@ -67,5 +71,5 @@ add_executable(vulkanproj
 # External
 target_link_libraries(vulkanproj
   ${CMAKE_SOURCE_DIR}/src/third_party/GLFW/glfw-3.3.bin.WIN64/lib-vc2019/glfw3.lib
-  ${CMAKE_SOURCE_DIR}/src/third_party/VulkanSDK/1.1.121.0/Lib/vulkan-1.lib
+  Vulkan::Vulkan
 )
