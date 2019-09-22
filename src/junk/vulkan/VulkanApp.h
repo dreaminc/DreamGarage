@@ -66,6 +66,8 @@ public:
 
 	RESULT FindQueueFamilies();
 
+	RESULT InitializeLogicalDevice();
+
 private:
 // Window Stuff (GLFW)
 	GLFWwindow* m_pglfwWindow = nullptr;
@@ -74,7 +76,7 @@ private:
 	int m_windowHeight = DEFAULT_WINDOW_HEIGHT;
 
 // Vulkan
-	VkInstance m_vkInstance;
+	VkInstance m_hVkInstance;
 
 	
 	VkDebugUtilsMessengerEXT m_vulkanDebugMessenger;
@@ -104,9 +106,18 @@ private:
 		VkDebugUtilsMessengerEXT debugMessenger,
 		const VkAllocationCallbacks* pAllocator);
 
+	VkApplicationInfo m_vkApplicationInfo = {};
+	VkInstanceCreateInfo m_vkInstanceCreateInfo = {};
+	VkDeviceQueueCreateInfo m_vkQueueCreateInfo = {};
+	VkDeviceCreateInfo m_vkDeviceCreateInfo = {};
+	VkPhysicalDeviceFeatures m_vkPhysicalDeviceFeatures = {};
+
 	std::vector<VkPhysicalDevice> m_vkPhysicalDeviceHandles;
 	uint32_t m_vkPhysicalDevices_n = 0;
 	VkPhysicalDevice m_hVkSelectedPhysicalDevice = nullptr;
+
+	VkDevice m_hVkLogicalDevice = nullptr;
+	VkQueue m_hVkGraphicsQueue = nullptr;
 };
 
 #endif // ! VULKAN_JUNK_APP_

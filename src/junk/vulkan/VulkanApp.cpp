@@ -175,47 +175,44 @@ Error:
 
 RESULT VulkanApp::CreateVulkanInstance() {
 	RESULT r = R_PASS;
-	
-	VkApplicationInfo appInfo = {};
-	VkInstanceCreateInfo createInfo = {};
 
 	// App Info
-	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = "Hello Triangle";
-	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.pEngineName = "No engine";
-	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.apiVersion = VK_API_VERSION_1_0;
+	m_vkApplicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	m_vkApplicationInfo.pApplicationName = "Hello Triangle";
+	m_vkApplicationInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+	m_vkApplicationInfo.pEngineName = "No engine";
+	m_vkApplicationInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+	m_vkApplicationInfo.apiVersion = VK_API_VERSION_1_0;
 
 	// Create Info
-	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	createInfo.pApplicationInfo = &appInfo;
+	m_vkInstanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	m_vkInstanceCreateInfo.pApplicationInfo = &m_vkApplicationInfo;
 
 	// Extensions
 	CRM(InitializeVulkanExtensions(), "Failed to initialize vulkan extensions");
-	createInfo.enabledExtensionCount = static_cast<uint32_t>(m_vulkanRequiredExtensions.size());
-	createInfo.ppEnabledExtensionNames = m_vulkanRequiredExtensions.data();
+	m_vkInstanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(m_vulkanRequiredExtensions.size());
+	m_vkInstanceCreateInfo.ppEnabledExtensionNames = m_vulkanRequiredExtensions.data();
 
 	// Enable validation support if our layers are supported
 	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
 	if (m_fValidationLayersEnabled) {
 		CRM(CheckValidationLayerSupport(), "Vulkan validation layer check failed");
 
-		createInfo.enabledLayerCount = static_cast<uint32_t>(m_vulkanValidationLayers.size());
-		createInfo.ppEnabledLayerNames = m_vulkanValidationLayers.data();
+		m_vkInstanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(m_vulkanValidationLayers.size());
+		m_vkInstanceCreateInfo.ppEnabledLayerNames = m_vulkanValidationLayers.data();
 
 		CRM(PopulateDebugMessengerCreateInfo(debugCreateInfo), 
 			"Failed to populate debug messenger info for instance creation");
 
-		createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)(&debugCreateInfo);
+		m_vkInstanceCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)(&debugCreateInfo);
 	}
 	else {
-		createInfo.enabledLayerCount = 0;
-		createInfo.pNext = nullptr;
+		m_vkInstanceCreateInfo.enabledLayerCount = 0;
+		m_vkInstanceCreateInfo.pNext = nullptr;
 	}
 
 	// Create our instance
-	CBM(vkCreateInstance(&createInfo, nullptr, &m_vkInstance) == VK_SUCCESS, "Failed to create VK instance");
+	CBM(vkCreateInstance(&m_vkInstanceCreateInfo, nullptr, &m_hVkInstance) == VK_SUCCESS, "Failed to create VK instance");
 
 Error:
 	return r;
@@ -301,7 +298,7 @@ RESULT VulkanApp::SetupVulkanDebugMessenger() {
 	CRM(PopulateDebugMessengerCreateInfo(createInfo), "Failed to populate vkDebugUtilsMessengerCreateInfoEXT");
 
 	// Set up the call backs for the debug messenger
-	CBM((CreateDebugUtilsMessengerEXT(m_vkInstance, &createInfo, nullptr, &m_vulkanDebugMessenger) == VK_SUCCESS),
+	CBM((CreateDebugUtilsMessengerEXT(m_hVkInstance, &createInfo, nullptr, &m_vulkanDebugMessenger) == VK_SUCCESS),
 		"Failed to set up vulkan debug messenger");
 
 Error:
@@ -402,11 +399,11 @@ Error:
 RESULT VulkanApp::InitializePhysicalDevices() {
 	RESULT r = R_PASS;
 
-	vkEnumeratePhysicalDevices(m_vkInstance, &m_vkPhysicalDevices_n, nullptr);
+	vkEnumeratePhysicalDevices(m_hVkInstance, &m_vkPhysicalDevices_n, nullptr);
 	CBM((m_vkPhysicalDevices_n > 0), "No vulkan physical devices found");
 
 	m_vkPhysicalDeviceHandles = std::vector<VkPhysicalDevice>(m_vkPhysicalDevices_n);
-	vkEnumeratePhysicalDevices(m_vkInstance, &m_vkPhysicalDevices_n, m_vkPhysicalDeviceHandles.data());
+	vkEnumeratePhysicalDevices(m_hVkInstance, &m_vkPhysicalDevices_n, m_vkPhysicalDeviceHandles.data());
 
 	for (const auto& vkDeviceHandle : m_vkPhysicalDeviceHandles) {
 		if (IsVulkanDeviceSuitable(vkDeviceHandle)) {
@@ -486,6 +483,54 @@ Error:
 	return r;
 }
 
+RESULT VulkanApp::InitializeLogicalDevice() {
+	RESULT r = R_PASS;
+
+	// Create the queue we will be using
+	// Note: We can have multiple queues - this is how we accomplish multi-thread access
+	// Idea: Each application could in theory have a queue
+
+	
+
+	m_vkQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+	m_vkQueueCreateInfo.queueFamilyIndex = m_vulkanQueueFamilyIndices.graphicsFamily;
+	m_vkQueueCreateInfo.queueCount = 1;
+
+	float queuePriority = 1.0f;
+	m_vkQueueCreateInfo.pQueuePriorities = &queuePriority;
+
+	
+	// Device Features
+
+	m_vkDeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	m_vkDeviceCreateInfo.pQueueCreateInfos = &m_vkQueueCreateInfo;
+	m_vkDeviceCreateInfo.queueCreateInfoCount = 1;
+	m_vkDeviceCreateInfo.pEnabledFeatures = &m_vkPhysicalDeviceFeatures;
+
+	m_vkDeviceCreateInfo.enabledExtensionCount = 0;
+
+	// This is technically ignored, but good to set anyways
+	if (m_fValidationLayersEnabled) {
+		m_vkDeviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(m_vulkanValidationLayers.size());
+		m_vkDeviceCreateInfo.ppEnabledLayerNames = m_vulkanValidationLayers.data();
+	}
+	else {
+		m_vkDeviceCreateInfo.enabledLayerCount = 0;
+	}
+
+	
+	CBM(vkCreateDevice(m_hVkSelectedPhysicalDevice, &m_vkDeviceCreateInfo, nullptr, &m_hVkLogicalDevice) == VK_SUCCESS, 
+		"Failed to create vulkan logical device");
+
+	// Set up the queue
+
+	vkGetDeviceQueue(m_hVkLogicalDevice, m_vulkanQueueFamilyIndices.graphicsFamily, 0, &m_hVkGraphicsQueue);
+	CNM(m_hVkGraphicsQueue, "Failed to retreiver graphics queue");
+
+Error:
+	return r;
+}
+
 RESULT VulkanApp::MainLoop() {
 	RESULT r = R_PASS;
 
@@ -504,11 +549,20 @@ RESULT VulkanApp::CleanUp() {
 
 	// 
 	if (m_fValidationLayersEnabled) {
-		DestroyDebugUtilsMessengerEXT(m_vkInstance, m_vulkanDebugMessenger, nullptr);
+		DestroyDebugUtilsMessengerEXT(m_hVkInstance, m_vulkanDebugMessenger, nullptr);
+	}
+
+	// Destroy Vulkan Logical Device
+	if (m_hVkLogicalDevice != nullptr) {
+		vkDestroyDevice(m_hVkLogicalDevice, nullptr);
+		m_hVkLogicalDevice = nullptr;
 	}
 
 	// Destroy Vulkan Instance
-	vkDestroyInstance(m_vkInstance, nullptr);
+	if (m_hVkInstance != nullptr) {
+		vkDestroyInstance(m_hVkInstance, nullptr);
+		m_hVkInstance = nullptr;
+	}
 
 	// Clean up window
 	if (m_pglfwWindow != nullptr) {
