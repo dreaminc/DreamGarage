@@ -19,6 +19,8 @@
 
 struct VulkanQueueFamilyIndices {
 	uint32_t graphicsFamily;
+	uint32_t presentFamily;
+	
 	bool fValid = false;
 
 	bool IsValid() {
@@ -35,7 +37,7 @@ public:
 	static RESULT TestVulkanSetup();
 
 	RESULT Run();
-	RESULT InitWindow();
+	RESULT InitializeGLFWWindow();
 	RESULT MainLoop();
 	RESULT CleanUp();
 
@@ -46,6 +48,8 @@ public:
 
 	RESULT SetupVulkanDebugMessenger();
 	RESULT PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+
+	RESULT CreateVulkanSurface();
 
 	// Vulkan Extensions
 	RESULT InitializeVulkanExtensions();
@@ -76,9 +80,8 @@ private:
 	int m_windowHeight = DEFAULT_WINDOW_HEIGHT;
 
 // Vulkan
-	VkInstance m_hVkInstance;
+	VkInstance m_hVkInstance = nullptr;
 
-	
 	VkDebugUtilsMessengerEXT m_vulkanDebugMessenger;
 
 	bool m_fValidationLayersEnabled = true;
@@ -118,6 +121,12 @@ private:
 
 	VkDevice m_hVkLogicalDevice = nullptr;
 	VkQueue m_hVkGraphicsQueue = nullptr;
+
+	// Presentation
+	VkSurfaceKHR m_hVkSurfaceKHR = nullptr;
+	VkQueue m_hVkPresentationQueue = nullptr;
+
+
 };
 
 #endif // ! VULKAN_JUNK_APP_

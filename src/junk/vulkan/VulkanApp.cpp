@@ -3,6 +3,8 @@
 #include "glm/vec4.hpp"
 #include "glm/mat4x4.hpp"
 
+#include <set>
+
 VulkanApp::VulkanApp() {
 	// 
 }
@@ -47,7 +49,7 @@ Error:
 RESULT VulkanApp::Run() {
 	RESULT r = R_PASS;
 
-	CRM(InitWindow(), "Vulkan initialization failed");
+	CRM(InitializeGLFWWindow(), "Vulkan initialization failed");
 
 	CRM(InitializeVulkan(), "Vulkan initialization failed");
 
@@ -59,7 +61,7 @@ Error:
 	return r;
 }
 
-RESULT VulkanApp::InitWindow() {
+RESULT VulkanApp::InitializeGLFWWindow() {
 	RESULT r = R_PASS;
 
 	glfwInit();
@@ -350,7 +352,11 @@ RESULT VulkanApp::InitializeVulkan() {
 		CRM(SetupVulkanDebugMessenger(), "Failed to set up vulkan debug messenger");
 	}
 
+	CRM(CreateVulkanSurface(), "Failed to create vulkan surface")
+
 	CRM(InitializePhysicalDevices(), "Failed to initialize physical devices");
+
+	CRM(InitializeLogicalDevice(), "Failed to initialize logical device");
 
 Error:
 	return r;
@@ -394,6 +400,35 @@ Success:
 
 Error:
 	return false;
+}
+
+// TODO: Only windows
+#include "vulkan/vulkan_win32.h"
+
+// Needed for GLFW Win32 Specific functions
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include "GLFW/glfw3native.h"
+
+RESULT VulkanApp::CreateVulkanSurface() {
+	RESULT r = R_PASS;
+
+	// Win32 way
+	/*
+	VkWin32SurfaceCreateInfoKHR vkWin32SuraceCreateInfoKHR = {};
+	vkWin32SuraceCreateInfoKHR.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	vkWin32SuraceCreateInfoKHR.hwnd = glfwGetWin32Window(m_pglfwWindow);
+	vkWin32SuraceCreateInfoKHR.hinstance = GetModuleHandle(nullptr);
+
+	CBM((vkCreateWin32SurfaceKHR(m_hVkInstance, &vkWin32SuraceCreateInfoKHR, nullptr, &m_vkSurfaceKHR) == VK_SUCCESS),
+		"Failed to create Win32 vulkan surface KHR");
+	*/
+
+	CBM((glfwCreateWindowSurface(m_hVkInstance, m_pglfwWindow, nullptr, &m_hVkSurfaceKHR) == VK_SUCCESS),
+		"Failed to create Win32 vulkan surface KHR using GLFW");
+
+
+Error:
+	return r;
 }
 
 RESULT VulkanApp::InitializePhysicalDevices() {
@@ -471,10 +506,20 @@ RESULT VulkanApp::FindQueueFamilies() {
 
 	int i = 0;
 	for (const auto& queueFamily : queueFamilies) {
+			
+		// Ensure queue supports graphics, has more than one queue, and supports presenting
+
 		if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-			m_vulkanQueueFamilyIndices.graphicsFamily = i;
-			m_vulkanQueueFamilyIndices.fValid = true;
-			break;
+
+			VkBool32 fPresentSupport = false;
+			vkGetPhysicalDeviceSurfaceSupportKHR(m_hVkSelectedPhysicalDevice, i, m_hVkSurfaceKHR, &fPresentSupport);
+
+			if (fPresentSupport) {
+				m_vulkanQueueFamilyIndices.graphicsFamily = i;
+				m_vulkanQueueFamilyIndices.presentFamily = i;
+				m_vulkanQueueFamilyIndices.fValid = true;
+				break;
+			}
 		}
 		i++;
 	}
@@ -495,16 +540,12 @@ RESULT VulkanApp::InitializeLogicalDevice() {
 	m_vkQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 	m_vkQueueCreateInfo.queueFamilyIndex = m_vulkanQueueFamilyIndices.graphicsFamily;
 	m_vkQueueCreateInfo.queueCount = 1;
-
-	float queuePriority = 1.0f;
-	m_vkQueueCreateInfo.pQueuePriorities = &queuePriority;
-
 	
 	// Device Features
 
 	m_vkDeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	m_vkDeviceCreateInfo.pQueueCreateInfos = &m_vkQueueCreateInfo;
-	m_vkDeviceCreateInfo.queueCreateInfoCount = 1;
+	//m_vkDeviceCreateInfo.pQueueCreateInfos = &m_vkQueueCreateInfo;
+	//m_vkDeviceCreateInfo.queueCreateInfoCount = 1;
 	m_vkDeviceCreateInfo.pEnabledFeatures = &m_vkPhysicalDeviceFeatures;
 
 	m_vkDeviceCreateInfo.enabledExtensionCount = 0;
@@ -518,6 +559,29 @@ RESULT VulkanApp::InitializeLogicalDevice() {
 		m_vkDeviceCreateInfo.enabledLayerCount = 0;
 	}
 
+	// Set up queues
+
+	float queuePriority = 1.0f;
+	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+	std::set<uint32_t> uniqueQueueFamilies = {
+		m_vulkanQueueFamilyIndices.graphicsFamily, m_vulkanQueueFamilyIndices.presentFamily
+	};
+
+
+	for (uint32_t queueFamily : uniqueQueueFamilies) {
+		VkDeviceQueueCreateInfo vkDeviceQueueCreateInfo = {};
+		
+		vkDeviceQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		vkDeviceQueueCreateInfo.queueFamilyIndex = queueFamily;
+		vkDeviceQueueCreateInfo.queueCount = 1;
+		vkDeviceQueueCreateInfo.pQueuePriorities = &queuePriority;
+
+		queueCreateInfos.push_back(vkDeviceQueueCreateInfo);
+	}
+
+	m_vkDeviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+	m_vkDeviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+	m_vkQueueCreateInfo.pQueuePriorities = &queuePriority;
 	
 	CBM(vkCreateDevice(m_hVkSelectedPhysicalDevice, &m_vkDeviceCreateInfo, nullptr, &m_hVkLogicalDevice) == VK_SUCCESS, 
 		"Failed to create vulkan logical device");
@@ -525,14 +589,17 @@ RESULT VulkanApp::InitializeLogicalDevice() {
 	// Set up the queue
 
 	vkGetDeviceQueue(m_hVkLogicalDevice, m_vulkanQueueFamilyIndices.graphicsFamily, 0, &m_hVkGraphicsQueue);
-	CNM(m_hVkGraphicsQueue, "Failed to retreiver graphics queue");
+	CNM(m_hVkGraphicsQueue, "Failed to get graphics queue");
+
+	vkGetDeviceQueue(m_hVkLogicalDevice, m_vulkanQueueFamilyIndices.presentFamily, 0, &m_hVkPresentationQueue);
+	CNM(m_hVkPresentationQueue, "Failed to get presentation queue");
 
 Error:
 	return r;
 }
 
 RESULT VulkanApp::MainLoop() {
-	RESULT r = R_PASS;
+	RESULT r = R_PASS;	
 
 	while (!glfwWindowShouldClose(m_pglfwWindow)) {
 		glfwPollEvents();
@@ -556,6 +623,11 @@ RESULT VulkanApp::CleanUp() {
 	if (m_hVkLogicalDevice != nullptr) {
 		vkDestroyDevice(m_hVkLogicalDevice, nullptr);
 		m_hVkLogicalDevice = nullptr;
+	}
+
+	if (m_hVkSurfaceKHR != nullptr) {
+		vkDestroySurfaceKHR(m_hVkInstance, m_hVkSurfaceKHR, nullptr);
+		m_hVkSurfaceKHR = nullptr;
 	}
 
 	// Destroy Vulkan Instance
