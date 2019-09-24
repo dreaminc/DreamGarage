@@ -64,7 +64,21 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
 
-    message("dos/src/junk/vulkaninitproj/cmakelists.txt apple clang")
+    message("dos/src/cmakelists.txt apple clang")
+
+    # Force Include the src/core/config.h
+    # add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")
+    # Release Configuration
+
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
+
+    # Debug Configuration
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 -Wall -Wextra -Werror -stdlib=libc++ -fpermissive")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 -Wall -Wextra -Werror -stdlib=libc++ -fpermissive")
 
 #    message("flags: ${CMAKE_CXX_FLAGS}")
 #    message("debug flags: ${CMAKE_CXX_FLAGS_DEBUG}")
@@ -77,3 +91,4 @@ else()
 endif()
 
 add_subdirectory(vulkaninitproj)
+add_subdirectory(helloworld)

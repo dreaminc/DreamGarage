@@ -33,6 +33,12 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 
 #include "logger/DreamLogger.h"
 
+#ifdef __APPLE__
+//    #pragma GCC diagnostic push
+//    #pragma GCC diagnostic ignored "-Wvariadic-macros"
+    #pragma GCC system_header
+#endif
+
 // Logging (needs DreamLogger included)
 // This has been moved to project config, otherwise it breaks across multiple projects
 // This requirement will be fixed when we move away from the monolithic build
@@ -48,7 +54,12 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
  
 #if defined(DEBUG_OUT_TO_CONSOLE)
 	// TODO: Tie into the official console/interface system
+#ifdef __APPLE__
+    #define CONSOLE_OUT(str, ...) do { printf(str, ##__VA_ARGS__); } while(0);
+#else
 	#define CONSOLE_OUT(str, ...) do { printf(str, ##__VA_ARGS__); } while(0);
+#endif
+
 #elif defined(DEBUG_OUT_TO_WIN_DEBUGGER)
 	// empty
 #endif
@@ -56,64 +67,33 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 
 // Console Output
 #ifdef _DEBUG
-	#ifdef __APPLE__
-    		#define DEBUG_OUT(str, ...) do { CONSOLE_OUT(str, __VA_OPT__(,) __VA_ARGS__); } while(0);
-    		#define DEBUG_LINEOUT(str, ...) do { CONSOLE_OUT(str, __VA_OPT__(,) __VA_ARGS__); CONSOLE_OUT("\n"); } while(0);
-		#define DEBUG_LINEOUT_RETURN(str, ...) do { CONSOLE_OUT(str, __VA_OPT__(,) __VA_ARGS__); CONSOLE_OUT("\r"); } while(0);
-		#define DEBUG_SYSTEM_PAUSE() do { system("pause"); } while(0);
-	#else
-		#define DEBUG_OUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); } while(0);
-		#define DEBUG_LINEOUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\n"); } while(0);
-		#define DEBUG_LINEOUT_RETURN(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\r"); } while(0);
-		#define DEBUG_SYSTEM_PAUSE() do { system("pause"); } while(0);
-	#endif
-#else
-#ifdef __APPLE__
-	#define DEBUG_OUT(str, ...)
-	#define DEBUG_LINEOUT(str, ...)
-	#define DEBUG_LINEOUT_RETURN(str, ...)
-	#define DEBUG_SYSTEM_PAUSE()
+    #define DEBUG_OUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); } while(0);
+    #define DEBUG_LINEOUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\n"); } while(0);
+    #define DEBUG_LINEOUT_RETURN(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\r"); } while(0);
+    #define DEBUG_SYSTEM_PAUSE() do { system("pause"); } while(0);
 #else
 	#define DEBUG_OUT(str, ...)
 	#define DEBUG_LINEOUT(str, ...)
 	#define DEBUG_LINEOUT_RETURN(str, ...)
 	#define DEBUG_SYSTEM_PAUSE()
-#endif
 #endif
 
 
 // DevEnv output (available in release) but should throw a production error
-#ifdef _WIN32
-	#define DOS_DEBUGGER_SIGNATURE "DOS::"
-	#define DOS_DEBUGGER_SIGNATURE_SIZE	5		// size in bytes
-	#define	DOS_DEBUGGER_OUTPUT_MAX_SIZE	1024
+#define DOS_DEBUGGER_SIGNATURE "DOS::"
+#define DOS_DEBUGGER_SIGNATURE_SIZE	5		// size in bytes
+#define	DOS_DEBUGGER_OUTPUT_MAX_SIZE	1024
 
-	extern void OutputDebugString(wchar_t*);
-	static char szDebugOutputString[DOS_DEBUGGER_OUTPUT_MAX_SIZE] = { DOS_DEBUGGER_SIGNATURE };
+extern void OutputDebugString(wchar_t*);
+static char szDebugOutputString[DOS_DEBUGGER_OUTPUT_MAX_SIZE] = { DOS_DEBUGGER_SIGNATURE };
 
-	//#define DEVENV_LINEOUT(str) do { OutputDebugString(str); } while(0); 
-		
-	#define DEVENV_LINEOUT(str, ...) do {																												\
-		sprintf_s(szDebugOutputString + DOS_DEBUGGER_SIGNATURE_SIZE, DOS_DEBUGGER_OUTPUT_MAX_SIZE - DOS_DEBUGGER_SIGNATURE_SIZE, str, ##__VA_ARGS__);		\
-		if (szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\n' && szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\r')							\
-			OutputDebugStringA(szDebugOutputString);																									\
-		} while(0);
-#elif defined(__APPLE__)
-	#define DOS_DEBUGGER_SIGNATURE "DOS::"
-	#define DOS_DEBUGGER_SIGNATURE_SIZE	5		// size in bytes
-	#define	DOS_DEBUGGER_OUTPUT_MAX_SIZE	1024
+//#define DEVENV_LINEOUT(str) do { OutputDebugString(str); } while(0);
 
-	extern void OutputDebugString(wchar_t*);
-	static char szDebugOutputString[DOS_DEBUGGER_OUTPUT_MAX_SIZE] = { DOS_DEBUGGER_SIGNATURE };
-
-	//#define DEVENV_LINEOUT(str) do { OutputDebugString(str); } while(0);
-
-	#define DEVENV_LINEOUT(str, ...) do {																															\
-		sprintf_s(szDebugOutputString + DOS_DEBUGGER_SIGNATURE_SIZE, DOS_DEBUGGER_OUTPUT_MAX_SIZE - DOS_DEBUGGER_SIGNATURE_SIZE, str, __VA_OPT__(,) __VA_ARGS__);		\
-		if (szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\n' && szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\r')										\
-			OutputDebugStringA(szDebugOutputString);																												\
-		} while(0);
-#endif
+#define DEVENV_LINEOUT(str, ...) do {																												\
+    sprintf_s(szDebugOutputString + DOS_DEBUGGER_SIGNATURE_SIZE, DOS_DEBUGGER_OUTPUT_MAX_SIZE - DOS_DEBUGGER_SIGNATURE_SIZE, str, ##__VA_ARGS__);		\
+    if (szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\n' && szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\r')							\
+        OutputDebugStringA(szDebugOutputString);																									\
+    } while(0);
 
 /*
 #ifndef __FUNCTION_NAME__
@@ -140,27 +120,22 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 
 	#define DOSLogLine(level, crt, r) DOSLOG(ERR, "%s:%s:%s(%d):Error: 0x%x\n", crt, __BASE_FILE__, __FUNCTION__, __LINE__, r)
 
-	#if defined(__APPLE__)
-		#define DOSLogLineMessage(level, crt, r, msg, ...) do {															\
-			sprintf_s(szDosLogOutputString, msg, __VA_OPT__(,) __VA_ARGS__);															\
-			DOSLOG(level, "%s:%s:%s(%d:0x%x):%s\n", crt, __BASE_FILE__, __FUNCTION__, __LINE__, r, szDosLogOutputString)		\
-		} while (0);
-	#else
-		#define DOSLogLineMessage(level, crt, r, msg, ...) do {															\
-			sprintf_s(szDosLogOutputString, msg, ##__VA_ARGS__);															\
-			DOSLOG(level, "%s:%s:%s(%d:0x%x):%s\n", crt, __BASE_FILE__, __FUNCTION__, __LINE__, r, szDosLogOutputString)		\
-		} while (0);
-	#endif
+#ifdef __APPLE__
+    #define DOSLogLineMessage(level, crt, r, msg, ...) do {\
+        sprintf(szDosLogOutputString, msg, ##__VA_ARGS__);															\
+        DOSLOG(level, "%s:%s:%s(%d:0x%x):%s\n", crt, __BASE_FILE__, __FUNCTION__, __LINE__, r, szDosLogOutputString)		\
+    } while (0);
+#else
+    #define DOSLogLineMessage(level, crt, r, msg, ...) do {\
+        sprintf_s(szDosLogOutputString, msg, ##__VA_ARGS__);															\
+        DOSLOG(level, "%s:%s:%s(%d:0x%x):%s\n", crt, __BASE_FILE__, __FUNCTION__, __LINE__, r, szDosLogOutputString)		\
+    } while (0);
+#endif
 
 	#define DOSLogError(crt, r) DOSLogLine(ERR, crt, r)
 
-	#if defined(__APPLE__)
-		#define DOSLogErrorMessage(crt, r, msg, ...) DOSLogLineMessage(ERR, crt, r, msg, __VA_OPT__(,) __VA_ARGS__)
-		#define DOSLogWarningMessage(crt, r, msg, ...) DOSLogLineMessage(WARN, crt, r, msg, __VA_OPT__(,) __VA_ARGS__)
-	#else
-		#define DOSLogErrorMessage(crt, r, msg, ...) DOSLogLineMessage(ERR, crt, r, msg, ##__VA_ARGS__)
-		#define DOSLogWarningMessage(crt, r, msg, ...) DOSLogLineMessage(WARN, crt, r, msg, ##__VA_ARGS__)
-	#endif
+    #define DOSLogErrorMessage(crt, r, msg, ...) DOSLogLineMessage(ERR, crt, r, msg, ##__VA_ARGS__)
+    #define DOSLogWarningMessage(crt, r, msg, ...) DOSLogLineMessage(WARN, crt, r, msg, ##__VA_ARGS__)
 
 	#define DOSLogWarning(crt, r) DOSLogLine(WARN, crt, r)
 
@@ -224,15 +199,9 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 #define CB(condition) do{if(!(condition)) {r = R_FAIL; DOSLogError("CB", r);goto Error;}}while(0);
 #define WCB(condition) do{if(!(condition)) {r = R_WARNING; DOSLogError("WCB", r);goto Error;}}while(0);
 #define CBR(condition, failCode) do{if(!(condition)) {r = failCode; if(r&0x80000000){DOSLogError("CBR", r);} goto Error;}}while(0);
-#if defined(__APPLE__)
-	#define CBM(condition, msg, ...) do{if(!(condition)) { DOSLogErrorMessage("CBM", r, msg, __VA_OPT__(,) __VA_ARGS__); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, __VA_OPT__(,) __VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
-	#define WCBM(condition, msg, ...) do{if(!(condition)) { DOSLogWarningMessage("WCBM", r, msg, __VA_OPT__(,) __VA_ARGS__); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, __VA_OPT__(,) __VA_ARGS__); DEBUG_OUT("\n"); r = R_WARNING;/*goto Error;*/}}while(0);
-	#define CBRM(condition, failCode, msg, ...) do{if(!(condition)) {r = failCode; if(r&0x80000000){ DOSLogErrorMessage("CBRM", r, msg, __VA_OPT__(,) __VA_ARGS__); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, __VA_OPT__(,) __VA_ARGS__); DEBUG_OUT("\n"); r = failCode;} goto Error; }}while(0);
-#else
-	#define CBM(condition, msg, ...) do{if(!(condition)) { DOSLogErrorMessage("CBM", r, msg, ##__VA_ARGS__); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
-	#define WCBM(condition, msg, ...) do{if(!(condition)) { DOSLogWarningMessage("WCBM", r, msg, ##__VA_ARGS__); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_WARNING;/*goto Error;*/}}while(0);
-	#define CBRM(condition, failCode, msg, ...) do{if(!(condition)) {r = failCode; if(r&0x80000000){ DOSLogErrorMessage("CBRM", r, msg, ##__VA_ARGS__); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode;} goto Error; }}while(0);
-#endif
+#define CBM(condition, msg, ...) do{if(!(condition)) { DOSLogErrorMessage("CBM", r, msg, ##__VA_ARGS__); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
+#define WCBM(condition, msg, ...) do{if(!(condition)) { DOSLogWarningMessage("WCBM", r, msg, ##__VA_ARGS__); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_WARNING;/*goto Error;*/}}while(0);
+#define CBRM(condition, failCode, msg, ...) do{if(!(condition)) {r = failCode; if(r&0x80000000){ DOSLogErrorMessage("CBRM", r, msg, ##__VA_ARGS__); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode;} goto Error; }}while(0);
 
 #define ACBM(condition, msg, ...) do{if(!condition){DOSLogErrorMessage("ACBM", R_FAIL, msg, ##__VA_ARGS__); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0);}}while(0);
 #define ACB(condition) do{if(!condition){DOSLogError("ACB", R_FAIL); assert(0);}}while(0);

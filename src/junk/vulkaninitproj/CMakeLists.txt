@@ -12,7 +12,7 @@ link_directories(${CMAKE_BINARY_DIR})
 
 add_executable(vulkaninitproj
     ${SOURCES}
-)
+        ../helloworld/main.cpp)
 
 target_link_libraries(vulkaninitproj
     # TODO: Make this into a windows dependent list 
