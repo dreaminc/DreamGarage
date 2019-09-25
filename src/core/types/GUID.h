@@ -11,6 +11,16 @@
 
 #include <string>
 
+// TODO: This is the Windows definition of GUID and is being added
+// here for the purpose of compilation (included in <windows.h>
+
+typedef struct _GUID {
+    unsigned long  Data1;
+    unsigned short Data2;
+    unsigned short Data3;
+    unsigned char  Data4[8];
+} GUID;
+
 class guid : public TypeObj {
 public:
 	guid();

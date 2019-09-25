@@ -42,7 +42,7 @@ public:
 	virtual bool Intersect(const BoundingQuad& rhs) override;
 	virtual bool Intersect(const BoundingPlane& rhs) override;
 
-	virtual bool Intersect(point& pt) override;
+	virtual bool Intersect(const point& pt) override;
 	virtual bool Intersect(const ray& r) override;
 	bool Intersect(const line& l, point *pptCollision = nullptr);
 

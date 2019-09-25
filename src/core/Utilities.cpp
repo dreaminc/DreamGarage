@@ -68,13 +68,14 @@ char* util::WideCStringToCString(const wchar_t *pwszStr) {
 	RESULT r = R_PASS;
 
 	char *pszString = nullptr;
+    size_t bytesWritten = -1;
 
 	size_t pwszStr_n = wcslen(pwszStr) + 1;
 
 	pszString = (char*)calloc(pwszStr_n * sizeof(char), 1);
 	CN(pszString);
 
-	size_t bytesWritten = wcstombs(pszString, pwszStr, pwszStr_n);
+	bytesWritten = wcstombs(pszString, pwszStr, pwszStr_n);
 	CB((bytesWritten == (pwszStr_n - 1)));
 
 	return pszString;
@@ -98,8 +99,10 @@ wchar_t* util::CStringToWideCString(const char *pszStr) {
 	pwszString = (wchar_t*)calloc(pszStr_n * sizeof(wchar_t), 1);
 	CN(pwszString);
 
-	size_t charsWritten = mbstowcs(pwszString, pszStr, pszStr_n);
-	CB((charsWritten == (pszStr_n - 1)));
+    {
+        size_t charsWritten = mbstowcs(pwszString, pszStr, pszStr_n);
+        CB((charsWritten == (pszStr_n - 1)));
+    }
 
 	return pwszString;
 
@@ -135,7 +138,7 @@ GUID util::StringToGuid(const std::string& strGUID) {
 	GUID guid;
 
 	sscanf(strGUID.c_str(),
-		"{%8x-%4hx-%4hx-%2hhx%2hhx-%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx}",
+		"{%8lX-%4hx-%4hx-%2hhx%2hhx-%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx}",
 		&guid.Data1, &guid.Data2, &guid.Data3,
 		&guid.Data4[0], &guid.Data4[1], &guid.Data4[2], &guid.Data4[3],
 		&guid.Data4[4], &guid.Data4[5], &guid.Data4[6], &guid.Data4[7]);
@@ -147,7 +150,7 @@ std::string util::GuidToString(GUID guid) {
 	char szGUID[39];
 
 	snprintf(szGUID, sizeof(szGUID),
-		"{%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x}",
+		"{%08lX-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x}",
 		guid.Data1, guid.Data2, guid.Data3,
 		guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3],
 		guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);

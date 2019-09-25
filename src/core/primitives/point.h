@@ -15,6 +15,10 @@
 
 class vector;
 
+#if not defined(FLOAT_PRECISION) and not defined(DOUBLE_PRECISION)
+#define FLOAT_PRECISION
+#endif
+
 #ifdef FLOAT_PRECISION
 	typedef float point_precision;
 #elif defined(DOUBLE_PRECISION)
@@ -46,7 +50,9 @@ public:
 	point(point_precision x, point_precision y, point_precision z);
 	point(point_precision values[3]);
 	point(point_precision x, point_precision y, point_precision z, point_precision w);
+
 	point(const matrix<point_precision, 4, 1>& arg);
+    point& operator=(const matrix<point_precision, 4, 1> &arg);
 
 	RESULT SetZeroW();
 	RESULT Reverse();
@@ -104,9 +110,6 @@ public:
 	// Subtracting a vector from a point gives us a point
 	point operator-(const vector& rhs) const;
 	point& operator-=(const vector& rhs);
-
-	// Explicitly specializing the assignment operator
-	point& operator=(const matrix<point_precision, 4, 1> &arg);
 
 	bool operator>(point &rhs);
 	bool operator>=(point &rhs);

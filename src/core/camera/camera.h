@@ -99,6 +99,14 @@ public:
 	// TODO: update this with a time delta / delta movement 
 	ray GetRay(int xPos, int yPos);			// This is assuming an integer screen position but really just calls the one above
 
+    // Explictly override this and call the virtual object function
+    // This is related to a GCC compilation thing
+    // TODO: This might be hiding an issue, the GetRay function of camera is different than the
+    // GetRay of virtual object
+    ray GetRay(bool fAbsolute = false) override {
+        return (reinterpret_cast<VirtualObj*>(this))->GetRay(fAbsolute);
+    }
+
 	bool IsAllowedMoveByKeys();
 
 	quaternion GetOffsetOrientation();

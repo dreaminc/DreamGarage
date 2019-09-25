@@ -16,12 +16,23 @@ vector::vector(vector_precision val) {
 	this->element(3, 0) = 1.0f;
 }
 
-vector::vector(matrix <vector_precision, 4, 1> &rhs) {
+vector::vector(const matrix <vector_precision, 4, 1> &rhs) {
 	this->clear();
+
 	this->element(0, 0) = rhs.element(0, 0);
 	this->element(1, 0) = rhs.element(1, 0);
 	this->element(2, 0) = rhs.element(2, 0);
 	this->element(3, 0) = 1.0f;
+}
+
+// Explicitly specializing the assignment operator
+vector& vector::operator=(const matrix<vector_precision, 4, 1> &arg) {
+    if (this == &arg)      // Same object?
+        return *this;        // Yes, so skip assignment, and just return *this.
+
+    memcpy(this->m_data, arg.m_data, sizeof(vector_precision) * 4 * 1);
+
+    return *this;
 }
 
 vector::vector(vector_precision x, vector_precision y, vector_precision z) {
@@ -157,17 +168,6 @@ vector vector::NormalizedCross(vector rhs) {
 vector vector::RotateByQuaternion(quaternion q) {
 	return q.RotateVector(*this);
 }
-
-// Explicitly specializing the assignment operator
-vector& vector::operator=(const matrix<vector_precision, 4, 1> &arg) {
-	if (this == &arg)      // Same object?
-		return *this;        // Yes, so skip assignment, and just return *this.
-
-	memcpy(this->m_data, arg.m_data, sizeof(vector_precision) * 4 * 1);
-
-	return *this;
-}
-
 
 vector& vector::operator*=(const vector_precision& a) {
 	for (int i = 0; i < 4; i++)

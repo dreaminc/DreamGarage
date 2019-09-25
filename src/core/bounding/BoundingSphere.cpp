@@ -52,7 +52,7 @@ bool BoundingSphere::Intersect(const BoundingBox& rhs) {
 	return static_cast<BoundingBox>(rhs).Intersect(*this);
 }
 
-bool BoundingSphere::Intersect(point& pt) {
+bool BoundingSphere::Intersect(const point& pt) {
 	float distance = (pt - GetOrigin()).magnitude();
 
 	if (abs(distance) <= GetRadius())

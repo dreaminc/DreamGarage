@@ -126,8 +126,8 @@ public:
 
 	virtual RESULT Allocate() override;
 
-	inline unsigned int NumberVertices();
-	inline unsigned int NumberIndices();
+	inline unsigned int NumberVertices() override;
+	inline unsigned int NumberIndices() override;
 
 	bool IsBillboard();
 	void SetBillboard(bool fBillboard);

@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 
+#include "types/GUID.h"
+
 namespace util {
 	std::vector<std::string> TokenizeString(std::string str, char cDelim);
 	std::vector<std::string> TokenizeString(std::string str, std::string strDelim);

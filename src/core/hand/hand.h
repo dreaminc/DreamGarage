@@ -7,7 +7,6 @@
 // dos/src/core/hand/hand.h
 
 #include <memory>
-#include "xstring"                 // for wstring
 
 #include "core/primitives/composite.h"
 #include "core/primitives/point.h"      // for point

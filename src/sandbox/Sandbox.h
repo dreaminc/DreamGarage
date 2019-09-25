@@ -13,9 +13,11 @@
 #include "memory"                                      // for shared_ptr
 #include "functional"                                  // for function
 #include "stdint.h"                                    // for uint8_t
-#include "xstring"                                     // for string, wstring
 #include <stddef.h>                                    // for size_t
-#include <windef.h>                                    // for HWND // TODO: Should remove or use for windows only
+
+#ifdef _WIN32
+    #include <windef.h>                                    // for HWND // TODO: Should remove or use for windows only
+#endif
 
 #include "core/types/DObject.h"
 
@@ -33,7 +35,7 @@
 #include "sense/SenseKeyboard.h"
 #include "sense/SenseMouse.h"
 #include "sense/SenseController.h"
-#include "sense/SenseGamepadController.h"
+#include "sense/SenseGamePadController.h"
 
 #include "hmd/HMD.h"                                   
 #include "hmd/HMDFactory.h"

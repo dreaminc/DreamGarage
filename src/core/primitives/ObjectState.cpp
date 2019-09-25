@@ -89,14 +89,14 @@ RESULT ObjectState::SetMass(double kgMass) {
 	return R_SUCCESS;
 }
 
-const double ObjectState::GetMass() {
+double ObjectState::GetMass() {
 	if (m_fImmovable == false)
 		return m_kgMass;
 	else
 		return std::numeric_limits<double>::infinity();
 }
 
-const double ObjectState::GetInverseMass() {
+double ObjectState::GetInverseMass() {
 	if (m_fImmovable == false)
 		return m_inverseMass;
 	else

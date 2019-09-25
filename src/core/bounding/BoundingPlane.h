@@ -26,7 +26,7 @@ public:
 	virtual bool Intersect(const BoundingQuad& rhs) override;
 	virtual bool Intersect(const BoundingPlane& rhs) override;
 
-	virtual bool Intersect(point& pt) override;
+	virtual bool Intersect(const point& pt) override;
 	virtual bool Intersect(const ray& r) override;
 
 	virtual CollisionManifold Collide(const BoundingBox& rhs) override;
@@ -42,19 +42,19 @@ public:
 		return BoundingVolume::Type::PLANE;
 	}
 	
-	virtual RESULT SetMaxPointFromOrigin(point ptMax) override {
+	virtual RESULT SetMaxPointFromOrigin(__attribute__((unused)) point ptMax) override {
 		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
-	virtual RESULT SetHalfVector(vector vHalfVector) override {
+	virtual RESULT SetHalfVector(__attribute__((unused)) vector vHalfVector) override {
 		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
-	virtual point GetMinPoint(bool fAbsolute = false) override {
+	virtual point GetMinPoint(__attribute__((unused)) bool fAbsolute = false) override {
 		return point();
 	}
 
-	virtual point GetMaxPoint(bool fAbsolute = false) override {
+	virtual point GetMaxPoint(__attribute__((unused)) bool fAbsolute = false) override {
 		return point();
 	}
 

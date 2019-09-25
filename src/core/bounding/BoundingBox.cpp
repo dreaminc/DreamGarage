@@ -269,12 +269,12 @@ bool IntersectSATAABB(const BoundingBox& lhs, const BoundingBox& rhs) {
 		vector vAxisA = vAxesA[i];
 
 		// Self Box Axes
-		if (temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxisA, vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB) < 0.0f) {
+		if ((temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxisA, vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB)) < 0.0f) {
 			return false;
 		}
 
 		// The other box Axes (todo: test if it's an OBB)
-		if (temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxesB[i], vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB) < 0.0f) {
+		if ((temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxesB[i], vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB)) < 0.0f) {
 			return false;
 		}
 
@@ -284,7 +284,7 @@ bool IntersectSATAABB(const BoundingBox& lhs, const BoundingBox& rhs) {
 
 			// Ensure not same
 			if (vAxisA != vAxisB) {
-				if (temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxisB.cross(vAxisA), vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB) < 0.0f) {
+				if ((temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxisB.cross(vAxisA), vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB)) < 0.0f) {
 					return false;
 				}
 			}
@@ -444,9 +444,10 @@ vector BoundingBox::GetAxis(BoxAxis boxAxis, bool fOriented) {
 	vector retVector = vector(0.0f, 0.0f, 0.0f);
 
 	switch (boxAxis) {
-	case BoxAxis::X_AXIS: retVector = vector::iVector(1.0f); break;
-	case BoxAxis::Y_AXIS: retVector = vector::jVector(1.0f); break;
-	case BoxAxis::Z_AXIS: retVector = vector::kVector(1.0f); break;
+        case BoxAxis::X_AXIS: retVector = vector::iVector(1.0f); break;
+        case BoxAxis::Y_AXIS: retVector = vector::jVector(1.0f); break;
+        case BoxAxis::Z_AXIS: retVector = vector::kVector(1.0f); break;
+        case BoxAxis::INVALID: ACBM(false, "Invalid box axis");
 	}
 
 	// Rotate by OBB if so

@@ -62,7 +62,7 @@ bool BoundingQuad::Intersect(const BoundingPlane& rhs) {
 	return false;
 }
 
-bool BoundingQuad::Intersect(point& pt) {
+bool BoundingQuad::Intersect(const point& pt) {
 	// TODO:
 
 	return false;
@@ -477,6 +477,10 @@ point BoundingQuad::GetQuadPoint(QuadPoint ptType) {
 			ptRet.x() -= halfWidth;
 			ptRet.z() -= halfHeight;
 		} break;
+
+		case QuadPoint::INVALID: {
+		    ACBM(false, "QuadPoint invalid is not valid");
+		} break;
 	}
 
 	// Accounts for normal rotation
@@ -496,25 +500,29 @@ point BoundingQuad::GetAbsoluteQuadPoint(QuadPoint ptType) {
 	double halfHeight = m_height / 2.0f;
 
 	switch (ptType) {
-	case QuadPoint::TOP_RIGHT: {
-		ptRet.x() += halfWidth;
-		ptRet.z() += halfHeight;
-	} break;
+        case QuadPoint::TOP_RIGHT: {
+            ptRet.x() += halfWidth;
+            ptRet.z() += halfHeight;
+        } break;
 
-	case QuadPoint::TOP_LEFT: {
-		ptRet.x() -= halfWidth;
-		ptRet.z() += halfHeight;
-	} break;
+        case QuadPoint::TOP_LEFT: {
+            ptRet.x() -= halfWidth;
+            ptRet.z() += halfHeight;
+        } break;
 
-	case QuadPoint::BOTTOM_RIGHT: {
-		ptRet.x() += halfWidth;
-		ptRet.z() -= halfHeight;
-	} break;
+        case QuadPoint::BOTTOM_RIGHT: {
+            ptRet.x() += halfWidth;
+            ptRet.z() -= halfHeight;
+        } break;
 
-	case QuadPoint::BOTTOM_LEFT: {
-		ptRet.x() -= halfWidth;
-		ptRet.z() -= halfHeight;
-	} break;
+        case QuadPoint::BOTTOM_LEFT: {
+            ptRet.x() -= halfWidth;
+            ptRet.z() -= halfHeight;
+        } break;
+
+        case QuadPoint::INVALID: {
+            ACBM(false, "Invalid Quad Point");
+        } break
 	}
 
 	// Absolute Orientation
@@ -549,6 +557,10 @@ line BoundingQuad::GetAbsoluteQuadEdge(QuadEdge edgeType) {
 		case QuadEdge::BOTTOM: {
 			ptB = GetAbsoluteQuadPoint(QuadPoint::BOTTOM_RIGHT);
 			ptA = GetAbsoluteQuadPoint(QuadPoint::BOTTOM_LEFT);
+		} break;
+
+		case QuadEdge::INVALID: {
+		    ACBM(false, "Invalid quad edge");
 		} break;
 	}
 

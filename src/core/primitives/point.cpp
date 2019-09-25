@@ -44,6 +44,15 @@ point::point(const matrix<point_precision, 4, 1>& arg) :
 	// empty
 }
 
+point& point::operator=(const matrix<point_precision, 4, 1> &arg) {
+    if (this == &arg)      // Same object?
+        return *this;        // Yes, so skip assignment, and just return *this.
+
+    memcpy(this->m_data, arg.m_data, sizeof(point_precision) * 4 * 1);
+
+    return *this;
+}
+
 RESULT point::SetZeroW() {
 	this->element(3, 0) = 1.0f;
 	return R_PASS;
@@ -204,16 +213,6 @@ point& point::operator-=(const vector& rhs) {
 
 point point::operator-(const vector& rhs) const {
 	return point(*this).operator-=(rhs);
-}
-
-// Explicitly specializing the assignment operator
-point& point::operator=(const matrix<point_precision, 4, 1> &arg) {
-	if (this == &arg)      // Same object?
-		return *this;        // Yes, so skip assignment, and just return *this.
-
-	memcpy(this->m_data, arg.m_data, sizeof(point_precision) * 4 * 1);
-
-	return *this;
 }
 
 bool point::operator>(point &rhs) {

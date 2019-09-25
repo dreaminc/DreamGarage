@@ -153,11 +153,7 @@ static char szDebugOutputString[DOS_DEBUGGER_OUTPUT_MAX_SIZE] = { DOS_DEBUGGER_S
 // Check RESULT value
 // Ensures that RESULT is successful
 #define CR(res) do{r=(res);if(r&0x80000000){DOSLogError("CR", r); goto Error;}}while(0);
-#if defined(__APPLE__)
-	#define CRM(res, msg, ...) do{r= (res);if(r&0x80000000){DOSLogErrorMessage("CRM", res, msg, __VA_OPT__(,) __VA_ARGS__); DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, __VA_OPT__(,) __VA_ARGS__); DEBUG_OUT("Error: 0x%x\n",r);goto Error;}}while(0);
-#else
-	#define CRM(res, msg, ...) do{r= (res);if(r&0x80000000){DOSLogErrorMessage("CRM", res, msg, ##__VA_ARGS__); DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("Error: 0x%x\n",r);goto Error;}}while(0);
-#endif
+#define CRM(res, msg, ...) do{r= (res);if(r&0x80000000){DOSLogErrorMessage("CRM", res, msg, ##__VA_ARGS__); DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("Error: 0x%x\n",r);goto Error;}}while(0);
 
 // CP - Critical Path
 // This will resolve to the internal value in release
@@ -165,15 +161,9 @@ static char szDebugOutputString[DOS_DEBUGGER_OUTPUT_MAX_SIZE] = { DOS_DEBUGGER_S
 	#define CRCP(res) CR(res)
 	#define CBCP(condition) CB(condition)
 	#define CBCPS(condition) CB(condition)
-	#if defined(__APPLE__)
-		#define CRMCP(res, msg, ...) CRM(res, msg, __VA_OPT__(,) __VA_ARGS__)
-		#define CBMCP(condition, msg, ...) CBM(condition, msg, __VA_OPT__(,) __VA_ARGS__)
-		#define CBMCPS(condition, msg, ...) CBM(condition, msg, __VA_OPT__(,) __VA_ARGS__)
-	#else
-		#define CRMCP(res, msg, ...) CRM(res, msg, ##__VA_ARGS__)
-		#define CBMCP(condition, msg, ...) CBM(condition, msg, ##__VA_ARGS__)
-		#define CBMCPS(condition, msg, ...) CBM(condition, msg, ##__VA_ARGS__)
-	#endif
+    #define CRMCP(res, msg, ...) CRM(res, msg, ##__VA_ARGS__)
+    #define CBMCP(condition, msg, ...) CBM(condition, msg, ##__VA_ARGS__)
+    #define CBMCPS(condition, msg, ...) CBM(condition, msg, ##__VA_ARGS__)
 #else
 	#define CRCP(res) res
 	#define CRMCP(res, msg, ...) res

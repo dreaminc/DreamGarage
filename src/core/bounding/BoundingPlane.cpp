@@ -95,7 +95,7 @@ bool BoundingPlane::Intersect(const BoundingPlane& rhs) {
 	return true;
 }
 
-bool BoundingPlane::Intersect(point& pt) {
+bool BoundingPlane::Intersect(const point& pt) {
 	float distance = plane(GetOrigin(), GetNormal()).Distance(pt);
 
 	if (distance == 0) {

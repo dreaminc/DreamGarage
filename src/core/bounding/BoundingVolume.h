@@ -45,7 +45,7 @@ public:
 	virtual bool Intersect(const BoundingQuad& rhs) = 0;
 	virtual bool Intersect(const BoundingPlane& rhs) = 0;
 
-	virtual bool Intersect(point& pt) = 0;
+	virtual bool Intersect(const point& pt) = 0;
 	virtual bool Intersect(const ray &rCast) = 0;
 	//TODO: virtual bool Intersect(line& ln) = 0;
 	// TODO: virtual bool Intersect(const plane& pl) = 0;

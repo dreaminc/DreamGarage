@@ -1,7 +1,6 @@
 #ifndef PUBLISHER_H_
 #define PUBLISHER_H_
 
-
 #include "core/ehm/EHM.h"
 
 // Dream Core
@@ -111,7 +110,7 @@ public:
 		}
 	}
 
-	char *GetPublisherName() {
+	char const *GetPublisherName() {
 		return "Publisher Base Class";
 	}
 
@@ -140,7 +139,7 @@ public:
 		return (!(it == m_events.end()));
 	}
 
-	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT> GetEvents() {
+	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, typename I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT> GetEvents() {
 		return m_events;
 	}
 	
@@ -149,7 +148,7 @@ public:
 	RESULT RegisterSubscriber(PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 		
-		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
+		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, typename I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
 		std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
@@ -209,7 +208,7 @@ public:
 	RESULT UnregisterSubscriber(Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 
-		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
+		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, typename I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
         CNM(pSubscriber, "Subscriber cannot be NULL");
 
 		while (it != m_events.end()) {
@@ -265,7 +264,7 @@ public:
 	}
 
 private:
-	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT> m_events;
+	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, typename I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT> m_events;
 };
 
 #endif // ! PUBLISHER_H_

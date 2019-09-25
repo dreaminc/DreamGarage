@@ -178,7 +178,7 @@ public:
 
 	static matrix<TMatrix, N, M> MakeIdentity(TMatrix val = 1.0f) {
 		matrix<TMatrix, N, M> retMatrix;
-		retMatrix.identity(1.0f);
+		retMatrix.identity(val);
 		return retMatrix;
 	}
 
@@ -475,7 +475,6 @@ public:
         return *this;
     }
 
-	/*
     // comparison
     bool operator==( const matrix<TMatrix, N, M>& arg) const {
         for(int i = 0; i < N * M; i++)
@@ -496,7 +495,7 @@ public:
     bool operator!() const {
         return isZero();
     }
-	*/
+	//*/
 
     // Arithmetic Operators
     // -------------------------------------------------------------------------
@@ -961,8 +960,6 @@ Error:
 // TODO: Add Transpose
 template <typename TMat4x4, int N>
 matrix<TMat4x4, N, N> transpose(matrix<TMat4x4, N, N> mat) {
-	RESULT r = R_PASS;
-
 	matrix<TMat4x4, 4, 4> retMatrix;
 	retMatrix.clear();
 
@@ -977,8 +974,6 @@ matrix<TMat4x4, N, N> transpose(matrix<TMat4x4, N, N> mat) {
 
 template <typename TMat, int N, int M>
 matrix<TMat, M, N> transpose(matrix<TMat, N, M> mat) {
-	RESULT r = R_PASS;
-
 	matrix<TMat, M, N> retMatrix;
 	retMatrix.clear();
 
@@ -993,17 +988,16 @@ matrix<TMat, M, N> transpose(matrix<TMat, N, M> mat) {
 
 template <typename TMat4x4, int N, int M>
 matrix<TMat4x4, N, M> absolute(matrix<TMat4x4, N, M> mat) {
-	RESULT r = R_PASS;
+    matrix<TMat4x4, N, M> retMatrix;
 
-	matrix<TMat4x4, N, M> retMatrix;
-	retMatrix.clear();
+    retMatrix.clear();
 
 	for (int i = 0; i < N * M; i++) {
 		retMatrix(i) = (TMat4x4)(std::fabs((double)(mat(i))));
 	}
-
 	return retMatrix;
 }
+
 
 /*
 // TODO: Implement determinant (not critical atm)
@@ -1067,7 +1061,6 @@ const matrix<TMat4x4, 4, 1> matrix<TMat4x4, 4, 4>::operator*(const matrix<TMat4x
 	return MatrixBase<TMatrix, 4, 1>(this*) *= arg;
 }
 
-/*
 template <typename TMat4x4>
 class matrix<TMat4x4, 4, 4> {
 public:
@@ -1110,6 +1103,6 @@ public:
 		return MatrixBase<TMatrix, 4, 1>(this*) *= arg;
 	}
 };
-*/
+//*/
 
-#endif MATRIX_H_
+#endif // ! MATRIX_H_

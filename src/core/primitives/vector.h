@@ -9,6 +9,10 @@
 
 #include "core/matrix/matrix.h"
 
+#if not defined(FLOAT_PRECISION) and not defined(DOUBLE_PRECISION)
+    #define FLOAT_PRECISION
+#endif
+
 #ifdef FLOAT_PRECISION
 	typedef float vector_precision;
 #elif defined(DOUBLE_PRECISION)
@@ -22,7 +26,10 @@ class vector : public matrix <vector_precision, 4, 1> {
 public:
 	vector();
 	vector(vector_precision val);
-	vector(matrix <vector_precision, 4, 1> &rhs);
+
+	vector(const matrix <vector_precision, 4, 1> &rhs);
+    vector& operator=(const matrix<vector_precision, 4, 1> &arg);
+
 	vector(vector_precision x, vector_precision y, vector_precision z);
 	vector(vector rhs, vector lhs);	// Cross product - Not assumed to be normalized
 	vector(const point& pt);
@@ -57,9 +64,6 @@ public:
 	vector NormalizedCross(vector rhs);
 
 	vector RotateByQuaternion(quaternion q);
-
-	// Explicitly specializing the assignment operator
-	vector& operator=(const matrix<vector_precision, 4, 1> &arg);
 
 	vector& operator*=(const vector_precision& a);
 	vector operator*(const vector_precision& a) const;
