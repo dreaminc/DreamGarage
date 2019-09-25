@@ -8,16 +8,18 @@
 	#include "hal/ogl/gl/glext.h"
 	//#include "hal/ogl/gl/glext.h"
 	#include "hal/ogl/gl/glcorearb.h"
+
+	#pragma comment(lib, "opengl32.lib")
+    #pragma comment(lib, "glu32.lib")
 #elif defined(__APPLE__)
 	#import <OpenGL/gl.h>
 	#import <OpenGL/glu.h>
 	#include <OpenGL/glext.h>
-
 	//#include <OpenGL/wglext.h>
+
+
 #endif
 
-#pragma comment(lib, "opengl32.lib")
-#pragma comment(lib, "glu32.lib")
 
 #include "core/primitives/color.h"
 

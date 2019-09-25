@@ -2,7 +2,9 @@
 
 // Logging is redefining macros due to CEF, Logging++ and WebRTC
 // When we solve logging we need to solve this too
-#pragma warning( disable : 4005)
+#if defined(_WIN32)
+    #pragma warning( disable : 4005)
+#endif
 
 #include "FreeImageObj.h"
 #include "MemoryImageObj.h"

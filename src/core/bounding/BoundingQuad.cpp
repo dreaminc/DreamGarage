@@ -522,7 +522,7 @@ point BoundingQuad::GetAbsoluteQuadPoint(QuadPoint ptType) {
 
         case QuadPoint::INVALID: {
             ACBM(false, "Invalid Quad Point");
-        } break
+        } break;
 	}
 
 	// Absolute Orientation

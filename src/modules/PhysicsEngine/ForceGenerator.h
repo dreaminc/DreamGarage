@@ -9,13 +9,13 @@
 // Dream Force Generator
 // The virtual class defining a force generator
 
-#include "core/types/UID.h"
+#include "core/types/DObject.h"
 
 #include "core/primitives/vector.h"
 
 class ObjectState;
 
-class ForceGenerator {
+class ForceGenerator : public DObject {
 	friend class PhysicsIntegrator;
 	friend class ForceGeneratorFactory;
 
@@ -44,7 +44,6 @@ public:
 	}
 
 private:
-	UID m_uid;
 	bool m_fEnabled = true;
 };
 

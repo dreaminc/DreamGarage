@@ -147,7 +147,7 @@ bool vector::IsZero() {
 }
 
 // Component Multiplication
-vector vector::ComponentMultiply(vector &lhs, vector &rhs) {
+vector vector::ComponentMultiply(const vector &lhs, const vector &rhs) {
 	return vector(lhs.x() * rhs.x(), 
 				  lhs.y() * rhs.y(), 
 				  lhs.z() * rhs.z());

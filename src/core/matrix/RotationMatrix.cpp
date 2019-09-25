@@ -31,9 +31,17 @@ RotationMatrix::RotationMatrix(ROTATION_MATRIX_TYPE axis, rotation_precision the
 	m_type(axis)
 {
 	switch (axis) {
-	case X_AXIS: SetXRotationMatrix(theta); break;
-	case Y_AXIS: SetYRotationMatrix(theta); break;
-	case Z_AXIS: SetZRotationMatrix(theta); break;
+        case X_AXIS: SetXRotationMatrix(theta); break;
+        case Y_AXIS: SetYRotationMatrix(theta); break;
+        case Z_AXIS: SetZRotationMatrix(theta); break;
+
+        case XYZ_AXIS:
+        case ARBITRARY_AXIS:
+        case QUATERNION:
+        case VECTOR:
+        case INVALID: {
+            ACBM(false, "Rotation matrix %d not handled", axis);
+        } break;
 	}
 }
 

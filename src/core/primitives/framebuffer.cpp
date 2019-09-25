@@ -1,4 +1,4 @@
-#include "Framebuffer.h"
+#include "framebuffer.h"
 
 framebuffer::framebuffer() :
 	m_width(0),

@@ -202,9 +202,9 @@ public:
 		return r;
 	}
 
-	virtual RESULT InitializeModule(void *pContext = nullptr) = 0;
-	virtual RESULT OnDidFinishInitializing(void *pContext = nullptr) = 0;
-	virtual RESULT Update(void *pContext = nullptr) = 0;
+	virtual RESULT InitializeModule(void *pContext = nullptr) override = 0;
+	virtual RESULT OnDidFinishInitializing(void *pContext = nullptr) override = 0;
+	virtual RESULT Update(void *pContext = nullptr) override = 0;
 
 protected:
 	//TODO: these can be moved into DreamApp.tpp

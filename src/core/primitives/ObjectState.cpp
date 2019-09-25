@@ -252,9 +252,12 @@ RESULT ObjectState::SetInertiaTensor(MassDistributionType type, const matrix<poi
 RESULT ObjectState::RecalculateInertialTensor() {
 	RESULT r = R_SUCCESS;
 
+    DimObj *pDimObj = nullptr;
+
 	CB((m_massDistributionType != ObjectState::MassDistributionType::INVALID));
 	CN(m_pParentObj);
-	DimObj *pDimObj = dynamic_cast<DimObj*>(m_pParentObj);
+
+	pDimObj = dynamic_cast<DimObj*>(m_pParentObj);
 	CN(pDimObj);
 
 	switch (m_massDistributionType) {
@@ -279,8 +282,10 @@ RESULT ObjectState::RecalculateInertialTensor() {
 			return SetInertiaTensorQuad(pBoundingQuad->GetWidth(), pBoundingQuad->GetHeight());
 		} break;
 
+		case ObjectState::MassDistributionType::PLANE:
+		case ObjectState::MassDistributionType::INVALID:
 		case ObjectState::MassDistributionType::CUSTOM: {
-			// TODO: ?
+			CBM(false, "mass distro %d not handled", m_massDistributionType);
 		} break;
 	}
 

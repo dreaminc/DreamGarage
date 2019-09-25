@@ -39,6 +39,8 @@ public:
 	BoundingVolume(VirtualObj *pParentObject);
 	BoundingVolume(VirtualObj *pParentObject, point ptOrigin);
 
+	virtual ~BoundingVolume();
+
 	bool Intersect(BoundingVolume* pRHS);
 	virtual bool Intersect(const BoundingSphere& rhs) = 0;
 	virtual bool Intersect(const BoundingBox& rhs) = 0;

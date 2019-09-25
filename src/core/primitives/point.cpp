@@ -215,7 +215,7 @@ point point::operator-(const vector& rhs) const {
 	return point(*this).operator-=(rhs);
 }
 
-bool point::operator>(point &rhs) {
+bool point::operator>(const point &rhs) const {
 	// Same object?
 	if (this == &rhs)
 		return false;
@@ -227,7 +227,7 @@ bool point::operator>(point &rhs) {
 		);
 }
 
-bool point::operator>=(point &rhs) {
+bool point::operator>=(point &rhs) const {
 	// Same object?
 	if (this == &rhs)
 		return true;
@@ -239,7 +239,7 @@ bool point::operator>=(point &rhs) {
 		);
 }
 
-bool point::operator<(point &rhs) {
+bool point::operator<(point &rhs) const {
 	// Same object?
 	if (this == &rhs)
 		return false;
@@ -251,7 +251,7 @@ bool point::operator<(point &rhs) {
 		);
 }
 
-bool point::operator<=(point &rhs) {
+bool point::operator<=(point &rhs) const {
 	// Same object?
 	if (this == &rhs)
 		return true;

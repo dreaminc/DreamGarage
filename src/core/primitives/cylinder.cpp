@@ -37,7 +37,7 @@ cylinder::cylinder(double radius, double height, int numAngularDivisions, int nu
 	//CR(InitializeBoundingSphere());
 	CR(InitializeOBB());
 
-// Success:
+Success:
 	Validate();
 	return;
 Error:
@@ -48,160 +48,172 @@ Error:
 RESULT cylinder::SetCylinderVertices(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
 	RESULT r = R_PASS;
 
-	if (m_numAngularDivisions < MIN_CYLINDER_DIVISIONS) m_numAngularDivisions = MIN_CYLINDER_DIVISIONS;
-	//if (m_numVerticalDivisions < MIN_CYLINDER_DIVISIONS) m_numVerticalDivisions = MIN_CYLINDER_DIVISIONS;
-	if (m_numVerticalDivisions < 1) m_numVerticalDivisions = 1;
+	m_radius = radius;
+	m_height = height;
+	m_numAngularDivisions = numAngularDivisions;
+	m_numVerticalDivisions = numVerticalDivisions;
 
-	CR(Allocate());
+    {
 
-	int numStrips = m_numVerticalDivisions + 3;
-	int numStripDivs = (m_numAngularDivisions + 1);
-	int vertCount = 0;
+        if (m_numAngularDivisions < MIN_CYLINDER_DIVISIONS) m_numAngularDivisions = MIN_CYLINDER_DIVISIONS;
+        //if (m_numVerticalDivisions < MIN_CYLINDER_DIVISIONS) m_numVerticalDivisions = MIN_CYLINDER_DIVISIONS;
+        if (m_numVerticalDivisions < 1) m_numVerticalDivisions = 1;
 
-	float thetaDiv = static_cast<float>((2.0f * M_PI) / (m_numAngularDivisions));
-	float heightDiv = static_cast<float>(height / m_numVerticalDivisions);
+        CR(Allocate());
 
-	// Bottom strip
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < numStripDivs; j++) {
-			point_precision sphereY = 0.0f;
+        int numStrips = m_numVerticalDivisions + 3;
+        int numStripDivs = (m_numAngularDivisions + 1);
+        int vertCount = 0;
 
-			float effTheta = thetaDiv * static_cast<float>(j);
-			point_precision sphereX = radius * sin(effTheta);
-			point_precision sphereZ = radius * cos(effTheta);
+        float thetaDiv = static_cast<float>((2.0f * M_PI) / (m_numAngularDivisions));
+        float heightDiv = static_cast<float>(m_height / m_numVerticalDivisions);
 
-			uv_precision u = static_cast<float>(0.5f + ((atan2(sin(effTheta - M_PI), cos(effTheta - M_PI)))) / (2.0f * M_PI));
-			if (j == (numStripDivs - 1))
-				u += 1.0f;
-			uv_precision v = 0.0f;
+        // Bottom strip
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < numStripDivs; j++) {
+                point_precision sphereY = 0.0f;
 
-			vector n = vector(0.0f, -1.0f, 0.0f).Normal();
+                float effTheta = thetaDiv * static_cast<float>(j);
+                point_precision sphereX = m_radius * sin(effTheta);
+                point_precision sphereZ = m_radius * cos(effTheta);
 
-			if (i == 0) {
-				sphereX = 0.0f;
-				sphereZ = 0.0f;
-			}
+                uv_precision u = static_cast<float>(0.5f + ((atan2(sin(effTheta - M_PI), cos(effTheta - M_PI)))) /
+                                                           (2.0f * M_PI));
+                if (j == (numStripDivs - 1))
+                    u += 1.0f;
+                uv_precision v = 0.0f;
 
-			m_pVertices[vertCount] = vertex(point(sphereX, sphereY, sphereZ), n, uvcoord(u, v));
+                vector n = vector(0.0f, -1.0f, 0.0f).Normal();
 
-			// TODO: check cyl BTN
-			vector b(cos(effTheta), 0.0f, -sin(effTheta));
-			vector t = b.cross(n);
+                if (i == 0) {
+                    sphereX = 0.0f;
+                    sphereZ = 0.0f;
+                }
 
-			m_pVertices[vertCount].SetTangentBitangent(t.Normal(), b.Normal());
+                m_pVertices[vertCount] = vertex(point(sphereX, sphereY, sphereZ), n, uvcoord(u, v));
 
-			vertCount++;
-		}
-	}
+                // TODO: check cyl BTN
+                vector b(cos(effTheta), 0.0f, -sin(effTheta));
+                vector t = b.cross(n);
 
-	for (int i = 0; i <= m_numVerticalDivisions; i++) {
-		// build from the ground up
-		point_precision sphereY = height * (static_cast<float>(i) / (m_numVerticalDivisions));
+                m_pVertices[vertCount].SetTangentBitangent(t.Normal(), b.Normal());
 
-		for (int j = 0; j < numStripDivs; j++) {
-			//float effTheta = thetaDiv * static_cast<float>(numStripDivs - j - 1);
-			float effTheta = thetaDiv * static_cast<float>(j);
-			point_precision sphereX = radius * sin(effTheta);
-			point_precision sphereZ = radius * cos(effTheta);
+                vertCount++;
+            }
+        }
 
-			uv_precision u = static_cast<float>(0.5f + ((atan2(sin(effTheta - M_PI), cos(effTheta - M_PI)))) / (2.0f * M_PI));
-			if (j == (numStripDivs - 1))
-				u += 1.0f;
-			uv_precision v = static_cast<float>(static_cast<float>(i) / m_numVerticalDivisions);
+        for (int i = 0; i <= m_numVerticalDivisions; i++) {
+            // build from the ground up
+            point_precision sphereY = m_height * (static_cast<float>(i) / (m_numVerticalDivisions));
 
-			vector n = vector(sphereX, 0.0f, sphereZ).Normal();
+            for (int j = 0; j < numStripDivs; j++) {
+                //float effTheta = thetaDiv * static_cast<float>(numStripDivs - j - 1);
+                float effTheta = thetaDiv * static_cast<float>(j);
+                point_precision sphereX = m_radius * sin(effTheta);
+                point_precision sphereZ = m_radius * cos(effTheta);
 
-			m_pVertices[vertCount] = vertex(point(sphereX, sphereY, sphereZ), n, uvcoord(u, v));
+                uv_precision u = static_cast<float>(0.5f + ((atan2(sin(effTheta - M_PI), cos(effTheta - M_PI)))) /
+                                                           (2.0f * M_PI));
+                if (j == (numStripDivs - 1))
+                    u += 1.0f;
+                uv_precision v = static_cast<float>(static_cast<float>(i) / m_numVerticalDivisions);
 
-			// TODO: check cyl BTN
-			vector b(cos(effTheta), 0.0f, -sin(effTheta));
-			vector t = b.cross(n);
+                vector n = vector(sphereX, 0.0f, sphereZ).Normal();
 
-			m_pVertices[vertCount].SetTangentBitangent(t.Normal(), b.Normal());
+                m_pVertices[vertCount] = vertex(point(sphereX, sphereY, sphereZ), n, uvcoord(u, v));
 
-			vertCount++;
-		}
-	}
+                // TODO: check cyl BTN
+                vector b(cos(effTheta), 0.0f, -sin(effTheta));
+                vector t = b.cross(n);
 
-	// Top strip
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < numStripDivs; j++) {
-			point_precision sphereY = height;
+                m_pVertices[vertCount].SetTangentBitangent(t.Normal(), b.Normal());
 
-			float effTheta = thetaDiv * static_cast<float>(j);
-			point_precision sphereX = radius * sin(effTheta);
-			point_precision sphereZ = radius * cos(effTheta);
+                vertCount++;
+            }
+        }
 
-			uv_precision u = static_cast<float>(0.5f + ((atan2(sin(effTheta - M_PI), cos(effTheta - M_PI)))) / (2.0f * M_PI));
-			if (j == (numStripDivs - 1))
-				u += 1.0f;
-			uv_precision v = 1.0f;
+        // Top strip
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < numStripDivs; j++) {
+                point_precision sphereY = m_height;
 
-			vector n = vector(0.0f, 1.0f, 0.0f).Normal();
+                float effTheta = thetaDiv * static_cast<float>(j);
+                point_precision sphereX = m_radius * sin(effTheta);
+                point_precision sphereZ = m_radius * cos(effTheta);
 
-			if (i == 1) {
-				sphereX = 0.0f;
-				sphereZ = 0.0f;
-			}
+                uv_precision u = static_cast<float>(0.5f + ((atan2(sin(effTheta - M_PI), cos(effTheta - M_PI)))) /
+                                                           (2.0f * M_PI));
+                if (j == (numStripDivs - 1))
+                    u += 1.0f;
+                uv_precision v = 1.0f;
 
-			m_pVertices[vertCount] = vertex(point(sphereX, sphereY, sphereZ), n, uvcoord(u, v));
+                vector n = vector(0.0f, 1.0f, 0.0f).Normal();
 
-			// TODO: check cyl BTN
-			vector b(cos(effTheta), 0.0f, -sin(effTheta));
-			vector t = b.cross(n);
+                if (i == 1) {
+                    sphereX = 0.0f;
+                    sphereZ = 0.0f;
+                }
 
-			m_pVertices[vertCount].SetTangentBitangent(t.Normal(), b.Normal());
+                m_pVertices[vertCount] = vertex(point(sphereX, sphereY, sphereZ), n, uvcoord(u, v));
 
-			vertCount++;
-		}
-	}
+                // TODO: check cyl BTN
+                vector b(cos(effTheta), 0.0f, -sin(effTheta));
+                vector t = b.cross(n);
 
-	// Indices
-	int indexCount = 0;
-	int indexStripTop, indexStripBottom;
+                m_pVertices[vertCount].SetTangentBitangent(t.Normal(), b.Normal());
 
-	// Bottom Strip
-	indexStripTop = numStripDivs;
-	indexStripBottom = 0;
+                vertCount++;
+            }
+        }
 
-	for (int j = 0; j < (numStripDivs) * 2; j++) {
-		if (j % 2 == 0)
-			m_pIndices[indexCount] = indexStripTop++;
-		else
-			m_pIndices[indexCount] = indexStripBottom++;
+        // Indices
+        int indexCount = 0;
+        int indexStripTop, indexStripBottom;
 
-		indexCount++;
-	}
+        // Bottom Strip
+        indexStripTop = numStripDivs;
+        indexStripBottom = 0;
 
-	for (int i = 2; i < (m_numVerticalDivisions + 2); i++) {
+        for (int j = 0; j < (numStripDivs) * 2; j++) {
+            if (j % 2 == 0)
+                m_pIndices[indexCount] = indexStripTop++;
+            else
+                m_pIndices[indexCount] = indexStripBottom++;
 
-		indexStripBottom = (i * numStripDivs);
-		indexStripTop = ((i + 1) * numStripDivs);
+            indexCount++;
+        }
 
-		for (int j = 0; j < (numStripDivs) * 2; j++) {
-			if (j % 2 == 0)
-				m_pIndices[indexCount] = indexStripTop++;
-			else
-				m_pIndices[indexCount] = indexStripBottom++;
+        for (int i = 2; i < (m_numVerticalDivisions + 2); i++) {
 
-			indexCount++;
-		}
-	}
+            indexStripBottom = (i * numStripDivs);
+            indexStripTop = ((i + 1) * numStripDivs);
 
-	// Top Strip
-	indexStripBottom = (m_numVerticalDivisions + 3) * numStripDivs;
-	indexStripTop = (m_numVerticalDivisions + 4) * numStripDivs;
+            for (int j = 0; j < (numStripDivs) * 2; j++) {
+                if (j % 2 == 0)
+                    m_pIndices[indexCount] = indexStripTop++;
+                else
+                    m_pIndices[indexCount] = indexStripBottom++;
 
-	for (int j = 0; j < (numStripDivs) * 2; j++) {
-		if (j % 2 == 0)
-			m_pIndices[indexCount] = indexStripTop++;
-		else
-			m_pIndices[indexCount] = indexStripBottom++;
+                indexCount++;
+            }
+        }
 
-		indexCount++;
-	}
+        // Top Strip
+        indexStripBottom = (m_numVerticalDivisions + 3) * numStripDivs;
+        indexStripTop = (m_numVerticalDivisions + 4) * numStripDivs;
 
-	//CR(SetColor(c));
+        for (int j = 0; j < (numStripDivs) * 2; j++) {
+            if (j % 2 == 0)
+                m_pIndices[indexCount] = indexStripTop++;
+            else
+                m_pIndices[indexCount] = indexStripBottom++;
+
+            indexCount++;
+        }
+
+        //CR(SetColor(c));
+
+    }
 
 Error:
 	return r;

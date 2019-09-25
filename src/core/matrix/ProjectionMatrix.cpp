@@ -16,6 +16,10 @@ ProjectionMatrix::ProjectionMatrix(PROJECTION_MATRIX_TYPE type, projection_preci
 		case PROJECTION_MATRIX_ORTHOGRAPHIC: {
 			ACRM(SetOrthographic(width, height, nearPlane, farPlane), "Failed to set perspective matrix");
 		} break;
+
+		case PROJECTION_MATRIX_INVALID: {
+            ACBM(false, "Invalid projection matrix");
+		} break;
 	}
 }
 
@@ -223,6 +227,7 @@ const char *ProjectionMatrix::StringProjectionMatrixType() {
 	switch (m_type) {
 		case PROJECTION_MATRIX_PERSPECTIVE: return "Perspective"; break;
 		case PROJECTION_MATRIX_ORTHOGRAPHIC: return "Orthographic"; break;
+		case PROJECTION_MATRIX_INVALID: return "Invalid"; break;
 	}
 
 	return "Invalid";

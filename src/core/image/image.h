@@ -24,7 +24,7 @@ protected:
 	image(int width, int height, int channels);
 
 public:
-	~image();
+	virtual ~image();
 
 	virtual RESULT LoadFromPath() = 0;
 	virtual RESULT LoadFromMemory() = 0;

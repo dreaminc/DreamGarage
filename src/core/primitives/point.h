@@ -111,10 +111,10 @@ public:
 	point operator-(const vector& rhs) const;
 	point& operator-=(const vector& rhs);
 
-	bool operator>(point &rhs);
-	bool operator>=(point &rhs);
-	bool operator<(point &rhs);
-	bool operator<=(point &rhs);
+	bool operator>(const point &rhs);
+	bool operator>=(const point &rhs);
+	bool operator<(const point &rhs);
+	bool operator<=(const point &rhs);
 
 	static point max(point &lhs, point &rhs);
 	static point min(point &lhs, point &rhs);

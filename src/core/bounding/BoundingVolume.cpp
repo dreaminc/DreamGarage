@@ -23,6 +23,10 @@ BoundingVolume::BoundingVolume(VirtualObj *pParentObject, point ptOrigin) :
 	// Empty
 }
 
+BoundingVolume::~BoundingVolume() {
+    //
+}
+
 // TODO: Uhhh - not this
 bool BoundingVolume::Intersect(BoundingVolume* pRHS) {
 	BoundingBox *pBoundingBox = dynamic_cast<BoundingBox*>(pRHS);

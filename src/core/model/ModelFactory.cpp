@@ -1,6 +1,6 @@
 #include "ModelFactory.h"
 
-#include "Sandbox/PathManager.h"
+#include "sandbox/PathManager.h"
 
 #include "os/DreamOS.h"
 

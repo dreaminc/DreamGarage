@@ -16,6 +16,10 @@
 
 #include "core/matrix/matrix.h"
 
+#if not defined(FLOAT_PRECISION) and not defined(DOUBLE_PRECISION)
+#define FLOAT_PRECISION
+#endif
+
 class vector;
 
 #ifdef FLOAT_PRECISION

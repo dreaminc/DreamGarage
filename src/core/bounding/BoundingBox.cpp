@@ -1409,7 +1409,7 @@ bool BoundingBox::Intersect(const BoundingPlane& rhs) {
 }
 
 //bool Intersect(const point& pt) {
-bool BoundingBox::Intersect(point& pt) {
+bool BoundingBox::Intersect(const point& pt) {
 	point ptMin = GetMinPoint();
 	point ptMax = GetMaxPoint();
 
@@ -1638,6 +1638,10 @@ point BoundingBox::GetBoxPoint(BoxPoint ptType, bool fOriented) {
 			retPoint.y() *= -1.0f;
 			retPoint.z() *= -1.0f;
 		} break;
+
+		case BoxPoint::INVALID: {
+            ACBM(false, "Invalid box point");
+		} break;
 	}
 
 	// Transform point accordingly
@@ -1696,6 +1700,10 @@ BoundingBox::face BoundingBox::GetFace(BoxFace faceType, bool fOriented) {
 			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR, fOriented);
 			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR, fOriented);
 		} break;
+
+		case BoxFace::INVALID: {
+		    ACBM(false, "Invalid box face");
+		} break;
 	}
 
 	faceBox.m_vNormal = GetBoxFaceNormal(faceType, fOriented);
@@ -1713,6 +1721,7 @@ vector BoundingBox::GetBoxFaceNormal(BoxFace faceType, bool fOriented) {
 		case BoxFace::LEFT: vNormal = vector::iVector(-1.0f); break;
 		case BoxFace::FRONT: vNormal = vector::kVector(1.0f); break;
 		case BoxFace::BACK: vNormal = vector::kVector(-1.0f); break;
+		case BoxFace::INVALID: ACBM(false, "Invalid box face"); break;
 	}
 
 	// Rotate if needed 
@@ -1787,6 +1796,10 @@ line BoundingBox::GetBoxEdge(BoxEdge edgeType) {
 		case BoxEdge::RIGHT_FAR: {
 			lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR), 
 							GetBoxPoint(BoxPoint::TOP_RIGHT_FAR)); 
+		} break;
+
+		case BoxEdge::INVALID: {
+		    ACBM(false, "Invalid box edge");
 		} break;
 
 	}

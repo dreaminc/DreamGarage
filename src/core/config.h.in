@@ -46,6 +46,17 @@
 
 #elif defined(__APPLE__)
 	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_OSX
+
+    #pragma clang diagnostic ignored "-Wunused-label"
+    #pragma clang diagnostic ignored "-Wunused-parameter"
+    #pragma clang diagnostic ignored "-Wnull-conversion"
+
+    // TODO: Re-eval these
+    #pragma clang diagnostic ignored "-Wunused-variable"
+    #pragma clang diagnostic ignored "-Waddress-of-temporary"
+    #pragma clang diagnostic ignored "-Wsign-compare"
+    #pragma clang diagnostic ignored "-Wformat"
+
 #elif defined (__linux__)
 	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_LINUX
 #else

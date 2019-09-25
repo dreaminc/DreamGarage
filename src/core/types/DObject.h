@@ -22,7 +22,7 @@ public:
 		// empty
 	}
 
-	~DObject() {
+	virtual ~DObject() {
 		// empty
 	}
 

@@ -52,7 +52,8 @@ enum class HMDDeviceType {
 	NONE	
 };
 
-enum EYE_TYPE;
+//enum EYE_TYPE;
+#include "core/camera/camera.h"     // include the EYE
 
 typedef struct HMDEvent {
 	HMDEventType m_eventType;

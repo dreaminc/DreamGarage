@@ -22,7 +22,7 @@
 class point;
 class quaternion;
 
-class vector : public matrix <vector_precision, 4, 1> {
+class vector : public matrix<vector_precision, 4, 1> {
 public:
 	vector();
 	vector(vector_precision val);
@@ -70,7 +70,7 @@ public:
 
 	// Utility
 public:
-	static vector ComponentMultiply(vector &lhs, vector &rhs);
+	static vector ComponentMultiply(const vector &lhs, const vector &rhs);
 
 	static vector XUnitVector() { return vector(1.0f, 0.0f, 0.0f); }
 	static vector YUnitVector() { return vector(0.0f, 1.0f, 0.0f); }
@@ -80,5 +80,11 @@ public:
 	static vector jVector(vector_precision value = 1.0f) { return vector(0.0f, value, 0.0f); }
 	static vector kVector(vector_precision value = 1.0f) { return vector(0.0f, 0.0f, value); }
 };
+
+// TODO: Must be a better way to map vector to mat<T, N, M>
+vector operator* (const vector_precision val, const vector& arg) {
+    matrix<vector_precision, 4, 1> result(arg);
+    return (result *= (val));
+}
 
 #endif // !VECTOR_H_

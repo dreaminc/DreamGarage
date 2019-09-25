@@ -15,8 +15,8 @@
 #include <string>
 #include <functional>
 
-#include "Cloud/User/User.h"
-#include "Cloud/User/TwilioNTSInformation.h"
+#include "cloud/User/User.h"
+#include "cloud/User/TwilioNTSInformation.h"
 
 class CloudController;
 

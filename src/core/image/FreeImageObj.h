@@ -8,16 +8,16 @@
 
 // Logging is redefining macros due to CEF, Logging++ and WebRTC
 // When we solve logging we need to solve this too
-#pragma warning( disable : 4005)
+
+#if defined(_WIN32)
+    #pragma warning( disable : 4005)
+#endif
+
+#include <string>
 
 #include <FreeImagePlus.h>
 
-// DREAM OS
-// DreamOS/Dimension/Primitives/image/FreeImageObj.h
-// The FreeImage Object file 
-
 #include "image.h"
-#include <string>
 
 class FreeImageObj : public image {
 public:

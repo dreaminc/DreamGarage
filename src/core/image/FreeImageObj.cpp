@@ -65,58 +65,66 @@ Error:
 RESULT FreeImageObj::LoadImage() {
 	RESULT r = R_PASS;
 
-	CN(m_pfiBitmap);
+    {
 
-	m_fiColorType = FreeImage_GetColorType(m_pfiBitmap);
-	auto pFIHeaderInfo = FreeImage_GetInfo(m_pfiBitmap);
-	CN(pFIHeaderInfo);
-	memcpy(&m_fiHeaderInfo, pFIHeaderInfo, sizeof(BITMAPINFO));
+        CN(m_pfiBitmap);
 
-	m_fiBitsPerPixel = FreeImage_GetBPP(m_pfiBitmap);
-	
-	switch (m_fiColorType) {
-		case FIC_MINISWHITE:
-		case FIC_MINISBLACK: {
-			m_channels = 1;
-		} break;
+        m_fiColorType = FreeImage_GetColorType(m_pfiBitmap);
+        auto pFIHeaderInfo = FreeImage_GetInfo(m_pfiBitmap);
+        CN(pFIHeaderInfo);
+        memcpy(&m_fiHeaderInfo, pFIHeaderInfo, sizeof(BITMAPINFO));
 
-		case FIC_RGB: {
-			if (m_fiBitsPerPixel != 32) {
-				m_pfiBitmap = FreeImage_ConvertTo32Bits(m_pfiBitmap);
-				CNM(m_pfiBitmap, "Failed to convert to 32 bits");
-				m_fiBitsPerPixel = 32;
-			}
+        m_fiBitsPerPixel = FreeImage_GetBPP(m_pfiBitmap);
 
-			m_fiColorType = FIC_RGBALPHA;
-			m_channels = 4;
-		} break;
+        switch (m_fiColorType) {
+            case FIC_MINISWHITE:
+            case FIC_MINISBLACK: {
+                m_channels = 1;
+            }
+                break;
 
-		case FIC_RGBALPHA: {
-			m_channels = 4;
-		} break;
+            case FIC_RGB: {
+                if (m_fiBitsPerPixel != 32) {
+                    m_pfiBitmap = FreeImage_ConvertTo32Bits(m_pfiBitmap);
+                    CNM(m_pfiBitmap, "Failed to convert to 32 bits");
+                    m_fiBitsPerPixel = 32;
+                }
 
-	
-		case FIC_PALETTE:
-		case FIC_CMYK:
-		default: {
-			if (m_fiBitsPerPixel != 32) {
-				m_pfiBitmap = FreeImage_ConvertTo32Bits(m_pfiBitmap);
-				CNM(m_pfiBitmap, "Failed to convert to 32 bits");
-				m_fiBitsPerPixel = 32;
-			}
+                m_fiColorType = FIC_RGBALPHA;
+                m_channels = 4;
+            }
+                break;
 
-			m_channels = 4;
-		} break;			
-	}
+            case FIC_RGBALPHA: {
+                m_channels = 4;
+            }
+                break;
 
-	m_width = FreeImage_GetWidth(m_pfiBitmap);
-	m_height = FreeImage_GetHeight(m_pfiBitmap);
-	m_scanWidth = FreeImage_GetPitch(m_pfiBitmap);
-	
-	// Get a handle to the data buffer
-	//m_pImageBuffer = FreeImage_GetBits(m_pfiBitmap32);
-	m_pImageBuffer = FreeImage_GetBits(m_pfiBitmap);
-	CN(m_pImageBuffer);
+
+            case FIC_PALETTE:
+            case FIC_CMYK:
+            default: {
+                if (m_fiBitsPerPixel != 32) {
+                    m_pfiBitmap = FreeImage_ConvertTo32Bits(m_pfiBitmap);
+                    CNM(m_pfiBitmap, "Failed to convert to 32 bits");
+                    m_fiBitsPerPixel = 32;
+                }
+
+                m_channels = 4;
+            }
+                break;
+        }
+
+        m_width = FreeImage_GetWidth(m_pfiBitmap);
+        m_height = FreeImage_GetHeight(m_pfiBitmap);
+        m_scanWidth = FreeImage_GetPitch(m_pfiBitmap);
+
+        // Get a handle to the data buffer
+        //m_pImageBuffer = FreeImage_GetBits(m_pfiBitmap32);
+        m_pImageBuffer = FreeImage_GetBits(m_pfiBitmap);
+        CN(m_pImageBuffer);
+
+    }
 
 Error:
 	return r;
@@ -155,19 +163,23 @@ Error:
 RESULT FreeImageObj::LoadFromMemory() {
 	RESULT r = R_PASS;
 
-	CR(InitializeFreeImage());
+    {
 
-	FIMEMORY *pfiMemory = FreeImage_OpenMemory(m_pSourceBuffer, (DWORD)(m_pSourceBuffer_n));
-	CN(pfiMemory);
+        CR(InitializeFreeImage());
 
-	// get the file type 
-	m_fiImageFormat = FreeImage_GetFileTypeFromMemory(pfiMemory, 0);
-	CBM((m_fiImageFormat != FIF_UNKNOWN), "Could not load image from memory");
+        FIMEMORY *pfiMemory = FreeImage_OpenMemory(m_pSourceBuffer, (DWORD) (m_pSourceBuffer_n));
+        CN(pfiMemory);
 
-	m_pfiBitmap = FreeImage_LoadFromMemory(m_fiImageFormat, pfiMemory, 0);
-	CN(m_pfiBitmap);
+        // get the file type
+        m_fiImageFormat = FreeImage_GetFileTypeFromMemory(pfiMemory, 0);
+        CBM((m_fiImageFormat != FIF_UNKNOWN), "Could not load image from memory");
 
-	CRM(LoadImage(), "Failed to load info");
+        m_pfiBitmap = FreeImage_LoadFromMemory(m_fiImageFormat, pfiMemory, 0);
+        CN(m_pfiBitmap);
+
+        CRM(LoadImage(), "Failed to load info");
+
+    }
 
 Error:
 	return r;
