@@ -7,7 +7,7 @@ pipeline {
       }
     }
 
-    state('Test') {
+    stage('Test') {
       steps {
         echo 'Testing...'
       }
