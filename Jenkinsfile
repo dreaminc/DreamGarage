@@ -1,12 +1,24 @@
 pipeline {
-  agent any
+  agent {
+    dockerfile true
+  }
   
   stages {
+    stage('Checkout') {
+      steps{
+        checkout scm
+        sh 'mkdir -p build local'
+      }
+    }
+
     stage('Build') {
       steps {
         echo 'Building...'
-        cmake arguments: '-DCMAKE_TOOLCHAIN_FILE=~/Projects/vcpkg/scripts/buildsystems/vcpkg.cmake', installation: 'InSearchPath'
-        cmakeBuild buildType: 'Release', cleanBuild: true, installation: 'InSearchPath', steps: [[withCmake: true]]
+        sh '''
+          cd build &&
+          cmake -D CMAKE_BUILD_TYPE=Debug -D BUILD_TESTING=ON .. &&
+          make
+        '''
       }
     }
 
