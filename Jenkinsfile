@@ -1,24 +1,26 @@
 pipeline {
-  agent {
-    dockerfile true
-  }
+  agent any
   
   stages {
+
     stage('Checkout') {
       steps{
+        echo 'Checking out code'
+        
         checkout scm
-        sh 'mkdir -p build local'
+
+        mkdir build
+        cd build
       }
     }
 
     stage('Build') {
       steps {
         echo 'Building...'
-        sh '''
-          cd build &&
-          cmake -D CMAKE_BUILD_TYPE=Debug -D BUILD_TESTING=ON .. &&
-          make
-        '''
+        cmake --version
+        cmake ..
+
+        msbuild ALL_BUILD.vcxproj /verbosity:minimal /maxcpucount:1 /property:Configuration=%configuration%
       }
     }
 
