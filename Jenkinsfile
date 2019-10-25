@@ -1,12 +1,10 @@
 pipeline {
   agent any
   
-  checkout([  $class: 'GitSCM', 
-    branches: [[name: 'refs/heads/'+env.BRANCH_NAME]],
+  checkout([$class:'GitSCM', 
+    branches: [[name: "refs/heads/" + env.BRANCH_NAME]],
         doGenerateSubmoduleConfigurations: false,
-        extensions: [
-            [$class: 'GitLFSPull']
-        ]
+        extensions:[[$class:'GitLFSPull']]
     ])
 
   stages {
