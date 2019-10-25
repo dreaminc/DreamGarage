@@ -3,24 +3,10 @@ pipeline {
   
   stages {
 
-    stage('Checkout') {
-      steps{
-        echo 'Checking out code'
-        
-        checkout scm
-
-        mkdir build
-        cd build
-      }
-    }
-
     stage('Build') {
       steps {
-        echo 'Building...'
-        cmake --version
-        cmake ..
-
-        msbuild ALL_BUILD.vcxproj /verbosity:minimal /maxcpucount:1 /property:Configuration=%configuration%
+        cmake arguments: '-DCMAKE_TOOLCHAIN_FILE=~/Projects/vcpkg/scripts/buildsystems/vcpkg.cmake', installation: 'InSearchPath'
+        cmakeBuild buildType: 'Release', cleanBuild: true, installation: 'InSearchPath', steps: [[withCmake: true]]
       }
     }
 
