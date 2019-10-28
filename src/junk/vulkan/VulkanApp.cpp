@@ -535,8 +535,6 @@ RESULT VulkanApp::InitializeLogicalDevice() {
 	// Note: We can have multiple queues - this is how we accomplish multi-thread access
 	// Idea: Each application could in theory have a queue
 
-	
-
 	m_vkQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 	m_vkQueueCreateInfo.queueFamilyIndex = m_vulkanQueueFamilyIndices.graphicsFamily;
 	m_vkQueueCreateInfo.queueCount = 1;
@@ -560,13 +558,12 @@ RESULT VulkanApp::InitializeLogicalDevice() {
 	}
 
 	// Set up queues
-
 	float queuePriority = 1.0f;
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	std::set<uint32_t> uniqueQueueFamilies = {
-		m_vulkanQueueFamilyIndices.graphicsFamily, m_vulkanQueueFamilyIndices.presentFamily
+		m_vulkanQueueFamilyIndices.graphicsFamily, 
+		m_vulkanQueueFamilyIndices.presentFamily
 	};
-
 
 	for (uint32_t queueFamily : uniqueQueueFamilies) {
 		VkDeviceQueueCreateInfo vkDeviceQueueCreateInfo = {};
@@ -581,7 +578,7 @@ RESULT VulkanApp::InitializeLogicalDevice() {
 
 	m_vkDeviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 	m_vkDeviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-	m_vkQueueCreateInfo.pQueuePriorities = &queuePriority;
+	//m_vkQueueCreateInfo.pQueuePriorities = &queuePriority;
 	
 	CBM(vkCreateDevice(m_hVkSelectedPhysicalDevice, &m_vkDeviceCreateInfo, nullptr, &m_hVkLogicalDevice) == VK_SUCCESS, 
 		"Failed to create vulkan logical device");
@@ -600,11 +597,7 @@ Error:
 }
 
 RESULT VulkanApp::MainLoop() {
-<<<<<<< HEAD
 	RESULT r = R_PASS;	
-=======
-	RESULT r = R_PASS;
->>>>>>> 5b2bdc3720a958ddbccb2871053570d8f68fdfd0
 
 	while (!glfwWindowShouldClose(m_pglfwWindow)) {
 		glfwPollEvents();
