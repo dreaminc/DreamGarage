@@ -92,4 +92,4 @@ add_subdirectory(ui)
 add_subdirectory(webbrowser)
 
 # Adds junk repos
-# add_subdirectory(junk)
+add_subdirectory(junk)
