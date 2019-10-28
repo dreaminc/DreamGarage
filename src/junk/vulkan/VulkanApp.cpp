@@ -594,12 +594,17 @@ RESULT VulkanApp::InitializeLogicalDevice() {
 	vkGetDeviceQueue(m_hVkLogicalDevice, m_vulkanQueueFamilyIndices.presentFamily, 0, &m_hVkPresentationQueue);
 	CNM(m_hVkPresentationQueue, "Failed to get presentation queue");
 
+
 Error:
 	return r;
 }
 
 RESULT VulkanApp::MainLoop() {
+<<<<<<< HEAD
 	RESULT r = R_PASS;	
+=======
+	RESULT r = R_PASS;
+>>>>>>> 5b2bdc3720a958ddbccb2871053570d8f68fdfd0
 
 	while (!glfwWindowShouldClose(m_pglfwWindow)) {
 		glfwPollEvents();
@@ -608,8 +613,6 @@ RESULT VulkanApp::MainLoop() {
 Error:
 	return r;
 }
-
-
 
 RESULT VulkanApp::CleanUp() {
 	RESULT r = R_PASS;
@@ -635,6 +638,7 @@ RESULT VulkanApp::CleanUp() {
 		vkDestroyInstance(m_hVkInstance, nullptr);
 		m_hVkInstance = nullptr;
 	}
+
 
 	// Clean up window
 	if (m_pglfwWindow != nullptr) {
