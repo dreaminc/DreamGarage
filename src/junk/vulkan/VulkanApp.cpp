@@ -175,6 +175,63 @@ Error:
 	return r;
 }
 
+RESULT VulkanApp::InitializeVulkanDeviceExtensions() {
+	RESULT r = R_PASS;
+
+	CRM(RetrieveRequiredVulkanDeviceExtensions(), "Failed to retrieve required vulkan device extensions");
+
+Error:
+	return r;
+}
+
+RESULT VulkanApp::RetrieveRequiredVulkanDeviceExtensions() {
+	RESULT r = R_PASS;
+
+	m_vulkanDeviceRequiredExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+
+Error:
+	return r;
+}
+
+/*
+RESULT VulkanApp::RetrieveSupportedVulkanDeviceExtensions() {
+	RESULT r = R_PASS;
+
+	// TODO: Related to GLFW vs. WIN32 API 
+	// We will need to figure out what extensions Dream needs
+
+	// Retrieve supported extensions
+	vkEnumerateInstanceExtensionProperties(nullptr, &m_numSupportedVulkanExtensions, nullptr);
+	m_supportedExtensions = std::vector<VkExtensionProperties>(m_numSupportedVulkanExtensions);
+
+	vkEnumerateInstanceExtensionProperties(nullptr, &m_numSupportedVulkanExtensions, m_supportedExtensions.data());
+
+	for (const auto& extension : m_supportedExtensions) {
+		DEBUG_LINEOUT("vk-ext found: %s", extension.extensionName);
+	}
+
+	if (m_vulkanRequiredExtensions.size() > 0) {
+		for (const auto& pszRequiredVkExt : m_vulkanRequiredExtensions) {
+			bool fFound = false;
+
+			for (const auto& extension : m_supportedExtensions) {
+				if (strcmp(extension.extensionName, pszRequiredVkExt) == 0) {
+					fFound = true;
+				}
+			}
+
+			CBM(fFound, "Error: vulkan extension %s not supported", pszRequiredVkExt);
+
+			DEBUG_LINEOUT("Found extension %s", pszRequiredVkExt);
+		}
+	}
+
+Error:
+	return r;
+}
+*/
+
+
 RESULT VulkanApp::CreateVulkanInstance() {
 	RESULT r = R_PASS;
 
@@ -483,10 +540,27 @@ Error:
 RESULT VulkanApp::SelectPhysicalDevice() {
 	RESULT r = R_PASS;
 
-
+	// TODO: ??
 
 Error:
 	return r;
+}
+
+// Check the extensions match for a device per required extensions
+bool VulkanQueueFamilyIndices::CheckVulkanDeviceExtensionSupport(VkPhysicalDevice vkDevice, std::vector<const char*> vulkanDeviceRequiredExtensions) {
+	uint32_t extensionCount = 0;
+	vkEnumerateDeviceExtensionProperties(vkDevice, nullptr, &extensionCount, nullptr);
+
+	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+	vkEnumerateDeviceExtensionProperties(vkDevice, nullptr, &extensionCount, availableExtensions.data());
+
+	std::set<std::string> requiredExtensions(vulkanDeviceRequiredExtensions.begin(), vulkanDeviceRequiredExtensions.end());
+
+	for (const auto& vkExtension : availableExtensions) {
+		requiredExtensions.erase(vkExtension.extensionName);
+	}
+
+	return requiredExtensions.empty();
 }
 
 // TODO: Actual implementation should be a bit more robust than this
@@ -518,6 +592,13 @@ RESULT VulkanApp::FindQueueFamilies() {
 				m_vulkanQueueFamilyIndices.graphicsFamily = i;
 				m_vulkanQueueFamilyIndices.presentFamily = i;
 				m_vulkanQueueFamilyIndices.fValid = true;
+
+				m_vulkanQueueFamilyIndices.fVulkanDeviceExtensionsSupported = 
+					VulkanQueueFamilyIndices::CheckVulkanDeviceExtensionSupport(
+						m_hVkSelectedPhysicalDevice, 
+						m_vulkanDeviceRequiredExtensions
+					);
+
 				break;
 			}
 		}
@@ -528,69 +609,85 @@ Error:
 	return r;
 }
 
+VulkanSwapChainSupportDetails VulkanSwapChainSupportDetails::QueryVulkanSwapChainSupport(VkPhysicalDevice vkDevice) {
+	VulkanSwapChainSupportDetails vulkanSwapChainSupportDetails;
+
+	// 
+
+	return vulkanSwapChainSupportDetails;
+}
+
+
 RESULT VulkanApp::InitializeLogicalDevice() {
 	RESULT r = R_PASS;
 
-	// Create the queue we will be using
-	// Note: We can have multiple queues - this is how we accomplish multi-thread access
-	// Idea: Each application could in theory have a queue
+	CRM(InitializeVulkanDeviceExtensions(), "Failed to initialize vulkan device extensions");
 
-	m_vkQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	m_vkQueueCreateInfo.queueFamilyIndex = m_vulkanQueueFamilyIndices.graphicsFamily;
-	m_vkQueueCreateInfo.queueCount = 1;
-	
-	// Device Features
+	{
 
-	m_vkDeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	//m_vkDeviceCreateInfo.pQueueCreateInfos = &m_vkQueueCreateInfo;
-	//m_vkDeviceCreateInfo.queueCreateInfoCount = 1;
-	m_vkDeviceCreateInfo.pEnabledFeatures = &m_vkPhysicalDeviceFeatures;
+		// Create the queue we will be using
+		// Note: We can have multiple queues - this is how we accomplish multi-thread access
+		// Idea: Each application could in theory have a queue
 
-	m_vkDeviceCreateInfo.enabledExtensionCount = 0;
+		m_vkQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		m_vkQueueCreateInfo.queueFamilyIndex = m_vulkanQueueFamilyIndices.graphicsFamily;
+		m_vkQueueCreateInfo.queueCount = 1;
 
-	// This is technically ignored, but good to set anyways
-	if (m_fValidationLayersEnabled) {
-		m_vkDeviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(m_vulkanValidationLayers.size());
-		m_vkDeviceCreateInfo.ppEnabledLayerNames = m_vulkanValidationLayers.data();
+		// Device Features
+
+		m_vkDeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		//m_vkDeviceCreateInfo.pQueueCreateInfos = &m_vkQueueCreateInfo;
+		//m_vkDeviceCreateInfo.queueCreateInfoCount = 1;
+		m_vkDeviceCreateInfo.pEnabledFeatures = &m_vkPhysicalDeviceFeatures;
+
+		// Device Extensions
+		m_vkDeviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(m_vulkanDeviceRequiredExtensions.size());
+		m_vkDeviceCreateInfo.ppEnabledExtensionNames = m_vulkanDeviceRequiredExtensions.data();
+
+		// This is technically ignored, but good to set anyways
+		if (m_fValidationLayersEnabled) {
+			m_vkDeviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(m_vulkanValidationLayers.size());
+			m_vkDeviceCreateInfo.ppEnabledLayerNames = m_vulkanValidationLayers.data();
+		}
+		else {
+			m_vkDeviceCreateInfo.enabledLayerCount = 0;
+		}
+
+		// Set up queues
+		float queuePriority = 1.0f;
+		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+		std::set<uint32_t> uniqueQueueFamilies = {
+			m_vulkanQueueFamilyIndices.graphicsFamily,
+			m_vulkanQueueFamilyIndices.presentFamily
+		};
+
+		for (uint32_t queueFamily : uniqueQueueFamilies) {
+			VkDeviceQueueCreateInfo vkDeviceQueueCreateInfo = {};
+
+			vkDeviceQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			vkDeviceQueueCreateInfo.queueFamilyIndex = queueFamily;
+			vkDeviceQueueCreateInfo.queueCount = 1;
+			vkDeviceQueueCreateInfo.pQueuePriorities = &queuePriority;
+
+			queueCreateInfos.push_back(vkDeviceQueueCreateInfo);
+		}
+
+		m_vkDeviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+		m_vkDeviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+		//m_vkQueueCreateInfo.pQueuePriorities = &queuePriority;
+
+		CBM(vkCreateDevice(m_hVkSelectedPhysicalDevice, &m_vkDeviceCreateInfo, nullptr, &m_hVkLogicalDevice) == VK_SUCCESS,
+			"Failed to create vulkan logical device");
+
+		// Set up the queue
+
+		vkGetDeviceQueue(m_hVkLogicalDevice, m_vulkanQueueFamilyIndices.graphicsFamily, 0, &m_hVkGraphicsQueue);
+		CNM(m_hVkGraphicsQueue, "Failed to get graphics queue");
+
+		vkGetDeviceQueue(m_hVkLogicalDevice, m_vulkanQueueFamilyIndices.presentFamily, 0, &m_hVkPresentationQueue);
+		CNM(m_hVkPresentationQueue, "Failed to get presentation queue");
+
 	}
-	else {
-		m_vkDeviceCreateInfo.enabledLayerCount = 0;
-	}
-
-	// Set up queues
-	float queuePriority = 1.0f;
-	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-	std::set<uint32_t> uniqueQueueFamilies = {
-		m_vulkanQueueFamilyIndices.graphicsFamily, 
-		m_vulkanQueueFamilyIndices.presentFamily
-	};
-
-	for (uint32_t queueFamily : uniqueQueueFamilies) {
-		VkDeviceQueueCreateInfo vkDeviceQueueCreateInfo = {};
-		
-		vkDeviceQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		vkDeviceQueueCreateInfo.queueFamilyIndex = queueFamily;
-		vkDeviceQueueCreateInfo.queueCount = 1;
-		vkDeviceQueueCreateInfo.pQueuePriorities = &queuePriority;
-
-		queueCreateInfos.push_back(vkDeviceQueueCreateInfo);
-	}
-
-	m_vkDeviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
-	m_vkDeviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-	//m_vkQueueCreateInfo.pQueuePriorities = &queuePriority;
-	
-	CBM(vkCreateDevice(m_hVkSelectedPhysicalDevice, &m_vkDeviceCreateInfo, nullptr, &m_hVkLogicalDevice) == VK_SUCCESS, 
-		"Failed to create vulkan logical device");
-
-	// Set up the queue
-
-	vkGetDeviceQueue(m_hVkLogicalDevice, m_vulkanQueueFamilyIndices.graphicsFamily, 0, &m_hVkGraphicsQueue);
-	CNM(m_hVkGraphicsQueue, "Failed to get graphics queue");
-
-	vkGetDeviceQueue(m_hVkLogicalDevice, m_vulkanQueueFamilyIndices.presentFamily, 0, &m_hVkPresentationQueue);
-	CNM(m_hVkPresentationQueue, "Failed to get presentation queue");
-
 
 Error:
 	return r;

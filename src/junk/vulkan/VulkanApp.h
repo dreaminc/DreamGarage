@@ -20,12 +20,26 @@
 struct VulkanQueueFamilyIndices {
 	uint32_t graphicsFamily;
 	uint32_t presentFamily;
+	bool fVulkanDeviceExtensionsSupported = false;
 	
 	bool fValid = false;
 
+	static bool CheckVulkanDeviceExtensionSupport(
+		VkPhysicalDevice vkDevice, 
+		std::vector<const char*> vulkanDeviceRequiredExtensions
+	);
+
 	bool IsValid() {
-		return fValid;
+		return fValid && fVulkanDeviceExtensionsSupported;
 	}
+};
+
+struct VulkanSwapChainSupportDetails {
+	VkSurfaceCapabilitiesKHR vkSurfaceCapabilitiesKHR;
+	std::vector<VkSurfaceFormatKHR> vkSurfaceFormats;
+	std::vector<VkPresentModeKHR> vkPresentModes;
+
+	static VulkanSwapChainSupportDetails QueryVulkanSwapChainSupport(VkPhysicalDevice vkDevice);
 };
 
 class VulkanApp {
@@ -57,6 +71,10 @@ public:
 	RESULT RetrieveSupportedVulkanExtensions();
 
 	RESULT CheckValidationLayerSupport();
+
+	// Device Extensions
+	RESULT InitializeVulkanDeviceExtensions();
+	RESULT RetrieveRequiredVulkanDeviceExtensions();
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT msgSeverity,
@@ -95,6 +113,10 @@ private:
 	std::vector<const char*> m_vulkanRequiredExtensions;
 
 	VulkanQueueFamilyIndices m_vulkanQueueFamilyIndices;
+
+	// Vulkan Device Extensions
+	std::vector<const char*> m_vulkanDeviceRequiredExtensions;
+	
 
 private:
 	// Vulkan Extensions
