@@ -303,7 +303,6 @@ bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation, vector &vDire
 	float velocity = 0.0f;
 
 	for (int i = (int)(m_recentPoints.size()) - 1; i > 0; i--) {
-		m_recentPoints[i];
 			
 		float currentX = m_recentPoints[i].x() - m_recentPoints[i-1].x();
 		float currentY = m_recentPoints[i].y() - m_recentPoints[i-1].y();
@@ -340,6 +339,7 @@ bool UIPointerLabel::OrientationFromAverage(quaternion& qRotation, vector &vDire
 	qRotation = quaternion::MakeQuaternionWithEuler(m_currentAngle, 0.0f, 0.0f);
 
 	return true;
+
 Error:
 	return false;
 }
