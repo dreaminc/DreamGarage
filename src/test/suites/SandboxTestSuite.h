@@ -29,13 +29,17 @@ public:
 	// Tests
 	RESULT AddTestObjectPipeline();
 	RESULT AddTestCompositeObject();
+
+
+	RESULT AddTestWin64();
+	RESULT AddTestAndroid();
 	
 
 private:
 	RESULT SetupDreamAppPipeline();
 
 private:
-	DreamOS * m_pDreamOS = nullptr;
+	virtual RESULT DefaultResetProcess(void* pContext) override;
 };
 
 #endif // ! SANDBOX_TEST_SUITE_H_

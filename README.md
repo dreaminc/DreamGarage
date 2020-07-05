@@ -132,3 +132,12 @@ If Libyuv fails to build under x64 and is failing as a dependency, it is possibl
 https://chromium.googlesource.com/libyuv/libyuv/+/master/docs/getting_started.md
 
 
+### Android
+
+```
+keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000
+```
+
+
+
+

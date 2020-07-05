@@ -137,6 +137,8 @@ Error:
 	return r;
 }
 
+
+
 RESULT HALTestSuite::SetupTestSuite() {
 	RESULT r = R_PASS;
 
@@ -146,7 +148,7 @@ Error:
 	return r;
 }
 
-RESULT HALTestSuite::DefaultResetProcess(void *pContext) {
+RESULT HALTestSuite::DefaultResetProcess(void* pContext) {
 	RESULT r = R_PASS;
 
 	// Will reset the sandbox as needed between tests
@@ -154,7 +156,7 @@ RESULT HALTestSuite::DefaultResetProcess(void *pContext) {
 	CR(m_pDreamOS->RemoveAllObjects());
 
 	// Reset the pipeline
-	HALImp *pHAL;
+	HALImp* pHAL;
 	pHAL = m_pDreamOS->GetHALImp();
 
 	Pipeline* pPipeline;
