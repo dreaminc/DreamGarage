@@ -1,0 +1,9 @@
+make: Entering directory 'C:/dev/DreamGarage/Android/VrSamples/VrCubeWorld_SurfaceView/Projects/Android'
+[arm64-v8a] Prebuilt       : libvrapi.so <= C:/dev/DreamGarage/Android/VrSamples/VrCubeWorld_SurfaceView/Projects/Android/jni/../../../../../VrApi/Projects/AndroidPrebuilt/jni/../../../Libs/Android/arm64-v8a/Release/
+make: Leaving directory 'C:/dev/DreamGarage/Android/VrSamples/VrCubeWorld_SurfaceView/Projects/Android'
+make: Entering directory 'C:/dev/DreamGarage/Android/VrSamples/VrCubeWorld_SurfaceView/Projects/Android'
+[arm64-v8a] Compile        : vrcubeworldsv <= VrCubeWorld_SurfaceView.c
+make: Leaving directory 'C:/dev/DreamGarage/Android/VrSamples/VrCubeWorld_SurfaceView/Projects/Android'
+make: Entering directory 'C:/dev/DreamGarage/Android/VrSamples/VrCubeWorld_SurfaceView/Projects/Android'
+[arm64-v8a] SharedLibrary  : libvrcubeworldsv.so
+make: Leaving directory 'C:/dev/DreamGarage/Android/VrSamples/VrCubeWorld_SurfaceView/Projects/Android'

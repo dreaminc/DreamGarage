@@ -1,0 +1,18 @@
+{
+  "buildFiles": [
+    "C:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android\\jni\\Android.mk",
+    "C:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android\\jni\\Application.mk"
+  ],
+  "cleanCommands": [
+    "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.3.6528147\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dC:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android\\jni\\Android.mk NDK_APPLICATION_MK\u003dC:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android\\jni\\Application.mk APP_ABI\u003darm64-v8a NDK_ALL_ABIS\u003darm64-v8a NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-23 NDK_OUT\u003dC:/dev/DreamGarage/Android/VrSamples/VrCubeWorld_SurfaceView/Projects/Android/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dC:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android\\build\\intermediates\\ndkBuild\\debug\\lib V\u003d0 -CC:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android APP_PLATFORM\u003dandroid-21 NDK_TOOLCHAIN_VERSION\u003dclang APP_STL\u003dc++_static NDK_DEBUG\u003d1 OVR_DEBUG\u003d1 USE_ASAN\u003d1 clean"
+  ],
+  "buildTargetsCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.3.6528147\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dC:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android\\jni\\Android.mk NDK_APPLICATION_MK\u003dC:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android\\jni\\Application.mk APP_ABI\u003darm64-v8a NDK_ALL_ABIS\u003darm64-v8a NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-23 NDK_OUT\u003dC:/dev/DreamGarage/Android/VrSamples/VrCubeWorld_SurfaceView/Projects/Android/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dC:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android\\build\\intermediates\\ndkBuild\\debug\\lib V\u003d0 -j12 -CC:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android APP_PLATFORM\u003dandroid-21 NDK_TOOLCHAIN_VERSION\u003dclang APP_STL\u003dc++_static NDK_DEBUG\u003d1 OVR_DEBUG\u003d1 USE_ASAN\u003d1 {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "vrcubeworldsv-debug-arm64-v8a": {
+      "artifactName": "vrcubeworldsv",
+      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.3.6528147\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dC:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android\\jni\\Android.mk NDK_APPLICATION_MK\u003dC:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android\\jni\\Application.mk APP_ABI\u003darm64-v8a NDK_ALL_ABIS\u003darm64-v8a NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-23 NDK_OUT\u003dC:/dev/DreamGarage/Android/VrSamples/VrCubeWorld_SurfaceView/Projects/Android/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dC:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android\\build\\intermediates\\ndkBuild\\debug\\lib V\u003d0 -j12 -CC:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android APP_PLATFORM\u003dandroid-21 NDK_TOOLCHAIN_VERSION\u003dclang APP_STL\u003dc++_static NDK_DEBUG\u003d1 OVR_DEBUG\u003d1 USE_ASAN\u003d1 C:/dev/DreamGarage/Android/VrSamples/VrCubeWorld_SurfaceView/Projects/Android/build/intermediates/ndkBuild/debug/obj/local/arm64-v8a/libvrcubeworldsv.so",
+      "abi": "arm64-v8a",
+      "output": "C:\\dev\\DreamGarage\\Android\\VrSamples\\VrCubeWorld_SurfaceView\\Projects\\Android\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\arm64-v8a\\libvrcubeworldsv.so"
+    }
+  }
+}
