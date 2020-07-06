@@ -102,22 +102,27 @@ class VrAppPlugin implements Plugin<Project> {
 
 	  defaultConfig {
 		  minSdkVersion 21
-		  targetSdkVersion 21
+		  targetSdkVersion 26
 
 		  externalNativeBuild {
 			  ndk {
 			  }
 			  ndkBuild {
 				  def numProcs = Runtime.runtime.availableProcessors()
-				  arguments "V=0", "-j$numProcs", "-C$project.buildDir.parent", "APP_PLATFORM=android-21", "NDK_TOOLCHAIN_VERSION=clang", "APP_STL=c++_static"
+				  arguments "V=0", "-j$numProcs", "-C$project.buildDir.parent", "APP_PLATFORM=android-21", "NDK_TOOLCHAIN_VERSION=clang", "APP_STL=c++_static", '-DANDROID_STL=c++_static'
 			  }
 		  }
 	  }
 
 	  externalNativeBuild {
-		  ndkBuild {
-			  path 'jni/Android.mk'
-		  }
+//		  ndkBuild {
+//			  path 'jni/Android.mk'
+//		  }
+
+          cmake {
+              version '3.15.0'
+              path '../../../CMakeLists.txt'
+          }
 	  }
 
 	  signingConfigs {

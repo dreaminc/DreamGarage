@@ -10,6 +10,8 @@
     #else
         #include "sandbox/win64/Win64Sandbox.h"
     #endif
+#elif defined(__ANDROID__)
+    #include "sandbox/android/AndroidSandbox.h"
 #elif defined(__APPLE__)
     #include "sandbox/osx/OSXSandbox.h"
 #elif defined(__linux__)
@@ -32,17 +34,26 @@ Sandbox* SandboxFactory::MakeSandbox(SANDBOX_APP_TYPE type, DreamOS *pDOSHandle)
             #endif
 		} break;
 
+		case SANDBOX_APP_ANDROID: {
+			#if defined(__ANDROID__)
+				pSandbox = new AndroidSandbox(L"DreamOSSandbox");
+			#else
+				pSandbox = nullptr;
+				DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
+			#endif
+		} break;
+
         case SANDBOX_APP_OSX: {
             #if defined(__APPLE__)
                 pSandbox = new OSXSandbox("DreamOSSandbox");
             #else
-                pSandbox = NULL;
+                pSandbox = nullptr;
                 DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
             #endif
         } break;
             
 		default: {
-            pSandbox = NULL;
+            pSandbox = nullptr;
             DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
 		} break;
 	}
@@ -52,6 +63,7 @@ Sandbox* SandboxFactory::MakeSandbox(SANDBOX_APP_TYPE type, DreamOS *pDOSHandle)
 	CRM(pSandbox->InitializeOGLRenderingContext(), "Failed to initialize Sandbox OpenGL rendering context");
 
 	return pSandbox;
+
 Error:
 	if (pSandbox != NULL) {
 		delete pSandbox;
