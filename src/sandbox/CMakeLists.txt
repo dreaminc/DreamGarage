@@ -64,6 +64,7 @@ ELSEIF(WIN32)
    add_library(sandbox
     ${SOURCES}
     ${WIN64_SOURCES}
+    ${ANDROID_SOURCES}
    )
 ENDIF()
 

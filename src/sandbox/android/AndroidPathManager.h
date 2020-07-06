@@ -1,14 +1,13 @@
-#ifndef WIN_64_PATH_MANAGER_H_
-#define WIN_64_PATH_MANAGER_H_
+#ifndef ANDROID_PATH_MANAGER_H_
+#define ANDROID_PATH_MANAGER_H_
 
 #include "core/ehm/EHM.h"
 
-// Dream Sandbox Win64
-// dos/src/sandbox/win64/Win64PathManager.h
+// Dream Sandbox Android
+// dos/src/sandbox/android/AndroidPathManager.h
 
-// Dream OS Win64 sandbox path manager
+// Dream OS Android sandbox path manager
 
-#include <windows.h>
 #include <stdlib.h>
 #include <string.h>
 #include <tchar.h>
@@ -17,9 +16,9 @@
 
 class DreamOS;
 
-class Win64PathManager : public PathManager {
+class AndroidPathManager : public PathManager {
 public:
-	Win64PathManager();
+	AndroidPathManager();
 
 	RESULT DoesPathExist(const wchar_t *pszPath);
 	RESULT GetListOfDirectoriesInPath(PATH_VALUE_TYPE type, std::list<wchar_t*>* pListDirs);
@@ -31,7 +30,6 @@ protected:
 	virtual RESULT OpenDreamPathsFile() override;
 	virtual RESULT UpdateCurrentPath() override;
 	virtual RESULT SetCurrentPath(wchar_t *pszPath) override;
-	//RESULT RegisterPath(wchar_t *pszName, wchar_t *pszValue);
 
 	virtual RESULT CreateDirectory(wchar_t *pszDirectoryName) override;
 
@@ -39,11 +37,11 @@ public:
 	RESULT PrintPaths();
 
 	RESULT GetCurrentPath(wchar_t*&pszCurrentPath);
+
 	virtual RESULT GetDreamPath(std::wstring &wstrAppDataPath, DREAM_PATH_TYPE pathValueType) override;
 	virtual RESULT GetDreamPath(wchar_t*&pszDreamPath) override;
 	virtual RESULT GetDreamPath(char* &n_pszDreamPath) override;
 	virtual RESULT GetDreamPath(std::wstring &r_wstrDreamPath) override;
-	//RESULT GetValuePath(PATH_VALUE_TYPE, wchar_t* &pszPath);
 
 private:
 	wchar_t m_pszCurDirectiory[MAX_PATH];
@@ -56,4 +54,4 @@ private:
 	size_t m_pszShadersPath_n;
 };
 
-#endif // ! WIN_64_PATH_MANAGER_H_
+#endif // ! ANDROID_PATH_MANAGER_H_

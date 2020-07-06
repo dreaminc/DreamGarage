@@ -1,4 +1,4 @@
-#include "Win64PathManager.h"
+#include "AndroidPathManager.h"
 
 #include <stdlib.h>
 #include <cstring>
@@ -6,7 +6,7 @@
 
 #include "os/DreamOS.h"
 
-Win64PathManager::Win64PathManager() :
+AndroidPathManager::AndroidPathManager() :
 	PathManager()	// Call super
 {
 	memset(m_pszDreamRootPath, 0, (sizeof(wchar_t) * MAX_PATH));
@@ -23,7 +23,7 @@ Win64PathManager::Win64PathManager() :
 }
 
 
-RESULT Win64PathManager::Dealloc() {
+RESULT AndroidPathManager::Dealloc() {
 	RESULT r = R_PASS;
 
 	// Empty for now
@@ -31,19 +31,8 @@ RESULT Win64PathManager::Dealloc() {
 	return r;
 }
 
-/*
-RESULT Win64PathManager::RegisterPath(wchar_t *pszName, wchar_t *pszValue) {
-	RESULT r = R_PASS;
-
-	DEBUG_LINEOUT("Found Name:%S Value:%S", pszName, pszValue);
-
-Error:
-	return r;
-}
-*/
-
 // This file runs in current directory
-RESULT Win64PathManager::OpenDreamPathsFile() {
+RESULT AndroidPathManager::OpenDreamPathsFile() {
 	RESULT r = R_PASS;
 
 	FILE *pFile = NULL;
@@ -72,7 +61,7 @@ Error:
 	return r;
 }
 
-RESULT Win64PathManager::GetCurrentPath(wchar_t *& pszCurrentPath) {
+RESULT AndroidPathManager::GetCurrentPath(wchar_t *& pszCurrentPath) {
 	RESULT r = R_PASS;
 
 	pszCurrentPath = nullptr;
@@ -84,7 +73,7 @@ Error:
 	return r;
 }
 
-RESULT Win64PathManager::GetDreamPath(std::wstring &wstrAppDataPath, DREAM_PATH_TYPE pathValueType) {
+RESULT AndroidPathManager::GetDreamPath(std::wstring &wstrAppDataPath, DREAM_PATH_TYPE pathValueType) {
 	RESULT r = R_PASS;
 
 	if (m_fUseInstallPath) {
@@ -128,7 +117,7 @@ Error:
 	return r;
 }
 
-RESULT Win64PathManager::GetDreamPath(std::wstring &r_wstrDreamPath) {
+RESULT AndroidPathManager::GetDreamPath(std::wstring &r_wstrDreamPath) {
 	RESULT r = R_PASS;
 
 	r_wstrDreamPath.clear();
@@ -141,7 +130,7 @@ Error:
 	return r;
 }
 
-RESULT Win64PathManager::GetDreamPath(char* &n_pszDreamPath) {
+RESULT AndroidPathManager::GetDreamPath(char* &n_pszDreamPath) {
 	RESULT r = R_PASS;
 
 	n_pszDreamPath = nullptr;
@@ -162,7 +151,7 @@ Error:
 	return r;
 }
 
-RESULT Win64PathManager::GetDreamPath(wchar_t*&pszDreamPath) {
+RESULT AndroidPathManager::GetDreamPath(wchar_t*&pszDreamPath) {
 	RESULT r = R_PASS;
 
 	pszDreamPath = nullptr;
@@ -174,7 +163,7 @@ Error:
 	return r;
 }
 
-RESULT Win64PathManager::SetCurrentPath(wchar_t *pszPath) {
+RESULT AndroidPathManager::SetCurrentPath(wchar_t *pszPath) {
 	RESULT r = R_PASS;
 
 	CBM(SetCurrentDirectory(pszPath), "Failed to set path to %S", pszPath);
@@ -187,7 +176,7 @@ Error:
 }
 
 // This will create a local DreamOS path directory
-RESULT Win64PathManager::CreateDirectory(wchar_t *pszDirectoryName) {
+RESULT AndroidPathManager::CreateDirectory(wchar_t *pszDirectoryName) {
 	RESULT r = R_PASS;
 
 	CBM(::CreateDirectoryW(pszDirectoryName, NULL), "Failed to create directory %S", pszDirectoryName);
@@ -196,7 +185,7 @@ Error:
 	return r;
 }
 
-RESULT Win64PathManager::UpdateCurrentPath() {
+RESULT AndroidPathManager::UpdateCurrentPath() {
 	RESULT r = R_PASS;
 
 	// Initialize Current Path
@@ -206,7 +195,7 @@ RESULT Win64PathManager::UpdateCurrentPath() {
 	return r;
 }
 
-RESULT Win64PathManager::InitializePaths(DreamOS *pDOSHandle) {
+RESULT AndroidPathManager::InitializePaths(DreamOS *pDOSHandle) {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("Win64PathManager Initialize Paths");
@@ -294,7 +283,7 @@ Error:
 	return r;
 }
 
-RESULT Win64PathManager::DoesPathExist(const wchar_t *pszPath) {
+RESULT AndroidPathManager::DoesPathExist(const wchar_t *pszPath) {
 	RESULT r = R_PATH_NOT_FOUND;
 	DWORD fileAttributes = GetFileAttributesW(pszPath);
 	
@@ -307,7 +296,7 @@ RESULT Win64PathManager::DoesPathExist(const wchar_t *pszPath) {
 	return r;
 }
 
-RESULT Win64PathManager::PrintPaths() {
+RESULT AndroidPathManager::PrintPaths() {
 	RESULT r = R_PASS;
 
 	// Some debug / path management
@@ -317,7 +306,7 @@ RESULT Win64PathManager::PrintPaths() {
 	return r;
 }
 
-RESULT Win64PathManager::GetListOfFilesInPath(std::wstring strNameDir, std::vector<std::wstring> &vstrFiles, const wchar_t *pszOptExtension) {
+RESULT AndroidPathManager::GetListOfFilesInPath(std::wstring strNameDir, std::vector<std::wstring> &vstrFiles, const wchar_t *pszOptExtension) {
 	RESULT r = R_PASS;
 	HANDLE hFind = INVALID_HANDLE_VALUE;
 	WIN32_FIND_DATA fileFindData;
@@ -351,7 +340,7 @@ Error:
 }
 
 // Make note that this will allocate new strings and push them into the directory list
-RESULT Win64PathManager::GetListOfDirectoriesInPath(PATH_VALUE_TYPE type, std::list<wchar_t*>* pListDirs) {
+RESULT AndroidPathManager::GetListOfDirectoriesInPath(PATH_VALUE_TYPE type, std::list<wchar_t*>* pListDirs) {
 	RESULT r = R_PASS;
 	wchar_t *pszValuePath = NULL;
 	long pszValuePath_n = 0;

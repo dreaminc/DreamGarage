@@ -1,5 +1,5 @@
-#ifndef WINDOWS_64_APP_H_
-#define WINDOWS_64_APP_H_
+#ifndef ANDROID_SANDBOX_H_
+#define ANDROID_SANDBOX_H_
 
 #include "core/ehm/EHM.h"
 
@@ -25,19 +25,12 @@
 #define DEFAULT_FULLSCREEN false
 
 class OGLImp;
-class Win64Keyboard;
-class Win64Mouse;
-class Win64CredentialManager;
 
-class Win64Sandbox : public Sandbox {
-public:
-	enum WindowMessages {
-		UI_THREAD_CALLBACK = WM_APP + 1
-	};
+class AndroidSandbox : public Sandbox {
 
 public:
-	Win64Sandbox(TCHAR* pszClassName);
-	~Win64Sandbox();
+	AndroidSandbox(wchar_t* pszClassName);
+	~AndroidSandbox();
 
 public:	// Sandbox Interface
 	virtual RESULT InitializeSandbox() override;
@@ -67,22 +60,20 @@ public:	// Sandbox Interface
 
 public:
 	virtual RESULT InitializePathManager(DreamOS *pDOSHandle) override;	
+	
 	RESULT InitializeOGLRenderingContext();
 	RESULT InitializeCloudController();
-	//RESULT InitializeHAL();
 	RESULT InitializeKeyboard();
 	RESULT InitializeMouse();
 	RESULT InitializeGamepad();
-	RESULT InitializeLeapMotion();	
 
 private:
-	static LRESULT __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
-	LRESULT __stdcall WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
 	RESULT SetDeviceContext(HDC hDC);
 	RESULT SetDimensions(int pxWidth, int pxHeight);
 
 	// Handle a mouse event from a window's message. Return true if the message is handled, and false otherwise.
 	bool HandleMouseEvent(const MSG&	windowMassage);
+
 	// Handle a key event from a window's message. Return true if the message is handled, and false otherwise.
 	bool HandleKeyEvent(const MSG&	windowMassage);
 
@@ -105,28 +96,13 @@ private:
 	int m_posX;
 	int m_posY;
 
-	WNDCLASSEX m_wndclassex; 
 	HWND m_hwndWindow;
 	DWORD m_ThreadID;
 
 	HDC m_hDC;					// Private GDI Device Context
-	HINSTANCE m_hInstance;		// Holds The Instance Of The Application
-
-	// DesktopCapture vars
-	unsigned int m_desktoppxWidth = 0;
-	unsigned int m_desktoppxHeight = 0;
-	unsigned long m_pDesktopFrameData_n = 0;
-
-	MSG m_windowsMessage;
 
 private:
 	std::function<void(int msg_id, void* data)> m_fnUIThreadCallback;
-
-public:
-	//std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
-	//Win64Keyboard *m_pWin64Keyboard;
-	//Win64Mouse *m_pWin64Mouse;
-	//HMD *m_pHMD;
 };
 
-#endif // ! WINDOWS_64_APP_H_
+#endif // ! ANDROID_SANDBOX_H_

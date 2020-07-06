@@ -6,6 +6,8 @@
     #else
         #include "sandbox/win64/Win64PathManager.h"
     #endif
+#elif defined(__ANDROID__)
+    #include "sandbox/android/AndroidPathManager.h"
 #elif defined(__APPLE__)
     #include "sandbox/osx/OSXPathManager.h"
 #elif defined(__linux__)
@@ -25,6 +27,15 @@ PathManager* PathManagerFactory::MakePathManager(PATH_MANAGER_TYPE type, DreamOS
             #else
                 pPathManager = NULL;
                 DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
+            #endif
+		} break;
+
+		case PATH_MANAGER_ANDROID: {
+            #if defined(__ANDROID__)
+                pPathManager = new AndroidPathManager();
+            #else
+			    pPathManager = NULL;
+			    DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
             #endif
 		} break;
 

@@ -2201,14 +2201,14 @@ void* AppThreadFunction(void* parm) {
     return NULL;
 }
 
-static void ovrAppThread_Create(ovrAppThread* appThread, JNIEnv* env, jobject activityObject) {
-    env->GetJavaVM(&appThread->JavaVm);
-    appThread->ActivityObject = env->NewGlobalRef(activityObject);
-    appThread->Thread = 0;
-    appThread->NativeWindow = NULL;
-    ovrMessageQueue_Create(&appThread->MessageQueue);
+static void ovrAppThread_Create(ovrAppThread* pOVRAppThread, JNIEnv* pJNIEnvironemnt, jobject pJObjActivity) {
+    pJNIEnvironemnt->GetJavaVM(&pOVRAppThread->JavaVm);
+    pOVRAppThread->ActivityObject = pJNIEnvironemnt->NewGlobalRef(pJObjActivity);
+    pOVRAppThread->Thread = 0;
+    pOVRAppThread->NativeWindow = NULL;
+    ovrMessageQueue_Create(&pOVRAppThread->MessageQueue);
 
-    const int createErr = pthread_create(&appThread->Thread, NULL, AppThreadFunction, appThread);
+    const int createErr = pthread_create(&pOVRAppThread->Thread, NULL, AppThreadFunction, pOVRAppThread);
     if (createErr != 0) {
         ALOGE("pthread_create returned %i", createErr);
     }
@@ -2222,29 +2222,15 @@ static void ovrAppThread_Destroy(ovrAppThread* appThread, JNIEnv* env) {
 
 // Activity lifecycle
 
-//JNIEXPORT jlong JNICALL
-//Java_com_dos_testclient_GLES3JNILib_onCreate(JNIEnv* env, jobject obj, jobject activity) {
-//    ALOGV("    GLES3JNILib::onCreate()");
-//
-//    ovrAppThread* appThread = (ovrAppThread*)malloc(sizeof(ovrAppThread));
-//    ovrAppThread_Create(appThread, env, activity);
-//
-//    ovrMessageQueue_Enable(&appThread->MessageQueue, true);
-//    ovrMessage message;
-//    ovrMessage_Init(&message, MESSAGE_ON_CREATE, MQ_WAIT_PROCESSED);
-//    ovrMessageQueue_PostMessage(&appThread->MessageQueue, &message);
-//
-//    return (jlong)((size_t)appThread);
-//}
-
 extern "C" {
 
 JNIEXPORT jlong JNICALL
-Java_com_dos_testclient_GLES3JNILib_onCreate(JNIEnv *env, jobject obj, jobject activity) {
+Java_com_dos_testclient_GLES3JNILib_onCreate(JNIEnv *pJNIEnvironment, jobject pJObj, jobject pJObjActivity) {
     ALOGV("    GLES3JNILibActivity::onCreate()");
 
+    // Create the App Thread (entry point for the application)
     ovrAppThread *appThread = (ovrAppThread *) malloc(sizeof(ovrAppThread));
-    ovrAppThread_Create(appThread, env, activity);
+    ovrAppThread_Create(appThread, pJNIEnvironment, pJObjActivity);
 
     ovrMessageQueue_Enable(&appThread->MessageQueue, true);
     ovrMessage message;
@@ -2255,8 +2241,10 @@ Java_com_dos_testclient_GLES3JNILib_onCreate(JNIEnv *env, jobject obj, jobject a
 }
 
 JNIEXPORT void JNICALL
-Java_com_dos_testclient_GLES3JNILib_onStart(JNIEnv *env, jobject obj, jlong handle) {
+Java_com_dos_testclient_GLES3JNILib_onStart(JNIEnv *pJNIEnvironment, jobject pJObj, jlong handle) {
+
     ALOGV("    GLES3JNILib::onStart()");
+
     ovrAppThread *appThread = (ovrAppThread *) ((size_t) handle);
     ovrMessage message;
     ovrMessage_Init(&message, MESSAGE_ON_START, MQ_WAIT_PROCESSED);
@@ -2264,8 +2252,10 @@ Java_com_dos_testclient_GLES3JNILib_onStart(JNIEnv *env, jobject obj, jlong hand
 }
 
 JNIEXPORT void JNICALL
-Java_com_dos_testclient_GLES3JNILib_onResume(JNIEnv *env, jobject obj, jlong handle) {
+Java_com_dos_testclient_GLES3JNILib_onResume(JNIEnv *pJNIEnvironment, jobject pJObj, jlong handle) {
+
     ALOGV("    GLES3JNILib::onResume()");
+
     ovrAppThread *appThread = (ovrAppThread *) ((size_t) handle);
     ovrMessage message;
     ovrMessage_Init(&message, MESSAGE_ON_RESUME, MQ_WAIT_PROCESSED);
@@ -2273,8 +2263,10 @@ Java_com_dos_testclient_GLES3JNILib_onResume(JNIEnv *env, jobject obj, jlong han
 }
 
 JNIEXPORT void JNICALL
-Java_com_dos_testclient_GLES3JNILib_onPause(JNIEnv *env, jobject obj, jlong handle) {
+Java_com_dos_testclient_GLES3JNILib_onPause(JNIEnv *pJNIEnvironment, jobject pJObj, jlong handle) {
+
     ALOGV("    GLES3JNILib::onPause()");
+
     ovrAppThread *appThread = (ovrAppThread *) ((size_t) handle);
     ovrMessage message;
     ovrMessage_Init(&message, MESSAGE_ON_PAUSE, MQ_WAIT_PROCESSED);
@@ -2282,8 +2274,10 @@ Java_com_dos_testclient_GLES3JNILib_onPause(JNIEnv *env, jobject obj, jlong hand
 }
 
 JNIEXPORT void JNICALL
-Java_com_dos_testclient_GLES3JNILib_onStop(JNIEnv *env, jobject obj, jlong handle) {
+Java_com_dos_testclient_GLES3JNILib_onStop(JNIEnv *pJNIEnvironment, jobject pJObj, jlong handle) {
+
     ALOGV("    GLES3JNILib::onStop()");
+
     ovrAppThread *appThread = (ovrAppThread *) ((size_t) handle);
     ovrMessage message;
     ovrMessage_Init(&message, MESSAGE_ON_STOP, MQ_WAIT_PROCESSED);
@@ -2291,7 +2285,8 @@ Java_com_dos_testclient_GLES3JNILib_onStop(JNIEnv *env, jobject obj, jlong handl
 }
 
 JNIEXPORT void JNICALL
-Java_com_dos_testclient_GLES3JNILib_onDestroy(JNIEnv *env, jobject obj, jlong handle) {
+Java_com_dos_testclient_GLES3JNILib_onDestroy(JNIEnv *pJNIEnvironment, jobject pJObj, jlong handle) {
+
     ALOGV("    GLES3JNILib::onDestroy()");
 
     ovrAppThread *appThread = (ovrAppThread *) ((size_t) handle);
@@ -2300,21 +2295,22 @@ Java_com_dos_testclient_GLES3JNILib_onDestroy(JNIEnv *env, jobject obj, jlong ha
     ovrMessageQueue_PostMessage(&appThread->MessageQueue, &message);
     ovrMessageQueue_Enable(&appThread->MessageQueue, false);
 
-    ovrAppThread_Destroy(appThread, env);
+    ovrAppThread_Destroy(appThread, pJNIEnvironment);
     free(appThread);
 }
 
 // Surface lifecycle
 
 JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceCreated(
-        JNIEnv *env,
-        jobject obj,
+        JNIEnv *pJNIEnvironment,
+        jobject pJObj,
         jlong handle,
-        jobject surface) {
+        jobject pJObjSurface) 
+{
     ALOGV("    GLES3JNILib::onSurfaceCreated()");
     ovrAppThread *appThread = (ovrAppThread *) ((size_t) handle);
 
-    ANativeWindow *newNativeWindow = ANativeWindow_fromSurface(env, surface);
+    ANativeWindow *newNativeWindow = ANativeWindow_fromSurface(pJNIEnvironment, pJObjSurface);
     if (ANativeWindow_getWidth(newNativeWindow) < ANativeWindow_getHeight(newNativeWindow)) {
         // An app that is relaunched after pressing the home button gets an initial surface with
         // the wrong orientation even though android:screenOrientation="landscape" is set in the
@@ -2332,14 +2328,15 @@ JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceCreated(
 }
 
 JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceChanged(
-        JNIEnv *env,
-        jobject obj,
+        JNIEnv *pJNIEnvironment,
+        jobject pJObj,
         jlong handle,
-        jobject surface) {
+        jobject pJObjSurface)
+{
     ALOGV("    GLES3JNILib::onSurfaceChanged()");
     ovrAppThread *appThread = (ovrAppThread *) ((size_t) handle);
 
-    ANativeWindow *newNativeWindow = ANativeWindow_fromSurface(env, surface);
+    ANativeWindow *newNativeWindow = ANativeWindow_fromSurface(pJNIEnvironment, pJObjSurface);
     if (ANativeWindow_getWidth(newNativeWindow) < ANativeWindow_getHeight(newNativeWindow)) {
         // An app that is relaunched after pressing the home button gets an initial surface with
         // the wrong orientation even though android:screenOrientation="landscape" is set in the
@@ -2349,7 +2346,7 @@ JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceChanged(
     }
 
     if (newNativeWindow != appThread->NativeWindow) {
-        if (appThread->NativeWindow != NULL) {
+        if (appThread->NativeWindow != nullptr) {
             ovrMessage message;
             ovrMessage_Init(&message, MESSAGE_ON_SURFACE_DESTROYED, MQ_WAIT_PROCESSED);
             ovrMessageQueue_PostMessage(&appThread->MessageQueue, &message);
@@ -2357,7 +2354,8 @@ JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceChanged(
             ANativeWindow_release(appThread->NativeWindow);
             appThread->NativeWindow = NULL;
         }
-        if (newNativeWindow != NULL) {
+
+        if (newNativeWindow != nullptr) {
             ALOGV("        NativeWindow = ANativeWindow_fromSurface( env, surface )");
             appThread->NativeWindow = newNativeWindow;
             ovrMessage message;
@@ -2365,15 +2363,16 @@ JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceChanged(
             ovrMessage_SetPointerParm(&message, 0, appThread->NativeWindow);
             ovrMessageQueue_PostMessage(&appThread->MessageQueue, &message);
         }
-    } else if (newNativeWindow != NULL) {
+    } else if (newNativeWindow != nullptr) {
         ANativeWindow_release(newNativeWindow);
     }
 }
 
 JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceDestroyed(
-        JNIEnv *env,
-        jobject obj,
-        jlong handle) {
+        JNIEnv *pJNIEnvironment,
+        jobject pJObj,
+        jlong handle)
+{
     ALOGV("    GLES3JNILib::onSurfaceDestroyed()");
     ovrAppThread *appThread = (ovrAppThread *) ((size_t) handle);
     ovrMessage message;
@@ -2381,22 +2380,25 @@ JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceDestroyed(
     ovrMessageQueue_PostMessage(&appThread->MessageQueue, &message);
     ALOGV("        ANativeWindow_release( NativeWindow )");
     ANativeWindow_release(appThread->NativeWindow);
-    appThread->NativeWindow = NULL;
+    appThread->NativeWindow = nullptr;
 }
 
 // Input
 
 JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onKeyEvent(
-        JNIEnv *env,
-        jobject obj,
+        JNIEnv *pJNIEnvironment,
+        jobject pJObj,
         jlong handle,
         int keyCode,
-        int action) {
+        int action)
+{
     if (action == AKEY_EVENT_ACTION_UP) {
         ALOGV("    GLES3JNILib::onKeyEvent( %d, %d )", keyCode, action);
     }
+
     ovrAppThread *appThread = (ovrAppThread *) ((size_t) handle);
     ovrMessage message;
+
     ovrMessage_Init(&message, MESSAGE_ON_KEY_EVENT, MQ_WAIT_NONE);
     ovrMessage_SetIntegerParm(&message, 0, keyCode);
     ovrMessage_SetIntegerParm(&message, 1, action);
