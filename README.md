@@ -138,6 +138,12 @@ https://chromium.googlesource.com/libyuv/libyuv/+/master/docs/getting_started.md
 keytool -genkey -v -keystore android.debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000
 ```
 
+Mirror Quest to PC
+
+```
+adb exec-out "while true; do screenrecord --bit-rate=2m --output-format=h264 --time-limit 180 -; done" | "C:\Program Files (x86)\VideoLAN\VLC\vlc.exe" --demux h264 --h264-fps=60 --clock-jitter=0 -
+```
+
 
 
 
