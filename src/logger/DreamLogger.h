@@ -53,6 +53,12 @@ public:
 			//case DreamLogger::Level::CRITICAL: {
 			//	m_pDreamLogger->critical(pszMessage, args...);
 			//} break;
+
+			case DreamLogger::Level::CRITICAL:
+			case DreamLogger::Level::INVALID:
+			default: {
+				// unhandled
+			} break;
 		}
 
 	Error:

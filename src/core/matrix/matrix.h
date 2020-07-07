@@ -178,7 +178,7 @@ public:
 
 	static matrix<TMatrix, N, M> MakeIdentity(TMatrix val = 1.0f) {
 		matrix<TMatrix, N, M> retMatrix;
-		retMatrix.identity(1.0f);
+		retMatrix.identity(val);
 		return retMatrix;
 	}
 
@@ -451,12 +451,12 @@ public:
     // -------------------------------------------------------------------------
 	
     // Copy
-	 /*
+    /*
     matrix& matrix::operator=(const matrix<TMatrix, N, M>& arg) {
         memcpy(m_data, arg.m_data, sizeof(TMatrix) * N * M);
         return *this;
     }
-	*/
+	//*/
 
 	 matrix<TMatrix, N, M>& operator=(const matrix<TMatrix, N, M> &arg) {
 		 if (this == &arg)      // Same object?
@@ -475,7 +475,6 @@ public:
         return *this;
     }
 
-	/*
     // comparison
     bool operator==( const matrix<TMatrix, N, M>& arg) const {
         for(int i = 0; i < N * M; i++)
@@ -496,7 +495,7 @@ public:
     bool operator!() const {
         return isZero();
     }
-	*/
+	//*/
 
     // Arithmetic Operators
     // -------------------------------------------------------------------------
@@ -961,8 +960,6 @@ Error:
 // TODO: Add Transpose
 template <typename TMat4x4, int N>
 matrix<TMat4x4, N, N> transpose(matrix<TMat4x4, N, N> mat) {
-	RESULT r = R_PASS;
-
 	matrix<TMat4x4, 4, 4> retMatrix;
 	retMatrix.clear();
 
@@ -977,8 +974,6 @@ matrix<TMat4x4, N, N> transpose(matrix<TMat4x4, N, N> mat) {
 
 template <typename TMat, int N, int M>
 matrix<TMat, M, N> transpose(matrix<TMat, N, M> mat) {
-	RESULT r = R_PASS;
-
 	matrix<TMat, M, N> retMatrix;
 	retMatrix.clear();
 
@@ -993,8 +988,6 @@ matrix<TMat, M, N> transpose(matrix<TMat, N, M> mat) {
 
 template <typename TMat4x4, int N, int M>
 matrix<TMat4x4, N, M> absolute(matrix<TMat4x4, N, M> mat) {
-	RESULT r = R_PASS;
-
 	matrix<TMat4x4, N, M> retMatrix;
 	retMatrix.clear();
 
@@ -1067,7 +1060,7 @@ const matrix<TMat4x4, 4, 1> matrix<TMat4x4, 4, 4>::operator*(const matrix<TMat4x
 	return MatrixBase<TMatrix, 4, 1>(this*) *= arg;
 }
 
-/*
+// / *
 template <typename TMat4x4>
 class matrix<TMat4x4, 4, 4> {
 public:
@@ -1112,4 +1105,4 @@ public:
 };
 */
 
-#endif MATRIX_H_
+#endif // ! MATRIX_H_

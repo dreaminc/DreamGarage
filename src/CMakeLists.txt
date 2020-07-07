@@ -3,9 +3,9 @@
 # Force Include the src/core/config.h
 if(MSVC)
     add_definitions(/FI"${CMAKE_SOURCE_DIR}/src/core/config.h")
-#else()
-#    # GCC or Clang
-#    add_definitions(-include ${CMAKE_SOURCE_DIR}/src/core/config.h)
+else()
+   # GCC or Clang
+   add_definitions(-include "${CMAKE_SOURCE_DIR}/src/core/config.h")
 endif()
 
 # Both Configurations
@@ -96,10 +96,13 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
 	#SET(CMAKE_CXX_FLAGS -pthread)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+    
+    # Override certain warnings cause they're dumb
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmacro-redefined -Wno-unused-variable")
 
 	# Debug Configuration
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 -Wall -Wextra -Werror -fpermissive -stdlib=libc++ -Wno-reorder -fdeclspec")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 -Wall -Wextra -Werror -fpermissive -stdlib=libc++ -Wno-reorder -Wmacro-redefined -fdeclspec")
 
 	# Release Configuration
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 -Wall -Wextra -Werror -fpermissive -stdlib=libc++ -Wno-reorder -fdeclspec")
@@ -143,27 +146,40 @@ else()
 
 endif()
 
-add_subdirectory(apps)
-add_subdirectory(meetclient)
-add_subdirectory(cloud)
-add_subdirectory(core)
-add_subdirectory(dreamcef)
-add_subdirectory(dreamdesktop)
-add_subdirectory(hal)
-add_subdirectory(hmd)
-add_subdirectory(logger)
-add_subdirectory(modules)
-add_subdirectory(os)
-add_subdirectory(pipeline)
-add_subdirectory(sandbox)
-add_subdirectory(scene)
-add_subdirectory(sense)
-add_subdirectory(sound)
-add_subdirectory(test)
-add_subdirectory(testclient)
-# # add_subdirectory(third_party)
-add_subdirectory(ui)
-add_subdirectory(webbrowser)
+IF(ANDROID)
+    # The Android Build    
 
-# Adds junk repos
-# add_subdirectory(junk)
+    add_subdirectory(core)
+    add_subdirectory(sandbox)
+    add_subdirectory(testclient)
+
+ELSEIF(WIN32)
+    # The Windows Build
+
+    add_subdirectory(apps)
+    add_subdirectory(meetclient)
+    add_subdirectory(cloud)
+    add_subdirectory(core)
+    add_subdirectory(dreamcef)
+    add_subdirectory(dreamdesktop)
+    add_subdirectory(hal)
+    add_subdirectory(hmd)
+    add_subdirectory(logger)
+    add_subdirectory(modules)
+    add_subdirectory(os)
+    add_subdirectory(pipeline)
+    add_subdirectory(sandbox)
+    add_subdirectory(scene)
+    add_subdirectory(sense)
+    add_subdirectory(sound)
+    add_subdirectory(test)
+    add_subdirectory(testclient)
+    # # add_subdirectory(third_party)
+    add_subdirectory(ui)
+    add_subdirectory(webbrowser)
+
+    # Adds junk repos
+    # add_subdirectory(junk)
+
+ENDIF()
+

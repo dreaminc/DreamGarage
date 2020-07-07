@@ -28,7 +28,7 @@ BoundingQuad::BoundingQuad(VirtualObj *pParentObject, point ptOrigin, vector vNo
 	// empty
 }
 
-bool BoundingQuad::Intersect(const BoundingBox& rhs) {
+bool BoundingQuad::Intersect(UNUSED const BoundingBox& rhs) {
 	// TODO:
 
 	return false;
@@ -189,7 +189,7 @@ CollisionManifold BoundingQuad::Collide(const BoundingSphere& rhs) {
 		point ptMin = point((-1.0f * GetWidth()) / 2.0f, 0.0f, (-1.0f * GetHeight()) / 2.0f);
 
 		float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
-		float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
+		UNUSED float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
 		float closestZ = std::max(ptMin.z(), std::min(ptSphereOrigin.z(), ptMax.z()));
 		//*/
 
@@ -232,7 +232,7 @@ CollisionManifold BoundingQuad::Collide(const BoundingSphere& rhs) {
 bool BoundingQuad::Intersect(const line& l, point *pptCollision) {
 	double t = -1.0f;
 
-	vector vNormal = RotationMatrix(GetAbsoluteOrientation()) * m_vNormal;
+	vector vNormal = (vector)(RotationMatrix(GetAbsoluteOrientation()) * m_vNormal);
 	vNormal.Normalize();
 
 	ray r = static_cast<line>(l).GetRay();
@@ -270,7 +270,7 @@ bool BoundingQuad::Intersect(const line& l, point *pptCollision) {
 bool BoundingQuad::Intersect(const ray& r) {
 	double t = -1.0f;
 
-	vector vNormal = RotationMatrix(GetAbsoluteOrientation()) * m_vNormal;
+	vector vNormal = (vector)(RotationMatrix(GetAbsoluteOrientation()) * m_vNormal);
 	vNormal.Normalize();
 
 	t = ((vector)(GetAbsoluteOrigin() - r.GetOrigin())).dot(vNormal);
@@ -306,7 +306,7 @@ CollisionManifold BoundingQuad::Collide(const ray &rCast) {
 
 	double t = -1.0f;
 
-	vector vNormal = RotationMatrix(GetAbsoluteOrientation()) * m_vNormal;
+	vector vNormal = (vector)(RotationMatrix(GetAbsoluteOrientation()) * m_vNormal);
 	vNormal.Normalize();
 	
 	t = ((vector)(GetAbsoluteOrigin() - rCast.GetOrigin())).dot(vNormal);
@@ -366,7 +366,7 @@ vector BoundingQuad::GetNormal() {
 vector BoundingQuad::GetAbsoluteNormal() {
 	quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
 	RotationMatrix matRotation = RotationMatrix(qOrientation);
-	vector vNormal = (matRotation * m_vNormal);
+	vector vNormal =(vector)(matRotation * m_vNormal);
 	return vNormal.Normal();
 }
 
@@ -476,6 +476,11 @@ point BoundingQuad::GetQuadPoint(QuadPoint ptType) {
 		case QuadPoint::BOTTOM_LEFT: {
 			ptRet.x() -= halfWidth;
 			ptRet.z() -= halfHeight;
+		} break;
+
+		case QuadPoint::INVALID:
+		default: {
+			// unhandled
 		} break;
 	}
 

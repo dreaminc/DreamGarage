@@ -96,7 +96,7 @@ public:
 	bool IntersectGJK(const BoundingBox& rhs);
 
 	//bool Intersect(const point& pt) {
-	bool Intersect(point& pt);
+	virtual bool Intersect(point& pt) override;
 	virtual bool Intersect(const ray& r) override;
 
 	virtual CollisionManifold Collide(const BoundingBox& rhs) override;

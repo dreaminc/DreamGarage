@@ -60,6 +60,7 @@ public:
 
 	// Explicitly specializing the assignment operator
 	vector& operator=(const matrix<vector_precision, 4, 1> &arg);
+	vector& operator=(matrix<vector_precision, 4, 1> &arg);
 
 	vector& operator*=(const vector_precision& a);
 	vector operator*(const vector_precision& a) const;

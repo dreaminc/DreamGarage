@@ -42,19 +42,19 @@ public:
 		return BoundingVolume::Type::PLANE;
 	}
 	
-	virtual RESULT SetMaxPointFromOrigin(point ptMax) override {
+	virtual RESULT SetMaxPointFromOrigin(UNUSED point ptMax) override {
 		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
-	virtual RESULT SetHalfVector(vector vHalfVector) override {
+	virtual RESULT SetHalfVector(UNUSED vector vHalfVector) override {
 		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
-	virtual point GetMinPoint(bool fAbsolute = false) override {
+	virtual point GetMinPoint(UNUSED bool fAbsolute = false) override {
 		return point();
 	}
 
-	virtual point GetMaxPoint(bool fAbsolute = false) override {
+	virtual point GetMaxPoint(UNUSED bool fAbsolute = false) override {
 		return point();
 	}
 

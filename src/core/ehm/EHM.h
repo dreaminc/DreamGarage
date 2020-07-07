@@ -29,6 +29,16 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 #define RSUCCESS() (!RFAILED())
 #define RCHECK(res) (!(res & 0x80000000))
 
+//
+
+#ifdef __ANDROID__
+#define UNUSED __attribute__((unused))
+#endif
+
+#ifndef UNUSED
+#define UNUSED
+#endif
+
 // Logging
 
 #include "logger/DreamLogger.h"
@@ -84,13 +94,28 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 		if (szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\n' && szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\r')						\
 			OutputDebugStringA(szDebugOutputString);																									\
 		} while(0);
+#elif defined(__ANDROID__)
+	#define DOS_DEBUGGER_SIGNATURE "DOS::"
+	#define DOS_DEBUGGER_SIGNATURE_SIZE	5		// size in bytes
+	#define	DOS_DEBUGGER_OUTPUT_MAX_SIZE 1024
+
+	extern void OutputDebugString(wchar_t*);
+	static char szDebugOutputString[DOS_DEBUGGER_OUTPUT_MAX_SIZE] = { DOS_DEBUGGER_SIGNATURE };
+
+	//#define DEVENV_LINEOUT(str) do { OutputDebugString(str); } while(0);
+
+	#define DEVENV_LINEOUT(str, ...) do {																												\
+		sprintf_s(szDebugOutputString + DOS_DEBUGGER_SIGNATURE_SIZE, DOS_DEBUGGER_OUTPUT_MAX_SIZE - DOS_DEBUGGER_SIGNATURE_SIZE, str, ##__VA_ARGS__);	\
+		if (szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\n' && szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\r')						\
+			OutputDebugStringA(szDebugOutputString);																									\
+		} while(0);
 #endif
 
 /*
 #ifndef __FUNCTION_NAME__
 	#ifdef WIN32   //WINDOWS
 		#define CurrentFunctionName  __FUNCTION__  
-	#else          //*NIX
+	#else          // *NIX
 		#define CurrentFunctionName   __func__ 
 	#endif
 #else
@@ -110,9 +135,15 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 	static char szDosLogOutputString[DOS_DEBUGGER_OUTPUT_MAX_SIZE] = { DOS_DEBUGGER_SIGNATURE };
 
 	#define DOSLogLine(level, crt, r) DOSLOG(ERR, "%s:%s:%s(%d):Error: 0x%x\n", crt, __BASE_FILE__, __FUNCTION__, __LINE__, r)
-#define DOSLogLineMessage(level, crt, r, msg, ...) do {																	\
-		sprintf_s(szDosLogOutputString, msg, ##__VA_ARGS__);															\
-		DOSLOG(level, "%s:%s:%s(%d:0x%x):%s\n", crt, __BASE_FILE__, __FUNCTION__, __LINE__, r, szDosLogOutputString)			\
+//	#define DOSLogLineMessage(level, crt, r, msg, ...) do {																	\
+//		sprintf_s(szDosLogOutputString, msg, ##__VA_ARGS__);																\
+//		DOSLOG(level, "%s:%s:%s(%d:0x%x):%s\n", crt, __BASE_FILE__, __FUNCTION__, __LINE__, r, szDosLogOutputString)		\
+//	} while (0);
+
+	// This is for Android to work
+	#define DOSLogLineMessage(level, crt, r, msg, ...) do {																	\
+		sprintf(szDosLogOutputString, msg, ##__VA_ARGS__);																\
+		DOSLOG(level, "%s:%s:%s(%d:0x%x):%s\n", crt, __BASE_FILE__, __FUNCTION__, __LINE__, r, szDosLogOutputString)		\
 	} while (0);
 
 	#define DOSLogError(crt, r) DOSLogLine(ERR, crt, r)

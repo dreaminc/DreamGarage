@@ -141,7 +141,7 @@ point BoundingBox::GetFarthestPointInDirection(vector vDirection) {
 	}
 	else {
 		RotationMatrix matRotation = RotationMatrix(GetAbsoluteOrientation());
-		vector vDirectionAdjust = inverse(matRotation) * vDirection;
+		vector vDirectionAdjust = (vector)(inverse(matRotation) * vDirection);
 
 		point ptReturn;
 
@@ -179,7 +179,7 @@ point BoundingBox::GetFarthestPointInDirection(vector vDirection) {
 
 point BoundingBox::GetSupportPoint(const BoundingBox& bbA, const BoundingBox& bbB, vector vDirection) {
 	point ptBBA = static_cast<BoundingBox>(bbA).GetFarthestPointInDirection(vDirection);
-	point ptBBB = static_cast<BoundingBox>(bbB).GetFarthestPointInDirection(-1.0f * vDirection);
+	point ptBBB = static_cast<BoundingBox>(bbB).GetFarthestPointInDirection((vector)(-1.0f * vDirection));
 
 	return (point)(ptBBA - ptBBB);
 }
@@ -217,7 +217,7 @@ double TransformToAxisAABB(vector vAxis, vector vHalfVector) {
 
 // This treats box A as AABB and box B as OBB
 double OverlapAxisDistanceAABBOBB(const vector &vAxis,
-	vector vHalfVectorA, vector vAxesA[3],
+	vector vHalfVectorA, UNUSED vector vAxesA[3],
 	vector vHalfVectorB, point ptOriginB, vector vAxesB[3])
 {
 
@@ -236,9 +236,9 @@ double OverlapAxisDistanceAABBOBB(const vector &vAxis,
 bool IntersectSATAABB(const BoundingBox& lhs, const BoundingBox& rhs) {
 	
 	double temp;
-	double minAxisDistance = std::numeric_limits<double>::infinity();
+	UNUSED double minAxisDistance = std::numeric_limits<double>::infinity();
 	vector vAxis, vAxisTemp;
-	float penetration = 0.0f;
+	UNUSED float penetration = 0.0f;
 
 	// Move test into space of this bounding box
 	point ptBoxAOrigin = static_cast<BoundingBox>(lhs).GetAbsoluteOrigin();
@@ -250,7 +250,7 @@ bool IntersectSATAABB(const BoundingBox& lhs, const BoundingBox& rhs) {
 
 	point ptBoxBOrigin = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin();
 	vector vBoxBHV = static_cast<BoundingBox>(rhs).GetHalfVector();
-	quaternion qBoxBOrientation = static_cast<BoundingBox>(rhs).GetAbsoluteOrientation();
+	UNUSED quaternion qBoxBOrientation = static_cast<BoundingBox>(rhs).GetAbsoluteOrientation();
 
 	vector vAxesA[3], vAxesB[3];
 
@@ -269,12 +269,12 @@ bool IntersectSATAABB(const BoundingBox& lhs, const BoundingBox& rhs) {
 		vector vAxisA = vAxesA[i];
 
 		// Self Box Axes
-		if (temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxisA, vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB) < 0.0f) {
+		if ((temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxisA, vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB)) < 0.0f) {
 			return false;
 		}
 
 		// The other box Axes (todo: test if it's an OBB)
-		if (temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxesB[i], vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB) < 0.0f) {
+		if ((temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxesB[i], vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB)) < 0.0f) {
 			return false;
 		}
 
@@ -284,7 +284,7 @@ bool IntersectSATAABB(const BoundingBox& lhs, const BoundingBox& rhs) {
 
 			// Ensure not same
 			if (vAxisA != vAxisB) {
-				if (temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxisB.cross(vAxisA), vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB) < 0.0f) {
+				if ((temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxisB.cross(vAxisA), vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB)) < 0.0f) {
 					return false;
 				}
 			}
@@ -444,9 +444,12 @@ vector BoundingBox::GetAxis(BoxAxis boxAxis, bool fOriented) {
 	vector retVector = vector(0.0f, 0.0f, 0.0f);
 
 	switch (boxAxis) {
-	case BoxAxis::X_AXIS: retVector = vector::iVector(1.0f); break;
-	case BoxAxis::Y_AXIS: retVector = vector::jVector(1.0f); break;
-	case BoxAxis::Z_AXIS: retVector = vector::kVector(1.0f); break;
+		case BoxAxis::X_AXIS: retVector = vector::iVector(1.0f); break;
+		case BoxAxis::Y_AXIS: retVector = vector::jVector(1.0f); break;
+		case BoxAxis::Z_AXIS: retVector = vector::kVector(1.0f); break;
+
+		case BoxAxis::INVALID:
+		default: break;
 	}
 
 	// Rotate by OBB if so
@@ -517,10 +520,10 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	vAxesA[1] = vector::jVector(1.0f); 
 	vAxesA[2] = vector::kVector(1.0f);
 
-	vector vTranslationAB = matTransposeRotationA * (ptBoxBOrigin - ptBoxAOrigin);
+	vector vTranslationAB = (vector)(matTransposeRotationA * (ptBoxBOrigin - ptBoxAOrigin));
 	auto matRelativeRotation = matTransposeRotationA * matRotationB;
 
-	vector vBHVRelativeToA = matRelativeRotation * vBoxBHV;
+	vector vBHVRelativeToA = (vector)(matRelativeRotation * vBoxBHV);
 	vBHVRelativeToA = absolute(vBHVRelativeToA);
 
 	// Get Box B axes in A space
@@ -578,7 +581,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 		vAxis *= -1.0f;
 	}
 	//
-	vector vNormal = matRotationA * vAxis;
+	vector vNormal = (vector)(matRotationA * vAxis);
 
 	// Find the incident vector - Find most negative dot prod
 	vector vFaceVectorReference;
@@ -970,7 +973,7 @@ CollisionManifold BoundingBox::CollideBruteForce(const BoundingBox& rhs) {
 		quaternion qBoxAOrientation = pBoxA->GetAbsoluteOrientation();
 
 		point ptBoxBOrigin = pBoxB->GetAbsoluteOrigin();
-		quaternion qBoxBOrientation = pBoxB->GetAbsoluteOrientation();
+		UNUSED quaternion qBoxBOrientation = pBoxB->GetAbsoluteOrientation();
 
 
 		// Point - Face Detection
@@ -1129,7 +1132,7 @@ CollisionManifold BoundingBox::CollideBruteForce(const BoundingBox& rhs) {
 			BoundingBox::BoxEdge boxEdgeB = (BoundingBox::BoxEdge)(i);
 			line lineBoxEdgeB = pBoxB->GetBoxEdge(boxEdgeB);			
 
-			lineBoxEdgeB.Translate(ptBoxAOrigin * -1.0f);
+			lineBoxEdgeB.Translate((vector)(ptBoxAOrigin * -1.0f));
 			lineBoxEdgeB.ApplyMatrix(inverse(RotationMatrix(qBoxAOrientation)));
 			vector vRay = lineBoxEdgeB.GetVector();
 

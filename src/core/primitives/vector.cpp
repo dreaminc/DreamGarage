@@ -168,6 +168,14 @@ vector& vector::operator=(const matrix<vector_precision, 4, 1> &arg) {
 	return *this;
 }
 
+vector& vector::operator=(matrix<vector_precision, 4, 1> &arg) {
+	if (this == &arg)      // Same object?
+		return *this;        // Yes, so skip assignment, and just return *this.
+
+	memcpy(this->m_data, arg.m_data, sizeof(vector_precision) * 4 * 1);
+
+	return *this;
+}
 
 vector& vector::operator*=(const vector_precision& a) {
 	for (int i = 0; i < 4; i++)

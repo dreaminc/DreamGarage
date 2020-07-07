@@ -19,6 +19,7 @@
 
 class ObjectDerivative;
 class ForceGenerator;
+class VirtualObj;
 
 class ObjectState : public dirty {
 	friend class VirtualObj;
@@ -55,8 +56,8 @@ public:
 	RESULT ClearForceGenerators();
 
 	RESULT SetMass(double kgMass);
-	const double GetMass();
-	const double GetInverseMass();
+	double GetMass();
+	double GetInverseMass();
 
 	RESULT SetImmovable(bool fImmovable);
 	bool IsImmovable();

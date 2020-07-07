@@ -46,6 +46,8 @@
 
 #elif defined(__APPLE__)
 	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_OSX
+#elif defined(__ANDROID__)
+	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_ANDROID
 #elif defined (__linux__)
 	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_LINUX
 #else
