@@ -61,7 +61,7 @@ double image::GetAverageValueAtUV(double uValue, double vValue) {
 	return retVal;
 }
 
-RESULT image::CopyBuffer(int width, int height, int channels, void *pBuffer, size_t pBuffer_n) {
+RESULT image::CopyBuffer(UNUSED int width, UNUSED int height, UNUSED int channels, void *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
 	// TODO: May need to add size of stuff

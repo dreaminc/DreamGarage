@@ -17,8 +17,6 @@ HysteresisPlane::~HysteresisPlane() {
 }
 
 inline bool HysteresisPlane::Resolve(VirtualObj *pObj) {
-	RESULT r = R_PASS;
-
 	point ptBoxOrigin = GetPosition(true);
 	point ptSphereOrigin = pObj->GetOrigin(true);
 	ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation(true))) * (ptSphereOrigin - GetOrigin(true)));
@@ -31,7 +29,4 @@ inline bool HysteresisPlane::Resolve(VirtualObj *pObj) {
 	else {
 		return distance > m_offThreshold;
 	}
-
-Error:
-	return false;
 }

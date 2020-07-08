@@ -93,7 +93,6 @@ public:
 	}
 
 	RESULT IncrementRGB(float amount) {
-		RESULT r = R_PASS;
 
 		this->r() += amount;
 
@@ -117,8 +116,7 @@ public:
 			}
 		}
 
-	Error:
-		return r;
+		return R_PASS;
 	}
 
 	// TODO: Understand performance implications of this although both element and this are inline

@@ -62,7 +62,7 @@ template RESULT VirtualObj::IntegrateState<ObjectState::IntegrationType::RK4>(fl
 template RESULT VirtualObj::IntegrateState<ObjectState::IntegrationType::EUCLID>(float timeStart, float timeDelta, const std::list<ForceGenerator*> &externalForceGenerators);
 
 // Position
-point VirtualObj::GetOrigin(bool fAbsolute) {
+point VirtualObj::GetOrigin(UNUSED bool fAbsolute) {
 	return m_objectState.m_ptOrigin;
 }
 
@@ -140,7 +140,7 @@ VirtualObj* VirtualObj::SetScale(vector vScale) {
 	return this;
 }
 
-vector VirtualObj::GetScale(bool fAbsolute) {
+vector VirtualObj::GetScale(UNUSED bool fAbsolute) {
 	return m_vScale;
 }
 
@@ -217,7 +217,7 @@ ray VirtualObj::GetRay(bool fAbsolute) {
 	//return ray(GetOrigin(fAbsolute), vDirection);
 
 	RotationMatrix matLook = RotationMatrix(GetOrientation(fAbsolute));
-	vector vDirection = matLook * vector::kVector(-1.0f);
+	vector vDirection = (vector)(matLook * vector::kVector(-1.0f));
 	vDirection.Normalize();
 	return ray(GetOrigin(fAbsolute), vDirection);
 }
@@ -433,7 +433,7 @@ VirtualObj* VirtualObj::SetOrientationOffsetDeg(quaternion_precision thetaXdeg, 
 	return this;
 }
 
-quaternion VirtualObj::GetOrientation(bool fAbsolute) {
+quaternion VirtualObj::GetOrientation(UNUSED bool fAbsolute) {
 	//return m_objectState.m_qRotation;
 	//return m_objectState.m_qOrientationOffset * m_objectState.m_qRotation;
 	return m_objectState.m_qRotation * m_objectState.m_qOrientationOffset;
@@ -559,12 +559,12 @@ matrix<virtual_precision, 4, 4> VirtualObj::GetModelMatrix(matrix<virtual_precis
 	}
 }
 
-matrix<virtual_precision, 4, 4> VirtualObj::GetRotationMatrix(matrix<virtual_precision, 4, 4> childMat) {
+matrix<virtual_precision, 4, 4> VirtualObj::GetRotationMatrix(UNUSED matrix<virtual_precision, 4, 4> childMat) {
 	//return RotationMatrix(m_objectState.m_qRotation);
 	return RotationMatrix(GetOrientation());
 }
 
-matrix<virtual_precision, 4, 4> VirtualObj::GetTranslationMatrix(matrix<virtual_precision, 4, 4> childMat) {
+matrix<virtual_precision, 4, 4> VirtualObj::GetTranslationMatrix(UNUSED matrix<virtual_precision, 4, 4> childMat) {
 	if (m_ptPivot.IsZero()) {
 		return TranslationMatrix(m_objectState.m_ptOrigin);
 	}

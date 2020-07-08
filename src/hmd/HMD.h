@@ -52,7 +52,7 @@ enum class HMDDeviceType {
 	NONE	
 };
 
-enum EYE_TYPE;
+enum class EYE_TYPE : uint8_t;
 
 typedef struct HMDEvent {
 	HMDEventType m_eventType;

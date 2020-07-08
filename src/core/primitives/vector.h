@@ -23,6 +23,7 @@ public:
 	vector();
 	vector(vector_precision val);
 	vector(matrix <vector_precision, 4, 1> &rhs);
+	vector(const matrix <vector_precision, 4, 1> &rhs);
 	vector(vector_precision x, vector_precision y, vector_precision z);
 	vector(vector rhs, vector lhs);	// Cross product - Not assumed to be normalized
 	vector(const point& pt);
@@ -68,6 +69,7 @@ public:
 	// Utility
 public:
 	static vector ComponentMultiply(vector &lhs, vector &rhs);
+	static vector ComponentMultiply(vector &lhs, vector &&rhs);
 
 	static vector XUnitVector() { return vector(1.0f, 0.0f, 0.0f); }
 	static vector YUnitVector() { return vector(0.0f, 1.0f, 0.0f); }
@@ -77,5 +79,8 @@ public:
 	static vector jVector(vector_precision value = 1.0f) { return vector(0.0f, value, 0.0f); }
 	static vector kVector(vector_precision value = 1.0f) { return vector(0.0f, 0.0f, value); }
 };
+
+vector operator*(const vector_precision lhs, vector &rhs);
+
 
 #endif // !VECTOR_H_

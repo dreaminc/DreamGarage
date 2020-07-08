@@ -17,7 +17,7 @@
 
 #define DEFAULT_CAMERA_ROTATE_SPEED 0.002f
 #define DEFAULT_CAMERA_MOVE_SPEED 2.0f
-#define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_PERSPECTIVE
+#define DEFAULT_PROJECTION_TYPE ProjectionMatrix::type::PERSPECTIVE
 
 camera::camera(point ptOrigin, viewport cameraVieport) :
 	VirtualObj(ptOrigin),

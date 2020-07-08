@@ -1,5 +1,6 @@
 #include "version.h"
-#include "Core/Utilities.h"
+#include "core/Utilities.h"
+
 #include <math.h>
 
 version::version(const version &ver) {
@@ -127,14 +128,19 @@ bool version::operator!=(const version &b) const {
 }
 
 bool version::operator<(const version &b) const {
-	if (m_major < b.m_major) 
+	if (m_major < b.m_major) {
 		return true;
-	else if (m_major == b.m_major) 
-		if (m_minor < b.m_minor) 
+	}
+	else if (m_major == b.m_major) {
+		if (m_minor < b.m_minor) {
 			return true;
-		else if (m_minor == b.m_minor) 
-			if (m_doubleminor < b.m_doubleminor) 
+		}
+		else if (m_minor == b.m_minor) {
+			if (m_doubleminor < b.m_doubleminor) {
 				return true;
+			}
+		}
+	}
 
 	return false;
 }			

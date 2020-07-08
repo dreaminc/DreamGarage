@@ -8,7 +8,7 @@
 #include "ui/UIKeyboardLayout.h"
 
 #include "core/primitives/quad.h"
-#include "core/primitives/Framebuffer.h"
+#include "core/primitives/framebuffer.h"
 
 #include "core/Utilities.h"
 

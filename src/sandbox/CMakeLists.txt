@@ -42,29 +42,32 @@ include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
 # TODO: This should not be here (only in HMD yo)
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/openvr/headers)
 
-IF(APPLE
+IF(APPLE)
    # Mac OS X specific code
    # TODO: Add OSX vs. iOS
-   #add_library(sandbox
-   # ${SOURCES}
-   # ${OSX_SOURCES}
-   #)
-#
-   #add_library(sandbox
-   # ${SOURCES}
-   # ${IOS_SOURCES}
-   #)
-)
-ELSEIF(UNIX AND NOT APPLE)
-  #add_library(sandbox
+  add_library(sandbox
+    ${SOURCES}
+    ${OSX_SOURCES}
+  )
+
+  #  add_library(sandbox
   #  ${SOURCES}
-  #  ${LINUX_SOURCES}
-  #)
+  #  ${IOS_SOURCES}
+  #  )
+ELSEIF(UNIX AND NOT APPLE)
+  add_library(sandbox
+    ${SOURCES}
+    ${LINUX_SOURCES}
+  )
 ELSEIF(WIN32)
-   add_library(sandbox
+  add_library(sandbox
     ${SOURCES}
     ${WIN64_SOURCES}
+  )
+ELSEIF(ANDROID)
+  add_library(sandbox
+    ${SOURCES}
     ${ANDROID_SOURCES}
-   )
+  )
 ENDIF()
 

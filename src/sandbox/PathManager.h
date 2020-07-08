@@ -79,7 +79,7 @@ class PathManager : public DObject {
 
 public:
 	PathManager();
-	~PathManager();
+	virtual ~PathManager();
 
 	const wchar_t *GetPathValueString(PATH_VALUE_TYPE type) {
 		return m_cszPathValues[type];

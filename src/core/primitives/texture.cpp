@@ -5,7 +5,7 @@
 #include <utility>
 #include <regex>
 
-#include "Sandbox/PathManager.h"
+#include "sandbox/PathManager.h"
 
 #include "core/image/ImageFactory.h"
 
@@ -169,7 +169,7 @@ double texture::GetAverageValueAtUV(double uValue, double vValue) {
 	}
 }
 
-RESULT texture::SetParams(int pxWidth, int pxHeight, int channels, int samples, int levels) {
+RESULT texture::SetParams(int pxWidth, int pxHeight, int channels, UNUSED int samples, int levels) {
 	RESULT r = R_PASS;
 
 	CR(SetWidth(pxWidth));
@@ -207,15 +207,15 @@ Error:
 	return r;
 }
 
-RESULT texture::LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
+RESULT texture::LoadBufferFromTexture(UNUSED void *pBuffer, UNUSED size_t pBuffer_n) {
 	return R_NOT_IMPLEMENTED_WARNING;
 }
 
-RESULT texture::LoadFlippedBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
+RESULT texture::LoadFlippedBufferFromTexture(UNUSED void *pBuffer, UNUSED size_t pBuffer_n) {
 	return R_NOT_IMPLEMENTED_WARNING;
 }
 
-RESULT texture::LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) {
+RESULT texture::LoadImageFromTexture(UNUSED int level, UNUSED PIXEL_FORMAT pixelFormat) {
 	return R_NOT_HANDLED;
 }
 
@@ -290,19 +290,19 @@ size_t texture::GetTextureSize() {
 	return sizeTexture;
 }
 
-RESULT texture::UpdateDimensions(int width, int height) {
+RESULT texture::UpdateDimensions(UNUSED int width, UNUSED int height) {
 	return R_NOT_HANDLED;
 }
 
-RESULT texture::Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) {
+RESULT texture::Update(UNUSED unsigned char* pBuffer, UNUSED int width, UNUSED int height, UNUSED PIXEL_FORMAT pixelFormat) {
 	return R_NOT_IMPLEMENTED_WARNING;
 }
 
-RESULT texture::UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) {
+RESULT texture::UpdateTextureFromBuffer(UNUSED void *pBuffer, UNUSED size_t pBuffer_n) {
 	return R_NOT_IMPLEMENTED_WARNING;
 }
 
-RESULT texture::UpdateTextureRegionFromBuffer(void *pBuffer, int x, int y, int width, int height) {
+RESULT texture::UpdateTextureRegionFromBuffer(UNUSED void *pBuffer, UNUSED int x, UNUSED int y, UNUSED int width, UNUSED int height) {
 	return R_NOT_IMPLEMENTED_WARNING;
 }
 

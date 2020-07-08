@@ -54,6 +54,7 @@ std::shared_ptr<font> font::MakeFreetypeFont(std::wstring wstrFontFilename, bool
 	FT_Error fte = 0;
 	char *pszFilepath = nullptr;
 	FT_Face pFTFace = nullptr;
+	PathManager *pPathManager = nullptr;
 
 	if (IsFreetypeInitialized() == false) {
 		CR(InitializeFreetypeLibrary());
@@ -63,7 +64,7 @@ std::shared_ptr<font> font::MakeFreetypeFont(std::wstring wstrFontFilename, bool
 	pFont = std::make_shared<font>(fDistanceMapped);
 	CN(pFont);
 
-	PathManager *pPathManager = PathManager::instance();
+	pPathManager = PathManager::instance();
 	CN(pPathManager);
 
 	pPathManager->GetFilePath(PATH_FONT, wstrFontFilename, pszFilepath);
@@ -107,8 +108,10 @@ RESULT font::LoadFreetypeGlyphs() {
 	FT_Error fte = 0;
 
 	for (FT_Long i = 0; i < m_pFTFace->num_glyphs; i++) {
+
 		FT_Load_Char(m_pFTFace, i, FT_LOAD_RENDER);
-		CBM((fte == 0), "Font failed to load char %d with error 0x%x", i, fte);
+
+		CBM((fte == 0), "Font failed to load char %d with error 0x%x", (int)(i), fte);
 
 		CharacterGlyph glyph;
 		

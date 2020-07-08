@@ -1,5 +1,5 @@
 #include "TextEntryString.h"
-#include "Sense/SenseKeyboard.h"
+#include "sense/SenseKeyboard.h"
 
 RESULT TextEntryString::UpdateString(unsigned int keyCode) {
 

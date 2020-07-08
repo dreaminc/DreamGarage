@@ -2,7 +2,7 @@
 
 #include "core/types/Number.h"
 
-#include "Core/Utilities.h"
+#include "core/Utilities.h"
 
 // Initialize and allocate the instance
 PathManager* PathManager::m_pInstance = nullptr;
@@ -77,7 +77,7 @@ Error:
 }
 
 // Set up path manager
-RESULT PathManager::InitializePaths(DreamOS *pDOSHandle) {
+RESULT PathManager::InitializePaths(UNUSED DreamOS *pDOSHandle) {
 	DEBUG_LINEOUT("PathManager Initialize Paths");
 	return R_VIRTUAL;
 }

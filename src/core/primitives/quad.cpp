@@ -112,7 +112,7 @@ Error:
 
 // This needs to be re-designed, too specific for 2D blits.
 //quad::quad(float height, float width, point& ptCenter, uvcoord& uvBottomLeft, uvcoord& uvUpperRight, vector vNormal) :
-quad::quad(float width, float height, point& ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) :
+quad::quad(float width, float height, UNUSED point& ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) :
 	m_params(width, height, 1, 1, vNormal)
 {
 	RESULT r = R_PASS;
@@ -273,7 +273,7 @@ Error:
 	return r;
 }
 
-RESULT quad::SetVertices(BoundingQuad* pBoundingQuad, bool fTriangleBased) {
+RESULT quad::SetVertices(BoundingQuad* pBoundingQuad, UNUSED bool fTriangleBased) {
 	RESULT r = R_PASS;
 
 	SetOrigin(pBoundingQuad->GetOrigin());
@@ -392,6 +392,18 @@ vector quad::GetNormal(bool fAbsolute) {
 RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight) {
 	RESULT r = R_PASS;
 
+	float halfHeight;
+	float halfWidth;
+
+	float widthInc;
+	float heightInc;
+
+	int vertCount = 0;
+	int indexCount = 0;
+	int A, B, C, D;
+
+	TriangleIndexGroup *pTriIndices = nullptr;
+
 	CR(Allocate());
 
 	m_params.width = width;
@@ -402,18 +414,14 @@ RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoor
 
 	m_params.heightMapScale = 2.0f;
 
-	float halfHeight = height / 2.0f;
-	float halfWidth = width / 2.0f;
+	halfHeight = height / 2.0f;
+	halfWidth = width / 2.0f;
 
-	float widthInc = width / m_params.numHorizontalDivisions;
-	float heightInc = height / m_params.numVerticalDivisions;
-
-	int vertCount = 0;
-	int indexCount = 0;
-	int A, B, C, D;
+	widthInc = width / m_params.numHorizontalDivisions;
+	heightInc = height / m_params.numVerticalDivisions;
 
 	// Set up indices 
-	TriangleIndexGroup *pTriIndices = reinterpret_cast<TriangleIndexGroup*>(m_pIndices);
+	pTriIndices = reinterpret_cast<TriangleIndexGroup*>(m_pIndices);
 
 	for (int i = 0; i < m_params.numHorizontalDivisions + 1; i++) {
 		for (int j = 0; j < m_params.numVerticalDivisions + 1; j++) {
@@ -482,7 +490,8 @@ template <typename T>
 std::vector<std::pair<T, T>> quad::GetCurveBuffer(T startVal, T endVal, int divisions, quad::CurveType curveType, T val) {
 	std::vector<std::pair<T, T>> returnValues;
 
-	float xVal = startVal;
+	//float xVal = startVal;
+
 	T range = (endVal - startVal);
 	T increment = range / (divisions - 1);
 
@@ -503,6 +512,11 @@ std::vector<std::pair<T, T>> quad::GetCurveBuffer(T startVal, T endVal, int divi
 			case CurveType::CIRCLE: {
 				T radius = val;
 				yVal = radius - std::sqrt(std::pow(radius, 2) - std::pow(xVal, 2));
+			} break;
+
+			case CurveType::INVALID:
+			default: {
+				//
 			} break;
 		}
 
@@ -528,6 +542,11 @@ std::pair<T, T> quad::GetCurveFocus(quad::CurveType curveType, T val) {
 			// TODO: make radius programmatic
 		case CurveType::CIRCLE: {
 			ptFocus = std::make_pair(0.0f, val);
+		} break;
+
+		case CurveType::INVALID:
+		default: {
+			// break;
 		} break;
 	}
 
@@ -629,7 +648,7 @@ T quad::GetCurveInterpolatedValue(T xVal, std::vector<std::pair<T, T>> curveValu
 	}
 
 	// Find interpolated value
-	for (int i = 0; i < curveValues.size(); i++) {
+	for (int i = 0; i < (int)curveValues.size(); i++) {
 		lastXVal = curXVal;
 		lastYVal = curYVal;
 
@@ -737,6 +756,6 @@ Error:
 // TODO: Trapezoid
 // TODO: Rhombus
 // TODO: Trapezium + Evaluate Points
-quad::type quad::EvaluatePoints(point a, point b, point c) {
+quad::type quad::EvaluatePoints(UNUSED point a, UNUSED point b, UNUSED point c) {
 	return type::INVALID;
 }

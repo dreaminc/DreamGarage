@@ -71,6 +71,10 @@ RESULT BasisMatrix::SetBasisMatrixType(BasisMatrix::type matType) {
 			vUp = vector(0.0f, -1.0f, 0.0f);
 			vLeft = vector(1.0f, 0.0f, 0.0f);
 		} break;
+
+		case INVALID: {
+			// invalid
+		} break;
 	}
 
 	SetBasisMatrixVectors(vLeft, vUp, vLook);

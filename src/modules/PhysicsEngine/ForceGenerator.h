@@ -24,9 +24,7 @@ public:
 		// empty
 	}
 
-	~ForceGenerator() {
-		// empty
-	}
+	virtual ~ForceGenerator() = default;
 
 protected:
 	virtual RESULT Update() = 0;

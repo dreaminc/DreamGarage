@@ -254,7 +254,9 @@ RESULT ObjectState::RecalculateInertialTensor() {
 
 	CB((m_massDistributionType != ObjectState::MassDistributionType::INVALID));
 	CN(m_pParentObj);
-	DimObj *pDimObj = dynamic_cast<DimObj*>(m_pParentObj);
+
+	DimObj *pDimObj;
+	pDimObj = dynamic_cast<DimObj*>(m_pParentObj);
 	CN(pDimObj);
 
 	switch (m_massDistributionType) {
@@ -281,6 +283,11 @@ RESULT ObjectState::RecalculateInertialTensor() {
 
 		case ObjectState::MassDistributionType::CUSTOM: {
 			// TODO: ?
+		} break;
+
+		case ObjectState::MassDistributionType::INVALID:
+		default:{
+			//
 		} break;
 	}
 

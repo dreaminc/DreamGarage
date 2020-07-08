@@ -3,15 +3,14 @@
 
 #include "core/ehm/EHM.h"
 
-
 // Dream Sandbox
 // dos/src/andbox/PathManagerFactory.h
 
 // Dream OS Path Manager Factory for the construction of path managers within a given
 // sandbox or native implementation
 
-#include "Sandbox/PathManager.h"
-#include "Core/Types/Factory.h"
+#include "sandbox/PathManager.h"
+#include "core/types/Factory.h"
 
 class DreamOS;
 

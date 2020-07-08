@@ -16,7 +16,7 @@ public:
 	MemoryImageObj(int width, int height, int channels);
 
 	// TODO: Do we want it?
-	virtual RESULT LoadFromPath() { return R_NOT_IMPLEMENTED_WARNING; };
+	virtual RESULT LoadFromPath() override { return R_NOT_IMPLEMENTED_WARNING; }
 	virtual RESULT LoadFromMemory() override;
 
 private:

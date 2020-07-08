@@ -1,6 +1,13 @@
 #ifndef DOS_TEST_CLIENT_SURFACE_VIEW_H_
 #define DOS_TEST_CLIENT_SURFACE_VIEW_H_
 
+#include "core/ehm/EHM.h"
+
+// Dream Sandbox Android Test Client Surface View
+// dos/src/testclient/DOSTestClient_SuirfaceView.h
+
+// Dream OS Android Test Client Surface View (TODO: this is the entry point)
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -35,10 +42,11 @@
 #endif
 
 // OVR API
-#include "VrApi.h"
-#include "VrApi_Helpers.h"
-#include "VrApi_SystemUtils.h"
-#include "VrApi_Input.h"
+// TODO: Fix this in CMAKE
+#include "third_party/OCULUS/ovr_sdk_mobile_1.34.0/VrApi/Include/VrApi.h"
+#include "third_party/OCULUS/ovr_sdk_mobile_1.34.0/VrApi/Include/VrApi_Helpers.h"
+#include "third_party/OCULUS/ovr_sdk_mobile_1.34.0/VrApi/Include/VrApi_SystemUtils.h"
+#include "third_party/OCULUS/ovr_sdk_mobile_1.34.0/VrApi/Include/VrApi_Input.h"
 
 #if !defined(GL_EXT_multisampled_render_to_texture)
 typedef void(GL_APIENTRY* PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC)(

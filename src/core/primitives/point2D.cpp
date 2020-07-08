@@ -96,6 +96,11 @@ point_precision& point2D::GetComponent(component c) {
 		case component::Y: {
 			return y();
 		} break;
+
+		case component::INVALID:
+		default: {
+			//
+		} break;
 	}
 
 	return y();

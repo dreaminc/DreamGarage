@@ -196,7 +196,7 @@ public:
 			MixIntoIndex(pDataBuffer[byteCount], m_state.m_circularBuffer_c + sampleOffset + byteCount);
 		}
 
-	Error:
+	//Error:
 		return r;
 	}
 
@@ -207,7 +207,7 @@ public:
 
 		WriteNextValue(value);
 
-	Error:
+	//Error:
 		return r;
 	}
 
@@ -219,7 +219,7 @@ public:
 		//MixIntoNextValue(value);
 		MixIntoIndex(value, m_state.m_circularBuffer_c + sampleOffset);
 
-	Error:
+	//Error:
 		return r;
 	}
 

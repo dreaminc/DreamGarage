@@ -51,8 +51,8 @@ public:
 public:
 	virtual RESULT Allocate() override;
 
-	inline unsigned int NumberVertices() { return m_nVertices; }
-	inline unsigned int NumberIndices() { return m_nIndices; }
+	virtual inline unsigned int NumberVertices() override { return m_nVertices; }
+	virtual inline unsigned int NumberIndices() override { return m_nIndices; }
 
 private:
 	unsigned int m_nVertices;

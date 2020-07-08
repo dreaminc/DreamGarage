@@ -74,7 +74,8 @@ char* util::WideCStringToCString(const wchar_t *pwszStr) {
 	pszString = (char*)calloc(pwszStr_n * sizeof(char), 1);
 	CN(pszString);
 
-	size_t bytesWritten = wcstombs(pszString, pwszStr, pwszStr_n);
+	size_t bytesWritten;
+	bytesWritten = wcstombs(pszString, pwszStr, pwszStr_n);
 	CB((bytesWritten == (pwszStr_n - 1)));
 
 	return pszString;
@@ -98,7 +99,8 @@ wchar_t* util::CStringToWideCString(const char *pszStr) {
 	pwszString = (wchar_t*)calloc(pszStr_n * sizeof(wchar_t), 1);
 	CN(pwszString);
 
-	size_t charsWritten = mbstowcs(pwszString, pszStr, pszStr_n);
+	size_t charsWritten;
+	charsWritten = mbstowcs(pwszString, pszStr, pszStr_n);
 	CB((charsWritten == (pszStr_n - 1)));
 
 	return pwszString;

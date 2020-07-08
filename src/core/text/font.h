@@ -25,6 +25,7 @@
 
 class composite;
 class quad;
+struct CharacterGlyph;
 
 class font {
 	friend struct CharacterGlyph;

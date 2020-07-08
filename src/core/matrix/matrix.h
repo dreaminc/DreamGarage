@@ -205,8 +205,8 @@ public:
 		matrix<TMatrix, N - 1, M - 1> retMatrix;
 		retMatrix.clear();
 
-		int rowCount = 0;
-		int colCount = 0;
+		unsigned int rowCount = 0;
+		unsigned int colCount = 0;
 
 		CRM(RangeCheck(i, j), "%d %d minor not possible in %d x %d matrix", i, j, N, M);
 
@@ -711,6 +711,12 @@ public:
 // TODO: Fix const-ness?
 template <typename TMat4x4, int N, int M>
 matrix<TMat4x4, N, M> operator* (TMat4x4 val, matrix<TMat4x4, N, M>& arg) {
+	matrix<TMat4x4, N, M> result(arg);
+	return (result *= (val));
+}
+
+template <typename TMat4x4, int N, int M>
+matrix<TMat4x4, N, M> operator* (TMat4x4 val, matrix<TMat4x4, N, M>&& arg) {
 	matrix<TMat4x4, N, M> result(arg);
 	return (result *= (val));
 }

@@ -45,11 +45,11 @@ bool BoundingPlane::Intersect(const BoundingSphere& rhs) {
 
 bool BoundingPlane::Intersect(const BoundingBox& rhs) {
 	
-	vector vBoxHalfVector = RotationMatrix(static_cast<BoundingBox>(rhs).GetAbsoluteOrientation()) * static_cast<BoundingBox>(rhs).GetHalfVector(true);
+	vector vBoxHalfVector = (vector)(RotationMatrix(static_cast<BoundingBox>(rhs).GetAbsoluteOrientation()) * static_cast<BoundingBox>(rhs).GetHalfVector(true));
 
 	vector vPlaneNormal = GetNormal();
 
-	vector vProjectHVOnPlaneNormal = (vBoxHalfVector.dot(vPlaneNormal)) * vPlaneNormal;
+	vector vProjectHVOnPlaneNormal = (vector)((vBoxHalfVector.dot(vPlaneNormal)) * vPlaneNormal);
 
 	point ptBoxOrigin = static_cast<BoundingBox>(rhs).GetOrigin();
 	point ptPlaneOrigin = GetOrigin();
@@ -70,7 +70,7 @@ bool BoundingPlane::Intersect(const BoundingQuad& rhs) {
 
 	vector vPlaneNormal = GetNormal();
 
-	vector vProjectHVOnPlaneNormal = (vQuadHalfVector.dot(vPlaneNormal)) * vPlaneNormal;
+	vector vProjectHVOnPlaneNormal = (vector)((vQuadHalfVector.dot(vPlaneNormal)) * vPlaneNormal);
 
 	point ptQuadOrigin = static_cast<BoundingQuad>(rhs).GetOrigin();
 	point ptPlaneOrigin = GetOrigin();
@@ -89,7 +89,9 @@ bool BoundingPlane::Intersect(const BoundingPlane& rhs) {
 	vector vCross = rhs.GetNormal().cross(m_vNormal);
 
 	if (vCross.magnitude() == 0.0f) {
-		return Intersect(static_cast<BoundingPlane>(rhs).GetOrigin());
+		point ptOrigin = static_cast<BoundingPlane>(rhs).GetOrigin();
+		return Intersect(ptOrigin);
+		//return Intersect(static_cast<BoundingPlane>(rhs).GetOrigin());
 	}
 	
 	return true;
@@ -108,7 +110,7 @@ bool BoundingPlane::Intersect(point& pt) {
 bool BoundingPlane::Intersect(const ray& r) {
 	double t = -1.0f;
 
-	vector vNormal = RotationMatrix(GetAbsoluteOrientation()) * m_vNormal;
+	vector vNormal = (vector)(RotationMatrix(GetAbsoluteOrientation()) * m_vNormal);
 	vNormal.Normalize();
 
 	t = ((vector)(GetAbsoluteOrigin() - r.GetOrigin())).dot(vNormal);
@@ -182,7 +184,7 @@ CollisionManifold BoundingPlane::Collide(const ray &rCast) {
 
 	double t = -1.0f;
 
-	vector vNormal = RotationMatrix(GetAbsoluteOrientation()) * m_vNormal;
+	vector vNormal = (vector)(RotationMatrix(GetAbsoluteOrientation()) * m_vNormal);
 	vNormal.Normalize();
 
 	t = ((vector)(GetAbsoluteOrigin() - rCast.GetOrigin())).dot(vNormal);

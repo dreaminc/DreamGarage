@@ -11,9 +11,9 @@
 
 #include <string>
 
-class guid : public TypeObj {
+class GUID : public TypeObj {
 public:
-	guid();
+	GUID();
 
 	//UINT64 GetID();
 	//RESULT Dealloc();
@@ -22,11 +22,11 @@ public:
 
 	RESULT SetGUIDFromString(std::string strGUID);
 
-	bool operator==(const guid& rhs) {
+	bool operator==(const GUID& rhs) {
 		return ((m_uiIDUpper == rhs.m_uiIDUpper) && (m_uiIDLower == rhs.m_uiIDLower));
 	}
 
-	friend inline bool operator==(const guid& lhs, const guid& rhs) {
+	friend inline bool operator==(const GUID& lhs, const GUID& rhs) {
 		return ((lhs.m_uiIDUpper == rhs.m_uiIDUpper) && (lhs.m_uiIDLower == rhs.m_uiIDLower));
 	}
 
@@ -41,6 +41,12 @@ private:
 	// Initialized in source
 	static UINT64 ms_uiIDCounterLower;
 	static UINT64 ms_uiIDCounterUpper;
+
+public:
+	uint32_t Data1;
+	uint16_t Data2;
+	uint16_t Data3;
+	uint8_t Data4[8];
 };
 
 #endif // ! GUID_H_

@@ -217,7 +217,7 @@ RESULT quaternion::RotateByVectorSlerp(vector v, quaternion_precision theta, qua
 }
 
 // https://en.wikipedia.org/wiki/Slerp
-RESULT quaternion::RotateToQuaternionSlerp(quaternion q0, quaternion q1, double t) {
+RESULT quaternion::RotateToQuaternionSlerp(UNUSED quaternion q0, UNUSED quaternion q1, UNUSED double t) {
 	return R_NOT_IMPLEMENTED_WARNING;
 }
 

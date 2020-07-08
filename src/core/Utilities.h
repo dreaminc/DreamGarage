@@ -10,6 +10,8 @@
 // Once enough similar functionality is in here that justifies an object, it should be forked out into 
 // an object but there are a variety of random functions that are useful engine wide that can be put here.
 
+#include "core/types/GUID.h"
+
 #include <sstream>
 #include <string>
 #include <vector>

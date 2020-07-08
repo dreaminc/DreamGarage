@@ -966,8 +966,11 @@ CollisionManifold BoundingBox::CollideBruteForce(const BoundingBox& rhs) {
 	// TODO: Assumes OBB - can be optimized for AABB and OBB-AABB certainly
 	for (int j = 0; j < 2; j++) {
 		// Do this early to improve perf
-		BoundingBox *pBoxA = (j == 0) ? this : &(static_cast<BoundingBox>(rhs));
-		BoundingBox *pBoxB = (j == 0) ? &(static_cast<BoundingBox>(rhs)) : this;
+//		BoundingBox *pBoxA = (j == 0) ? this : &(static_cast<BoundingBox>(rhs));
+//		BoundingBox *pBoxB = (j == 0) ? &(static_cast<BoundingBox>(rhs)) : this;
+
+		BoundingBox *pBoxA = (j == 0) ? this : (BoundingBox*)(&rhs);
+		BoundingBox *pBoxB = (j == 0) ? (BoundingBox*)(&rhs) : this;
 
 		point ptBoxAOrigin = pBoxA->GetAbsoluteOrigin();
 		quaternion qBoxAOrientation = pBoxA->GetAbsoluteOrientation();
@@ -1071,14 +1074,17 @@ CollisionManifold BoundingBox::CollideBruteForce(const BoundingBox& rhs) {
 		// Do this early to improve perf
 		int j = 0;
 
-		BoundingBox *pBoxA = (j == 0) ? this : &(static_cast<BoundingBox>(rhs));
-		BoundingBox *pBoxB = (j == 0) ? &(static_cast<BoundingBox>(rhs)) : this;
+//		BoundingBox *pBoxA = (j == 0) ? this : &(static_cast<BoundingBox>(rhs));
+//		BoundingBox *pBoxB = (j == 0) ? &(static_cast<BoundingBox>(rhs)) : this;
+
+        BoundingBox *pBoxA = (j == 0) ? this : (BoundingBox*)(&rhs);
+        BoundingBox *pBoxB = (j == 0) ? (BoundingBox*)(&rhs) : this;
 
 		point ptBoxAOrigin = pBoxA->GetAbsoluteOrigin();
 		quaternion qBoxAOrientation = pBoxA->GetAbsoluteOrientation();
 
 		point ptBoxBOrigin = pBoxB->GetAbsoluteOrigin();
-		quaternion qBoxBOrientation = pBoxB->GetAbsoluteOrientation();
+		UNUSED quaternion qBoxBOrientation = pBoxB->GetAbsoluteOrientation();
 
 		// Test all edges
 		double minDistanceTemp = std::numeric_limits<double>::infinity();
@@ -1144,17 +1150,17 @@ CollisionManifold BoundingBox::CollideBruteForce(const BoundingBox& rhs) {
 			double tFar = INFINITY;
 			bool fMiss = false;
 
-			for (int i = 0; i < 3; i++) {
+			for (int k = 0; k < 3; k++) {
 
-				if (std::abs(vRay(i)) < DREAM_EPSILON) {
-					if (ptMin(i) - lineBoxEdgeB.a()(i) > 0 || ptMax(i) - lineBoxEdgeB.a()(i) < 0) {
+				if (std::abs(vRay(k)) < DREAM_EPSILON) {
+					if (ptMin(k) - lineBoxEdgeB.a()(k) > 0 || ptMax(k) - lineBoxEdgeB.a()(k) < 0) {
 						fMiss = true;
 						continue;
 					}
 				}
 				else {
-					double t1 = (ptMin(i) - lineBoxEdgeB.a()(i)) / vRay(i);
-					double t2 = (ptMax(i) - lineBoxEdgeB.a()(i)) / vRay(i);
+					double t1 = (ptMin(k) - lineBoxEdgeB.a()(k)) / vRay(j);
+					double t2 = (ptMax(k) - lineBoxEdgeB.a()(k)) / vRay(j);
 
 					double tMin = std::min(t1, t2);
 					double tMax = std::max(t1, t2);
@@ -1186,19 +1192,19 @@ CollisionManifold BoundingBox::CollideBruteForce(const BoundingBox& rhs) {
 
 				// Test for situations where the magnitude of min-max is equivalent 
 				// to a dimension of one of the boxes
-				for (int i = 0; i < 3; i++) {
-					auto axisMagnitude = (ptEdgeMax(i) - ptEdgeMin(i));
+				for (int k = 0; k < 3; k++) {
+					auto axisMagnitude = (ptEdgeMax(k) - ptEdgeMin(k));
 
-					if (axisMagnitude - (pBoxA->GetHalfVector()(i) * 2.0f) >= -DREAM_EPSILON) {
+					if (axisMagnitude - (pBoxA->GetHalfVector()(k) * 2.0f) >= -DREAM_EPSILON) {
 						weight = 2;
 					}
-					else if (axisMagnitude - (pBoxB->GetHalfVector()(i) * 2.0f) >= -DREAM_EPSILON) {
+					else if (axisMagnitude - (pBoxB->GetHalfVector()(k) * 2.0f) >= -DREAM_EPSILON) {
 						weight = 2;
 					}
 				}
 
-				double minDistance1 = std::numeric_limits<double>::max();
-				double minDistance2 = std::numeric_limits<double>::max();
+				UNUSED double minDistance1 = std::numeric_limits<double>::max();
+				UNUSED double minDistance2 = std::numeric_limits<double>::max();
 
 				double distanceX = pBoxA->GetHalfVector().x() - std::abs(ptEdgeMid.x());
 				double distanceXabs = std::abs(distanceX);
@@ -1271,10 +1277,10 @@ CollisionManifold BoundingBox::CollideBruteForce(const BoundingBox& rhs) {
 				point ptBoxBOriginRefA = inverse(RotationMatrix(qBoxAOrientation)) * (ptBoxBOrigin - ptBoxAOrigin);
 
 				if (vNormal.IsValid() == false) {
-					int a = 5;
+					UNUSED int a = 5;
 				}
 
-				vector vNormalOriented = RotationMatrix(qBoxAOrientation) * vNormal;
+				vector vNormalOriented = (vector)(RotationMatrix(qBoxAOrientation) * vNormal);
 				//vNormal = vNormal * -1.0f;
 				vNormalOriented.Normalize();
 
@@ -1553,7 +1559,7 @@ point BoundingBox::GetMaxPoint(bool fAbsolute) {
 	return (GetOrigin() + GetHalfVector(fAbsolute));
 }
 
-point BoundingBox::GetMinPointOriented(bool fAbsolute) {
+point BoundingBox::GetMinPointOriented(UNUSED bool fAbsolute) {
 	if (m_type == Type::AABB) {
 		return GetMinPoint();
 	}
@@ -1563,7 +1569,7 @@ point BoundingBox::GetMinPointOriented(bool fAbsolute) {
 	}
 }
 
-point BoundingBox::GetMaxPointOriented(bool fAbsolute) {
+point BoundingBox::GetMaxPointOriented(UNUSED bool fAbsolute) {
 	if (m_type == Type::AABB) {
 		return GetMaxPoint();
 	}
@@ -1640,6 +1646,11 @@ point BoundingBox::GetBoxPoint(BoxPoint ptType, bool fOriented) {
 			retPoint.y() *= -1.0f;
 			retPoint.z() *= -1.0f;
 		} break;
+
+		case BoxPoint::INVALID:
+		default: {
+		    //
+		} break;
 	}
 
 	// Transform point accordingly
@@ -1698,6 +1709,11 @@ BoundingBox::face BoundingBox::GetFace(BoxFace faceType, bool fOriented) {
 			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR, fOriented);
 			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR, fOriented);
 		} break;
+
+		case BoxFace::INVALID:
+		default: {
+		    //
+		} break;
 	}
 
 	faceBox.m_vNormal = GetBoxFaceNormal(faceType, fOriented);
@@ -1715,6 +1731,11 @@ vector BoundingBox::GetBoxFaceNormal(BoxFace faceType, bool fOriented) {
 		case BoxFace::LEFT: vNormal = vector::iVector(-1.0f); break;
 		case BoxFace::FRONT: vNormal = vector::kVector(1.0f); break;
 		case BoxFace::BACK: vNormal = vector::kVector(-1.0f); break;
+
+		case BoxFace::INVALID:
+		default: {
+		    //
+		} break;
 	}
 
 	// Rotate if needed 
@@ -1789,6 +1810,11 @@ line BoundingBox::GetBoxEdge(BoxEdge edgeType) {
 		case BoxEdge::RIGHT_FAR: {
 			lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR), 
 							GetBoxPoint(BoxPoint::TOP_RIGHT_FAR)); 
+		} break;
+
+		case BoxEdge::INVALID:
+		default:{
+		    //
 		} break;
 
 	}

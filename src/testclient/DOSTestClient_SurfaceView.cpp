@@ -857,7 +857,7 @@ static void ovrFramebuffer_SetNone() {
     GL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
 }
 
-static void ovrFramebuffer_Resolve(ovrFramebuffer* frameBuffer) {
+static void ovrFramebuffer_Resolve(UNUSED ovrFramebuffer* frameBuffer) {
     // Discard the depth buffer, so the tiler won't need to write it back out to memory.
     const GLenum depthAttachment[1] = {GL_DEPTH_ATTACHMENT};
     glInvalidateFramebuffer(GL_DRAW_FRAMEBUFFER, 1, depthAttachment);
@@ -1101,11 +1101,12 @@ static void ovrRenderer_Destroy(ovrRenderer* renderer) {
 
 static ovrLayerProjection2 ovrRenderer_RenderFrame(
     ovrRenderer* renderer,
-    const ovrJava* java,
+    UNUSED const ovrJava* java,
     const ovrScene* scene,
     const ovrSimulation* simulation,
     const ovrTracking2* tracking,
-    ovrMobile* ovr) {
+    UNUSED ovrMobile* ovr
+) {
     ovrMatrix4f rotationMatrices[NUM_ROTATIONS];
     for (int i = 0; i < NUM_ROTATIONS; i++) {
         rotationMatrices[i] = ovrMatrix4f_CreateRotation(
@@ -1643,7 +1644,7 @@ static int ovrApp_HandleKeyEvent(ovrApp* app, const int keyCode, const int actio
     return 0;
 }
 
-static void ovrApp_HandleVrApiEvents(ovrApp* app) {
+static void ovrApp_HandleVrApiEvents(UNUSED ovrApp* app) {
     ovrEventDataBuffer eventDataBuffer = {};
 
     // Poll for VrApi events
@@ -2006,7 +2007,7 @@ void* AppThreadFunction(void* parm) {
                 &iconLayer.Header,
             };
 
-            ovrSubmitFrameDescription2 frameDesc = {0};
+            ovrSubmitFrameDescription2 frameDesc = { 0 };
             frameDesc.Flags = frameFlags;
             frameDesc.SwapInterval = 1;
             frameDesc.FrameIndex = appState.FrameIndex;

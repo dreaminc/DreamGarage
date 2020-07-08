@@ -122,7 +122,7 @@ Error:
 	return r;
 }
 
-RESULT volume::SetVolumeVertices(BoundingBox* pBoundingBox, bool fTriangleBased) {
+RESULT volume::SetVolumeVertices(BoundingBox* pBoundingBox, UNUSED bool fTriangleBased) {
 	RESULT r = R_PASS;
 
 	//double length = pBoundingBox->GetWidth();

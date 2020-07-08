@@ -24,6 +24,10 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 #endif
 */
 
+#ifndef __BASE_FILE__
+#define __BASE_FILE__ DOS_BASE_FILE
+#endif
+
 
 #define RFAILED() (r&0x80000000)
 #define RSUCCESS() (!RFAILED())

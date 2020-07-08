@@ -141,9 +141,9 @@ private:
         return R_PASS;
     }
     
-    const bool CompareInt(int rhs) { return (*(int*)this->m_pNumber) == rhs; }
-    const bool CompareFloat(float rhs) { return (*(float*)this->m_pNumber) == rhs; }
-    const bool CompareDouble(double rhs) { return (*(double*)this->m_pNumber) == rhs; }
+    bool CompareInt(int rhs) { return (*(int*)this->m_pNumber) == rhs; }
+    bool CompareFloat(float rhs) { return (*(float*)this->m_pNumber) == rhs; }
+    bool CompareDouble(double rhs) { return (*(double*)this->m_pNumber) == rhs; }
 
 private:
     RESULT allocNumberType(void *pVal, NUMBER_TYPE type) {

@@ -1,20 +1,24 @@
 #include "ProjectionMatrix.h"
 
-ProjectionMatrix::ProjectionMatrix(PROJECTION_MATRIX_TYPE type, projection_precision width,
+ProjectionMatrix::ProjectionMatrix(ProjectionMatrix::type projType, projection_precision width,
 																projection_precision height,
 																projection_precision nearPlane,
 																projection_precision farPlane,
 																projection_precision angle
 ) :
-	m_type(type)
+	m_type(projType)
 {
-	switch (type) {
-		case PROJECTION_MATRIX_PERSPECTIVE: {
+	switch (projType) {
+		case ProjectionMatrix::type::PERSPECTIVE: {
 			ACRM(SetPerspective(width, height, nearPlane, farPlane, angle), "Failed to set perspective matrix");
 		} break;
 
-		case PROJECTION_MATRIX_ORTHOGRAPHIC: {
+		case ProjectionMatrix::type::ORTHOGRAPHIC: {
 			ACRM(SetOrthographic(width, height, nearPlane, farPlane), "Failed to set perspective matrix");
+		} break;
+
+		case ProjectionMatrix::type::INVALID: {
+			// invalid
 		} break;
 	}
 }
@@ -22,7 +26,7 @@ ProjectionMatrix::ProjectionMatrix(PROJECTION_MATRIX_TYPE type, projection_preci
 ProjectionMatrix::ProjectionMatrix(projection_precision left, projection_precision right,
 								   projection_precision top, projection_precision bottom,
 								   projection_precision nearPlane, projection_precision farPlane) :
-	m_type(PROJECTION_MATRIX_PERSPECTIVE)
+	m_type(ProjectionMatrix::type::PERSPECTIVE)
 {
 	ACRM(SetPerspective(left, right, top, bottom, nearPlane, farPlane), "Failed to set perspective matrix");
 }
@@ -30,14 +34,14 @@ ProjectionMatrix::ProjectionMatrix(projection_precision left, projection_precisi
 ProjectionMatrix::ProjectionMatrix(projection_precision width, projection_precision height,
 	projection_precision nearPlane, projection_precision farPlane,
 	projection_precision angle) :
-	m_type(PROJECTION_MATRIX_PERSPECTIVE)
+	m_type(ProjectionMatrix::type::PERSPECTIVE)
 {
 	ACRM(SetPerspective(width, height, nearPlane, farPlane, angle), "Failed to set perspective matrix");
 }
 
 ProjectionMatrix::ProjectionMatrix(projection_precision width, projection_precision height,
 								   projection_precision nearPlane, projection_precision farPlane) :
-	m_type(PROJECTION_MATRIX_ORTHOGRAPHIC)
+	m_type(ProjectionMatrix::type::ORTHOGRAPHIC)
 {
 	ACRM(SetOrthographic(width, height, nearPlane, farPlane), "Failed to set perspective matrix");
 }
@@ -54,7 +58,7 @@ ProjectionMatrix ProjectionMatrix::MakeOrtho(projection_precision left, projecti
 {
 	ProjectionMatrix projMat;
 
-	projMat.m_type = PROJECTION_MATRIX_ORTHOGRAPHIC;
+	projMat.m_type = ProjectionMatrix::type::ORTHOGRAPHIC;
 	projMat.SetOrthographic(left, right, top, bottom, nearPlane, farPlane);
 
 	return projMat;
@@ -66,7 +70,7 @@ ProjectionMatrix ProjectionMatrix::MakeOrthoYAxis(projection_precision left, pro
 {
 	ProjectionMatrix projMat;
 
-	projMat.m_type = PROJECTION_MATRIX_ORTHOGRAPHIC;
+	projMat.m_type = ProjectionMatrix::type::ORTHOGRAPHIC;
 	projMat.SetOrthographicYAxis(left, right, top, bottom, nearPlane, farPlane);
 
 	return projMat;
@@ -84,7 +88,6 @@ RESULT ProjectionMatrix::SetPerspective(projection_precision width,
 										projection_precision farPlane, 
 										projection_precision angle) 
 {
-	RESULT r = R_PASS;
 
 	this->clear();
 
@@ -112,9 +115,9 @@ RESULT ProjectionMatrix::SetPerspective(projection_precision width,
 
 	this->element(3, 2) = (-1.0f);
 
-	m_type = PROJECTION_MATRIX_PERSPECTIVE;
+	m_type = ProjectionMatrix::type::PERSPECTIVE;
 
-	return r;
+	return R_PASS;
 }
 
 
@@ -124,10 +127,8 @@ RESULT ProjectionMatrix::SetPerspective(projection_precision left, projection_pr
 										projection_precision nearPlane,
 										projection_precision farPlane)
 {
-	RESULT r = R_PASS;
 	
 	this->clear();
-
 	
 	this->element(0, 0) = (2.0f * nearPlane) / (right - left);
 	this->element(2, 0) = (right + left) / (right - left);
@@ -140,9 +141,9 @@ RESULT ProjectionMatrix::SetPerspective(projection_precision left, projection_pr
 
 	this->element(3, 2) = (-1.0f);
 
-	m_type = PROJECTION_MATRIX_PERSPECTIVE;
+	m_type = ProjectionMatrix::type::PERSPECTIVE;
 
-	return r;
+	return R_PASS;
 }
 
 // http://www.songho.ca/opengl/gl_projectionmatrix.html
@@ -151,9 +152,8 @@ RESULT ProjectionMatrix::SetOrthographic(projection_precision width,
 										 projection_precision nearPlane, 
 										 projection_precision farPlane) 
 {
-	RESULT r = R_PASS;
 
-	m_type = PROJECTION_MATRIX_ORTHOGRAPHIC;
+	m_type = ProjectionMatrix::type::ORTHOGRAPHIC;
 
 	this->clear();
 	
@@ -165,7 +165,7 @@ RESULT ProjectionMatrix::SetOrthographic(projection_precision width,
 
 	this->element(3, 3) = 1.0f;
 
-	return r;
+	return R_PASS;
 }
 
 // http://www.songho.ca/opengl/gl_projectionmatrix.html
@@ -173,9 +173,8 @@ RESULT ProjectionMatrix::SetOrthographic(projection_precision left, projection_p
 										 projection_precision top, projection_precision bottom,
 										 projection_precision nearPlane, projection_precision farPlane) 
 {
-	RESULT r = R_PASS;
 
-	m_type = PROJECTION_MATRIX_ORTHOGRAPHIC;
+	m_type = ProjectionMatrix::type::ORTHOGRAPHIC;
 
 	this->clear();
 
@@ -191,16 +190,15 @@ RESULT ProjectionMatrix::SetOrthographic(projection_precision left, projection_p
 
 	this->element(3, 3) = 1.0f;
 	
-	return r;
+	return R_PASS;
 }
 
 RESULT ProjectionMatrix::SetOrthographicYAxis(projection_precision left, projection_precision right,
 											  projection_precision top, projection_precision bottom,
 											  projection_precision nearPlane, projection_precision farPlane)
 {
-	RESULT r = R_PASS;
 
-	m_type = PROJECTION_MATRIX_ORTHOGRAPHIC;
+	m_type = ProjectionMatrix::type::ORTHOGRAPHIC;
 
 	this->clear();
 
@@ -216,13 +214,14 @@ RESULT ProjectionMatrix::SetOrthographicYAxis(projection_precision left, project
 
 	this->element(3, 3) = 1.0f;
 
-	return r;
+	return R_PASS;
 }
 
 const char *ProjectionMatrix::StringProjectionMatrixType() {
 	switch (m_type) {
-		case PROJECTION_MATRIX_PERSPECTIVE: return "Perspective"; break;
-		case PROJECTION_MATRIX_ORTHOGRAPHIC: return "Orthographic"; break;
+		case ProjectionMatrix::type::PERSPECTIVE: return "Perspective"; break;
+		case ProjectionMatrix::type::ORTHOGRAPHIC: return "Orthographic"; break;
+		case ProjectionMatrix::type::INVALID: return "invalid"; break;
 	}
 
 	return "Invalid";

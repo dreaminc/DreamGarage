@@ -9,7 +9,7 @@
 
 stereocamera::stereocamera(point ptOrigin, viewport cameraVieport) :
 	camera(ptOrigin, cameraVieport),
-	m_eye(EYE_MONO)
+	m_eye(EYE_TYPE::EYE_MONO)
 {
 	m_pupillaryDistance = (DEFAULT_PUPILLARY_DISTANCE / 1000.0f);
 }
@@ -19,18 +19,19 @@ point stereocamera::GetEyePosition(EYE_TYPE eye) {
 
 	
 	switch (eye) {
-	case EYE_LEFT: {
-		ptEye = camera::GetOrigin() + (GetRightVector() * (-m_pupillaryDistance / 2.0f));
-	} break;
+		case EYE_TYPE::EYE_LEFT: {
+			ptEye = camera::GetOrigin() + (GetRightVector() * (-m_pupillaryDistance / 2.0f));
+		} break;
 
-	case EYE_RIGHT: {
-		ptEye = camera::GetOrigin() + (GetRightVector() * (m_pupillaryDistance / 2.0f));
-	} break;
+		case EYE_TYPE::EYE_RIGHT: {
+			ptEye = camera::GetOrigin() + (GetRightVector() * (m_pupillaryDistance / 2.0f));
+		} break;
 
-	default:
-	case EYE_MONO: {
-		ptEye = camera::GetOrigin();
-	} break;
+		case EYE_TYPE::EYE_MONO:
+		case EYE_TYPE::EYE_INVALID:
+		default: {
+			ptEye = camera::GetOrigin();
+		} break;
 	}
 
 	ptEye.w() = 0.0f;
@@ -42,12 +43,12 @@ ProjectionMatrix stereocamera::GetProjectionMatrix(EYE_TYPE eye) {
 	//ProjectionMatrix projMat;
 
 	if (m_pHMD != nullptr) {
-		if (m_fProjEyeInit[eye] == false) {
-			m_projEye[eye] = m_pHMD->GetPerspectiveFOVMatrix(eye, m_NearPlane, m_FarPlane);
-			m_fProjEyeInit[eye] = true;
+		if (m_fProjEyeInit[(uint8_t)eye] == false) {
+			m_projEye[(uint8_t)eye] = m_pHMD->GetPerspectiveFOVMatrix(eye, m_NearPlane, m_FarPlane);
+			m_fProjEyeInit[(uint8_t)eye] = true;
 		}
 
-		return m_projEye[eye];
+		return m_projEye[(uint8_t)eye];
 	}
 	else {
 		return camera::GetProjectionMatrix();
@@ -56,8 +57,8 @@ ProjectionMatrix stereocamera::GetProjectionMatrix(EYE_TYPE eye) {
 	//return projMat;
 }
 
-point stereocamera::GetOrigin(bool fAbsolute) {
-	point eyePos = GetEyePosition(EYE_MONO);
+point stereocamera::GetOrigin(UNUSED bool fAbsolute) {
+	point eyePos = GetEyePosition(EYE_TYPE::EYE_MONO);
 
 	if (m_pHMD != nullptr) {
 		eyePos += m_pHMD->GetHeadPointOrigin();

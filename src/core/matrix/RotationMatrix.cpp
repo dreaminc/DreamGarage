@@ -31,9 +31,12 @@ RotationMatrix::RotationMatrix(ROTATION_MATRIX_TYPE axis, rotation_precision the
 	m_type(axis)
 {
 	switch (axis) {
-	case X_AXIS: SetXRotationMatrix(theta); break;
-	case Y_AXIS: SetYRotationMatrix(theta); break;
-	case Z_AXIS: SetZRotationMatrix(theta); break;
+		case X_AXIS: SetXRotationMatrix(theta); break;
+		case Y_AXIS: SetYRotationMatrix(theta); break;
+		case Z_AXIS: SetZRotationMatrix(theta); break;
+
+		case INVALID:
+		default: break;
 	}
 }
 
@@ -123,7 +126,7 @@ RESULT RotationMatrix::SetVectorRotationMatrix(vector v, vector up) {
 	v.Normalize();
 	identity();
 
-	vector zAxis = -1.0f * v.Normal();
+	vector zAxis = v.Normal() * -1.0f;
 	vector xAxis;
 
 	if (((zAxis * up) != 0.0f) && (zAxis != up))

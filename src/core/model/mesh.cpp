@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-#include "Sandbox/PathManager.h"
+#include "sandbox/PathManager.h"
 
 /*
 mesh::mesh(wchar_t *pszModelName) {
@@ -40,10 +40,9 @@ mesh::mesh(mesh::params *pMeshParams) :
 
 	m_nIndices = static_cast<unsigned int>(pMeshParams->indices.size());
 	m_nVertices = static_cast<unsigned int>(pMeshParams->vertices.size());
+	unsigned int indexCount = 0;
 
 	CR(Allocate());
-
-	unsigned int indexCount = 0;
 
 	for (auto& v : pMeshParams->vertices) {
 		m_pVertices[indexCount] = vertex(v);
@@ -103,9 +102,9 @@ mesh::mesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& ind
 	m_nIndices = static_cast<unsigned int>(indices.size());
 	m_nVertices = static_cast<unsigned int>(vertices.size());
 
-	CR(Allocate());
-
 	unsigned int indexCount = 0;
+
+	CR(Allocate());
 
 	for (auto& v : vertices) {
 		m_pVertices[indexCount] = vertex(v);
@@ -148,9 +147,9 @@ RESULT mesh::SetVertices(const std::vector<vertex>& vertices) {
 	m_nVertices = static_cast<unsigned int>(vertices.size());
 	m_nIndices = m_nVertices;
 
-	CR(Allocate());
-
 	unsigned int verticesCnt = 0;
+
+	CR(Allocate());
 
 	for (auto& v : vertices) {
 		m_pIndices[verticesCnt] = verticesCnt;

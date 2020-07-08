@@ -14,12 +14,6 @@
 #define DEFAULT_NEAR_PLANE 0.1f
 #define DEFAULT_FAR_PLANE 10000.0f
 
-typedef enum {
-	PROJECTION_MATRIX_PERSPECTIVE,
-	PROJECTION_MATRIX_ORTHOGRAPHIC,
-	PROJECTION_MATRIX_INVALID
-} PROJECTION_MATRIX_TYPE;
-
 #ifdef FLOAT_PRECISION
 	typedef float projection_precision;
 #elif defined(DOUBLE_PRECISION)
@@ -28,13 +22,20 @@ typedef enum {
 
 class ProjectionMatrix : public matrix<projection_precision, 4, 4> {
 public:
+	typedef enum {
+		PERSPECTIVE,
+		ORTHOGRAPHIC,
+		INVALID
+	} type;
+
+public:
 	ProjectionMatrix() :
-		m_type(PROJECTION_MATRIX_INVALID)
+		m_type(type::INVALID)
 	{
 		clear();
 	}
 
-	ProjectionMatrix(PROJECTION_MATRIX_TYPE type, projection_precision width, 
+	ProjectionMatrix(ProjectionMatrix::type projType, projection_precision width,
 												  projection_precision height, 
 												  projection_precision nearPlane, 
 												  projection_precision farPlane, 
@@ -79,7 +80,7 @@ private:
 	RESULT SetOrthographicYAxis(projection_precision left, projection_precision right, projection_precision top, projection_precision bottom, projection_precision nearPlane, projection_precision farPlane);
 
 private:
-	PROJECTION_MATRIX_TYPE m_type;
+	type m_type;
 };
 
 #endif // ! PROJECTION_MATRIX_H_

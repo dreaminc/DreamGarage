@@ -172,20 +172,20 @@ public:
 		return pObj;
 	}
 
-	virtual DimObj* MakeObject(PrimParams* pPrimParams, bool fInitialize = true) { ACBM((false), "MakeObject not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual texture* MakeTexture(PrimParams *pPrimParams, bool fInitialize = true) { ACBM((false), "MakeTexture not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual DimObj* MakeObject(UNUSED PrimParams* pPrimParams, UNUSED bool fInitialize = true) { ACBM((false), "MakeObject not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual texture* MakeTexture(UNUSED PrimParams *pPrimParams, UNUSED bool fInitialize = true) { ACBM((false), "MakeTexture not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
-	virtual RESULT InitializeObject(DimObj* pDimObj) { return R_NOT_IMPLEMENTED_ERROR; }
-	virtual RESULT InitializeTexture(texture *pTexture) { return R_NOT_IMPLEMENTED_ERROR; }
+	virtual RESULT InitializeObject(UNUSED DimObj* pDimObj) { return R_NOT_IMPLEMENTED_ERROR; }
+	virtual RESULT InitializeTexture(UNUSED texture *pTexture) { return R_NOT_IMPLEMENTED_ERROR; }
 
 	// TODO: Remove and use param pack function
-	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) { ACBM((false), "MakeLight not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual light* MakeLight(UNUSED LIGHT_TYPE type, UNUSED light_precision intensity, UNUSED point ptOrigin, UNUSED color colorDiffuse, UNUSED color colorSpecular, UNUSED vector vectorDirection) { ACBM((false), "MakeLight not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
-	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) { ACBM((false), "MakeQuad not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual quad* MakeQuad(double width, double height, point ptCenter, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector()) { ACBM((false), "MakeQuad not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual quad* MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector()) { ACBM((false), "MakeQuad not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual quad* MakeQuad(UNUSED double width, UNUSED double height, UNUSED int numHorizontalDivisions = 1, UNUSED int numVerticalDivisions = 1, UNUSED texture *pTextureHeight = nullptr, UNUSED vector vNormal = vector::jVector()) { ACBM((false), "MakeQuad not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual quad* MakeQuad(UNUSED double width, UNUSED double height, UNUSED point ptCenter, UNUSED uvcoord uvTopLeft, UNUSED uvcoord uvBottomRight, UNUSED vector vNormal = vector::jVector()) { ACBM((false), "MakeQuad not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual quad* MakeQuad(UNUSED float width, UNUSED float height, UNUSED int numHorizontalDivisions, UNUSED int numVerticalDivisions, UNUSED uvcoord uvTopLeft, UNUSED uvcoord uvBottomRight, UNUSED quad::CurveType curveType = quad::CurveType::FLAT, UNUSED vector vNormal = vector::jVector()) { ACBM((false), "MakeQuad not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
-	virtual sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) { ACBM((false), "MakeSphere not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual sphere* MakeSphere(UNUSED float radius = 1.0f, UNUSED int numAngularDivisions = 3, UNUSED int numVerticalDivisions = 3, UNUSED color c = color(COLOR_WHITE)) { ACBM((false), "MakeSphere not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) { ACBM((false), "MakeCylinder not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 	virtual DimRay* MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) { ACBM((false), "MakeRay not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 	virtual DimPlane* MakePlane(point ptOrigin, vector vNormal) { ACBM((false), "MakePlane not implemented by %s HAL", GetHALName().c_str()); return nullptr; }

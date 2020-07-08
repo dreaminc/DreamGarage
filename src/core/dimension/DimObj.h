@@ -71,7 +71,7 @@ public:
 		Specular 
 	};
 
-	virtual OBJECT_TYPE GetType();
+	virtual OBJECT_TYPE GetType() override;
 
 	virtual RESULT Allocate() = 0;
 

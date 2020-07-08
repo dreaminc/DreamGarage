@@ -5,16 +5,16 @@
 #include <sstream>
 
 // Initialize the static value
-UINT64 guid::ms_uiIDCounterUpper = (UINT64)(0);
-UINT64 guid::ms_uiIDCounterLower = (UINT64)(0);
+UINT64 GUID::ms_uiIDCounterUpper = (UINT64)(0);
+UINT64 GUID::ms_uiIDCounterLower = (UINT64)(0);
 
-guid::guid() :
+GUID::GUID() :
 	TypeObj(TYPE_OBJ_GUID)
 {
-	guid::GetNewUID(&m_uiIDLower, &m_uiIDUpper);
+	GUID::GetNewUID(&m_uiIDLower, &m_uiIDUpper);
 }
 
-std::string guid::GetGUIDString() {
+std::string GUID::GetGUIDString() {
 	std::string strReturn = "";
 	uint8_t bytes[16];
 	memset(&bytes, 0, sizeof(uint8_t) * 16);
@@ -40,7 +40,7 @@ std::string guid::GetGUIDString() {
 	return strReturn;
 }
 
-RESULT guid::SetGUIDFromString(std::string strGUID) {
+RESULT GUID::SetGUIDFromString(std::string strGUID) {
 	RESULT r = R_PASS;
 
 	// Ensure valid string (16 bytes (2 chars x 32))
@@ -57,7 +57,7 @@ Error:
 	return r;
 }
 
-RESULT guid::IncrementUID() {
+RESULT GUID::IncrementUID() {
 	RESULT r = R_PASS;
 	
 	if (ms_uiIDCounterLower < ULLONG_MAX) {
@@ -74,16 +74,16 @@ Error:
 	return r;
 }
 
-RESULT guid::GetNewUID(UINT64 *puiIDCounterLower, UINT64 *puiIDCounterUpper) {
+RESULT GUID::GetNewUID(UINT64 *puiIDCounterLower, UINT64 *puiIDCounterUpper) {
 	RESULT r = R_PASS;
 
-	guid::IncrementUID();
+	GUID::IncrementUID();
 
 	CN(puiIDCounterUpper);
 	CN(puiIDCounterLower);
 
-	*puiIDCounterLower = guid::ms_uiIDCounterLower;
-	*puiIDCounterUpper = guid::ms_uiIDCounterUpper;
+	*puiIDCounterLower = GUID::ms_uiIDCounterLower;
+	*puiIDCounterUpper = GUID::ms_uiIDCounterUpper;
 
 Error:
 	return r;

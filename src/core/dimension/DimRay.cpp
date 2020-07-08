@@ -137,7 +137,7 @@ ray DimRay::GetRay(bool fAbsolute) {
 	point ptOrigin = (RotationMatrix(GetOrientation(fAbsolute)) * m_ptOrigin) + DimObj::GetOrigin(fAbsolute);
 	//point ptOrigin = DimObj::GetOrigin(fAbsolute);
 	
-	vector vDirection = RotationMatrix(GetOrientation(fAbsolute)) * m_vDirection;
+	vector vDirection = (vector)(RotationMatrix(GetOrientation(fAbsolute)) * m_vDirection);
 
 	return ray(ptOrigin, vDirection);
 }

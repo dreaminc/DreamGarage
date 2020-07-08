@@ -1,6 +1,6 @@
 #include "line.h"
 
-#include "Core/Utilities.h"
+#include "core/Utilities.h"
 
 line::line() :
 	m_ptA(),

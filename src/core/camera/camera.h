@@ -34,7 +34,7 @@ class SenseKeyboard;
 
 class composite;
 
-enum EYE_TYPE {
+enum class EYE_TYPE : uint8_t {
 	EYE_LEFT,
 	EYE_RIGHT,
 	EYE_MONO,
@@ -107,7 +107,7 @@ public:
 	bool HasHMD();
 
 	virtual EYE_TYPE GetCameraEye() {
-		return EYE_MONO;
+		return EYE_TYPE::EYE_MONO;
 	}
 
 protected:
@@ -119,7 +119,7 @@ protected:
 	// TODO: Should these go into view port too?
 	camera_precision m_NearPlane;
 	camera_precision m_FarPlane;
-	PROJECTION_MATRIX_TYPE m_ProjectionType;
+	ProjectionMatrix::type m_ProjectionType;
 
 	// TODO: Move to virtual object?
 	// TODO: Should this even be in here?

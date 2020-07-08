@@ -56,7 +56,7 @@ Error:
 std::string CommandLineManager::GetCommandLineArgument(int num) {
 	std::string strRet;
 
-	if (num < m_strCommandLineArguments.size()) {
+	if (num < (int)m_strCommandLineArguments.size()) {
 		strRet = m_strCommandLineArguments[num];
 	}
 

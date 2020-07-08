@@ -10,7 +10,7 @@
 
 #include <string>
 
-#include "core/types/guid.h"
+#include "core/types/GUID.h"
 #include "core/types/version.h"
 
 #include "third_party/json/include/json.hpp"
@@ -59,7 +59,7 @@ public:
 
 private:
 	CloudMessage::type m_type;
-	guid m_GUID;
+	GUID m_GUID;
 	version m_version;
 	std::string m_strToken;
 	

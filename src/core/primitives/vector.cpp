@@ -24,6 +24,14 @@ vector::vector(matrix <vector_precision, 4, 1> &rhs) {
 	this->element(3, 0) = 1.0f;
 }
 
+vector::vector(const matrix <vector_precision, 4, 1> &rhs) {
+	this->clear();
+	this->element(0, 0) = rhs.element(0, 0);
+	this->element(1, 0) = rhs.element(1, 0);
+	this->element(2, 0) = rhs.element(2, 0);
+	this->element(3, 0) = 1.0f;
+}
+
 vector::vector(vector_precision x, vector_precision y, vector_precision z) {
 	this->clear();
 	this->element(0, 0) = x;
@@ -142,6 +150,12 @@ vector vector::ComponentMultiply(vector &lhs, vector &rhs) {
 				  lhs.z() * rhs.z());
 }
 
+vector vector::ComponentMultiply(vector &lhs, vector &&rhs) {
+	return vector(lhs.x() * rhs.x(),
+				  lhs.y() * rhs.y(),
+				  lhs.z() * rhs.z());
+}
+
 // Cross Product
 vector vector::cross(vector rhs) {
 	return vector(*this, rhs);
@@ -186,4 +200,8 @@ vector& vector::operator*=(const vector_precision& a) {
 
 vector vector::operator*(const vector_precision& a) const {
 	return vector(*this).operator*=(a);
+}
+
+vector operator* (const vector_precision lhs, vector &rhs) {
+	return rhs.operator*=(lhs);
 }

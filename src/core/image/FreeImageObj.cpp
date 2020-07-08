@@ -68,8 +68,11 @@ RESULT FreeImageObj::LoadImage() {
 	CN(m_pfiBitmap);
 
 	m_fiColorType = FreeImage_GetColorType(m_pfiBitmap);
-	auto pFIHeaderInfo = FreeImage_GetInfo(m_pfiBitmap);
+
+	BITMAPINFO* pFIHeaderInfo;
+	pFIHeaderInfo = FreeImage_GetInfo(m_pfiBitmap);
 	CN(pFIHeaderInfo);
+
 	memcpy(&m_fiHeaderInfo, pFIHeaderInfo, sizeof(BITMAPINFO));
 
 	m_fiBitsPerPixel = FreeImage_GetBPP(m_pfiBitmap);
@@ -157,7 +160,8 @@ RESULT FreeImageObj::LoadFromMemory() {
 
 	CR(InitializeFreeImage());
 
-	FIMEMORY *pfiMemory = FreeImage_OpenMemory(m_pSourceBuffer, (DWORD)(m_pSourceBuffer_n));
+	FIMEMORY *pfiMemory;
+	pfiMemory = FreeImage_OpenMemory(m_pSourceBuffer, (DWORD)(m_pSourceBuffer_n));
 	CN(pfiMemory);
 
 	// get the file type 

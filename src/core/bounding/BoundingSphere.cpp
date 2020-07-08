@@ -168,7 +168,7 @@ RESULT BoundingSphere::SetHalfVector(vector vHalfVector) {
 	return R_PASS;
 }
 
-vector BoundingSphere::GetHalfVector(bool fAbsolute) {
+vector BoundingSphere::GetHalfVector(UNUSED bool fAbsolute) {
 	//point_precision vecRadiusValue = m_radius / std::sqrt(3);
 	return vector(m_radius);
 }

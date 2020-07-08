@@ -579,7 +579,7 @@ std::shared_ptr<DimObj> DimObj::GetChildObject(int index) {
 
 	auto childrenVector = GetChildren();
 
-	CB(childrenVector.size() > index);
+	CB((int)childrenVector.size() > index);
 
 	{
 		std::shared_ptr<VirtualObj> pVirtualObj = childrenVector[index];
@@ -943,7 +943,7 @@ Error:
 RESULT DimObj::CopyVertices(vertex pVerts[], int pVerts_n) {
 	RESULT r = R_PASS;
 
-	CBM((pVerts_n == NumberVertices()), "Cannot copy %d verts into DimObj with %d verts", pVerts_n, NumberVertices());
+	CBM((pVerts_n == (int)NumberVertices()), "Cannot copy %d verts into DimObj with %d verts", pVerts_n, NumberVertices());
 	for (int i = 0; i < pVerts_n; i++)
 		m_pVertices[i].SetVertex(pVerts[i]);
 

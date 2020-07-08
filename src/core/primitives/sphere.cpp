@@ -100,7 +100,7 @@ Error:
 }
 
 // TODO: Add non triangle based for sphere
-RESULT sphere::SetSphereVertices(BoundingSphere* pBoundingSphere, bool fTriangleBased) {
+RESULT sphere::SetSphereVertices(BoundingSphere* pBoundingSphere, UNUSED bool fTriangleBased) {
 	RESULT r = R_PASS;
 
 	m_params.radius = pBoundingSphere->GetRadius(false) * 1.05f;	// Add a buffer so we can see the reference geometry 
@@ -113,20 +113,29 @@ Error:
 	return r;
 }
 
-RESULT sphere::SetSphereVertices(float radius, int numAngularDivisions, int numVerticalDivisions, point ptOrigin, color c) {
+RESULT sphere::SetSphereVertices(float radius, UNUSED int numAngularDivisions, UNUSED int numVerticalDivisions, point ptOrigin, color c) {
 	RESULT r = R_PASS;
 
-	if (m_params.numAngularDivisions < MIN_SPHERE_DIVISIONS) m_params.numAngularDivisions = MIN_SPHERE_DIVISIONS;
-	if (m_params.numVerticalDivisions < MIN_SPHERE_DIVISIONS) m_params.numVerticalDivisions = MIN_SPHERE_DIVISIONS;
+	if (m_params.numAngularDivisions < MIN_SPHERE_DIVISIONS)
+		m_params.numAngularDivisions = MIN_SPHERE_DIVISIONS;
 
-	CR(Allocate());
+	if (m_params.numVerticalDivisions < MIN_SPHERE_DIVISIONS)
+		m_params.numVerticalDivisions = MIN_SPHERE_DIVISIONS;
 
-	// Vertices 
+	// Vertices
 	int numStrips = m_params.numVerticalDivisions;
 	int numStripDivs = (m_params.numAngularDivisions + 1);
 	int vertCount = 0;
+
+	// Indices
+	int indexCount = 0;
+	int indexStripTop, indexStripBottom;
+
+	// Geometry
 	float thetaDiv = static_cast<float>((2.0f * M_PI) / (m_params.numAngularDivisions));
 	float psiDiv = static_cast<float>((1.0f * M_PI) / (m_params.numVerticalDivisions - 1));
+
+	CR(Allocate());
 
 	for (int i = 0; i < numStrips; i++) {
 		float effPsi = psiDiv * static_cast<float>(i);
@@ -173,8 +182,6 @@ RESULT sphere::SetSphereVertices(float radius, int numAngularDivisions, int numV
 	}
 
 	// Indices
-	int indexCount = 0;
-	int indexStripTop, indexStripBottom;
 
 	for (int i = 0; i < numStrips; i++) {
 

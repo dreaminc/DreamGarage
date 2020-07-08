@@ -43,9 +43,9 @@ public:
 	composite(HALImp *pHALImp);
 
 	// DimObj Interface
-	RESULT Allocate();
-	inline unsigned int NumberVertices();
-	inline unsigned int NumberIndices();
+	virtual RESULT Allocate() override;
+	inline unsigned int NumberVertices() override;
+	inline unsigned int NumberIndices() override;
 
 	RESULT AddObject(std::shared_ptr<DimObj> pDimObj);
 	RESULT ClearObjects();

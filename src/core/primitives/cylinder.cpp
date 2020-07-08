@@ -45,14 +45,17 @@ Error:
 	return;
 }
 
-RESULT cylinder::SetCylinderVertices(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
+RESULT cylinder::SetCylinderVertices(double radius, double height, UNUSED int numAngularDivisions, UNUSED int numVerticalDivisions) {
 	RESULT r = R_PASS;
 
-	if (m_numAngularDivisions < MIN_CYLINDER_DIVISIONS) m_numAngularDivisions = MIN_CYLINDER_DIVISIONS;
-	//if (m_numVerticalDivisions < MIN_CYLINDER_DIVISIONS) m_numVerticalDivisions = MIN_CYLINDER_DIVISIONS;
-	if (m_numVerticalDivisions < 1) m_numVerticalDivisions = 1;
+	if (m_numAngularDivisions < MIN_CYLINDER_DIVISIONS)
+		m_numAngularDivisions = MIN_CYLINDER_DIVISIONS;
 
-	CR(Allocate());
+	//if (m_numVerticalDivisions < MIN_CYLINDER_DIVISIONS)
+	//		m_numVerticalDivisions = MIN_CYLINDER_DIVISIONS;
+
+	if (m_numVerticalDivisions < 1)
+		m_numVerticalDivisions = 1;
 
 	int numStrips = m_numVerticalDivisions + 3;
 	int numStripDivs = (m_numAngularDivisions + 1);
@@ -60,6 +63,8 @@ RESULT cylinder::SetCylinderVertices(double radius, double height, int numAngula
 
 	float thetaDiv = static_cast<float>((2.0f * M_PI) / (m_numAngularDivisions));
 	float heightDiv = static_cast<float>(height / m_numVerticalDivisions);
+
+	CR(Allocate());
 
 	// Bottom strip
 	for (int i = 0; i < 2; i++) {
@@ -157,7 +162,9 @@ RESULT cylinder::SetCylinderVertices(double radius, double height, int numAngula
 	}
 
 	// Indices
-	int indexCount = 0;
+	int indexCount;
+	indexCount = 0;
+
 	int indexStripTop, indexStripBottom;
 
 	// Bottom Strip
