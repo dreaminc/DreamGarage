@@ -595,8 +595,12 @@ RESULT user::UpdateProfilePhoto() {
 	texture *pTexture = nullptr;
 
 	CN(m_pPendingPhotoTextureBuffer);
-	uint8_t* pBuffer = &(m_pPendingPhotoTextureBuffer->operator[](0));
-	size_t pBuffer_n = m_pPendingPhotoTextureBuffer->size();
+
+	uint8_t* pBuffer;
+	pBuffer = &(m_pPendingPhotoTextureBuffer->operator[](0));
+
+	size_t pBuffer_n;
+	pBuffer_n = m_pPendingPhotoTextureBuffer->size();
 
 	pTexture = m_pDreamOS->MakeTextureFromFileBuffer(texture::type::TEXTURE_2D, pBuffer, pBuffer_n);
 	CN(pTexture);
@@ -699,6 +703,11 @@ RESULT user::UpdateHand(const HandState& pHandState) {
 		case HAND_TYPE::HAND_RIGHT: {
 			pHand = m_pRightHand;
 		} break;
+
+		case HAND_TYPE::HAND_INVALID:
+		default: {
+		    //
+		} break;
 	}
 
 	CN(pHand);
@@ -727,8 +736,11 @@ RESULT user::UpdateMouth(float mouthScale) {
 		m_mouthScale = (1.0f - newAmount) * (m_mouthScale) + (newAmount) * (newMouthScale);
 	}
 
-	float numBins = (float)(m_numMouthStates);
-	int rangedValue = (int)(m_mouthScale * numBins);
+    float numBins;
+	numBins = (float)(m_numMouthStates);
+
+    int rangedValue;
+	rangedValue = (int)(m_mouthScale * numBins);
 
 	if (rangedValue > 3) {
 		rangedValue = 3;

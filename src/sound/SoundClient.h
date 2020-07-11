@@ -121,4 +121,4 @@ protected:
 	bool m_fHRTFEnabled = false;
 };
 
-#endif SOUND_CLIENT_H_
+#endif // ! SOUND_CLIENT_H_

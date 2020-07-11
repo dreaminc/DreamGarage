@@ -165,7 +165,8 @@ RESULT model::HandleOnMeshReady(DimObj* pDimObj, void *pContext) {
 
 	CNM(pDimObj, "Incoming DimObj invalid");
 
-	mesh *pMesh = dynamic_cast<mesh*>(pDimObj);
+    mesh *pMesh;
+	pMesh = dynamic_cast<mesh*>(pDimObj);
 	CNM(pMesh, "Incoming mesh invalid");
 
 	// Mesh has been loaded and added to GPU 
@@ -248,7 +249,7 @@ RESULT model::HandleOnMeshReady(DimObj* pDimObj, void *pContext) {
 		CN(pPendingMeshID);
 
 		CBM((std::find(m_pendingMeshIDs.begin(), m_pendingMeshIDs.end(), *pPendingMeshID) != m_pendingMeshIDs.end()), 
-			"Couldn't find pending mesh ID %d", *pPendingMeshID);
+			"Couldn't find pending mesh ID %d", (int)(*pPendingMeshID));
 
 		m_pendingMeshIDs.erase(std::remove(m_pendingMeshIDs.begin(), m_pendingMeshIDs.end(), *pPendingMeshID), m_pendingMeshIDs.end());
 	}
@@ -312,7 +313,7 @@ std::shared_ptr<mesh> model::GetChildMesh(int index) {
 
 	auto childrenVector = GetChildren();
 
-	CB(childrenVector.size() > index);
+	CB(childrenVector.size() > (size_t)(index));
 
 	{
 		std::shared_ptr<VirtualObj> pVirtualObj = childrenVector[index];

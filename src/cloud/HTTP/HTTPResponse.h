@@ -12,7 +12,9 @@
 #include <functional>
 
 // TODO: move into CMake config unless this breaks the build anyways
-#include "third_party/libcurl/curl-7.49.1/include/curl/curl.h"
+//#include "third_party/libcurl/curl-7.49.1/include/curl/curl.h"
+
+class CURL;
 
 class HTTPResponse {
 	friend class HTTPController;

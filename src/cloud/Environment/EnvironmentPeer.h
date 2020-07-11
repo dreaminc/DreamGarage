@@ -21,7 +21,7 @@ public:
 	}
 
 	RESULT PrintEnvironmentPeer() {
-		DEBUG_LINEOUT("User ID %d Environment ID %d", m_userID, m_environmentID);
+		DEBUG_LINEOUT("User ID %d Environment ID %d", (int)m_userID, (int)m_environmentID);
 		DEBUG_LINEOUT("SDP Offer: %s", m_strSDPOffer.c_str());
 		return R_PASS;
 	}

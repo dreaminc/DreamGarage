@@ -4,9 +4,9 @@
 
 #include <string>
 
-#include "Test/TestSuiteFactory.h"
+#include "test/TestSuiteFactory.h"
 
-#include "Sandbox/CommandLineManager.h"
+#include "sandbox/CommandLineManager.h"
 
 // TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
 //#define TESTING
@@ -244,10 +244,12 @@ RESULT DreamTestClient::SaveCameraSettings(point ptPosition, quaternion qOrienta
 	return R_NOT_IMPLEMENTED_WARNING;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch"
 RESULT DreamTestClient::Notify(SenseKeyboardEvent *kbEvent) {
-	RESULT r = R_PASS;
 
 	switch (kbEvent->KeyCode) {
+
 		case (SenseVirtualKey)('N') : {
 			if (kbEvent->KeyState != 0) {
 				//HUD_OUT("Key 'N' is pressed - next test");
@@ -256,9 +258,10 @@ RESULT DreamTestClient::Notify(SenseKeyboardEvent *kbEvent) {
 		} break;
 	}
 
-	//Error:
-	return r;
+//Error:
+	return R_PASS;
 }
+#pragma clang diagnostic pop
 
 RESULT DreamTestClient::Notify(CollisionObjectEvent *oEvent) {
 	RESULT r = R_PASS;

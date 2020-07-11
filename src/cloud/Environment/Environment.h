@@ -26,8 +26,10 @@ public:
 		// empty
 	}
 
+	~Environment() = default;
+
 	RESULT PrintEnvironment() {
-		DEBUG_LINEOUT("Environment ID %d", m_environmentID);
+		DEBUG_LINEOUT("Environment ID %d", (int)m_environmentID);
 		return R_PASS;
 	}
 

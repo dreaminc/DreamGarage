@@ -27,7 +27,7 @@
 #include "WebRTCAudioTrackSink.h"
 #include "WebRTCVideoSink.h"
 
-class WebRTConductor;
+class WebRTCConductor;
 //class WebRTCLocalAudioSource;
 //class WebRTCAudioTrackSink;
 class User;
@@ -128,8 +128,8 @@ protected:
 
 	virtual void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
 	virtual void OnRenegotiationNeeded() override;
-	virtual void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state);
-	virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state);
+	virtual void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state) override;
+	virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override;
 	virtual void OnIceCandidate(const webrtc::IceCandidateInterface* pICECandidate) override;
 	virtual void OnIceConnectionReceivingChange(bool fReceiving) override;
 

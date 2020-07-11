@@ -10,7 +10,7 @@
 // relevant user information (and assets)
 
 #include "memory"                      // for shared_ptr
-#include "xstring"                     // for wstring
+//#include "xstring"                     // for wstring
 #include <map>
 
 #include "os/app/DreamApp.h"
@@ -96,7 +96,7 @@ protected:
 	static DreamUserApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-	virtual RESULT Notify(InteractionObjectEvent *mEvent);
+	virtual RESULT Notify(InteractionObjectEvent *mEvent) override ;
 
 	hand *GetHand(HAND_TYPE type);
 	RESULT SetHand(hand* pHand);
@@ -126,7 +126,7 @@ public:
 
 	// Pointing
 public:
-	virtual RESULT Notify(HysteresisEvent *mEvent);
+	virtual RESULT Notify(HysteresisEvent *mEvent) override ;
 private:
 
 	// Current Hysteresis Event (ON/OFF)

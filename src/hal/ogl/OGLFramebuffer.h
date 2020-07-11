@@ -12,7 +12,7 @@
 
 #include "OGLCommon.h"
 
-#include "core/primitives/Framebuffer.h"
+#include "core/primitives/framebuffer.h"
 
 class OGLImp;
 class OGLTexture;

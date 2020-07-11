@@ -38,4 +38,4 @@ private:
 		
 };
 
-#endif DREAM_APP_HANDLE_H_
+#endif // ! DREAM_APP_HANDLE_H_

@@ -8,6 +8,12 @@
 	#include "hal/ogl/gl/glext.h"
 	//#include "hal/ogl/gl/glext.h"
 	#include "hal/ogl/gl/glcorearb.h"
+#elif defined(__ANDROID__)
+	// EGL
+	#include <EGL/egl.h>
+	#include <EGL/eglext.h>
+	#include <GLES3/gl3.h>
+	#include <GLES3/gl3ext.h>
 #elif defined(__APPLE__)
 	#import <OpenGL/gl.h>
 	#import <OpenGL/glu.h>

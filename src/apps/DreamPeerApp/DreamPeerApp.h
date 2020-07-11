@@ -171,7 +171,7 @@ private:
 	bool m_fVisible = false;
 
 private:
-	PeerConnectionState m_peerConnectionState = {0};
+	PeerConnectionState m_peerConnectionState = {};
 };
 
 #endif // ~ DREAM_PEER_H_

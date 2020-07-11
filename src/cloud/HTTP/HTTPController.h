@@ -14,7 +14,7 @@
 #include <memory>
 
 // TODO: move into CMake config unless this breaks the build anyways
-#include "third_party/libcurl/curl-7.49.1/include/curl/curl.h"
+// #include "third_party/libcurl/curl-7.49.1/include/curl/curl.h"
 
 #include "HTTPResponse.h"
 #include "HTTPRequest.h"
@@ -35,6 +35,8 @@ public:
 	virtual RESULT RequestFile(std::string strURI, std::vector<std::string> strHeaders, std::string strBody, HTTPResponseFileCallback fnResponseFileCallback, void *pContext = nullptr) = 0;
 };
 
+class CURLM;
+class CURL;
 
 class HTTPController : public HTTPControllerProxy {
 public:
@@ -130,7 +132,7 @@ private:
 	std::thread	m_thread;
 	bool m_fRunning;
 
-	CURLM* m_pCURLMultiHandle;
+	CURLM* m_pCURLMultiHandle = nullptr;
 	int m_CURLMultiHandleCount;
 
 	// used as a default response when a response callback is not set

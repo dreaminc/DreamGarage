@@ -27,7 +27,7 @@ text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, text::flags textFlags) 
 	return;
 }
 
-text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText, double width, double height, bool fBillboard) :
+text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, UNUSED const std::string& strText, double width, double height, UNUSED bool fBillboard) :
 	FlatContext(pHALImp),
 	m_width(width),
 	m_height(height),
@@ -44,7 +44,7 @@ text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strT
 	return;
 }
 
-text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText, double lineHeightM, text::flags textFlags) :
+text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, UNUSED const std::string& strText, double lineHeightM, text::flags textFlags) :
 	FlatContext(pHALImp),
 	m_width(1.0f),
 	m_height(1.0f),
@@ -66,7 +66,7 @@ Error:
 	return;
 }
 
-text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText, double width, double height, text::flags textFlags) :
+text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, UNUSED const std::string& strText, double width, double height, text::flags textFlags) :
 	FlatContext(pHALImp),
 	m_width(width),
 	m_height(height),
@@ -140,6 +140,11 @@ VirtualObj* text::SetPosition(point pt, VerticalAlignment vAlign, HorizontalAlig
 		case HorizontalAlignment::RIGHT: {
 			xOffset = m_width / 2;
 		} break;
+
+		case HorizontalAlignment ::INVALID:
+		default: {
+			//
+		} break;
 	}
 
 	switch (m_vAlign) {
@@ -153,6 +158,11 @@ VirtualObj* text::SetPosition(point pt, VerticalAlignment vAlign, HorizontalAlig
 
 		case VerticalAlignment::BOTTOM: {
 			yOffset = -m_height / 2;
+		} break;
+
+		case VerticalAlignment::INVALID:
+		default: {
+			//
 		} break;
 	}
 
@@ -268,7 +278,7 @@ Error:
 
 // TODO: Wrapping will wrap the text if outside of the width
 // set for the object
-RESULT text::SetWrap(bool fWrap) {
+RESULT text::SetWrap(UNUSED bool fWrap) {
 	RESULT r = R_PASS;
 
 	//Error:
@@ -280,7 +290,7 @@ RESULT text::SetWrap(bool fWrap) {
 
 // Incompatible: Scale to fit
 // Compatible: Wrap
-RESULT text::SetFitToSize(bool fFitToSize) {
+RESULT text::SetFitToSize(UNUSED bool fFitToSize) {
 	RESULT r = R_PASS;
 
 	//Error:
@@ -288,7 +298,7 @@ RESULT text::SetFitToSize(bool fFitToSize) {
 }
 
 // TODO: This will set whether or not the text is billboarded
-RESULT text::SetBillboard(bool fBillboard) {
+RESULT text::SetBillboard(UNUSED bool fBillboard) {
 	return R_NOT_IMPLEMENTED_WARNING;
 }
 
@@ -420,22 +430,28 @@ Error:
 RESULT text::CreateLayout(UIKeyboardLayout *pLayout, double marginRatio) {
 	RESULT r = R_PASS;
 
-	// Clear out kids
-	CR(ClearChildren());
-
 	//float posX = 0.0f;
 	float posY = 0.0f;
 
 	float width = 0.0f;
 	//float height = 0.0f;
 
-	float fontImageWidth = static_cast<float>(m_pFont->GetFontTextureWidth());
-	float fontImageHeight = static_cast<float>(m_pFont->GetFontTextureHeight());
-	float fontLineHeight = static_cast<float>(m_pFont->GetFontLineHeight());
+	float fontImageWidth;
+	float fontImageHeight;
+	float fontLineHeight;
 
-	float rowHeight = pLayout->GetRowHeight();
+	float rowHeight;
+	float effLineHeightM;
 
-	float effLineHeightM = GetMSizeFromDots(m_pFont->GetFontLineHeight());
+	// Clear out kids
+	CR(ClearChildren());
+
+	fontImageWidth = static_cast<float>(m_pFont->GetFontTextureWidth());
+	fontImageHeight = static_cast<float>(m_pFont->GetFontTextureHeight());
+	fontLineHeight = static_cast<float>(m_pFont->GetFontLineHeight());
+
+	rowHeight = pLayout->GetRowHeight();
+	effLineHeightM = GetMSizeFromDots(m_pFont->GetFontLineHeight());
 	
 	util::Clamp<double>(marginRatio, 0.0f, 0.5f);
 
@@ -521,8 +537,8 @@ RESULT text::AddCharacter(const std::string& strChar) {
 		strText += strChar;
 	}
 	else {
-		for (int i = 0; i < m_strText.size(); i++) {
-			if (i == m_cursorIndex) {
+		for (int i = 0; i < (int)m_strText.size(); i++) {
+			if (i == (int)m_cursorIndex) {
 				//TODO: add cursor asset
 				strText += strChar;
 			}
@@ -546,8 +562,8 @@ RESULT text::RemoveCharacter() {
 		strText.pop_back();
 	}
 	else {
-		for (int i = 0; i < m_strText.size(); i++) {
-			if (i != m_cursorIndex - 1) {
+		for (int i = 0; i < (int)m_strText.size(); i++) {
+			if (i != (int)m_cursorIndex - 1) {
 				strText += m_strText[i];
 			}
 			else {
@@ -569,6 +585,18 @@ RESULT text::SetText(const std::string& strText) {
 	std::vector<std::shared_ptr<quad>> curLineQuads;
 	std::string strRender = strText;
 
+	float fontLineHeight;
+
+	// Apply DPMM to the width
+	double effectiveDotsWidth;
+	double effectiveDotsHeight;
+
+	// These are in dots
+	float posX;
+	float posY;
+	float fromStartOfWord;
+	float toWord;
+
 	CBR((m_strText.compare(strText) != 0), R_NO_EFFECT);
 
 	// Clear out kids
@@ -578,22 +606,22 @@ RESULT text::SetText(const std::string& strText) {
 
 	m_strText = strText;
 
-	float fontLineHeight = static_cast<float>(m_pFont->GetFontLineHeight());
+	fontLineHeight = static_cast<float>(m_pFont->GetFontLineHeight());
 
 	// Apply DPMM to the width
-	double effectiveDotsWidth = GetDPMM(m_width);
-	double effectiveDotsHeight = GetDPMM(m_height);
+	effectiveDotsWidth = GetDPMM(m_width);
+	effectiveDotsHeight = GetDPMM(m_height);
 
 	// These are in dots 
-	float posX = 0.0f;
-	float posY = 0.0f;
-	float fromStartOfWord = 0.0f;
-	float toWord = 0.0f;
+	posX = 0.0f;
+	posY = 0.0f;
+	fromStartOfWord = 0.0f;
+	toWord = 0.0f;
 
 	if (IsPassword()) {
 		// set m_strText to all * characters during rendering
 		std::string strPassword;
-		for (int i = 0; i < strText.size(); i++) {
+		for (int i = 0; i < (int)strText.size(); i++) {
 			strPassword += "*";
 		}
 		strRender = strPassword;
@@ -609,8 +637,8 @@ RESULT text::SetText(const std::string& strText) {
 		float periodGlyphWidth = GetMSizeFromDots(periodGlyph.width) * m_scaleFactor;
 		float periodWidth = 0.0f;
 
-		for (int i = (int)(strRender.size()) - 1; i >= 0; i--) {
-			char &c = strRender[i];
+		for (int j = (int)(strRender.size()) - 1; j >= 0; j--) {
+			char &c = strRender[j];
 			CharacterGlyph glyph;
 			bool fInWord = false;
 
@@ -698,9 +726,9 @@ RESULT text::SetText(const std::string& strText) {
 							float xOffset = GetMSizeFromDots(toWord) * m_scaleFactor;
 							float yOffset = GetMSizeFromDots(fontLineHeight) * m_scaleFactor;
 
-							for (auto &pQuad : curWordQuads) {
-								pQuad->translateX(-xOffset);
-								pQuad->translateZ(yOffset);		// Note this is in Z because of flat context mechanics
+							for (auto &pQuadInner : curWordQuads) {
+								pQuadInner->translateX(-xOffset);
+								pQuadInner->translateZ(yOffset);		// Note this is in Z because of flat context mechanics
 							}
 
 							posX = fromStartOfWord;
@@ -753,7 +781,7 @@ Error:
 	return r;
 }
 
-RESULT text::AddTrailingEllipsisQuads(float posX, float posY, float posXM, float posYM, std::vector<std::shared_ptr<quad>> curLineQuads) {
+RESULT text::AddTrailingEllipsisQuads(float posX, float posY, float posXM, UNUSED float posYM, std::vector<std::shared_ptr<quad>> curLineQuads) {
 	RESULT r = R_PASS;
 
 	CharacterGlyph periodGlyph; 

@@ -340,7 +340,7 @@ public:
 	typedef std::map<PIndexClass, T_SubscriberVector> T_SubscriberMap;
 	//typedef std::map<PIndexClass, T_EventSubscriber*> T_SubscriberMap;
 
-	typedef std::map<PKeyClass, T_SubscriberMap*, I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT> T_KeyMap;
+	typedef std::map<PKeyClass, T_SubscriberMap*, typename I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT> T_KeyMap;
 
 	T_KeyMap m_indexedEvents;
 };

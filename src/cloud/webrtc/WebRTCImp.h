@@ -11,19 +11,15 @@
 // TODO: CEF will need to be moved to a cross platform implementation
 // and this will be the top level
 
-//#define WIN32_LEAN_AND_MEAN
-
 #include <memory>
 
 #include "WebRTCCommon.h"
 
-#include "third_party/webrtc/include/webrtc/rtc_base/win32socketserver.h"
-
 #include "WebRTCConductor.h"
 
 #include "cloud/CloudImp.h"
-#include "Cloud/User/User.h"
-#include "Cloud/User/TwilioNTSInformation.h"
+#include "cloud/User/User.h"
+#include "cloud/User/TwilioNTSInformation.h"
 
 #include "core/types/Proxy.h"
 
@@ -42,9 +38,12 @@ class WebRTCImp : public CloudImp,
 				  public WebRTCImpProxy
 {
 public:
+
+#ifdef _WIN32
 	enum WindowMessages {
 		UI_THREAD_CALLBACK = WM_APP + 1,
 	};
+#endif
 
 public:
 	class WebRTCObserver {
@@ -79,8 +78,8 @@ public:
 	// CloudImp Interface
 	RESULT Initialize();
 	RESULT RegisterObserver(WebRTCObserver *pWebRTCObserver);
-	RESULT CreateNewURLRequest(std::wstring& strURL);
-	RESULT Update();
+	virtual RESULT CreateNewURLRequest(std::wstring& strURL) override ;
+	virtual RESULT Update() override;
 	virtual User GetUser() override;
 	virtual TwilioNTSInformation GetTwilioNTSInformation() override;
 
@@ -145,16 +144,23 @@ protected:
 	virtual RESULT OnAudioChannel(long peerConnectionID) override;
 
 protected:
+
+    // TODO: Move into proper win32 implementation
+#ifdef _WIN32
 	// WebRTC Specific
 	DWORD GetUIThreadID() { return m_UIThreadID; }
+#endif
 
 private:
 	std::shared_ptr<WebRTCConductor> m_pWebRTCConductor;
-	
+
+// TODO: Move into proper win32 implementation
+#ifdef _WIN32
 	rtc::Win32Thread* m_pWin32thread = nullptr;
 	rtc::Win32SocketServer* m_pWin32SocketServer = nullptr;
-
 	DWORD m_UIThreadID;
+#endif
+
 	std::string m_strServer;
 	WebRTCObserver *m_pWebRTCObserver;
 

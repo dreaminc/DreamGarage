@@ -94,12 +94,12 @@ public:
 	~DreamBrowserApp();
 
 	// DreamApp Interface
-	virtual RESULT InitializeApp(void *pContext = nullptr);
-	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr);
-	virtual RESULT Update(void *pContext = nullptr);
-	virtual RESULT Shutdown(void *pContext = nullptr);
+	virtual RESULT InitializeApp(void *pContext = nullptr) override;
+	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
+	virtual RESULT Update(void *pContext = nullptr) override ;
+	virtual RESULT Shutdown(void *pContext = nullptr) override ;
 
-	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
+	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) override;
 
 	// control events
 	RESULT ScrollBrowserToPoint(int pxXScroll, int pxYScroll);		// Absolute- scroll to this point

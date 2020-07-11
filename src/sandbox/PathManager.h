@@ -136,7 +136,7 @@ public:
 	std::wstring GetDirectoryPathFromFilePath(std::wstring wstrFilePath);
 	std::string GetDirectoryPathFromFilePath(std::string strFilePath);
 
-	bool IsRootPath(wchar_t *pwszRoot, wchar_t *pwszFilename, wchar_t** ppszOptPath = nullptr);
+	bool IsRootPath(const wchar_t *pwszRoot, wchar_t *pwszFilename, wchar_t** ppszOptPath = nullptr);
 	bool IsAbsolutePath(wchar_t *pwszFilename);
 	bool IsDreamPath(wchar_t *pwszFilename, wchar_t** ppszOptPath = nullptr);
 

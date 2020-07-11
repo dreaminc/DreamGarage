@@ -15,7 +15,7 @@
 #include "core/primitives/ray.h"
 
 #include "ActiveObject.h"
-#include "Sense/SenseController.h"
+#include "sense/SenseController.h"
 
 class VirtualObj;
 class ContactPoint;

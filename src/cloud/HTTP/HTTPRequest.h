@@ -9,10 +9,12 @@
 // HTTP Request Object
 
 // TODO: move into CMake config unless this breaks the build anyways
-#include "third_party/libcurl/curl-7.49.1/include/curl/curl.h"
+//#include "third_party/libcurl/curl-7.49.1/include/curl/curl.h"
 
 #include <string>
 #include <vector>
+
+class CURL;
 
 class HTTPRequest {
 public:

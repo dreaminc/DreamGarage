@@ -47,7 +47,7 @@ public:
 	MenuController(Controller* pParentController);
 	~MenuController();
 
-	RESULT Initialize();
+	virtual RESULT Initialize() override;
 
 	RESULT HandleEnvironmentSocketMessage(std::shared_ptr<CloudMessage> pCloudMessage);
 

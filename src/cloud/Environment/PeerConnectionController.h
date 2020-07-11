@@ -73,7 +73,7 @@ public:
 	PeerConnectionController(Controller* pParentController);
 	~PeerConnectionController();
 
-	RESULT Initialize();
+	virtual RESULT Initialize() override;
 	RESULT ClearPeerConnections();
 
 	//RESULT InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel);

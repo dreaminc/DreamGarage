@@ -14,6 +14,11 @@
 #include "cloud/User/User.h"
 #include "cloud/User/TwilioNTSInformation.h"
 
+#if defined(_WIN32)
+	//#define WIN32_LEAN_AND_MEAN
+	#include "third_party/webrtc/include/webrtc/rtc_base/win32socketserver.h"
+#endif
+
 WebRTCImp::WebRTCImp(CloudController *pParentCloudController) :
 	CloudImp(pParentCloudController),
 	m_pWebRTCConductor(nullptr),

@@ -20,7 +20,7 @@
 #include "core/types/Controller.h"
 #include "core/types/ControllerProxy.h"
 
-#include "user/UserFactory.h"
+#include "cloud/User/UserFactory.h"
 
 class Message;
 class UpdateHeadMessage; 
@@ -166,7 +166,7 @@ public:
 	RESULT Start(std::string strUsername, std::string strPassword, long environmentID);
 	RESULT Stop();
 
-	RESULT Initialize();
+	virtual RESULT Initialize() override;
 	RESULT InitializeUser(version ver = 1.0f);
 	RESULT InitializeEnvironment(long environmentID = -1);
 	RESULT CreateNewURLRequest(std::wstring& strURL);

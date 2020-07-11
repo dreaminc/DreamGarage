@@ -15,8 +15,8 @@
 #include <string>
 #include <functional>
 
-#include "Cloud/User/User.h"
-#include "Cloud/User/TwilioNTSInformation.h"
+#include "cloud/User/User.h"
+#include "cloud/User/TwilioNTSInformation.h"
 
 class CloudController;
 
@@ -34,17 +34,15 @@ public:
 		// empty
 	}
 
-	~CloudImp() {
-		// empty
-	}
+	~CloudImp() = default;
 
 	virtual RESULT Update() { return R_NOT_IMPLEMENTED_WARNING; }
-	virtual RESULT CreateNewURLRequest(std::wstring& strURL) { return R_NOT_IMPLEMENTED_WARNING; }
+	virtual RESULT CreateNewURLRequest(UNUSED std::wstring& strURL) { return R_NOT_IMPLEMENTED_WARNING; }
 
 	CloudController* GetParentCloudController() { return m_pParentCloudController; }
 
-	virtual RESULT SetUser(User currentUser) { return R_NOT_IMPLEMENTED_WARNING; };
-	virtual RESULT SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation) { return R_NOT_IMPLEMENTED_WARNING; };
+	virtual RESULT SetUser(UNUSED User currentUser) { return R_NOT_IMPLEMENTED_WARNING; };
+	virtual RESULT SetTwilioNTSInformation(UNUSED TwilioNTSInformation twilioNTSInformation) { return R_NOT_IMPLEMENTED_WARNING; };
 
 
 private:

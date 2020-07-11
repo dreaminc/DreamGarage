@@ -557,7 +557,7 @@ template <typename T>
 T quad::GetCurveBufferArcLength(std::vector<std::pair<T, T>> curveValues) {
 	T retVal = 0;
 
-	for (int i = 1; i < curveValues.size(); i++) {
+	for (int i = 1; i < (int)curveValues.size(); i++) {
 		T xDiff = (curveValues[i].first - curveValues[i - 1].first);
 		T yDiff = (curveValues[i].second - curveValues[i - 1].second);
 		T incDistance = std::sqrt(std::pow(xDiff, 2.0f) + std::pow(yDiff, 2.0f));

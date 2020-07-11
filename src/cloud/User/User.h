@@ -70,8 +70,8 @@ public:
 
 	RESULT PrintUser() {
 
-		DEBUG_LINEOUT("User %d Version %s", m_userID, m_version.GetString().c_str());
-		DEBUG_LINEOUT("Default Environment %d", m_defaultEnvironmentID);
+		DEBUG_LINEOUT("User %d Version %s", (int)m_userID, m_version.GetString().c_str());
+		DEBUG_LINEOUT("Default Environment %d", (int)m_defaultEnvironmentID);
 		DEBUG_LINEOUT("email: %s", m_strEmail.c_str());
 		DEBUG_LINEOUT("screen name: %s", m_strScreenName.c_str());
 		DEBUG_LINEOUT("first name: %s", m_strFirstName.c_str());

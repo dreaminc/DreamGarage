@@ -86,7 +86,7 @@ public:
 		DOSLOG(INFO, "Twilio NTS Information TTL: %d", m_TTL);
 		DOSLOG(INFO, "Created: %s Updated %s", std::ctime(&m_timeCreated), std::ctime(&m_timeUpdated));
 		
-		for (int i = 0; i < m_ICEServerURIs.size(); i++) {
+		for (int i = 0; i < (int)m_ICEServerURIs.size(); i++) {
 			DOSLOG(INFO, "%d: %s", i, m_ICEServerURIs[i].c_str());
 			//DOSLOG(INFO, "%d: Username: %s", i, m_ICEServerUsernames[i].c_str());
 			//DOSLOG(INFO, "%d: Password: %s", i, m_ICEServerPasswords[i].c_str());

@@ -11,7 +11,7 @@
 #include "core/primitives/point.h"
 #include "core/primitives/point2D.h"
 
-#include "sense/SenseGamepadController.h"
+#include "sense/SenseGamePadController.h"
 #include "sense/SenseController.h"
 
 #include "core/hand/HandType.h"

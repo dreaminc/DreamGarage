@@ -56,7 +56,7 @@
 
 // Dream Modules
 
-#include "UI/UIKeyboard.h"
+#include "ui/UIKeyboard.h"
 
 class UIKeyboardLayout;
 class DreamMessage;
@@ -157,18 +157,22 @@ public:
 	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
 
 	HMD *GetHMD();
+
+	// TODO: Need to switch to a kind of 'NativeWindowHandle' type
+#ifdef _WIN32
 	HWND GetDreamHWND();
+#endif
 
 	RESULT RecenterHMD();
 
 	// PeerConnectionObserver
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
-	virtual RESULT OnNewSocketConnection(int seatPosition) = 0;
+	virtual RESULT OnNewSocketConnection(int seatPosition) override = 0;
 	virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) override;
 	virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
-	virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
-	virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
+	virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override = 0;
+	virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
 
@@ -229,11 +233,11 @@ public:
 	}
 
 	//User Observer
-	virtual RESULT OnDreamVersion(version dreamVersion) {
+	virtual RESULT OnDreamVersion(version dreamVersion) override {
 		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
-	virtual RESULT OnAPIConnectionCheck(bool fIsConnected) {
+	virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override {
 		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
@@ -552,7 +556,7 @@ protected:
 protected:
 	RESULT RegisterObjectCollision(VirtualObj *pVirtualObject);
 
-	virtual RESULT Notify(CollisionObjectEvent *oEvent) { return R_PASS; }
+	virtual RESULT Notify(CollisionObjectEvent *oEvent) override { return R_PASS; }
 
 public:
 	RESULT RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);

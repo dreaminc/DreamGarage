@@ -103,9 +103,9 @@ private:
 
 	//SenseKeyboard
 public:
-	RESULT UpdateKeyStates();
+	virtual RESULT UpdateKeyStates() override ;
 	virtual RESULT UpdateKeyState(SenseVirtualKey key, uint8_t keyState) override;
-	RESULT CheckKeyState(SenseVirtualKey key);
+	virtual RESULT CheckKeyState(SenseVirtualKey key) override;
 
 	//Active Keys
 private:

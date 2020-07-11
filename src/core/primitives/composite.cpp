@@ -31,18 +31,6 @@ ClearObjects();
 }
 */
 
-RESULT composite::Allocate() {
-	return R_NOT_IMPLEMENTED_WARNING;
-}
-
-inline unsigned int composite::NumberVertices() {
-	return 0;
-}
-
-inline unsigned int composite::NumberIndices() {
-	return 0;
-}
-
 RESULT composite::AddObject(std::shared_ptr<DimObj> pDimObj) {
 	RESULT r = R_PASS;
 

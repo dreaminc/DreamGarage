@@ -186,40 +186,40 @@ public:
 	virtual quad* MakeQuad(UNUSED float width, UNUSED float height, UNUSED int numHorizontalDivisions, UNUSED int numVerticalDivisions, UNUSED uvcoord uvTopLeft, UNUSED uvcoord uvBottomRight, UNUSED quad::CurveType curveType = quad::CurveType::FLAT, UNUSED vector vNormal = vector::jVector()) { ACBM((false), "MakeQuad not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
 	virtual sphere* MakeSphere(UNUSED float radius = 1.0f, UNUSED int numAngularDivisions = 3, UNUSED int numVerticalDivisions = 3, UNUSED color c = color(COLOR_WHITE)) { ACBM((false), "MakeSphere not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) { ACBM((false), "MakeCylinder not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual DimRay* MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) { ACBM((false), "MakeRay not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual DimPlane* MakePlane(point ptOrigin, vector vNormal) { ACBM((false), "MakePlane not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual cylinder* MakeCylinder(UNUSED double radius, UNUSED double height, UNUSED int numAngularDivisions, UNUSED int numVerticalDivisions) { ACBM((false), "MakeCylinder not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual DimRay* MakeRay(UNUSED point ptOrigin, UNUSED vector vDirection, UNUSED float step, UNUSED bool fDirectional) { ACBM((false), "MakeRay not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual DimPlane* MakePlane(UNUSED point ptOrigin, UNUSED vector vNormal) { ACBM((false), "MakePlane not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 	
-	virtual volume* MakeVolume(double side, bool fTriangleBased = true) { ACBM((false), "MakeVolume not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) { ACBM((false), "MakeVolume not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual volume* MakeVolume(UNUSED double side, UNUSED bool fTriangleBased = true) { ACBM((false), "MakeVolume not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual volume* MakeVolume(UNUSED double width, UNUSED double length, UNUSED double height, UNUSED bool fTriangleBased = true) { ACBM((false), "MakeVolume not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
-	virtual text *MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE) { ACBM((false), "MakeText not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM = 0.25f, text::flags textFlags = text::flags::NONE) { ACBM((false), "MakeText not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 0.25f, text::flags textFlags = text::flags::NONE) { ACBM((false), "MakeText not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual text* MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) { ACBM((false), "MakeText not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual text* MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) { ACBM((false), "MakeText not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual text* MakeText(const std::wstring& wstrFontName, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) { ACBM((false), "MakeText not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual text *MakeText(UNUSED std::shared_ptr<font> pFont, UNUSED UIKeyboardLayout *pLayout, UNUSED double margin, UNUSED text::flags textFlags = text::flags::NONE) { ACBM((false), "MakeText not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual text *MakeText(UNUSED std::shared_ptr<font> pFont, UNUSED const std::string& strContent, UNUSED double lineHeightM = 0.25f, UNUSED text::flags textFlags = text::flags::NONE) { ACBM((false), "MakeText not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual text *MakeText(UNUSED std::shared_ptr<font> pFont, UNUSED const std::string& strContent, UNUSED double width = 1.0f, UNUSED double height = 0.25f, UNUSED text::flags textFlags = text::flags::NONE) { ACBM((false), "MakeText not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual text* MakeText(UNUSED std::shared_ptr<font> pFont, UNUSED const std::string& strContent, UNUSED double width = 1.0f, UNUSED double height = 1.0f, UNUSED bool fDistanceMap = false, UNUSED bool fBillboard = false) { ACBM((false), "MakeText not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual text* MakeText(UNUSED std::shared_ptr<font> pFont, UNUSED texture *pFontTexture, UNUSED const std::string& strContent, UNUSED double width = 1.0f, UNUSED double height = 1.0f, UNUSED bool fDistanceMap = false, UNUSED bool fBillboard = false) { ACBM((false), "MakeText not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual text* MakeText(UNUSED const std::wstring& wstrFontName, UNUSED const std::string& strContent, UNUSED double width = 1.0f, UNUSED double height = 1.0f, UNUSED bool fDistanceMap = false, UNUSED bool fBillboard = false) { ACBM((false), "MakeText not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
-	virtual texture* MakeTexture(const texture &srcTexture) { ACBM((false), "MakeTexture not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual texture* MakeTexture(texture::type type, const wchar_t *pszFilename) { ACBM((false), "MakeTexture not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual texture* MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) { ACBM((false), "MakeTexture not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual texture *MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) { ACBM((false), "MakeTextureFromFileBuffer not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual texture* MakeTexture(UNUSED const texture &srcTexture) { ACBM((false), "MakeTexture not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual texture* MakeTexture(UNUSED texture::type type, UNUSED const wchar_t *pszFilename) { ACBM((false), "MakeTexture not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual texture* MakeTexture(UNUSED texture::type type, UNUSED int width, UNUSED int height, UNUSED PIXEL_FORMAT pixelFormat, UNUSED int channels, UNUSED void *pBuffer, UNUSED int pBuffer_n) { ACBM((false), "MakeTexture not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual texture *MakeTextureFromFileBuffer(UNUSED texture::type type, UNUSED uint8_t *pBuffer, UNUSED size_t pBuffer_n) { ACBM((false), "MakeTextureFromFileBuffer not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
-	virtual cubemap* MakeCubemap(const std::wstring &wstrCubemapName) { ACBM((false), "MakeCubemap not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual cubemap* MakeCubemap(UNUSED const std::wstring &wstrCubemapName) { ACBM((false), "MakeCubemap not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
 	virtual skybox *MakeSkybox() { ACBM((false), "MakeSkybox not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
 	//virtual model *MakeModel(wchar_t *pszModelName) = 0;
 
-	virtual mesh *MakeMesh(const std::vector<vertex>& vertices) { ACBM((false), "MakeMesh not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual mesh *MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) { ACBM((false), "MakeMesh not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual mesh *MakeMesh(UNUSED const std::vector<vertex>& vertices) { ACBM((false), "MakeMesh not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual mesh *MakeMesh(UNUSED const std::vector<vertex>& vertices, UNUSED const std::vector<dimindex>& indices) { ACBM((false), "MakeMesh not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
 	//virtual composite* MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) = 0;
 
 	// TODO: Fix this
 	//virtual composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f)) = 0;
 
-	virtual billboard *MakeBillboard(point ptOrigin, float width, float height) { ACBM((false), "MakeBillboard not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual billboard *MakeBillboard(UNUSED point ptOrigin, UNUSED float width, UNUSED float height) { ACBM((false), "MakeBillboard not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
 	// Composite
 	//template<typename... Targs>
@@ -232,13 +232,13 @@ public:
 	virtual composite *MakeComposite() { ACBM((false), "MakeComposite not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 	virtual model *MakeModel() { ACBM((false), "MakeModel not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
-	virtual FlatContext* MakeFlatContext(int pxFBWidth, int pxFBHeight, int channels) { ACBM((false), "MakeFlatContext not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual FlatContext* MakeFlatContext(UNUSED int pxFBWidth, UNUSED int pxFBHeight, UNUSED int channels) { ACBM((false), "MakeFlatContext not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
 
 	// TODO: These shouldn't be a thing - definitely not at the HAL abstraction layer
 	virtual user *MakeUser() { ACBM((false), "MakeUser not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual hand* MakeHand(HAND_TYPE type) { ACBM((false), "MakeHand not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
-	virtual hand* MakeHand(HAND_TYPE type, long avatarID) { ACBM((false), "MakeHand not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual hand* MakeHand(UNUSED HAND_TYPE type) { ACBM((false), "MakeHand not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual hand* MakeHand(UNUSED HAND_TYPE type, UNUSED long avatarID) { ACBM((false), "MakeHand not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 
 protected:	
 	// TODO: This should not be here either

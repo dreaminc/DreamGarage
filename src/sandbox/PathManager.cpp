@@ -552,7 +552,7 @@ std::string PathManager::GetDirectoryPathFromFilePath(std::string strFilePath) {
 	return strFilePath.substr(0, strFilePath.find_last_of("\\/")) + "\\";
 }
 
-bool PathManager::IsRootPath(wchar_t *pwszRoot, wchar_t *pwszFilename, wchar_t** ppszOptPath) {
+bool PathManager::IsRootPath(const wchar_t *pwszRoot, wchar_t *pwszFilename, wchar_t** ppszOptPath) {
 	wchar_t *pwszFirst = nullptr;
 	bool fRetVal = false;
 
@@ -675,7 +675,7 @@ Error:
 	return r;
 }
 
-RESULT PathManager::GetFileVersionThatExists(PATH_VALUE_TYPE type, version versionFile, const wchar_t *pszFileName, version *versionFileExists) {
+RESULT PathManager::GetFileVersionThatExists(PATH_VALUE_TYPE type, version versionFile, UNUSED const wchar_t *pszFileName, version *versionFileExists) {
 	RESULT r = R_PASS;
 	std::list<wchar_t*> *pListDirs = new std::list<wchar_t*>();
 	version maxVersion = 0;
@@ -801,7 +801,8 @@ FILE* PathManager::OpenFile(PATH_VALUE_TYPE type, wchar_t* pszFilename, wchar_t*
 	}
 
 	// Load file from path
-	pFile = _wfopen(pszFilePath, pszOpenMode);
+	//pFile = _wfopen((const char *)(pszFilePath), (const char *)(pszOpenMode));
+	pFile = fopen((const char *)(pszFilePath), (const char *)(pszOpenMode));
 	CN(pFile);
 
 	return pFile;

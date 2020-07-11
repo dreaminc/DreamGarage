@@ -39,6 +39,7 @@
 #include "sense/SenseMouse.h"
 #include "sense/SenseController.h"
 #include "sense/SenseGamePadController.h"
+#include "sense/SenseLeapMotion.h"
 
 #include "hmd/HMD.h"                                   
 #include "hmd/HMDFactory.h"
@@ -87,6 +88,7 @@ class SenseLeapMotion;
 class PhysicsEngine;
 class InteractionEngine;
 class DreamAppManager;
+class DreamModuleManager;
 
 template <typename SEventClass> class Subscriber;
 

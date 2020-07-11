@@ -262,11 +262,11 @@ public:
 		return sound::type::INVALID;
 	}
 
-	inline virtual RESULT ReadNextValue(int channel, CBType &value) { 
+	inline virtual RESULT ReadNextValue(int channel, CBType &value) override {
 		return m_ppCircularBuffers[channel]->ReadNextValue(value);
 	}
 
-	RESULT IncrementBuffer(int numFrames) {
+	virtual RESULT IncrementBuffer(int numFrames) override {
 		RESULT r = R_PASS;
 
 		// This will block
@@ -322,7 +322,7 @@ public:
 		return r;
 	}
 
-	RESULT PushMonoAudioBuffer(int numFrames, SoundBuffer *pSourceBuffer) {
+	virtual RESULT PushMonoAudioBuffer(int numFrames, SoundBuffer *pSourceBuffer) override {
 		RESULT r = R_PASS;
 
 		CBM((pSourceBuffer->GetType() == GetType()), "Don't currently support different type buffer pushes");
@@ -342,7 +342,7 @@ public:
 	}
 
 	// Pushes interlaced data
-	RESULT PushData(CBType *pDataBuffer, int numFrames, int samplingRate) {
+	virtual RESULT PushData(CBType *pDataBuffer, int numFrames, int samplingRate) override {
 		RESULT r = R_PASS;
 
 		int sampleCount = 0;
@@ -486,7 +486,7 @@ public:
 	}
 
 	// Pushes interlaced data
-	RESULT MixData(CBType *pDataBuffer, int numFrames, int samplingRate, float usOffset) {
+	virtual RESULT MixData(CBType *pDataBuffer, int numFrames, int samplingRate, float usOffset) override {
 		RESULT r = R_PASS;
 
 		int sampleCount = 0;

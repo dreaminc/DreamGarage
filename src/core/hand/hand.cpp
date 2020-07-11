@@ -71,7 +71,7 @@ Error:
 RESULT hand::PendCreateHandModel(long avatarModelID) {
 	RESULT r = R_PASS;
 
-	CBM(avatarModelID >= 1 && avatarModelID <= NUM_AVATARS, "invalid avatar model id %d", avatarModelID);
+	CBM(avatarModelID >= 1 && avatarModelID <= NUM_AVATARS, "invalid avatar model id %d", (int)avatarModelID);
 	
 	m_fLoadHandModel = true;
 	m_avatarModelId = avatarModelID;
@@ -200,7 +200,8 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 	CN(pDreamOS);
 	m_pDreamOS = pDreamOS;
 
-	auto pHMD = m_pDreamOS->GetHMD();
+	HMD *pHMD;
+	pHMD = m_pDreamOS->GetHMD();
 	CNR(pHMD, R_SKIPPED);
 
 	m_pController = pHMD->GetSenseControllerObject((ControllerType)(m_handType));
@@ -211,62 +212,69 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 
 	//TODO: several unique positioning variables per device here that aren't used anywhere else
 	switch (pHMD->GetDeviceType()) {
-	case (HMDDeviceType::OCULUS): {
+		case (HMDDeviceType::OCULUS): {
 
-		float scale = OVR_OVERLAY_SCALE;
-		float overlayAspect = OVR_OVERLAY_ASPECT_RATIO;
-		float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
-		m_pDreamOS->AddObjectToUIGraph(m_pController);
-		// re-enable if overlays are used again
-		/*
-		m_pOverlayQuad = m_pController->AddQuad(scale / overlayAspect, scale);
-		m_pOverlayQuad->SetPosition(point(scale * t * OVR_OVERLAY_POSITION_X, 
-										scale * OVR_OVERLAY_POSITION_Y, 
-										scale * OVR_OVERLAY_POSITION_Z));
-		m_pOverlayQuad->SetVisible(false);
-		//*/
+			float scale = OVR_OVERLAY_SCALE;
+			float overlayAspect = OVR_OVERLAY_ASPECT_RATIO;
+			float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
+			m_pDreamOS->AddObjectToUIGraph(m_pController);
+			// re-enable if overlays are used again
+			/*
+			m_pOverlayQuad = m_pController->AddQuad(scale / overlayAspect, scale);
+			m_pOverlayQuad->SetPosition(point(scale * t * OVR_OVERLAY_POSITION_X,
+											scale * OVR_OVERLAY_POSITION_Y,
+											scale * OVR_OVERLAY_POSITION_Z));
+			m_pOverlayQuad->SetVisible(false);
+			//*/
 
-		m_distance = 0.2f;
-		m_angle = -23.0f * (float)(M_PI) / 180.0f;
+			m_distance = 0.2f;
+			m_angle = -23.0f * (float)(M_PI) / 180.0f;
 
-	} break;
-	case (HMDDeviceType::VIVE): {
+		} break;
 
-		float scale = VIVE_OVERLAY_SCALE;
-		float overlayAspect = VIVE_ASPECT_RATIO;
-		float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
+		case (HMDDeviceType::VIVE): {
 
-		m_pDreamOS->AddObjectToUIGraph(m_pController);
-		// re-enable if overlays are used again
-		/*
-		m_pOverlayQuad = m_pController->AddQuad(scale / overlayAspect, scale);
-		m_pOverlayQuad->SetPosition(point(scale * t * VIVE_OVERLAY_POSITION_X, 
-										scale * VIVE_OVERLAY_POSITION_Y, 
-										scale * VIVE_OVERLAY_POSITION_Z));
-		m_pOverlayQuad->SetVisible(false);
-		//*/
+			float scale = VIVE_OVERLAY_SCALE;
+			float overlayAspect = VIVE_ASPECT_RATIO;
+			float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
 
-		m_distance = 0.2f;
-		m_angle = -60.0f * (float)(M_PI) / 180.0f;
+			m_pDreamOS->AddObjectToUIGraph(m_pController);
+			// re-enable if overlays are used again
+			/*
+			m_pOverlayQuad = m_pController->AddQuad(scale / overlayAspect, scale);
+			m_pOverlayQuad->SetPosition(point(scale * t * VIVE_OVERLAY_POSITION_X,
+											scale * VIVE_OVERLAY_POSITION_Y,
+											scale * VIVE_OVERLAY_POSITION_Z));
+			m_pOverlayQuad->SetVisible(false);
+			//*/
 
-	} break;
-	case (HMDDeviceType::META): {
-		float scale = VIVE_OVERLAY_SCALE;
-		float overlayAspect = VIVE_ASPECT_RATIO;
-		float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
-		/*
-		m_pOverlayQuad = m_pController->AddQuad(scale / overlayAspect, scale);
-		m_pDreamOS->AddObjectToUIGraph(m_pController);
-		m_pOverlayQuad->SetPosition(point(scale * t * VIVE_OVERLAY_POSITION_X,
-			scale * VIVE_OVERLAY_POSITION_Y,
-			scale * VIVE_OVERLAY_POSITION_Z));
-		m_pOverlayQuad->SetVisible(false);
-		//*/
+			m_distance = 0.2f;
+			m_angle = -60.0f * (float)(M_PI) / 180.0f;
 
-		m_distance = 0.0f;
-		m_angle = 0.0f;
+		} break;
 
-	} break;
+		case (HMDDeviceType::META): {
+			float scale = VIVE_OVERLAY_SCALE;
+			float overlayAspect = VIVE_ASPECT_RATIO;
+			float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
+			/*
+			m_pOverlayQuad = m_pController->AddQuad(scale / overlayAspect, scale);
+			m_pDreamOS->AddObjectToUIGraph(m_pController);
+			m_pOverlayQuad->SetPosition(point(scale * t * VIVE_OVERLAY_POSITION_X,
+				scale * VIVE_OVERLAY_POSITION_Y,
+				scale * VIVE_OVERLAY_POSITION_Z));
+			m_pOverlayQuad->SetVisible(false);
+			//*/
+
+			m_distance = 0.0f;
+			m_angle = 0.0f;
+
+		} break;
+
+		case (HMDDeviceType::NONE):
+		default: {
+			CBM(false, "HMD Type unhandled");
+		} break;
 	}
 
 	m_headOffset = point(0.0f, m_distance * sin(m_angle), -m_distance * cos(m_angle));
@@ -352,26 +360,39 @@ RESULT hand::SetModelState(ModelState modelState) {
 	}
 
 	switch (m_modelState) {
-	case ModelState::HAND: {
-		if (m_pModel != nullptr) {
-			HideModel();
-		}
-	} break;
-	case ModelState::CONTROLLER: {
-		HideController();
-	} break;
+		case ModelState::HAND: {
+			if (m_pModel != nullptr) {
+				HideModel();
+			}
+		} break;
+
+		case ModelState::CONTROLLER: {
+			HideController();
+		} break;
+
+		case ModelState::INVALID:
+		default: {
+			//
+		} break;
 	}
 
 	switch (modelState) {
-	case ModelState::HAND: {
-		if (m_pModel != nullptr) {
-			ShowModel();
-		}
-	} break;
-	case ModelState::CONTROLLER: {
-		ShowController();
-	//	ShowObject(m_pController, HAND_ANIMATION_DURATION);
-	} break;
+
+		case ModelState::HAND: {
+			if (m_pModel != nullptr) {
+				ShowModel();
+			}
+		} break;
+
+		case ModelState::CONTROLLER: {
+			ShowController();
+		//	ShowObject(m_pController, HAND_ANIMATION_DURATION);
+		} break;
+
+		case ModelState::INVALID:
+		default: {
+			//
+		} break;
 	}
 
 	m_modelState = modelState;
@@ -392,16 +413,22 @@ RESULT hand::Update() {
 	}
 
 	switch (m_modelState) {
-	case ModelState::HAND: {
-		if (m_pModel != nullptr) {
-			m_pModel->SetVisible(m_fTracked);
-		}
-	} break;
-	case ModelState::CONTROLLER: {
-		m_pController->SetVisible(m_fTracked);
-		m_pHead->SetVisible(m_fTracked);
-		//m_pHMDComposite->SetVisible(m_fTracked, false);
-	} break;
+		case ModelState::HAND: {
+			if (m_pModel != nullptr) {
+				m_pModel->SetVisible(m_fTracked);
+			}
+		} break;
+
+		case ModelState::CONTROLLER: {
+			m_pController->SetVisible(m_fTracked);
+			m_pHead->SetVisible(m_fTracked);
+			//m_pHMDComposite->SetVisible(m_fTracked, false);
+		} break;
+
+		case ModelState::INVALID:
+		default: {
+			//
+		} break;
 	}
 
 Error:
@@ -514,7 +541,8 @@ HandState hand::GetHandState() {
 		GetPosition(true),
 		GetOrientation(true),
 		m_handType,
-		m_fTracked
+		m_fTracked,
+		0, 0
 	};
 
 	return handState;

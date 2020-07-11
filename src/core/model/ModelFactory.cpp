@@ -22,7 +22,7 @@
 #include "core/primitives/Vertex.h"
 #include "core/primitives/color.h"
 
-std::vector<texture*> MakeTexturesFromAssetImporterMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiTextureType textureType, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
+std::vector<texture*> MakeTexturesFromAssetImporterMaterial(model *pModel, UNUSED std::shared_ptr<mesh> pMesh, aiTextureType textureType, aiMaterial *pAIMaterial, UNUSED const aiScene *pAIScene) {
 	RESULT r = R_PASS;
 	std::vector<texture*> retTextures;
 
@@ -83,7 +83,7 @@ Error:
 	return std::vector<std::wstring>();
 }
 
-RESULT ProcessAssetImporterMeshMaterial(model *pModel, aiMaterial *pAIMaterial, const aiScene *pAIScene, mesh::params *pMeshParams) {
+RESULT ProcessAssetImporterMeshMaterial(model *pModel, aiMaterial *pAIMaterial, UNUSED const aiScene *pAIScene, mesh::params *pMeshParams) {
 	RESULT r = R_PASS;
 
 	aiColor4D aic;
@@ -480,7 +480,9 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 	CNM(pModel, "Failed to load model");
 
 	// Load model from disk
-	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(pModel->GetModelFilePath()), GetAssImpFlags(modelFactoryFlags));
+	const aiScene *pAIScene;
+	pAIScene = assetImporter.ReadFile(util::WideStringToString(pModel->GetModelFilePath()), GetAssImpFlags(modelFactoryFlags));
+
 	CNM(pAIScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());
 	CBM(((pAIScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) == 0), "Asset Importer Scene Incomplete: %s", assetImporter.GetErrorString());
 	CNM(pAIScene->mRootNode, "Asset Importer scene root is null: %s", assetImporter.GetErrorString());
@@ -501,7 +503,7 @@ Error:
 	return nullptr;
 }
 
-model *ModelFactory::MakeModel(DreamOS *pDOS, PrimParams *pPrimParams, bool fInitialize) {
+model *ModelFactory::MakeModel(DreamOS *pDOS, PrimParams *pPrimParams, UNUSED bool fInitialize) {
 	RESULT r = R_PASS;
 
 	model *pModel = nullptr;
@@ -515,7 +517,9 @@ model *ModelFactory::MakeModel(DreamOS *pDOS, PrimParams *pPrimParams, bool fIni
 	CR(pModel->SetDreamOS(pDOS));
 
 	// Load model from disk
-	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(pModel->GetModelFilePath()), GetAssImpFlags(pModelParams->modelFactoryFlags));
+	const aiScene *pAIScene;
+	pAIScene = assetImporter.ReadFile(util::WideStringToString(pModel->GetModelFilePath()), GetAssImpFlags(pModelParams->modelFactoryFlags));
+
 	CNM(pAIScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());
 	CBM(((pAIScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) == 0), "Asset Importer Scene Incomplete: %s", assetImporter.GetErrorString());
 	CNM(pAIScene->mRootNode, "Asset Importer scene root is null: %s", assetImporter.GetErrorString());

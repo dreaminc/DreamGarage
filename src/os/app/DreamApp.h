@@ -139,9 +139,9 @@ public:
 
 	~DreamApp() = default;
 
-	virtual RESULT InitializeApp(void *pContext = nullptr) = 0;
-	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) = 0;
-	virtual RESULT Update(void *pContext = nullptr) = 0;
+	virtual RESULT InitializeApp(void *pContext = nullptr) override = 0;
+	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override = 0;
+	virtual RESULT Update(void *pContext = nullptr) override = 0;
 
 protected:
 	//vector GetCameraLookXZ();

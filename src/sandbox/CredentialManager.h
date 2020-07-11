@@ -20,8 +20,8 @@ public:
 		CREDENTIAL_INVALID
 	};
 
-	CredentialManager() {};	// empty
-	~CredentialManager() {};
+	CredentialManager() = default;
+	virtual ~CredentialManager() = default;
 
 public:
 	// virtuals

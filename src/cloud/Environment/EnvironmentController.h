@@ -147,7 +147,7 @@ public:
 	~EnvironmentController();
 
 public:
-	RESULT Initialize();
+	virtual RESULT Initialize() override;
 
 	RESULT ConnectToEnvironmentSocket(User user, long environmentID);
 	RESULT DisconnectFromEnvironmentSocket();
@@ -204,7 +204,7 @@ public:
 
 	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override { return R_NOT_IMPLEMENTED_WARNING; }
 
-	long GetUserID();
+	virtual long GetUserID() override;
 
 	// TODO: Temporary 
 	//RESULT InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel);
