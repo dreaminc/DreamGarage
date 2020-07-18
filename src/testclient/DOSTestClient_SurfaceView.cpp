@@ -2120,7 +2120,7 @@ extern "C" {
 // Activity lifecycle
 
 JNIEXPORT jlong JNICALL
-Java_com_dos_testclient_GLES3JNILib_onCreate(JNIEnv *pJNIEnvironment, UNUSED jobject pJObj, jobject pJObjActivity) {
+Java_com_dos_testclient_GLES3JNILib_onCreate_old(JNIEnv *pJNIEnvironment, UNUSED jobject pJObj, jobject pJObjActivity) {
     ALOGV("    GLES3JNILibActivity::onCreate()");
 
     // Create the App Thread (entry point for the application)
@@ -2136,7 +2136,7 @@ Java_com_dos_testclient_GLES3JNILib_onCreate(JNIEnv *pJNIEnvironment, UNUSED job
 }
 
 JNIEXPORT void JNICALL
-Java_com_dos_testclient_GLES3JNILib_onStart(UNUSED JNIEnv *pJNIEnvironment, UNUSED jobject pJObj, jlong handle) {
+Java_com_dos_testclient_GLES3JNILib_onStart_old(UNUSED JNIEnv *pJNIEnvironment, UNUSED jobject pJObj, jlong handle) {
 
     ALOGV("    GLES3JNILib::onStart()");
 
@@ -2147,7 +2147,7 @@ Java_com_dos_testclient_GLES3JNILib_onStart(UNUSED JNIEnv *pJNIEnvironment, UNUS
 }
 
 JNIEXPORT void JNICALL
-Java_com_dos_testclient_GLES3JNILib_onResume(UNUSED JNIEnv *pJNIEnvironment, UNUSED jobject pJObj, jlong handle) {
+Java_com_dos_testclient_GLES3JNILib_onResume_old(UNUSED JNIEnv *pJNIEnvironment, UNUSED jobject pJObj, jlong handle) {
 
     ALOGV("    GLES3JNILib::onResume()");
 
@@ -2158,7 +2158,7 @@ Java_com_dos_testclient_GLES3JNILib_onResume(UNUSED JNIEnv *pJNIEnvironment, UNU
 }
 
 JNIEXPORT void JNICALL
-Java_com_dos_testclient_GLES3JNILib_onPause(UNUSED JNIEnv *pJNIEnvironment, UNUSED jobject pJObj, jlong handle) {
+Java_com_dos_testclient_GLES3JNILib_onPause_old(UNUSED JNIEnv *pJNIEnvironment, UNUSED jobject pJObj, jlong handle) {
 
     ALOGV("    GLES3JNILib::onPause()");
 
@@ -2169,7 +2169,7 @@ Java_com_dos_testclient_GLES3JNILib_onPause(UNUSED JNIEnv *pJNIEnvironment, UNUS
 }
 
 JNIEXPORT void JNICALL
-Java_com_dos_testclient_GLES3JNILib_onStop(UNUSED JNIEnv *pJNIEnvironment, UNUSED jobject pJObj, jlong handle) {
+Java_com_dos_testclient_GLES3JNILib_onStop_old(UNUSED JNIEnv *pJNIEnvironment, UNUSED jobject pJObj, jlong handle) {
 
     ALOGV("    GLES3JNILib::onStop()");
 
@@ -2180,7 +2180,7 @@ Java_com_dos_testclient_GLES3JNILib_onStop(UNUSED JNIEnv *pJNIEnvironment, UNUSE
 }
 
 JNIEXPORT void JNICALL
-Java_com_dos_testclient_GLES3JNILib_onDestroy(JNIEnv *pJNIEnvironment, UNUSED jobject pJObj, jlong handle) {
+Java_com_dos_testclient_GLES3JNILib_onDestroy_old(JNIEnv *pJNIEnvironment, UNUSED jobject pJObj, jlong handle) {
 
     ALOGV("    GLES3JNILib::onDestroy()");
 
@@ -2196,7 +2196,7 @@ Java_com_dos_testclient_GLES3JNILib_onDestroy(JNIEnv *pJNIEnvironment, UNUSED jo
 
 // Surface lifecycle
 
-JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceCreated(
+JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceCreated_old(
         JNIEnv *pJNIEnvironment,
         UNUSED jobject pJObj,
         jlong handle,
@@ -2222,7 +2222,7 @@ JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceCreated(
     ovrMessageQueue_PostMessage(&appThread->MessageQueue, &message);
 }
 
-JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceChanged(
+JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceChanged_old(
         JNIEnv *pJNIEnvironment,
         UNUSED jobject pJObj,
         jlong handle,
@@ -2263,7 +2263,7 @@ JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceChanged(
     }
 }
 
-JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceDestroyed(
+JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceDestroyed_old(
         UNUSED JNIEnv *pJNIEnvironment,
         UNUSED jobject pJObj,
         jlong handle)
@@ -2280,7 +2280,7 @@ JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceDestroyed(
 
 // Input
 
-JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onKeyEvent(
+JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onKeyEvent_old(
         UNUSED JNIEnv *pJNIEnvironment,
         UNUSED jobject pJObj,
         jlong handle,

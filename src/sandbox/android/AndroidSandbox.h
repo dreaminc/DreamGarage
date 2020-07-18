@@ -16,8 +16,9 @@
 
 #include <functional>
 
+//#include "hmd/HMD.h"
+
 #include "sandbox/Sandbox.h"
-#include "hmd/HMD.h"
 
 #define DEFAULT_WIDTH 1920 / 2
 #define DEFAULT_HEIGHT 1080 / 2

@@ -110,58 +110,58 @@ extern "C" {
 
 // Activity lifecycle
 
-JNIEXPORT jlong JNICALL Java_com_dos_testclient_GLES3JNILib_onCreate(
+JNIEXPORT jlong JNICALL Java_com_dos_testclient_GLES3JNILib_onCreate_old(
 	JNIEnv* pJNIEnvironment, 
 	jobject pJObj, 
 	jobject pJObjActivity);
 
-JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onStart(
+JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onStart_old(
 	JNIEnv* pJNIEnvironment, 
 	jobject pJObj, 
 	jlong handle);
 
-JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onResume(
+JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onResume_old(
 	JNIEnv* pJNIEnvironment, 
 	jobject pJObj, 
 	jlong handle);
 
-JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onPause(
+JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onPause_old(
 	JNIEnv* pJNIEnvironment, 
 	jobject pJObj, 
 	jlong handle);
 
-JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onStop(
+JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onStop_old(
 	JNIEnv* pJNIEnvironment, 
 	jobject pJObj, 
 	jlong handle);
 
-JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onDestroy(
+JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onDestroy_old(
 	JNIEnv* pJNIEnvironment, 
 	jobject pJObj, 
 	jlong handle);
 
 // Surface lifecycle
 
-JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceCreated(
+JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceCreated_old(
 	JNIEnv* pJNIEnvironment,
 	jobject pJObj,
 	jlong handle,
 	jobject pJObjSurface);
 
-JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceChanged(
+JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceChanged_old(
 	JNIEnv* pJNIEnvironment,
 	jobject pJObj,
 	jlong handle,
 	jobject pJObjSurface);
 
-JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceDestroyed(
+JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onSurfaceDestroyed_old(
 	JNIEnv* pJNIEnvironment,
 	jobject pJObj,
 	jlong handle);
 
 // Input
 
-JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onKeyEvent(
+JNIEXPORT void JNICALL Java_com_dos_testclient_GLES3JNILib_onKeyEvent_old(
 	JNIEnv* pJNIEnvironment,
 	jobject pJObj,
 	jlong handle,
