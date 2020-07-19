@@ -1,3 +1,0 @@
-dos/src/cmakelists.txt clang
-dos/src/testclient/cmakelists.txt clang
-Configuring done
