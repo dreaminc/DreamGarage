@@ -1,4 +1,4 @@
 rootProject.projectDir = new File(settingsDir, '../..')
 rootProject.name = "DreamGarage_TestClient"
 
-include ':', 'Project:Android'
+include 'Project:Android'

@@ -15,7 +15,7 @@ typedef struct {
     bool EXT_texture_border_clamp; // GL_EXT_texture_border_clamp, GL_OES_texture_border_clamp
 } OpenGLExtensions_t;
 
-OpenGLExtensions_t glExtensions;
+OpenGLExtensions_t glExtensions; sdf
 
 static void EglInitExtensions() {
     const char* allExtensions = (const char*)glGetString(GL_EXTENSIONS);

@@ -1,7 +1,6 @@
 **/.cxx
 **/.gradle
 **/build
-**/gradle
 
 *.keystore
 local.properties

@@ -203,7 +203,7 @@ IF(ANDROID)
 
     target_link_libraries(testclient core)
     #target_link_libraries(testclient os)
-    #target_link_libraries(testclient sandbox)
+    target_link_libraries(testclient sandbox)
     #target_link_libraries(testclient test)
     #target_link_libraries(testclient logger)
     #target_link_libraries(testclient modules)
