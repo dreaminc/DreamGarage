@@ -169,6 +169,7 @@ IF(ANDROID)
     # The Android Build    
 
     add_subdirectory(core)
+    add_subdirectory(logger)
     #add_subdirectory(sandbox)
     add_subdirectory(testclient)
 

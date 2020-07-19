@@ -1,5 +1,6 @@
 {
   "buildFiles": [
+    "C:\\dev\\DreamGarage\\src\\logger\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\core\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\CMakeLists.txt",
@@ -21,6 +22,13 @@
       "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\testclient\\ndk-helpers\\ndkHelperBin\\Debug\\x86_64\\libnative_app_glue.a",
       "runtimeFiles": []
     },
+    "logger-Debug-x86_64": {
+      "artifactName": "logger",
+      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\" logger",
+      "abi": "x86_64",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\logger\\liblogger.a",
+      "runtimeFiles": []
+    },
     "NdkHelper-Debug-x86_64": {
       "artifactName": "NdkHelper",
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\" NdkHelper",
@@ -33,7 +41,11 @@
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\" TestClientNativeActivity",
       "abi": "x86_64",
       "output": "C:\\dev\\DreamGarage\\Android\\testclient\\build\\intermediates\\cmake\\debug\\obj\\x86_64\\libTestClientNativeActivity.so",
-      "runtimeFiles": []
+      "runtimeFiles": [
+        "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\testclient\\ndk-helpers\\ndkHelperBin\\Debug\\x86_64\\libNdkHelper.a",
+        "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\core\\libcore.a",
+        "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\testclient\\ndk-helpers\\ndkHelperBin\\Debug\\x86_64\\libnative_app_glue.a"
+      ]
     },
     "core-Debug-x86_64": {
       "artifactName": "core",

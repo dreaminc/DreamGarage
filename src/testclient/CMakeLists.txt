@@ -238,6 +238,7 @@ IF(ANDROID)
         PRIVATE
             NdkHelper
             core
+            logger
             #sandbox
     )
 

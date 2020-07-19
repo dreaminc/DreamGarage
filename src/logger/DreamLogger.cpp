@@ -1,6 +1,6 @@
 #include "DreamLogger.h"
 
-#include "Sandbox/PathManager.h"
+#include "sandbox/PathManager.h"
 
 #include <ctime>
 
@@ -19,11 +19,11 @@ INITIALIZE_EASYLOGGINGPP
 // Init the singleton
 DreamLogger* DreamLogger::s_pInstance = nullptr;
 
+// TODO: Replace these with the proper path manager stuff
 #if (defined(_WIN32) || defined(_WIN64))
 	//extern char* GetCommandLineA();
 	//extern unsigned long GetModuleFileNameA(void*, char*, unsigned long);
 
-	// TODO: Replace these with the proper path manager stuff
 	std::string GetPathOfExecutible() {
 		char szPathResult[MAX_PATH];
 		return std::string(szPathResult, GetModuleFileNameA(nullptr, szPathResult, MAX_PATH));
@@ -44,9 +44,31 @@ DreamLogger* DreamLogger::s_pInstance = nullptr;
 	uint32_t GetProcessID() {
 		return GetCurrentProcessId();
 	}
-#endif
+#elif defined(ANDROID)
+	#define MAX_PATH 260
 
-#if (defined(__linux) || defined(__linux__))
+	std::string GetPathOfExecutible() {
+		char result[PATH_MAX];
+		ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+		return std::string(result, (count > 0) ? count : 0);
+	}
+
+	std::string GetFolderPathOfExecutible() {
+		std::string strExecPath = GetPathOfExecutible();
+		auto slashPosition = strExecPath.find_last_of("\\/");
+		return strExecPath.substr(0, slashPosition);
+	}
+
+	std::string GetCommandLineString() {
+		// TODO: Not imp.
+		return "";
+	}
+
+	uint32_t GetProcessID() {
+		// TODO: Not imp.
+		return 0;
+	}
+#elif (defined(__linux) || defined(__linux__))
 	#include <string>
 	#include <limits.h>
 	#include <unistd.h>
@@ -55,6 +77,12 @@ DreamLogger* DreamLogger::s_pInstance = nullptr;
 		char result[PATH_MAX];
 		ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
 		return std::string(result, (count > 0) ? count : 0);
+	}
+
+	std::string GetFolderPathOfExecutible() {
+		std::string strExecPath = GetPathOfExecutible();
+		auto slashPosition = strExecPath.find_last_of("\\/");
+		return strExecPath.substr(0, slashPosition);
 	}
 
 	std::string GetCommandLineString() {
@@ -87,7 +115,7 @@ RESULT DreamLogger::Flush() {
 	if (m_pDreamLogger != nullptr)
 		m_pDreamLogger->flush();
 	else
-		R_NOT_INITIALIZED;
+		return R_NOT_INITIALIZED;
 
 	return R_PASS;
 }

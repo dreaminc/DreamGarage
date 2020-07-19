@@ -95,3 +95,6 @@
 48727	68786	616896428	src/core/CMakeFiles/core.dir/user/dosuser.cpp.o	4f342313a49bb158
 68786	79676	616896439	src/core/libcore.a	f7923c4f687f7711
 79676	80603	616896440	../../../../build/intermediates/cmake/debug/obj/arm64-v8a/libTestClientNativeActivity.so	baef0cc3d80d0f45
+12	3751	616898225	src/logger/CMakeFiles/logger.dir/DreamLogger.cpp.o	9610673417779dbc
+3751	3976	616898225	src/logger/liblogger.a	b59223096a45d402
+3976	4297	616898225	../../../../build/intermediates/cmake/debug/obj/arm64-v8a/libTestClientNativeActivity.so	17c14402b06161c2

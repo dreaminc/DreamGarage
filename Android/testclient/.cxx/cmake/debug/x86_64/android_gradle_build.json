@@ -2,11 +2,13 @@
   "stringTable": {
     "0": "C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86_64",
     "1": "--target=x86_64-none-linux-android21 --gcc-toolchain=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -I../../../../../../src/third_party/webrtc/include/webrtc -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info -D_DEBUG -D_CONSOLE -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DENABLE_WEBRTC=1 -DENABLE_MEDIA_ROUTER=1 -DENABLE_PEPPER_CDMS -DENABLE_SRTP=0 -D_USE_MATH_DEFINES -DCEF_AUDIO_MIRROR -DDOS_BASE_FILE=%(Filename)%(Extension) -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -fPIC -include C:/dev/DreamGarage/src/core/config.h",
-    "2": "--target=x86_64-none-linux-android21 --gcc-toolchain=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DTestClientNativeActivity_EXPORTS -DUNICODE -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -I../../../../../../src/third_party/webrtc/include/webrtc -I../../../../../../src/third_party/openvr/headers -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/testclient/ndk-helpers/ndk_helper -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -DNDEBUG -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCEF_AUDIO_MIRROR -DSTAGING_BUILD -DDOS_BASE_FILE__=%(Filename)%(Extension) -DWEBRTC_POSIX -D_DEBUG -D_CONSOLE -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DENABLE_WEBRTC=1 -DENABLE_MEDIA_ROUTER=1 -DENABLE_PEPPER_CDMS -DENABLE_SRTP=0 -D_USE_MATH_DEFINES -DCEF_AUDIO_MIRROR -DDOS_BASE_FILE=%(Filename)%(Extension) -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -fPIC -include C:/dev/DreamGarage/src/core/config.h -include C:/dev/DreamGarage/src/core/config.h -std=c++11",
-    "3": "--target=x86_64-none-linux-android21 --gcc-toolchain=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -I../../../../../../src/third_party/webrtc/include/webrtc -I../../../../../../src/third_party/openvr/headers -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -O0 -fno-limit-debug-info -fPIC -include C:/dev/DreamGarage/src/core/config.h -include C:/dev/DreamGarage/src/core/config.h",
-    "4": "--target=x86_64-none-linux-android21 --gcc-toolchain=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -I../../../../../../src/third_party/webrtc/include/webrtc -I../../../../../../src/third_party/openvr/headers -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/testclient/ndk-helpers/ndk_helper -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -DNDEBUG -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCEF_AUDIO_MIRROR -DSTAGING_BUILD -DDOS_BASE_FILE__=%(Filename)%(Extension) -DWEBRTC_POSIX -D_DEBUG -D_CONSOLE -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DENABLE_WEBRTC=1 -DENABLE_MEDIA_ROUTER=1 -DENABLE_PEPPER_CDMS -DENABLE_SRTP=0 -D_USE_MATH_DEFINES -DCEF_AUDIO_MIRROR -DDOS_BASE_FILE=%(Filename)%(Extension) -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -fPIC -include C:/dev/DreamGarage/src/core/config.h -include C:/dev/DreamGarage/src/core/config.h -std=c++11"
+    "2": "--target=x86_64-none-linux-android21 --gcc-toolchain=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info -D_DEBUG -D_CONSOLE -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DENABLE_WEBRTC=1 -DENABLE_MEDIA_ROUTER=1 -DENABLE_PEPPER_CDMS -DENABLE_SRTP=0 -D_USE_MATH_DEFINES -DCEF_AUDIO_MIRROR -DDOS_BASE_FILE=%(Filename)%(Extension) -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -fPIC -include C:/dev/DreamGarage/src/core/config.h",
+    "3": "--target=x86_64-none-linux-android21 --gcc-toolchain=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DTestClientNativeActivity_EXPORTS -DUNICODE -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -I../../../../../../src/third_party/webrtc/include/webrtc -I../../../../../../src/third_party/openvr/headers -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/testclient/ndk-helpers/ndk_helper -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -DNDEBUG -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCEF_AUDIO_MIRROR -DSTAGING_BUILD -DDOS_BASE_FILE__=%(Filename)%(Extension) -DWEBRTC_POSIX -D_DEBUG -D_CONSOLE -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DENABLE_WEBRTC=1 -DENABLE_MEDIA_ROUTER=1 -DENABLE_PEPPER_CDMS -DENABLE_SRTP=0 -D_USE_MATH_DEFINES -DCEF_AUDIO_MIRROR -DDOS_BASE_FILE=%(Filename)%(Extension) -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -fPIC -include C:/dev/DreamGarage/src/core/config.h -include C:/dev/DreamGarage/src/core/config.h -std=c++11",
+    "4": "--target=x86_64-none-linux-android21 --gcc-toolchain=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -I../../../../../../src/third_party/webrtc/include/webrtc -I../../../../../../src/third_party/openvr/headers -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -O0 -fno-limit-debug-info -fPIC -include C:/dev/DreamGarage/src/core/config.h -include C:/dev/DreamGarage/src/core/config.h",
+    "5": "--target=x86_64-none-linux-android21 --gcc-toolchain=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -I../../../../../../src/third_party/webrtc/include/webrtc -I../../../../../../src/third_party/openvr/headers -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/testclient/ndk-helpers/ndk_helper -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -DNDEBUG -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCEF_AUDIO_MIRROR -DSTAGING_BUILD -DDOS_BASE_FILE__=%(Filename)%(Extension) -DWEBRTC_POSIX -D_DEBUG -D_CONSOLE -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DENABLE_WEBRTC=1 -DENABLE_MEDIA_ROUTER=1 -DENABLE_PEPPER_CDMS -DENABLE_SRTP=0 -D_USE_MATH_DEFINES -DCEF_AUDIO_MIRROR -DDOS_BASE_FILE=%(Filename)%(Extension) -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -fPIC -include C:/dev/DreamGarage/src/core/config.h -include C:/dev/DreamGarage/src/core/config.h -std=c++11"
   },
   "buildFiles": [
+    "C:\\dev\\DreamGarage\\src\\logger\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\core\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\CMakeLists.txt",
@@ -30,12 +32,34 @@
       "files": [
         {
           "src": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\sources\\android\\native_app_glue\\android_native_app_glue.c",
-          "flagsOrdinal": 3,
+          "flagsOrdinal": 4,
           "workingDirectoryOrdinal": 0
         }
       ],
       "headers": [],
       "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\testclient\\ndk-helpers\\ndkHelperBin\\Debug\\x86_64\\libnative_app_glue.a",
+      "runtimeFiles": []
+    },
+    "logger-Debug-x86_64": {
+      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\" logger",
+      "buildType": "debug",
+      "toolchain": "2949140636",
+      "abi": "x86_64",
+      "artifactName": "logger",
+      "files": [
+        {
+          "src": "C:\\dev\\DreamGarage\\src\\logger\\DreamLogger.cpp",
+          "flagsOrdinal": 2,
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "headers": [
+        {
+          "header": "C:\\dev\\DreamGarage\\src\\logger\\DreamLogger.h",
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\logger\\liblogger.a",
       "runtimeFiles": []
     },
     "NdkHelper-Debug-x86_64": {
@@ -47,52 +71,52 @@
       "files": [
         {
           "src": "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\gestureDetector.cpp",
-          "flagsOrdinal": 4,
+          "flagsOrdinal": 5,
           "workingDirectoryOrdinal": 0
         },
         {
           "src": "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\gl3stub.cpp",
-          "flagsOrdinal": 4,
+          "flagsOrdinal": 5,
           "workingDirectoryOrdinal": 0
         },
         {
           "src": "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\GLContext.cpp",
-          "flagsOrdinal": 4,
+          "flagsOrdinal": 5,
           "workingDirectoryOrdinal": 0
         },
         {
           "src": "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\interpolator.cpp",
-          "flagsOrdinal": 4,
+          "flagsOrdinal": 5,
           "workingDirectoryOrdinal": 0
         },
         {
           "src": "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\JNIHelper.cpp",
-          "flagsOrdinal": 4,
+          "flagsOrdinal": 5,
           "workingDirectoryOrdinal": 0
         },
         {
           "src": "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\perfMonitor.cpp",
-          "flagsOrdinal": 4,
+          "flagsOrdinal": 5,
           "workingDirectoryOrdinal": 0
         },
         {
           "src": "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\sensorManager.cpp",
-          "flagsOrdinal": 4,
+          "flagsOrdinal": 5,
           "workingDirectoryOrdinal": 0
         },
         {
           "src": "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\shader.cpp",
-          "flagsOrdinal": 4,
+          "flagsOrdinal": 5,
           "workingDirectoryOrdinal": 0
         },
         {
           "src": "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\tapCamera.cpp",
-          "flagsOrdinal": 4,
+          "flagsOrdinal": 5,
           "workingDirectoryOrdinal": 0
         },
         {
           "src": "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\vecmath.cpp",
-          "flagsOrdinal": 4,
+          "flagsOrdinal": 5,
           "workingDirectoryOrdinal": 0
         }
       ],
@@ -109,12 +133,12 @@
       "files": [
         {
           "src": "C:\\dev\\DreamGarage\\src\\testclient\\TestClientRenderer.cpp",
-          "flagsOrdinal": 2,
+          "flagsOrdinal": 3,
           "workingDirectoryOrdinal": 0
         },
         {
           "src": "C:\\dev\\DreamGarage\\src\\testclient\\TestClientNativeActivity.cpp",
-          "flagsOrdinal": 2,
+          "flagsOrdinal": 3,
           "workingDirectoryOrdinal": 0
         }
       ],
@@ -125,7 +149,11 @@
         }
       ],
       "output": "C:\\dev\\DreamGarage\\Android\\testclient\\build\\intermediates\\cmake\\debug\\obj\\x86_64\\libTestClientNativeActivity.so",
-      "runtimeFiles": []
+      "runtimeFiles": [
+        "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\testclient\\ndk-helpers\\ndkHelperBin\\Debug\\x86_64\\libNdkHelper.a",
+        "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\core\\libcore.a",
+        "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\testclient\\ndk-helpers\\ndkHelperBin\\Debug\\x86_64\\libnative_app_glue.a"
+      ]
     },
     "core-Debug-x86_64": {
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\" core",

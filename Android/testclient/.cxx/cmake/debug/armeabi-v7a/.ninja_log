@@ -118,3 +118,6 @@
 29	6605	616895659	src/core/CMakeFiles/core.dir/user/dosuser.cpp.o	6f982ff70514fdd4
 15	900	616895681	src/core/libcore.a	e169ed0c1bf8602d
 34	575	616896359	../../../../build/intermediates/cmake/debug/obj/armeabi-v7a/libTestClientNativeActivity.so	9ce8d051bab4cc7b
+15	3812	616898220	src/logger/CMakeFiles/logger.dir/DreamLogger.cpp.o	393a2d2ad5cc0fbe
+3812	4352	616898221	src/logger/liblogger.a	ead3c1af3a647d4e
+4352	4610	616898221	../../../../build/intermediates/cmake/debug/obj/armeabi-v7a/libTestClientNativeActivity.so	7a0041ac73264530

@@ -1,5 +1,6 @@
 {
   "buildFiles": [
+    "C:\\dev\\DreamGarage\\src\\logger\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\core\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\CMakeLists.txt",
@@ -14,6 +15,13 @@
   ],
   "buildTargetsCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
+    "logger-Debug-arm64-v8a": {
+      "artifactName": "logger",
+      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\" logger",
+      "abi": "arm64-v8a",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\\src\\logger\\liblogger.a",
+      "runtimeFiles": []
+    },
     "NdkHelper-Debug-arm64-v8a": {
       "artifactName": "NdkHelper",
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\" NdkHelper",
@@ -33,7 +41,11 @@
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\" TestClientNativeActivity",
       "abi": "arm64-v8a",
       "output": "C:\\dev\\DreamGarage\\Android\\testclient\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a\\libTestClientNativeActivity.so",
-      "runtimeFiles": []
+      "runtimeFiles": [
+        "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\\src\\testclient\\ndk-helpers\\ndkHelperBin\\Debug\\arm64-v8a\\libNdkHelper.a",
+        "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\\src\\core\\libcore.a",
+        "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\\src\\testclient\\ndk-helpers\\ndkHelperBin\\Debug\\arm64-v8a\\libnative_app_glue.a"
+      ]
     },
     "native_app_glue-Debug-arm64-v8a": {
       "artifactName": "native_app_glue",

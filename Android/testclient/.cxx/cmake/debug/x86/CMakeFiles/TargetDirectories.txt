@@ -5,6 +5,9 @@ C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86/src/CMakeFiles/rebuil
 C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86/src/core/CMakeFiles/core.dir
 C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86/src/core/CMakeFiles/edit_cache.dir
 C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86/src/core/CMakeFiles/rebuild_cache.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86/src/logger/CMakeFiles/rebuild_cache.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86/src/logger/CMakeFiles/logger.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86/src/logger/CMakeFiles/edit_cache.dir
 C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86/src/testclient/CMakeFiles/edit_cache.dir
 C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86/src/testclient/CMakeFiles/TestClientNativeActivity.dir
 C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86/src/testclient/CMakeFiles/rebuild_cache.dir

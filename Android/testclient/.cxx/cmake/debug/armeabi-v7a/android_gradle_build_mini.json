@@ -1,5 +1,6 @@
 {
   "buildFiles": [
+    "C:\\dev\\DreamGarage\\src\\logger\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\core\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\CMakeLists.txt",
@@ -44,6 +45,13 @@
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\armeabi-v7a\" NdkHelper",
       "abi": "armeabi-v7a",
       "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\armeabi-v7a\\src\\testclient\\ndk-helpers\\ndkHelperBin\\Debug\\armeabi-v7a\\libNdkHelper.a",
+      "runtimeFiles": []
+    },
+    "logger-Debug-armeabi-v7a": {
+      "artifactName": "logger",
+      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\armeabi-v7a\" logger",
+      "abi": "armeabi-v7a",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\armeabi-v7a\\src\\logger\\liblogger.a",
       "runtimeFiles": []
     }
   }

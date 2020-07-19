@@ -567,6 +567,60 @@ build src/core/rebuild_cache: phony src/core/CMakeFiles/rebuild_cache.util
 
 
 #############################################
+# Utility command for rebuild_cache
+
+build src/logger/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\dev\DreamGarage\Android\testclient\.cxx\cmake\debug\x86_64\src\logger && C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -HC:\dev\DreamGarage -BC:\dev\DreamGarage\Android\testclient\.cxx\cmake\debug\x86_64"
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+build src/logger/rebuild_cache: phony src/logger/CMakeFiles/rebuild_cache.util
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target logger
+
+
+#############################################
+# Order-only phony target for logger
+
+build cmake_object_order_depends_target_logger: phony
+build src/logger/CMakeFiles/logger.dir/DreamLogger.cpp.o: CXX_COMPILER__logger ../../../../../../src/logger/DreamLogger.cpp || cmake_object_order_depends_target_logger
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE
+  DEP_FILE = src\logger\CMakeFiles\logger.dir\DreamLogger.cpp.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -D_DEBUG -D_CONSOLE -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DENABLE_WEBRTC=1 -DENABLE_MEDIA_ROUTER=1 -DENABLE_PEPPER_CDMS -DENABLE_SRTP=0 -D_USE_MATH_DEFINES -DCEF_AUDIO_MIRROR -DDOS_BASE_FILE="%(Filename)%(Extension)" -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -fPIC   -include C:/dev/DreamGarage/src/core/config.h
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include
+  OBJECT_DIR = src\logger\CMakeFiles\logger.dir
+  OBJECT_FILE_DIR = src\logger\CMakeFiles\logger.dir
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target logger
+
+
+#############################################
+# Link the static library src\logger\liblogger.a
+
+build src/logger/liblogger.a: CXX_STATIC_LIBRARY_LINKER__logger src/logger/CMakeFiles/logger.dir/DreamLogger.cpp.o
+  LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -D_DEBUG -D_CONSOLE -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DENABLE_WEBRTC=1 -DENABLE_MEDIA_ROUTER=1 -DENABLE_PEPPER_CDMS -DENABLE_SRTP=0 -D_USE_MATH_DEFINES -DCEF_AUDIO_MIRROR -DDOS_BASE_FILE="%(Filename)%(Extension)" -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec
+  OBJECT_DIR = src\logger\CMakeFiles\logger.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_FILE = src\logger\liblogger.a
+  TARGET_PDB = logger.a.dbg
+
+#############################################
+# Utility command for edit_cache
+
+build src/logger/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\dev\DreamGarage\Android\testclient\.cxx\cmake\debug\x86_64\src\logger && C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+build src/logger/edit_cache: phony src/logger/CMakeFiles/edit_cache.util
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# C:/dev/DreamGarage/src/CMakeLists.txt
+# =============================================================================
+
+
+#############################################
 # Utility command for edit_cache
 
 build src/testclient/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
@@ -581,7 +635,7 @@ build src/testclient/edit_cache: phony src/testclient/CMakeFiles/edit_cache.util
 #############################################
 # Order-only phony target for TestClientNativeActivity
 
-build cmake_object_order_depends_target_TestClientNativeActivity: phony || cmake_object_order_depends_target_NdkHelper cmake_object_order_depends_target_core cmake_object_order_depends_target_native_app_glue
+build cmake_object_order_depends_target_TestClientNativeActivity: phony || cmake_object_order_depends_target_NdkHelper cmake_object_order_depends_target_core cmake_object_order_depends_target_logger cmake_object_order_depends_target_native_app_glue
 build src/testclient/CMakeFiles/TestClientNativeActivity.dir/TestClientRenderer.cpp.o: CXX_COMPILER__TestClientNativeActivity ../../../../../../src/testclient/TestClientRenderer.cpp || cmake_object_order_depends_target_TestClientNativeActivity
   DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DTestClientNativeActivity_EXPORTS -DUNICODE
   DEP_FILE = src\testclient\CMakeFiles\TestClientNativeActivity.dir\TestClientRenderer.cpp.o.d
@@ -604,10 +658,10 @@ build src/testclient/CMakeFiles/TestClientNativeActivity.dir/TestClientNativeAct
 #############################################
 # Link the shared library ..\..\..\..\build\intermediates\cmake\debug\obj\x86_64\libTestClientNativeActivity.so
 
-build ../../../../build/intermediates/cmake/debug/obj/x86_64/libTestClientNativeActivity.so: CXX_SHARED_LIBRARY_LINKER__TestClientNativeActivity src/testclient/CMakeFiles/TestClientNativeActivity.dir/TestClientRenderer.cpp.o src/testclient/CMakeFiles/TestClientNativeActivity.dir/TestClientNativeActivity.cpp.o | src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libNdkHelper.a src/core/libcore.a src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libnative_app_glue.a || src/core/libcore.a src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libNdkHelper.a src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libnative_app_glue.a
+build ../../../../build/intermediates/cmake/debug/obj/x86_64/libTestClientNativeActivity.so: CXX_SHARED_LIBRARY_LINKER__TestClientNativeActivity src/testclient/CMakeFiles/TestClientNativeActivity.dir/TestClientRenderer.cpp.o src/testclient/CMakeFiles/TestClientNativeActivity.dir/TestClientNativeActivity.cpp.o | src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libNdkHelper.a src/core/libcore.a src/logger/liblogger.a src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libnative_app_glue.a || src/core/libcore.a src/logger/liblogger.a src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libNdkHelper.a src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libnative_app_glue.a
   LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -DNDEBUG -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCEF_AUDIO_MIRROR -DSTAGING_BUILD -DDOS_BASE_FILE__="%(Filename)%(Extension)" -DWEBRTC_POSIX -D_DEBUG -D_CONSOLE -D__STD_C -D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DENABLE_WEBRTC=1 -DENABLE_MEDIA_ROUTER=1 -DENABLE_PEPPER_CDMS -DENABLE_SRTP=0 -D_USE_MATH_DEFINES -DCEF_AUDIO_MIRROR -DDOS_BASE_FILE="%(Filename)%(Extension)" -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec
   LINK_FLAGS = -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments   -u ANativeActivity_onCreate
-  LINK_LIBRARIES = src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libNdkHelper.a src/core/libcore.a src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libnative_app_glue.a -lGLESv2 -lEGL -llog -landroid -latomic -latomic -lm
+  LINK_LIBRARIES = src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libNdkHelper.a src/core/libcore.a src/logger/liblogger.a src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libnative_app_glue.a -lGLESv2 -lEGL -llog -landroid -latomic -latomic -lm
   OBJECT_DIR = src\testclient\CMakeFiles\TestClientNativeActivity.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -781,7 +835,9 @@ build core: phony src/core/libcore.a
 build libNdkHelper.a: phony src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libNdkHelper.a
 build libTestClientNativeActivity.so: phony ../../../../build/intermediates/cmake/debug/obj/x86_64/libTestClientNativeActivity.so
 build libcore.a: phony src/core/libcore.a
+build liblogger.a: phony src/logger/liblogger.a
 build libnative_app_glue.a: phony src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libnative_app_glue.a
+build logger: phony src/logger/liblogger.a
 build native_app_glue: phony src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/libnative_app_glue.a
 # =============================================================================
 # Folder targets.
@@ -792,13 +848,19 @@ build native_app_glue: phony src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_6
 #############################################
 # Folder: C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86_64/src
 
-build  src/all: phony src/core/all src/testclient/all
+build  src/all: phony src/core/all src/logger/all src/testclient/all
 # =============================================================================
 
 #############################################
 # Folder: C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86_64/src/core
 
 build  src/core/all: phony core
+# =============================================================================
+
+#############################################
+# Folder: C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/x86_64/src/logger
+
+build  src/logger/all: phony logger
 # =============================================================================
 
 #############################################
@@ -818,7 +880,7 @@ build  src/testclient/ndk-helpers/ndkHelperBin/Debug/x86_64/all: phony native_ap
 #############################################
 # The main all target.
 
-build all: phony src/core/libcore.a ../../../../build/intermediates/cmake/debug/obj/x86_64/libTestClientNativeActivity.so
+build all: phony src/core/libcore.a src/logger/liblogger.a ../../../../build/intermediates/cmake/debug/obj/x86_64/libTestClientNativeActivity.so
 
 #############################################
 # Make the all target the default.
@@ -828,13 +890,13 @@ default all
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | ../../../../../../CMakeLists.txt ../../../../../../src/CMakeLists.txt ../../../../../../src/core/CMakeLists.txt ../../../../../../src/core/config.h.in ../../../../../../src/testclient/CMakeLists.txt ../../../../../../src/testclient/ndk-helpers/ndk_helper/CMakeLists.txt C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/AndroidNdkModules.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/android.toolchain.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/platforms.cmake CMakeCache.txt CMakeFiles/3.10.2/CMakeCCompiler.cmake CMakeFiles/3.10.2/CMakeCXXCompiler.cmake CMakeFiles/3.10.2/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE | ../../../../../../CMakeLists.txt ../../../../../../src/CMakeLists.txt ../../../../../../src/core/CMakeLists.txt ../../../../../../src/core/config.h.in ../../../../../../src/logger/CMakeLists.txt ../../../../../../src/testclient/CMakeLists.txt ../../../../../../src/testclient/ndk-helpers/ndk_helper/CMakeLists.txt C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/AndroidNdkModules.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/android.toolchain.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/platforms.cmake CMakeCache.txt CMakeFiles/3.10.2/CMakeCCompiler.cmake CMakeFiles/3.10.2/CMakeCXXCompiler.cmake CMakeFiles/3.10.2/CMakeSystem.cmake
   pool = console
 
 #############################################
 # A missing CMake input file is not an error.
 
-build ../../../../../../CMakeLists.txt ../../../../../../src/CMakeLists.txt ../../../../../../src/core/CMakeLists.txt ../../../../../../src/core/config.h.in ../../../../../../src/testclient/CMakeLists.txt ../../../../../../src/testclient/ndk-helpers/ndk_helper/CMakeLists.txt C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/AndroidNdkModules.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/android.toolchain.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/platforms.cmake CMakeCache.txt CMakeFiles/3.10.2/CMakeCCompiler.cmake CMakeFiles/3.10.2/CMakeCXXCompiler.cmake CMakeFiles/3.10.2/CMakeSystem.cmake: phony
+build ../../../../../../CMakeLists.txt ../../../../../../src/CMakeLists.txt ../../../../../../src/core/CMakeLists.txt ../../../../../../src/core/config.h.in ../../../../../../src/logger/CMakeLists.txt ../../../../../../src/testclient/CMakeLists.txt ../../../../../../src/testclient/ndk-helpers/ndk_helper/CMakeLists.txt C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/AndroidNdkModules.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/android.toolchain.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/platforms.cmake CMakeCache.txt CMakeFiles/3.10.2/CMakeCCompiler.cmake CMakeFiles/3.10.2/CMakeCXXCompiler.cmake CMakeFiles/3.10.2/CMakeSystem.cmake: phony
 
 #############################################
 # Clean all the built files.

@@ -146,8 +146,8 @@
     <content url="file://$MODULE_DIR$/../../../../src/core/user">
       <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/user" isTestSource="false" />
     </content>
-    <content url="file://$MODULE_DIR$/../../../../src/sandbox">
-      <sourceFolder url="file://$MODULE_DIR$/../../../../src/sandbox" isTestSource="false" />
+    <content url="file://$MODULE_DIR$/../../../../src/logger">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/logger" isTestSource="false" />
     </content>
     <content url="file://$MODULE_DIR$/../../../../src/testclient">
       <sourceFolder url="file://$MODULE_DIR$/../../../../src/testclient" isTestSource="false" />
