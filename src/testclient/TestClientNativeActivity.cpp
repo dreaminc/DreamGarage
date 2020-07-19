@@ -31,6 +31,8 @@
 
 #include "TestClientRenderer.h"
 
+#include "core/ehm/EHM.h"
+
 //-------------------------------------------------------------------------
 // Preprocessor
 //-------------------------------------------------------------------------
@@ -399,11 +401,12 @@ Engine g_engine;
  */
 void android_main(android_app* state) {
 
+  DEBUG_LINEOUT("TestClient:android_main starting ...");
+
   g_engine.SetState(state);
 
   // Init helper functions
-  ndk_helper::JNIHelper::GetInstance()->Init(state->activity,
-                                             HELPER_CLASS_NAME);
+  ndk_helper::JNIHelper::GetInstance()->Init(state->activity, HELPER_CLASS_NAME);
 
   state->userData = &g_engine;
   state->onAppCmd = Engine::HandleCmd;

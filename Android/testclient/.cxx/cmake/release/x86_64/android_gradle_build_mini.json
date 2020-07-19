@@ -1,7 +1,9 @@
 {
   "buildFiles": [
+    "C:\\dev\\DreamGarage\\src\\logger\\CMakeLists.txt",
+    "C:\\dev\\DreamGarage\\src\\core\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\CMakeLists.txt",
-    "C:\\dev\\DreamGarage\\src\\third_party\\ndk-helpers\\ndk_helper\\CMakeLists.txt",
+    "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\CMakeLists.txt",
     "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\build\\cmake\\android.toolchain.cmake",
     "C:\\dev\\DreamGarage\\src\\core\\config.h.in",
     "C:\\dev\\DreamGarage\\CMakeLists.txt",
@@ -13,11 +15,18 @@
   ],
   "buildTargetsCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
+    "logger-Release-x86_64": {
+      "artifactName": "logger",
+      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" logger",
+      "abi": "x86_64",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\\src\\logger\\liblogger.a",
+      "runtimeFiles": []
+    },
     "native_app_glue-Release-x86_64": {
       "artifactName": "native_app_glue",
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" native_app_glue",
       "abi": "x86_64",
-      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\\src\\third_party\\ndk-helpers\\ndk_helper\\libnative_app_glue.a",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\\src\\testclient\\ndk-helpers\\ndkHelperBin\\Release\\x86_64\\libnative_app_glue.a",
       "runtimeFiles": []
     },
     "TestClientNativeActivity-Release-x86_64": {
@@ -31,7 +40,14 @@
       "artifactName": "NdkHelper",
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" NdkHelper",
       "abi": "x86_64",
-      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\\src\\third_party\\ndk-helpers\\ndk_helper\\libNdkHelper.a",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\\src\\testclient\\ndk-helpers\\ndkHelperBin\\Release\\x86_64\\libNdkHelper.a",
+      "runtimeFiles": []
+    },
+    "core-Release-x86_64": {
+      "artifactName": "core",
+      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" core",
+      "abi": "x86_64",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\\src\\core\\libcore.a",
       "runtimeFiles": []
     }
   }

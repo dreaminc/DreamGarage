@@ -45,6 +45,8 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 
 // Logging
 
+#define DOS_DEBUGGER_SIGNATURE "DOS::"
+
 #include "logger/DreamLogger.h"
 
 // Logging (needs DreamLogger included)
@@ -62,7 +64,14 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
  
 #if defined(DEBUG_OUT_TO_CONSOLE)
 	// TODO: Tie into the official console/interface system
-	#define CONSOLE_OUT(str, ...) do { printf(str, ##__VA_ARGS__); } while(0);
+
+	#if defined(_WIN32)
+		#define CONSOLE_OUT(str, ...) do { printf(str, ##__VA_ARGS__); } while(0);
+    #elif defined(ANDROID)
+		#include <android/log.h>
+		#define CONSOLE_OUT(str, ...) do { ((void)__android_log_print(ANDROID_LOG_INFO, DOS_DEBUGGER_SIGNATURE, str, ##__VA_ARGS__)); } while(0);
+    #endif
+
 #elif defined(DEBUG_OUT_TO_WIN_DEBUGGER)
 	// empty
 #endif
@@ -99,7 +108,6 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 			OutputDebugStringA(szDebugOutputString);																									\
 		} while(0);
 #elif defined(__ANDROID__)
-	#define DOS_DEBUGGER_SIGNATURE "DOS::"
 	#define DOS_DEBUGGER_SIGNATURE_SIZE	5		// size in bytes
 	#define	DOS_DEBUGGER_OUTPUT_MAX_SIZE 1024
 
