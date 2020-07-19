@@ -32,7 +32,7 @@
 #include "core/primitives/skybox.h"
 #include "core/primitives/billboard.h"
 
-#include "core/user/user.h"
+#include "core/user/dosuser.h"
 #include "core/text/text.h"
 #include "core/dimension/DimRay.h"
 #include "core/dimension/DimPlane.h"
@@ -509,8 +509,8 @@ public:
 	composite *AddComposite();
 	composite *MakeComposite();
 
-	user *AddUser();
-	user *MakeUser();
+	dosuser *AddUser();
+	dosuser *MakeUser();
 
 	billboard *AddBillboard(point ptOrigin, float width, float height);
 	billboard *MakeBillboard(point ptOrigin, float width, float height);

@@ -22,7 +22,7 @@
 #include "pipeline/Pipeline.h"
 #include "pipeline/PipelineCommon.h"
 
-#include "core/user/user.h"
+#include "core/user/dosuser.h"
 
 #include "core/primitives/light.h"
 #include "core/primitives/quad.h"
@@ -236,7 +236,7 @@ public:
 
 
 	// TODO: These shouldn't be a thing - definitely not at the HAL abstraction layer
-	virtual user *MakeUser() { ACBM((false), "MakeUser not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
+	virtual dosuser *MakeUser() { ACBM((false), "MakeUser not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 	virtual hand* MakeHand(UNUSED HAND_TYPE type) { ACBM((false), "MakeHand not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 	virtual hand* MakeHand(UNUSED HAND_TYPE type, UNUSED long avatarID) { ACBM((false), "MakeHand not implemented by %s HAL", GetHALName().c_str()); return nullptr; }
 

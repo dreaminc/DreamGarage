@@ -101,7 +101,7 @@ class DimPlane;
 class volume; 
 class skybox;
 class model;
-class user;
+class dosuser;
 class Message;
 
 class UIKeyboardLayout;
@@ -148,7 +148,8 @@ private:
 
 public:
 	Sandbox();
-	~Sandbox();
+
+	virtual ~Sandbox();
 
 	RESULT SetSandboxConfiguration(Sandbox::configuration sandboxconf);
 	const Sandbox::configuration& GetSandboxConfiguration();
@@ -207,7 +208,7 @@ public:
 	virtual RESULT InitializeCloudController() = 0;
 	virtual RESULT InitializeKeyboard() = 0;
 	virtual RESULT InitializeMouse() = 0;
-	virtual RESULT InitializeLeapMotion() = 0;
+	virtual RESULT InitializeLeapMotion() { return R_NOT_IMPLEMENTED; };
 	virtual RESULT InitializeGamepad() = 0;
 	virtual long GetTickCount();
 	virtual RESULT GetStackTrace() = 0;
@@ -441,8 +442,8 @@ public:
 	composite* AddComposite();
 	composite* MakeComposite();
 
-	user *AddUser();
-	user *MakeUser();
+	dosuser *AddUser();
+	dosuser *MakeUser();
 
 	billboard *AddBillboard(point ptOrigin, float width, float height);
 	billboard *MakeBillboard(point ptOrigin, float width, float height);

@@ -204,6 +204,9 @@ IF(ANDROID)
 
     # add_subdirectory(${ndkHelperSrc})
 
+    # Add the NDK helpers dir (currently in testclient, should be moved to sandbox/android)
+    add_subdirectory(ndk-helpers/ndk_helper ndk-helpers/ndkHelperBin/${CMAKE_BUILD_TYPE}/${ANDROID_ABI} EXCLUDE_FROM_ALL)
+
     # The Android Build
     add_library(TestClientNativeActivity
         SHARED
@@ -234,6 +237,8 @@ IF(ANDROID)
     target_link_libraries(TestClientNativeActivity
         PRIVATE
             NdkHelper
+            core
+            #sandbox
     )
 
 ELSEIF(WIN32)

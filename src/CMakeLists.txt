@@ -168,7 +168,7 @@ endif()
 IF(ANDROID)
     # The Android Build    
 
-    #add_subdirectory(core)
+    add_subdirectory(core)
     #add_subdirectory(sandbox)
     add_subdirectory(testclient)
 
@@ -177,9 +177,6 @@ IF(ANDROID)
     # get_filename_component(ndkHelperSrc ${ndkHelperDir}/ndk_helper ABSOLUTE)
     # #add_subdirectory(${ndkHelperSrc}
     # #        ${ndkHelperDir}/ndkHelperBin/${CMAKE_BUILD_TYPE}/${ANDROID_ABI})
-
-    # Add the NDK helper
-    add_subdirectory(third_party/ndk-helpers/ndk_helper)
 
 ELSEIF(WIN32)
     # The Windows Build

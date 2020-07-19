@@ -23,7 +23,7 @@ class PeerConnection;
 class composite;
 class UIView;
 class DreamOS;
-class user;
+class dosuser;
 class camera;
 class text;
 class font;
@@ -127,8 +127,8 @@ public:
 
 	WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy();
 
-	std::shared_ptr<user> GetUserModel();
-	RESULT AssignUserModel(user* pUserModel);
+	std::shared_ptr<dosuser> GetUserModel();
+	RESULT AssignUserModel(dosuser* pUserModel);
 
 	RESULT ReleaseUserModel();
 
@@ -166,7 +166,7 @@ private:
 	DreamPeerApp::state m_state = DreamPeerApp::state::UNINITIALIZED;
 
 	std::shared_ptr<SpatialSoundObject> m_pSpatialSoundObject = nullptr;
-	std::shared_ptr<user> m_pUserModel = nullptr;
+	std::shared_ptr<dosuser> m_pUserModel = nullptr;
 	bool m_fPendingAssignedUserModel = false;
 	bool m_fVisible = false;
 

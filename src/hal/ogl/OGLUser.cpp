@@ -1,7 +1,7 @@
 #include "OGLUser.h"
 
 OGLUser::OGLUser(OGLImp *pParentImp) :
-	user(pParentImp),
+	dosuser(pParentImp),
 	OGLObj(pParentImp)
 {
 	// TODO: Implement valid and CV EHM

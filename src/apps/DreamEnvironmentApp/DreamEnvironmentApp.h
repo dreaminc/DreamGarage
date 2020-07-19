@@ -27,7 +27,7 @@ class quaternion;
 
 //TODO: move to proxy?
 class OGLProgramScreenFade;
-class user;
+class dosuser;
 class ObjectStoreNode;
 
 #define SCENE_SCALE 0.025f

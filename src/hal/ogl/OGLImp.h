@@ -107,7 +107,7 @@ public:
 	virtual model *MakeModel() override;
 
 	FlatContext* MakeFlatContext(int width, int height, int channels);
-	user *MakeUser();
+	dosuser *MakeUser();
 
 	virtual billboard *MakeBillboard(point ptOrigin, float width, float height) override;
 

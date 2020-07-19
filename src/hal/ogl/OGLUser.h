@@ -12,13 +12,13 @@
 
 #include "OGLObj.h"
 
-#include "core/user/user.h"
+#include "core/user/dosuser.h"
 
 // Pyramid inheritance throws a dominance warning which needs to be suppressed 
 // until c++ adds a special keyword to deal with this issue, this is by design
 #pragma warning(push)
 #pragma warning(disable : 4250)
-class OGLUser : public user, public OGLObj {
+class OGLUser : public dosuser, public OGLObj {
 public:
 	OGLUser(OGLImp *pParentImp);
 };

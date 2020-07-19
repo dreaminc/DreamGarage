@@ -36,7 +36,7 @@ Sandbox* SandboxFactory::MakeSandbox(SANDBOX_APP_TYPE type, DreamOS *pDOSHandle)
 
 		case SANDBOX_APP_ANDROID: {
 			#if defined(__ANDROID__)
-				pSandbox = new AndroidSandbox(L"DreamOSSandbox");
+				pSandbox = new AndroidSandbox((wchar_t*)(L"DreamOSSandbox"));
 			#else
 				pSandbox = nullptr;
 				DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);

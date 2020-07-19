@@ -2777,7 +2777,7 @@ RESULT HALTestSuite::AddTestUserModel() {
 	int nRepeats = 1;
 
 	struct TestContext {
-		user *pUser = nullptr;
+		dosuser *pUser = nullptr;
 		composite *pComposite = nullptr;
 		std::shared_ptr<model> pModel = nullptr;
 	} *pTestContext = new TestContext();

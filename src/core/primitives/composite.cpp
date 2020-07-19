@@ -5,7 +5,7 @@
 #include "hal/HALImp.h"
 
 #include "core/hand/hand.h"
-#include "core/user/user.h"
+#include "core/user/dosuser.h"
 
 #include "core/primitives/FlatContext.h"
 #include "core/primitives/sphere.h"
@@ -260,10 +260,10 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<user> composite::MakeUser() {
+std::shared_ptr<dosuser> composite::MakeUser() {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<user> pUser(m_pHALImp->MakeUser());
+	std::shared_ptr<dosuser> pUser(m_pHALImp->MakeUser());
 	CN(pUser);
 
 Success:
@@ -277,10 +277,10 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<user> composite::AddUser() {
+std::shared_ptr<dosuser> composite::AddUser() {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<user> pUser = MakeUser();
+	std::shared_ptr<dosuser> pUser = MakeUser();
 	CN(pUser);
 
 	CR(AddObject(pUser));

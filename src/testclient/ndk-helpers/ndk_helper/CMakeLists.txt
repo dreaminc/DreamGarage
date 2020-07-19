@@ -17,6 +17,7 @@ add_library(NdkHelper
     tapCamera.cpp
     vecmath.cpp
 )
+
 set_target_properties(NdkHelper
   PROPERTIES
     CXX_STANDARD 11
@@ -24,6 +25,7 @@ set_target_properties(NdkHelper
     CXX_EXTENSIONS NO
     INTERFACE_INCLUDE_DIRECTORIES $<TARGET_PROPERTY:NdkHelper,INCLUDE_DIRECTORIES>
 )
+
 target_include_directories(NdkHelper
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}

@@ -39,7 +39,7 @@ class UpdateHeadMessage;
 class UserController;
 class quad;
 class texture;
-class user;
+class dosuser;
 struct HandState;
 struct SenseKeyboardEvent;
 struct SenseTypingEvent;
@@ -193,7 +193,7 @@ public:
 	RESULT BroadcastUpdateHandMessage(HandState handState);
 	RESULT BroadcastUpdateMouthMessage(float mouthSize);
 
-	user* ActivateUser(long userId);
+	dosuser* ActivateUser(long userId);
 
 	virtual RESULT Exit(RESULT r) override;
 
@@ -214,10 +214,10 @@ private:
 
 	RESULT SetupUserModelPool();
 	RESULT AllocateAndAssignUserModelFromPool(DreamPeerApp *pDreamPeer);
-	user* FindUserModelInPool(DreamPeerApp *pDreamPeer);
+	dosuser* FindUserModelInPool(DreamPeerApp *pDreamPeer);
 	RESULT UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pDreamPeer);
 
-	std::array<std::pair<DreamPeerApp*, user*>, MAX_PEERS> m_usersModelPool = { std::pair<DreamPeerApp*, user*>(nullptr, nullptr) };
+	std::array<std::pair<DreamPeerApp*, dosuser*>, MAX_PEERS> m_usersModelPool = { std::pair<DreamPeerApp*, dosuser*>(nullptr, nullptr) };
 
 private:
 	RESULT AuthenticateFromStoredCredentials();

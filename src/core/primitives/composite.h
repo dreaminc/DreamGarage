@@ -20,7 +20,7 @@ class HALImp;
 class sphere;
 class volume;
 class DimRay;
-class user;
+class dosuser;
 #include "core/primitives/quad.h"
 
 class model;
@@ -156,8 +156,8 @@ public:
 	std::shared_ptr<hand> MakeHand(HAND_TYPE type, long avatarID);
 	std::shared_ptr<hand> AddHand(HAND_TYPE type, long avatarID);
 
-	std::shared_ptr<user> MakeUser();
-	std::shared_ptr<user> AddUser();
+	std::shared_ptr<dosuser> MakeUser();
+	std::shared_ptr<dosuser> AddUser();
 
 	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin);
 	std::shared_ptr<quad> MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());

@@ -9,7 +9,7 @@
 #include "core/camera/camera.h"
 #include "core/text/font.h"
 #include "core/hand/hand.h"
-#include "core/user/user.h"
+#include "core/user/dosuser.h"
 
 #include "cloud/HTTP/HTTPController.h"
 #include "cloud/Environment/PeerConnection.h"
@@ -228,15 +228,15 @@ Error:
 	return r;
 }
 
-std::shared_ptr<user> DreamPeerApp::GetUserModel() {
+std::shared_ptr<dosuser> DreamPeerApp::GetUserModel() {
 	return m_pUserModel;
 }
 
-RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
+RESULT DreamPeerApp::AssignUserModel(dosuser* pUserModel) {
 	RESULT r = R_PASS;
 
 	CN(pUserModel);
-	m_pUserModel = std::shared_ptr<user>(pUserModel);
+	m_pUserModel = std::shared_ptr<dosuser>(pUserModel);
 	m_pUserModel->SetVisible(m_fVisible);
 	m_pUserModel->SetDreamOS(GetDOS());
 

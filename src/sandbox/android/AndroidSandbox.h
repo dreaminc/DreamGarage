@@ -8,11 +8,9 @@
 
 // Dream OS Windows 64 Sandbox
 
-#include <windows.h>
 #include <memory>
 #include <stdlib.h>
 #include <string.h>
-#include <tchar.h>
 
 #include <functional>
 
@@ -62,25 +60,25 @@ public:	// Sandbox Interface
 public:
 	virtual RESULT InitializePathManager(DreamOS *pDOSHandle) override;	
 	
-	RESULT InitializeOGLRenderingContext();
-	RESULT InitializeCloudController();
-	RESULT InitializeKeyboard();
-	RESULT InitializeMouse();
-	RESULT InitializeGamepad();
+	virtual RESULT InitializeOGLRenderingContext() override;
+	virtual RESULT InitializeCloudController() override;
+	virtual RESULT InitializeKeyboard() override;
+	virtual RESULT InitializeMouse() override;
+	virtual RESULT InitializeGamepad() override;
 
 private:
-	RESULT SetDeviceContext(HDC hDC);
+	//RESULT SetDeviceContext(HDC hDC);
 	RESULT SetDimensions(int pxWidth, int pxHeight);
 
 	// Handle a mouse event from a window's message. Return true if the message is handled, and false otherwise.
-	bool HandleMouseEvent(const MSG&	windowMassage);
+	//bool HandleMouseEvent(const MSG& windowMassage);
 
 	// Handle a key event from a window's message. Return true if the message is handled, and false otherwise.
-	bool HandleKeyEvent(const MSG&	windowMassage);
+	//bool HandleKeyEvent(const MSG& windowMassage);
 
 public:
-	HDC GetDeviceContext();
-	virtual HWND GetWindowHandle() override;
+	//HDC GetDeviceContext();
+	//virtual HWND GetWindowHandle() override;
 
 	RESULT RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> m_fnUIThreadCallback);
 	RESULT UnregisterUIThreadCallback();
@@ -90,17 +88,17 @@ private:
 	bool m_fFullscreen;
 	long m_wndStyle;
 
-	TCHAR* m_pszClassName;
+	wchar_t* m_pszClassName;
 
 	int m_pxWidth;
 	int m_pxHeight;
 	int m_posX;
 	int m_posY;
 
-	HWND m_hwndWindow;
-	DWORD m_ThreadID;
+	//HWND m_hwndWindow;
+	//DWORD m_ThreadID;
 
-	HDC m_hDC;					// Private GDI Device Context
+	//HDC m_hDC;					// Private GDI Device Context
 
 private:
 	std::function<void(int msg_id, void* data)> m_fnUIThreadCallback;

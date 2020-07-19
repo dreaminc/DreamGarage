@@ -1,7 +1,9 @@
 #include "Sandbox.h"
-\
-#include <synchapi.h>                           // for Sleep
-#include <WinUser.h>                            // for GetAsyncKeyState, VK_ESCAPE
+
+#if defined(_WIN32)
+	#include <synchapi.h>                           // for Sleep
+	#include <WinUser.h>                            // for GetAsyncKeyState, VK_ESCAPE
+#endif
 
 #include "CommandLineManager.h"
 
@@ -65,7 +67,7 @@
 #include "core/model/model.h"             // for model
 #include "core/model/mesh.h"              // for mesh
 
-#include "core/user/user.h"                    // for user
+#include "core/user/dosuser.h"                    // for user
 
 #include "core/camera/stereocamera.h"            // for stereocamera
 
@@ -1717,10 +1719,10 @@ Error:
 	return nullptr;
 }
 
-user *Sandbox::MakeUser() {
+dosuser *Sandbox::MakeUser() {
 	RESULT r = R_PASS;
 
-	user* pUser = m_pHALImp->MakeUser();
+	dosuser* pUser = m_pHALImp->MakeUser();
 	CN(pUser);
 
 	//Success:
@@ -1734,10 +1736,10 @@ Error:
 	return nullptr;
 }
 
-user *Sandbox::AddUser() {
+dosuser *Sandbox::AddUser() {
 	RESULT r = R_PASS;
 
-	user* pUser = MakeUser();
+	dosuser* pUser = MakeUser();
 	CN(pUser);
 
 	CR(AddObject(pUser));

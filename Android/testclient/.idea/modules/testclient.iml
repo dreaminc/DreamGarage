@@ -101,14 +101,59 @@
       <excludeFolder url="file://$MODULE_DIR$/../../.externalNativeBuild" />
       <excludeFolder url="file://$MODULE_DIR$/../../build" />
     </content>
-    <content url="file://$MODULE_DIR$/../../../../src">
-      <sourceFolder url="file://$MODULE_DIR$/../../../../src" isTestSource="false" />
+    <content url="file://$MODULE_DIR$/../../../../src/core">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/bounding">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/bounding" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/camera">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/camera" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/datastructures">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/datastructures" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/dimension">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/dimension" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/hand">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/hand" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/hysteresis">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/hysteresis" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/image">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/image" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/material">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/material" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/matrix">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/matrix" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/model">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/model" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/primitives">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/primitives" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/text">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/text" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/types">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/types" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/core/user">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/core/user" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../../src/sandbox">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/sandbox" isTestSource="false" />
     </content>
     <content url="file://$MODULE_DIR$/../../../../src/testclient">
       <sourceFolder url="file://$MODULE_DIR$/../../../../src/testclient" isTestSource="false" />
     </content>
-    <content url="file://$MODULE_DIR$/../../../../src/third_party/ndk-helpers/ndk_helper">
-      <sourceFolder url="file://$MODULE_DIR$/../../../../src/third_party/ndk-helpers/ndk_helper" isTestSource="false" />
+    <content url="file://$MODULE_DIR$/../../../../src/testclient/ndk-helpers/ndk_helper">
+      <sourceFolder url="file://$MODULE_DIR$/../../../../src/testclient/ndk-helpers/ndk_helper" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 29 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

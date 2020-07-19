@@ -575,10 +575,10 @@ Error:
 	return nullptr;
 }
 
-user *OGLImp::MakeUser() {
+dosuser *OGLImp::MakeUser() {
 	RESULT r = R_PASS;
 
-	user *pUser = new OGLUser(this);
+	dosuser *pUser = new OGLUser(this);
 	CN(pUser);
 
 	//Success:

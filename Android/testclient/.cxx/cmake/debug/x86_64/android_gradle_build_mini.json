@@ -1,7 +1,8 @@
 {
   "buildFiles": [
+    "C:\\dev\\DreamGarage\\src\\core\\CMakeLists.txt",
     "C:\\dev\\DreamGarage\\src\\CMakeLists.txt",
-    "C:\\dev\\DreamGarage\\src\\third_party\\ndk-helpers\\ndk_helper\\CMakeLists.txt",
+    "C:\\dev\\DreamGarage\\src\\testclient\\ndk-helpers\\ndk_helper\\CMakeLists.txt",
     "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\build\\cmake\\android.toolchain.cmake",
     "C:\\dev\\DreamGarage\\src\\core\\config.h.in",
     "C:\\dev\\DreamGarage\\CMakeLists.txt",
@@ -17,14 +18,14 @@
       "artifactName": "native_app_glue",
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\" native_app_glue",
       "abi": "x86_64",
-      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\third_party\\ndk-helpers\\ndk_helper\\libnative_app_glue.a",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\testclient\\ndk-helpers\\ndkHelperBin\\Debug\\x86_64\\libnative_app_glue.a",
       "runtimeFiles": []
     },
     "NdkHelper-Debug-x86_64": {
       "artifactName": "NdkHelper",
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\" NdkHelper",
       "abi": "x86_64",
-      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\third_party\\ndk-helpers\\ndk_helper\\libNdkHelper.a",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\testclient\\ndk-helpers\\ndkHelperBin\\Debug\\x86_64\\libNdkHelper.a",
       "runtimeFiles": []
     },
     "TestClientNativeActivity-Debug-x86_64": {
@@ -32,6 +33,13 @@
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\" TestClientNativeActivity",
       "abi": "x86_64",
       "output": "C:\\dev\\DreamGarage\\Android\\testclient\\build\\intermediates\\cmake\\debug\\obj\\x86_64\\libTestClientNativeActivity.so",
+      "runtimeFiles": []
+    },
+    "core-Debug-x86_64": {
+      "artifactName": "core",
+      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\" core",
+      "abi": "x86_64",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\x86_64\\src\\core\\libcore.a",
       "runtimeFiles": []
     }
   }

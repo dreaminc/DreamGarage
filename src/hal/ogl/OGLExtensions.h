@@ -26,7 +26,7 @@ public:
 
 	// TODO: WGL Extensions should be elsewhere
 
-	inline BOOL wglSwapIntervalEXT(int interval) {
+	inline bool wglSwapIntervalEXT(int interval) {
 		return m_wglSwapIntervalEXT(interval);
 	}
 
@@ -416,8 +416,12 @@ public:
 
 private:
 	// TODO: WGL stuff should be elsewhere
-	//PFNWGLSWAPINTERVALEXTPROC m_wglSwapIntervalEXT;
+#if defined(_WIN32)
 	BOOL(WINAPI * m_wglSwapIntervalEXT) (int interval);
+#else
+	//
+#endif
+
 
 	// OGL Program 
 	PFNGLCREATEPROGRAMPROC m_glCreateProgram;

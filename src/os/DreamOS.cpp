@@ -1425,11 +1425,11 @@ composite *DreamOS::MakeComposite() {
 	return m_pSandbox->MakeComposite();
 }
 
-user *DreamOS::MakeUser() {
+dosuser *DreamOS::MakeUser() {
 	return m_pSandbox->MakeUser();
 }
 
-user *DreamOS::AddUser() {
+dosuser *DreamOS::AddUser() {
 	return m_pSandbox->AddUser();
 }
 

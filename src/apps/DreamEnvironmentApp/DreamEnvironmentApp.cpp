@@ -10,7 +10,7 @@
 #include "hal/SkyboxScatterProgram.h"
 #include "hal/FogProgram.h"
 
-#include "core/user/user.h"
+#include "core/user/dosuser.h"
 #include "core/Utilities.h"
 
 #include "Sandbox/CommandLineManager.h"

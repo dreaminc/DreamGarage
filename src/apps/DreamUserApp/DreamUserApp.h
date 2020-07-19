@@ -35,7 +35,7 @@ class texture;
 class hand;
 class DimRay;
 class VirtualObj;
-class user;
+class dosuser;
 class quaternion;
 
 class CEFBrowserManager;
@@ -222,7 +222,7 @@ private:
 	//user *m_pUserModel = nullptr;
 	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
 	
-	std::shared_ptr<user> m_pUserModel = nullptr;
+	std::shared_ptr<dosuser> m_pUserModel = nullptr;
 	hand* m_pLeftHand = nullptr;
 	hand* m_pRightHand = nullptr;
 

@@ -87,7 +87,7 @@ class SinkNode;
 class SoundBuffer;
 class UIKeyboard;
 class light;
-class user;
+class dosuser;
 struct InteractionObjectEvent;
 
 DOSTestSuite::DOSTestSuite(DreamOS *pDreamOS) :
@@ -2153,7 +2153,7 @@ RESULT DOSTestSuite::AddTestUserApp() {
 	int nRepeats = 1;
 
 	struct TestContext : public Subscriber<InteractionObjectEvent> {
-		user *pUser = nullptr;
+		dosuser *pUser = nullptr;
 		sphere *pSphere = nullptr;
 		std::shared_ptr<DreamPeerApp> m_pPeers[4] = { nullptr };
 		std::shared_ptr<DreamUserApp> pDreamUserApp = nullptr;
@@ -3067,7 +3067,7 @@ RESULT DOSTestSuite::AddTestEnvironmentSeating() {
 		OGLProgramScreenFade *pScreenFadeProgram = nullptr;
 		std::shared_ptr<DreamEnvironmentApp> pEnvironmentApp = nullptr;
 
-		std::vector<user*> m_users;
+		std::vector<dosuser*> m_users;
 		std::shared_ptr<texture> m_pTestTexture;
 
 		bool fFirst = true;

@@ -105,7 +105,8 @@ public:
 		// Find the connection
 		CNM((pDConnection = Connection(strName, CONNECTION_TYPE::INPUT)), "In Connection %s not found", strName.c_str());
 
-		DConnectionTyped<objType> *pDConnectionTyped = dynamic_cast<DConnectionTyped<objType>*>(pDConnection);
+		DConnectionTyped<objType> *pDConnectionTyped;
+		pDConnectionTyped = dynamic_cast<DConnectionTyped<objType>*>(pDConnection);
 		CN(pDConnectionTyped);
 
 		CR(pDConnectionTyped->SetConnection(pDestination));
@@ -124,10 +125,12 @@ public:
 		CNM((pDConnection = Connection(strName, CONNECTION_TYPE::OUTPUT)), "Output Connection %s not found", strName.c_str());
 		CBM((pDConnection->IsPassthru()), "Output Connection %s is not set to pass thru", strName.c_str())
 
-		DConnectionTyped<objType> *pDConnectionTyped = dynamic_cast<DConnectionTyped<objType>*>(pDConnection);
+		DConnectionTyped<objType> *pDConnectionTyped;
+		pDConnectionTyped = dynamic_cast<DConnectionTyped<objType>*>(pDConnection);
 		CN(pDConnectionTyped);
 
-		DConnectionTyped<objType> *pDConnectionTypedOutput = dynamic_cast<DConnectionTyped<objType>*>(pOutputConnection);
+		DConnectionTyped<objType> *pDConnectionTypedOutput;
+		pDConnectionTypedOutput = dynamic_cast<DConnectionTyped<objType>*>(pOutputConnection);
 		CN(pDConnectionTypedOutput);
 
 		//CR(pDConnectionTyped->SetConnection(pDestination));

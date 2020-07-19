@@ -292,7 +292,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 		std::string strInitials = pUserController->GetUser().GetInitials();
 
 		if (avatarID != -1) {	// don't do this step until the user profile info is loaded
-			m_pUserModel = std::shared_ptr<user>(GetDOS()->MakeUser());
+			m_pUserModel = std::shared_ptr<dosuser>(GetDOS()->MakeUser());
 			CN(m_pUserModel);
 
 			CR(m_pUserModel->SetDreamOS(GetDOS()));

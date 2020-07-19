@@ -106,7 +106,7 @@ RESULT cubemap::LoadCubeMapFromFiles(const wchar_t *pszName, std::vector<std::ws
 	PathManager *pPathManager = PathManager::instance();
 	CN(pPathManager);
 
-	CBM((vstrCubeMapFiles.size() == 6), "LoadCubeMapFromFiles expects 6 files to be provided only %lu found", vstrCubeMapFiles.size());
+	CBM((vstrCubeMapFiles.size() == 6), "LoadCubeMapFromFiles expects 6 files to be provided only %lu found", (unsigned long)vstrCubeMapFiles.size());
 
 	for (auto &strFilename : vstrCubeMapFiles) {
 		std::wstring wstrFilePath;

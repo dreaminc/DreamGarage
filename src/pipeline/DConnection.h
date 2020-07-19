@@ -128,10 +128,12 @@ public:
 		CB(pInputConnection->GetType() == CONNECTION_TYPE::INPUT);
 		CB(pOutputConnection->GetType() == CONNECTION_TYPE::OUTPUT);
 
-		DConnectionTyped<objType>* pTypedInputConnection = dynamic_cast<DConnectionTyped<objType>*>(pInputConnection);
+		DConnectionTyped<objType>* pTypedInputConnection;
+		pTypedInputConnection = dynamic_cast<DConnectionTyped<objType>*>(pInputConnection);
 		CN(pTypedInputConnection);
 
-		DConnectionTyped<objType>* pTypedOutputConnection = dynamic_cast<DConnectionTyped<objType>*>(pOutputConnection);
+		DConnectionTyped<objType>* pTypedOutputConnection;
+		pTypedOutputConnection = dynamic_cast<DConnectionTyped<objType>*>(pOutputConnection);
 		CN(pTypedOutputConnection);
 
 		CN(pTypedInputConnection->m_ppObject);
@@ -147,7 +149,6 @@ public:
 			CN(pTypedOutputConnection->m_pObject);
 			*pTypedInputConnection->m_ppObject = pTypedOutputConnection->m_pObject;
 		}
-
 
 	Error:
 		return r;

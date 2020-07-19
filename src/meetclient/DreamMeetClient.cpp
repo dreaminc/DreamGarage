@@ -483,7 +483,7 @@ RESULT DreamMeetClient::SetupUserModelPool() {
 
 	// Set up user pool
 	for (int i = 0; i < MAX_PEERS; i++) {
-		m_usersModelPool[i] = std::make_pair<DreamPeerApp*, user*>(nullptr, MakeUser());
+		m_usersModelPool[i] = std::make_pair<DreamPeerApp*, dosuser*>(nullptr, MakeUser());
 		//m_usersModelPool[i].second->SetVisible(false);
 	}
 
@@ -537,7 +537,7 @@ RESULT DreamMeetClient::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp
 	return R_NOT_FOUND;
 }
 
-user* DreamMeetClient::FindUserModelInPool(DreamPeerApp *pDreamPeer) {
+dosuser* DreamMeetClient::FindUserModelInPool(DreamPeerApp *pDreamPeer) {
 	for (const auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == pDreamPeer) {
 			return userModelPair.second;
@@ -1322,7 +1322,7 @@ Error:
 	return r;
 }
 
-user* DreamMeetClient::ActivateUser(long userId) {
+dosuser* DreamMeetClient::ActivateUser(long userId) {
 	/*
 	if (m_peerUsers.find(userId) == m_peerUsers.end()) {
 		if (m_usersPool.empty()) {

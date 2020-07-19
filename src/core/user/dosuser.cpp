@@ -1,4 +1,4 @@
-#include "user.h"
+#include "dosuser.h"
 
 #include "os/DreamOS.h"
 
@@ -20,7 +20,7 @@
 
 #include "sandbox/PathManager.h"
 
-user::user(HALImp* pHALImp) :
+dosuser::dosuser(HALImp* pHALImp) :
 	composite(pHALImp)
 {
 	m_pHeadTextures.clear();
@@ -28,7 +28,7 @@ user::user(HALImp* pHALImp) :
 	Initialize();
 }
 
-user::user(HALImp* pHALImp, DreamOS *pDreamOS) :
+dosuser::dosuser(HALImp* pHALImp, DreamOS *pDreamOS) :
 	composite(pHALImp),
 	m_pDreamOS(pDreamOS)
 {
@@ -37,7 +37,7 @@ user::user(HALImp* pHALImp, DreamOS *pDreamOS) :
 	Initialize();
 }
 
-user::~user() {
+dosuser::~dosuser() {
 
 	RemoveMouth();
 
@@ -45,7 +45,7 @@ user::~user() {
 	m_pUIObjectComposite = nullptr;
 }
 
-RESULT user::Initialize() {
+RESULT dosuser::Initialize() {
 	RESULT r = R_PASS;
 
 	InitializeOBB();
@@ -86,15 +86,15 @@ Error:
 	return r;
 }
 
-std::shared_ptr<composite> user::GetHead() {
+std::shared_ptr<composite> dosuser::GetHead() {
 	return m_pHead;
 }
 
-std::shared_ptr<model> user::GetMouth() {
+std::shared_ptr<model> dosuser::GetMouth() {
 	return m_pMouth;
 }
 
-RESULT user::RemoveMouth() {
+RESULT dosuser::RemoveMouth() {
 	RESULT r = R_PASS;
 
 	CNR(m_pDreamOS, R_SKIPPED);
@@ -109,7 +109,7 @@ Error:
 	return r;
 }
 
-std::shared_ptr<hand> user::GetHand(HAND_TYPE type) {
+std::shared_ptr<hand> dosuser::GetHand(HAND_TYPE type) {
 	if (type == HAND_TYPE::HAND_LEFT) {
 		return m_pLeftHand;
 	}
@@ -119,12 +119,12 @@ std::shared_ptr<hand> user::GetHand(HAND_TYPE type) {
 	return nullptr;
 }
 
-RESULT user::SetDreamOS(DreamOS *pDreamOS) {
+RESULT dosuser::SetDreamOS(DreamOS *pDreamOS) {
 	m_pDreamOS = pDreamOS;
 	return R_PASS;
 }
 
-RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
+RESULT dosuser::UpdateAvatarModelWithID(long avatarModelID) {
 	RESULT r = R_PASS;
 
 	color modelColor;
@@ -155,7 +155,7 @@ Error:
 	return r;
 }
 
-RESULT user::OnModelReady(DimObj *pDimObj, void *pContext) {
+RESULT dosuser::OnModelReady(DimObj *pDimObj, void *pContext) {
 	RESULT r = R_PASS;
 
 	vector vHeadOffset = vector(0.0f, (float)(M_PI), 0.0f);
@@ -175,7 +175,7 @@ Error:
 	return r;
 }
 
-RESULT user::LoadHeadModelFromID() {
+RESULT dosuser::LoadHeadModelFromID() {
 	RESULT r = R_PASS;
 
 	PathManager *pPathManager = PathManager::instance();
@@ -192,7 +192,7 @@ RESULT user::LoadHeadModelFromID() {
 
 	//m_pHeadModel = AddModel(wstrHeadModel);
 	//CN(m_pHeadModel)
-	CR(m_pDreamOS->MakeModel(std::bind(&user::OnModelReady, this, std::placeholders::_1, std::placeholders::_2), this, wstrHeadModel));
+	CR(m_pDreamOS->MakeModel(std::bind(&dosuser::OnModelReady, this, std::placeholders::_1, std::placeholders::_2), this, wstrHeadModel));
 	m_fLoadingModel = true;
 
 	m_pMouth = m_pMouthComposite->AddModel(wstrMouthModel);
@@ -213,7 +213,7 @@ Error:
 	return r;
 }
 
-RESULT user::SetMouthPosition(point ptPosition) {
+RESULT dosuser::SetMouthPosition(point ptPosition) {
 	RESULT r = R_PASS;
 
 	CNR(m_pMouthComposite, R_SKIPPED)
@@ -224,7 +224,7 @@ Error:
 	return r;
 }
 
-RESULT user::SetMouthOrientation(quaternion qOrientation) {
+RESULT dosuser::SetMouthOrientation(quaternion qOrientation) {
 	RESULT r = R_PASS;
 
 	CNR(m_pMouthComposite, R_SKIPPED)
@@ -235,7 +235,7 @@ Error:
 	return r;
 }
 
-RESULT user::UpdateMouthPose() {
+RESULT dosuser::UpdateMouthPose() {
 	RESULT r = R_PASS;
 
 	CNR(m_pMouth, R_SKIPPED)
@@ -245,15 +245,15 @@ Error:
 	return R_PASS;
 }
 
-long user::GetAvatarModelId() {
+long dosuser::GetAvatarModelId() {
 	return m_avatarModelId;
 }
 
-int user::GetCurrentMouthPose() {
+int dosuser::GetCurrentMouthPose() {
 	return m_currentMouthPose;
 }
 
-RESULT user::InitializeObject() {
+RESULT dosuser::InitializeObject() {
 	RESULT r = R_PASS;
 
 	m_pUIObjectComposite = MakeComposite();
@@ -272,7 +272,7 @@ Error:
 	return r;
 }
 
-RESULT user::InitializeUserNameText(std::string strScreenName) {
+RESULT dosuser::InitializeUserNameText(std::string strScreenName) {
 	RESULT r = R_PASS;
 
 	if (m_pFont == nullptr) {
@@ -303,7 +303,7 @@ Error:
 	return r;
 }
 
-RESULT user::InitializeUserNameLabel() {
+RESULT dosuser::InitializeUserNameLabel() {
 	RESULT r = R_PASS;
 
 	vector vCameraDirection;
@@ -388,7 +388,7 @@ Error:
 
 }
 
-RESULT user::UpdateUserNameLabelPlacement(camera *pCamera) {
+RESULT dosuser::UpdateUserNameLabelPlacement(camera *pCamera) {
 	RESULT r = R_PASS;
 
 	point ptSeatPosition = m_pUIObjectComposite->GetPosition(true);
@@ -439,7 +439,7 @@ Error:
 	return r;
 }
 
-RESULT user::ShowUserNameField() {
+RESULT dosuser::ShowUserNameField() {
 	RESULT r = R_PASS;
 
 	auto fnStartCallback = [&](void *pContext) {
@@ -473,7 +473,7 @@ Error:
 	return r;
 }
 
-RESULT user::HideUserNameField() {
+RESULT dosuser::HideUserNameField() {
 	RESULT r = R_PASS;
 	
 	auto fnStartCallback = [&](void *pContext) {
@@ -512,7 +512,7 @@ Error:
 	return r;
 }
 
-RESULT user::SetUserLabelPosition(point ptPosition) {
+RESULT dosuser::SetUserLabelPosition(point ptPosition) {
 	RESULT r = R_PASS;
 
 	m_pUIObjectComposite->SetPosition(ptPosition);
@@ -521,7 +521,7 @@ RESULT user::SetUserLabelPosition(point ptPosition) {
 	return r;
 }
 
-RESULT user::SetUserLabelOrientation(quaternion qOrientation) {
+RESULT dosuser::SetUserLabelOrientation(quaternion qOrientation) {
 	RESULT r = R_PASS;
 
 	m_pUIObjectComposite->SetOrientation(qOrientation);
@@ -529,39 +529,39 @@ RESULT user::SetUserLabelOrientation(quaternion qOrientation) {
 	return r;
 }
 
-bool user::HasProfilePhoto() {
+bool dosuser::HasProfilePhoto() {
 	return m_strProfilePhotoURL != "";
 }
 
-RESULT user::SetProfilePhoto(std::string strProfilePhoto) {
+RESULT dosuser::SetProfilePhoto(std::string strProfilePhoto) {
 	m_strProfilePhotoURL = strProfilePhoto;
 	return R_PASS;
 }
 
-RESULT user::SetScreenName(std::string strScreenName) {
+RESULT dosuser::SetScreenName(std::string strScreenName) {
 	m_strScreenName = strScreenName;
 	return R_PASS;
 }
 
-RESULT user::SetInitials(std::string strInitials) {
+RESULT dosuser::SetInitials(std::string strInitials) {
 	m_strInitials = strInitials;
 	return R_PASS;
 }
 
-std::string user::GetInitials() {
+std::string dosuser::GetInitials() {
 	return m_strInitials;
 }
 
-RESULT user::SetSeatingPosition(int seatingPosition) {
+RESULT dosuser::SetSeatingPosition(int seatingPosition) {
 	m_seatingPosition = seatingPosition;
 	return R_PASS;
 }
 
-int user::GetSeatingPosition() {
+int dosuser::GetSeatingPosition() {
 	return m_seatingPosition;
 }
 
-RESULT user::PendProfilePhotoDownload() {
+RESULT dosuser::PendProfilePhotoDownload() {
 	RESULT r = R_PASS;
 
 	std::string strAuthorizationToken;
@@ -573,13 +573,13 @@ RESULT user::PendProfilePhotoDownload() {
 	CN(pUserControllerProxy);
 	CN(pHTTPControllerProxy);
 
-	CR(pHTTPControllerProxy->RequestFile(m_strProfilePhotoURL, std::vector<std::string>(), "", std::bind(&user::OnProfilePhotoDownload, this, std::placeholders::_1, std::placeholders::_2), nullptr));
+	CR(pHTTPControllerProxy->RequestFile(m_strProfilePhotoURL, std::vector<std::string>(), "", std::bind(&dosuser::OnProfilePhotoDownload, this, std::placeholders::_1, std::placeholders::_2), nullptr));
 
 Error:
 	return r;
 }
 
-RESULT user::OnProfilePhotoDownload(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext) {
+RESULT dosuser::OnProfilePhotoDownload(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext) {
 	RESULT r = R_PASS;
 
 	CN(pBufferVector);
@@ -589,7 +589,7 @@ Error:
 	return r;
 }
 
-RESULT user::UpdateProfilePhoto() {
+RESULT dosuser::UpdateProfilePhoto() {
 	RESULT r = R_PASS;
 
 	texture *pTexture = nullptr;
@@ -614,15 +614,15 @@ Error:
 	return r;
 }
 
-std::shared_ptr<composite> user::GetUserLabelComposite() {
+std::shared_ptr<composite> dosuser::GetUserLabelComposite() {
 	return m_pUserLabelComposite;
 }
 
-std::shared_ptr<composite> user::GetUserObjectComposite() {
+std::shared_ptr<composite> dosuser::GetUserObjectComposite() {
 	return m_pUIObjectComposite;
 }
 
-bool user::IsUserNameVisible() {
+bool dosuser::IsUserNameVisible() {
 	if (m_pTextUserName != nullptr && m_pNameBackground != nullptr) {
 		return m_pTextUserName->IsVisible() && m_pNameBackground->IsVisible();
 	}
@@ -631,7 +631,7 @@ bool user::IsUserNameVisible() {
 	}
 }
 
-RESULT user::Update() {
+RESULT dosuser::Update() {
 	RESULT r = R_PASS;
 
 	if (m_pUIObjectComposite != nullptr && m_pNameBackground == nullptr && m_pTextUserName != nullptr && !m_pTextUserName->IsDirty() && m_seatingPosition != -1) {
@@ -685,7 +685,7 @@ Error:
 }
 
 //TODO: why doesn't this use hand::SetHandState(pHandState)
-RESULT user::UpdateHand(const HandState& pHandState) {
+RESULT dosuser::UpdateHand(const HandState& pHandState) {
 	RESULT r = R_PASS;
 
 	point ptHand = pHandState.ptPalm;
@@ -722,7 +722,7 @@ Error:
 	return r;
 }
 
-RESULT user::UpdateMouth(float mouthScale) {
+RESULT dosuser::UpdateMouth(float mouthScale) {
 	RESULT r = R_PASS;
 	
 	CNR(m_pMouth, R_SKIPPED);

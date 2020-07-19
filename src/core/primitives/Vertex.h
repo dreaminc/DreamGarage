@@ -101,7 +101,7 @@ public:
 	}
 
 	static void *GetVertexOffset() {
-		int64_t offset = NULL;
+		int64_t offset = 0;
 		return (void*)(offset);
 	}
 

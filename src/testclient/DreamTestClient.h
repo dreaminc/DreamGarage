@@ -49,7 +49,7 @@ public:
 	virtual RESULT Notify(CollisionObjectEvent *oEvent) override;
 
 private:
-	user *m_pPeerUser;
+	dosuser *m_pPeerUser;
 
 private:
 	RESULT RegisterTestSuite(std::shared_ptr<TestSuite> pTestSuite);
