@@ -17,3 +17,6 @@ logs/
 " CEF Generated
 **/CEFCache
 **/GPUCache
+
+# VS Code
+.vscode/
