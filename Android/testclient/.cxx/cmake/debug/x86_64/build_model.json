@@ -111,7 +111,7 @@
       "cxxFolder": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx",
       "gradleModulePathName": ":testclient",
       "intermediatesFolder": "C:\\dev\\DreamGarage\\Android\\testclient\\build\\intermediates",
-      "makeFile": "C:\\dev\\DreamGarage\\Android\\testclient\\src\\main\\cpp\\CMakeLists.txt",
+      "makeFile": "C:\\dev\\DreamGarage\\CMakeLists.txt",
       "moduleBuildFile": "C:\\dev\\DreamGarage\\Android\\testclient\\build.gradle",
       "moduleRootFolder": "C:\\dev\\DreamGarage\\Android\\testclient",
       "ndkDefaultAbiList": [

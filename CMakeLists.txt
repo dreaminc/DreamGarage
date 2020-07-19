@@ -1,10 +1,10 @@
 # /CMakeList.txt : CMake project for dos
 
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.10)
 
 set(DREAM_VERSION 1.1.0)
 
-project(dos LANGUAGES CXX)
+project(dos LANGUAGES C CXX)
 
 include_directories(src)
 

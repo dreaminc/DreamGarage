@@ -11,7 +11,7 @@
 # =============================================================================
 
 # =============================================================================
-# Project: MoreTeapotsNativeActivity
+# Project: dos
 # Configuration: Release
 # =============================================================================
 
@@ -38,60 +38,108 @@ build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
   DESC = No interactive CMake dialog available...
   restat = 1
 build edit_cache: phony CMakeFiles/edit_cache.util
-# =============================================================================
-# Object build statements for SHARED_LIBRARY target MoreTeapotsNativeActivity
-
-
-#############################################
-# Order-only phony target for MoreTeapotsNativeActivity
-
-build cmake_object_order_depends_target_MoreTeapotsNativeActivity: phony || cmake_object_order_depends_target_NdkHelper cmake_object_order_depends_target_native_app_glue
-build CMakeFiles/MoreTeapotsNativeActivity.dir/MoreTeapotsNativeActivity.cpp.o: CXX_COMPILER__MoreTeapotsNativeActivity C$:/dev/DreamGarage/Android/testclient/src/main/cpp/MoreTeapotsNativeActivity.cpp || cmake_object_order_depends_target_MoreTeapotsNativeActivity
-  DEFINES = -DMoreTeapotsNativeActivity_EXPORTS
-  DEP_FILE = CMakeFiles\MoreTeapotsNativeActivity.dir\MoreTeapotsNativeActivity.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG  -fPIC   -std=c++11
-  INCLUDES = -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper
-  OBJECT_DIR = CMakeFiles\MoreTeapotsNativeActivity.dir
-  OBJECT_FILE_DIR = CMakeFiles\MoreTeapotsNativeActivity.dir
-build CMakeFiles/MoreTeapotsNativeActivity.dir/MoreTeapotsRenderer.cpp.o: CXX_COMPILER__MoreTeapotsNativeActivity C$:/dev/DreamGarage/Android/testclient/src/main/cpp/MoreTeapotsRenderer.cpp || cmake_object_order_depends_target_MoreTeapotsNativeActivity
-  DEFINES = -DMoreTeapotsNativeActivity_EXPORTS
-  DEP_FILE = CMakeFiles\MoreTeapotsNativeActivity.dir\MoreTeapotsRenderer.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG  -fPIC   -std=c++11
-  INCLUDES = -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper
-  OBJECT_DIR = CMakeFiles\MoreTeapotsNativeActivity.dir
-  OBJECT_FILE_DIR = CMakeFiles\MoreTeapotsNativeActivity.dir
-
-# =============================================================================
-# Link build statements for SHARED_LIBRARY target MoreTeapotsNativeActivity
-
-
-#############################################
-# Link the shared library C:\dev\DreamGarage\Android\testclient\build\intermediates\cmake\release\obj\x86\libMoreTeapotsNativeActivity.so
-
-build C$:/dev/DreamGarage/Android/testclient/build/intermediates/cmake/release/obj/x86/libMoreTeapotsNativeActivity.so: CXX_SHARED_LIBRARY_LINKER__MoreTeapotsNativeActivity CMakeFiles/MoreTeapotsNativeActivity.dir/MoreTeapotsNativeActivity.cpp.o CMakeFiles/MoreTeapotsNativeActivity.dir/MoreTeapotsRenderer.cpp.o | C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libNdkHelper.a C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libnative_app_glue.a || C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libNdkHelper.a C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libnative_app_glue.a
-  LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG
-  LINK_FLAGS = -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments   -u ANativeActivity_onCreate
-  LINK_LIBRARIES = C:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libNdkHelper.a C:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libnative_app_glue.a -lGLESv2 -lEGL -llog -landroid -latomic -latomic -lm
-  OBJECT_DIR = CMakeFiles\MoreTeapotsNativeActivity.dir
-  POST_BUILD = cd .
-  PRE_LINK = cd .
-  SONAME = libMoreTeapotsNativeActivity.so
-  SONAME_FLAG = -Wl,-soname,
-  TARGET_FILE = C:\dev\DreamGarage\Android\testclient\build\intermediates\cmake\release\obj\x86\libMoreTeapotsNativeActivity.so
-  TARGET_PDB = MoreTeapotsNativeActivity.so.dbg
 
 #############################################
 # Utility command for rebuild_cache
 
 build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D C:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86 && C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -HC:\dev\DreamGarage\Android\testclient\src\main\cpp -BC:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86"
+  COMMAND = cmd.exe /C "cd /D C:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86 && C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -HC:\dev\DreamGarage -BC:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
 build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# C:/dev/DreamGarage/Android/testclient/src/main/cpp/CMakeLists.txt
+# C:/dev/DreamGarage/CMakeLists.txt
+# =============================================================================
+
+
+#############################################
+# Utility command for edit_cache
+
+build src/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86\src && C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+build src/edit_cache: phony src/CMakeFiles/edit_cache.util
+
+#############################################
+# Utility command for rebuild_cache
+
+build src/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86\src && C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -HC:\dev\DreamGarage -BC:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86"
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+build src/rebuild_cache: phony src/CMakeFiles/rebuild_cache.util
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# C:/dev/DreamGarage/src/CMakeLists.txt
+# =============================================================================
+
+
+#############################################
+# Utility command for edit_cache
+
+build src/testclient/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86\src\testclient && C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -E echo "No interactive CMake dialog available.""
+  DESC = No interactive CMake dialog available...
+  restat = 1
+build src/testclient/edit_cache: phony src/testclient/CMakeFiles/edit_cache.util
+# =============================================================================
+# Object build statements for SHARED_LIBRARY target TestClientNativeActivity
+
+
+#############################################
+# Order-only phony target for TestClientNativeActivity
+
+build cmake_object_order_depends_target_TestClientNativeActivity: phony || cmake_object_order_depends_target_NdkHelper cmake_object_order_depends_target_native_app_glue
+build src/testclient/CMakeFiles/TestClientNativeActivity.dir/TestClientRenderer.cpp.o: CXX_COMPILER__TestClientNativeActivity ../../../../../../src/testclient/TestClientRenderer.cpp || cmake_object_order_depends_target_TestClientNativeActivity
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DTestClientNativeActivity_EXPORTS -DUNICODE
+  DEP_FILE = src\testclient\CMakeFiles\TestClientNativeActivity.dir\TestClientRenderer.cpp.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -DNDEBUG -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCEF_AUDIO_MIRROR -DSTAGING_BUILD -DDOS_BASE_FILE__="%(Filename)%(Extension)" -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -fPIC   -include C:/dev/DreamGarage/src/core/config.h -include C:/dev/DreamGarage/src/core/config.h -std=c++11
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -I../../../../../../src/third_party/webrtc/include/webrtc -I../../../../../../src/third_party/openvr/headers -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/third_party/ndk-helpers/ndk_helper
+  OBJECT_DIR = src\testclient\CMakeFiles\TestClientNativeActivity.dir
+  OBJECT_FILE_DIR = src\testclient\CMakeFiles\TestClientNativeActivity.dir
+build src/testclient/CMakeFiles/TestClientNativeActivity.dir/TestClientNativeActivity.cpp.o: CXX_COMPILER__TestClientNativeActivity ../../../../../../src/testclient/TestClientNativeActivity.cpp || cmake_object_order_depends_target_TestClientNativeActivity
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DTestClientNativeActivity_EXPORTS -DUNICODE
+  DEP_FILE = src\testclient\CMakeFiles\TestClientNativeActivity.dir\TestClientNativeActivity.cpp.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -DNDEBUG -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCEF_AUDIO_MIRROR -DSTAGING_BUILD -DDOS_BASE_FILE__="%(Filename)%(Extension)" -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -fPIC   -include C:/dev/DreamGarage/src/core/config.h -include C:/dev/DreamGarage/src/core/config.h -std=c++11
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -I../../../../../../src/third_party/webrtc/include/webrtc -I../../../../../../src/third_party/openvr/headers -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/third_party/ndk-helpers/ndk_helper
+  OBJECT_DIR = src\testclient\CMakeFiles\TestClientNativeActivity.dir
+  OBJECT_FILE_DIR = src\testclient\CMakeFiles\TestClientNativeActivity.dir
+
+# =============================================================================
+# Link build statements for SHARED_LIBRARY target TestClientNativeActivity
+
+
+#############################################
+# Link the shared library ..\..\..\..\build\intermediates\cmake\release\obj\x86\libTestClientNativeActivity.so
+
+build ../../../../build/intermediates/cmake/release/obj/x86/libTestClientNativeActivity.so: CXX_SHARED_LIBRARY_LINKER__TestClientNativeActivity src/testclient/CMakeFiles/TestClientNativeActivity.dir/TestClientRenderer.cpp.o src/testclient/CMakeFiles/TestClientNativeActivity.dir/TestClientNativeActivity.cpp.o | src/third_party/ndk-helpers/ndk_helper/libNdkHelper.a src/third_party/ndk-helpers/ndk_helper/libnative_app_glue.a || src/third_party/ndk-helpers/ndk_helper/libNdkHelper.a src/third_party/ndk-helpers/ndk_helper/libnative_app_glue.a
+  LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -DNDEBUG -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCEF_AUDIO_MIRROR -DSTAGING_BUILD -DDOS_BASE_FILE__="%(Filename)%(Extension)" -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3
+  LINK_FLAGS = -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments   -u ANativeActivity_onCreate
+  LINK_LIBRARIES = src/third_party/ndk-helpers/ndk_helper/libNdkHelper.a src/third_party/ndk-helpers/ndk_helper/libnative_app_glue.a -lGLESv2 -lEGL -llog -landroid -latomic -latomic -lm
+  OBJECT_DIR = src\testclient\CMakeFiles\TestClientNativeActivity.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  SONAME = libTestClientNativeActivity.so
+  SONAME_FLAG = -Wl,-soname,
+  TARGET_FILE = ..\..\..\..\build\intermediates\cmake\release\obj\x86\libTestClientNativeActivity.so
+  TARGET_PDB = TestClientNativeActivity.so.dbg
+
+#############################################
+# Utility command for rebuild_cache
+
+build src/testclient/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86\src\testclient && C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -HC:\dev\DreamGarage -BC:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86"
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+build src/testclient/rebuild_cache: phony src/testclient/CMakeFiles/rebuild_cache.util
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# C:/dev/DreamGarage/src/CMakeLists.txt
 # =============================================================================
 
 # =============================================================================
@@ -102,26 +150,27 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # Order-only phony target for native_app_glue
 
 build cmake_object_order_depends_target_native_app_glue: phony
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/native_app_glue.dir/C_/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue/android_native_app_glue.c.o: C_COMPILER__native_app_glue C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue/android_native_app_glue.c || cmake_object_order_depends_target_native_app_glue
-  DEP_FILE = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\native_app_glue.dir\C_\Users\idanb\AppData\Local\Android\Sdk\ndk\21.2.6472646\sources\android\native_app_glue\android_native_app_glue.c.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -O2 -DNDEBUG  -fPIC
-  INCLUDES = -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue
-  OBJECT_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\native_app_glue.dir
-  OBJECT_FILE_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\native_app_glue.dir\C_\Users\idanb\AppData\Local\Android\Sdk\ndk\21.2.6472646\sources\android\native_app_glue
+build src/third_party/ndk-helpers/ndk_helper/CMakeFiles/native_app_glue.dir/C_/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue/android_native_app_glue.c.o: C_COMPILER__native_app_glue C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue/android_native_app_glue.c || cmake_object_order_depends_target_native_app_glue
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE
+  DEP_FILE = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\native_app_glue.dir\C_\Users\idanb\AppData\Local\Android\Sdk\ndk\21.2.6472646\sources\android\native_app_glue\android_native_app_glue.c.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -O2 -DNDEBUG  -fPIC   -include C:/dev/DreamGarage/src/core/config.h
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue
+  OBJECT_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\native_app_glue.dir
+  OBJECT_FILE_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\native_app_glue.dir\C_\Users\idanb\AppData\Local\Android\Sdk\ndk\21.2.6472646\sources\android\native_app_glue
 
 # =============================================================================
 # Link build statements for STATIC_LIBRARY target native_app_glue
 
 
 #############################################
-# Link the static library C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\libnative_app_glue.a
+# Link the static library src\third_party\ndk-helpers\ndk_helper\libnative_app_glue.a
 
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libnative_app_glue.a: C_STATIC_LIBRARY_LINKER__native_app_glue C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/native_app_glue.dir/C_/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue/android_native_app_glue.c.o
+build src/third_party/ndk-helpers/ndk_helper/libnative_app_glue.a: C_STATIC_LIBRARY_LINKER__native_app_glue src/third_party/ndk-helpers/ndk_helper/CMakeFiles/native_app_glue.dir/C_/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue/android_native_app_glue.c.o
   LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -O2 -DNDEBUG
-  OBJECT_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\native_app_glue.dir
+  OBJECT_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\native_app_glue.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_FILE = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\libnative_app_glue.a
+  TARGET_FILE = src\third_party\ndk-helpers\ndk_helper\libnative_app_glue.a
   TARGET_PDB = native_app_glue.a.dbg
 # =============================================================================
 # Object build statements for STATIC_LIBRARY target NdkHelper
@@ -131,114 +180,141 @@ build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libnative_app_
 # Order-only phony target for NdkHelper
 
 build cmake_object_order_depends_target_NdkHelper: phony || cmake_object_order_depends_target_native_app_glue
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/gestureDetector.cpp.o: CXX_COMPILER__NdkHelper C$:/dev/DreamGarage/Android/common/ndk_helper/gestureDetector.cpp || cmake_object_order_depends_target_NdkHelper
-  DEP_FILE = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir\gestureDetector.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG  -fPIC   -std=c++11
-  INCLUDES = -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper
-  OBJECT_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-  OBJECT_FILE_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/gl3stub.cpp.o: CXX_COMPILER__NdkHelper C$:/dev/DreamGarage/Android/common/ndk_helper/gl3stub.cpp || cmake_object_order_depends_target_NdkHelper
-  DEP_FILE = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir\gl3stub.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG  -fPIC   -std=c++11
-  INCLUDES = -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper
-  OBJECT_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-  OBJECT_FILE_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/GLContext.cpp.o: CXX_COMPILER__NdkHelper C$:/dev/DreamGarage/Android/common/ndk_helper/GLContext.cpp || cmake_object_order_depends_target_NdkHelper
-  DEP_FILE = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir\GLContext.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG  -fPIC   -std=c++11
-  INCLUDES = -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper
-  OBJECT_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-  OBJECT_FILE_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/interpolator.cpp.o: CXX_COMPILER__NdkHelper C$:/dev/DreamGarage/Android/common/ndk_helper/interpolator.cpp || cmake_object_order_depends_target_NdkHelper
-  DEP_FILE = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir\interpolator.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG  -fPIC   -std=c++11
-  INCLUDES = -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper
-  OBJECT_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-  OBJECT_FILE_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/JNIHelper.cpp.o: CXX_COMPILER__NdkHelper C$:/dev/DreamGarage/Android/common/ndk_helper/JNIHelper.cpp || cmake_object_order_depends_target_NdkHelper
-  DEP_FILE = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir\JNIHelper.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG  -fPIC   -std=c++11
-  INCLUDES = -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper
-  OBJECT_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-  OBJECT_FILE_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/perfMonitor.cpp.o: CXX_COMPILER__NdkHelper C$:/dev/DreamGarage/Android/common/ndk_helper/perfMonitor.cpp || cmake_object_order_depends_target_NdkHelper
-  DEP_FILE = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir\perfMonitor.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG  -fPIC   -std=c++11
-  INCLUDES = -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper
-  OBJECT_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-  OBJECT_FILE_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/sensorManager.cpp.o: CXX_COMPILER__NdkHelper C$:/dev/DreamGarage/Android/common/ndk_helper/sensorManager.cpp || cmake_object_order_depends_target_NdkHelper
-  DEP_FILE = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir\sensorManager.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG  -fPIC   -std=c++11
-  INCLUDES = -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper
-  OBJECT_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-  OBJECT_FILE_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/shader.cpp.o: CXX_COMPILER__NdkHelper C$:/dev/DreamGarage/Android/common/ndk_helper/shader.cpp || cmake_object_order_depends_target_NdkHelper
-  DEP_FILE = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir\shader.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG  -fPIC   -std=c++11
-  INCLUDES = -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper
-  OBJECT_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-  OBJECT_FILE_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/tapCamera.cpp.o: CXX_COMPILER__NdkHelper C$:/dev/DreamGarage/Android/common/ndk_helper/tapCamera.cpp || cmake_object_order_depends_target_NdkHelper
-  DEP_FILE = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir\tapCamera.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG  -fPIC   -std=c++11
-  INCLUDES = -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper
-  OBJECT_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-  OBJECT_FILE_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/vecmath.cpp.o: CXX_COMPILER__NdkHelper C$:/dev/DreamGarage/Android/common/ndk_helper/vecmath.cpp || cmake_object_order_depends_target_NdkHelper
-  DEP_FILE = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir\vecmath.cpp.o.d
-  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG  -fPIC   -std=c++11
-  INCLUDES = -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper
-  OBJECT_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
-  OBJECT_FILE_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
+build src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/gestureDetector.cpp.o: CXX_COMPILER__NdkHelper ../../../../../../src/third_party/ndk-helpers/ndk_helper/gestureDetector.cpp || cmake_object_order_depends_target_NdkHelper
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE
+  DEP_FILE = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir\gestureDetector.cpp.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -fPIC   -include C:/dev/DreamGarage/src/core/config.h -std=c++11
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/third_party/ndk-helpers/ndk_helper
+  OBJECT_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+  OBJECT_FILE_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+build src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/gl3stub.cpp.o: CXX_COMPILER__NdkHelper ../../../../../../src/third_party/ndk-helpers/ndk_helper/gl3stub.cpp || cmake_object_order_depends_target_NdkHelper
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE
+  DEP_FILE = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir\gl3stub.cpp.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -fPIC   -include C:/dev/DreamGarage/src/core/config.h -std=c++11
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/third_party/ndk-helpers/ndk_helper
+  OBJECT_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+  OBJECT_FILE_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+build src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/GLContext.cpp.o: CXX_COMPILER__NdkHelper ../../../../../../src/third_party/ndk-helpers/ndk_helper/GLContext.cpp || cmake_object_order_depends_target_NdkHelper
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE
+  DEP_FILE = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir\GLContext.cpp.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -fPIC   -include C:/dev/DreamGarage/src/core/config.h -std=c++11
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/third_party/ndk-helpers/ndk_helper
+  OBJECT_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+  OBJECT_FILE_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+build src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/interpolator.cpp.o: CXX_COMPILER__NdkHelper ../../../../../../src/third_party/ndk-helpers/ndk_helper/interpolator.cpp || cmake_object_order_depends_target_NdkHelper
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE
+  DEP_FILE = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir\interpolator.cpp.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -fPIC   -include C:/dev/DreamGarage/src/core/config.h -std=c++11
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/third_party/ndk-helpers/ndk_helper
+  OBJECT_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+  OBJECT_FILE_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+build src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/JNIHelper.cpp.o: CXX_COMPILER__NdkHelper ../../../../../../src/third_party/ndk-helpers/ndk_helper/JNIHelper.cpp || cmake_object_order_depends_target_NdkHelper
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE
+  DEP_FILE = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir\JNIHelper.cpp.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -fPIC   -include C:/dev/DreamGarage/src/core/config.h -std=c++11
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/third_party/ndk-helpers/ndk_helper
+  OBJECT_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+  OBJECT_FILE_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+build src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/perfMonitor.cpp.o: CXX_COMPILER__NdkHelper ../../../../../../src/third_party/ndk-helpers/ndk_helper/perfMonitor.cpp || cmake_object_order_depends_target_NdkHelper
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE
+  DEP_FILE = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir\perfMonitor.cpp.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -fPIC   -include C:/dev/DreamGarage/src/core/config.h -std=c++11
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/third_party/ndk-helpers/ndk_helper
+  OBJECT_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+  OBJECT_FILE_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+build src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/sensorManager.cpp.o: CXX_COMPILER__NdkHelper ../../../../../../src/third_party/ndk-helpers/ndk_helper/sensorManager.cpp || cmake_object_order_depends_target_NdkHelper
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE
+  DEP_FILE = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir\sensorManager.cpp.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -fPIC   -include C:/dev/DreamGarage/src/core/config.h -std=c++11
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/third_party/ndk-helpers/ndk_helper
+  OBJECT_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+  OBJECT_FILE_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+build src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/shader.cpp.o: CXX_COMPILER__NdkHelper ../../../../../../src/third_party/ndk-helpers/ndk_helper/shader.cpp || cmake_object_order_depends_target_NdkHelper
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE
+  DEP_FILE = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir\shader.cpp.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -fPIC   -include C:/dev/DreamGarage/src/core/config.h -std=c++11
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/third_party/ndk-helpers/ndk_helper
+  OBJECT_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+  OBJECT_FILE_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+build src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/tapCamera.cpp.o: CXX_COMPILER__NdkHelper ../../../../../../src/third_party/ndk-helpers/ndk_helper/tapCamera.cpp || cmake_object_order_depends_target_NdkHelper
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE
+  DEP_FILE = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir\tapCamera.cpp.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -fPIC   -include C:/dev/DreamGarage/src/core/config.h -std=c++11
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/third_party/ndk-helpers/ndk_helper
+  OBJECT_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+  OBJECT_FILE_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+build src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/vecmath.cpp.o: CXX_COMPILER__NdkHelper ../../../../../../src/third_party/ndk-helpers/ndk_helper/vecmath.cpp || cmake_object_order_depends_target_NdkHelper
+  DEFINES = -DDOSROOTDIR=\"C:/dev/DreamGarage\" -DUNICODE
+  DEP_FILE = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir\vecmath.cpp.o.d
+  FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3 -fPIC   -include C:/dev/DreamGarage/src/core/config.h -std=c++11
+  INCLUDES = -I../../../../../../src -I../../../../../../src/third_party/Freetype/freetype-2.8/include -I../../../../../../src/third_party/assimp/3.3.1/include -I../../../../../../src/third_party/Freeimage/include -I../../../../../../src/third_party/CEF/CEF_BINARY_3538 -I../../../../../../src/third_party/json/include -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -I../../../../../../src/third_party/ndk-helpers/ndk_helper
+  OBJECT_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
+  OBJECT_FILE_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
 
 # =============================================================================
 # Link build statements for STATIC_LIBRARY target NdkHelper
 
 
 #############################################
-# Link the static library C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\libNdkHelper.a
+# Link the static library src\third_party\ndk-helpers\ndk_helper\libNdkHelper.a
 
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libNdkHelper.a: CXX_STATIC_LIBRARY_LINKER__NdkHelper C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/gestureDetector.cpp.o C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/gl3stub.cpp.o C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/GLContext.cpp.o C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/interpolator.cpp.o C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/JNIHelper.cpp.o C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/perfMonitor.cpp.o C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/sensorManager.cpp.o C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/shader.cpp.o C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/tapCamera.cpp.o C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir/vecmath.cpp.o || C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libnative_app_glue.a
-  LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG
-  OBJECT_DIR = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\CMakeFiles\NdkHelper.dir
+build src/third_party/ndk-helpers/ndk_helper/libNdkHelper.a: CXX_STATIC_LIBRARY_LINKER__NdkHelper src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/gestureDetector.cpp.o src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/gl3stub.cpp.o src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/GLContext.cpp.o src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/interpolator.cpp.o src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/JNIHelper.cpp.o src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/perfMonitor.cpp.o src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/sensorManager.cpp.o src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/shader.cpp.o src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/tapCamera.cpp.o src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir/vecmath.cpp.o || src/third_party/ndk-helpers/ndk_helper/libnative_app_glue.a
+  LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -DNOCONCEPTS -pthread -fPIC -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -O0 -fno-limit-debug-info  -DWEBRTC_POSIX -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -O3
+  OBJECT_DIR = src\third_party\ndk-helpers\ndk_helper\CMakeFiles\NdkHelper.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_FILE = C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86\libNdkHelper.a
+  TARGET_FILE = src\third_party\ndk-helpers\ndk_helper\libNdkHelper.a
   TARGET_PDB = NdkHelper.a.dbg
 
 #############################################
 # Utility command for edit_cache
 
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86 && C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -E echo "No interactive CMake dialog available.""
+build src/third_party/ndk-helpers/ndk_helper/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86\src\third_party\ndk-helpers\ndk_helper && C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -E echo "No interactive CMake dialog available.""
   DESC = No interactive CMake dialog available...
   restat = 1
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/edit_cache: phony C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/edit_cache.util
+build src/third_party/ndk-helpers/ndk_helper/edit_cache: phony src/third_party/ndk-helpers/ndk_helper/CMakeFiles/edit_cache.util
 
 #############################################
 # Utility command for rebuild_cache
 
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D C:\dev\DreamGarage\Android\common\ndkHelperBin\Release\x86 && C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -HC:\dev\DreamGarage\Android\testclient\src\main\cpp -BC:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86"
+build src/third_party/ndk-helpers/ndk_helper/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cmd.exe /C "cd /D C:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86\src\third_party\ndk-helpers\ndk_helper && C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -HC:\dev\DreamGarage -BC:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
-build C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/rebuild_cache: phony C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/rebuild_cache.util
+build src/third_party/ndk-helpers/ndk_helper/rebuild_cache: phony src/third_party/ndk-helpers/ndk_helper/CMakeFiles/rebuild_cache.util
 # =============================================================================
 # Target aliases.
 
-build MoreTeapotsNativeActivity: phony C$:/dev/DreamGarage/Android/testclient/build/intermediates/cmake/release/obj/x86/libMoreTeapotsNativeActivity.so
-build NdkHelper: phony C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libNdkHelper.a
-build libMoreTeapotsNativeActivity.so: phony C$:/dev/DreamGarage/Android/testclient/build/intermediates/cmake/release/obj/x86/libMoreTeapotsNativeActivity.so
-build libNdkHelper.a: phony C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libNdkHelper.a
-build libnative_app_glue.a: phony C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libnative_app_glue.a
-build native_app_glue: phony C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libnative_app_glue.a
+build NdkHelper: phony src/third_party/ndk-helpers/ndk_helper/libNdkHelper.a
+build TestClientNativeActivity: phony ../../../../build/intermediates/cmake/release/obj/x86/libTestClientNativeActivity.so
+build libNdkHelper.a: phony src/third_party/ndk-helpers/ndk_helper/libNdkHelper.a
+build libTestClientNativeActivity.so: phony ../../../../build/intermediates/cmake/release/obj/x86/libTestClientNativeActivity.so
+build libnative_app_glue.a: phony src/third_party/ndk-helpers/ndk_helper/libnative_app_glue.a
+build native_app_glue: phony src/third_party/ndk-helpers/ndk_helper/libnative_app_glue.a
 # =============================================================================
 # Folder targets.
 
 # =============================================================================
 # =============================================================================
+
+#############################################
+# Folder: C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/x86/src
+
+build  src/all: phony src/testclient/all src/third_party/ndk-helpers/ndk_helper/all
+# =============================================================================
+
+#############################################
+# Folder: C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/x86/src/testclient
+
+build  src/testclient/all: phony TestClientNativeActivity
+# =============================================================================
+
+#############################################
+# Folder: C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/x86/src/third_party/ndk-helpers/ndk_helper
+
+build  src/third_party/ndk-helpers/ndk_helper/all: phony native_app_glue NdkHelper
 # =============================================================================
 # Built-in targets
 
@@ -246,7 +322,7 @@ build native_app_glue: phony C$:/dev/DreamGarage/Android/common/ndkHelperBin/Rel
 #############################################
 # The main all target.
 
-build all: phony C$:/dev/DreamGarage/Android/testclient/build/intermediates/cmake/release/obj/x86/libMoreTeapotsNativeActivity.so C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libnative_app_glue.a C$:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/libNdkHelper.a
+build all: phony ../../../../build/intermediates/cmake/release/obj/x86/libTestClientNativeActivity.so src/third_party/ndk-helpers/ndk_helper/libnative_app_glue.a src/third_party/ndk-helpers/ndk_helper/libNdkHelper.a
 
 #############################################
 # Make the all target the default.
@@ -256,13 +332,13 @@ default all
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/AndroidNdkModules.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompiler.cmake.in C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompilerABI.c C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompiler.cmake.in C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCXXCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompileFeatures.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompilerABI.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeFindBinUtils.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeParseImplicitLinkInfo.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystem.cmake.in C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCXXCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCompilerCommon.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-FindBinUtils.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Internal/FeatureTesting.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android/Determine-Compiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/android.toolchain.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/platforms.cmake C$:/dev/DreamGarage/Android/common/ndk_helper/CMakeLists.txt C$:/dev/DreamGarage/Android/testclient/src/main/cpp/CMakeLists.txt CMakeCache.txt CMakeFiles/3.10.2/CMakeCCompiler.cmake CMakeFiles/3.10.2/CMakeCXXCompiler.cmake CMakeFiles/3.10.2/CMakeSystem.cmake CMakeFiles/feature_tests.c CMakeFiles/feature_tests.cxx
+build build.ninja: RERUN_CMAKE | ../../../../../../CMakeLists.txt ../../../../../../src/CMakeLists.txt ../../../../../../src/core/config.h.in ../../../../../../src/testclient/CMakeLists.txt ../../../../../../src/third_party/ndk-helpers/ndk_helper/CMakeLists.txt C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/AndroidNdkModules.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompiler.cmake.in C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompilerABI.c C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompiler.cmake.in C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCXXCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompileFeatures.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompilerABI.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeFindBinUtils.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeParseImplicitLinkInfo.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystem.cmake.in C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCXXCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCompilerCommon.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-FindBinUtils.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Internal/FeatureTesting.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android/Determine-Compiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/android.toolchain.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/platforms.cmake CMakeCache.txt CMakeFiles/3.10.2/CMakeCCompiler.cmake CMakeFiles/3.10.2/CMakeCXXCompiler.cmake CMakeFiles/3.10.2/CMakeSystem.cmake CMakeFiles/feature_tests.c CMakeFiles/feature_tests.cxx
   pool = console
 
 #############################################
 # A missing CMake input file is not an error.
 
-build C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/AndroidNdkModules.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompiler.cmake.in C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompilerABI.c C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompiler.cmake.in C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCXXCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompileFeatures.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompilerABI.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeFindBinUtils.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeParseImplicitLinkInfo.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystem.cmake.in C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCXXCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCompilerCommon.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-FindBinUtils.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Internal/FeatureTesting.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android/Determine-Compiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/android.toolchain.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/platforms.cmake C$:/dev/DreamGarage/Android/common/ndk_helper/CMakeLists.txt C$:/dev/DreamGarage/Android/testclient/src/main/cpp/CMakeLists.txt CMakeCache.txt CMakeFiles/3.10.2/CMakeCCompiler.cmake CMakeFiles/3.10.2/CMakeCXXCompiler.cmake CMakeFiles/3.10.2/CMakeSystem.cmake CMakeFiles/feature_tests.c CMakeFiles/feature_tests.cxx: phony
+build ../../../../../../CMakeLists.txt ../../../../../../src/CMakeLists.txt ../../../../../../src/core/config.h.in ../../../../../../src/testclient/CMakeLists.txt ../../../../../../src/third_party/ndk-helpers/ndk_helper/CMakeLists.txt C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/AndroidNdkModules.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompiler.cmake.in C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompilerABI.c C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompiler.cmake.in C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCXXCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompileFeatures.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompilerABI.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeFindBinUtils.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeParseImplicitLinkInfo.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystem.cmake.in C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCXXCompiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCompilerCommon.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-FindBinUtils.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Internal/FeatureTesting.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-C.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-CXX.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android/Determine-Compiler.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/android.toolchain.cmake C$:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/build/cmake/platforms.cmake CMakeCache.txt CMakeFiles/3.10.2/CMakeCCompiler.cmake CMakeFiles/3.10.2/CMakeCXXCompiler.cmake CMakeFiles/3.10.2/CMakeSystem.cmake CMakeFiles/feature_tests.c CMakeFiles/feature_tests.cxx: phony
 
 #############################################
 # Clean all the built files.

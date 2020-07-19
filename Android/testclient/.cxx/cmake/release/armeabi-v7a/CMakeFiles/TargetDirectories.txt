@@ -1,7 +1,11 @@
 C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/armeabi-v7a/CMakeFiles/edit_cache.dir
-C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/armeabi-v7a/CMakeFiles/MoreTeapotsNativeActivity.dir
 C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/armeabi-v7a/CMakeFiles/rebuild_cache.dir
-C:/dev/DreamGarage/Android/common/ndkHelperBin/Release/armeabi-v7a/CMakeFiles/native_app_glue.dir
-C:/dev/DreamGarage/Android/common/ndkHelperBin/Release/armeabi-v7a/CMakeFiles/NdkHelper.dir
-C:/dev/DreamGarage/Android/common/ndkHelperBin/Release/armeabi-v7a/CMakeFiles/edit_cache.dir
-C:/dev/DreamGarage/Android/common/ndkHelperBin/Release/armeabi-v7a/CMakeFiles/rebuild_cache.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/armeabi-v7a/src/CMakeFiles/edit_cache.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/armeabi-v7a/src/CMakeFiles/rebuild_cache.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/armeabi-v7a/src/testclient/CMakeFiles/edit_cache.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/armeabi-v7a/src/testclient/CMakeFiles/TestClientNativeActivity.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/armeabi-v7a/src/testclient/CMakeFiles/rebuild_cache.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/armeabi-v7a/src/third_party/ndk-helpers/ndk_helper/CMakeFiles/native_app_glue.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/armeabi-v7a/src/third_party/ndk-helpers/ndk_helper/CMakeFiles/NdkHelper.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/armeabi-v7a/src/third_party/ndk-helpers/ndk_helper/CMakeFiles/edit_cache.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/armeabi-v7a/src/third_party/ndk-helpers/ndk_helper/CMakeFiles/rebuild_cache.dir

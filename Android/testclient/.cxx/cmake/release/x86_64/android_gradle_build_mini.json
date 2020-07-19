@@ -1,9 +1,12 @@
 {
   "buildFiles": [
-    "C:\\dev\\DreamGarage\\Android\\common\\ndk_helper\\CMakeLists.txt",
+    "C:\\dev\\DreamGarage\\src\\CMakeLists.txt",
+    "C:\\dev\\DreamGarage\\src\\third_party\\ndk-helpers\\ndk_helper\\CMakeLists.txt",
     "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\build\\cmake\\android.toolchain.cmake",
-    "C:\\dev\\DreamGarage\\Android\\testclient\\src\\main\\cpp\\CMakeLists.txt",
-    "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\build\\cmake\\platforms.cmake"
+    "C:\\dev\\DreamGarage\\src\\core\\config.h.in",
+    "C:\\dev\\DreamGarage\\CMakeLists.txt",
+    "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\build\\cmake\\platforms.cmake",
+    "C:\\dev\\DreamGarage\\src\\testclient\\CMakeLists.txt"
   ],
   "cleanCommands": [
     "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" clean"
@@ -14,21 +17,21 @@
       "artifactName": "native_app_glue",
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" native_app_glue",
       "abi": "x86_64",
-      "output": "C:\\dev\\DreamGarage\\Android\\common\\ndkHelperBin\\Release\\x86_64\\libnative_app_glue.a",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\\src\\third_party\\ndk-helpers\\ndk_helper\\libnative_app_glue.a",
+      "runtimeFiles": []
+    },
+    "TestClientNativeActivity-Release-x86_64": {
+      "artifactName": "TestClientNativeActivity",
+      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" TestClientNativeActivity",
+      "abi": "x86_64",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\build\\intermediates\\cmake\\release\\obj\\x86_64\\libTestClientNativeActivity.so",
       "runtimeFiles": []
     },
     "NdkHelper-Release-x86_64": {
       "artifactName": "NdkHelper",
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" NdkHelper",
       "abi": "x86_64",
-      "output": "C:\\dev\\DreamGarage\\Android\\common\\ndkHelperBin\\Release\\x86_64\\libNdkHelper.a",
-      "runtimeFiles": []
-    },
-    "MoreTeapotsNativeActivity-Release-x86_64": {
-      "artifactName": "MoreTeapotsNativeActivity",
-      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" MoreTeapotsNativeActivity",
-      "abi": "x86_64",
-      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\build\\intermediates\\cmake\\release\\obj\\x86_64\\libMoreTeapotsNativeActivity.so",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\\src\\third_party\\ndk-helpers\\ndk_helper\\libNdkHelper.a",
       "runtimeFiles": []
     }
   }

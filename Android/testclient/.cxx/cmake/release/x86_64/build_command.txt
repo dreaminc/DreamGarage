@@ -1,6 +1,6 @@
 Executable : C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe
 arguments : 
--HC:\dev\DreamGarage\Android\testclient\src\main\cpp
+-HC:\dev\DreamGarage
 -DCMAKE_FIND_ROOT_PATH=C:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\prefab\x86_64\prefab
 -DCMAKE_BUILD_TYPE=Release
 -DCMAKE_TOOLCHAIN_FILE=C:\Users\idanb\AppData\Local\Android\Sdk\ndk\21.2.6472646\build\cmake\android.toolchain.cmake

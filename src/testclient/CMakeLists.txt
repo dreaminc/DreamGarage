@@ -17,8 +17,9 @@ file(GLOB WIN64_SOURCES
 )
 
 file(GLOB ANDROID_SOURCES 
-  "DOSTestClient_SurfaceView.cpp"
-  "DOSTestClient_SurfaceView.h"
+  "TestClientRenderer.cpp"
+  "TestClientRenderer.h"
+  "TestClientNativeActivity.cpp"
 )
 
 
@@ -195,18 +196,45 @@ else()
 endif()
 
 IF(ANDROID)
+    # # build the ndk-helper library
+    # get_filename_component(ndkHelperDir ${CMAKE_SOURCE_DIR}/src/third_party/ndk-helpers ABSOLUTE)
+    # get_filename_component(ndkHelperSrc ${ndkHelperDir}/ndk_helper ABSOLUTE)
+    # #add_subdirectory(${ndkHelperSrc}
+    # #        ${ndkHelperDir}/ndkHelperBin/${CMAKE_BUILD_TYPE}/${ANDROID_ABI})
+
+    # add_subdirectory(${ndkHelperSrc})
+
     # The Android Build
-    add_library(testclient
-        ${SOURCES}
-        ${ANDROID_SOURCES}
+    add_library(TestClientNativeActivity
+        SHARED
+            #${SOURCES}
+            ${ANDROID_SOURCES}
     )
 
-    target_link_libraries(testclient core)
+    set_target_properties(TestClientNativeActivity
+        PROPERTIES
+            CXX_STANDARD 11
+            CXX_STANDARD_REQUIRED YES
+            CXX_EXTENSIONS NO
+    )
+
+    #target_link_libraries(testclient core)
     #target_link_libraries(testclient os)
-    target_link_libraries(testclient sandbox)
+    #target_link_libraries(testclient sandbox)
     #target_link_libraries(testclient test)
     #target_link_libraries(testclient logger)
     #target_link_libraries(testclient modules)
+
+    # Export ANativeActivity_onCreate(),
+    # Refer to: https://github.com/android-ndk/ndk/issues/381.
+    set_target_properties(TestClientNativeActivity
+        PROPERTIES  LINK_FLAGS "-u ANativeActivity_onCreate")
+
+    # add ndk helped lib dependencies
+    target_link_libraries(TestClientNativeActivity
+        PRIVATE
+            NdkHelper
+    )
 
 ELSEIF(WIN32)
     # The Windows Build

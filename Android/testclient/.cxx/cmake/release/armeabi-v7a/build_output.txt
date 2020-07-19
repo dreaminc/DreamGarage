@@ -10,4 +10,6 @@ Detecting CXX compiler ABI info
 Detecting CXX compiler ABI info - done
 Detecting CXX compile features
 Detecting CXX compile features - done
+dos/src/cmakelists.txt clang
+dos/src/testclient/cmakelists.txt clang
 Configuring done

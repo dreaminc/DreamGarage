@@ -6,7 +6,7 @@
 # It is included in the main 'build.ninja'.
 
 # =============================================================================
-# Project: MoreTeapotsNativeActivity
+# Project: dos
 # Configuration: Release
 # =============================================================================
 # =============================================================================
@@ -22,7 +22,7 @@ rule CUSTOM_COMMAND
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__MoreTeapotsNativeActivity
+rule CXX_COMPILER__TestClientNativeActivity
   depfile = $DEP_FILE
   deps = gcc
   command = C:\Users\idanb\AppData\Local\Android\Sdk\ndk\21.2.6472646\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=x86_64-none-linux-android21 --gcc-toolchain=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64/sysroot  $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -32,7 +32,7 @@ rule CXX_COMPILER__MoreTeapotsNativeActivity
 #############################################
 # Rule for linking CXX shared library.
 
-rule CXX_SHARED_LIBRARY_LINKER__MoreTeapotsNativeActivity
+rule CXX_SHARED_LIBRARY_LINKER__TestClientNativeActivity
   command = cmd.exe /C "$PRE_LINK && C:\Users\idanb\AppData\Local\Android\Sdk\ndk\21.2.6472646\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=x86_64-none-linux-android21 --gcc-toolchain=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64/sysroot -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
   description = Linking CXX shared library $TARGET_FILE
   restat = $RESTAT
@@ -80,7 +80,7 @@ rule CXX_STATIC_LIBRARY_LINKER__NdkHelper
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -HC:\dev\DreamGarage\Android\testclient\src\main\cpp -BC:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86_64
+  command = C:\Users\idanb\AppData\Local\Android\Sdk\cmake\3.10.2.4988404\bin\cmake.exe -HC:\dev\DreamGarage -BC:\dev\DreamGarage\Android\testclient\.cxx\cmake\release\x86_64
   description = Re-running CMake...
   generator = 1
 

@@ -1,9 +1,12 @@
 {
   "buildFiles": [
-    "C:\\dev\\DreamGarage\\Android\\common\\ndk_helper\\CMakeLists.txt",
+    "C:\\dev\\DreamGarage\\src\\CMakeLists.txt",
+    "C:\\dev\\DreamGarage\\src\\third_party\\ndk-helpers\\ndk_helper\\CMakeLists.txt",
     "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\build\\cmake\\android.toolchain.cmake",
-    "C:\\dev\\DreamGarage\\Android\\testclient\\src\\main\\cpp\\CMakeLists.txt",
-    "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\build\\cmake\\platforms.cmake"
+    "C:\\dev\\DreamGarage\\src\\core\\config.h.in",
+    "C:\\dev\\DreamGarage\\CMakeLists.txt",
+    "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\build\\cmake\\platforms.cmake",
+    "C:\\dev\\DreamGarage\\src\\testclient\\CMakeLists.txt"
   ],
   "cleanCommands": [
     "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\" clean"
@@ -14,21 +17,21 @@
       "artifactName": "NdkHelper",
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\" NdkHelper",
       "abi": "arm64-v8a",
-      "output": "C:\\dev\\DreamGarage\\Android\\common\\ndkHelperBin\\Debug\\arm64-v8a\\libNdkHelper.a",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\\src\\third_party\\ndk-helpers\\ndk_helper\\libNdkHelper.a",
       "runtimeFiles": []
     },
-    "MoreTeapotsNativeActivity-Debug-arm64-v8a": {
-      "artifactName": "MoreTeapotsNativeActivity",
-      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\" MoreTeapotsNativeActivity",
+    "TestClientNativeActivity-Debug-arm64-v8a": {
+      "artifactName": "TestClientNativeActivity",
+      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\" TestClientNativeActivity",
       "abi": "arm64-v8a",
-      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a\\libMoreTeapotsNativeActivity.so",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a\\libTestClientNativeActivity.so",
       "runtimeFiles": []
     },
     "native_app_glue-Debug-arm64-v8a": {
       "artifactName": "native_app_glue",
       "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\" native_app_glue",
       "abi": "arm64-v8a",
-      "output": "C:\\dev\\DreamGarage\\Android\\common\\ndkHelperBin\\Debug\\arm64-v8a\\libnative_app_glue.a",
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\debug\\arm64-v8a\\src\\third_party\\ndk-helpers\\ndk_helper\\libnative_app_glue.a",
       "runtimeFiles": []
     }
   }

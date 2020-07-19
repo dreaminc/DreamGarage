@@ -1,8 +1,8 @@
-# Install script for directory: C:/dev/DreamGarage/Android/testclient/src/main/cpp
+# Install script for directory: C:/dev/DreamGarage
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/MoreTeapotsNativeActivity")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/dos")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -39,7 +39,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/cmake_install.cmake")
+  include("C:/dev/DreamGarage/Android/testclient/.cxx/cmake/debug/armeabi-v7a/src/cmake_install.cmake")
 
 endif()
 

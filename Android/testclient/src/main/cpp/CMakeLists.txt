@@ -15,7 +15,7 @@
 #
 
 cmake_minimum_required(VERSION 3.4.1)
-project(MoreTeapotsNativeActivity LANGUAGES C CXX)
+project(TestClientNativeActivity LANGUAGES C CXX)
 
 # set up common compile options
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Werror -fno-exceptions -fno-rtti")
@@ -30,8 +30,8 @@ add_subdirectory(${ndkHelperSrc}
 # now build app's shared lib
 add_library(${PROJECT_NAME}
   SHARED
-    MoreTeapotsNativeActivity.cpp
-    MoreTeapotsRenderer.cpp
+        TestClientNativeActivity.cpp
+        TestClientRenderer.cpp
 )
 set_target_properties(${PROJECT_NAME}
   PROPERTIES
