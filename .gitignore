@@ -4,9 +4,6 @@
 *.swp
 logs/
 
-" Meson Generated
-**/build*
-
 " CMake Generated
 **/out*
 

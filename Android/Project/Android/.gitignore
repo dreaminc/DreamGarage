@@ -1,8 +1,0 @@
-**/.cxx
-**/.gradle
-**/build
-
-*.keystore
-local.properties
-gradlew
-gradlew.bat

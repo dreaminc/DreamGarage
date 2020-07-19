@@ -1,7 +1,1 @@
-
-rootProject.projectDir = new File(settingsDir, '.')
-rootProject.name = "DreamGarage"
-
-include ':'
-
-// Top level settings
+include ':testclient'

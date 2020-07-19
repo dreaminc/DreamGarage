@@ -1,0 +1,18 @@
+# ninja log v5
+16	730	616885735	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86/CMakeFiles/NdkHelper.dir/gl3stub.cpp.o	d2e0d536a29f7112
+25	1202	616885736	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86/CMakeFiles/NdkHelper.dir/sensorManager.cpp.o	bb198af7b0160e33
+7	1249	616885736	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86/CMakeFiles/native_app_glue.dir/C_/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue/android_native_app_glue.c.o	e4b716f87c199aa6
+10	1277	616885736	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86/CMakeFiles/NdkHelper.dir/GLContext.cpp.o	332de450f9303d21
+22	1278	616885736	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86/CMakeFiles/NdkHelper.dir/perfMonitor.cpp.o	2dc6bec5df020759
+30	1301	616885736	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86/CMakeFiles/NdkHelper.dir/interpolator.cpp.o	c4d5137a2169cce3
+37	1304	616885736	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86/CMakeFiles/NdkHelper.dir/vecmath.cpp.o	54e23ce389b64f42
+13	1518	616885736	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86/CMakeFiles/NdkHelper.dir/gestureDetector.cpp.o	9f4c443627f4d718
+40	1555	616885737	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86/CMakeFiles/NdkHelper.dir/shader.cpp.o	198d047c713eaeae
+0	1642	616885737	CMakeFiles/MoreTeapotsNativeActivity.dir/MoreTeapotsNativeActivity.cpp.o	e71aaabf13584e85
+34	1648	616885737	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86/CMakeFiles/NdkHelper.dir/tapCamera.cpp.o	dd92484d016e1edc
+19	1875	616885737	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86/CMakeFiles/NdkHelper.dir/JNIHelper.cpp.o	b2282790f2c8998d
+1263	1941	616885737	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86/libnative_app_glue.a	d0a3bb3fc24fbb3
+5	1976	616885737	CMakeFiles/MoreTeapotsNativeActivity.dir/MoreTeapotsRenderer.cpp.o	e15682181c6d3d11
+1941	2059	616885737	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86/libNdkHelper.a	5431d076b9044174
+2059	2380	616885737	C:/dev/DreamGarage/Android/testclient/build/intermediates/cmake/debug/obj/x86/libMoreTeapotsNativeActivity.so	12b35601ef978f22
+0	12	0	clean	e09dce1c3ac61408

@@ -1,0 +1,17 @@
+ninja: Entering directory `C:\dev\DreamGarage\Android\testclient\.cxx\cmake\debug\x86_64'
+[1/16] Building CXX object C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86_64/CMakeFiles/NdkHelper.dir/gl3stub.cpp.o
+[2/16] Building C object C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86_64/CMakeFiles/native_app_glue.dir/C_/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue/android_native_app_glue.c.o
+[3/16] Building CXX object C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86_64/CMakeFiles/NdkHelper.dir/interpolator.cpp.o
+[4/16] Building CXX object C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86_64/CMakeFiles/NdkHelper.dir/perfMonitor.cpp.o
+[5/16] Building CXX object C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86_64/CMakeFiles/NdkHelper.dir/GLContext.cpp.o
+[6/16] Building CXX object C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86_64/CMakeFiles/NdkHelper.dir/vecmath.cpp.o
+[7/16] Building CXX object C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86_64/CMakeFiles/NdkHelper.dir/sensorManager.cpp.o
+[8/16] Linking C static library C:\dev\DreamGarage\Android\common\ndkHelperBin\Debug\x86_64\libnative_app_glue.a
+[9/16] Building CXX object C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86_64/CMakeFiles/NdkHelper.dir/gestureDetector.cpp.o
+[10/16] Building CXX object C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86_64/CMakeFiles/NdkHelper.dir/shader.cpp.o
+[11/16] Building CXX object CMakeFiles/MoreTeapotsNativeActivity.dir/MoreTeapotsNativeActivity.cpp.o
+[12/16] Building CXX object C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86_64/CMakeFiles/NdkHelper.dir/tapCamera.cpp.o
+[13/16] Building CXX object C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/x86_64/CMakeFiles/NdkHelper.dir/JNIHelper.cpp.o
+[14/16] Linking CXX static library C:\dev\DreamGarage\Android\common\ndkHelperBin\Debug\x86_64\libNdkHelper.a
+[15/16] Building CXX object CMakeFiles/MoreTeapotsNativeActivity.dir/MoreTeapotsRenderer.cpp.o
+[16/16] Linking CXX shared library C:\dev\DreamGarage\Android\testclient\build\intermediates\cmake\debug\obj\x86_64\libMoreTeapotsNativeActivity.so

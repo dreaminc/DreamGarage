@@ -1,0 +1,133 @@
+{
+  "stringTable": {
+    "0": "C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/x86_64",
+    "1": "--target=x86_64-none-linux-android21 --gcc-toolchain=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DMoreTeapotsNativeActivity_EXPORTS -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG -fPIC -std=c++11",
+    "2": "--target=x86_64-none-linux-android21 --gcc-toolchain=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64/sysroot -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -O2 -DNDEBUG -fPIC",
+    "3": "--target=x86_64-none-linux-android21 --gcc-toolchain=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/windows-x86_64/sysroot -IC:/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue -IC:/dev/DreamGarage/Android/common/ndk_helper -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -Wall -Werror -fno-exceptions -fno-rtti -O2 -DNDEBUG -fPIC -std=c++11"
+  },
+  "buildFiles": [
+    "C:\\dev\\DreamGarage\\Android\\common\\ndk_helper\\CMakeLists.txt",
+    "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\build\\cmake\\android.toolchain.cmake",
+    "C:\\dev\\DreamGarage\\Android\\testclient\\src\\main\\cpp\\CMakeLists.txt",
+    "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\build\\cmake\\platforms.cmake"
+  ],
+  "cleanCommands": [
+    "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" clean"
+  ],
+  "buildTargetsCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "native_app_glue-Release-x86_64": {
+      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" native_app_glue",
+      "buildType": "release",
+      "toolchain": "2949140636",
+      "abi": "x86_64",
+      "artifactName": "native_app_glue",
+      "files": [
+        {
+          "src": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\sources\\android\\native_app_glue\\android_native_app_glue.c",
+          "flagsOrdinal": 2,
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "headers": [],
+      "output": "C:\\dev\\DreamGarage\\Android\\common\\ndkHelperBin\\Release\\x86_64\\libnative_app_glue.a",
+      "runtimeFiles": []
+    },
+    "NdkHelper-Release-x86_64": {
+      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" NdkHelper",
+      "buildType": "release",
+      "toolchain": "2949140636",
+      "abi": "x86_64",
+      "artifactName": "NdkHelper",
+      "files": [
+        {
+          "src": "C:\\dev\\DreamGarage\\Android\\common\\ndk_helper\\gestureDetector.cpp",
+          "flagsOrdinal": 3,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "C:\\dev\\DreamGarage\\Android\\common\\ndk_helper\\gl3stub.cpp",
+          "flagsOrdinal": 3,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "C:\\dev\\DreamGarage\\Android\\common\\ndk_helper\\GLContext.cpp",
+          "flagsOrdinal": 3,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "C:\\dev\\DreamGarage\\Android\\common\\ndk_helper\\interpolator.cpp",
+          "flagsOrdinal": 3,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "C:\\dev\\DreamGarage\\Android\\common\\ndk_helper\\JNIHelper.cpp",
+          "flagsOrdinal": 3,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "C:\\dev\\DreamGarage\\Android\\common\\ndk_helper\\perfMonitor.cpp",
+          "flagsOrdinal": 3,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "C:\\dev\\DreamGarage\\Android\\common\\ndk_helper\\sensorManager.cpp",
+          "flagsOrdinal": 3,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "C:\\dev\\DreamGarage\\Android\\common\\ndk_helper\\shader.cpp",
+          "flagsOrdinal": 3,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "C:\\dev\\DreamGarage\\Android\\common\\ndk_helper\\tapCamera.cpp",
+          "flagsOrdinal": 3,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "C:\\dev\\DreamGarage\\Android\\common\\ndk_helper\\vecmath.cpp",
+          "flagsOrdinal": 3,
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "headers": [],
+      "output": "C:\\dev\\DreamGarage\\Android\\common\\ndkHelperBin\\Release\\x86_64\\libNdkHelper.a",
+      "runtimeFiles": []
+    },
+    "MoreTeapotsNativeActivity-Release-x86_64": {
+      "buildCommand": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"C:\\dev\\DreamGarage\\Android\\testclient\\.cxx\\cmake\\release\\x86_64\" MoreTeapotsNativeActivity",
+      "buildType": "release",
+      "toolchain": "2949140636",
+      "abi": "x86_64",
+      "artifactName": "MoreTeapotsNativeActivity",
+      "files": [
+        {
+          "src": "C:\\dev\\DreamGarage\\Android\\testclient\\src\\main\\cpp\\MoreTeapotsNativeActivity.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "C:\\dev\\DreamGarage\\Android\\testclient\\src\\main\\cpp\\MoreTeapotsRenderer.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "headers": [],
+      "output": "C:\\dev\\DreamGarage\\Android\\testclient\\build\\intermediates\\cmake\\release\\obj\\x86_64\\libMoreTeapotsNativeActivity.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "2949140636": {
+      "cCompilerExecutable": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang.exe",
+      "cppCompilerExecutable": "C:\\Users\\idanb\\AppData\\Local\\Android\\Sdk\\ndk\\21.2.6472646\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [
+    "c"
+  ],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

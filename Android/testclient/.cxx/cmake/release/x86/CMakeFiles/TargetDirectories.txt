@@ -1,0 +1,7 @@
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/x86/CMakeFiles/edit_cache.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/x86/CMakeFiles/MoreTeapotsNativeActivity.dir
+C:/dev/DreamGarage/Android/testclient/.cxx/cmake/release/x86/CMakeFiles/rebuild_cache.dir
+C:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/native_app_glue.dir
+C:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/NdkHelper.dir
+C:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/edit_cache.dir
+C:/dev/DreamGarage/Android/common/ndkHelperBin/Release/x86/CMakeFiles/rebuild_cache.dir

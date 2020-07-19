@@ -1,0 +1,18 @@
+# ninja log v5
+16	773	616884651	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/CMakeFiles/NdkHelper.dir/gl3stub.cpp.o	3cd64f117879ffc2
+10	1441	616884652	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/CMakeFiles/native_app_glue.dir/C_/Users/idanb/AppData/Local/Android/Sdk/ndk/21.2.6472646/sources/android/native_app_glue/android_native_app_glue.c.o	1bdb1d341cd9ba75
+25	1854	616884652	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/CMakeFiles/NdkHelper.dir/perfMonitor.cpp.o	1674569771d5b969
+29	1865	616884652	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/CMakeFiles/NdkHelper.dir/sensorManager.cpp.o	29683f7b572bd231
+33	1876	616884652	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/CMakeFiles/NdkHelper.dir/vecmath.cpp.o	92fcd15ca6295bf6
+7	1925	616884652	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/CMakeFiles/NdkHelper.dir/GLContext.cpp.o	ad453f205350cfb
+22	1928	616884652	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/CMakeFiles/NdkHelper.dir/interpolator.cpp.o	5866bf03dca217c9
+13	1991	616884652	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/CMakeFiles/NdkHelper.dir/gestureDetector.cpp.o	4904681c5a29d07a
+40	2073	616884652	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/CMakeFiles/NdkHelper.dir/shader.cpp.o	aef1cceac4614bcd
+4	2335	616884653	CMakeFiles/MoreTeapotsNativeActivity.dir/MoreTeapotsNativeActivity.cpp.o	369e7e273da8b4ea
+36	2457	616884653	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/CMakeFiles/NdkHelper.dir/tapCamera.cpp.o	7732d4f0ebe821c5
+1443	2497	616884653	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/libnative_app_glue.a	258062daae7efc7f
+19	2630	616884653	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/CMakeFiles/NdkHelper.dir/JNIHelper.cpp.o	7df6f45e7cd73a2f
+1	2689	616884653	CMakeFiles/MoreTeapotsNativeActivity.dir/MoreTeapotsRenderer.cpp.o	d3a810174c0b654a
+2630	2753	616884653	C:/dev/DreamGarage/Android/common/ndkHelperBin/Debug/armeabi-v7a/libNdkHelper.a	9776ce8b29588377
+2753	2965	616884653	C:/dev/DreamGarage/Android/testclient/build/intermediates/cmake/debug/obj/armeabi-v7a/libMoreTeapotsNativeActivity.so	c8f6d7aefbae61f1
+1	40	0	clean	e09dce1c3ac61408
