@@ -45,7 +45,11 @@ std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pC
 
 		case TEST_SUITE_TYPE::CLOUD: {
 			CNM(pContext, "This test suite requires DreamOS to be passed as context");
-			pTestSuite = std::make_shared<CloudTestSuite>((DreamOS*)pContext);
+			
+			DreamOS* pDreamOS = (DreamOS*)(pContext);
+			CNM(pDreamOS, "This test suite requires a valid DreamOS handle to be passed as context")
+
+			pTestSuite = std::make_shared<CloudTestSuite>(pDreamOS);
 		} break;
 
 		case TEST_SUITE_TYPE::WEBRTC: {

@@ -113,7 +113,7 @@ private:
 	CloudController *GetCloudController();
 
 private:
-	DreamOS *m_pDreamOS = nullptr;
+	//DreamOS *m_pDreamOS = nullptr;
 	CloudController *m_pCloudController = nullptr;
 	UserController *m_pUserController = nullptr;
 	std::shared_ptr<DreamContentViewApp> m_pDreamContentView = nullptr;
