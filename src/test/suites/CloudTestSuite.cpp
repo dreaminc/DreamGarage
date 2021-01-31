@@ -49,18 +49,20 @@ CloudTestSuite::~CloudTestSuite() {
 RESULT CloudTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestSwitchingEnvironmentSockets());
+	// TODO: Re-enable these tests
+
+	//CR(AddTestSwitchingEnvironmentSockets());
 
 	// TODO: Closed box testing (multi user/environment instances or cloud controllers if need be)
-	CR(AddTestMultiConnectTest());
+	//CR(AddTestMultiConnectTest());
 
 	// Requires login
 
-	CR(AddTestDownloadFile());	 
+	//CR(AddTestDownloadFile());	 
 
 	CR(AddTestConnectLogin());
 	
-	CR(AddTestMenuAPI());
+	//CR(AddTestMenuAPI());
 
 	// TODO: Add Websocket tests
 	// TODO: Add HTTP / CURL tests
@@ -671,10 +673,18 @@ Error:
 RESULT CloudTestSuite::AddTestConnectLogin() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 30.0f;
+	TestObject::TestDescriptor testDescriptor;
+
+	testDescriptor.sDuration = 30.0f;
+	testDescriptor.nRepeats = 1;
+	testDescriptor.strTestName = "connectlogin";
+	testDescriptor.strTestDescription = "Test connect and log into service";
+
+	// Cloud controller passed as context
+	testDescriptor.pContext = GetCloudController();
 
 	// Initialize the test
-	auto fnInitialize = [&](void *pContext) {
+	testDescriptor.fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		// Cloud Controller
@@ -705,7 +715,7 @@ RESULT CloudTestSuite::AddTestConnectLogin() {
 	};
 
 	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
+	testDescriptor.fnTest = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		// Cloud Controller
@@ -720,11 +730,8 @@ RESULT CloudTestSuite::AddTestConnectLogin() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest("connectlogin", fnInitialize, fnTest, GetCloudController());
+	auto pNewTest = AddTest(testDescriptor);
 	CN(pNewTest);
-
-	pNewTest->SetTestDescription("Test connect and log into service");
-	pNewTest->SetTestDuration(sTestTime);
 
 Error:
 	return r;

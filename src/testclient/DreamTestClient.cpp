@@ -33,8 +33,13 @@ RESULT DreamTestClient::ConfigureSandbox() {
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
 	sandboxconfig.fUseGamepad = true;
+	
 	sandboxconfig.fInitCloud = false;		// TODO: This is currently breaking stuff
+	//sandboxconfig.fInitCloud = true;		// TODO: This is currently breaking stuff
+	
+	//sandboxconfig.fInitSound = true;
 	sandboxconfig.fInitSound = false;
+
 	sandboxconfig.fInitUserApp = false;		// Turn on for testing User app related functionality 
 	sandboxconfig.fInitNamedPipe = true;
 	sandboxconfig.fInitKeyboard = false;
@@ -153,10 +158,10 @@ RESULT DreamTestClient::RegisterTestSuites() {
 	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this));
 	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PIPELINE, this));
 	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::SANDBOX, this));
+	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::CLOUD, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::COLLISION, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::MULTICONTENT, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UIVIEW, this));
-	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::CLOUD, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::INTERACTION, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::ANIMATION, this));
