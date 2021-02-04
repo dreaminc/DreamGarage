@@ -456,8 +456,8 @@ public:
 			float frameLocation = 0.0f;
 			int frameFloor = 0;
 			int frameCeiling = 0;
-			int sampleFloor = 0;
-			int sampleCeiling = 0;
+			//int sampleFloor = 0;
+			//int sampleCeiling = 0;
 			float ratio = 0.0f;
 			CBType interpolatedValue = 0;
 

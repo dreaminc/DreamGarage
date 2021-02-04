@@ -45,75 +45,74 @@
 #define BUFFER_OFFSET(i) (void*)(((char*)(nullptr) + (i)))
 
 struct TEAPOT_VERTEX {
-  float pos[3];
-  float normal[3];
+	float pos[3];
+	float normal[3];
 };
 
 enum SHADER_ATTRIBUTES {
-  ATTRIB_VERTEX,
-  ATTRIB_NORMAL,
-  ATTRIB_COLOR,
-  ATTRIB_UV
+	ATTRIB_VERTEX,
+	ATTRIB_NORMAL,
+	ATTRIB_COLOR,
+	ATTRIB_UV
 };
 
 struct SHADER_PARAMS {
-  GLuint program_;
-  GLuint light0_;
-  GLuint material_diffuse_;
-  GLuint material_ambient_;
-  GLuint material_specular_;
+	GLuint program_;
+	GLuint light0_;
+	GLuint material_diffuse_;
+	GLuint material_ambient_;
+	GLuint material_specular_;
 
-  GLuint matrix_projection_;
-  GLuint matrix_view_;
+	GLuint matrix_projection_;
+	GLuint matrix_view_;
 };
 
 struct TEAPOT_MATERIALS {
-  float specular_color[4];
-  float ambient_color[3];
+	float specular_color[4];
+	float ambient_color[3];
 };
 
-class TestClientRenderer {
-  int32_t num_indices_;
-  int32_t num_vertices_;
-  GLuint ibo_;
-  GLuint vbo_;
-  GLuint ubo_;
+class TestClientTeapotRenderer {
+	int32_t m_indices_n;
+	int32_t m_vertices_n;
+	GLuint m_glIBO;
+	GLuint m_glVBO;
+	GLuint m_glUBO;
 
-  SHADER_PARAMS shader_param_;
-  bool LoadShaders(SHADER_PARAMS* params, const char* strVsh,
-                   const char* strFsh);
-  bool LoadShadersES3(SHADER_PARAMS* params, const char* strVsh,
-                      const char* strFsh,
-                      std::map<std::string, std::string>& shaderParameters);
+	SHADER_PARAMS m_shaderParams;
 
-  ndk_helper::Mat4 mat_projection_;
-  ndk_helper::Mat4 mat_view_;
-  std::vector<ndk_helper::Mat4> vec_mat_models_;
-  std::vector<ndk_helper::Vec3> vec_colors_;
-  std::vector<ndk_helper::Vec2> vec_rotations_;
-  std::vector<ndk_helper::Vec2> vec_current_rotations_;
+	bool LoadShaders(SHADER_PARAMS* pShaderParams, const char* pszVertexShader, const char* pszFragmentShader);
+	bool LoadShadersES3(SHADER_PARAMS* pShaderParams, const char* pszVertextShader, const char* pszFragmentShader, 
+		std::map<std::string, std::string>& shaderParameters);
 
-  ndk_helper::TapCamera* camera_;
+	ndk_helper::Mat4 m_mat4Projection;
+	ndk_helper::Mat4 m_mat4View;
+	std::vector<ndk_helper::Mat4> m_mat4Models;
+	std::vector<ndk_helper::Vec3> m_mat4ModelColors;
+	std::vector<ndk_helper::Vec2> m_vec2ModelRotations;
+	std::vector<ndk_helper::Vec2> m_vec2ModelCurrentRotations;
 
-  int32_t teapot_x_;
-  int32_t teapot_y_;
-  int32_t teapot_z_;
-  int32_t ubo_matrix_stride_;
-  int32_t ubo_vector_stride_;
-  bool geometry_instancing_support_;
-  bool arb_support_;
+	ndk_helper::TapCamera* m_pTapCamera;
 
-  std::string ToString(const int32_t i);
+	int32_t m_teapotX;
+	int32_t m_teapotY;
+	int32_t m_teapotZ;
+	int32_t m_UBOMatrixStride;
+	int32_t m_UBOVectorStride;
+	bool m_fGeometryInstancingSupported;
+	bool m_fARBSupported;
 
- public:
-  TestClientRenderer();
-  virtual ~TestClientRenderer();
-  void Init(const int32_t numX, const int32_t numY, const int32_t numZ);
-  void Render();
-  void Update(float dTime);
-  bool Bind(ndk_helper::TapCamera* camera);
-  void Unload();
-  void UpdateViewport();
+	std::string ToString(const int32_t i);
+
+public:
+	TestClientTeapotRenderer();
+	virtual ~TestClientTeapotRenderer();
+	void Init(const int32_t numX, const int32_t numY, const int32_t numZ);
+	void Render();
+	void Update(float dTime);
+	bool Bind(ndk_helper::TapCamera* camera);
+	void Unload();
+	void UpdateViewport();
 };
 
 #endif

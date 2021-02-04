@@ -132,6 +132,7 @@ private:
 	InteractionEventType UpdateActiveObject(ActiveObject::type activeObjectType, VirtualObj *pInteractionObject, CollisionManifold manifold, VirtualObj *pEventObject);
 
 public:
+	virtual ~InteractionEngine() = default;
 
 	RESULT Update();
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);

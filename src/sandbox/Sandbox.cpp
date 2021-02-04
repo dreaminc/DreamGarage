@@ -24,10 +24,11 @@
 #include "pipeline/ProgramNode.h"
 #include "pipeline/SinkNode.h"
 
-// TODO: This needs to be resolved in the build system 
-// or the configuration 
+// TODO: This needs to be resolved in the build system or the configuration
 #ifndef OCULUS_PRODUCTION_BUILD
+#ifndef __ANDROID__
 	#include <hmd/openvr/OpenVRDevice.h>
+#endif
 #endif
 
 #include "os/app/DreamAppMessage.h"
@@ -41,7 +42,7 @@
 
 #include "sense/SenseLeapMotion.h"
 
-// TODO: Fix, no OGL allowed at this level 
+// TODO: Fix, no OGL allowed at this level
 #include "hal/ogl/OGLHand.h"
 
 // TODO:
@@ -192,6 +193,21 @@ RESULT Sandbox::Notify(SenseMouseEvent *mEvent) {
 				m_pSenseMouse->ReleaseMouse();
 			}
 		} break;
+
+		// Unhandled cases 
+		case SENSE_MOUSE_LEFT_BUTTON_DOWN:
+		case SENSE_MOUSE_MIDDLE_BUTTON_DOWN:
+		case SENSE_MOUSE_MIDDLE_BUTTON_UP:
+		case SENSE_MOUSE_RIGHT_BUTTON_DOWN:
+		case SENSE_MOUSE_RIGHT_BUTTON_UP:
+		case SENSE_MOUSE_WHEEL:
+		case SENSE_MOUSE_MIDDLE_DRAG_MOVE:
+		case SENSE_MOUSE_RIGHT_DRAG_MOVE:
+		case SENSE_MOUSE_INVALID: 
+		default: {
+			// do nothing
+		} break;
+
 	}
 
 //Error:
@@ -531,11 +547,20 @@ RESULT Sandbox::RunAppLoop() {
 
 		//DreamConsole::GetConsole()->OnFrameRendered();
 #ifdef _DEBUG
+	#if defined(_WIN32)
 		if (IsShuttingDown() || GetAsyncKeyState(VK_ESCAPE)) {
+	#else
+		if (IsShuttingDown()) {
+	#endif
 #else
 		if (IsShuttingDown()) {
 #endif
+
+		#if defined(_WIN32)
 			Sleep(1000);
+		#else
+			sleep(1);
+		#endif
 			Shutdown();
 		}
 	}
@@ -2097,7 +2122,7 @@ Error:
 RESULT Sandbox::RegisterSubscriber(HMDEventType hmdEvent, Subscriber<HMDEvent>* pHMDEventSubscriber) {
 	RESULT r = R_PASS;
 
-	CNR(m_SandboxConfiguration.fUseHMD, R_SKIPPED);
+	CBR(m_SandboxConfiguration.fUseHMD, R_SKIPPED);
 	CNM(m_pHMD, "HMD not initialized");
 	CR(m_pHMD->RegisterSubscriber(hmdEvent, pHMDEventSubscriber));
 
@@ -2107,8 +2132,10 @@ Error:
 
 RESULT Sandbox::UnregisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
 	RESULT r = R_PASS;
+
 	if (m_pHMD != nullptr) {
 		SenseController *pSenseController = m_pHMD->GetSenseController();
+
 		if (pSenseController != nullptr) {
 			CR(pSenseController->UnregisterSubscriber(controllerEvent, pControllerSubscriber));
 		}

@@ -26,9 +26,11 @@ public:
 
 	// TODO: WGL Extensions should be elsewhere
 
+#if defined(_WIN32)
 	inline bool wglSwapIntervalEXT(int interval) {
 		return m_wglSwapIntervalEXT(interval);
 	}
+#endif
 
 	// OGL Program
 	inline GLuint glCreateProgram(void) {
@@ -43,6 +45,7 @@ public:
 		return m_glIsProgram(programID);
 	}
 
+#if defined(_WIN32)
 	inline void glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params) {
 		return m_glGetProgramInterfaceiv(program, programInterface, pname, params);
 	}
@@ -54,6 +57,7 @@ public:
 	inline void glGetProgramResourceName(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name) {
 		return m_glGetProgramResourceName(program, programInterface, index, bufSize, length, name);
 	}
+#endif
 
 	inline void glUseProgram(GLuint programID) {
 		return m_glUseProgram(programID);
@@ -206,9 +210,11 @@ public:
 		return m_glCreateShader(type);
 	}
 
+#if defined(_WIN32)
 	inline GLuint glCreateShaderObject(GLenum type) {
 		return m_glCreateShaderObject(type);
 	}
+#endif
 
 	inline void glDeleteShader(GLuint shader) {
 		return m_glDeleteShader(shader);
@@ -241,16 +247,18 @@ public:
 		return m_glActiveTexture(texture);
 	}
 
+#if defined(_WIN32)
 	inline void glBindTextures(GLuint first, GLsizei count, const GLuint *textures) {
 		return m_glBindTextures(first, count, textures);
 	}
 
-	inline void glTextStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) {
-		return m_glTexStorage2D(target, levels, internalformat, width, height);
-	}
-
 	inline void glTexImage2DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations) {
 		return m_glTexImage2DMultisample(target, samples, internalformat, width, height, fixedsamplelocations);
+	}
+#endif
+
+	inline void glTextStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) {
+		return m_glTexStorage2D(target, levels, internalformat, width, height);
 	}
 
 	/*
@@ -265,6 +273,7 @@ public:
 	}
 	*/
 
+#if defined(_WIN32)
 	inline void glGetnTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLsizei bufSize, void *pixels) {
 		return m_glGetnTexImage(target, level, format, type, bufSize, pixels);
 	}
@@ -272,6 +281,7 @@ public:
 	inline void glGetTextureImage(GLuint texture, GLint level, GLenum format, GLenum type, GLsizei bufSize, void *pixels) {
 		return m_glGetTextureImage(texture, level, format, type, bufSize, pixels);
 	}
+#endif
 
 	inline void glGenerateMipmap(GLenum target) {
 		return m_glGenerateMipmap(target);
@@ -314,9 +324,11 @@ public:
 		return m_glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
 	}
 
+#if defined(_WIN32)
 	inline void glFramebufferTexture(GLenum target, GLenum attachment, GLuint texture, GLint level) {
 		return m_glFramebufferTexture(target, attachment, texture, level);
 	}
+#endif
 
 	inline GLenum glCheckFramebufferStatus(GLenum target) {
 		return m_glCheckFramebufferStatus(target);
@@ -335,9 +347,12 @@ public:
 	}
 
 	// PBO
+
+#if defined(_WIN32)
 	inline void* glMapBuffer(GLenum target, GLenum access) {
 		return m_glMapBuffer(target, access);
 	}
+#endif
 
 	inline bool glUnmapBuffer(GLenum target) {
 		return m_glUnmapBuffer(target);
@@ -406,9 +421,11 @@ public:
 		return m_glGetQueryiv(target, pname, params);
 	}
 
+#if defined(_WIN32)
 	inline void glGetQueryObjectiv(GLuint id, GLenum pname, GLint *params) {
 		return m_glGetQueryObjectiv(id, pname, params);
 	}
+#endif
 
 	inline void glGetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params) {
 		return m_glGetQueryObjectuiv(id, pname, params);
@@ -422,14 +439,17 @@ private:
 	//
 #endif
 
-
 	// OGL Program 
 	PFNGLCREATEPROGRAMPROC m_glCreateProgram;
 	PFNGLDELETEPROGRAMPROC m_glDeleteProgram;
 	PFNGLISPROGRAMPROC m_glIsProgram;
+
+#if defined(_WIN32)
 	PFNGLGETPROGRAMINTERFACEIVPROC m_glGetProgramInterfaceiv;
 	PFNGLGETPROGRAMRESOURCEIVPROC m_glGetProgramResourceiv;
 	PFNGLGETPROGRAMRESOURCENAMEPROC m_glGetProgramResourceName;
+#endif
+
 	PFNGLUSEPROGRAMPROC m_glUseProgram;
 	PFNGLLINKPROGRAMPROC m_glLinkProgram;
 	PFNGLGETPROGRAMIVPROC m_glGetProgramiv;
@@ -478,7 +498,11 @@ private:
 	PFNGLATTACHSHADERPROC m_glAttachShader;
 	PFNGLDETACHSHADERPROC m_glDetachShader;
 	PFNGLCREATESHADERPROC m_glCreateShader;
+
+#if defined(_WIN32)
 	PFNGLCREATESHADEROBJECTARBPROC m_glCreateShaderObject;
+#endif
+
 	PFNGLDELETESHADERPROC m_glDeleteShader;
 	PFNGLSHADERSOURCEPROC m_glShaderSource;
 	PFNGLCOMPILESHADERPROC m_glCompileShader;
@@ -488,18 +512,21 @@ private:
 	// Textures
 	//PFNGLGENTEXTURESPROC m_glGenTextures;
 	PFNGLACTIVETEXTUREPROC m_glActiveTexture;
+
+#if defined(_WIN32)
 	PFNGLBINDTEXTURESPROC m_glBindTextures;
+	PFNGLTEXIMAGE2DMULTISAMPLEPROC m_glTexImage2DMultisample;
+	PFNGLGETTEXTUREIMAGEPROC m_glGetTextureImage;
+	PFNGLGETNTEXIMAGEPROC m_glGetnTexImage;
+#endif
+
 	//PFNGLBINDTEXTUREPROC m_glBindTexture;
 	PFNGLTEXSTORAGE2DPROC m_glTexStorage2D;
-	PFNGLTEXIMAGE2DMULTISAMPLEPROC m_glTexImage2DMultisample;
 	//PFNGLTEXPARAMETERIPROC m_glTexParameteri;
 	//PFNGLTEXIMAGE2DPROC m_glTexImage2D;
 	//PFNGLCOPYTEXIMAGE2DPROC m_glCopyTexImage2D;	// part of core
 	//PFNGLTEXSUBIMAGE2DPROC m_glTexSubImage2D;
 	PFNGLGENERATEMIPMAPPROC m_glGenerateMipmap;
-	PFNGLGETTEXTUREIMAGEPROC m_glGetTextureImage;
-	PFNGLGETNTEXIMAGEPROC m_glGetnTexImage;
-
 
 	// FBO
 	PFNGLGENFRAMEBUFFERSPROC m_glGenFramebuffers;
@@ -512,7 +539,11 @@ private:
 	PFNGLRENDERBUFFERSTORAGEPROC m_glRenderbufferStorage;
 	PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC m_glRenderBufferStorageMultisample;
 	PFNGLFRAMEBUFFERRENDERBUFFERPROC m_glFramebufferRenderbuffer;
+
+#if defined(_WIN32)
 	PFNGLFRAMEBUFFERTEXTUREPROC m_glFramebufferTexture;
+#endif
+
 	PFNGLCHECKFRAMEBUFFERSTATUSPROC m_glCheckFramebufferStatus;
 	PFNGLFRAMEBUFFERTEXTURE2DPROC m_glFramebufferTexture2D;
 	PFNGLBLITFRAMEBUFFERPROC m_glBlitFramebuffer;
@@ -520,7 +551,9 @@ private:
 	PFNGLDRAWBUFFERSPROC m_glDrawBuffers;
 
 	// PBO
+#if defined(_WIN32)
 	PFNGLMAPBUFFERPROC m_glMapBuffer;
+#endif
 	PFNGLUNMAPBUFFERPROC m_glUnmapBuffer;
 
 	// VBO
@@ -543,7 +576,11 @@ private:
 	PFNGLBEGINQUERYPROC m_glBeginQuery;
 	PFNGLENDQUERYPROC m_glEndQuery;
 	PFNGLGETQUERYIVPROC m_glGetQueryiv;
+
+#if defined(_WIN32)
 	PFNGLGETQUERYOBJECTIVPROC m_glGetQueryObjectiv;
+#endif
+
 	PFNGLGETQUERYOBJECTUIVPROC m_glGetQueryObjectuiv;
 };
 

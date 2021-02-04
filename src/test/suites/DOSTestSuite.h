@@ -6,7 +6,9 @@
 // Dream OS Test Suite
 // dos/src/test/suites/DOSTestSuite.h
 
-#include "xstring"                // for string
+#ifdef _WIN32
+	#include "xstring"                // for string
+#endif
 
 #include "DreamTestSuite.h"
 

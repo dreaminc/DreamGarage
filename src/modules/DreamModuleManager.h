@@ -32,7 +32,7 @@ class DreamModuleManager : public Manager {
 
 public:
 	DreamModuleManager(DreamOS *pDreamOS);
-	~DreamModuleManager();
+	virtual ~DreamModuleManager();
 
 	virtual RESULT Initialize() override;
 	virtual RESULT Update() override;

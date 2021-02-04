@@ -80,7 +80,7 @@ public:
 		// empty stub
 	}
 
-	~HMD() {
+	virtual ~HMD() {
 		// empty stub
 	}
 

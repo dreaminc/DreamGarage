@@ -19,6 +19,8 @@
 // TODO: Add test name
 // TODO: Add test description
 
+class TestSuite;
+
 class TestObject : public DObject {
 public:
 	friend class TestSuite;

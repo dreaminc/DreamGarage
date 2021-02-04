@@ -93,13 +93,13 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
     
     # Override certain warnings cause they're dumb
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -Wno-unused-label")
 
 	# Debug Configuration
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -Wno-unused-label -Wno-unused-parameter")
 
 	# Release Configuration
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -Wno-unused-label -Wno-unused-parameter")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -113,13 +113,13 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
     
     # Override certain warnings cause they're dumb
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -Wno-unused-label")
 
 	# Debug Configuration
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -Wno-unused-label -Wno-unused-parameter")
 
 	# Release Configuration
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -Wno-unused-label -Wno-unused-parameter")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
     
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -133,13 +133,13 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
     
 	# Override certain warnings cause they're dumb
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -Wno-unused-label")
 
 	# Debug Configuration
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -Wno-unused-label -Wno-unused-parameter")
 
 	# Release Configuration
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -Wno-unused-label -Wno-unused-parameter")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 
@@ -154,13 +154,13 @@ else()
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
     # Override certain warnings cause they're dumb
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -Wno-unused-label")
 
 	# Debug Configuration
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -Wno-unused-label -Wno-unused-parameter")
 
 	# Release Configuration
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -Wno-unused-label -Wno-unused-parameter")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 endif()
@@ -170,8 +170,11 @@ IF(ANDROID)
 
     add_subdirectory(core)
     add_subdirectory(logger)
-    #add_subdirectory(sandbox)
+    add_subdirectory(sandbox)
     add_subdirectory(testclient)
+    add_subdirectory(modules)
+    add_subdirectory(os)
+    add_subdirectory(test)
 
     # # build the ndk-helper library
     # get_filename_component(ndkHelperDir ${CMAKE_SOURCE_DIR}/src/third_party/ndk-helpers ABSOLUTE)

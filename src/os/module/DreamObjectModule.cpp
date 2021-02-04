@@ -56,7 +56,7 @@ RESULT DreamObjectModule::PendingTextureObject::ClearObjectImp() {
 DreamObjectModule::DreamObjectModule(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamObjectModule>(pDreamOS, pContext)
 {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	Validate();
 	return;
@@ -201,7 +201,11 @@ RESULT DreamObjectModule::ModuleProcess(void *pContext) {
 			}
 		}
 
+#ifdef _WIN32
 		Sleep(1);
+#else
+		usleep(1000);
+#endif
 	}
 
 Error:

@@ -65,7 +65,7 @@ public:
 
 	texture(texture::type texType, wchar_t *pszFilename);
 	
-	~texture();
+	virtual ~texture();
 
 	texture::type GetTextureType() {
 		return m_params.textureType;

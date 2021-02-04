@@ -85,7 +85,7 @@ class DreamUserApp : public DreamApp<DreamUserApp>,
 
 public:
 	DreamUserApp(DreamOS *pDreamOS, void *pContext = nullptr);
-	~DreamUserApp();
+	virtual ~DreamUserApp();
 
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;

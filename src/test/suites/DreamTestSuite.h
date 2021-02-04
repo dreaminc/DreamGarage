@@ -8,7 +8,7 @@
 // Simple interface for dream specific test suites 
 // Mostly forces the SetupPipeline virtual function
 
-#include "Test/TestSuite.h"
+#include "test/TestSuite.h"
 
 class DreamOS;
 

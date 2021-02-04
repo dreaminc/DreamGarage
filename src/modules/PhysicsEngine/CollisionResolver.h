@@ -27,6 +27,9 @@ class CollisionResolver : Subscriber<CollisionGroupEvent>, public valid {
 private:
 	CollisionResolver();
 
+public:
+	virtual ~CollisionResolver() = default;
+
 protected:
 	RESULT Initialize();
 

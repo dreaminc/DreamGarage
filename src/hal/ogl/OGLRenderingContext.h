@@ -23,7 +23,7 @@ public:
 		// empty
 	}
 
-	~OGLRenderingContext() {
+	virtual ~OGLRenderingContext() {
 		// empty
 	}
 };

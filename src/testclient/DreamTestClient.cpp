@@ -149,6 +149,10 @@ RESULT DreamTestClient::RegisterTestSuites() {
 
 	m_registeredTestSuites = std::map<std::string, std::shared_ptr<TestSuite>>();
 
+#ifdef __ANDROID__
+	// TODO: 
+	// RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::HAL, this));
+#else
 	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::WEBRTC, this));
 	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::HAL, this));
 	RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this));
@@ -165,6 +169,7 @@ RESULT DreamTestClient::RegisterTestSuites() {
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::INTERACTION, this));
 	//RegisterTestSuite(TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::ANIMATION, this));
+#endif
 
 Error:
 	return r;

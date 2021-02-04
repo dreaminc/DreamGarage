@@ -94,6 +94,7 @@ public:
 
 	RESULT SetHMD(HMD *pHMD);
 
+	using VirtualObj::GetRay;
 	ray GetRay(double xPos, double yPos, double t = 0.0f);
 
 	// TODO: update this with a time delta / delta movement 

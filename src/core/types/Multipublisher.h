@@ -64,7 +64,8 @@ public:
 	}
 
 	//std::map<PKeyClass, std::map<PIndexClass, Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT> GetEvents() {
-	auto GetEvents() {
+	//auto GetEvents() {
+	std::map<PKeyClass, std::map<PIndexClass, std::vector<Subscriber<PKEventClass>*>>*, typename I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT> GetEvents() {
 		return m_indexedEvents;
 	}
 
@@ -73,7 +74,7 @@ public:
 	// This is an event subscription against a particular object
 	RESULT RegisterSubscriber(PIndexClass indexEvent, PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
-		char *pszEvent = nullptr;
+		//char *pszEvent = nullptr;
 
 		typename T_KeyMap::iterator it;
 		typename Multipublisher::T_SubscriberMap* pSubscriberMap = nullptr;
@@ -98,7 +99,7 @@ public:
 			T_SubscriberVector *pSubscriberVector = &((*pSubscriberMap)[indexEvent]);
 			auto subscriberVectorIt = find(pSubscriberVector->begin(), pSubscriberVector->end(), pSubscriber);
 
-			CBM((subscriberVectorIt == pSubscriberVector->end()), "Object already subscribed to event %s", GetEventKeyString(keyEvent));
+			CBM((subscriberVectorIt == pSubscriberVector->end()), "Object already subscribed to event %s", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 			pSubscriberVector->push_back(pSubscriber);
 		}
 		
@@ -130,7 +131,7 @@ public:
 
 			T_SubscriberVector *pSubscriberVector = &((*pSubscriberMap)[indexClass]);
 			auto subscriberVectorIt = find(pSubscriberVector->begin(), pSubscriberVector->end(), pSubscriber);
-			CBM((subscriberVectorIt != pSubscriberVector->end()), "Subscriber not subscribed to event %s", GetEventKeyString(keyClass));
+			CBM((subscriberVectorIt != pSubscriberVector->end()), "Subscriber not subscribed to event %s", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyClass));
 
 			pSubscriberVector->erase(subscriberVectorIt);
 

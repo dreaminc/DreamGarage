@@ -9,7 +9,10 @@
 #include <functional>
 #include <stack>
 #include "memory"                                      // for shared_ptr
-#include "xstring"                                     // for string, wstring
+
+#ifdef _WIN32
+	#include "xstring"                                     // for string, wstring
+#endif
 
 #include "modules/InteractionEngine/InteractionObjectEvent.h"
 

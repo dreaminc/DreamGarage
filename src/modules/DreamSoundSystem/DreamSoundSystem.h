@@ -51,7 +51,7 @@ public:
 
 public:
 	DreamSoundSystem(DreamOS *pDreamOS, void *pContext = nullptr);
-	~DreamSoundSystem();
+	virtual ~DreamSoundSystem();
 
 	virtual RESULT InitializeModule(void *pContext = nullptr) override;
 	virtual RESULT OnDidFinishInitializing(void *pContext = nullptr) override;

@@ -22,7 +22,7 @@ public:
 	};
 
 private:
-	__declspec(align(8)) struct MessageBody {
+	UNUSED __declspec(align(8)) struct MessageBody {
 		PeerAckMessage::type m_ackType;
 	} m_body;
 

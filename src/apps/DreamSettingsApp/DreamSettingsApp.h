@@ -24,10 +24,10 @@ public:
 	~DreamSettingsApp();
 
 	// DreamApp Interface
-	virtual RESULT InitializeApp(void *pContext = nullptr);
-	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr);
-	virtual RESULT Update(void *pContext = nullptr);
-	virtual RESULT Shutdown(void *pContext = nullptr);
+	virtual RESULT InitializeApp(void *pContext = nullptr) override;
+	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
+	virtual RESULT Update(void *pContext = nullptr) override;
+	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
 protected:
 	static DreamSettingsApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -42,9 +42,11 @@ public:
 	RESULT Hide();
 
 public:
-	std::string GetSuccessString();
+	std::string GetSuccessString() override;
 
 public:
+
+	using DreamFormApp::Notify;
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 	
 	// handles settings cancellation

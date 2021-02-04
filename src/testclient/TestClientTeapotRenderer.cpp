@@ -21,7 +21,7 @@
 //--------------------------------------------------------------------------------
 // Include files
 //--------------------------------------------------------------------------------
-#include "TestClientRenderer.h"
+#include "TestClientTeapotRenderer.h"
 
 #include <string.h>
 
@@ -33,21 +33,21 @@
 //--------------------------------------------------------------------------------
 // Ctor
 //--------------------------------------------------------------------------------
-TestClientRenderer::TestClientRenderer()
-    : geometry_instancing_support_(false) {}
+TestClientTeapotRenderer::TestClientTeapotRenderer()
+    : m_fGeometryInstancingSupported(false) {}
 
 //--------------------------------------------------------------------------------
 // Dtor
 //--------------------------------------------------------------------------------
-TestClientRenderer::~TestClientRenderer() { Unload(); }
+TestClientTeapotRenderer::~TestClientTeapotRenderer() { Unload(); }
 
 //--------------------------------------------------------------------------------
 // Init
 //--------------------------------------------------------------------------------
-void TestClientRenderer::Init(const int32_t numX, const int32_t numY, const int32_t numZ) {
+void TestClientTeapotRenderer::Init(const int32_t numX, const int32_t numY, const int32_t numZ) {
 
   if (ndk_helper::GLContext::GetInstance()->GetGLVersion() >= 3.0) {
-    geometry_instancing_support_ = true;
+    m_fGeometryInstancingSupported = true;
   }
   else if (ndk_helper::GLContext::GetInstance()->CheckExtension(
                  "GL_NV_draw_instanced") &&
@@ -64,19 +64,19 @@ void TestClientRenderer::Init(const int32_t numX, const int32_t numY, const int3
   glFrontFace(GL_CCW);
 
   // Create Index buffer
-  num_indices_ = sizeof(teapotIndices) / sizeof(teapotIndices[0]);
-  glGenBuffers(1, &ibo_);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_);
+  m_indices_n = sizeof(teapotIndices) / sizeof(teapotIndices[0]);
+  glGenBuffers(1, &m_glIBO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glIBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(teapotIndices), teapotIndices,
                GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   // Create VBO
-  num_vertices_ = sizeof(teapotPositions) / sizeof(teapotPositions[0]) / 3;
+  m_vertices_n = sizeof(teapotPositions) / sizeof(teapotPositions[0]) / 3;
   int32_t stride = sizeof(TEAPOT_VERTEX);
   int32_t index = 0;
-  TEAPOT_VERTEX* p = new TEAPOT_VERTEX[num_vertices_];
-  for (int32_t i = 0; i < num_vertices_; ++i) {
+  TEAPOT_VERTEX* p = new TEAPOT_VERTEX[m_vertices_n];
+  for (int32_t i = 0; i < m_vertices_n; ++i) {
     p[i].pos[0] = teapotPositions[index];
     p[i].pos[1] = teapotPositions[index + 1];
     p[i].pos[2] = teapotPositions[index + 2];
@@ -86,60 +86,60 @@ void TestClientRenderer::Init(const int32_t numX, const int32_t numY, const int3
     p[i].normal[2] = teapotNormals[index + 2];
     index += 3;
   }
-  glGenBuffers(1, &vbo_);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-  glBufferData(GL_ARRAY_BUFFER, stride * num_vertices_, p, GL_STATIC_DRAW);
+  glGenBuffers(1, &m_glVBO);
+  glBindBuffer(GL_ARRAY_BUFFER, m_glVBO);
+  glBufferData(GL_ARRAY_BUFFER, stride * m_vertices_n, p, GL_STATIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   delete[] p;
 
   // Init Projection matrices
-  teapot_x_ = numX;
-  teapot_y_ = numY;
-  teapot_z_ = numZ;
-  vec_mat_models_.reserve(teapot_x_ * teapot_y_ * teapot_z_);
+  m_teapotX = numX;
+  m_teapotY = numY;
+  m_teapotZ = numZ;
+  m_mat4Models.reserve(m_teapotX * m_teapotY * m_teapotZ);
 
   UpdateViewport();
 
   const float total_width = 500.f;
-  float gap_x = total_width / (teapot_x_ - 1);
-  float gap_y = total_width / (teapot_y_ - 1);
-  float gap_z = total_width / (teapot_z_ - 1);
+  float gap_x = total_width / (m_teapotX - 1);
+  float gap_y = total_width / (m_teapotY - 1);
+  float gap_z = total_width / (m_teapotZ - 1);
   float offset_x = -total_width / 2.f;
   float offset_y = -total_width / 2.f;
   float offset_z = -total_width / 2.f;
 
-  for (int32_t x = 0; x < teapot_x_; ++x)
-    for (int32_t y = 0; y < teapot_y_; ++y)
-      for (int32_t z = 0; z < teapot_z_; ++z) {
-        vec_mat_models_.push_back(ndk_helper::Mat4::Translation(
+  for (int32_t x = 0; x < m_teapotX; ++x)
+    for (int32_t y = 0; y < m_teapotY; ++y)
+      for (int32_t z = 0; z < m_teapotZ; ++z) {
+        m_mat4Models.push_back(ndk_helper::Mat4::Translation(
             x * gap_x + offset_x, y * gap_y + offset_y,
             z * gap_z + offset_z));
-        vec_colors_.push_back(ndk_helper::Vec3(
+        m_mat4ModelColors.push_back(ndk_helper::Vec3(
             random() / float(RAND_MAX * 1.1), random() / float(RAND_MAX * 1.1),
             random() / float(RAND_MAX * 1.1)));
 
         float rotation_x = random() / float(RAND_MAX) - 0.5f;
         float rotation_y = random() / float(RAND_MAX) - 0.5f;
-        vec_rotations_.push_back(ndk_helper::Vec2(rotation_x * 0.05f, rotation_y * 0.05f));
-        vec_current_rotations_.push_back(
+        m_vec2ModelRotations.push_back(ndk_helper::Vec2(rotation_x * 0.05f, rotation_y * 0.05f));
+        m_vec2ModelCurrentRotations.push_back(
             ndk_helper::Vec2(rotation_x * M_PI, rotation_y * M_PI));
       }
 
-  if (geometry_instancing_support_) {
+  if (m_fGeometryInstancingSupported) {
     //
     // Create parameter dictionary for shader patch
     std::map<std::string, std::string> param;
     param[std::string("%NUM_TEAPOT%")] =
-        ToString(teapot_x_ * teapot_y_ * teapot_z_);
+        ToString(m_teapotX * m_teapotY * m_teapotZ);
     param[std::string("%LOCATION_VERTEX%")] = ToString(ATTRIB_VERTEX);
     param[std::string("%LOCATION_NORMAL%")] = ToString(ATTRIB_NORMAL);
-    if (arb_support_)
+    if (m_fARBSupported)
       param[std::string("%ARB%")] = std::string("ARB");
     else
       param[std::string("%ARB%")] = std::string("");
 
     // Load shader
-    bool b = LoadShadersES3(&shader_param_, "Shaders/VS_ShaderPlainES3.vsh",
+    bool b = LoadShadersES3(&m_shaderParams, "Shaders/VS_ShaderPlainES3.vsh",
                             "Shaders/ShaderPlainES3.fsh", param);
     if (b) {
       //
@@ -147,37 +147,37 @@ void TestClientRenderer::Init(const int32_t numX, const int32_t numY, const int3
       //
       GLuint bindingPoint = 1;
       GLuint blockIndex;
-      blockIndex = glGetUniformBlockIndex(shader_param_.program_, "ParamBlock");
-      glUniformBlockBinding(shader_param_.program_, blockIndex, bindingPoint);
+      blockIndex = glGetUniformBlockIndex(m_shaderParams.program_, "ParamBlock");
+      glUniformBlockBinding(m_shaderParams.program_, blockIndex, bindingPoint);
 
       // Retrieve array stride value
       int32_t num_indices;
-      glGetActiveUniformBlockiv(shader_param_.program_, blockIndex,
+      glGetActiveUniformBlockiv(m_shaderParams.program_, blockIndex,
                                 GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &num_indices);
       GLint i[num_indices];
       GLint stride[num_indices];
-      glGetActiveUniformBlockiv(shader_param_.program_, blockIndex,
+      glGetActiveUniformBlockiv(m_shaderParams.program_, blockIndex,
                                 GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, i);
-      glGetActiveUniformsiv(shader_param_.program_, num_indices, (GLuint*)i,
+      glGetActiveUniformsiv(m_shaderParams.program_, num_indices, (GLuint*)i,
                             GL_UNIFORM_ARRAY_STRIDE, stride);
 
-      ubo_matrix_stride_ = stride[0] / sizeof(float);
-      ubo_vector_stride_ = stride[2] / sizeof(float);
+      m_UBOMatrixStride = stride[0] / sizeof(float);
+      m_UBOVectorStride = stride[2] / sizeof(float);
 
-      glGenBuffers(1, &ubo_);
-      glBindBuffer(GL_UNIFORM_BUFFER, ubo_);
-      glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, ubo_);
+      glGenBuffers(1, &m_glUBO);
+      glBindBuffer(GL_UNIFORM_BUFFER, m_glUBO);
+      glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, m_glUBO);
 
       // Store color value which wouldn't be updated every frame
-      int32_t size = teapot_x_ * teapot_y_ * teapot_z_ *
-                      (ubo_matrix_stride_ + ubo_matrix_stride_ +
-                       ubo_vector_stride_);  // Mat4 + Mat4 + Vec3 + 1 stride
+      int32_t size = m_teapotX * m_teapotY * m_teapotZ *
+                      (m_UBOMatrixStride + m_UBOMatrixStride +
+                       m_UBOVectorStride);  // Mat4 + Mat4 + Vec3 + 1 stride
       float* pBuffer = new float[size];
       float* pColor =
-          pBuffer + teapot_x_ * teapot_y_ * teapot_z_ * ubo_matrix_stride_ * 2;
-      for (int32_t i = 0; i < teapot_x_ * teapot_y_ * teapot_z_; ++i) {
-        memcpy(pColor, &vec_colors_[i], 3 * sizeof(float));
-        pColor += ubo_vector_stride_;  // Assuming std140 layout which is 4
+          pBuffer + m_teapotX * m_teapotY * m_teapotZ * m_UBOMatrixStride * 2;
+      for (int32_t i = 0; i < m_teapotX * m_teapotY * m_teapotZ; ++i) {
+        memcpy(pColor, &m_mat4ModelColors[i], 3 * sizeof(float));
+        pColor += m_UBOVectorStride;  // Assuming std140 layout which is 4
                                        // DWORD stride for vectors
       }
 
@@ -187,19 +187,19 @@ void TestClientRenderer::Init(const int32_t numX, const int32_t numY, const int3
     } else {
       LOGI("Shader compilation failed!! Falls back to ES2.0 pass");
       // This happens some devices.
-      geometry_instancing_support_ = false;
+      m_fGeometryInstancingSupported = false;
       // Load shader for GLES2.0
-      LoadShaders(&shader_param_, "Shaders/VS_ShaderPlain.vsh",
+      LoadShaders(&m_shaderParams, "Shaders/VS_ShaderPlain.vsh",
                   "Shaders/ShaderPlain.fsh");
     }
   } else {
     // Load shader for GLES2.0
-    LoadShaders(&shader_param_, "Shaders/VS_ShaderPlain.vsh",
+    LoadShaders(&m_shaderParams, "Shaders/VS_ShaderPlain.vsh",
                 "Shaders/ShaderPlain.fsh");
   }
 }
 
-void TestClientRenderer::UpdateViewport() {
+void TestClientTeapotRenderer::UpdateViewport() {
   int32_t viewport[4];
   glGetIntegerv(GL_VIEWPORT, viewport);
 
@@ -208,12 +208,12 @@ void TestClientRenderer::UpdateViewport() {
   if (viewport[2] < viewport[3]) {
     float aspect =
             static_cast<float>(viewport[2]) / static_cast<float>(viewport[3]);
-    mat_projection_ =
+    m_mat4Projection =
             ndk_helper::Mat4::Perspective(aspect, 1.0f, CAM_NEAR, CAM_FAR);
   } else {
     float aspect =
             static_cast<float>(viewport[3]) / static_cast<float>(viewport[2]);
-    mat_projection_ =
+    m_mat4Projection =
             ndk_helper::Mat4::Perspective(1.0f, aspect, CAM_NEAR, CAM_FAR);
   }
 }
@@ -221,50 +221,50 @@ void TestClientRenderer::UpdateViewport() {
 //--------------------------------------------------------------------------------
 // Unload
 //--------------------------------------------------------------------------------
-void TestClientRenderer::Unload() {
-  if (vbo_) {
-    glDeleteBuffers(1, &vbo_);
-    vbo_ = 0;
+void TestClientTeapotRenderer::Unload() {
+  if (m_glVBO) {
+    glDeleteBuffers(1, &m_glVBO);
+    m_glVBO = 0;
   }
-  if (ubo_) {
-    glDeleteBuffers(1, &ubo_);
-    ubo_ = 0;
+  if (m_glUBO) {
+    glDeleteBuffers(1, &m_glUBO);
+    m_glUBO = 0;
   }
-  if (ibo_) {
-    glDeleteBuffers(1, &ibo_);
-    ibo_ = 0;
+  if (m_glIBO) {
+    glDeleteBuffers(1, &m_glIBO);
+    m_glIBO = 0;
   }
-  if (shader_param_.program_) {
-    glDeleteProgram(shader_param_.program_);
-    shader_param_.program_ = 0;
+  if (m_shaderParams.program_) {
+    glDeleteProgram(m_shaderParams.program_);
+    m_shaderParams.program_ = 0;
   }
 }
 
 //--------------------------------------------------------------------------------
 // Update
 //--------------------------------------------------------------------------------
-void TestClientRenderer::Update(float fTime) {
+void TestClientTeapotRenderer::Update(float fTime) {
   const float CAM_X = 0.f;
   const float CAM_Y = 0.f;
   const float CAM_Z = 2000.f;
 
-  mat_view_ = ndk_helper::Mat4::LookAt(ndk_helper::Vec3(CAM_X, CAM_Y, CAM_Z),
+  m_mat4View = ndk_helper::Mat4::LookAt(ndk_helper::Vec3(CAM_X, CAM_Y, CAM_Z),
                                        ndk_helper::Vec3(0.f, 0.f, 0.f),
                                        ndk_helper::Vec3(0.f, 1.f, 0.f));
 
-  if (camera_) {
-    camera_->Update();
-    mat_view_ = camera_->GetTransformMatrix() * mat_view_ *
-                camera_->GetRotationMatrix();
+  if (m_pTapCamera) {
+    m_pTapCamera->Update();
+    m_mat4View = m_pTapCamera->GetTransformMatrix() * m_mat4View *
+                m_pTapCamera->GetRotationMatrix();
   }
 }
 
 //--------------------------------------------------------------------------------
 // Render
 //--------------------------------------------------------------------------------
-void TestClientRenderer::Render() {
+void TestClientTeapotRenderer::Render() {
   // Bind the VBO
-  glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+  glBindBuffer(GL_ARRAY_BUFFER, m_glVBO);
 
   int32_t iStride = sizeof(TEAPOT_VERTEX);
   // Pass the vertex data
@@ -276,82 +276,82 @@ void TestClientRenderer::Render() {
   glEnableVertexAttribArray(ATTRIB_NORMAL);
 
   // Bind the IB
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glIBO);
 
-  glUseProgram(shader_param_.program_);
+  glUseProgram(m_shaderParams.program_);
 
   TEAPOT_MATERIALS material = {{1.0f, 1.0f, 1.0f, 10.f}, {0.1f, 0.1f, 0.1f}, };
 
   // Update uniforms
   // using glUniform3fv here was troublesome..
-  glUniform4f(shader_param_.material_specular_, material.specular_color[0],
+  glUniform4f(m_shaderParams.material_specular_, material.specular_color[0],
               material.specular_color[1], material.specular_color[2],
               material.specular_color[3]);
-  glUniform3f(shader_param_.material_ambient_, material.ambient_color[0],
+  glUniform3f(m_shaderParams.material_ambient_, material.ambient_color[0],
               material.ambient_color[1], material.ambient_color[2]);
 
-  glUniform3f(shader_param_.light0_, 100.f, -200.f, -600.f);
+  glUniform3f(m_shaderParams.light0_, 100.f, -200.f, -600.f);
 
-  if (geometry_instancing_support_) {
+  if (m_fGeometryInstancingSupported) {
     //
     // Geometry instancing, new feature in GLES3.0
     //
 
     // Update UBO
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo_);
+    glBindBuffer(GL_UNIFORM_BUFFER, m_glUBO);
     float* p = (float*)glMapBufferRange(
-        GL_UNIFORM_BUFFER, 0, teapot_x_ * teapot_y_ * teapot_z_ *
-                                  (ubo_matrix_stride_ * 2) * sizeof(float),
+        GL_UNIFORM_BUFFER, 0, m_teapotX * m_teapotY * m_teapotZ *
+                                  (m_UBOMatrixStride * 2) * sizeof(float),
         GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
     float* mat_mvp = p;
-    float* mat_mv = p + teapot_x_ * teapot_y_ * teapot_z_ * ubo_matrix_stride_;
-    for (int32_t i = 0; i < teapot_x_ * teapot_y_ * teapot_z_; ++i) {
+    float* mat_mv = p + m_teapotX * m_teapotY * m_teapotZ * m_UBOMatrixStride;
+    for (int32_t i = 0; i < m_teapotX * m_teapotY * m_teapotZ; ++i) {
       // Rotation
       float x, y;
-      vec_current_rotations_[i] += vec_rotations_[i];
-      vec_current_rotations_[i].Value(x, y);
+      m_vec2ModelCurrentRotations[i] += m_vec2ModelRotations[i];
+      m_vec2ModelCurrentRotations[i].Value(x, y);
       ndk_helper::Mat4 mat_rotation =
           ndk_helper::Mat4::RotationX(x) * ndk_helper::Mat4::RotationY(y);
 
       // Feed Projection and Model View matrices to the shaders
-      ndk_helper::Mat4 mat_v = mat_view_ * vec_mat_models_[i] * mat_rotation;
-      ndk_helper::Mat4 mat_vp = mat_projection_ * mat_v;
+      ndk_helper::Mat4 mat_v = m_mat4View * m_mat4Models[i] * mat_rotation;
+      ndk_helper::Mat4 mat_vp = m_mat4Projection * mat_v;
 
       memcpy(mat_mvp, mat_vp.Ptr(), sizeof(mat_v));
-      mat_mvp += ubo_matrix_stride_;
+      mat_mvp += m_UBOMatrixStride;
 
       memcpy(mat_mv, mat_v.Ptr(), sizeof(mat_v));
-      mat_mv += ubo_matrix_stride_;
+      mat_mv += m_UBOMatrixStride;
     }
     glUnmapBuffer(GL_UNIFORM_BUFFER);
 
     // Instanced rendering
-    glDrawElementsInstanced(GL_TRIANGLES, num_indices_, GL_UNSIGNED_SHORT,
+    glDrawElementsInstanced(GL_TRIANGLES, m_indices_n, GL_UNSIGNED_SHORT,
                             BUFFER_OFFSET(0),
-                            teapot_x_ * teapot_y_ * teapot_z_);
+                            m_teapotX * m_teapotY * m_teapotZ);
 
   } else {
     // Regular rendering pass
-    for (int32_t i = 0; i < teapot_x_ * teapot_y_ * teapot_z_; ++i) {
+    for (int32_t i = 0; i < m_teapotX * m_teapotY * m_teapotZ; ++i) {
       // Set diffuse
       float x, y, z;
-      vec_colors_[i].Value(x, y, z);
-      glUniform4f(shader_param_.material_diffuse_, x, y, z, 1.f);
+      m_mat4ModelColors[i].Value(x, y, z);
+      glUniform4f(m_shaderParams.material_diffuse_, x, y, z, 1.f);
 
       // Rotation
-      vec_current_rotations_[i] += vec_rotations_[i];
-      vec_current_rotations_[i].Value(x, y);
+      m_vec2ModelCurrentRotations[i] += m_vec2ModelRotations[i];
+      m_vec2ModelCurrentRotations[i].Value(x, y);
       ndk_helper::Mat4 mat_rotation =
           ndk_helper::Mat4::RotationX(x) * ndk_helper::Mat4::RotationY(y);
 
       // Feed Projection and Model View matrices to the shaders
-      ndk_helper::Mat4 mat_v = mat_view_ * vec_mat_models_[i] * mat_rotation;
-      ndk_helper::Mat4 mat_vp = mat_projection_ * mat_v;
-      glUniformMatrix4fv(shader_param_.matrix_projection_, 1, GL_FALSE,
+      ndk_helper::Mat4 mat_v = m_mat4View * m_mat4Models[i] * mat_rotation;
+      ndk_helper::Mat4 mat_vp = m_mat4Projection * mat_v;
+      glUniformMatrix4fv(m_shaderParams.matrix_projection_, 1, GL_FALSE,
                          mat_vp.Ptr());
-      glUniformMatrix4fv(shader_param_.matrix_view_, 1, GL_FALSE, mat_v.Ptr());
+      glUniformMatrix4fv(m_shaderParams.matrix_view_, 1, GL_FALSE, mat_v.Ptr());
 
-      glDrawElements(GL_TRIANGLES, num_indices_, GL_UNSIGNED_SHORT,
+      glDrawElements(GL_TRIANGLES, m_indices_n, GL_UNSIGNED_SHORT,
                      BUFFER_OFFSET(0));
     }
   }
@@ -363,7 +363,7 @@ void TestClientRenderer::Render() {
 //--------------------------------------------------------------------------------
 // LoadShaders
 //--------------------------------------------------------------------------------
-bool TestClientRenderer::LoadShaders(SHADER_PARAMS* params, const char* strVsh,
+bool TestClientTeapotRenderer::LoadShaders(SHADER_PARAMS* params, const char* strVsh,
                                      const char* strFsh) {
   //
   // Shader load for GLES2
@@ -440,7 +440,7 @@ bool TestClientRenderer::LoadShaders(SHADER_PARAMS* params, const char* strVsh,
   return true;
 }
 
-bool TestClientRenderer::LoadShadersES3(
+bool TestClientTeapotRenderer::LoadShadersES3(
     SHADER_PARAMS* params, const char* strVsh, const char* strFsh,
     std::map<std::string, std::string>& shaderParams) {
   //
@@ -513,15 +513,15 @@ bool TestClientRenderer::LoadShadersES3(
 //--------------------------------------------------------------------------------
 // Bind
 //--------------------------------------------------------------------------------
-bool TestClientRenderer::Bind(ndk_helper::TapCamera* camera) {
-  camera_ = camera;
+bool TestClientTeapotRenderer::Bind(ndk_helper::TapCamera* camera) {
+  m_pTapCamera = camera;
   return true;
 }
 
 //--------------------------------------------------------------------------------
 // Helper functions
 //--------------------------------------------------------------------------------
-std::string TestClientRenderer::ToString(const int32_t i) {
+std::string TestClientTeapotRenderer::ToString(const int32_t i) {
   char str[64];
   snprintf(str, sizeof(str), "%d", i);
   return std::string(str);

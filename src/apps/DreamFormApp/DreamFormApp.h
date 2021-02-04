@@ -44,10 +44,10 @@ public:
 	~DreamFormApp();
 
 	// DreamApp Interface
-	virtual RESULT InitializeApp(void *pContext = nullptr);
-	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr);
-	virtual RESULT Update(void *pContext = nullptr);
-	virtual RESULT Shutdown(void *pContext = nullptr);
+	virtual RESULT InitializeApp(void *pContext = nullptr) override;
+	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
+	virtual RESULT Update(void *pContext = nullptr) override;
+	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
 protected:
 	static DreamFormApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);

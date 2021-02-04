@@ -36,7 +36,7 @@ public:
 		ClearICEServers();
 	}
 
-	TwilioNTSInformation(std::string strDateCreated, std::string strDateUpdated, int TTL) : 
+	TwilioNTSInformation(std::string strDateCreated, std::string strDateUpdated, int TTL) :
 		m_TTL(TTL)
 	{
 		ClearICEServers();
@@ -98,7 +98,7 @@ public:
 private:
 	std::time_t m_timeCreated;
 	std::time_t m_timeUpdated;
-	int m_TTL;
+	UNUSED int m_TTL = -1;
 
 	std::string m_strUsername;
 	std::string m_strPassword;

@@ -54,19 +54,19 @@ public:
 		return m_body.pAudioDataBuffer;
 	}
 
-	const int GetBitsPerSample() {
+	int GetBitsPerSample() {
 		return m_body.bitsPerSample;
 	}
 
-	const int GetSamplingRate() {
+	int GetSamplingRate() {
 		return m_body.samplingRate;
 	}
 
-	const size_t GetNumChannels() {
+	size_t GetNumChannels() {
 		return m_body.numChannels;
 	}
 
-	const size_t GetNumFrames() {
+	size_t GetNumFrames() {
 		return m_body.numFrames;
 	}
 };

@@ -4,7 +4,7 @@ DreamAppMessage::DreamAppMessage(long senderUserID, long receiverUserID, std::st
 	DreamMessage(senderUserID, receiverUserID, DreamMessage::type::APP, messageSize)
 {
 	m_dreamAppMessageHeader.strSenderDreamAppName = strSenderDreamAppName;
-	m_dreamAppMessageHeader.uidSenderDreamApp;
+	m_dreamAppMessageHeader.uidSenderDreamApp = uidSenderDreamApp;
 }
 
 DreamAppMessage::~DreamAppMessage() {
@@ -14,7 +14,8 @@ DreamAppMessage::~DreamAppMessage() {
 RESULT DreamAppMessage::PrintMessage() {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("DreamAppMessage sender:%s UID: %I64u",
+	//DEBUG_LINEOUT("DreamAppMessage sender:%s UID: %I64u",
+	DEBUG_LINEOUT("DreamAppMessage sender:%s UID: %llu",
 		m_dreamAppMessageHeader.strSenderDreamAppName.c_str(), m_dreamAppMessageHeader.uidSenderDreamApp.GetID());
 
 	CR(DreamMessage::PrintMessage());

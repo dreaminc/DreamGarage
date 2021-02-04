@@ -47,7 +47,11 @@ public:
 	~OGLProgram();
 
 	// ProgramNode Interface
-	virtual RESULT SetupConnections() = 0;
+
+#if defined(_WIN32)
+	virtual RESULT SetupConnections() = 0;  
+#endif
+
 	virtual RESULT ProcessNode(long frameID = 0) override;
 
 	virtual RESULT OGLInitialize();

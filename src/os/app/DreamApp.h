@@ -33,7 +33,7 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) = 0;
 	virtual RESULT Shutdown(void *pContext = nullptr) = 0;
 
-	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) { return R_NOT_HANDLED; }
+	virtual RESULT HandleDreamAppMessage(UNUSED PeerConnection* pPeerConnection, UNUSED DreamAppMessage *pDreamAppMessage) { return R_NOT_HANDLED; }
 
 	virtual composite* GetComposite();
 	RESULT SetComposite(composite* pComposite);

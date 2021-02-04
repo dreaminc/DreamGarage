@@ -48,7 +48,7 @@ public:
 	OGLImp(OGLRenderingContext *pOpenGLRenderingContext);
 	~OGLImp();
 
-	virtual std::string GetHALName() {
+	virtual std::string GetHALName() override {
 		return "ogl";
 	}
 
@@ -95,24 +95,25 @@ public:
 	
 	virtual cubemap* MakeCubemap(const std::wstring &wstrCubemapName) override;
 
-	skybox *MakeSkybox();
+	// TODO: Remove this
+	skybox *MakeSkybox() override;
 
 	//mesh *MakeMesh(wchar_t *pszModelName);
 	OGLMesh* MakeMesh(PrimParams *pPrimParams, bool fInitialize = false);
-	mesh *MakeMesh(const std::vector<vertex>& vertices);
-	mesh *MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
+	mesh *MakeMesh(const std::vector<vertex>& vertices) override;
+	mesh *MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) override;
 
 	OGLModel* MakeModel(PrimParams *pPrimParams, bool fInitialize = false);
 	virtual composite *MakeComposite() override;
 	virtual model *MakeModel() override;
 
-	FlatContext* MakeFlatContext(int width, int height, int channels);
-	dosuser *MakeUser();
+	FlatContext* MakeFlatContext(int width, int height, int channels) override;
+	dosuser *MakeUser() override;
 
 	virtual billboard *MakeBillboard(point ptOrigin, float width, float height) override;
 
-	hand* MakeHand(HAND_TYPE type);
-	hand* MakeHand(HAND_TYPE type, long avatarID);
+	hand* MakeHand(HAND_TYPE type) override;
+	hand* MakeHand(HAND_TYPE type, long avatarID) override;
 
 	// TODO: Fix w/ scene graph not here
 	//composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));

@@ -68,6 +68,7 @@ class UIKeyboard : public DreamApp<UIKeyboard>,
 
 public:
 	UIKeyboard(DreamOS *pDreamOS, void *pContext = nullptr);
+	virtual ~UIKeyboard() = default;
 
 private:
 	RESULT InitializeQuadsWithLayout(UIKeyboardLayout *pLayout);

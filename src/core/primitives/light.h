@@ -59,8 +59,8 @@ public:
 		matrix<virtual_precision, 4, 4> matVP;
 		matVP.identity();
 
-		quaternion qOrientation = quaternion::jQuaternion(0.0f);
-		//qOrientation.RotateByVector(m_vectorDirection, 0.0f); //quaternion(0.0f, m_vectorDirection).RotateVector(vector::kVector(-1.0f));
+		// quaternion qOrientation = quaternion::jQuaternion(0.0f);
+		// qOrientation.RotateByVector(m_vectorDirection, 0.0f); //quaternion(0.0f, m_vectorDirection).RotateVector(vector::kVector(-1.0f));
 
 		if (m_type == LIGHT_DIRECTIONAL) {
 			matVP = ProjectionMatrix(width, height, nearPlane, farPlane);

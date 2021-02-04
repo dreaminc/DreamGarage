@@ -37,7 +37,7 @@ class DreamAppManager : public Manager {
 
 public:
 	DreamAppManager(DreamOS *pDreamOS);
-	~DreamAppManager();
+	virtual ~DreamAppManager();
 
 	virtual RESULT Initialize() override;
 	virtual RESULT Update() override;

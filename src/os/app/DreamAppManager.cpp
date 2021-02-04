@@ -123,16 +123,16 @@ RESULT DreamAppManager::Update() {
 	{
 		// TODO: A lot of this can be alleviated with multi-threading 
 		// and the update for an app is stuff that needs to be inside of the render thread
-		auto tAfterLoop = std::chrono::high_resolution_clock::now();
-		auto usLastLoopTime = std::chrono::duration_cast<std::chrono::microseconds>(tAfterLoop - m_tBeforeLoop).count();
-		double usAppTimeAvailable = (1.0e6 / m_minFrameRate) - (double)(usLastLoopTime);
+		// auto tAfterLoop = std::chrono::high_resolution_clock::now();
+		// auto usLastLoopTime = std::chrono::duration_cast<std::chrono::microseconds>(tAfterLoop - m_tBeforeLoop).count();
+		// double usAppTimeAvailable = (1.0e6 / m_minFrameRate) - (double)(usLastLoopTime);
 
-		//CBRM((usAppTimeAvailable > 0.0f), R_SKIPPED ,"Sandbox took longer than min frame rate time available %f", (double)(usAppTimeAvailable));
+		// CBRM((usAppTimeAvailable > 0.0f), R_SKIPPED ,"Sandbox took longer than min frame rate time available %f", (double)(usAppTimeAvailable));
 
-		double usTimeLeft = 0.0f;
-		auto tAppUpdatesStart = std::chrono::high_resolution_clock::now();
+		// double usTimeLeft = 0.0f;
+		// auto tAppUpdatesStart = std::chrono::high_resolution_clock::now();
 
-		//while (m_appPriorityQueue.size() > 0 && 
+		// while (m_appPriorityQueue.size() > 0 &&
 		//	(usTimeLeft = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - tAppUpdatesStart).count()) < usAppTimeAvailable) 
 		while (m_appPriorityQueue.size() > 0)
 		{
@@ -249,7 +249,7 @@ DreamAppHandle* DreamAppManager::CaptureApp(UID uid, DreamAppBase* pRequestingAp
 	//stored in the map, not whether the 'AppState' is true or not
 	//CB(m_appHandleRegistry.count(uid) == 0);
 	CB(	m_appHandleRegistry.count(uid) == 0 || 
-		pApp->GetHandleLimit() == -1 ||
+		//pApp->GetHandleLimit() == -1 || TODO: GetHandleLimit is unsigned so whatever this is doing, it's not much
 		m_appHandleRegistry[uid].size() < pApp->GetHandleLimit());
 	
 	pAppHandle = pApp->GetAppHandle();

@@ -20,7 +20,7 @@ public:
 		// empty
 	}
 
-	~RenderingContext() {
+	virtual ~RenderingContext() {
 			// empty
 	}
 

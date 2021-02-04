@@ -13,6 +13,7 @@ public:
 public: 
 	UID();
 	UID(UID::type uidType);
+	virtual ~UID() = default;
 
 	UINT64 GetID();
 	RESULT Dealloc();

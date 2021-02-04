@@ -27,6 +27,9 @@ class PhysicsIntegrator : public Integrator {
 private:
 	PhysicsIntegrator();
 
+public:
+	virtual ~PhysicsIntegrator() = default;
+
 protected:
 	virtual RESULT UpdateObject(VirtualObj *pVirtualObj, double msTimeStep) override;
 

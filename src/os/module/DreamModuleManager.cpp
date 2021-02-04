@@ -112,14 +112,14 @@ RESULT DreamModuleManager::Update() {
 	{
 		// TODO: A lot of this can be alleviated with multi-threading 
 		// and the update for an app is stuff that needs to be inside of the render thread
-		auto tAfterLoop = std::chrono::high_resolution_clock::now();
-		auto usLastLoopTime = std::chrono::duration_cast<std::chrono::microseconds>(tAfterLoop - m_tBeforeLoop).count();
-		double usModuleTimeAvailable = (1.0e6 / m_minFrameRate) - (double)(usLastLoopTime);
+		// auto tAfterLoop = std::chrono::high_resolution_clock::now();
+		// auto usLastLoopTime = std::chrono::duration_cast<std::chrono::microseconds>(tAfterLoop - m_tBeforeLoop).count();
+		// double usModuleTimeAvailable = (1.0e6 / m_minFrameRate) - (double)(usLastLoopTime);
 
-		double usTimeLeft = 0.0f;
-		auto tModuleUpdatesStart = std::chrono::high_resolution_clock::now();
+		// double usTimeLeft = 0.0f;
+		// auto tModuleUpdatesStart = std::chrono::high_resolution_clock::now();
 
-		//while (m_appPriorityQueue.size() > 0 && 
+		// while (m_appPriorityQueue.size() > 0 &&
 		//	(usTimeLeft = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - tAppUpdatesStart).count()) < usAppTimeAvailable) 
 		while (m_modulePriorityQueue.size() > 0)
 		{

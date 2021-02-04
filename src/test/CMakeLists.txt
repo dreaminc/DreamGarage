@@ -15,7 +15,7 @@ source_group("suites" FILES ${TEST_SUITE_SOURCES})
 # TODO: This should not be here!!!!!!!!!!
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
 
-add_library(test
+add_library(test_suite
     ${SOURCES}
     ${TEST_SUITE_SOURCES}
 )

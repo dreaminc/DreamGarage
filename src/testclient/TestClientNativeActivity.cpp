@@ -29,15 +29,16 @@
 #include <android_native_app_glue.h>
 #include <android/native_window_jni.h>
 
-#include "TestClientRenderer.h"
+#include "TestClientTeapotRenderer.h"
 
 #include "core/ehm/EHM.h"
 
 //-------------------------------------------------------------------------
 // Preprocessor
 //-------------------------------------------------------------------------
-#define HELPER_CLASS_NAME \
-  "com/sample/helper/NDKHelper"  // Class name of helper function
+
+#define HELPER_CLASS_NAME "com/sample/helper/NDKHelper"  // Class name of helper function
+
 //-------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------
@@ -49,13 +50,14 @@ const int32_t NUM_TEAPOTS_Z = 8;
 // Shared state for our app.
 //-------------------------------------------------------------------------
 struct android_app;
-class Engine {
-  TestClientRenderer renderer_;
+
+class TestNativeActivityTeapotEngine {
+  TestClientTeapotRenderer m_testClientTeapotRenderer;
 
   ndk_helper::GLContext* gl_context_;
 
-  bool initialized_resources_;
-  bool has_focus_;
+  bool m_fRescourcesInitialized;
+  bool m_fHasFocus;
 
   ndk_helper::DoubletapDetector doubletap_detector_;
   ndk_helper::PinchDetector pinch_detector_;
@@ -64,11 +66,11 @@ class Engine {
 
   ndk_helper::TapCamera tap_camera_;
 
-  android_app* app_;
+  android_app* m_pAndroidAppState;
 
-  ASensorManager* sensor_manager_;
-  const ASensor* accelerometer_sensor_;
-  ASensorEventQueue* sensor_event_queue_;
+  ASensorManager* pAndroidSensorManager = nullptr;
+  const ASensor* pAndroidAccelerometerSensor = nullptr;
+  ASensorEventQueue* pAndroidSensorEventQueue = nullptr;
 
   void UpdateFPS(float fps);
   void ShowUI();
@@ -78,8 +80,8 @@ class Engine {
   static void HandleCmd(struct android_app* app, int32_t cmd);
   static int32_t HandleInput(android_app* app, AInputEvent* event);
 
-  Engine();
-  ~Engine();
+  TestNativeActivityTeapotEngine();
+  ~TestNativeActivityTeapotEngine();
   void SetState(android_app* app);
   int InitDisplay(android_app* app);
   void LoadResources();
@@ -100,58 +102,61 @@ class Engine {
 //-------------------------------------------------------------------------
 // Ctor
 //-------------------------------------------------------------------------
-Engine::Engine()
-    : initialized_resources_(false),
-      has_focus_(false),
-      app_(NULL),
-      sensor_manager_(NULL),
-      accelerometer_sensor_(NULL),
-      sensor_event_queue_(NULL) {
+TestNativeActivityTeapotEngine::TestNativeActivityTeapotEngine()
+    : m_fRescourcesInitialized(false),
+      m_fHasFocus(false),
+      m_pAndroidAppState(NULL),
+      pAndroidSensorManager(NULL),
+      pAndroidAccelerometerSensor(NULL),
+      pAndroidSensorEventQueue(NULL) {
   gl_context_ = ndk_helper::GLContext::GetInstance();
 }
 
 //-------------------------------------------------------------------------
 // Dtor
 //-------------------------------------------------------------------------
-Engine::~Engine() {}
+TestNativeActivityTeapotEngine::~TestNativeActivityTeapotEngine() {}
 
 /**
  * Load resources
  */
-void Engine::LoadResources() {
-  renderer_.Init(NUM_TEAPOTS_X, NUM_TEAPOTS_Y, NUM_TEAPOTS_Z);
-  renderer_.Bind(&tap_camera_);
+void TestNativeActivityTeapotEngine::LoadResources() {
+  m_testClientTeapotRenderer.Init(NUM_TEAPOTS_X, NUM_TEAPOTS_Y, NUM_TEAPOTS_Z);
+  m_testClientTeapotRenderer.Bind(&tap_camera_);
 }
 
 /**
  * Unload resources
  */
-void Engine::UnloadResources() { renderer_.Unload(); }
+void TestNativeActivityTeapotEngine::UnloadResources() { m_testClientTeapotRenderer.Unload(); }
 
 /**
  * Initialize an EGL context for the current display.
  */
-int Engine::InitDisplay(android_app *app) {
-  if (!initialized_resources_) {
-    gl_context_->Init(app_->window);
+int TestNativeActivityTeapotEngine::InitDisplay(android_app *app) {
+  if (!m_fRescourcesInitialized) {
+    gl_context_->Init(m_pAndroidAppState->window);
     LoadResources();
-    initialized_resources_ = true;
-  } else if(app->window != gl_context_->GetANativeWindow()) {
+    m_fRescourcesInitialized = true;
+  } 
+  else if(app->window != gl_context_->GetANativeWindow()) {
     // Re-initialize ANativeWindow.
     // On some devices, ANativeWindow is re-created when the app is resumed
     assert(gl_context_->GetANativeWindow());
     UnloadResources();
     gl_context_->Invalidate();
-    app_ = app;
+    m_pAndroidAppState = app;
     gl_context_->Init(app->window);
     LoadResources();
-    initialized_resources_ = true;
-  } else {
+    m_fRescourcesInitialized = true;
+  } 
+  else {
     // initialize OpenGL ES and EGL
-    if (EGL_SUCCESS == gl_context_->Resume(app_->window)) {
+    if (EGL_SUCCESS == gl_context_->Resume(m_pAndroidAppState->window)) {
       UnloadResources();
       LoadResources();
-    } else {
+    } 
+    else {
       assert(0);
     }
   }
@@ -165,7 +170,7 @@ int Engine::InitDisplay(android_app *app) {
 
   // Note that screen size might have been changed
   glViewport(0, 0, gl_context_->GetScreenWidth(), gl_context_->GetScreenHeight());
-  renderer_.UpdateViewport();
+  m_testClientTeapotRenderer.UpdateViewport();
 
   tap_camera_.SetFlip(1.f, -1.f, -1.f);
   tap_camera_.SetPinchTransformFactor(10.f, 10.f, 8.f);
@@ -176,18 +181,20 @@ int Engine::InitDisplay(android_app *app) {
 /**
  * Just the current frame in the display.
  */
-void Engine::DrawFrame() {
+void TestNativeActivityTeapotEngine::DrawFrame() {
   float fps;
+
   if (monitor_.Update(fps)) {
     UpdateFPS(fps);
   }
+  
   double dTime = monitor_.GetCurrentTime();
-  renderer_.Update(dTime);
+  m_testClientTeapotRenderer.Update(dTime);
 
   // Just fill the screen with a color.
   glClearColor(0.5f, 0.5f, 0.5f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  renderer_.Render();
+  m_testClientTeapotRenderer.Render();
 
   // Swap
   if (EGL_SUCCESS != gl_context_->Swap()) {
@@ -196,20 +203,18 @@ void Engine::DrawFrame() {
   }
 }
 
-/**
- * Tear down the EGL context currently associated with the display.
- */
-void Engine::TermDisplay() { gl_context_->Suspend(); }
 
-void Engine::TrimMemory() {
+// Tear down the EGL context currently associated with the display.
+void TestNativeActivityTeapotEngine::TermDisplay() { gl_context_->Suspend(); }
+
+void TestNativeActivityTeapotEngine::TrimMemory() {
   LOGI("Trimming memory");
   gl_context_->Invalidate();
 }
-/**
- * Process the next input event.
- */
-int32_t Engine::HandleInput(android_app* app, AInputEvent* event) {
-  Engine* eng = (Engine*)app->userData;
+
+// Process the next input event.
+int32_t TestNativeActivityTeapotEngine::HandleInput(android_app* app, AInputEvent* event) {
+  TestNativeActivityTeapotEngine* eng = (TestNativeActivityTeapotEngine*)app->userData;
   if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
     ndk_helper::GESTURE_STATE doubleTapState =
         eng->doubletap_detector_.Detect(event);
@@ -220,7 +225,8 @@ int32_t Engine::HandleInput(android_app* app, AInputEvent* event) {
     if (doubleTapState == ndk_helper::GESTURE_STATE_ACTION) {
       // Detect double tap
       eng->tap_camera_.Reset(true);
-    } else {
+    } 
+    else {
       // Handle drag state
       if (dragState & ndk_helper::GESTURE_STATE_START) {
         // Otherwise, start dragging
@@ -228,12 +234,14 @@ int32_t Engine::HandleInput(android_app* app, AInputEvent* event) {
         eng->drag_detector_.GetPointer(v);
         eng->TransformPosition(v);
         eng->tap_camera_.BeginDrag(v);
-      } else if (dragState & ndk_helper::GESTURE_STATE_MOVE) {
+      } 
+      else if (dragState & ndk_helper::GESTURE_STATE_MOVE) {
         ndk_helper::Vec2 v;
         eng->drag_detector_.GetPointer(v);
         eng->TransformPosition(v);
         eng->tap_camera_.Drag(v);
-      } else if (dragState & ndk_helper::GESTURE_STATE_END) {
+      } 
+      else if (dragState & ndk_helper::GESTURE_STATE_END) {
         eng->tap_camera_.EndDrag();
       }
 
@@ -246,7 +254,8 @@ int32_t Engine::HandleInput(android_app* app, AInputEvent* event) {
         eng->TransformPosition(v1);
         eng->TransformPosition(v2);
         eng->tap_camera_.BeginPinch(v1, v2);
-      } else if (pinchState & ndk_helper::GESTURE_STATE_MOVE) {
+      } 
+      else if (pinchState & ndk_helper::GESTURE_STATE_MOVE) {
         // Multi touch
         // Start new pinch
         ndk_helper::Vec2 v1;
@@ -258,195 +267,240 @@ int32_t Engine::HandleInput(android_app* app, AInputEvent* event) {
       }
     }
     return 1;
+
   }
+
   return 0;
 }
 
-/**
- * Process the next main command.
- */
-void Engine::HandleCmd(struct android_app* app, int32_t cmd) {
-  Engine* eng = (Engine*)app->userData;
+// Process the next main command.
+void TestNativeActivityTeapotEngine::HandleCmd(struct android_app* app, int32_t cmd) {
+
+  TestNativeActivityTeapotEngine* eng = (TestNativeActivityTeapotEngine*)app->userData;
+  
   switch (cmd) {
-    case APP_CMD_SAVE_STATE:
-      break;
-    case APP_CMD_INIT_WINDOW:
-      // The window is being shown, get it ready.
-      if (app->window != NULL) {
-        eng->InitDisplay(app);
-        eng->has_focus_ = true;
+    case APP_CMD_SAVE_STATE: {
+        // 
+    } break;
+
+    case APP_CMD_INIT_WINDOW: {
+        // The window is being shown, get it ready.
+        if (app->window != NULL) {
+            eng->InitDisplay(app);
+            eng->m_fHasFocus = true;
+            eng->DrawFrame();
+        }
+    } break;
+
+    case APP_CMD_TERM_WINDOW: {
+        // The window is being hidden or closed, clean it up.
+        eng->TermDisplay();
+        eng->m_fHasFocus = false;
+    } break;
+
+    case APP_CMD_STOP: {
+        //
+    } break;
+
+    case APP_CMD_GAINED_FOCUS: {
+        eng->ResumeSensors();
+        // Start animation
+        eng->m_fHasFocus = true;
+    } break;
+
+    case APP_CMD_LOST_FOCUS: {
+        eng->SuspendSensors();
+        // Also stop animating.
+        eng->m_fHasFocus = false;
         eng->DrawFrame();
-      }
-      break;
-    case APP_CMD_TERM_WINDOW:
-      // The window is being hidden or closed, clean it up.
-      eng->TermDisplay();
-      eng->has_focus_ = false;
-      break;
-    case APP_CMD_STOP:
-      break;
-    case APP_CMD_GAINED_FOCUS:
-      eng->ResumeSensors();
-      // Start animation
-      eng->has_focus_ = true;
-      break;
-    case APP_CMD_LOST_FOCUS:
-      eng->SuspendSensors();
-      // Also stop animating.
-      eng->has_focus_ = false;
-      eng->DrawFrame();
-      break;
-    case APP_CMD_LOW_MEMORY:
-      // Free up GL resources
-      eng->TrimMemory();
-      break;
+    } break;
+
+    case APP_CMD_LOW_MEMORY: {
+        // Free up GL resources
+        eng->TrimMemory();
+    } break;
   }
 }
 
 //-------------------------------------------------------------------------
 // Sensor handlers
 //-------------------------------------------------------------------------
-void Engine::InitSensors() {
-  sensor_manager_ = ndk_helper::AcquireASensorManagerInstance(app_);
-  accelerometer_sensor_ = ASensorManager_getDefaultSensor(
-      sensor_manager_, ASENSOR_TYPE_ACCELEROMETER);
-  sensor_event_queue_ = ASensorManager_createEventQueue(
-      sensor_manager_, app_->looper, LOOPER_ID_USER, NULL, NULL);
+void TestNativeActivityTeapotEngine::InitSensors() {
+  pAndroidSensorManager = ndk_helper::AcquireASensorManagerInstance(m_pAndroidAppState);
+
+  pAndroidAccelerometerSensor = ASensorManager_getDefaultSensor(pAndroidSensorManager, ASENSOR_TYPE_ACCELEROMETER);
+  pAndroidSensorEventQueue = ASensorManager_createEventQueue(pAndroidSensorManager, m_pAndroidAppState->looper, LOOPER_ID_USER, nullptr, nullptr);
 }
 
-void Engine::ProcessSensors(int32_t id) {
-  // If a sensor has data, process it now.
+void TestNativeActivityTeapotEngine::ProcessSensors(int32_t id) {
+  
+    // If a sensor has data, process it now.
+
   if (id == LOOPER_ID_USER) {
-    if (accelerometer_sensor_ != NULL) {
+    if (pAndroidAccelerometerSensor != nullptr) {
       ASensorEvent event;
-      while (ASensorEventQueue_getEvents(sensor_event_queue_, &event, 1) > 0) {
+      while (ASensorEventQueue_getEvents(pAndroidSensorEventQueue, &event, 1) > 0) {
+          /* stub */
       }
     }
   }
 }
 
-void Engine::ResumeSensors() {
-  // When our app gains focus, we start monitoring the accelerometer.
-  if (accelerometer_sensor_ != NULL) {
-    ASensorEventQueue_enableSensor(sensor_event_queue_, accelerometer_sensor_);
-    // We'd like to get 60 events per second (in us).
-    ASensorEventQueue_setEventRate(sensor_event_queue_, accelerometer_sensor_,
-                                   (1000L / 60) * 1000);
-  }
+void TestNativeActivityTeapotEngine::ResumeSensors() {
+  
+    // When our app gains focus, we start monitoring the accelerometer.
+
+    if (pAndroidAccelerometerSensor != nullptr) {
+        ASensorEventQueue_enableSensor(pAndroidSensorEventQueue, pAndroidAccelerometerSensor);
+
+        // We'd like to get 60 events per second (in us).
+        ASensorEventQueue_setEventRate(pAndroidSensorEventQueue, pAndroidAccelerometerSensor, (1000L / 60) * 1000);
+    }
 }
 
-void Engine::SuspendSensors() {
-  // When our app loses focus, we stop monitoring the accelerometer.
+void TestNativeActivityTeapotEngine::SuspendSensors() {
+  
+    // When our app loses focus, we stop monitoring the accelerometer.
   // This is to avoid consuming battery while not being used.
-  if (accelerometer_sensor_ != NULL) {
-    ASensorEventQueue_disableSensor(sensor_event_queue_, accelerometer_sensor_);
+
+  if (pAndroidAccelerometerSensor != nullptr) {
+    ASensorEventQueue_disableSensor(pAndroidSensorEventQueue, pAndroidAccelerometerSensor);
   }
 }
 
-//-------------------------------------------------------------------------
 // Misc
-//-------------------------------------------------------------------------
-void Engine::SetState(android_app* state) {
-  app_ = state;
-  doubletap_detector_.SetConfiguration(app_->config);
-  drag_detector_.SetConfiguration(app_->config);
-  pinch_detector_.SetConfiguration(app_->config);
+void TestNativeActivityTeapotEngine::SetState(android_app* pAndroidAppState) {
+  
+    m_pAndroidAppState = pAndroidAppState;
+
+  doubletap_detector_.SetConfiguration(m_pAndroidAppState->config);
+  drag_detector_.SetConfiguration(m_pAndroidAppState->config);
+  pinch_detector_.SetConfiguration(m_pAndroidAppState->config);
 }
 
-bool Engine::IsReady() {
-  if (has_focus_) return true;
+bool TestNativeActivityTeapotEngine::IsReady() {
+
+  if (m_fHasFocus) 
+      return true;
 
   return false;
 }
 
-void Engine::TransformPosition(ndk_helper::Vec2& vec) {
+void TestNativeActivityTeapotEngine::TransformPosition(ndk_helper::Vec2& vec) {
   vec = ndk_helper::Vec2(2.0f, 2.0f) * vec /
             ndk_helper::Vec2(gl_context_->GetScreenWidth(),
-                             gl_context_->GetScreenHeight()) -
-        ndk_helper::Vec2(1.f, 1.f);
+                             gl_context_->GetScreenHeight()) - ndk_helper::Vec2(1.f, 1.f);
 }
 
-void Engine::ShowUI() {
-  JNIEnv* jni;
-  app_->activity->vm->AttachCurrentThread(&jni, NULL);
+void TestNativeActivityTeapotEngine::ShowUI() {
+  JNIEnv* pJNIEnvironment = nullptr;
+
+  m_pAndroidAppState->activity->vm->AttachCurrentThread(&pJNIEnvironment, nullptr);
 
   // Default class retrieval
-  jclass clazz = jni->GetObjectClass(app_->activity->clazz);
-  jmethodID methodID = jni->GetMethodID(clazz, "showUI", "()V");
-  jni->CallVoidMethod(app_->activity->clazz, methodID);
+  jclass clazz = pJNIEnvironment->GetObjectClass(m_pAndroidAppState->activity->clazz);
+  jmethodID methodID = pJNIEnvironment->GetMethodID(clazz, "showUI", "()V");
+  pJNIEnvironment->CallVoidMethod(m_pAndroidAppState->activity->clazz, methodID);
 
-  app_->activity->vm->DetachCurrentThread();
+  m_pAndroidAppState->activity->vm->DetachCurrentThread();
+
   return;
 }
 
-void Engine::UpdateFPS(float fps) {
-  JNIEnv* jni;
-  app_->activity->vm->AttachCurrentThread(&jni, NULL);
+void TestNativeActivityTeapotEngine::UpdateFPS(float fps) {
+  JNIEnv* pJNIEnvironment = nullptr;
+
+  m_pAndroidAppState->activity->vm->AttachCurrentThread(&pJNIEnvironment, nullptr);
 
   // Default class retrieval
-  jclass clazz = jni->GetObjectClass(app_->activity->clazz);
-  jmethodID methodID = jni->GetMethodID(clazz, "updateFPS", "(F)V");
-  jni->CallVoidMethod(app_->activity->clazz, methodID, fps);
+  jclass clazz = pJNIEnvironment->GetObjectClass(m_pAndroidAppState->activity->clazz);
+  jmethodID methodID = pJNIEnvironment->GetMethodID(clazz, "updateFPS", "(F)V");
+  pJNIEnvironment->CallVoidMethod(m_pAndroidAppState->activity->clazz, methodID, fps);
 
-  app_->activity->vm->DetachCurrentThread();
+  m_pAndroidAppState->activity->vm->DetachCurrentThread();
+
   return;
 }
 
-Engine g_engine;
+#include "DreamTestClient.h"
 
-/**
- * This is the main entry point of a native application that is using
- * android_native_app_glue.  It runs in its own thread, with its own
- * event loop for receiving input events and doing other things.
- */
-void android_main(android_app* state) {
+TestNativeActivityTeapotEngine g_TestNativeActivityTeapotEngine;
+DreamTestClient g_DreamTestClient;
 
-  DEBUG_LINEOUT("TestClient:android_main starting ...");
+// This is the main entry point of a native application that is using
+// android_native_app_glue.  It runs in its own thread, with its own
+// event loop for receiving input events and doing other things.
+void android_main(android_app* pAndroidAppState) {
+    RESULT r = R_PASS;
 
-  g_engine.SetState(state);
+    DEBUG_LINEOUT("TestClient:android_main starting ... ");
 
-  // Init helper functions
-  ndk_helper::JNIHelper::GetInstance()->Init(state->activity, HELPER_CLASS_NAME);
+    g_TestNativeActivityTeapotEngine.SetState(pAndroidAppState);
 
-  state->userData = &g_engine;
-  state->onAppCmd = Engine::HandleCmd;
-  state->onInputEvent = Engine::HandleInput;
+    // Init helper functions
+    ndk_helper::JNIHelper::GetInstance()->Init(pAndroidAppState->activity, HELPER_CLASS_NAME);
 
-#ifdef USE_NDK_PROFILER
-  monstartup("libMoreTeapotsNativeActivity.so");
-#endif
+    pAndroidAppState->userData = &g_TestNativeActivityTeapotEngine;
+    pAndroidAppState->onAppCmd = TestNativeActivityTeapotEngine::HandleCmd;
+    pAndroidAppState->onInputEvent = TestNativeActivityTeapotEngine::HandleInput;
 
-  // Prepare to monitor accelerometer
-  g_engine.InitSensors();
+    #ifdef USE_NDK_PROFILER
+        monstartup("libMoreTeapotsNativeActivity.so");
+    #endif
 
-  // loop waiting for stuff to do.
-  while (1) {
-    // Read all pending events.
-    int id;
-    int events;
-    android_poll_source* source;
+    // Prepare to monitor accelerometer
+    g_TestNativeActivityTeapotEngine.InitSensors();
 
-    // If not animating, we will block forever waiting for events.
-    // If animating, we loop until all events are read, then continue
-    // to draw the next frame of animation.
-    while ((id = ALooper_pollAll(g_engine.IsReady() ? 0 : -1, NULL, &events,
-                                 (void**)&source)) >= 0) {
-      // Process this event.
-      if (source != NULL) source->process(state, source);
+    // Try out sticking the dream test client in here
+    g_DreamTestClient = DreamTestClient();
+    //CRM(g_DreamTestClient.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
+    CRM(g_DreamTestClient.Initialize(0, nullptr), "Failed to initialize Dream Garage");
+    CRM(g_DreamTestClient.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
 
-      g_engine.ProcessSensors(id);
+    // loop waiting for stuff to do.
+    while (true) {
 
-      // Check if we are exiting.
-      if (state->destroyRequested != 0) {
-        g_engine.TermDisplay();
-        return;
-      }
+        // Read all pending events.
+        int id;
+        int events;
+        android_poll_source* pAndoridPollSource = nullptr;
+
+        // If not animating, we will block forever waiting for events.
+        // If animating, we loop until all events are read, then continue
+        // to draw the next frame of animation.
+        while ((id = ALooper_pollAll(g_TestNativeActivityTeapotEngine.IsReady() ? 0 : -1, 
+			   nullptr,
+			   &events,
+			   (void**)&pAndoridPollSource)) >= 0)
+        {
+        // Process this event.
+        if (pAndoridPollSource != nullptr) {
+            pAndoridPollSource->process(pAndroidAppState, pAndoridPollSource);
+        }
+
+        g_TestNativeActivityTeapotEngine.ProcessSensors(id);
+
+        // Check if we are exiting.
+        if (pAndroidAppState->destroyRequested != 0) {
+            g_TestNativeActivityTeapotEngine.TermDisplay();
+            return;
+        }
+        }
+
+        if (g_TestNativeActivityTeapotEngine.IsReady()) {
+            // Drawing is throttled to the screen update rate, so there is no need to do timing here.
+            g_TestNativeActivityTeapotEngine.DrawFrame();
+        }
     }
 
-    if (g_engine.IsReady()) {
-      // Drawing is throttled to the screen update rate, so there
-      // is no need to do timing here.
-      g_engine.DrawFrame();
-    }
-  }
+Success:
+    DreamLogger::instance()->Flush();
+    return;// (int)(r);
+
+Error:
+    DEBUG_LINEOUT("DREAM OS Exiting with Error 0x%x result", r);
+    DreamLogger::instance()->Flush();
+    DEBUG_SYSTEM_PAUSE();
+
+    return;// (int)(r);
 }

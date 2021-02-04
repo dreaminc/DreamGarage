@@ -67,6 +67,9 @@ class CollisionDetector : public Publisher<CollisionGroupEventType, CollisionGro
 private:
 	CollisionDetector();
 
+public:
+	virtual ~CollisionDetector() = default;
+
 protected:
 	RESULT Initialize();
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);

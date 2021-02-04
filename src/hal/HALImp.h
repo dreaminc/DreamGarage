@@ -79,7 +79,7 @@ public:
 
 public:
 	HALImp();
-	~HALImp();
+	virtual ~HALImp();
 
 	virtual std::string GetHALName() = 0;
 

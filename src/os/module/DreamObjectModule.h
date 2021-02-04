@@ -53,7 +53,7 @@ private:
 
 public:
 	DreamObjectModule(DreamOS *pDreamOS, void *pContext);
-	~DreamObjectModule();
+	virtual ~DreamObjectModule();
 
 	virtual RESULT InitializeModule(void *pContext = nullptr) override;
 	virtual RESULT OnDidFinishInitializing(void *pContext = nullptr) override;

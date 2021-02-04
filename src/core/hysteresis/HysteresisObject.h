@@ -34,7 +34,8 @@ class HysteresisObject : public VirtualObj, public Publisher<HysteresisEventType
 public:
 	HysteresisObject(float onThreshold, float offThreshold);
 	HysteresisObject();
-	~HysteresisObject();
+
+	virtual ~HysteresisObject();
 
 public:
 

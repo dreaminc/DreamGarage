@@ -20,6 +20,7 @@ enum class PRIMITIVE_TYPE {
 
 struct PrimParams {
 	virtual PRIMITIVE_TYPE GetPrimitiveType() = 0;
+	virtual ~PrimParams() {}
 };
 
 #endif // ! PRIM_PARAMS_H_

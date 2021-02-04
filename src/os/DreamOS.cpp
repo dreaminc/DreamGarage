@@ -21,7 +21,7 @@
 
 #include "module/DreamModuleManager.h"
 
-#include "Core/Utilities.h"
+#include "core/Utilities.h"
 
 #include "cloud/Environment/PeerConnection.h"
 #include "DreamMessage.h"
@@ -36,15 +36,15 @@ DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
 	m_pSandbox(nullptr)
 {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
-	//Success:
+Success:
 	Validate();
 	return;
 
-	//Error:
-	//	Invalidate();
-	//	return;
+Error:
+	Invalidate();
+	return;
 }
 
 DreamOS::~DreamOS() {
@@ -65,7 +65,8 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	CRM(m_pSandbox->SetDreamOSHandle(this), "Failed to set DreamOS handle");
 
 	// Initialize logger
-	auto pDreamLogger = DreamLogger::instance();
+	DreamLogger* pDreamLogger;
+	pDreamLogger = DreamLogger::instance();
 	CN(pDreamLogger);
 	pDreamLogger->Log(DreamLogger::Level::INFO, "DreamOS Starting ...");
 
@@ -328,6 +329,15 @@ RESULT DreamOS::OnDreamPeerStateChange(DreamPeerApp* pDreamPeer) {
 		case DreamPeerApp::state::ESTABLISHED: {
 			CR(OnNewDreamPeer(pDreamPeer));
 		} break;
+
+		case DreamPeerApp::state::UNINITIALIZED:
+		case DreamPeerApp::state::INITIALIZED:
+		case DreamPeerApp::state::PENDING:
+		case DreamPeerApp::state::DISCONNECTED:
+		case DreamPeerApp::state::INVALID:
+		default:{
+			//
+		} break;
 	}
 
 Error:
@@ -441,7 +451,8 @@ RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMes
 		} break;
 
 		default: {
-			DEBUG_LINEOUT("Unhandled Dream OS Message of Type 0x%I64x", dreamMsgType);
+			//DEBUG_LINEOUT("Unhandled Dream OS Message of Type 0x%I64x", dreamMsgType);
+			DEBUG_LINEOUT("Unhandled Dream OS Message of Type 0x%llx", dreamMsgType);
 		} break;
 		}
 	}
@@ -453,7 +464,8 @@ RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMes
 		CR(OnDreamAppMessage(pPeerConnection, (DreamAppMessage*)(pDataMessage)));
 	}
 	else {
-		DEBUG_LINEOUT("Unhandled Dream Message of Type 0x%I64x", dreamMsgType);
+		//DEBUG_LINEOUT("Unhandled Dream Message of Type 0x%I64x", dreamMsgType);
+		DEBUG_LINEOUT("Unhandled Dream Message of Type 0x%llx", dreamMsgType);
 	}
 
 Error:
@@ -470,8 +482,11 @@ RESULT DreamOS::HandlePeerHandshakeMessage(PeerConnection* pPeerConnection, Peer
 	auto pDreamPeer = FindPeer(pPeerConnection);
 	CN(pDreamPeer);
 
-	long userID = GetUserID();
-	long peerUserID = pPeerConnection->GetPeerUserID();
+	long userID;
+	userID = GetUserID();
+
+	long peerUserID;
+	peerUserID = pPeerConnection->GetPeerUserID();
 
 	{
 		// ACK the handshake
@@ -520,8 +535,8 @@ RESULT DreamOS::HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMes
 	auto pDreamPeer = FindPeer(pPeerConnection);
 	CN(pDreamPeer);
 
-	long userID = GetUserID();
-	long peerUserID = pPeerConnection->GetPeerUserID();
+	// long userID = GetUserID();
+	// long peerUserID = pPeerConnection->GetPeerUserID();
 
 	switch (pPeerAckMessage->GetACKType()) {
 	case PeerAckMessage::type::PEER_HANDSHAKE: {
@@ -557,7 +572,7 @@ std::shared_ptr<DreamPeerApp> DreamOS::CreateNewPeer(PeerConnection *pPeerConnec
 	CNM(pPeerConnection, "Peer Connection invalid");
 	peerUserID = pPeerConnection->GetPeerUserID();
 
-	CBM((m_dreamPeerApps.find(peerUserID) == m_dreamPeerApps.end()), "Error: Peer user ID %d already exists", peerUserID);
+	CBM((m_dreamPeerApps.find(peerUserID) == m_dreamPeerApps.end()), "Error: Peer user ID %ld already exists", peerUserID);
 
 	//pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this, true);
 	pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this, true);
@@ -707,7 +722,8 @@ RESULT DreamOS::MakeModel(std::function<RESULT(DimObj*, void*)> fnOnObjectReady,
 
 	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
 
-	model::params *pModelParams = new model::params(wstrModelFilename, modelFactoryFlags);
+	model::params *pModelParams;
+	pModelParams = new model::params(wstrModelFilename, modelFactoryFlags);
 	CN(pModelParams);
 
 	CRM(m_pDreamObjectModule->QueueNewObject(pModelParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
@@ -721,7 +737,8 @@ RESULT DreamOS::MakeMesh(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, 
 
 	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
 
-	mesh::params *pMeshParams = new mesh::params(meshParams);
+	mesh::params *pMeshParams;
+	pMeshParams = new mesh::params(meshParams);
 	CN(pMeshParams);
 
 	CRM(m_pDreamObjectModule->QueueNewObject(pMeshParams, fnOnObjectReady, pContext), "Failed to queue new mesh object in async obj module");
@@ -735,7 +752,8 @@ RESULT DreamOS::MakeSphere(std::function<RESULT(DimObj*, void*)> fnOnObjectReady
 
 	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
 
-	sphere::params *pSphereParams = new sphere::params(radius, numAngularDivisions, numVerticalDivisions);
+	sphere::params *pSphereParams;
+	pSphereParams = new sphere::params(radius, numAngularDivisions, numVerticalDivisions);
 	CN(pSphereParams);
 
 	CRM(m_pDreamObjectModule->QueueNewObject(pSphereParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
@@ -749,7 +767,8 @@ RESULT DreamOS::MakeVolume(std::function<RESULT(DimObj*, void*)> fnOnObjectReady
 
 	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
 
-	volume::params *pVolumeParams = new volume::params(volume::VOLUME_TYPE::RECTANGULAR_CUBOID, width, length, height, fTriangleBased);
+	volume::params *pVolumeParams;
+	pVolumeParams = new volume::params(volume::VOLUME_TYPE::RECTANGULAR_CUBOID, width, length, height, fTriangleBased);
 	CN(pVolumeParams);
 
 	CRM(m_pDreamObjectModule->QueueNewObject(pVolumeParams, fnOnObjectReady, pContext), "Failed to queue new object in async obj module");
@@ -763,7 +782,8 @@ RESULT DreamOS::MakeQuad(std::function<RESULT(DimObj*, void*)> fnOnObjectReady, 
 
 	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
 
-	quad::params *pQuadParams = new quad::params(width, height, numHorizontalDivisions, numVerticalDivisions, vNormal);
+	quad::params *pQuadParams;
+	pQuadParams = new quad::params(width, height, numHorizontalDivisions, numVerticalDivisions, vNormal);
 	CN(pQuadParams);
 
 	pQuadParams->pTextureHeight = pTextureHeight;
@@ -779,7 +799,8 @@ RESULT DreamOS::LoadTexture(std::function<RESULT(texture*, void*)> fnOnTextureRe
 
 	CNM(m_pDreamObjectModule, "DreamObjectModule not initialized");
 
-	texture::params *pTextureParams = new texture::params(type, pszFilename);
+	texture::params *pTextureParams;
+	pTextureParams = new texture::params(type, pszFilename);
 	CN(pTextureParams);
 
 	
@@ -850,9 +871,11 @@ HMD *DreamOS::GetHMD() {
 	return m_pSandbox->m_pHMD;
 }
 
+#ifdef _WIN32
 HWND DreamOS::GetDreamHWND() {
 	return m_pSandbox->GetWindowHandle();
 }
+#endif
 
 RESULT DreamOS::RecenterHMD() {
 	return m_pSandbox->m_pHMD->RecenterHMD();
@@ -1060,8 +1083,8 @@ Error:
 RESULT DreamOS::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
 	RESULT r = R_PASS;
 
-	int nChannels = pCaptureBuffer->NumChannels();
-	int samplingFrequency = pCaptureBuffer->GetSamplingRate();
+	UNUSED int nChannels = pCaptureBuffer->NumChannels();
+	UNUSED int samplingFrequency = pCaptureBuffer->GetSamplingRate();
 
 	AudioPacket pendingAudioPacket;
 	pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket);

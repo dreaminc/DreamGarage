@@ -33,11 +33,19 @@ source_group("TimeManager" FILES ${TIME_MANAGER_SOURCES})
 # TODO: This should not be here!!!!!
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
 
-add_library(modules
-    ${ANIMATION_ENGINE_SOURCES}
-    ${DREAM_SOUND_SYSTEM_SOURCES}
-    ${INTERACTION_ENGINE_SOURCES}
-    ${PHYSICS_ENGINE_SOURCES}
-    ${TIME_MANAGER_SOURCES}
-)
+IF(ANDROID)
+    
+    add_library(modules ${PHYSICS_ENGINE_SOURCES})
+
+ELSEIF(WIN32)
+    add_library(modules
+        ${ANIMATION_ENGINE_SOURCES}
+        ${DREAM_SOUND_SYSTEM_SOURCES}
+        ${INTERACTION_ENGINE_SOURCES}
+        ${PHYSICS_ENGINE_SOURCES}
+        ${TIME_MANAGER_SOURCES}
+    )
+ENDIF()
+
+
 

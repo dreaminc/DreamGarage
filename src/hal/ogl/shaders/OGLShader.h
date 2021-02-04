@@ -9,7 +9,7 @@
 // This is the container object for an OpenGL Shader
 // These should be accessed through the OpenGLShaderFactory object
 
-#include "hal/shader.h"
+#include "hal/Shader.h"
 
 #include "hal/ogl/OGLCommon.h"
 #include "hal/ogl/GLSLObject.h"
