@@ -9,7 +9,7 @@
 // Dream OS Path Manager Factory for the construction of path managers within a given
 // sandbox or native implementation
 
-#include "sandbox/PathManager.h"
+#include "path_manager/PathManager.h"
 #include "core/types/Factory.h"
 
 class DreamOS;

@@ -2000,15 +2000,15 @@ quaternion Sandbox::GetCameraOrientation() {
 }
 
 // Cloud Controller
-RESULT Sandbox::RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver) {
+RESULT Sandbox::RegisterPeerConnectionObserver(PeerConnectionObserver *pPeerConnectionObserver) {
 	return m_pCloudController->RegisterPeerConnectionObserver(pPeerConnectionObserver);
 }
 
-RESULT Sandbox::RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver) {
+RESULT Sandbox::RegisterEnvironmentObserver(EnvironmentObserver *pEnvironmentObserver) {
 	return m_pCloudController->RegisterEnvironmentObserver(pEnvironmentObserver);
 }
 
-RESULT Sandbox::RegisterUserObserver(CloudController::UserObserver *pUserObserver) {
+RESULT Sandbox::RegisterUserObserver(UserObserver *pUserObserver) {
 	return m_pCloudController->RegisterUserObserver(pUserObserver);
 }
 

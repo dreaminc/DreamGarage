@@ -8,7 +8,7 @@
 
 #include "core/primitives/VirtualObj.h"
 
-#include "Sound/SoundCommon.h"
+#include "sound/SoundCommon.h"
 
 class camera;
 class SoundFile;

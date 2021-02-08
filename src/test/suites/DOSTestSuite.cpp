@@ -2,10 +2,14 @@
 
 #include <chrono>
 #include "memory"                              // for shared_ptr
-#include "vcruntime_new.h"                     // for operator new, operator delete
-#include "vcruntime_string.h"                  // for memcpy
+
+#ifdef _WIN32
+	#include "vcruntime_new.h"                     // for operator new, operator delete
+	#include "vcruntime_string.h"                  // for memcpy
+	#include <WinUser.h>                           // for SendMessage
+#endif
+
 #include <stddef.h>                            // for size_t
-#include <WinUser.h>                           // for SendMessage
 
 #include "os/DreamOS.h"
 
@@ -26,12 +30,12 @@
 #include "hal/ogl/OGLProgramRefraction.h"
 #include "hal/ogl/OGLProgramSkybox.h"
 #include "hal/ogl/OGLProgramWater.h"
-#include "HAL/ogl/OGLProgramSkyboxScatter.h"
-#include "HAL/ogl/OGLProgramScreenFade.h"
+#include "hal/ogl/OGLProgramSkyboxScatter.h"
+#include "hal/ogl/OGLProgramScreenFade.h"
 #include "hal/ogl/OGLProgram.h"             // for OGLProgram
 #include "hal/EnvironmentProgram.h"  // for EnvironmentProgram
 #include "hal/HALImp.h"                        // for HALImp
-#include "HAL/SkyboxScatterProgram.h"
+#include "hal/SkyboxScatterProgram.h"
 
 #include "core/dimension/DimObj.h"                 // for DimObj
 

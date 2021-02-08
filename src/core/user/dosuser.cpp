@@ -11,14 +11,16 @@
 #include "core/text/font.h"
 #include "core/hand/hand.h"
 
+#include "cloud/CloudController.h"
 #include "cloud/HTTP/HTTPController.h"
+#include "cloud/User/UserController.h"
 
 #include "sandbox/CommandLineManager.h"
 
 #include "modules/AnimationEngine/AnimationCurve.h"
 #include "modules/AnimationEngine/AnimationItem.h"
 
-#include "sandbox/PathManager.h"
+#include "path_manager/PathManager.h"
 
 dosuser::dosuser(HALImp* pHALImp) :
 	composite(pHALImp)

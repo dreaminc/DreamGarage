@@ -228,49 +228,49 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 		};
 
 		// PeerConnectionObserver
-		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override {
 			DEVENV_LINEOUT("OnNewPeerConnection");
 
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnNewSocketConnection(int seatPosition) {
+		virtual RESULT OnNewSocketConnection(int seatPosition) override {
 			DEVENV_LINEOUT("OnNewSocketConnection");
 
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
+		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override {
 			DEVENV_LINEOUT("OnPeerConnectionClosed");
 
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) {
+		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) override {
 			DEVENV_LINEOUT("OnDataMessage");
 
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
+		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override {
 			DEVENV_LINEOUT("OnDataStringMessage");
 
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override {
 			DEBUG_LINEOUT("OnAudioData: %s", strAudioTrackLabel.c_str());
 
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) {
+		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override {
 			DEVENV_LINEOUT("OnDataChannel");
 
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) {
+		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override {
 			DEVENV_LINEOUT("OnAudioChannel");
 
 			return R_NOT_HANDLED;

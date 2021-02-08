@@ -32,10 +32,11 @@ public:
 	virtual WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection) = 0;
 };
 
-class WebRTCImp : public CloudImp, 
-				  public std::enable_shared_from_this<WebRTCImp>, 
-				  public WebRTCConductor::WebRTCConductorObserver,
-				  public WebRTCImpProxy
+class WebRTCImp : 
+	public CloudImp, 
+	public std::enable_shared_from_this<WebRTCImp>, 
+	public WebRTCConductor::WebRTCConductorObserver,
+	public WebRTCImpProxy
 {
 public:
 

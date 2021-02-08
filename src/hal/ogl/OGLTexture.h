@@ -94,9 +94,14 @@ private:
 	GLenum m_glTextureTarget = 0;
 
 	// Note: this will work as long as the client is the one to allocate the texture
-	// if not these values may be incorrect 
-	GLint m_glInternalFormat = GL_BGRA; 
-	GLenum m_glFormat = GL_BGRA;
+	// if not these values may be incorrect
+	// TODO: Fix this for GLES3.0
+
+	//GLint m_glInternalFormat = GL_BGRA;
+	//GLenum m_glFormat = GL_BGRA;
+	GLint m_glInternalFormat;
+	GLenum m_glFormat;
+
 	GLenum m_glPixelDataType = GL_UNSIGNED_BYTE;
 
 public:

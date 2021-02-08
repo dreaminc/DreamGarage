@@ -33,7 +33,7 @@
 #include "modules/TimeManager/TimeManagerModule.h"
 #include "modules/InteractionEngine/InteractionObjectEvent.h"  // for InteractionObjectEvent (ptr only), InteractionEventType
 
-#include "cloud/CloudController.h"
+//#include "cloud/CloudController.h"
 
 #include "sense/SenseKeyboard.h"
 #include "sense/SenseMouse.h"
@@ -83,6 +83,11 @@ class stereocamera;
 struct CollisionGroupEvent;
 struct CollisionObjectEvent;
 struct PrimParams;
+
+class CloudController;
+class PeerConnectionObserver;
+class EnvironmentObserver;
+class UserObserver;
 
 class SenseLeapMotion;
 class PhysicsEngine;
@@ -454,9 +459,9 @@ public:
 
 	// Cloud Controller 
 public:
-	RESULT RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver);
-	RESULT RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver);
-	RESULT RegisterUserObserver(CloudController::UserObserver *pUserObserver);
+	RESULT RegisterPeerConnectionObserver(PeerConnectionObserver *pPeerConnectionObserver);
+	RESULT RegisterEnvironmentObserver(EnvironmentObserver *pEnvironmentObserver);
+	RESULT RegisterUserObserver(UserObserver *pUserObserver);
 
 	RESULT BroadcastVideoFrame(const std::string &strVideoTrackLabel, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
@@ -554,7 +559,6 @@ protected:
 	std::unique_ptr<InteractionEngine> m_pInteractionEngine = nullptr;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
-	//OGLImp *m_pOGLImp;
 	HALImp *m_pHALImp = nullptr;
 
 	//std::shared_ptr<stereocamera> m_pCamera = nullptr;

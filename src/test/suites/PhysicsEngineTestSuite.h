@@ -57,7 +57,7 @@ public:
 
 
 private:
-	RESULT ResetTest(void *pContext);
+	RESULT ResetTest(void *pContext) override;
 
 private:
 	DreamOS *m_pDreamOS = nullptr;

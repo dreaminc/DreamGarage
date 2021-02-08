@@ -49,7 +49,8 @@ RESULT AnimationTestSuite::InitializeAnimationTest(void *pContext) {
 
 	CR(SetupPipeline());
 
-	AnimationTestContext *pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
+	AnimationTestContext *pTestContext;
+	pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
 
 	pTestContext->pComposite = m_pDreamOS->AddComposite();
 	CN(pTestContext->pComposite);
@@ -81,12 +82,12 @@ RESULT AnimationTestSuite::AddTestCurves() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		CR(SetupPipeline());
-
 		sphere *m_pSphere1 = nullptr;
 		sphere *m_pSphere2 = nullptr;
 		sphere *m_pSphere3 = nullptr;
 		sphere *m_pSphere4 = nullptr;
+
+		CR(SetupPipeline());
 
 		m_pSphere1 = m_pDreamOS->AddSphere(0.5f, 10.0f, 10.0f);
 		m_pSphere2 = m_pDreamOS->AddSphere(0.5f, 10.0f, 10.0f);
@@ -225,21 +226,25 @@ RESULT AnimationTestSuite::AddTestUIColor() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		auto cColor = color(0.0f, 0.0f, 1.0f, 0.0f);
+		color cColor = color(0.0f, 0.0f, 1.0f, 0.0f);
 		quaternion q;
 
 //		CR(SetupColorTestPipeline());
 		CR(SetupUINodePipeline());
 
-		auto pSphere = m_pDreamOS->AddSphere(0.2f, 10.0f, 10.0f);
+		sphere *pSphere;
+		pSphere = m_pDreamOS->AddSphere(0.2f, 10.0f, 10.0f);
 		pSphere->SetMaterialAmbient(0.75f);
 
-		auto pComposite = m_pDreamOS->MakeComposite();
+		composite *pComposite;
+		pComposite = m_pDreamOS->MakeComposite();
 		m_pDreamOS->AddObjectToUIGraph(pComposite);
 
-		texture* pTexturePNG = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"icons_600\\icon_png_600.png");
+		texture* pTexturePNG;
+		pTexturePNG = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"icons_600\\icon_png_600.png");
 
-		quad *m_pQuad = pComposite->MakeQuad(1.0f, 1.0f).get();
+		quad *m_pQuad;
+		m_pQuad = pComposite->MakeQuad(1.0f, 1.0f).get();
 		m_pQuad->MoveTo(0.0f, 0.0f, 0.0f);
 		m_pQuad->GetMaterial()->SetColors(COLOR_GREEN, COLOR_GREEN, COLOR_GREEN);
 		m_pQuad->SetDiffuseTexture(pTexturePNG);
@@ -294,7 +299,9 @@ RESULT AnimationTestSuite::AddTestAnimationBasic() {
 		AnimationState aState2;
 
 		CR(InitializeAnimationTest(pContext));
-		AnimationTestContext *pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
+
+		AnimationTestContext *pTestContext;
+		pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
 
 		CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pComposite));
 		aState.ptPosition = point(0.0f, 1.0f, -2.0f);
@@ -351,7 +358,9 @@ RESULT AnimationTestSuite::AddTestCancel() {
 		AnimationState aState2;
 
 		CR(InitializeAnimationTest(pContext));
-		AnimationTestContext *pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
+
+		AnimationTestContext *pTestContext;
+		pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
 
 		CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pComposite));
 
@@ -377,11 +386,14 @@ RESULT AnimationTestSuite::AddTestCancel() {
 		AnimationTestContext* pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
 		CN(pTestContext);
 
-		auto diff = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - pTestContext->startTime).count();
+		{
+			auto diff = std::chrono::duration<double>(
+					std::chrono::high_resolution_clock::now() - pTestContext->startTime).count();
 
-		if (diff > 1.0 && !pTestContext->fCancelled) {
-			m_pDreamOS->GetInteractionEngineProxy()->CancelAnimation(pTestContext->pSphere);
-			pTestContext->fCancelled = true;
+			if (diff > 1.0 && !pTestContext->fCancelled) {
+				m_pDreamOS->GetInteractionEngineProxy()->CancelAnimation(pTestContext->pSphere);
+				pTestContext->fCancelled = true;
+			}
 		}
 
 	Error:
@@ -432,20 +444,23 @@ RESULT AnimationTestSuite::SetupPipeline() {
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	ProgramNode* pRenderProgramNode;
+	pRenderProgramNode = pHAL->MakeProgramNode("minimal");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	ProgramNode* pReferenceGeometryProgram;
+	pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
 	CN(pReferenceGeometryProgram);
 	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	ProgramNode *pRenderScreenQuad;
+	pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
 	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
@@ -470,7 +485,8 @@ RESULT AnimationTestSuite::SetupUINodePipeline() {
 	//CR(pHAL->MakeCurrentContext());
 
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	ProgramNode* pRenderProgramNode;
+	pRenderProgramNode = pHAL->MakeProgramNode("environment");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
 //	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 	CN(pRenderProgramNode);
@@ -478,14 +494,16 @@ RESULT AnimationTestSuite::SetupUINodePipeline() {
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	ProgramNode* pSkyboxProgram;
+	pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 //*
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	ProgramNode* pUIProgramNode;
+	pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
 	CN(pUIProgramNode);
 	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -493,7 +511,8 @@ RESULT AnimationTestSuite::SetupUINodePipeline() {
 	//*/
 
 	// Screen Quad Shader (opt - we could replace this if we need to)
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	ProgramNode *pRenderScreenQuad;
+	pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
 	
 	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));

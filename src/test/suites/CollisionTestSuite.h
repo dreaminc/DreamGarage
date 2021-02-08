@@ -13,7 +13,7 @@
 #include <functional>
 #include <memory>
 
-#include "Scene/ObjectStoreNode.h"
+#include "scene/ObjectStoreNode.h"
 
 class DreamOS;
 
@@ -69,7 +69,7 @@ public:
 	// AABB 
 
 private:
-	RESULT ResetTest(void *pContext);
+	RESULT ResetTest(void *pContext) override;
 
 private:
 	DreamOS * m_pDreamOS = nullptr;

@@ -6,7 +6,7 @@
 
 #include "core/primitives/composite.h"
 
-#include "sandbox/PathManager.h"
+#include "path_manager/PathManager.h"
 
 // Freetype Library Stuff
 FT_Library font::m_pFT = nullptr;

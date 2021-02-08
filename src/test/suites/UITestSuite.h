@@ -67,7 +67,7 @@ public:
 	virtual RESULT AddTests() override;
 
 	// Menu Controller Observer
-	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
+	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode) override;
 
 	// Environment Asset Callback
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
@@ -150,6 +150,4 @@ private:
 	sphere *m_pSphere2;
 };
 
-
-
-#endif UI_TEST_SUITE_H_
+#endif // ! UI_TEST_SUITE_H_

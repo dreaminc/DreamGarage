@@ -58,13 +58,13 @@ class OGLProgramScreenFade;
 class SkyboxScatterProgram;
 class FogProgram;
 
-
 #define MAX_PEERS 8
 
-class DreamMeetClient : public DreamOS,
-				    public Subscriber<SenseKeyboardEvent>,
-					public Subscriber<SenseTypingEvent>,
-					public DOSObserver
+class DreamMeetClient : 
+	public DreamOS,
+	public Subscriber<SenseKeyboardEvent>,
+	public Subscriber<SenseTypingEvent>,
+	public DOSObserver,
 {
 public:
 

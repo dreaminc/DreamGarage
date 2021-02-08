@@ -37,7 +37,7 @@ class AudioPacket;
 #include "WebRTCAudioDeviceModule.h"
 
 class WebRTCConductor : 
-	public WebRTCPeerConnection::WebRTCPeerConnectionObserver//,
+	public WebRTCPeerConnection::WebRTCPeerConnectionObserver //,
 	//public AudioDeviceDataCapturer
 {
 public:

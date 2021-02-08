@@ -1,6 +1,6 @@
 #include "HTTPRequestFileHandler.h"
-#include "Sandbox/PathManager.h"
-#include "Core/Utilities.h"
+#include "path_manager/PathManager.h"
+#include "core/Utilities.h"
 
 HTTPRequestFileHandler::HTTPRequestFileHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseFileCallback fnResponseFileCallback) :
 	HTTPRequestHandler(pHTTPRequest, pHTTPResponse, nullptr),

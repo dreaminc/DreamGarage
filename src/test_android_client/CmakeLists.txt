@@ -1,4 +1,28 @@
-# src/CMakeList.txt : CMake project for DOS root source directory
+# src/test_android_client/CMakeLists.txt - Dream Test Client Libraries CMake file
+
+file(GLOB EDITOR_SOURCES 
+  "*.cpp"
+  "*.h"
+)
+source_group("" FILES ${EDITOR_SOURCES})
+
+file(GLOB TEST_ANDROID_CLIENT_SOURCES
+  "DreamTestAndroidClient.cpp"
+  "DreamTestAndroidClient.h"
+)
+
+file(GLOB ANDROID_SOURCES 
+  "TestClientTeapotRenderer.cpp"
+  "TestClientTeapotRenderer.h"
+  "TestClientNativeActivity.cpp"
+)
+
+
+# TODO: This should not be here!!!!!
+# include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
+
+# For OpenVR Matrix
+# include_directories(${CMAKE_SOURCE_DIR}/src/third_party/openvr/headers)
 
 # Force Include the src/core/config.h
 if(MSVC)
@@ -17,15 +41,15 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D_CRT_SECURE_NO_WARNINGS")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNOMINMAX")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DCEF_AUDIO_MIRROR")
-# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DSTAGING_BUILD")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DSTAGING_BUILD")
 # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D_ENABLE_LOGGING")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} --DDOS_BASE_FILE=\"%(Filename)%(Extension)\"")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DDOS_BASE_FILE__=\"%(Filename)%(Extension)\"")
 
 IF(WIN32)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D_WINDOWS")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DWEBRTC_WIN")
 ELSEIF(ANDROID)
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_DEBUG} -DWEBRTC_POSIX")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_RELEASE} -DWEBRTC_POSIX")
 ENDIF()
 
 # Debug Configuration
@@ -54,13 +78,13 @@ IF(WIN32)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DWIN32")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DWIN32_LEAN_AND_MEAN")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_WINSOCK_DEPRECATED_NO_WARNINGS")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_WINSOCK_DEPRECATED_NO_WARNINGS")
 ELSEIF(ANDROID)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DWEBRTC_POSIX")
 ENDIF()
 
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	message("dos/src/cmakelists.txt msvc")
+    message("dos/src/testclient/cmakelists.txt msvc")
 
     # Compiler Flags Release
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /W3 /WX /sdl /MP")      # General
@@ -82,9 +106,10 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST")               # Manifest File
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG:FASTLINK")         # Debugging
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")      # System
+
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
 
-    message("dos/src/cmakelists.txt apple clang")
+    message("dos/src/testclient/cmakelists.txt apple clang")
 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOCONCEPTS")
 
@@ -104,14 +129,14 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
-    message("dos/src/cmakelists.txt clang")
+    message("dos/src/testclient/cmakelists.txt clang")
 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOCONCEPTS")
 
 	#SET(CMAKE_CXX_FLAGS -pthread)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-    
+
     # Override certain warnings cause they're dumb
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -Wno-unused-label")
 
@@ -121,18 +146,18 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	# Release Configuration
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 -fpermissive -stdlib=libc++ -fdeclspec -Wno-unused-label -Wno-unused-parameter")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-    
+
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	
-	message("dos/src/cmakelists.txt GNU")
+	message("dos/src/testclient/cmakelists.txt GNU")
 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOCONCEPTS")
 
 	#SET(CMAKE_CXX_FLAGS -pthread)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
     
-	# Override certain warnings cause they're dumb
+    # Override certain warnings cause they're dumb
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -Wno-unused-label")
 
 	# Debug Configuration
@@ -145,14 +170,14 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 
 else()
 
-	message("dos/src/cmakelists.txt other: ${CMAKE_CXX_COMPILER_ID}")
+	message("dos/src/testclient/cmakelists.txt other: ${CMAKE_CXX_COMPILER_ID}")
 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOCONCEPTS")
 
 	#SET(CMAKE_CXX_FLAGS -pthread)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+    
     # Override certain warnings cause they're dumb
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror -Wfatal-errors -Wmacro-redefined -Wno-unused-variable -Wno-reorder -Wno-unused-parameter -Wno-unused-label")
 
@@ -166,55 +191,53 @@ else()
 endif()
 
 IF(ANDROID)
-    # The Android Build    
-
-    add_subdirectory(core)
-    add_subdirectory(logger)
-    add_subdirectory(path_manager)
-    add_subdirectory(test_android_client)
-    add_subdirectory(os)
-    add_subdirectory(sandbox)
-    add_subdirectory(cloud)
-
-    #add_subdirectory(testclient)
-    #add_subdirectory(modules)
-    #
-    #add_subdirectory(test)
-
     # # build the ndk-helper library
     # get_filename_component(ndkHelperDir ${CMAKE_SOURCE_DIR}/src/third_party/ndk-helpers ABSOLUTE)
     # get_filename_component(ndkHelperSrc ${ndkHelperDir}/ndk_helper ABSOLUTE)
     # #add_subdirectory(${ndkHelperSrc}
     # #        ${ndkHelperDir}/ndkHelperBin/${CMAKE_BUILD_TYPE}/${ANDROID_ABI})
 
+    # add_subdirectory(${ndkHelperSrc})
+
+    # Add the NDK helpers dir (currently in testclient, should be moved to sandbox/android)
+    add_subdirectory(ndk-helpers/ndk_helper ndk-helpers/ndkHelperBin/${CMAKE_BUILD_TYPE}/${ANDROID_ABI} EXCLUDE_FROM_ALL)
+
+    # The Android Build
+    add_library(TestClientNativeActivity
+        SHARED
+            ${TEST_CLIENT_SOURCES}
+            ${ANDROID_SOURCES}
+    )
+
+    set_target_properties(TestClientNativeActivity
+        PROPERTIES
+            CXX_STANDARD 11
+            CXX_STANDARD_REQUIRED YES
+            CXX_EXTENSIONS NO
+    )
+
+    # Export ANativeActivity_onCreate(),
+    # Refer to: https://github.com/android-ndk/ndk/issues/381.
+    set_target_properties(TestClientNativeActivity
+        PROPERTIES  LINK_FLAGS "-u ANativeActivity_onCreate")
+
+    # add ndk helped lib dependencies
+    target_link_libraries(TestClientNativeActivity PRIVATE NdkHelper)
+    target_link_libraries(TestClientNativeActivity PRIVATE core)
+    target_link_libraries(TestClientNativeActivity PRIVATE logger)
+    target_link_libraries(TestClientNativeActivity PRIVATE path_manager)
+    target_link_libraries(TestClientNativeActivity PRIVATE os)
+    target_link_libraries(TestClientNativeActivity PRIVATE sandbox)
+    target_link_libraries(TestClientNativeActivity PRIVATE cloud)
+
+    #target_link_libraries(TestClientNativeActivity PRIVATE sound)
+    #target_link_libraries(TestClientNativeActivity PRIVATE os)
+    #target_link_libraries(TestClientNativeActivity PRIVATE test_suite)
+    #target_link_libraries(TestClientNativeActivity PRIVATE modules)
+
 ELSEIF(WIN32)
-    # The Windows Build
-
-    add_subdirectory(apps)
-    add_subdirectory(meetclient)
-    add_subdirectory(cloud)
-    add_subdirectory(core)
-    add_subdirectory(dreamcef)
-    add_subdirectory(dreamdesktop)
-    add_subdirectory(hal)
-    add_subdirectory(hmd)
-    add_subdirectory(logger)
-    add_subdirectory(modules)
-    add_subdirectory(os)
-    add_subdirectory(pipeline)
-    add_subdirectory(path_manager)
-    add_subdirectory(sandbox)
-    add_subdirectory(scene)
-    add_subdirectory(sense)
-    add_subdirectory(sound)
-    add_subdirectory(test)
-    add_subdirectory(testclient)
-    # # add_subdirectory(third_party)
-    add_subdirectory(ui)
-    add_subdirectory(webbrowser)
-
-    # Adds junk repos
-    # add_subdirectory(junk)
-
+    # This is meant to set up the android code
+    message(FATAL_ERROR 
+        "Test Android client is not supported on windows"
+    )
 ENDIF()
-

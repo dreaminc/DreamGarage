@@ -16,6 +16,8 @@
 
 #include "third_party/json/include/json.hpp"
 
+#include "cloud/webrtc/WebRTCCommon.h"
+
 class PeerConnection {
 public:
 	PeerConnection(long userID, long offerUserID, long peerUserID, long peerConnectionID) :

@@ -7,7 +7,7 @@
         #include "sandbox/win64/Win64PathManager.h"
     #endif
 #elif defined(__ANDROID__)
-    #include "sandbox/android/AndroidPathManager.h"
+    #include "path_manager/android/AndroidPathManager.h"
 #elif defined(__APPLE__)
     #include "sandbox/osx/OSXPathManager.h"
 #elif defined(__linux__)

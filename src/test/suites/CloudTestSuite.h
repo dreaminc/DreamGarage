@@ -11,8 +11,8 @@
 
 #include "DreamTestSuite.h"
 
-#include "Cloud/CloudController.h"
-#include "Cloud/Menu/MenuController.h"
+#include "cloud/CloudController.h"
+#include "cloud/Menu/MenuController.h"
 
 class DreamOS;
 class CloudController;
@@ -51,7 +51,7 @@ public:
 	RESULT LaunchDreamView();
 
 	// Menu Controller Observer
-	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
+	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode) override;
 
 	// Environment Asset Callback
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;

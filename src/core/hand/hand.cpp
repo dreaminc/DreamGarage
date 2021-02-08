@@ -18,7 +18,7 @@
 
 #include "sense/SenseLeapMotionHand.h"
 
-#include "sandbox/PathManager.h"
+#include "path_manager/PathManager.h"
 
 hand::hand(HALImp* pHALImp, HAND_TYPE type) :
 	composite(pHALImp)

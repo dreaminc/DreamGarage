@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-#include "sandbox/PathManager.h"
+#include "path_manager/PathManager.h"
 
 /*
 mesh::mesh(wchar_t *pszModelName) {

@@ -32,11 +32,14 @@
 // TODO: Why is it there?
 #include "meetclient/AudioDataMessage.h"
 
+#include "cloud/CloudController.h"
+#include "cloud/webrtc/WebRTCImp.h"
+
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
 	m_pSandbox(nullptr)
 {
-	//RESULT r = R_PASS;
+	UNUSED RESULT r = R_PASS;
 
 Success:
 	Validate();
@@ -1566,15 +1569,15 @@ RESULT DreamOS::RemoveObjectFromAuxUIGraph(VirtualObj *pObject) {
 
 // Cloud Controller
 
-RESULT DreamOS::RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver) {
+RESULT DreamOS::RegisterPeerConnectionObserver(PeerConnectionObserver *pPeerConnectionObserver) {
 	return m_pSandbox->RegisterPeerConnectionObserver(pPeerConnectionObserver);
 }
 
-RESULT DreamOS::RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver) {
+RESULT DreamOS::RegisterEnvironmentObserver(EnvironmentObserver *pEnvironmentObserver) {
 	return m_pSandbox->RegisterEnvironmentObserver(pEnvironmentObserver);
 }
 
-RESULT DreamOS::RegisterUserObserver(CloudController::UserObserver *pUserObserver) {
+RESULT DreamOS::RegisterUserObserver(UserObserver *pUserObserver) {
 	return m_pSandbox->RegisterUserObserver(pUserObserver);
 }
 

@@ -42,7 +42,7 @@ public:
 	virtual RESULT AddTests() override;
 
 public:
-	RESULT ResetTest(void *pContext);
+	RESULT ResetTest(void *pContext) override;
 	RESULT AddTestAnimationBasic();
 	RESULT AddTestCancel();
 	RESULT AddTestCurves();

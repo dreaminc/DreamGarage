@@ -4,7 +4,7 @@
 
 #include "hal/HALImp.h"
 
-#include "sandbox/PathManager.h"
+#include "path_manager/PathManager.h"
 
 model::model(HALImp *pParentImp) :
 	composite(pParentImp),

@@ -116,13 +116,16 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 	extern void OutputDebugString(wchar_t*);
 	static char szDebugOutputString[DOS_DEBUGGER_OUTPUT_MAX_SIZE] = { DOS_DEBUGGER_SIGNATURE };
 
+	// TODO: Figure DEVENV for Android
+	#define DEVENV_LINEOUT(str)
+
 	//#define DEVENV_LINEOUT(str) do { OutputDebugString(str); } while(0);
 
-	#define DEVENV_LINEOUT(str, ...) do {																												\
-		sprintf_s(szDebugOutputString + DOS_DEBUGGER_SIGNATURE_SIZE, DOS_DEBUGGER_OUTPUT_MAX_SIZE - DOS_DEBUGGER_SIGNATURE_SIZE, str, ##__VA_ARGS__);	\
-		if (szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\n' && szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\r')						\
-			OutputDebugStringA(szDebugOutputString);																									\
-		} while(0);
+	//#define DEVENV_LINEOUT(str, ...) do {																												\
+	//	sprintf_s(szDebugOutputString + DOS_DEBUGGER_SIGNATURE_SIZE, DOS_DEBUGGER_OUTPUT_MAX_SIZE - DOS_DEBUGGER_SIGNATURE_SIZE, str, ##__VA_ARGS__);	\
+	//	if (szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\n' && szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\r')						\
+	//		OutputDebugStringA(szDebugOutputString);																									\
+	//	} while(0);
 #endif
 
 /*

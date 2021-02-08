@@ -422,10 +422,10 @@ void TestNativeActivityTeapotEngine::UpdateFPS(float fps) {
   return;
 }
 
-#include "DreamTestClient.h"
+#include "DreamTestAndroidClient.h"
 
 TestNativeActivityTeapotEngine g_TestNativeActivityTeapotEngine;
-DreamTestClient g_DreamTestClient;
+DreamTestAndroidClient g_DreamTestAndroidClient;
 
 // This is the main entry point of a native application that is using
 // android_native_app_glue.  It runs in its own thread, with its own
@@ -433,7 +433,7 @@ DreamTestClient g_DreamTestClient;
 void android_main(android_app* pAndroidAppState) {
     RESULT r = R_PASS;
 
-    DEBUG_LINEOUT("TestClient:android_main starting ... ");
+    DEBUG_LINEOUT("TestAndroidClient:android_main starting ... ");
 
     g_TestNativeActivityTeapotEngine.SetState(pAndroidAppState);
 
@@ -452,10 +452,10 @@ void android_main(android_app* pAndroidAppState) {
     g_TestNativeActivityTeapotEngine.InitSensors();
 
     // Try out sticking the dream test client in here
-    g_DreamTestClient = DreamTestClient();
+    g_DreamTestAndroidClient = DreamTestAndroidClient();
     //CRM(g_DreamTestClient.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
-    CRM(g_DreamTestClient.Initialize(0, nullptr), "Failed to initialize Dream Garage");
-    CRM(g_DreamTestClient.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
+    CRM(g_DreamTestAndroidClient.Initialize(0, nullptr), "Failed to initialize Dream Garage");
+    CRM(g_DreamTestAndroidClient.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
 
     // loop waiting for stuff to do.
     while (true) {

@@ -49,6 +49,10 @@ enum class CLOUD_CONTROLLER_TYPE {
 	INVALID
 };
 
+class PeerConnectionObserver;
+class EnvironmentObserver;
+class UserObserver;
+
 class CloudControllerProxy : public ControllerProxy {
 public:
 	//virtual CLOUD_CONTROLLER_TYPE GetControllerType() = 0;
@@ -57,11 +61,12 @@ public:
 	virtual long GetUserAvatarID() = 0;
 };
 
-class CloudController : public Controller, 
-						public CloudControllerProxy,
-						public std::enable_shared_from_this<CloudController>, 
-						public EnvironmentController::EnvironmentControllerObserver,
-						public UserController::UserControllerObserver
+class CloudController : 
+	public Controller, 
+	public CloudControllerProxy,
+	public std::enable_shared_from_this<CloudController>, 
+	public EnvironmentController::EnvironmentControllerObserver,
+	public UserController::UserControllerObserver
 {
 protected:
 	typedef std::function<RESULT(PeerConnection*, const std::string&)> HandleDataChannelStringMessageCallback;
@@ -71,57 +76,7 @@ protected:
 	RESULT RegisterDataChannelMessageCallback(HandleDataChannelMessageCallback fnHandleDataChannelMessageCallback);
 
 public:
-	// TODO: Replace with proxy or observer better pattern this is getting out of control
-
-	class PeerConnectionObserver {
-	public:
-		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
-		virtual RESULT OnNewSocketConnection(int seatPosition) = 0;
-		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) = 0;
-		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) = 0;
-		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
-		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
-		virtual RESULT OnVideoFrame(const std::string &strVideoTrackLabel, PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
-		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) = 0;
-		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) = 0;
-	};
 	
-	class EnvironmentObserver {
-	public:
-		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
-		virtual RESULT OnReceiveAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
-		virtual RESULT OnStopSending(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
-		virtual RESULT OnStopReceiving(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
-		virtual RESULT OnCloseAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
-		virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
-		virtual RESULT OnShareAsset(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
-		virtual RESULT OnGetByShareType(std::shared_ptr<EnvironmentShare> pEnvironmentShare) = 0;
-
-		virtual RESULT OnOpenCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
-		virtual RESULT OnCloseCamera(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
-		virtual RESULT OnSendCameraPlacement() = 0;
-		virtual RESULT OnStopSendingCameraPlacement() = 0;
-		virtual RESULT OnReceiveCameraPlacement(long userID) = 0;
-		virtual RESULT OnStopReceivingCameraPlacement() = 0;
-	};
-
-	class UserObserver {
-	public:
-		virtual RESULT OnDreamVersion(version dreamVersion) = 0;
-		virtual RESULT OnAPIConnectionCheck(bool fIsConnected) = 0;
-
-		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation, bool fIsSet) = 0;
-		virtual RESULT OnSetSettings() = 0;
-
-		virtual RESULT OnLogin() = 0;
-		virtual RESULT OnLogout() = 0;
-		virtual RESULT OnPendLogout() = 0;
-		virtual RESULT OnSwitchTeams() = 0;
-
-		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
-		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) = 0;
-		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) = 0;
-	};
 
 	RESULT RegisterPeerConnectionObserver(PeerConnectionObserver* pPeerConnectionControllerObserver);
 	RESULT RegisterEnvironmentObserver(EnvironmentObserver* pEnvironmentObserver);
@@ -154,7 +109,7 @@ public:
 
 public:
 	CloudController();
-	~CloudController();
+	virtual ~CloudController();
 
 	// CloudControllerProxy
 	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override { return CLOUD_CONTROLLER_TYPE::CLOUD; }

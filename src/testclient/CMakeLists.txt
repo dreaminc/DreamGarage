@@ -16,13 +16,6 @@ file(GLOB WIN64_SOURCES
   "DreamTestClientMain.h"
 )
 
-file(GLOB ANDROID_SOURCES 
-  "TestClientTeapotRenderer.cpp"
-  "TestClientTeapotRenderer.h"
-  "TestClientNativeActivity.cpp"
-)
-
-
 # TODO: This should not be here!!!!!
 include_directories(${CMAKE_SOURCE_DIR}/src/third_party/webrtc/include/webrtc)
 

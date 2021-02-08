@@ -87,6 +87,14 @@ struct PrimParams;
 
 #include "DreamVideoStreamSubscriber.h"
 
+// Cloud Observers 
+#include "cloud/PeerConnectionObserver.h"
+#include "cloud/EnvironmentObserver.h"
+#include "cloud/UserObserver.h"
+
+class ControllerProxy;
+enum class CLOUD_CONTROLLER_TYPE;
+
 class DOSObserver {
 public:
 	virtual RESULT HandleDOSMessage(std::string& strMessage) = 0;
@@ -101,9 +109,9 @@ public:
 class DreamOS :
 	public Subscriber<CollisionObjectEvent>,
 	public valid,
-	public CloudController::PeerConnectionObserver,
-	public CloudController::EnvironmentObserver,
-	public CloudController::UserObserver,
+	public PeerConnectionObserver,
+	public EnvironmentObserver,
+	public UserObserver,
 	public DreamPeerApp::DreamPeerAppObserver,
 	public DreamSoundSystem::observer
 {
@@ -137,7 +145,7 @@ public:
 
 public:
 	DreamOS();
-	~DreamOS();
+	virtual ~DreamOS();
 
 	RESULT Initialize(int argc = 0, const char *argv[] = nullptr);
 	RESULT Start();
@@ -165,7 +173,7 @@ public:
 
 	RESULT RecenterHMD();
 
-	// PeerConnectionObserver
+	// PeerConnectionControllerObserver
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
 	virtual RESULT OnNewSocketConnection(int seatPosition) override = 0;
 	virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override;
@@ -176,7 +184,9 @@ public:
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
 
-	// EnvironmentObserver
+	
+	///*  TODO: Don't love that this is here
+	// EnvironmentControllerObserver
 	// TODO: This should be encapsulated in it's own object
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
 		return R_NOT_IMPLEMENTED_WARNING;
@@ -232,7 +242,7 @@ public:
 		return R_NOT_IMPLEMENTED_WARNING;
 	}
 
-	//User Observer
+	//User Controller Observer
 	virtual RESULT OnDreamVersion(version dreamVersion) override {
 		return R_NOT_IMPLEMENTED_WARNING;
 	}
@@ -276,6 +286,7 @@ public:
 	virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) override {
 		return R_NOT_IMPLEMENTED_WARNING;
 	}
+	//*/
 
 	// DreamPeer Observer
 	virtual RESULT OnDreamPeerStateChange(DreamPeerApp* pDreamPeer) override;
@@ -567,9 +578,9 @@ public:
 
 	// Cloud Controller
 protected:
-	RESULT RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver);
-	RESULT RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver);
-	RESULT RegisterUserObserver(CloudController::UserObserver *pUserObserver);
+	RESULT RegisterPeerConnectionObserver(PeerConnectionObserver *pPeerConnectionObserver);
+	RESULT RegisterEnvironmentObserver(EnvironmentObserver *pEnvironmentObserver);
+	RESULT RegisterUserObserver(UserObserver *pUserObserver);
 
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
@@ -618,7 +629,8 @@ public:
 	RESULT GetCredential(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType);
 	RESULT RemoveCredential(std::wstring wstrKey, CredentialManager::type credType);
 
-	virtual RESULT SaveCameraSettings(point ptPosition, quaternion qOrientation) = 0;
+	// TODO: This needs to be re-done
+	virtual RESULT SaveCameraSettings(point ptPosition, quaternion qOrientation) { return R_NOT_IMPLEMENTED_WARNING; }
 
 	bool IsSandboxInternetConnectionValid();
 
@@ -682,6 +694,7 @@ public:
 	std::shared_ptr<UIKeyboard> GetKeyboardApp();
 	std::shared_ptr<DreamUserApp> GetUserApp();
 
+	// TODO: Why is this here
 	virtual RESULT GetDefaultVCamPlacement(point& ptPosition, quaternion& qOrientation) {
 		return R_NOT_IMPLEMENTED_WARNING;
 	};
@@ -691,6 +704,7 @@ private:
 	UID m_uid;
 
 private:
+	// TODO: Why is this here?
 	RESULT ReleaseFont(std::wstring wstrFontFileName);
 	std::shared_ptr<font> GetFont(std::wstring wstrFontFileName);
 	RESULT ClearFonts();

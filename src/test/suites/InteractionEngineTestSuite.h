@@ -60,7 +60,7 @@ public:
 	RESULT AddTestCompositeRayController();
 
 	RESULT InitializeRayCompositeTest(void *pContext);
-	RESULT ResetTest(void *pContext);
+	RESULT ResetTest(void *pContext) override;
 	RESULT AddNestedCompositeQuads(int nestingLevel, float size, std::shared_ptr<composite> pCompositeParent);
 	
 

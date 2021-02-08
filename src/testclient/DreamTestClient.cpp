@@ -250,10 +250,6 @@ RESULT DreamTestClient::OnNewSocketConnection(int seatPosition) {
 	return R_NOT_IMPLEMENTED_WARNING;
 }
 
-RESULT DreamTestClient::SaveCameraSettings(point ptPosition, quaternion qOrientation) {
-	return R_NOT_IMPLEMENTED_WARNING;
-}
-
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch"
 RESULT DreamTestClient::Notify(SenseKeyboardEvent *kbEvent) {

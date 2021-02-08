@@ -79,7 +79,7 @@ public:
 
 	// Used for creating a clickable quad in tests
 public:
-	RESULT Notify(InteractionObjectEvent *pEvent);
+	RESULT Notify(InteractionObjectEvent *pEvent) override;
 	WebBrowserPoint GetRelativeBrowserPointFromContact(point ptIntersectionContact);
 
 private:

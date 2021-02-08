@@ -5,7 +5,7 @@
 #include <utility>
 #include <regex>
 
-#include "sandbox/PathManager.h"
+#include "path_manager/PathManager.h"
 
 #include "core/image/ImageFactory.h"
 
